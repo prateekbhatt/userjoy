@@ -1,0 +1,206 @@
+/*code for sticky footer*/
+
+html,
+body {
+  height: 100%;
+}
+
+
+/*Placeholder Font Color*/
+.form-control:-moz-placeholder {
+    color: #000000;
+}
+.form-control::-moz-placeholder {
+    color: #000000;
+}
+
+::-webkit-input-placeholder { /* WebKit browsers */
+    color: #000000;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+    color: #000000;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+    color: #000000;
+}
+:-ms-input-placeholder { /* Internet Explorer 10+ */
+    color: #000000;
+}
+/*Placeholder Font Color*/
+
+/* Remove box-shadow from focussed inputs */
+.form-control:focus {
+  box-shadow: none;
+  border-width: 2px;
+}
+
+/* Wrapper for page content to push down footer */
+#sticky-footer-wrap {
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  /* Negative indent footer by its height */
+  margin: 0 auto -60px;
+  /* Pad bottom by footer height */
+  padding: 0 0 60px;
+}
+
+/* Set the fixed height of the footer here */
+#sticky-footer {
+  height: 60px;
+}
+
+/* Lastly, apply responsive CSS fixes as necessary */
+@media (max-width: 767px) {
+  #sticky-footer {
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+/*code for sticky footer ends*/
+
+.navbar-brand {
+  font-size: 28px;
+  /*color: #2c3e50;*/
+}
+
+/*remove bottom margin from navbar*/
+.navbar-modified{
+  margin-bottom: 0;
+}
+
+/*container-content creates padding-top for the block partial*/
+.container-content {
+  padding-top: 20px;
+}
+
+/*remove bottom-margin on alert-bar*/
+.alert-bar {
+  margin-bottom: 0;
+  /*font-weight: bold;*/
+}
+
+#navbar-logout-btn {
+  color: #df2e1b;
+  background-color: #fff;
+  border-color: #df2e1b;
+}
+
+/*.horiz-bar {
+  background-color: #ffffff;
+  content: "";
+  display: inline-block;
+  height: 1px;
+  position: relative;
+  vertical-align: middle;
+  width: 50%;
+}
+/*
+.hidden-sm {
+  .hidden-sm {
+  display: inherit !important;
+}
+}*/
+
+/*
+Author: Start Bootstrap - http://startbootstrap.com
+'SB Admin' HTML Template by Start Bootstrap
+
+All Start Bootstrap themes are licensed under Apache 2.0.
+For more info and more free Bootstrap 3 HTML themes, visit http://startbootstrap.com!
+*/
+
+/* ATTN: This is mobile first CSS - to update 786px and up screen width use the media query near the bottom of the document! */
+
+/* Global Styles */
+
+#navbar-sidenav-wrapper {
+  padding-left: 0;
+}
+
+#navbar-sidenav-page-wrapper {
+  width: 100%;
+  padding: 5px 15px;
+}
+
+/*hide navbar brand on sidenav for smaller screens*/
+#navbar-brand-sidenav {
+  display: none;
+}
+
+/* Edit Below to Customize Widths > 768px */
+@media (min-width:768px) {
+
+  /* Wrappers */
+  #navbar-brand-sidenav {
+    display: block;
+  }
+
+  #navbar-sidenav-wrapper {
+    padding-left: 180px;
+  }
+
+  #navbar-sidenav-page-wrapper {
+    padding: 15px 25px;
+  }
+
+  /* Side Nav */
+
+  .navbar-sidenav {
+    margin-left: -180px;
+    left: 180px;
+    width: 180px;
+    position: fixed;
+    color: #2c3e50;
+    /*padding-top: 61px;*/
+    height: 100%;
+    border-radius: 0;
+    border: none;
+    background-color: #ecf0f1;
+    overflow-y: auto;
+  }
+
+  .navbar-default .navbar-sidenav>.active>a, .navbar-default .navbar-nav>.active>a:hover, .navbar-default .navbar-nav>.active>a:focus {
+    color: #fff;
+    background-color: #7f8c8d;
+  }
+
+  /* Bootstrap Default Overrides - Customized Dropdowns for the Side Nav */
+
+  .navbar-sidenav>li.dropdown>ul.dropdown-menu {
+  position: relative;
+  min-width: 180px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background-color: transparent;
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  }
+
+  .navbar-sidenav>li.dropdown>ul.dropdown-menu>li>a {
+  color: #999999;
+  padding: 15px 15px 15px 25px;
+  }
+
+  .navbar-sidenav>li.dropdown>ul.dropdown-menu>li>a:hover,
+  .navbar-sidenav>li.dropdown>ul.dropdown-menu>li>a.active,
+  .navbar-sidenav>li.dropdown>ul.dropdown-menu>li>a:focus {
+  color: #fff;
+  background-color: #080808;
+  }
+
+  .navbar-sidenav>li>a {
+  width: 180px;
+  }
+
+  .navbar-inverse .navbar-nav>li>a:hover,
+  .navbar-inverse .navbar-nav>li>a:focus {
+  background-color: #080808;
+  }
+
+}
