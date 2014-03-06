@@ -40,6 +40,6 @@ nbproject
 
 
 ########################
-# local config
+# local config (INFO: Do Not ignore the local js file)
 ########################
-config/local.js
+# config/local.js
