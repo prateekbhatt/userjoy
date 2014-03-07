@@ -1,2 +1,0 @@
-# dashboard
-### a Sails application
