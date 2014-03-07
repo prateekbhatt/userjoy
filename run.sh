@@ -12,6 +12,19 @@ if ! ([[ $1 == 'development' ]] || [[ $1 == 'production' ]]); then
 
 fi
 
+# FIXME
+if [[ $1 == 'production' ]]; then
+
+  echo "NOTE: node-args is not being passed to individual processes by pm2"
+  echo "Unless that works the app cannot be started in production environment"
+  echo "Another approach would be to create separate development.js and"
+  echo "production.js files inside the applications which in turn call"
+  echo "app.js with the right arguments"
+
+  exit 1
+
+fi
+
 if [[ $1 == 'development' ]]; then
 
   APPENV=dev
@@ -25,7 +38,8 @@ fi
 cd apps/website
 
 echo 'Running website ...'
-if pm2 start app.js --name website --port=8000 --$APPENV; then
+# FIXME --node-args not working
+if pm2 start app.js --name website --node-args="--port=8000 --$APPENV"; then
   echo "website is running"
 else
   echo "website already running. restarting ..."
@@ -35,7 +49,8 @@ fi
 cd ../dashboard
 
 echo 'Running dashboard ...'
-if pm2 start app.js --name dashboard --port=8001 --$APPENV; then
+# FIXME --node-args not working
+if pm2 start app.js --name dashboard --node-args="--port=8001 --$APPENV"; then
   echo "dashboard is running"
 else
   echo "dashboard already running. restarting ..."
