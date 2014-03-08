@@ -1,44 +1,32 @@
 #!/bin/bash
 
-# store path to directory in which script is present
-SETUPDIR=$( cd $(dirname $0) ; pwd -P )
-echo 'Setup directory is', $SETUPDIR
-cd $SETUPDIR
+# Terminate after the first line that fails (returns nonzero exit code)
+set -e
 
-# First argument is expected to define environment
-# either 'production' or 'development'
-if ! ([[ $1 == 'development' ]] || [[ $1 == 'production' ]]); then
+bash ./setup/check-env-arg.sh $1
 
-  echo 'Error: First argument must be either "development" or "production"'
-  exit 1
-
-fi
-
-echo 'Installing' $1 'environment for DoDataDo ...'
+echo 'Installing' $1 'environment for DoDataDo ...' $(pwd)
 
 sudo apt-get update -y
 
 if [[ $1 == 'development' ]]; then
-
-  sudo bash ./add-hosts.sh
-
+  bash ./setup/add-hosts.sh
 fi
 
 # setup nginx
-sudo bash ./nginx/setup.sh $1
+bash ./setup/nginx/setup.sh $1
 
-# go back to setup directory
-cd $SETUPDIR
-unset SETUPDIR
+bash ./setup/install-npm-global-dependencies.sh
+bash ./setup/install-npm-project-dependencies.sh
 
-sudo bash ./install-npm-global-dependencies.sh
-
-bash ./install-apps.sh
+bash ./setup/install-apps.sh
 
 # make run.sh executable
-sudo chmod u+x ../run.sh
+sudo chmod u+x ./run.sh
 
-# start application
-echo 'To start the application, run:
-bash run.sh'
-# sh ../run.sh
+# create symlink of bin/dodatado.js in /usr/loca/bin/dodatado
+sudo ln -sf $(pwd)/bin/dodatado.js /usr/local/bin/dodatado
+
+bash ./setup/print-instructions.sh
+
+exit 0

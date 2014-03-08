@@ -1,22 +1,21 @@
 #!/bin/bash
 
+set -e
+
 echo 'Installing applications for DoDataDo ...'
 
-# store path to directory in which script is present
-APPSSETUPDIR=$( cd $(dirname $0) ; pwd -P )
-echo 'Setup directory is', $APPSSETUPDIR
-cd $APPSSETUPDIR
+cd apps
 
-cd ../apps/website
+cd website
 echo 'Downloading npm modules for website app ...' $(pwd)
-sudo npm install -y
-bower install -y
+npm install -y
+bower install
+cd ..
 
-cd ../dashboard
+cd dashboard
 echo 'Downloading npm modules for dashboard app ...' $(pwd)
-sudo npm install -y
-bower install -y
-
-unset APPSSETUPDIR
+npm install -y
+bower install
+cd ..
 
 exit 0

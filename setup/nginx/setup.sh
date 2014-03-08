@@ -1,35 +1,30 @@
 #!/bin/bash
 
-# store path to directory in which script is present
-NGINXSETUPDIR=$( cd $(dirname $0) ; pwd -P )
-cd $NGINXSETUPDIR
+# Terminate after the first line that fails (returns nonzero exit code)
+set -e
 
-# First argument is expected to define environment
-# either 'production' or 'development'
-if ! ([[ $1 == 'development' ]] || [[ $1 == 'production' ]]); then
+echo 'Installing nginx'
+# TODO: Must install nginx > 1.4 for websockets support
+sudo apt-get install nginx -y
 
-  echo 'Error: First argument must be either "development" or "production"'
-  exit 1
+echo 'Stopping process running on port 80 (free it up for nginx)'
+sudo fuser -k 80/tcp
 
-else
-
-  echo 'Installing nginx'
-  # TODO: Must install nginx > 1.4 for websockets support
-  sudo apt-get install nginx -y
-
-  echo 'Stopping process running on port 80 (free it up for nginx)'
-  sudo fuser -k 80/tcp
-
-  echo 'Starting nginx server'
-  sudo service nginx start
-
-fi
+echo 'Starting nginx server'
+sudo service nginx start
 
 # Copy the config files in nginx/sites-available
 if [[ $1 == 'development' ]]; then
 
-  echo 'Copying nginx development files to sites-available' $(pwd)
-  sudo cp -f ./development/* /etc/nginx/sites-available/
+  declare -a DO_APPS=( "website" "dashboard" "api" )
+
+  echo 'Copying nginx development files to sites-available and'
+  echo 'creating symlinks for nginx config files from sites-available to sites-enabled'
+
+  for app in "${DO_APPS[@]}"; do
+    sudo cp -f ./setup/nginx/development/app-$app /etc/nginx/sites-available/
+    sudo ln -sf /etc/nginx/sites-available/app-$app /etc/nginx/sites-enabled/app-$app
+  done
 
 elif [[ $1 == 'production' ]]; then
 
@@ -39,20 +34,11 @@ elif [[ $1 == 'production' ]]; then
 
 fi
 
-echo 'Creating symlinks for nginx config files from sites-available to sites-enabled'
-cd /etc/nginx/sites-enabled/
-
-sudo ln -s /etc/nginx/sites-available/app-api app-api
-sudo ln -s /etc/nginx/sites-available/app-dashboard app-dashboard
-sudo ln -s /etc/nginx/sites-available/app-website app-website
-
 # TODO: To ensure that nginx will be up after reboots,
 # it’s best to add it to the startup.
 # update-rc.d nginx defaults
 
 echo 'Restarting nginx'
 sudo service nginx restart
-
-unset NGINXSETUPDIR
 
 exit 0

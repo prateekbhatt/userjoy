@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 echo 'Adding do, app.do, api.do /etc/hosts'
 
 ETCHOSTFILE=/etc/hosts
