@@ -34,21 +34,31 @@ var jsFilesToInject = [
   // Below, as a demonstration, you'll see the built-in dependencies
   // linked in the proper order order
 
-  // Bring in the socket.io client
-  'js/socket.io.js',
-
-  // then beef it up with some convenience logic for talking to Sails.js
-  'js/sails.io.js',
-
-  // finally, include a simple boilerplate script that connects a socket
-  // to the Sails backend with some example code
-  'js/connection.example.js',
-
   //
   // *->    you might put other dependencies like jQuery or Angular here   <-*
   //
-  'bower_components/jquery/dist/jquery.js',
-  'bower_components/bootstrap/dist/js/bootstrap.js',
+  'bower_components/angular/angular.js',
+  'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
+  'bower_components/angular-ui-router/release/angular-ui-router.js',
+  'bower_components/angular-ui-utils/modules/route/route.js',
+  'bower_components/moment/moment.js',
+  'bower_components/angular-moment/angular-moment.js',
+  'bower_components/lodash/dist/lodash.js',
+  'bower_components/angular-lodash/angular-lodash.js',
+
+  // Bring in the socket.io client
+  // 'js/sockets/socket.io.js',
+  // 'bower_components/socket.io-client/dist/socket.io.min.js',
+
+  // then beef it up with some convenience logic for talking to Sails.js
+  // 'js/sockets/sails.io.js',
+  // 'bower_components/angular-sails/angular-sails.js',
+  // 'bower_components/bower-sails.io/sails.io.js',
+
+  // finally, include a simple boilerplate script that connects a socket
+  // to the Sails backend with some example code
+  // 'js/sockets/connection.example.js',
+
 
   // All of the rest of your app scripts
   'js/**/*.js'
@@ -78,12 +88,13 @@ var templateFilesToInject = [
 // Prefix relative paths to source files so they point to the proper locations
 // (i.e. where the other Grunt tasks spit them out, or in some cases, where
 // they reside in the first place)
-module.exports.cssFilesToInject = cssFilesToInject.map(function(path) {
+module.exports.cssFilesToInject = cssFilesToInject.map(function (path) {
   return '.tmp/public/' + path;
 });
-module.exports.jsFilesToInject = jsFilesToInject.map(function(path) {
+module.exports.jsFilesToInject = jsFilesToInject.map(function (path) {
   return '.tmp/public/' + path;
 });
-module.exports.templateFilesToInject = templateFilesToInject.map(function(path) {
+module.exports.templateFilesToInject = templateFilesToInject.map(function (
+  path) {
   return 'assets/' + path;
 });
