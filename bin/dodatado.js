@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 var program = require('commander'),
-  pm2 = require('pm2'),
   shell = require('shelljs'),
   start = require('./start'),
   cowsay = require('./cowsay'),
