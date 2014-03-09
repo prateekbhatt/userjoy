@@ -2,7 +2,7 @@
 
 var shell = require('shelljs'),
   path = require('path'),
-  APPS = ["website", "dashboard"],
+  APPS = ["website", "dashboard", "api"],
   ENVS = ['development', 'production'],
   _ = require('lodash');
 
