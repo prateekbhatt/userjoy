@@ -53,6 +53,14 @@ program
   });
 
 program
+  .command('logs [app]')
+  .description('logs output to console')
+  .action(function (app) {
+    app = app || '';
+    shell.exec('pm2 logs ' + app);
+  });
+
+program
   .command('cowsay [what]')
   .description('NO MOO')
   .action(function (moo) {
