@@ -5,7 +5,12 @@ set -e
 
 echo 'Installing nginx'
 # TODO: Must install nginx > 1.4 for websockets support
-sudo apt-get install nginx -y
+sudo echo "deb http://ppa.launchpad.net/nginx/release/ubuntu $(lsb_release -cs) main" >> /etc/apt/sources.list
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C300EE8C
+
+sudo apt-get update
+sudo apt-get install nginx -yf
+
 
 echo 'Stopping process running on port 80 (free it up for nginx)'
 sudo fuser -k 80/tcp
