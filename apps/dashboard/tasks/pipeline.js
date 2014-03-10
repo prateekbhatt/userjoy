@@ -21,6 +21,7 @@ var cssFilesToInject = [
 
   // NOTE: put required bower dependencies here
   // e.g. 'bower_components/bootstrap/dist/css/bootstrap.css',
+  'bower_components/ng-table/ng-table.css',
 
   // all other styles go below
   'styles/**/*.css'
@@ -45,6 +46,7 @@ var jsFilesToInject = [
   'bower_components/angular-moment/angular-moment.js',
   'bower_components/lodash/dist/lodash.js',
   'bower_components/angular-lodash/angular-lodash.js',
+  'bower_components/ng-table/ng-table.js',
 
   // Bring in the socket.io client
   // 'js/sockets/socket.io.js',
