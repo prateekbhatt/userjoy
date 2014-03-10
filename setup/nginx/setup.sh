@@ -4,13 +4,12 @@
 set -e
 
 echo 'Installing nginx'
+# TODO: Install only when the latest nginx is not already installed / running
 # TODO: Must install nginx > 1.4 for websockets support
-sudo echo "deb http://ppa.launchpad.net/nginx/release/ubuntu $(lsb_release -cs) main" >> /etc/apt/sources.list
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C300EE8C
-
+# REF: https://www.digitalocean.com/community/articles/how-to-install-the-latest-version-of-nginx-on-ubuntu-12-10
+sudo add-apt-repository ppa:nginx/stable
 sudo apt-get update
 sudo apt-get install nginx -yf
-
 
 echo 'Stopping process running on port 80 (free it up for nginx)'
 sudo fuser -k 80/tcp
