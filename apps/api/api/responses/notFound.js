@@ -3,7 +3,7 @@
  *
  * Usage:
  * return res.notFound();
- * 
+ *
  * NOTE:
  * If no user-defined route, blueprint route, or static file matches
  * the requested URL, Sails will call `res.notFound()`.
@@ -23,18 +23,22 @@ module.exports = function notFound() {
   };
 
   // If the user-agent wants a JSON response, send json
-  if (req.wantsJSON) {
-    return res.json(result, result.status);
-  }
+  // if (req.wantsJSON) {
+  //   return res.json(result, result.status);
+  // }
 
-  res.status(result.status);
-  res.render(viewFilePath, function(err) {
-    // If the view doesn't exist, or an error occured, send json
-    if (err) {
-      return res.json(result, result.status);
-    }
+  // res.status(result.status);
+  // res.render(viewFilePath, function(err) {
+  //   // If the view doesn't exist, or an error occured, send json
+  //   if (err) {
+  //     return res.json(result, result.status);
+  //   }
 
-    // Otherwise, serve the `views/404.*` page
-    res.render(viewFilePath);
-  });
+  //   // Otherwise, serve the `views/404.*` page
+  //   res.render(viewFilePath);
+  // });
+
+  // NOTE: Send json response (no http response)
+  result.message = "Endpoint '" + req.path + "' does not exist";
+  return res.json(result, result.status);
 };
