@@ -1,0 +1,8 @@
+--require should
+--ui bdd
+--recursive
+--reporter spec
+--growl
+--slow 30
+--check-leaks
+--globals Accounts,_,async,sails
