@@ -5,4 +5,5 @@
 --growl
 --slow 30
 --check-leaks
---globals Accounts,_,async,sails
+--globals Accounts,_,async,sails,request,CookieAccessInfo,Cookie,CookieJar
+

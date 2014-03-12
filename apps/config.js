@@ -3,7 +3,40 @@
  */
 
 var path = require('path'),
-  _ = require('lodash');
+  _ = require('lodash'),
+
+  BASE_URLS = {
+    development: 'do.localhost',
+    production: 'dodatado.com'
+  },
+
+  PORTS = {
+    website: 8000,
+    dashboard: 8001,
+    api: 8002
+  };
+
+function getBaseUrl(env) {
+  return BASE_URLS[env];
+}
+
+function getPort(appName) {
+  return PORTS[appName];
+}
+
+/**
+ * Hostnames for each app
+ * e.g., in production environment:
+ * dashboard: app.dodatado.com
+ */
+function getHosts(url) {
+  var hosts = {
+    website: 'http://' + url,
+    dashboard: 'http://' + 'app.' + url,
+    api: 'http://' + 'api.' + url
+  };
+  return hosts;
+}
 
 /**
  * General config settings for all apps
@@ -15,39 +48,11 @@ module.exports = function (env, appName) {
 
   var config = {};
 
-  var ports = {
-    website: 8000,
-    dashboard: 8001,
-    api: 8002
-  };
-
-  config.port = ports[appName];
-
   config.environment = env;
-
-  var baseUrl = {
-    development: 'do.localhost',
-    production: 'dodatado.com'
-  };
-
-  config.baseUrl = baseUrl[env];
-
-  /**
-   * Hostnames for each app
-   * e.g., in production environment:
-   * dashboard: app.dodatado.com
-   */
-  config.hosts = {};
-
-  (function (url) {
-
-    config.hosts = {
-      website: 'http://' + url,
-      dashboard: 'http://' + 'app.' + url,
-      api: 'http://' + 'api.' + url
-    };
-
-  })(config.baseUrl);
+  config.port = getPort(appName);
+  config.baseUrl = getBaseUrl(env);
+  config.hosts = getHosts(config.baseUrl);
+  config.appUrl = config.hosts[appName];
 
   return config;
 
