@@ -1,0 +1,92 @@
+<div class="col-md-9">
+    <div style="border-left: 1px solid #ecf0f1;">
+        <br>
+        <br>
+        <br>
+        <div>
+            <div>
+                <div class="caption-full">
+                    <form name="signup_form" novalidate ng-submit="signupForm()">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-1 col-md-offset-1 text-center">
+                                    <p style="font-size:20px">NAME &nbsp;&nbsp;</p>
+                                </div>
+                                <div class="col-md-5">
+                                    <input type="text" class="form-control" name="name" ng-model="field" required>
+                                    <br>
+                                    <div class="alert alert-info text-center" ng-show="signup_form.name.$error.required" style="background-color: #d9edf7; border-color: #bce8f1; padding: 7px">
+                                        <small class="error" ng-show="signup_form.name.$error.required" style="color: #31708f">
+                                        Enter a name to define your segment.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-1 col-md-offset-1 text-center">
+                                    <p style="font-size:20px">TYPE &nbsp;&nbsp;</p>
+                                </div>
+                                <div class="col-md-10">
+                                    <button type="button" class="btn btn-default" bs-dropdown="dropdown">Choose
+                                    <i class="fa fa-caret-down"> </i>
+                                    </button>
+                                </div>
+                                <br>
+                                <br>
+                                <br>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="row" ng-show="true" ng-repeat="filter in filters">
+                                <div class="col-md-1 col-md-offset-1 text-center">
+                                    <p style="font-size:20px" ng-show="$first">FILTER</p>
+                                    <a style="font-size:20px; cursor:pointer; cursor:hand" ng-show="!$first" ng-click="switchAndOr()">{{text}}</a>
+                                </div>
+                                <div class="col-md-10">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <button type="button" class="btn btn-default" bs-dropdown="dropdown" value="filter.segment">
+                                            <span>{{selectedSegment.name}}</span>
+                                            <i class="fa fa-caret-down"> </i>
+                                            </button>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <button type="button" class="btn btn-default" bs-dropdown="query" >
+                                            <span>{{selectedQuery.name}}</span>
+                                            <i class="fa fa-caret-down"> </i>
+                                            </button>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <input type="text" class="form-control" placeholder="Value" ng-model="filter.value">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <a class="btn btn-default fa fa-times" ng-click="removeFilter(filter)"></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <br>
+                                <br>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-md-4 col-sm-push-1">
+                                    <button class="btn btn-info" ng-click="addAnotherFilter()" ng-show="true" ng-disabled="!field.length">
+                                    <i class="fa fa-plus-square"></i>
+                                    Add Filter
+                                    </button>
+                                </div>
+                            </div>
+                            <hr>
+                            <br>
+                            &nbsp;&nbsp;
+                            <button class="btn btn-info" ng-disabled="!field.length">Create Segment</button>
+                            <br>
+                            <br>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
