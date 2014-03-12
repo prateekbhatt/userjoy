@@ -1,6 +1,3 @@
-var request = require('supertest');
-
-request = request('http://api.do.localhost/');
 
 describe('GET /', function () {
 
