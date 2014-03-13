@@ -31,7 +31,9 @@
     "font-awesome": "~4.0.3",
     "angular-strap": "2.0.0-rc.3",
     "angular-motion": "~0.3.2",
-    "angular-sanitize": "~1.2.14"
+    "angular-sanitize": "~1.2.14",
+    "angular-route": "~1.2.14",
+    "textAngular": "~1.2.0"
   },
   "resolutions": {
     "jquery": "2.0.0",
