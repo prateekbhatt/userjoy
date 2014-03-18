@@ -3,7 +3,7 @@
  *
  * ---------------------------------------------------------------
  *
- * Watch for changes on files in the `assets` folder,
+ * Watch for changes on files in the `api` folder,
  * and re-run the appropriate tasks.
  *
  * For usage docs see:
@@ -17,15 +17,10 @@ module.exports = function(grunt) {
 
 			// API files to watch:
 			files: ['api/**/*']
-		},
-		assets: {
 
-			// Assets to watch:
-			files: ['assets/**/*', 'tasks/pipeline.js'],
-
-			// When assets are changed:
-			tasks: ['syncAssets' , 'linkAssets']
-		}
+			// When api files are changed:
+			tasks: []
+    }
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-watch');
