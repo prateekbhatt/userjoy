@@ -206,18 +206,22 @@ describe('Resource /accounts', function () {
 
   });
 
-  describe('PUT /accounts/:id', function () {
+  describe('PUT /accounts/:id/name', function () {
 
-    it('updates account', function (done) {
+    it('updates account name', function (done) {
+
+      var newName = 'PrattBhatt';
 
       request
-        .put('/accounts/' + savedFirstAccount._id)
+        .put('/accounts/' + savedFirstAccount._id + '/name')
+        .send({
+          name: newName
+        })
         .expect('Content-Type', /json/)
         .expect(200)
-        .expect()
         .expect(function (res) {
-          if (!res.body.emailVerified === true) {
-            return 'Email verification not working';
+          if (!res.body.name === newName) {
+            return 'Name was not updated';
           }
         })
         .end(done);
