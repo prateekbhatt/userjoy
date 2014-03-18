@@ -4,6 +4,7 @@
 
 var mongoose = require('mongoose'),
   bcrypt = require('bcrypt'),
+  crypto = require('crypto'),
   Schema = mongoose.Schema,
   troop = require('mongoose-troop'),
   async = require('async'),
@@ -41,7 +42,13 @@ var AccountSchema = new Schema({
     select: false
   },
 
-  verified: {
+  // email verification token
+  verifyToken: {
+    type: String,
+    select: false
+  },
+
+  emailVerified: {
     type: Boolean,
     default: false
   }
@@ -63,6 +70,7 @@ AccountSchema.plugin(troop.timestamp, {
 
 /**
  * Bcrypt middleware to hash passwords
+ * before creating / updating record
  */
 
 AccountSchema.pre('save', function (next) {
@@ -95,17 +103,97 @@ AccountSchema.pre('save', function (next) {
 
 
 /**
+ * Middleware to generate an email verification token
+ * when a new account is created
+ */
+AccountSchema.pre('save', function (next) {
+
+  var user = this;
+
+  // email verification token should
+  // be created only for new users
+  if (!user.isNew) {
+    return next();
+  }
+
+  createToken(function (err, token) {
+
+    user.verifyToken = token;
+    next();
+
+  });
+
+});
+
+
+/**
  * Check if input password is right
  * @param  {string}   candidatePassword password input
  * @param  {Function} cb                callback function
  */
 
 AccountSchema.methods.comparePassword = function (candidatePassword, cb) {
-  bcrypt.compare(candidatePassword, this.pass, function (err, isMatch) {
+  bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
     if (err) return cb(err);
     cb(null, isMatch);
   });
 };
+
+
+/**
+ * Verify email
+ * @param  {string}   accountId
+ * @param  {string}   token     email verification token
+ * @param  {Function} cb        callback
+ */
+AccountSchema.statics.verify = function (accountId, token, cb) {
+
+  Account
+    .findById(accountId)
+    .select('verifyToken emailVerified')
+    .exec(function (err, account) {
+
+      if (err) {
+        return cb(err);
+      }
+
+      if (account.verifyToken !== token) {
+        return cb(new Error('Invalid Token'));
+      }
+
+      account.emailVerified = true;
+      account.verifyToken = undefined;
+      account.save(cb);
+
+    });
+}
+
+
+/**
+ * Generate a random token for:
+ * - email verification
+ * - password reset
+ * @param  {Function} cb callback function
+ */
+function createToken(cb) {
+
+  // create a random string
+  crypto.randomBytes(48, function (ex, buf) {
+
+    // make the string url safe
+    var token = buf.toString('base64')
+      .replace(/\//g, '_')
+      .replace(/\+/g, '-');
+
+    // shorten it
+    token = token
+      .toString()
+      .slice(1, 24);
+
+    cb(null, token);
+  });
+};
+
 
 // Remember Me implementation helper method
 // AccountSchema.methods.generateRandomToken = function () {
@@ -136,6 +224,6 @@ AccountSchema.methods.comparePassword = function (candidatePassword, cb) {
 // };
 
 
-var _model = mongoose.model('Account', AccountSchema);
+var Account = mongoose.model('Account', AccountSchema);
 
-module.exports = _model;
+module.exports = Account;

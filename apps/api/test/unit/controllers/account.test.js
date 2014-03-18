@@ -95,7 +95,7 @@ describe('Resource /accounts', function () {
         .get('/accounts/' + savedFirstAccount._id)
         .expect('Content-Type', /json/)
         .expect(function (res) {
-          if (!!res.body.password) {
+          if ( !! res.body.password) {
             return 'Returning password';
           }
         })
@@ -175,6 +175,50 @@ describe('Resource /accounts', function () {
         .expect({
           "error": ["password is required"],
           "status": 400
+        })
+        .end(done);
+
+    });
+
+  });
+
+  describe('GET /accounts/:id/verify-email/:token', function () {
+
+    it('updates email verified status to true', function (done) {
+
+      var url = '/accounts/' +
+        savedFirstAccount._id +
+        '/verify-email/' +
+        savedFirstAccount.verifyToken;
+
+      request
+        .get(url)
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .expect(function (res) {
+          if (!res.body.emailVerified === true) {
+            return 'Email verification not working';
+          }
+        })
+        .end(done);
+
+    });
+
+  });
+
+  describe('PUT /accounts/:id', function () {
+
+    it('updates account', function (done) {
+
+      request
+        .put('/accounts/' + savedFirstAccount._id)
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .expect()
+        .expect(function (res) {
+          if (!res.body.emailVerified === true) {
+            return 'Email verification not working';
+          }
         })
         .end(done);
 
