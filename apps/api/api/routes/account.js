@@ -3,7 +3,8 @@
  */
 
 var router = require('express')
-  .Router();
+  .Router(),
+  async = require('async');
 
 /**
  * Models
@@ -73,6 +74,8 @@ router.post('/', function (req, res, next) {
         return next(err);
       }
 
+      // TODO : Send Verification Email Here
+
       res.json(acc, 201);
     });
 
@@ -111,6 +114,42 @@ router.get('/:id/verify-email/:token', function (req, res, next) {
       res.json(account, 200);
 
     });
+
+});
+
+
+/**
+ * PUT /accounts/:id
+ * Update account
+ */
+
+router.put('/:id/name', function (req, res, next) {
+
+
+  async.waterfall([
+
+    function (cb) {
+
+      Account.findById(req.params.id, cb);
+
+    },
+
+    function (account, cb) {
+
+      account.name = req.body.name;
+      account.save(cb);
+
+    },
+
+  ], function (err, account) {
+
+    if (err) {
+      return next(err);
+    }
+
+    res.json(account, 200);
+
+  });
 
 });
 
