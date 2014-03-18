@@ -153,4 +153,36 @@ router.put('/:id/name', function (req, res, next) {
 
 });
 
+/**
+ * PUT /accounts/:id
+ * Update account
+ */
+
+router.put('/reset-password', function (req, res, next) {
+
+
+  Account.createResetPasswordToken(req.body.email, function (err, account) {
+
+    if (err) {
+
+      if (err.message === 'Invalid Email') {
+
+        return res.json({
+          error: 'Provide a valid email',
+          status: 400
+        }, 400);
+
+      }
+
+      return next(err);
+    }
+
+    // TODO : Send reset password mail here
+
+    res.json(account, 200);
+
+  });
+
+});
+
 module.exports = router;
