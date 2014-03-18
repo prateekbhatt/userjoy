@@ -89,6 +89,21 @@ describe('Resource /accounts', function () {
 
     });
 
+    it('should not return password', function (done) {
+
+      request
+        .get('/accounts/' + savedFirstAccount._id)
+        .expect('Content-Type', /json/)
+        .expect(function (res) {
+          if (!!res.body.password) {
+            return 'Returning password';
+          }
+        })
+        .expect(200)
+        .end(done);
+
+    });
+
     it('returns error if no account with id is present',
       function (done) {
 
