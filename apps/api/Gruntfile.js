@@ -1,7 +1,7 @@
 /**
  * Gruntfile
  *
- * This Node script is executed when you run `grunt` or `sails lift`.
+ * This Node script is executed when you run `grunt` or `npm start`.
  * It's purpose is to load the Grunt tasks in your project's `tasks`
  * folder, and allow you to add and remove tasks as you see fit.
  * For more information on how this works, check out the `README.md`
@@ -22,9 +22,6 @@ module.exports = function(grunt) {
 		includeAll = require('include-all');
 	} catch (e0) {
 		try {
-			includeAll = require('sails/node_modules/include-all');
-		}
-		catch(e1) {
 			console.error('Could not find `include-all` module.');
 			console.error('Skipping grunt tasks...');
 			console.error('To fix this, please run:');
@@ -33,7 +30,7 @@ module.exports = function(grunt) {
 
 			grunt.registerTask('default', []);
 			return;
-		}
+    }
 	}
 
 

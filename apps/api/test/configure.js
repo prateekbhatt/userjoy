@@ -1,109 +1,83 @@
-var Sails = require('sails'),
+var loadApp = require('../load'),
+  mongoose = require('mongoose'),
 
-  // create a variable to hold the instantiated sails server
-  app,
-
-  DbServer = require('../node_modules/sails-mongo/node_modules/mongodb')
-    .Server,
-  Db = require('../node_modules/sails-mongo/node_modules/mongodb')
-    .Db;
+  TEST_URL = 'http://localhost:3000';
 
 
-function createConnection(config, cb) {
-  var safe = config.safe ? 1 : 0;
-  var server = new DbServer(config.host, config.port, {
-    native_parser: config.nativeParser,
-    auth: {
-      user: config.user,
-      password: config.password
-    }
-  });
-  var db = new Db(config.database, server, {
-    w: safe,
-    native_parser: config.nativeParser
-  });
-
-  db.open(function (err) {
-    if (err) return cb(err);
-    if (db.serverConfig.options.auth.user && db.serverConfig.options.auth.password) {
-      return db.authenticate(db.serverConfig.options.auth.user, db.serverConfig
-        .options.auth.password, function (err, success) {
-          if (success) return cb(null, db);
-          if (db) db.close();
-          return cb(err ? err : new Error('Could not authenticate user ' +
-            auth[0]), null);
-        });
-    }
-
-    return cb(null, db);
-  });
-}
+/**
+ * Drop the test database
+ */
 
 function dropDb(cb) {
-  createConnection(sails.config.connections.mongo, function (err, db) {
-    db.dropDatabase(function () {
-      printMessage('Test database dropped');
-      cb();
-    });
+  mongoose.connection.db.dropDatabase(function () {
+
+    console.log();
+    console.log('  Dropped DB');
+    console.log();
+    console.log();
+
+    cb();
   });
 }
 
+
+/**
+ * Add commonly used modules to Globals
+ */
+
 function defineGlobals() {
-  global.request = require('supertest')(sails.config.appUrl);
+  global.request = require('supertest')(TEST_URL);
 }
 
-function printMessage(text) {
-  console.log('------------------------------');
-  console.log('     ', text);
-  console.log('------------------------------');
-  return;
+
+/**
+ * Start api server
+ */
+
+function startServer(done) {
+  loadApp.start(done);
 }
 
-// Global before hook
+
+/**
+ * Set node environment to test
+ */
+
+function setTestEnv() {
+  process.env.NODE_ENV = 'test';
+}
+
+/**
+ * Define the global before hook
+ * for the mocha tests
+ */
+
 before(function (done) {
-  this.timeout(10000);
-  // Lift Sails and start the server
-  Sails.lift({
 
-    log: {
-      level: 'error'
-    },
+  setTestEnv();
 
-  }, function (err, sails) {
+  startServer(function (err, db) {
 
-    if (!err) {
-      printMessage("Test server lifted");
+    if (err) {
+      return done(err);
     }
-
-    app = sails;
 
     defineGlobals();
 
-    if (err) {
-      return done(err);
-    }
-
-    dropDb(function () {
-      done(err, sails);
-    });
+    dropDb(done);
 
   });
+
 });
 
-// Global after hook
+
+/**
+ * Define the global after hook
+ * for the mocha tests
+ */
+
 after(function (done) {
-  app.lower(function (err) {
 
-    if (!err) {
-      console.log('\n\n');
-      printMessage("Test server lowered");
-    }
+  dropDb(done);
 
-    if (err) {
-      return done(err);
-    }
-
-    // dropDb(done);
-    done();
-  });
 });
