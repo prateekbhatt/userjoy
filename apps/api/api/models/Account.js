@@ -48,6 +48,12 @@ var AccountSchema = new Schema({
     select: false
   },
 
+  // password reset token
+  passwordResetToken: {
+    type: String,
+    select: false
+  },
+
   emailVerified: {
     type: Boolean,
     default: false
@@ -166,6 +172,67 @@ AccountSchema.statics.verify = function (accountId, token, cb) {
       account.save(cb);
 
     });
+}
+
+
+/**
+ * Create a reset password token
+ * @param  {string}   email email of the user
+ * @param  {Function} fn    callback function
+ */
+AccountSchema.statics.createResetPasswordToken = function (email, fn) {
+
+  if (!email) {
+    return fn(new Error('Invalid Email'));
+  }
+
+  async.waterfall([
+
+    // find account
+    function (cb) {
+
+      Account.findOne({
+
+        email: email
+
+      }, function (err, account) {
+
+        if (err) {
+          return cb(err);
+        }
+
+        if (!account) {
+          return cb(new Error('Not Found'));
+        }
+
+        cb(null, account);
+      });
+
+    },
+
+    // createToken
+    function (account, cb) {
+
+      createToken(function (err, token) {
+        cb(err, account, token)
+      });
+
+    },
+
+    // save password reset token
+    function (account, token, cb) {
+
+      account.passwordResetToken = token;
+      account.save(cb);
+
+    }
+
+  ], function (err, account) {
+
+    fn(err, account);
+
+  });
+
 }
 
 

@@ -31,9 +31,9 @@ Stores accounts on DoDataDo
 - email
 - name
 - password
-- timezone
+- verifyToken
 - emailVerified (boolean)
-- apps [apps that this account has access to]
+- passwordResetToken
 - createdAt
 - updatedAt
 
@@ -57,6 +57,7 @@ Stores accounts on DoDataDo
 >
 > - Should be valid for 24 hours since createdAt.
 > - Cron job should delete tokens older than 24 hours.
+> - UPDATE: Currently tokens are being stored in Account Model in `verifyToken` and `passwordResetToken` fields
 >
 > ### Account Sessions
 >

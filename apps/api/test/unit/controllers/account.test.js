@@ -230,4 +230,40 @@ describe('Resource /accounts', function () {
 
   });
 
+  describe('PUT /accounts/reset-password', function () {
+
+    it('creates a reset password token', function (done) {
+
+      request
+        .put('/accounts/reset-password')
+        .send({
+          email: savedFirstAccount.email
+        })
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .expect(function (res) {
+          if (!res.body.passwordResetToken) {
+            return 'passwordResetToken was not created';
+          }
+        })
+        .end(done);
+
+    });
+
+    it('returns error if email is not provided', function (done) {
+
+      request
+        .put('/accounts/reset-password')
+        .expect('Content-Type', /json/)
+        .expect(400)
+        .expect({
+          error: 'Provide a valid email',
+          status: 400
+        })
+        .end(done);
+
+    });
+
+  });
+
 });
