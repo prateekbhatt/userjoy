@@ -5,15 +5,24 @@
 var path = require('path'),
   _ = require('lodash'),
 
+  ENVIRONMENTS = ['development', 'production', 'test'],
+
   BASE_URLS = {
     development: 'do.localhost',
-    production: 'dodatado.com'
+    production: 'dodatado.com',
+    test: 'do.localhost'
   },
 
   PORTS = {
     website: 8000,
     dashboard: 8001,
     api: 8002
+  },
+
+  DATABASES = {
+    development: "dodatado-api-dev",
+    production: "dodatado",
+    test: "dodatado-api-test"
   };
 
 function getBaseUrl(env) {
@@ -39,12 +48,28 @@ function getHosts(url) {
 }
 
 /**
+ * MongoDB path
+ * @param  {string} env environment
+ * @return {string}     database path
+ */
+function getDbPath(env) {
+  var dbPath = "mongodb://localhost/" + DATABASES[env];
+  return dbPath;
+}
+
+/**
  * General config settings for all apps
  * @param  {string} env     environment in which the app is started
  * @param  {string} appName name of the application
  * @return {object}         config settings object
  */
-module.exports = function (env, appName) {
+module.exports = function (appName) {
+
+  var env = process.env.NODE_ENV;
+
+  if (!_.contains(ENVIRONMENTS, env)) {
+    throw new Error(env, "environment is not supported");
+  }
 
   var config = {};
 
@@ -53,6 +78,7 @@ module.exports = function (env, appName) {
   config.baseUrl = getBaseUrl(env);
   config.hosts = getHosts(config.baseUrl);
   config.appUrl = config.hosts[appName];
+  config.dbPath = getDbPath(env)
 
   return config;
 
