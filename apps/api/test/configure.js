@@ -1,5 +1,7 @@
 var loadApp = require('../load'),
   mongoose = require('mongoose'),
+  async = require('async'),
+  _ = require('lodash'),
 
   TEST_URL = 'http://localhost:3000';
 
@@ -8,7 +10,7 @@ var loadApp = require('../load'),
  * Drop the test database
  */
 
-function dropDb(cb) {
+function dropTestDb(cb) {
   mongoose.connection.db.dropDatabase(function () {
 
     console.log();
@@ -27,6 +29,9 @@ function dropDb(cb) {
 
 function defineGlobals() {
   global.request = require('supertest')(TEST_URL);
+  global._ = _;
+  global.async = async;
+  global.dropTestDb = dropTestDb;
 }
 
 
@@ -64,7 +69,7 @@ before(function (done) {
 
     defineGlobals();
 
-    dropDb(done);
+    dropTestDb(done);
 
   });
 
@@ -78,6 +83,6 @@ before(function (done) {
 
 after(function (done) {
 
-  dropDb(done);
+  dropTestDb(done);
 
 });
