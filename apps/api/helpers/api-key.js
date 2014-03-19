@@ -9,10 +9,6 @@ var uuid = require('node-uuid'),
   crypto = require('crypto'),
   _ = require('lodash');
 
-/**
- * Create new key
- * @return {string} api key
- */
 
 /**
  * Create new key

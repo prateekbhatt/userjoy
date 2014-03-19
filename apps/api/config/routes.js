@@ -20,7 +20,8 @@ module.exports = function loadRoutes(app) {
   // they are defined
   /////////////////////////////////////////////////////////
 
-  app.use('/accounts', routes.account);
+  app.use('/accounts', routes.AccountController);
+  app.use('/auth', routes.AuthController);
 
 
 
@@ -28,7 +29,7 @@ module.exports = function loadRoutes(app) {
   // Root url router should be defined at the end
   /////////////////////////////////////////////////////////
 
-  app.use('/', routes.index);
+  app.use('/', routes.IndexController);
 
   /////////////////////////////////////////////////////////
 
