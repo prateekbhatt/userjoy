@@ -28,10 +28,12 @@ function dropTestDb(cb) {
  */
 
 function defineGlobals() {
-  global.request = require('supertest')(TEST_URL);
+  global.request = require('supertest')
+    .agent(TEST_URL);
   global._ = _;
   global.async = async;
   global.dropTestDb = dropTestDb;
+  global.loginUser = loginUser;
 }
 
 
@@ -51,6 +53,23 @@ function startServer(done) {
 function setTestEnv() {
   process.env.NODE_ENV = 'test';
 }
+
+
+/**
+ * Login user helper
+ */
+
+var loginUser = function loginUser(opts) {
+  return function (done) {
+    request
+      .post('/login')
+      .send(opts)
+      .expect(200)
+      .end(done);
+
+  };
+};
+
 
 /**
  * Define the global before hook
