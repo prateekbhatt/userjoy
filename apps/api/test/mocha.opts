@@ -4,4 +4,4 @@
 --growl
 --slow 30
 --check-leaks
---globals CookieAccessInfo,Cookie,CookieJar,request
+--globals CookieAccessInfo,Cookie,CookieJar,request,_,async
