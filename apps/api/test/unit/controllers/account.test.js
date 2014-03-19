@@ -52,6 +52,10 @@ describe('Resource /accounts', function () {
 
   });
 
+  after(function (done) {
+    dropTestDb(done)
+  });
+
   describe('GET /accounts', function () {
 
     it('fetches all accounts',
