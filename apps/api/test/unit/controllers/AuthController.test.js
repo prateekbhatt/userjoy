@@ -26,7 +26,7 @@ describe('Resource /auth', function () {
 
   describe('POST /auth/login', function () {
 
-    it('authenticates user',
+    it('authenticates user with correct credentials',
       function (done) {
         request
           .post('/auth/login')
@@ -39,6 +39,40 @@ describe('Resource /auth', function () {
           .expect({
             status: 200,
             message: "Logged In Successfully"
+          })
+          .end(done);
+      });
+
+    it('returns error with incorrect email',
+      function (done) {
+        request
+          .post('/auth/login')
+          .send({
+            email: 'randomemail',
+            password: 'randomPass'
+          })
+          .expect('Content-Type', /json/)
+          .expect(403)
+          .expect({
+            status: 403,
+            error: "Invalid Email/Password"
+          })
+          .end(done);
+      });
+
+    it('returns error with incorrect password',
+      function (done) {
+        request
+          .post('/auth/login')
+          .send({
+            email: firstAccount.email,
+            password: 'randomPass'
+          })
+          .expect('Content-Type', /json/)
+          .expect(403)
+          .expect({
+            status: 403,
+            error: "Invalid Email/Password"
           })
           .end(done);
       });
