@@ -163,6 +163,10 @@ AccountSchema.statics.verify = function (accountId, token, cb) {
         return cb(err);
       }
 
+      if (!account) {
+        return cb(new Error('Account Not Found'));
+      }
+
       if (account.verifyToken !== token) {
         return cb(new Error('Invalid Token'));
       }
@@ -202,7 +206,7 @@ AccountSchema.statics.createResetPasswordToken = function (email, fn) {
         }
 
         if (!account) {
-          return cb(new Error('Not Found'));
+          return cb(new Error('Account Not Found'));
         }
 
         cb(null, account);
