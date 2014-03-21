@@ -37,7 +37,6 @@ describe('Resource /auth', function () {
           .expect('Content-Type', /json/)
           .expect(200)
           .expect({
-            status: 200,
             message: "Logged In Successfully"
           })
           .end(done);
@@ -52,9 +51,9 @@ describe('Resource /auth', function () {
             password: 'randomPass'
           })
           .expect('Content-Type', /json/)
-          .expect(403)
+          .expect(401)
           .expect({
-            status: 403,
+            status: 401,
             error: "Invalid Email/Password"
           })
           .end(done);
@@ -69,9 +68,9 @@ describe('Resource /auth', function () {
             password: 'randomPass'
           })
           .expect('Content-Type', /json/)
-          .expect(403)
+          .expect(401)
           .expect({
-            status: 403,
+            status: 401,
             error: "Invalid Email/Password"
           })
           .end(done);
@@ -95,7 +94,6 @@ describe('Resource /auth', function () {
           .expect('Content-Type', /json/)
           .expect(200)
           .expect({
-            status: 200,
             message: "Logged Out Successfully"
           })
           .end(done);
