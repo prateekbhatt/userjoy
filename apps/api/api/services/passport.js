@@ -64,7 +64,7 @@ passport.use(new LocalStrategy({
 
         if (!account) {
           return done(null, false, {
-            message: 'Email Not Found'
+            message: 'Invalid Email/Password'
           });
         }
 
@@ -76,7 +76,7 @@ passport.use(new LocalStrategy({
 
           if (!isMatch) {
             return done(null, false, {
-              message: 'Invalid Password'
+              message: 'Invalid Email/Password'
             });
           }
 
