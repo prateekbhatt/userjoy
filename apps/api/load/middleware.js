@@ -2,7 +2,8 @@ var logger = require('morgan'),
   cookieParser = require('cookie-parser'),
   bodyParser = require('body-parser'),
   passport = require('passport'),
-  session = require('express-session');
+  session = require('express-session'),
+  restErrorMiddleware = require('../helpers/restErrorMiddleware');
 
 module.exports = function loadMiddleware(app) {
 
@@ -26,5 +27,7 @@ module.exports = function loadMiddleware(app) {
   // Passport middleware
   app.use(passport.initialize());
   app.use(passport.session());
+
+  app.use(restErrorMiddleware);
 
 }

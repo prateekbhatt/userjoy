@@ -31,25 +31,19 @@ router.post('/login', function (req, res, next) {
   passport.authenticate('local', function (err, user, info) {
 
     if ((err) || (!user)) {
-      return res.json({
-        status: 403,
-        error: info && info.message ? info.message : 'Forbidden'
-      }, 403);
+      return res.unauthorized(info && info.message ? info.message :
+        'Forbidden');
     }
 
     req.login(user, function (err) {
 
       if (err) {
-        return res.json({
-          status: 403,
-          error: err
-        }, 403);
+        return res.unauthorized(err);
       }
 
       return res.json({
-        status: 200,
         message: 'Logged In Successfully'
-      }, 200);
+      });
 
     });
 
@@ -66,7 +60,6 @@ router.post('/logout', function (req, res, next) {
 
   req.logout();
   res.json({
-    status: 200,
     message: 'Logged Out Successfully'
   });
 

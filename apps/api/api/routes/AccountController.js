@@ -23,10 +23,10 @@ router.get('/', function (req, res, next) {
     .exec(function (err, accounts) {
 
       if (err) {
-        next(err);
+        return next(err);
       }
 
-      res.json(accounts, 200);
+      res.json(accounts);
 
     });
 
@@ -48,10 +48,10 @@ router.get('/:id', function (req, res, next) {
       }
 
       if (!acc) {
-        return next(new Error(404));
+        return res.notFound();
       }
 
-      res.json(acc, 200);
+      res.json(acc);
 
     });
 
@@ -95,23 +95,14 @@ router.get('/:id/verify-email/:token', function (req, res, next) {
 
       if (err) {
 
-        if (err.message === 'Invalid Token') {
-
-          return res.json({
-            error: err.message,
-            status: 403
-          }, 403);
-
+        if (_.contains(['Invalid Token', 'Account Not Found'], err.message)) {
+          return res.unauthorized('Invalid Attempt');
         }
 
         return next(err);
       }
 
-      if (!account || !account.emailVerified) {
-        return next(new Error('Email Verification Failed'));
-      }
-
-      res.json(account, 200);
+      res.json(account);
 
     });
 
@@ -147,7 +138,7 @@ router.put('/:id/name', function (req, res, next) {
       return next(err);
     }
 
-    res.json(account, 200);
+    res.json(account);
 
   });
 
@@ -166,12 +157,11 @@ router.put('/reset-password', function (req, res, next) {
     if (err) {
 
       if (err.message === 'Invalid Email') {
+        return res.badRequest('Provide a valid email');
+      }
 
-        return res.json({
-          error: 'Provide a valid email',
-          status: 400
-        }, 400);
-
+      if (err.message === 'Account Not Found') {
+        return res.notFound('Provide a valid email');
       }
 
       return next(err);
@@ -179,7 +169,7 @@ router.put('/reset-password', function (req, res, next) {
 
     // TODO : Send reset password mail here
 
-    res.json(account, 200);
+    res.json(account);
 
   });
 
