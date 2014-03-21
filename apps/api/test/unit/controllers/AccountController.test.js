@@ -2,6 +2,10 @@ describe('Resource /accounts', function () {
 
   var savedFirstAccount,
 
+    randomObjectId = '5303570d9c554e7356000017',
+
+    randomEmail = 'randomEmail@example.com',
+
     firstAccount = {
 
       name: 'Prateek',
@@ -111,10 +115,8 @@ describe('Resource /accounts', function () {
     it('returns error if no account with id is present',
       function (done) {
 
-        var randomId = '5303570d9c554e7356000017';
-
         request
-          .get('/accounts/' + randomId)
+          .get('/accounts/' + randomObjectId)
           .expect('Content-Type', /json/)
           .expect(404)
           .expect({
@@ -187,6 +189,44 @@ describe('Resource /accounts', function () {
   });
 
   describe('GET /accounts/:id/verify-email/:token', function () {
+
+    it('returns error for wrong token', function (done) {
+
+      var url = '/accounts/' +
+        savedFirstAccount._id +
+        '/verify-email/' +
+        'randomToken';
+
+      request
+        .get(url)
+        .expect('Content-Type', /json/)
+        .expect(401)
+        .expect({
+          status: 401,
+          error: 'Invalid Attempt'
+        })
+        .end(done);
+
+    });
+
+    it('returns error for wrong accountId', function (done) {
+
+      var url = '/accounts/' +
+        randomObjectId +
+        '/verify-email/' +
+        savedFirstAccount.verifyToken;
+
+      request
+        .get(url)
+        .expect('Content-Type', /json/)
+        .expect(401)
+        .expect({
+          status: 401,
+          error: 'Invalid Attempt'
+        })
+        .end(done);
+
+    });
 
     it('updates email verified status to true', function (done) {
 
@@ -267,6 +307,25 @@ describe('Resource /accounts', function () {
         .end(done);
 
     });
+
+    it('returns error if account with given email is not found',
+      function (done) {
+
+        request
+          .put('/accounts/reset-password')
+          .send({
+            email: randomEmail
+          })
+          .expect('Content-Type', /json/)
+          .expect(404)
+          .expect({
+            error: 'Provide a valid email',
+            status: 404
+          })
+          .end(done);
+
+      });
+
 
   });
 
