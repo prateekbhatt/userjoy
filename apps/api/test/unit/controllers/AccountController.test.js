@@ -60,26 +60,6 @@ describe('Resource /accounts', function () {
     dropTestDb(done)
   });
 
-  describe('GET /accounts', function () {
-
-    it('fetches all accounts',
-      function (done) {
-
-        request
-          .get('/accounts')
-          .expect('Content-Type', /json/)
-          .expect(function (res) {
-            if (!Array.isArray(res.body)) {
-              return 'Should return an array';
-            }
-          })
-          .expect(200)
-          .end(done);
-
-      });
-
-  });
-
   describe('GET /accounts/:id', function () {
 
     it('fetches account with given id', function (done) {

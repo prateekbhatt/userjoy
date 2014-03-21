@@ -12,26 +12,6 @@ var router = require('express')
 var Account = require('../models/Account');
 
 
-/**
- * GET /accounts
- */
-
-router.get('/', function (req, res, next) {
-
-  Account
-    .find()
-    .exec(function (err, accounts) {
-
-      if (err) {
-        return next(err);
-      }
-
-      res.json(accounts);
-
-    });
-
-});
-
 
 /**
  * GET /account/:id
