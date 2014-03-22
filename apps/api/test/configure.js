@@ -1,4 +1,5 @@
 var loadApp = require('../load'),
+  loadFixtures = require('./fixtures'),
   mongoose = require('mongoose'),
   async = require('async'),
   _ = require('lodash'),
@@ -29,7 +30,7 @@ function dropTestDb(cb) {
  * Login user helper
  */
 
-var loginUser = function loginUser(email, password, done) {
+function loginUser(email, password, done) {
   request
     .post('/auth/login')
     .send({
@@ -48,7 +49,7 @@ var loginUser = function loginUser(email, password, done) {
  * Log out user helper
  */
 
-var logoutUser = function (done) {
+function logoutUser(done) {
   request
     .post('/auth/logout')
     .expect({
@@ -71,6 +72,7 @@ var logoutUser = function (done) {
     global.dropTestDb = dropTestDb;
     global.loginUser = loginUser;
     global.logoutUser = logoutUser;
+    global.loadFixtures = loadFixtures;
   }
 
 
