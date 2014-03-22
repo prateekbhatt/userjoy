@@ -121,8 +121,6 @@ before(function (done) {
  * for the mocha tests
  */
 
-// after(function () {
-
-//   dropTestDb();
-
-// });
+after(function (done) {
+  dropTestDb(done);
+});
