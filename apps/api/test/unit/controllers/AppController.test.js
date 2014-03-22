@@ -13,19 +13,10 @@ describe('Resource /apps', function () {
 
 
   before(function (done) {
-
-    loadFixtures(function (err, savedData) {
-
-      if (err) return done(err);
-
+    setupTestDb(function (err) {
       saved = savedData;
-
-      loginEmail = saved.accounts.first.email;
-      loginPassword = saved.accounts.first.password;
-
-      logoutUser(done);
+      done(err);
     });
-
   });
 
 
@@ -62,7 +53,7 @@ describe('Resource /apps', function () {
     it('logging in user',
 
       function (done) {
-        loginUser(loginEmail, loginPassword, done);
+        loginUser(done);
       });
 
 
@@ -116,7 +107,7 @@ describe('Resource /apps', function () {
     it('logging in user',
 
       function (done) {
-        loginUser(loginEmail, loginPassword, done);
+        loginUser(done);
       });
 
 
@@ -162,7 +153,7 @@ describe('Resource /apps', function () {
     it('logging in user',
 
       function (done) {
-        loginUser(loginEmail, loginPassword, done);
+        loginUser(done);
       });
 
 
@@ -242,7 +233,7 @@ describe('Resource /apps', function () {
 
 
     it('logging in user', function (done) {
-      loginUser(loginEmail, loginPassword, done);
+      loginUser(done);
     });
 
 
