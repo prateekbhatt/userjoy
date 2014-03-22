@@ -76,6 +76,21 @@ function createApp(app, fn) {
 
 }
 
+function loginUser(email, password, done) {
+
+  request
+    .post('/auth/login')
+    .send({
+      email: email,
+      password: password
+    })
+    .expect({
+      message: 'Logged In Successfully'
+    })
+    .expect(200)
+    .end(done);
+};
+
 
 module.exports = function loadFixtures(callback) {
 
