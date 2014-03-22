@@ -34,23 +34,11 @@ router
   .get(isAuthenticated)
   .get(function (req, res, next) {
 
-    var accountId = req.user._id;
+    if (!req.user) {
+      return res.notFound();
+    }
 
-    Account
-      .findById(accountId)
-      .exec(function (err, acc) {
-
-        if (err) {
-          return next(err);
-        }
-
-        if (!acc) {
-          return res.notFound();
-        }
-
-        res.json(acc);
-
-      });
+    res.json(req.user);
 
   });
 
@@ -126,24 +114,8 @@ router
   .put(isAuthenticated)
   .put(function (req, res, next) {
 
-    var accountId = req.user._id;
-
-    async.waterfall([
-
-      function (cb) {
-
-        Account.findById(accountId, cb);
-
-      },
-
-      function (account, cb) {
-
-        account.name = req.body.name;
-        account.save(cb);
-
-      },
-
-    ], function (err, account) {
+    req.user.name = req.body.name;
+    req.user.save(function (err, account) {
 
       if (err) {
         return next(err);
