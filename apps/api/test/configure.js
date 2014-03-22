@@ -64,56 +64,63 @@ function logoutUser(done) {
  * Add commonly used modules to Globals
  */
 
-  function defineGlobals() {
-    global.request = require('supertest')
-      .agent(TEST_URL);
-    global._ = _;
-    global.async = async;
-    global.dropTestDb = dropTestDb;
-    global.loginUser = loginUser;
-    global.logoutUser = logoutUser;
-    global.loadFixtures = loadFixtures;
-  }
+function defineGlobals() {
+  global.request = require('supertest')
+    .agent(TEST_URL);
+  global._ = _;
+  global.async = async;
+  global.dropTestDb = dropTestDb;
+  global.loginUser = loginUser;
+  global.logoutUser = logoutUser;
+  global.loadFixtures = loadFixtures;
+}
 
 
-  /**
-   * Start api server
-   */
+/**
+ * Start api server
+ */
 
-  function startServer(done) {
-    loadApp.start(done);
-  }
-
-
-  /**
-   * Set node environment to test
-   */
-
-  function setTestEnv() {
-    process.env.NODE_ENV = 'test';
-  }
+function startServer(done) {
+  loadApp.start(done);
+}
 
 
-  /**
-   * Define the global before hook
-   * for the mocha tests
-   */
+/**
+ * Set node environment to test
+ */
+
+function setTestEnv() {
+  process.env.NODE_ENV = 'test';
+}
+
+
+/**
+ * Define the global before hook
+ * for the mocha tests
+ */
 
 before(function (done) {
 
-  setTestEnv();
+  async.series({
 
-  startServer(function (err, db) {
+    setTestEnv: function (cb) {
+      setTestEnv();
+      cb();
+    },
 
-    if (err) {
-      return done(err);
+    startServer: function (cb) {
+      startServer(cb);
+    },
+
+    setGlobals: function (cb) {
+      defineGlobals();
+      cb();
+    },
+
+    dropTestDb: function (cb) {
+      dropTestDb(cb);
     }
-
-    defineGlobals();
-
-    dropTestDb(done);
-
-  });
+  }, done)
 
 });
 
