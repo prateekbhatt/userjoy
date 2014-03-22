@@ -18,40 +18,10 @@ function dropTestDb(cb) {
     console.log();
     console.log();
 
-    cb();
+    if (cb) {
+      cb();
+    }
   });
-}
-
-
-/**
- * Add commonly used modules to Globals
- */
-
-function defineGlobals() {
-  global.request = require('supertest')
-    .agent(TEST_URL);
-  global._ = _;
-  global.async = async;
-  global.dropTestDb = dropTestDb;
-  global.loginUser = loginUser;
-}
-
-
-/**
- * Start api server
- */
-
-function startServer(done) {
-  loadApp.start(done);
-}
-
-
-/**
- * Set node environment to test
- */
-
-function setTestEnv() {
-  process.env.NODE_ENV = 'test';
 }
 
 
@@ -59,22 +29,73 @@ function setTestEnv() {
  * Login user helper
  */
 
-var loginUser = function loginUser(opts) {
-  return function (done) {
-    request
-      .post('/login')
-      .send(opts)
-      .expect(200)
-      .end(done);
-
-  };
+var loginUser = function loginUser(email, password, done) {
+  request
+    .post('/auth/login')
+    .send({
+      email: email,
+      password: password
+    })
+    .expect({
+      message: 'Logged In Successfully'
+    })
+    .expect(200)
+    .end(done);
 };
 
 
 /**
- * Define the global before hook
- * for the mocha tests
+ * Log out user helper
  */
+
+var logoutUser = function (done) {
+  request
+    .post('/auth/logout')
+    .expect({
+      message: 'Logged Out Successfully'
+    })
+    .expect(200)
+    .end(done);
+}
+
+
+/**
+ * Add commonly used modules to Globals
+ */
+
+  function defineGlobals() {
+    global.request = require('supertest')
+      .agent(TEST_URL);
+    global._ = _;
+    global.async = async;
+    global.dropTestDb = dropTestDb;
+    global.loginUser = loginUser;
+    global.logoutUser = logoutUser;
+  }
+
+
+  /**
+   * Start api server
+   */
+
+  function startServer(done) {
+    loadApp.start(done);
+  }
+
+
+  /**
+   * Set node environment to test
+   */
+
+  function setTestEnv() {
+    process.env.NODE_ENV = 'test';
+  }
+
+
+  /**
+   * Define the global before hook
+   * for the mocha tests
+   */
 
 before(function (done) {
 
@@ -100,8 +121,8 @@ before(function (done) {
  * for the mocha tests
  */
 
-after(function (done) {
+// after(function () {
 
-  dropTestDb(done);
+//   dropTestDb();
 
-});
+// });
