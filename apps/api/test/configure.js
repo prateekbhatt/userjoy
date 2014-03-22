@@ -27,22 +27,27 @@ function dropTestDb(cb) {
 
 
 /**
- * Login user helper
+ * Generates a Login user helper
  */
 
-function loginUser(email, password, done) {
-  request
-    .post('/auth/login')
-    .send({
-      email: email,
-      password: password
-    })
-    .expect({
-      message: 'Logged In Successfully'
-    })
-    .expect(200)
-    .end(done);
-};
+function loginUserGenerator(email, password) {
+
+  return function loginUser(done) {
+
+    request
+      .post('/auth/login')
+      .send({
+        email: email,
+        password: password
+      })
+      .expect({
+        message: 'Logged In Successfully'
+      })
+      .expect(200)
+      .end(done);
+  };
+
+}
 
 
 /**
@@ -70,9 +75,8 @@ function defineGlobals() {
   global._ = _;
   global.async = async;
   global.dropTestDb = dropTestDb;
-  global.loginUser = loginUser;
   global.logoutUser = logoutUser;
-  global.loadFixtures = loadFixtures;
+  global.setupTestDb = setupTestDb;
 }
 
 
@@ -94,12 +98,52 @@ function setTestEnv() {
 }
 
 
+function setupTestDb(done) {
+
+  var fixtureData;
+
+  async.series({
+
+    dropTestDb: function (cb) {
+      dropTestDb(cb);
+    },
+
+    loadFixtures: function (cb) {
+      loadFixtures(function (err, savedData) {
+        if (err) return cb(err);
+        fixtureData = savedData;
+        global.savedData = savedData;
+        cb();
+      });
+    },
+
+    loginFunction: function (cb) {
+
+      var firstAccount = fixtureData.accounts.first;
+
+      // add loginUser helper to global
+      global.loginUser = loginUserGenerator(firstAccount.email,
+        firstAccount.password);
+      cb();
+    },
+
+    logoutUser: function (cb) {
+      logoutUser(cb);
+    }
+
+  }, done)
+
+}
+
+
 /**
  * Define the global before hook
  * for the mocha tests
  */
 
 before(function (done) {
+
+  var fixtureData;
 
   async.series({
 
@@ -115,11 +159,8 @@ before(function (done) {
     setGlobals: function (cb) {
       defineGlobals();
       cb();
-    },
-
-    dropTestDb: function (cb) {
-      dropTestDb(cb);
     }
+
   }, done)
 
 });
