@@ -11,8 +11,9 @@ describe('Resource /auth', function () {
   before(function (done) {
 
     request
-      .post('/accounts')
+      .post('/account')
       .send(firstAccount)
+      .expect(201)
       .expect(function (res) {
         savedFirstAccount = res.body;
       })
@@ -80,24 +81,20 @@ describe('Resource /auth', function () {
 
   describe('POST /auth/logout', function () {
 
-    it('login', function () {
-      loginUser({
-        email: firstAccount.email,
-        password: firstAccount.password
-      })
+    it('logging in', function (done) {
+      loginUser(firstAccount.email, firstAccount.password, done);
     });
 
-    it('logs out user',
-      function (done) {
-        request
-          .post('/auth/logout')
-          .expect('Content-Type', /json/)
-          .expect(200)
-          .expect({
-            message: "Logged Out Successfully"
-          })
-          .end(done);
-      });
+    it('logs out user', function (done) {
+      request
+        .post('/auth/logout')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .expect({
+          message: "Logged Out Successfully"
+        })
+        .end(done);
+    });
 
   });
 
