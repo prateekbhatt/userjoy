@@ -20,7 +20,7 @@ module.exports = function loadRoutes(app) {
   // they are defined
   /////////////////////////////////////////////////////////
 
-  app.use('/accounts', routes.AccountController);
+  app.use('/account', routes.AccountController);
   app.use('/auth', routes.AuthController);
 
 
