@@ -22,6 +22,7 @@ module.exports = function loadRoutes(app) {
 
   app.use('/account', routes.AccountController);
   app.use('/auth', routes.AuthController);
+  app.use('/apps', routes.AppController);
 
 
 
