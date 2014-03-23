@@ -1,32 +1,14 @@
 describe('Resource /account', function () {
 
-  var savedFirstAccount,
-
-    randomObjectId = '5303570d9c554e7356000017',
+  var randomObjectId = '5303570d9c554e7356000017',
 
     randomEmail = 'randomEmail@example.com',
 
-    firstAccount = {
-
-      name: 'Prateek',
-      email: 'prateek@dodatado.com',
-      password: 'testingnewapp'
-
-    },
-
-    secondAccount = {
+    newAccount = {
 
       name: 'Savinay',
       email: 'savinay@dodatado.com',
       password: 'testingtesting'
-
-    },
-
-    existingEmailAccount = {
-
-      name: 'Pratt',
-      email: 'prateek@dodatado.com',
-      password: 'testingnewapprandom'
 
     },
 
@@ -45,20 +27,7 @@ describe('Resource /account', function () {
     };
 
   before(function (done) {
-
-    request
-      .post('/account')
-      .send(firstAccount)
-      .expect(201)
-      .expect(function (res) {
-        savedFirstAccount = res.body;
-      })
-      .end(done);
-
-  });
-
-  after(function (done) {
-    dropTestDb(done)
+    setupTestDb(done);
   });
 
   describe('GET /account', function () {
@@ -78,7 +47,7 @@ describe('Resource /account', function () {
     });
 
     it('logging in user', function (done) {
-      loginUser(firstAccount.email, firstAccount.password, done)
+      loginUser(done)
     });
 
     it('fetches account with given id', function (done) {
@@ -87,7 +56,7 @@ describe('Resource /account', function () {
         .expect('Content-Type', /json/)
         .expect(200)
         .expect(function (res) {
-          if (res.body.email !== firstAccount.email) {
+          if (res.body.email !== saved.accounts.first.email) {
             return 'Could not fetch firstAccount';
           }
         })
@@ -118,7 +87,7 @@ describe('Resource /account', function () {
 
       request
         .post('/account')
-        .send(secondAccount)
+        .send(newAccount)
         .expect('Content-Type', /json/)
         .expect(201)
         .end(done);
@@ -127,6 +96,13 @@ describe('Resource /account', function () {
 
     it('returns error if duplicate email', function (done) {
 
+      var existingEmailAccount = existingEmailAccount = {
+
+        name: 'Pratt',
+        email: saved.accounts.first.email,
+        password: 'testingnewapprandom'
+
+      }
       request
         .post('/account')
         .send(existingEmailAccount)
@@ -177,7 +153,7 @@ describe('Resource /account', function () {
     it('returns error for wrong token', function (done) {
 
       var url = '/account/' +
-        savedFirstAccount._id +
+        saved.accounts.first._id +
         '/verify-email/' +
         'randomToken';
 
@@ -198,7 +174,7 @@ describe('Resource /account', function () {
       var url = '/account/' +
         randomObjectId +
         '/verify-email/' +
-        savedFirstAccount.verifyToken;
+        saved.accounts.first.verifyToken;
 
       request
         .get(url)
@@ -215,9 +191,9 @@ describe('Resource /account', function () {
     it('updates email verified status to true', function (done) {
 
       var url = '/account/' +
-        savedFirstAccount._id +
+        saved.accounts.first._id +
         '/verify-email/' +
-        savedFirstAccount.verifyToken;
+        saved.accounts.first.verifyToken;
 
       request
         .get(url)
@@ -260,7 +236,7 @@ describe('Resource /account', function () {
     });
 
     it('logging in user', function (done) {
-      loginUser(firstAccount.email, firstAccount.password, done)
+      loginUser(done)
     });
 
     it('updates name', function (done) {
@@ -292,7 +268,7 @@ describe('Resource /account', function () {
       request
         .put('/account/reset-password')
         .send({
-          email: savedFirstAccount.email
+          email: saved.accounts.first.email
         })
         .expect('Content-Type', /json/)
         .expect(200)
