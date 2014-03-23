@@ -4,25 +4,13 @@ describe('Resource /apps', function () {
     name: 'My New App'
   },
 
-    randomId = '532d6bf862d673ba7131812a',
-
-    saved,
-
-    loginEmail,
-    loginPassword;
+    randomId = '532d6bf862d673ba7131812a';
 
 
   before(function (done) {
-    setupTestDb(function (err) {
-      saved = savedData;
-      done(err);
-    });
+    setupTestDb(done);
   });
 
-
-  after(function (done) {
-    dropTestDb(done);
-  });
 
   describe('POST /apps', function () {
 
