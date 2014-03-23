@@ -8,21 +8,62 @@ var loadApp = require('../load'),
 
 
 /**
- * Drop the test database
+ * Clear the test database
  */
 
-function dropTestDb(cb) {
-  mongoose.connection.db.dropDatabase(function () {
+function clearDb(callback) {
 
-    console.log();
-    console.log('  Dropped DB');
-    console.log();
-    console.log();
 
-    if (cb) {
-      cb();
-    }
-  });
+  function getMongoPath() {
+    var path = mongoose.connections[0].host +
+      ':' +
+      mongoose.connections[0].port +
+      '/' +
+      mongoose.connections[0].name;
+
+    return path;
+  }
+
+
+  mongoose.connection.db
+    .executeDbCommand({
+        dropDatabase: 1
+      },
+
+      function (err, result) {
+
+        var mongoPath = getMongoPath();
+
+        //Kill the current connection, then re-establish it
+        mongoose.connection.close()
+
+        mongoose.connect('mongodb://' + mongoPath, function (err) {
+
+          var asyncFunctions = [];
+
+          // Loop through all the known schemas, and
+          // execute an ensureIndex to make sure we're clean
+          _.each(
+
+            mongoose.connections[0].base.modelSchemas,
+
+            function (schema, key) {
+
+              asyncFunctions.push(function (cb) {
+                mongoose
+                  .model(key, schema)
+                  .ensureIndexes(cb);
+              })
+            });
+
+          async.parallel(asyncFunctions, function (err) {
+            console.log('  Cleared DB\n');
+            callback(err);
+          })
+
+        })
+      })
+
 }
 
 
@@ -74,7 +115,6 @@ function defineGlobals() {
     .agent(TEST_URL);
   global._ = _;
   global.async = async;
-  global.dropTestDb = dropTestDb;
   global.logoutUser = logoutUser;
   global.setupTestDb = setupTestDb;
 }
@@ -104,15 +144,15 @@ function setupTestDb(done) {
 
   async.series({
 
-    dropTestDb: function (cb) {
-      dropTestDb(cb);
+    clearDb: function (cb) {
+      clearDb(cb);
     },
 
     loadFixtures: function (cb) {
       loadFixtures(function (err, savedData) {
         if (err) return cb(err);
         fixtureData = savedData;
-        global.savedData = savedData;
+        global.saved = savedData;
         cb();
       });
     },
@@ -143,8 +183,6 @@ function setupTestDb(done) {
 
 before(function (done) {
 
-  var fixtureData;
-
   async.series({
 
     setTestEnv: function (cb) {
@@ -159,6 +197,10 @@ before(function (done) {
     setGlobals: function (cb) {
       defineGlobals();
       cb();
+    },
+
+    clearDb: function (cb) {
+      clearDb(cb);
     }
 
   }, done)
@@ -172,5 +214,10 @@ before(function (done) {
  */
 
 after(function (done) {
-  dropTestDb(done);
+
+  clearDb(function (err) {
+    if (err) return done(err);
+    mongoose.disconnect(done);
+  });
+
 });
