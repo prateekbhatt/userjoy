@@ -9,20 +9,25 @@
                     <a ui-sref="message.sent"><i class="fa fa-mail-forward"></i> Sent Messages</a>
                 </li>
                 <li>
-                    <a ui-sref="message.compose"><i class="fa fa-edit"></i> Compose
-                    <span class="fa arrow"></span></a>
-                    <ul class="nav nav-second-level">
-                        <li>
-                            <a ui-sref="message.compose.automate">Automate Messages</a>
-                        </li>
-                        <li>
-                            <a href="#">Send Manually</a>
-                        </li>
-                    </ul>
-                    </a>
+                <li>
+                    <accordion close-others="oneAtATime">
+                        <accordion-group is-open="isopen">
+                            <accordion-heading>
+                                <i class="fa fa-edit"></i> Compose <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isopen, 'glyphicon-chevron-right': !isopen}"></i>
+                            </accordion-heading>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a ui-sref="message.automate">Automate Messages</a>
+                                </li>
+                                <li>
+                                    <a ui-sref="message.manual">Send Manually</a>
+                                </li>
+                            </ul>
+                        </accordion-group>
+                    </accordion>
                 </li>
                 <li>
-                    <a href="forms.html"><span class="glyphicon glyphicon-list-alt"></span> Choose Templates</a>
+                    <a ui-sref="message.template"><span class="glyphicon glyphicon-list-alt"></span> Choose Templates</a>
                 </li>
             </ul>
             <!-- /#side-menu -->

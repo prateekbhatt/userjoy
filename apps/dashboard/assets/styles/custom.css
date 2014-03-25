@@ -89,6 +89,8 @@ body {
   border-color: #df2e1b;
 }
 
+.border-color {border: 1px solid #ccc;}
+
 /*.horiz-bar {
   background-color: #ffffff;
   content: "";
@@ -312,7 +314,7 @@ a:hover,a:focus {
     border:1px solid #ccc;
   }
 
-  .navbar-inverse .navbar-nav > .active > a {
+  .navbar-inverse .navbar-nav > .active > a { 
     color:#999;
     background-color: #222;
   }
@@ -325,5 +327,22 @@ a:hover,a:focus {
   .navbar-right .dropdown-menu {
     right: 0;
     left: auto;
+  }
+
+  .btn-default.disabled, .btn-default[disabled], fieldset[disabled] .btn-default, .btn-default.disabled:hover, .btn-default[disabled]:hover, fieldset[disabled] .btn-default:hover, .btn-default.disabled:focus, .btn-default[disabled]:focus, fieldset[disabled] .btn-default:focus, .btn-default.disabled:active, .btn-default[disabled]:active, fieldset[disabled] .btn-default:active, .btn-default.disabled.active, .btn-default[disabled].active, fieldset[disabled] .btn-default.active {
+    background-color: #fff;
+    border-color: #95a5a6;
+  }
+
+  .panel-group {
+    margin-bottom: 0px
+  }
+
+  .panel-collapse {
+    background-color: #f8f8f8;
+  }
+
+  accordion > .panel-group > .panel .panel-default .ng-isolate-scope > .panel-heading {
+    background-color: #f8f8f8;
   }
 }
