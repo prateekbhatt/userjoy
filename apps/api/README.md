@@ -112,6 +112,7 @@ Create new user for every new unique identifier for an app
 ##### Columns:
 
 - appId
+- appUserId (to allow the app to recognize a user even if the user changes email/username)
 - email (required)
 - name
 - username
@@ -121,17 +122,10 @@ Create new user for every new unique identifier for an app
 - unsubscribedThrough (messageId)
 - createdAt
 - updatedAt
-- country
-- city
-- ip
 - totalSessions
 - lastContacted
 - lastSession
 - lastHeardFrom
-- os
-- browser
-- browserVersion
-- deviceType (desktop, mobile, tablet)
 - healthScore (latest value from User Health)
 - tags [all tags this user belongs to]
 - notes
@@ -140,7 +134,6 @@ Create new user for every new unique identifier for an app
 
 ##### Notes:
 
-- Get city, country data from (api.hostinfo or Maxmind)
 
 - Health score should be calculated based on total sessions in last 30 days, total time spent on site [?]
 
@@ -153,6 +146,7 @@ Create new user for every new unique identifier for an app
     - utm_source
     - utm_term
 
+- utm data could be added to sessions
 
 ##### Embedded Documents:
 
@@ -204,9 +198,11 @@ Stores companies of a specific account
 ##### Columns:
 
 - appId
+- appCompanyId (similar to appUserId)
 - name
-- total sessions
+- totalSessions
 - meta (object containing additonal info about users)
+- created
 
 ### Segments
 
@@ -254,11 +250,21 @@ Create a new session if the user does not have any events in the last 30 minutes
 
 - appId
 - userId
-- total sessions
-- country
 - platform
+- country
+- city
+- ip
+- os
+- browser
+- browserVersion
+- deviceType (desktop, mobile, tablet)
 - createdAt
 - updatedAt
+
+##### Notes
+
+- Get city, country data from (api.hostinfo or Maxmind)
+
 
 ### Events
 
@@ -267,23 +273,26 @@ Stores events happening on an app
 ##### Columns:
 
 - appId
-- type (feature)
+- userId
+- sessionId
+- type (feature, pageview)
 - featureId
 - actionId
+- domain
+- path
+- title
+- createdAt
+- updatedAt
 
 ##### Notes:
 
 Ignoring the following:
 
-- sessionId
-- type (click, submit, pageview, change)
+- type (click, submit, change)
 - targetTag
 - targetId
 - targetClass
 - targetText
-- domain
-- path
-- title
 
 
 ### Message Templates
