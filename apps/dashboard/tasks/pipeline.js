@@ -54,7 +54,8 @@ var jsFilesToInject = [
   'bower_components/angular-animate/angular-animate.js',
   'bower_components/angular-sanitize/angular-sanitize.min.js',
   'bower_components/textAngular/textAngular.js',
-  'bower_components/textAngular/textAngular-sanitize.js',
+  // 'bower_components/textAngular/textAngular-sanitize.js',
+  // 'js/app/textAng.js',
 
   // Bring in the socket.io client
   // 'js/sockets/socket.io.js',
