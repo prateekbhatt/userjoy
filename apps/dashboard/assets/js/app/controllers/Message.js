@@ -21,6 +21,15 @@ angular.module('do.message', [])
                     }
                 }
             })
+            .state('message.id', {
+                url: '/inbox/1',
+                views: {
+                    "messageapp": {
+                        templateUrl: '/templates/message.inbox.id.html',
+                        controller: 'MessageBodyCtrl'
+                    }
+                }
+            })
             .state('message.sent', {
                 url: '/sent',
                 views: {
@@ -86,79 +95,125 @@ angular.module('do.message', [])
     }
 ])
 
-.controller('InboxCtrl', ['$scope', '$filter', 'ngTableParams',
-    function MessageCtrl($scope, $filter, ngTableParams) {
+.controller('InboxCtrl', ['$scope', '$filter', 'ngTableParams', '$log',
+    '$location',
+    function MessageCtrl($scope, $filter, ngTableParams, $log, $location) {
 
+        console.log('inside inboxctrl and showtable is true');
+        $scope.showTable = true;
+
+        $scope.showTableInbox = function () {
+            console.log("inside showTableInbox");
+            $scope.showTable = true;
+        }
+
+        $scope.openReplyBox = function(){
+            $log.info("Inside replybox");
+            
+        }
+
+        // Get Data from backend TODO
 
         var data = [{
+            id: '1',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM'
         }, {
+            id: '2',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM'
         }, {
+            id: '3',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM'
         }, {
+            id: '4',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM'
         }, {
+            id: '5',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM'
         }, {
+            id: '6',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM'
         }, {
+            id: '7',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM'
         }, {
+            id: '8',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM'
         }, {
+            id: '9',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM'
         }, {
+            id: '10',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM'
         }, {
+            id: '11',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM'
         }, {
+            id: '12',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM'
         }, {
+            id: '13',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM'
         }, {
+            id: '14',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM'
         }, {
+            id: '15',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM'
         }, {
+            id: '16',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM'
         }, {
+            id: '17',
             name: 'Larro Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM'
         }];
+
+        // Get Data from backend TODO
+
+        $scope.messagebody =
+            'Hi, Thanks for such an offer. I really appreciate it. Loerm Ipsum .......';
+
+
+
+        $scope.showSelectedMail = function () {
+            // console.log("inside selected mail");
+            // $scope.showTable = false;
+            $location.path('/messages/inbox/1');
+        }
+
 
         $scope.columnsInbox = [{
             title: 'User',
@@ -605,5 +660,13 @@ angular.module('do.message', [])
         $scope.options = {
             color: ['Blue', 'Red', 'Green', 'Cyan']
         };
+    }
+])
+
+.controller('MessageBodyCtrl', ['$scope',
+    function ($scope) {
+        // Get Data from Backend
+        $scope.messages =
+            'Hi, this is Larry Page. Thanks for such an offer. It was great.... Lorem Ipsum.......'
     }
 ]);

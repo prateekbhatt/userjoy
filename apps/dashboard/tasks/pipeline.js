@@ -25,6 +25,8 @@ var cssFilesToInject = [
 
   'bower_components/font-awesome/css/font-awesome.css',
 
+  'bower_components/angular-motion/dist/angular-motion.min.css',
+
   // all other styles go below
   'styles/**/*.css'
 ];

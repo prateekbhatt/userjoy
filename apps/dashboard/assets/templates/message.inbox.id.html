@@ -1,0 +1,39 @@
+<div class="panel panel-default">
+    <div id="wrapper">
+        <div id="page-wrapper">
+            <div class="row">
+                <div class="col-lg-12">
+                    <br>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="fa fa-envelope"></i> Message from Martha Stevens
+                            <div class="pull-right">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                    Actions
+                                    <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu pull-right" role="menu">
+                                        <li><a href="#" ng-click="openReplyBox()">Reply</a>
+                                        </li>
+                                        <li><a href="#">Reply to all</a>
+                                        </li>
+                                        <li><a href="#">Forward to a team member</a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li><a href="#">Delete this message</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row col-md-12" ng-bind="messages">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
