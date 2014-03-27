@@ -16,7 +16,8 @@ angular.module('dodatado', [
     'do.users',
     'ngSanitize',
     'do.message',
-    'textAngular'
+    'textAngular',
+    'do.popupmessage'
 ])
 
 .config(function myAppConfig($stateProvider, $urlRouterProvider,
