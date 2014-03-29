@@ -53,7 +53,7 @@
                                             <br>
                                             <tbody>
                                                 <a ui-sref="message.id">
-                                                    <tr ng-repeat="user in $data | filter:searchText" ng-click="showSelectedMail(user)">
+                                                    <tr ng-repeat="user in $data | filter:searchText" ng-click="showSelectedMail(user)" style="cursor:pointer">
                                                         <td ng-repeat="column in columnsInbox" ng-show="column.visible" sortable="column.field" class="text-center">
                                                         {{user[column.field]}}
                                                         </td>

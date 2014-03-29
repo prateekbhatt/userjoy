@@ -28,9 +28,85 @@
                             </div>
                         </div>
                         <div class="panel-body">
-                            <div class="row col-md-12" ng-bind="messages">
+                            <div class="col-md-12" ng-repeat="message in messages">
+                                <br ng-show="!$first">
+                                <br ng-show="!$first">
+                                <div class="blockquote-box clearfix">
+                                    <div class="square pull-left">
+                                        <img src="http://placehold.it/60/8e44ad/FFF&text=B" alt="" class="" />
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <h4>
+                                        <strong>{{message.createdby}}</strong></h4>
+                                    </div>
+                                    <div class="col-md-push-3 col-md-6">
+                                        <em>
+                                        <small>commented on {{message.createdat}}</small> &nbsp;
+                                        <!-- <a class="glyphicon glyphicon-pencil"></a>
+                                        <a class="glyphicon glyphicon-remove"></a> -->
+                                        </em>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <p>
+                                        {{message.messagebody}}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <br>
+                            <div ng-show="replyButtonClicked" ng-repeat="reply in replies">
+                                <div class="col-md-12">
+                                <br>
+                                <br>
+                                    <div class="blockquote-box clearfix">
+                                        <div class="square pull-left">
+                                            <img src="http://placehold.it/60/8e44ad/FFF&text=B" alt="" class="" />
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <h4>
+                                            <strong>Savinay</strong></h4>
+                                        </div>
+                                        <div class="col-md-push-3 col-md-6">
+                                            <em>
+                                            <small>commented on {{today | date: 'dd MMMM, yyyy'}}</small> &nbsp;
+                                            <!-- <a class="glyphicon glyphicon-pencil"></a>
+                                            <a class="glyphicon glyphicon-remove"></a> -->
+                                            </em>
+                                        </div>
+                                        <div class="col-md-10">
+                                            <p value="reply.body">
+                                            {{reply.body}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div ng-show="!insideReplyBox">
+                                <textarea class="form-control" placeholder="Click here to Reply or Forward" ng-click="showReplyButton()"></textarea>
+                            </div>
+                            <div ng-show="insideReplyBox">
+                                <div class="col-md-5">
+                                    <div class="alert alert-danger text-center" ng-show="showerror" style="background-color: #f2dede; border-color: #ebccd1; padding: 7px">
+                                        <small class="error" ng-show="showerror" style="color: #a94442">
+                                        There was an error. Reply cannot be blank.
+                                        </small>
+                                    </div>
+                                </div>
+                                <textarea class="form-control" rows="5" ng-model="replytext" ng-change="changeButtonText()"></textarea>
+                                <br>
+                                <div class="col-md-12">
+                                    <div class="btn-toolbar">
+                                        <button class="btn btn-info pull-right fa fa-trash-o col-md-1" ng-click="deleteReply()" style="height:42px"></button>&nbsp;&nbsp;
+                                        <button class="btn btn-info col-md-2 pull-right" ng-click="closeTicket()">{{buttontext}}</button>&nbsp;&nbsp;
+                                        <button type="submit" class="btn btn-info col-md-2 pull-right" ng-click="validateAndAddReply()">Reply</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                        <br>
                     </div>
                 </div>
             </div>
