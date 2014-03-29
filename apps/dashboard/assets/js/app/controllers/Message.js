@@ -97,7 +97,9 @@ angular.module('do.message', [])
 
 .controller('InboxCtrl', ['$scope', '$filter', 'ngTableParams', '$log',
     '$location',
-    function MessageCtrl($scope, $filter, ngTableParams, $log, $location) {
+    function ($scope, $filter, ngTableParams, $log, $location) {
+
+        $scope.replytext = 'hello world';
 
         console.log('inside inboxctrl and showtable is true');
         $scope.showTable = true;
@@ -107,10 +109,7 @@ angular.module('do.message', [])
             $scope.showTable = true;
         }
 
-        $scope.openReplyBox = function(){
-            $log.info("Inside replybox");
-            
-        }
+
 
         // Get Data from backend TODO
 
@@ -266,7 +265,7 @@ angular.module('do.message', [])
 ])
 
 .controller('SentCtrl', ['$scope', '$filter', 'ngTableParams',
-    function MessageCtrl($scope, $filter, ngTableParams) {
+    function ($scope, $filter, ngTableParams) {
 
         var data = [{
             name: 'Larry Page',
@@ -665,8 +664,110 @@ angular.module('do.message', [])
 
 .controller('MessageBodyCtrl', ['$scope',
     function ($scope) {
-        // Get Data from Backend
-        $scope.messages =
-            'Hi, this is Larry Page. Thanks for such an offer. It was great.... Lorem Ipsum.......'
+        $scope.openReplyBox = function () {
+            $log.info("Inside replybox");
+
+        }
+
+        $scope.today = new Date();
+
+        // Get Data from Backend TODO
+        $scope.messages = [{
+            messagebody: 'Hi, this is Larry Page. Thanks for such an offer. It was great.... Lorem Ipsum.......',
+            createdby: 'Savinay',
+            createdat: '23rd March, 2014'
+        }, {
+            messagebody: 'Hi, this is Sergey Brin. Thanks for such an offer. It was great.... Lorem Ipsum.......cadilus quasum irium idler sherlock holmes',
+            createdby: 'John',
+            createdat: '24th March, 2014'
+        }];
+
+
+        $scope.replies = [];
+
+        $scope.replyButtonClicked = false;
+
+        $scope.showReplyButton = function () {
+            $scope.insideReplyBox = true;
+            console.log('inside show reply button');
+            $scope.replytext = '';
+            console.log($scope.replytext);
+            $scope.buttontext = 'Close';
+            /*if(!$scope.replytext.length){
+                
+                console.log('inside replytext length > 0');
+            } else {
+                $scope.buttontext = 'Close and Reply';
+            }*/
+        }
+
+        $scope.changeButtonText = function () {
+            // $scope.buttontext = 'Close and Reply';
+            console.log("inside change button text");
+            if ($scope.replytext.length > 0) {
+                console.log('replytext length: ', $scope.replytext.length);
+                $scope.showerror = false;
+                $scope.buttontext = 'Close & Reply';
+            } else {
+                // $scope.showerror = true;
+                $scope.buttontext = 'Close';
+            }
+        }
+
+        $scope.deleteReply = function () {
+            console.log('deleting text', $scope.replytext);
+            // $scope.replytext = '';
+            $scope.showerror = false;
+            console.log('deleting text', $scope.replytext);
+            $scope.buttontext = 'Close';
+            $scope.insideReplyBox = false;
+            $scope.replyButtonClicked = true;
+        };
+
+        $scope.validateAndAddReply = function () {
+            console.log('reply text length is:', $scope.replytext.length);
+            if (!$scope.replytext.length) {
+                console.log('error in reply');
+                $scope.showerror = true;
+            }
+            if ($scope.replytext.length > 0) {
+                console.log("reply button clicked and validated");
+                $scope.replyButtonClicked = true;
+                $scope.replytextInDiv = $scope.replytext;
+                $scope.replytext = '';
+                $scope.replies.push({
+                    body: $scope.replytextInDiv,
+                    name: 'Savinay'
+                })
+                console.log('obejct of replies: ', $scope.replies);
+                $scope.buttontext = 'Close';
+                $scope.insideReplyBox = false;
+            }
+            console.log('validateReply', $scope.replytext);
+        }
+
+        $scope.closeTicket = function () {
+            if ($scope.replytext.length > 0) {
+                $scope.replyButtonClicked = true;
+                $scope.replytextInDiv = $scope.replytext;
+                $scope.replytext = '';
+                $scope.replies.push({
+                    body: $scope.replytextInDiv,
+                    name: 'Savinay'
+                })
+            }
+            $scope.buttontext = 'Reopen';
+
+        }
+
+        if (!$scope.replytext.length) {
+            $scope.buttontext = 'Close';
+        }
+
+        if ($scope.replytext.length > 0) {
+            console.log('reply length:', $scope.replytext.length);
+            $scope.buttontext = 'Close & Reply';
+        }
+
     }
 ]);

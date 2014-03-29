@@ -172,7 +172,7 @@
 
     //new dashboard controllers are from this point
 
-angular.module('do.users', [])
+    angular.module('do.users', [])
 
     .config(['$stateProvider',
         function ($stateProvider) {
@@ -272,7 +272,7 @@ angular.module('do.users', [])
         }
     ])
 
-    .controller('TableCtrl', ['$scope', '$filter', 'ngTableParams', 
+    .controller('TableCtrl', ['$scope', '$filter', 'ngTableParams',
         function ($scope, $filter, ngTableParams) {
             var data = [{
                 name: "Moroni",
@@ -433,7 +433,7 @@ angular.module('do.users', [])
             });
 
             $scope.tabledropdown = {
-                
+
             }
 
         }
