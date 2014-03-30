@@ -4,7 +4,7 @@ var loadApp = require('../load'),
   async = require('async'),
   _ = require('lodash'),
 
-  TEST_URL = 'http://localhost:3000';
+  TEST_URL = 'http://localhost:8002';
 
 
 /**
