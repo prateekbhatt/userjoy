@@ -29,7 +29,7 @@ exports.start = function startServer(done) {
 
   var app = express();
 
-  app.set('port', process.env.PORT || 3000);
+  app.set('port', process.env.PORT || 8002);
   setEnv();
 
   loadMiddleware(app);
