@@ -1,0 +1,25 @@
+<div class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" ng-show="title">
+                <button type="button" class="close" ng-click="$hide()">&times;</button>
+                <h4 class="modal-title" ng-bind="title"></h4>
+            </div>
+            <div class="modal-body">
+                <p ng-bind="content"></p>
+                <div class="media">
+                    <a class="pull-left" href="#">
+                    <img class="media-object" src="/images/mediaimage.jpg" style="width: 50px; height: 50px;">
+                    </a>
+                    <div class="media-body">
+                        <textarea class="form-control" placeholder="Write your message"></textarea>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="addComment()">Comment</button>
+            </div>
+        </div>
+    </div>
+</div>

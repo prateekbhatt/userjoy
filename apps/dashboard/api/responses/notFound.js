@@ -49,7 +49,7 @@
 
 
 module.exports = function sendAngularBase() {
-
+  console.log('INSIDE 404: ', this.req.path);
   // Get access to `req`, `res`, `sails`
   var req = this.req;
   var res = this.res;

@@ -1,0 +1,322 @@
+/*code for sticky footer*/
+
+html, body {
+    height: 100%;
+}
+/*Placeholder Font Color*/
+
+.form-control: -moz-placeholder {
+    color: #000000;
+}
+.form-control: : -moz-placeholder {
+    color: #000000;
+}
+: : -webkit-input-placeholder {
+    /* WebKit browsers */
+
+color: #000000;
+}
+: -moz-placeholder {
+    /* Mozilla Firefox 4 to 18 */
+
+color: #000000;
+}
+: : -moz-placeholder {
+    /* Mozilla Firefox 19+ */
+
+color: #000000;
+}
+: -ms-input-placeholder {
+    /* Internet Explorer 10+ */
+
+color: #000000;
+}
+/*Placeholder Font Color*/
+
+/* Remove box-shadow from focussed inputs */
+
+/*.form-control:focus {
+  box-shadow: none;
+  border-width: 2px;
+}*/
+
+/* Wrapper for page content to push down footer */
+
+#sticky-footer-wrap {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    /* Negative indent footer by its height */
+
+margin: 0 auto -60px;
+    /* Pad bottom by footer height */
+
+padding: 0 0 60px;
+}
+/* Set the fixed height of the footer here */
+
+#sticky-footer {
+    height: 60px;
+}
+/* Lastly, apply responsive CSS fixes as necessary */
+
+@media (max-width: 767px) {
+    #sticky-footer {
+        margin-left: -20px;
+        margin-right: -20px;
+        padding-left: 20px;
+        padding-right: 20px;
+   }
+}
+/*code for sticky footer ends*/
+
+.navbar-brand {
+    font-size: 28px;
+    /*color: #2c3e50;*/
+}
+/*remove bottom margin from navbar*/
+
+.navbar-modified {
+    margin-bottom: 0;
+}
+/*container-content creates padding-top for the block partial*/
+
+.container-content {
+    padding-top: 20px;
+}
+/*remove bottom-margin on alert-bar*/
+
+.alert-bar {
+    margin-bottom: 0;
+    /*font-weight: bold;*/
+}
+#navbar-logout-btn {
+    color: #df2e1b;
+    background-color: #fff;
+    border-color: #df2e1b;
+}
+.border-color {
+    border: 1px solid #ccc;
+}
+/*.horiz-bar {
+  background-color: #ffffff;
+  content: "";
+  display: inline-block;
+  height: 1px;
+  position: relative;
+  vertical-align: middle;
+  width: 50%;
+}
+/*
+.hidden-sm {
+  .hidden-sm {
+  display: inherit !important;
+}
+}*/
+
+/* 
+Author: Start Bootstrap - http://startbootstrap.com
+'SB Admin' HTML Template by Start Bootstrap
+
+All Start Bootstrap themes are licensed under Apache 2.0. 
+For more info and more free Bootstrap 3 HTML themes, visit http://startbootstrap.com!
+*/
+
+/* ATTN: This is mobile first CSS - to update 786px and up screen width use the media query near the bottom of the document! */
+
+/* Global Styles */
+
+#navbar-sidenav-wrapper {
+    padding-left: 0;
+}
+a {
+    color: #428bca;
+    text-decoration: none;
+}
+a:hover, a:focus {
+    color: #2a6496;
+    text-decoration: underline;
+}
+#navbar-sidenav-page-wrapper {
+    width: 100%;
+    padding: 5px 15px;
+}
+/*hide navbar brand on sidenav for smaller screens*/
+
+#navbar-brand-sidenav {
+    display: none;
+}
+/* Edit Below to Customize Widths > 768px */
+
+@media (min-width: 768px) {
+    /* Wrappers */
+
+#navbar-brand-sidenav {
+        display: block;
+   }
+   #navbar-sidenav-wrapper {
+       padding-left: 180px;
+  }
+  #navbar-sidenav-page-wrapper {
+      padding: 15px 25px;
+ }
+ /* Side Nav */
+
+.navbar-sidenav {
+     margin-left: -180px;
+     left: 180px;
+     width: 180px;
+     position: fixed;
+     color: #2c3e50;
+     /*padding-top: 61px;*/
+
+height: 100%;
+     border-radius: 0;
+     border: none;
+     background-color: #ecf0f1;
+     overflow-y: auto;
+}
+.navbar-default .navbar-sidenav>.active>a, .navbar-default .navbar-nav>.active>a:hover, .navbar-default .navbar-nav>.active>a:focus {
+    color: #fff;
+    background-color: #7f8c8d;
+}
+/* Bootstrap Default Overrides - Customized Dropdowns for the Side Nav */
+
+.navbar-sidenav>li.dropdown>ul.dropdown-menu {
+    position: relative;
+    min-width: 180px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+}
+.navbar-sidenav>li.dropdown>ul.dropdown-menu>li>a {
+    color: #999999;
+    padding: 15px 15px 15px 25px;
+}
+.navbar-sidenav>li.dropdown>ul.dropdown-menu>li>a:hover, .navbar-sidenav>li.dropdown>ul.dropdown-menu>li>a.active, .navbar-sidenav>li.dropdown>ul.dropdown-menu>li>a:focus {
+    color: #fff;
+    background-color: #080808;
+}
+.navbar-nav>li.dropdown .open>ul.dropdown-menu > li > a, .navbar-nav>li.dropdown .open>ul.dropdown-menu > li > a:hover, .navbar-nav>li.dropdown .open>ul.dropdown-menu > li > a:focus {
+    color: #999;
+    background-color: #222;
+}
+.navbar-sidenav>li>a {
+    width: 180px;
+}
+.navbar-inverse .navbar-nav>li>a:hover, .navbar-inverse .navbar-nav>li>a:focus {
+    background-color: #080808;
+}
+.navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:hover, .navbar-inverse .navbar-nav > .open > a:focus {
+    background-color: #000;
+    color: #ffffff;
+}
+.navbar-inverse .navbar-nav > li > a {
+    color: #999;
+}
+.navbar-inverse .navbar-nav > li > a:hover, .navbar-inverse .navbar-nav > li > a:focus {
+    color: #fff;
+    background-color: #000;
+}
+.dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus {
+    text-decoration: none;
+    color: #ffffff;
+    background-color: #222;
+}
+.navbar-inverse .navbar-right .navbar-nav > li.dropdown > a:hover, .navbar-inverse .navbar-right .navbar-nav > li.dropdown > a:focus {
+    color: #fff;
+    background-color: #000;
+}
+.navbar-inverse .navbar-header > a:hover, .navbar-inverse .navbar-header > a:focus {
+    color: #fff;
+}
+.dropdown-menu > .active > a, .dropdown-menu > .active > a:hover, .dropdown-menu > .active > a:focus {
+    color: #fff;
+    text-decoration: none;
+    background-color: #000;
+    outline: 0;
+}
+.pagination > .disabled > span, .pagination > .disabled > a, .pagination > .disabled > a:hover, .pagination > .disabled > a:focus {
+    color: #999;
+    background-color: #fff;
+    border-color: #ddd;
+    cursor: not-allowed;
+}
+.pagination > li > a, .pagination > li > span {
+    position: relative;
+    float: left;
+    padding: 10px 15px;
+    line-height: 1.428571429;
+    text-decoration: none;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    margin-left: -1px;
+}
+.btn-info {
+    color: #ffffff;
+    background-color: #5bc0de;
+    border-color: #46b8da;
+}
+.btn-info:hover, .btn-info:focus, .btn-info:active, .btn-info.active, .open .dropdown-toggle.btn-info {
+    color: #ffffff;
+    background-color: #39b3d7;
+    border-color: #3498db;
+}
+.btn-default:hover, .btn-default:focus, .btn-default:active, .btn-default.active, .open .dropdown-toggle.btn-default {
+    color: #333;
+    background-color: #ebebeb;
+    border-color: #adadad;
+}
+.btn-default {
+    color: #333;
+    background-color: #fff;
+    border-color: #ccc;
+}
+.form-control:focus {
+    border-color: #66afe9;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+}
+.form-control {
+    border: 1px solid #ccc;
+}
+.navbar-inverse .navbar-nav > .active > a {
+    color: #999;
+    background-color: #222;
+}
+.navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
+    color: #fff;
+    background-color: #000;
+}
+.navbar-right .dropdown-menu {
+    right: 0;
+    left: auto;
+}
+.btn-default.disabled, .btn-default[disabled], fieldset[disabled] .btn-default, .btn-default.disabled:hover, .btn-default[disabled]:hover, fieldset[disabled] .btn-default:hover, .btn-default.disabled:focus, .btn-default[disabled]:focus, fieldset[disabled] .btn-default:focus, .btn-default.disabled:active, .btn-default[disabled]:active, fieldset[disabled] .btn-default:active, .btn-default.disabled.active, .btn-default[disabled].active, fieldset[disabled] .btn-default.active {
+    background-color: #fff;
+    border-color: #95a5a6;
+}
+.panel-group {
+    margin-bottom: 0px
+}
+.panel-collapse {
+    background-color: #f8f8f8;
+}
+accordion > .panel-group > .panel .panel-default .ng-isolate-scope > .panel-heading {
+    background-color: #f8f8f8;
+}
+hr {
+    margin-top: 21px;
+    margin-bottom: 21px;
+    border-top: 1px solid #ecf0f1;
+}
+#chart {
+    height: 200px;
+    width: 400px;
+}
+}
