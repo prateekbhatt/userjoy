@@ -2,11 +2,11 @@
 
 set -e
 
-echo 'Adding do, app.do, api.do /etc/hosts'
+echo 'Adding do, app.do, api.do, cdn.do to /etc/hosts'
 
 ETCHOSTFILE=/etc/hosts
 ETCHOSTURL=127.0.0.1
-declare -a DOHOSTS=( "do.localhost" "app.do.localhost" "api.do.localhost" )
+declare -a DOHOSTS=( "do.localhost" "app.do.localhost" "api.do.localhost" "cdn.do.localhost" )
 
 for host in "${DOHOSTS[@]}"
 do

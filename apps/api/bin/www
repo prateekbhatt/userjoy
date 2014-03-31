@@ -1,0 +1,21 @@
+#!/usr/bin/env node
+var debug = require('debug')('my-application');
+var app = require('../app');
+
+app.set('port', process.env.PORT || 3000);
+
+function printMessage(text) {
+
+  console.log();
+  console.log('-------------------------------------------------');
+  console.log('   Express server listening');
+  console.log('   Port              :     ', app.get('port'));
+  console.log('   Environment       :     ', process.env.NODE_ENV);
+  console.log('-------------------------------------------------');
+  console.log();
+
+}
+
+var server = app.listen(app.get('port'), function() {
+  printMessage();
+});

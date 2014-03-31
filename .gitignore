@@ -25,6 +25,7 @@ results
 
 node_modules
 bower_components
+components
 npm-debug.log
 
 
@@ -37,7 +38,7 @@ npm-debug.log
 .netbeans
 nbproject
 .idea
-
+local/
 
 ########################
 # local config (INFO: Do Not ignore the local js file)

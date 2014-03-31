@@ -1,0 +1,7 @@
+--ui bdd
+--recursive
+--reporter spec
+--growl
+--slow 30
+--check-leaks
+--globals CookieAccessInfo,Cookie,CookieJar,request,_,async,loginUser,logoutUser,saved,setupTestDb
