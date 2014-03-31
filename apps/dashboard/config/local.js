@@ -23,6 +23,6 @@
  * http://sailsjs.org/#documentation
  */
 
-var env = process.env.NODE_ENV || 'development',
-  appName = 'dashboard';
-module.exports = require('../../config')(env, appName);
+var appName = 'dashboard';
+
+module.exports = require('../../config')(appName);

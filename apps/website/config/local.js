@@ -23,6 +23,6 @@
  * http://sailsjs.org/#documentation
  */
 
-var env = process.env.NODE_ENV || 'development',
-  appName = 'website';
-module.exports = require('../../config')(env, appName);
+var appName = 'website';
+
+module.exports = require('../../config')(appName);
