@@ -42,7 +42,8 @@ function getHosts(url) {
   var hosts = {
     website: 'http://' + url,
     dashboard: 'http://' + 'app.' + url,
-    api: 'http://' + 'api.' + url
+    api: 'http://' + 'api.' + url,
+    cdn: 'http://' + 'cdn.' + url
   };
   return hosts;
 }
