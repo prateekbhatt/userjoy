@@ -37,7 +37,7 @@ npm-debug.log
 .netbeans
 nbproject
 .idea
-try/
+local/
 
 ########################
 # local config (INFO: Do Not ignore the local js file)
