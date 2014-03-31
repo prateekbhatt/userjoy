@@ -1,0 +1,23 @@
+{
+  "name": "littlejohn-js",
+  "author": "Prateek Bhatt <prattbhatt@gmail.com>",
+  "version": "1.0.0",
+  "private": "true",
+  "description": "js lib to capture data and show notifications",
+  "repository": "git://github.com/prateekbhatt/littlejohn.git",
+  "main": "dodatado.js",
+  "dependencies": {},
+  "devDependencies": {
+    "component": "0.19.5",
+    "express": "~3.1.0",
+    "hbs": "~2.3.0",
+    "mocha-phantomjs": "3.1.2",
+    "uglify-js": ">= 1.3.4",
+    "underscore": "~1.4.3",
+    "phantomjs": "~1.9.2-0",
+    "gravy": "*"
+  },
+  "scripts": {
+    "test": "make test"
+  }
+}
