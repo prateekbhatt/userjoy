@@ -33,10 +33,14 @@
     "angular-motion": "~0.3.2",
     "angular-sanitize": "~1.2.14",
     "angular-route": "~1.2.14",
-    "textAngular": "~1.2.0"
+    "textAngular": "~1.2.0",
+    "d3": "~3.4.4",
+    "nvd3": "~1.1.15-beta",
+    "angularjs-nvd3-directives": "~0.0.5-beta"
   },
   "resolutions": {
-    "jquery": "2.0.0",
-    "angular": "1.2.15-build.2399+sha.ca4ddfa"
+    "angular": "1.2.15-build.2399+sha.ca4ddfa",
+    "d3": "~3.4.4",
+    "nvd3": "~1.1.15-beta"
   }
 }
