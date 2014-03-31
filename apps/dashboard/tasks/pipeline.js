@@ -27,6 +27,8 @@ var cssFilesToInject = [
 
   'bower_components/angular-motion/dist/angular-motion.min.css',
 
+  'bower_components/nvd3/nv.d3.css',
+
   // all other styles go below
   'styles/**/*.css'
 ];
@@ -56,6 +58,9 @@ var jsFilesToInject = [
   'bower_components/angular-animate/angular-animate.js',
   'bower_components/angular-sanitize/angular-sanitize.min.js',
   'bower_components/textAngular/textAngular.js',
+  'bower_components/d3/d3.min.js',
+  'bower_components/nvd3/nv.d3.js',
+  'bower_components/angularjs-nvd3-directives/dist/angularjs-nvd3-directives.js',
   // 'bower_components/textAngular/textAngular-sanitize.js',
   // 'js/app/textAng.js',
 
