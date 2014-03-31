@@ -1,0 +1,19 @@
+<div class="panel panel-default">
+    <div class="container">
+
+        <div class="row">
+
+            <div class="col-md-3">
+                <h3>Analyze your Users</h3>
+                <br>
+                <div class="list-group">
+                    <a ui-sref="users.segment" class="list-group-item" ng-click="{ active: isActive('/users/segment')}">Segment</a>
+                    <a ui-sref="users.list" class="list-group-item" ng-click="{ active: isActive('/users/list')}">List</a>
+                </div>
+            </div>
+            <div ui-view="panel"></div>
+        </div>
+    </div>
+
+</div>
+<div ui-view="table"></div>
