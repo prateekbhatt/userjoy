@@ -20,6 +20,11 @@ describe('Resource /auth', function () {
           .expect({
             message: "Logged In Successfully"
           })
+          .expect(function (res) {
+            if (res.header['set-cookie'].length !== 1) {
+              return 'header should contain with set-cookie array with one element';
+            }
+          })
           .end(done);
       });
 
