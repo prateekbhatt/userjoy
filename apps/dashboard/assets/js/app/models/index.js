@@ -3,4 +3,4 @@
  *
  * exposes all the models
  */
-angular.module('models', ['models.user']);
+angular.module('models', ['models.user', 'models.auth']);
