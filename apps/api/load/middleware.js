@@ -1,13 +1,33 @@
-var logger = require('morgan'),
-  cookieParser = require('cookie-parser'),
-  bodyParser = require('body-parser'),
-  passport = require('passport'),
-  session = require('express-session'),
-  restErrorMiddleware = require('../helpers/restErrorMiddleware');
+/**
+ * Module dependencies
+ */
+
+var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
+var logger = require('morgan');
+var passport = require('passport');
+var session = require('express-session');
+
+
+/**
+ * Helpers
+ */
+
+var restErrorMiddleware = require('../helpers/restErrorMiddleware');
+
+
+/**
+ * Session store config
+ */
 
 var sessionStore = require('./sessionStore')(session);
 
-module.exports = function loadMiddleware(app) {
+
+/**
+ * Adds middleware common to all routes
+ * @param  {Object} app
+ */
+module.exports.common = function loadCommonMiddleware(app) {
 
   if (process.env.NODE_ENV === 'development') {
     app.use(logger('dev'));
@@ -16,6 +36,16 @@ module.exports = function loadMiddleware(app) {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded());
   app.use(cookieParser());
+  app.use(restErrorMiddleware);
+
+};
+
+
+/**
+ * Adds session middleware specific to dashboard routes
+ * @param  {Object} app
+ */
+module.exports.session = function loadSessionMiddleware(app) {
 
   // Express Session middleware
   // TODO : ADD SESSION CONFIG TO A DIFFERENT FILE
@@ -32,6 +62,4 @@ module.exports = function loadMiddleware(app) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  app.use(restErrorMiddleware);
-
-}
+};
