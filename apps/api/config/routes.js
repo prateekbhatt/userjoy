@@ -12,11 +12,31 @@ var routes = require('include-all')({
 
 console.log('All route files:', Object.keys(routes));
 
-module.exports = function loadRoutes(app) {
+
+/**
+ * Defines data collector routes
+ * These routes collect data from the js snippet on users' browsers
+ * @param  {Object} app
+ */
+module.exports.collector = function loadCollectorRoutes(app) {
 
   ////////////////////////////////////////////////////////
-  // Define app routers below
-  // The will be executed in the order
+  // Define data collector routes below
+  ////////////////////////////////////////////////////////
+
+};
+
+
+/**
+ * Defines dashboard routes
+ * These routes work on the DoDataDo dashboard
+ * @param  {Object} app
+ */
+module.exports.dashboard = function loadDashboardRoutes(app) {
+
+  ////////////////////////////////////////////////////////
+  // Define dashboard api routes below
+  // They will be executed in the order
   // they are defined
   /////////////////////////////////////////////////////////
 
@@ -29,24 +49,25 @@ module.exports = function loadRoutes(app) {
   /////////////////////////////////////////////////////////
   // Root url router should be defined at the end
   /////////////////////////////////////////////////////////
-
   app.use('/', routes.IndexController);
-
   /////////////////////////////////////////////////////////
+};
 
 
-  /////////////////////////////////////////////////////////
-  // Error handling routes should
-  // be defined below
+/**
+ * Defines error routes
+ * @param  {Object} app
+ */
+module.exports.error = function loadErrorRoutes(app) {
 
+  ////////////////////////////////////////////////////////
+  // Define error handling routes below
+  ////////////////////////////////////////////////////////
 
 
   app.use(function (err, req, res, next) {
-
     var badRequestErr = errorHelper(err);
-
     res.json(badRequestErr, badRequestErr.status);
-
   });
 
   /// catch 404 and forwarding to error handler
@@ -55,8 +76,6 @@ module.exports = function loadRoutes(app) {
     err.status = 404;
     next(err);
   });
-
-  /// error handlers
 
   // development error handler
   // will print stacktrace
@@ -78,4 +97,4 @@ module.exports = function loadRoutes(app) {
     }, 404);
   });
 
-}
+};

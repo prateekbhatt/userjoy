@@ -32,8 +32,26 @@ exports.start = function startServer(done) {
   app.set('port', process.env.PORT || 8002);
   setEnv();
 
-  loadMiddleware(app);
-  loadRoutes(app);
+
+  // common middleware for all routes
+  loadMiddleware.common(app);
+
+
+  // collector routes which do not need session
+  loadRoutes.collector(app);
+
+
+  // session middleware required for dashboard routes
+  loadMiddleware.session(app);
+
+
+  // dashboard routes
+  loadRoutes.dashboard(app);
+
+
+  // error handling routes
+  loadRoutes.error(app);
+
 
   async.waterfall([
 
