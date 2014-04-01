@@ -5,6 +5,8 @@ var logger = require('morgan'),
   session = require('express-session'),
   restErrorMiddleware = require('../helpers/restErrorMiddleware');
 
+var sessionStore = require('./sessionStore')(session);
+
 module.exports = function loadMiddleware(app) {
 
   if (process.env.NODE_ENV === 'development') {
@@ -20,8 +22,10 @@ module.exports = function loadMiddleware(app) {
   app.use(session({
     secret: 'HAHAHAHA',
     cookie: {
+      key: 'dodatado.sid',
       maxAge: 60000
-    }
+    },
+    store: sessionStore
   }));
 
   // Passport middleware
