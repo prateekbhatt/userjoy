@@ -3,6 +3,7 @@ var loadApp = require('../load'),
   mongoose = require('mongoose'),
   async = require('async'),
   _ = require('lodash'),
+  expect = require('chai').expect,
 
   TEST_URL = 'http://localhost:8002';
 
@@ -117,6 +118,7 @@ function defineGlobals() {
   global.async = async;
   global.logoutUser = logoutUser;
   global.setupTestDb = setupTestDb;
+  global.expect = expect;
 }
 
 
