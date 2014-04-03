@@ -45,6 +45,11 @@ exports.start = function startServer(done) {
   loadMiddleware.session(app);
 
 
+  // cors middlware to allow requests from app.dodatado.com and dodatado.com
+  // to api routes
+  loadMiddleware.cors(app);
+
+
   // dashboard routes
   loadRoutes.dashboard(app);
 
