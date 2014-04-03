@@ -50,12 +50,27 @@ module.exports.common = function loadCommonMiddleware(app) {
  */
 module.exports.session = function loadSessionMiddleware(app) {
 
+  /**
+   * General config for all apps
+   */
+
+  var config = require('../../config')('api');
+
+
+  /**
+   * Cookie domain
+   */
+
+  var cookieDomain = config.cookieDomain;
+
+
   // Express Session middleware
   // TODO : ADD SESSION CONFIG TO A DIFFERENT FILE
   app.use(session({
     secret: 'HAHAHAHA',
+    key: 'dodatado.sid',
     cookie: {
-      key: 'dodatado.sid',
+      domain: cookieDomain,
       maxAge: 60000
     },
     store: sessionStore
