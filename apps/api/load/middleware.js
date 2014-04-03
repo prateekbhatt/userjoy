@@ -8,6 +8,7 @@ var logger = require('morgan');
 var passport = require('passport');
 var session = require('express-session');
 var cors = require('cors');
+var methodOverride = require('method-override');
 
 
 /**
@@ -36,6 +37,7 @@ module.exports.common = function loadCommonMiddleware(app) {
 
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded());
+  app.use(methodOverride());
   app.use(cookieParser());
   app.use(restErrorMiddleware);
 
