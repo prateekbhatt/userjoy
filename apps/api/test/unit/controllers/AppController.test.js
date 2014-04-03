@@ -1,4 +1,4 @@
-describe('Resource /apps', function () {
+describe.only('Resource /apps', function () {
 
   var newApp = {
     name: 'My New App'
@@ -44,13 +44,62 @@ describe('Resource /apps', function () {
         loginUser(done);
       });
 
+    it('should return error if name is not present', function (done) {
 
-    it('creates new app',
+      var newApp = {
+        domain: 'dodatado.com'
+      };
+
+      request
+        .post('/apps')
+        .set('cookie', loginCookie)
+        .send(newApp)
+        .expect('Content-Type', /json/)
+        .expect(400)
+        .expect({
+          "error": [
+            "name is required"
+          ],
+          "status": 400
+        })
+        .end(done);
+
+    });
+
+    it('should return error if domain is not present', function (done) {
+
+      var newApp = {
+        name: 'my-new-app'
+      };
+
+      request
+        .post('/apps')
+        .set('cookie', loginCookie)
+        .send(newApp)
+        .expect('Content-Type', /json/)
+        .expect(400)
+        .expect({
+          "error": [
+            "domain is required"
+          ],
+          "status": 400
+        })
+        .end(done);
+
+    });
+
+    it('should create new app',
 
       function (done) {
 
+        var newApp = {
+          name: 'new-app',
+          domain: 'new-app.co'
+        };
+
         request
           .post('/apps')
+          .set('cookie', loginCookie)
           .send(newApp)
           .expect('Content-Type', /json/)
           .expect(201)
@@ -105,6 +154,7 @@ describe('Resource /apps', function () {
 
         request
           .get('/apps')
+          .set('cookie', loginCookie)
           .expect('Content-Type', /json/)
           .expect(function (res) {
             if (!Array.isArray(res.body)) {
@@ -151,6 +201,7 @@ describe('Resource /apps', function () {
 
         request
           .get('/apps/' + saved.apps.first._id)
+          .set('cookie', loginCookie)
           .expect('Content-Type', /json/)
           .expect(function (res) {
             if (res.body.admin !== saved.accounts.first._id) {
@@ -171,6 +222,7 @@ describe('Resource /apps', function () {
 
         request
           .get('/apps/' + randomId)
+          .set('cookie', loginCookie)
           .expect('Content-Type', /json/)
           .expect(404)
           .expect({
@@ -188,6 +240,7 @@ describe('Resource /apps', function () {
 
         request
           .get('/apps/' + saved.apps.second._id)
+          .set('cookie', loginCookie)
           .expect('Content-Type', /json/)
           .expect(403)
           .end(done);
@@ -236,6 +289,7 @@ describe('Resource /apps', function () {
           .send({
             name: newName
           })
+          .set('cookie', loginCookie)
           .expect('Content-Type', /json/)
           .expect(200)
           .expect(function (res) {

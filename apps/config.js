@@ -84,6 +84,15 @@ function getCorsWhitelist(env) {
 }
 
 /**
+ * Gets base cookie domain
+ * @param  {string} env
+ * @return {string}     cookie domain
+ */
+function getCookieDomain(env) {
+  return '.'.concat(getBaseUrl(env));
+}
+
+/**
  * Get general config settings for all apps
  * @param  {string} appName name of the application
  * @return {object}         config settings object
@@ -105,6 +114,7 @@ module.exports = function (appName) {
   config.appUrl = config.hosts[appName];
   config.dbPath = getDbPath(env);
   config.corsWhitelist = getCorsWhitelist(env);
+  config.cookieDomain = getCookieDomain(env);
 
   return config;
 
