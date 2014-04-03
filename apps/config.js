@@ -25,6 +25,12 @@ var DATABASES = {
   test: "dodatado-api-test"
 };
 
+var API_CORS_WHITELIST = {
+  development: ['http://app.do.localhost', 'http://do.localhost'],
+  production: ['app.dodatado.com', 'dodatado.com'],
+  test: ['http://app.do.localhost', 'http://do.localhost']
+};
+
 /**
  * Get top-level domain
  * @param  {String} env
@@ -69,6 +75,15 @@ function getDbPath(env) {
 }
 
 /**
+ * Gets array of domains whitelisted by api for cors requests
+ * @param {string} env
+ * @return {array} whitelist
+ */
+function getCorsWhitelist(env) {
+  return API_CORS_WHITELIST[env];
+}
+
+/**
  * Get general config settings for all apps
  * @param  {string} appName name of the application
  * @return {object}         config settings object
@@ -88,7 +103,8 @@ module.exports = function (appName) {
   config.baseUrl = getBaseUrl(env);
   config.hosts = getHosts(config.baseUrl);
   config.appUrl = config.hosts[appName];
-  config.dbPath = getDbPath(env)
+  config.dbPath = getDbPath(env);
+  config.corsWhitelist = getCorsWhitelist(env);
 
   return config;
 
