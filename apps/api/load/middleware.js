@@ -8,6 +8,7 @@ var logger = require('morgan');
 var passport = require('passport');
 var session = require('express-session');
 var cors = require('cors');
+var methodOverride = require('method-override');
 
 
 /**
@@ -25,32 +26,6 @@ var sessionStore = require('./sessionStore')(session);
 
 
 /**
- * General config for all apps
- */
-
-var config = require('../../config')('api');
-
-
-/**
- * CORS whitelist for api routes
- */
-
-var whitelist = config.corsWhitelist;
-
-
-/**
- * CORS settings
- */
-
-var corsOptions = {
-  origin: function (origin, callback) {
-    var originIsWhitelisted = whitelist.indexOf(origin) !== -1;
-    callback(null, originIsWhitelisted);
-  }
-};
-
-
-/**
  * Adds middleware common to all routes
  * @param  {Object} app
  */
@@ -62,6 +37,7 @@ module.exports.common = function loadCommonMiddleware(app) {
 
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded());
+  app.use(methodOverride());
   app.use(cookieParser());
   app.use(restErrorMiddleware);
 
@@ -98,5 +74,32 @@ module.exports.session = function loadSessionMiddleware(app) {
  * @param {Object} app
  */
 module.exports.cors = function loadCorsMiddleware(app) {
+
+
+  /**
+   * General config for all apps
+   */
+
+  var config = require('../../config')('api');
+
+
+  /**
+   * CORS whitelist for api routes
+   */
+
+  var whitelist = config.corsWhitelist;
+
+
+  /**
+   * CORS settings
+   */
+
+  var corsOptions = {
+    origin: function (origin, callback) {
+      var originIsWhitelisted = whitelist.indexOf(origin) !== -1;
+      callback(null, originIsWhitelisted);
+    }
+  };
+
   app.use(cors(corsOptions));
 };
