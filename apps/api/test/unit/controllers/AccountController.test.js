@@ -47,12 +47,13 @@ describe('Resource /account', function () {
     });
 
     it('logging in user', function (done) {
-      loginUser(done)
+      loginUser(done);
     });
 
     it('fetches account with given id', function (done) {
       request
         .get('/account')
+        .set('cookie', loginCookie)
         .expect('Content-Type', /json/)
         .expect(200)
         .expect(function (res) {
@@ -68,6 +69,7 @@ describe('Resource /account', function () {
 
       request
         .get('/account')
+        .set('cookie', loginCookie)
         .expect('Content-Type', /json/)
         .expect(function (res) {
           if ( !! res.body.password) {
@@ -243,6 +245,7 @@ describe('Resource /account', function () {
 
       request
         .put('/account/name')
+        .set('cookie', loginCookie)
         .send({
           name: newName
         })
