@@ -55,10 +55,10 @@ router
 
     var newAccount = req.body;
 
-
     Account
       .create(newAccount, function (err, acc) {
 
+        console.log('api account post', newAccount, err, acc);
         if (err) {
           return next(err);
         }

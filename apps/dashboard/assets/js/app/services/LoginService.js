@@ -1,24 +1,22 @@
 angular.module('services.LoginService', [])
 
-.service('LoginService', [
+.service('LoginService', ['$log',
 
-    function () {
-        this.attemptLogin = function (email, password) {
-            // create your request to your resource or $http request
+    function ($log) {
 
-            var dummyUser = {
-                email: 'savinay@dodatado.com',
-                password: 'testtest'
-            }
+        var userIsAuthenticated = false;
 
-            if (email === dummyUser.email && password === dummyUser.password) {
-                return true;
-            } else {
-                return false;
-            }
+        this.setUserAuthenticated = function (value) {
+            $log.info('setUserAuthenticated', value);
+            userIsAuthenticated = value;
+        };
 
+        this.getUserAuthenticated = function () {
+            $log.info('getUserAuthenticated', userIsAuthenticated);
+            return userIsAuthenticated;
         };
 
         return this;
+
     }
 ])
