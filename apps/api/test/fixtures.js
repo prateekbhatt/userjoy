@@ -24,11 +24,13 @@ var accounts = {
   apps = {
 
     first: {
-      name: 'First App'
+      name: 'First App',
+      domain: 'firstapp.co'
     },
 
     second: {
-      name: 'Second App'
+      name: 'Second App',
+      domain: 'secondapp.co'
     }
   },
 

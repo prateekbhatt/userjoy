@@ -29,6 +29,11 @@ var AppSchema = new Schema({
     // validate: appNameValidator
   },
 
+  domain: {
+    type: String,
+    required: [true, 'Domain url is required']
+  },
+
   testKey: {
     type: String,
     unique: true
@@ -44,6 +49,12 @@ var AppSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Account',
     required: true
+  },
+
+  // isActive is set to true when we start recieveing data from the app
+  isActive: {
+    type: Boolean,
+    default: false
   }
 
   // TODO : Allow to add team members

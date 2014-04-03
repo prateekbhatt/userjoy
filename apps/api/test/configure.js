@@ -87,7 +87,11 @@ function loginUserGenerator(email, password) {
         message: 'Logged In Successfully'
       })
       .expect(200)
-      .end(done);
+      .end(function (err, res) {
+        global.loginCookie = res.header['set-cookie'];
+        // console.log('loginUser', res.header['set-cookie']);
+        done(err);
+      });
   };
 
 }
@@ -104,7 +108,10 @@ function logoutUser(done) {
       message: 'Logged Out Successfully'
     })
     .expect(200)
-    .end(done);
+    .end(function (err, res) {
+      global.loginCookie = '';
+      done(err);
+    });
 }
 
 
@@ -118,6 +125,7 @@ function defineGlobals() {
   global._ = _;
   global.async = async;
   global.logoutUser = logoutUser;
+  global.loginCookie = '';
   global.setupTestDb = setupTestDb;
   global.expect = expect;
   global.sinon = sinon;
