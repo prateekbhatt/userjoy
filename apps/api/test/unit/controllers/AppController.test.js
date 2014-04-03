@@ -1,4 +1,4 @@
-describe('Resource /apps', function () {
+describe.only('Resource /apps', function () {
 
   var newApp = {
     name: 'My New App'
@@ -44,10 +44,58 @@ describe('Resource /apps', function () {
         loginUser(done);
       });
 
+    it('should return error if name is not present', function (done) {
 
-    it('creates new app',
+      var newApp = {
+        domain: 'dodatado.com'
+      };
+
+      request
+        .post('/apps')
+        .set('cookie', loginCookie)
+        .send(newApp)
+        .expect('Content-Type', /json/)
+        .expect(400)
+        .expect({
+          "error": [
+            "name is required"
+          ],
+          "status": 400
+        })
+        .end(done);
+
+    });
+
+    it('should return error if domain is not present', function (done) {
+
+      var newApp = {
+        name: 'my-new-app'
+      };
+
+      request
+        .post('/apps')
+        .set('cookie', loginCookie)
+        .send(newApp)
+        .expect('Content-Type', /json/)
+        .expect(400)
+        .expect({
+          "error": [
+            "domain is required"
+          ],
+          "status": 400
+        })
+        .end(done);
+
+    });
+
+    it('should create new app',
 
       function (done) {
+
+        var newApp = {
+          name: 'new-app',
+          domain: 'new-app.co'
+        };
 
         request
           .post('/apps')
