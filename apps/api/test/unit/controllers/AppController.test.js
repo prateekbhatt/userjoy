@@ -51,6 +51,7 @@ describe('Resource /apps', function () {
 
         request
           .post('/apps')
+          .set('cookie', loginCookie)
           .send(newApp)
           .expect('Content-Type', /json/)
           .expect(201)
@@ -105,6 +106,7 @@ describe('Resource /apps', function () {
 
         request
           .get('/apps')
+          .set('cookie', loginCookie)
           .expect('Content-Type', /json/)
           .expect(function (res) {
             if (!Array.isArray(res.body)) {
@@ -151,6 +153,7 @@ describe('Resource /apps', function () {
 
         request
           .get('/apps/' + saved.apps.first._id)
+          .set('cookie', loginCookie)
           .expect('Content-Type', /json/)
           .expect(function (res) {
             if (res.body.admin !== saved.accounts.first._id) {
@@ -171,6 +174,7 @@ describe('Resource /apps', function () {
 
         request
           .get('/apps/' + randomId)
+          .set('cookie', loginCookie)
           .expect('Content-Type', /json/)
           .expect(404)
           .expect({
@@ -188,6 +192,7 @@ describe('Resource /apps', function () {
 
         request
           .get('/apps/' + saved.apps.second._id)
+          .set('cookie', loginCookie)
           .expect('Content-Type', /json/)
           .expect(403)
           .end(done);
@@ -236,6 +241,7 @@ describe('Resource /apps', function () {
           .send({
             name: newName
           })
+          .set('cookie', loginCookie)
           .expect('Content-Type', /json/)
           .expect(200)
           .expect(function (res) {
