@@ -8,7 +8,8 @@ angular.module('do.login', [])
                 views: {
                     "main": {
                         templateUrl: '/templates/login.html',
-                        controller: 'LoginCtrl'
+                        controller: 'LoginCtrl',
+                        authenticate: false
                     }
                 }
             })
@@ -16,30 +17,25 @@ angular.module('do.login', [])
     }
 ])
 
-.controller('LoginCtrl', ['$scope', 'LoginService', 'AuthService', '$location',
-    function ($scope, LoginService, AuthService, $location) {
+.controller('LoginCtrl', ['$scope', 'LoginService', 'AuthService', '$state',
+    '$log',
+    function ($scope, LoginService, AuthService, $state, $log) {
+
+        $log.info('LoginCtrl', LoginService.getUserAuthenticated())
+
         // If user is logged in send them to home page
-        if (AuthService.getUserAuthenticated()) {
-            $location.path('/users');
+        if (LoginService.getUserAuthenticated()) {
+            $state.transitionTo('users.list');
         }
 
         // attempt login to your api
         $scope.attemptLogin = function () {
-            
-        var success = LoginService.attemptLogin($scope.email, $scope.password);
-        console.log("success", success);
-            if (success) {
-                AuthService.setUserAuthenticated(true);
-                $location.path('/users');
-            } else {
-                AuthService.setUserAuthenticated(false);
-                // you're probably a hacker
-            }
-       
-         
 
-            /*AuthService.setUserAuthenticated(true);
-            $location.path('/users');*/
+            AuthService.attemptLogin($scope.email, $scope.password);
+            /*$log.info("login success: ", success);
+            if (success) {
+                $state.transitionTo('users.list');
+            }*/
         };
     }
 ]);
