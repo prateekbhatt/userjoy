@@ -7,6 +7,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var passport = require('passport');
 var session = require('express-session');
+var cors = require('cors');
 
 
 /**
@@ -21,6 +22,32 @@ var restErrorMiddleware = require('../helpers/restErrorMiddleware');
  */
 
 var sessionStore = require('./sessionStore')(session);
+
+
+/**
+ * General config for all apps
+ */
+
+var config = require('../../config')('api');
+
+
+/**
+ * CORS whitelist for api routes
+ */
+
+var whitelist = config.corsWhitelist;
+
+
+/**
+ * CORS settings
+ */
+
+var corsOptions = {
+  origin: function (origin, callback) {
+    var originIsWhitelisted = whitelist.indexOf(origin) !== -1;
+    callback(null, originIsWhitelisted);
+  }
+};
 
 
 /**
@@ -62,4 +89,14 @@ module.exports.session = function loadSessionMiddleware(app) {
   app.use(passport.initialize());
   app.use(passport.session());
 
+};
+
+
+/**
+ * Adds CORS middleware for requests from
+ * app subdomain and root domain of dodatado.com
+ * @param {Object} app
+ */
+module.exports.cors = function loadCorsMiddleware(app) {
+  app.use(cors(corsOptions));
 };
