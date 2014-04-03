@@ -22,7 +22,11 @@ module.exports.collector = function loadCollectorRoutes(app) {
 
   ////////////////////////////////////////////////////////
   // Define data collector routes below
+  // app.use('/company', routes.CollectorController);
+  // app.use('/identify', routes.CollectorController);
   ////////////////////////////////////////////////////////
+
+  app.use('/track', routes.CollectorController);
 
 };
 
