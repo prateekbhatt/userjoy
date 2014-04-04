@@ -3,4 +3,5 @@ angular.module('services', [
     'services.utils',
     'services.segmentQueryService',
     'services.LoginService',
+    'services.LoggedInAppService',
 ]);

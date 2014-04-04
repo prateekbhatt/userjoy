@@ -1,8 +1,9 @@
 angular.module('models.auth', ['services'])
 
 .service('AuthService', ['$http', 'utils', 'ipCookie', 'LoginService',
-    '$log', 'config', '$state', '$location',
-    function ($http, utils, ipCookie, LoginService, $log, config, $state, $location) {
+    '$log', 'config', '$state', '$location', 'LoggedInAppService',
+    function ($http, utils, ipCookie, LoginService, $log, config, $state,
+        $location, LoggedInAppService) {
 
         this.attemptLogin = function (email, password) {
 
@@ -12,42 +13,52 @@ angular.module('models.auth', ['services'])
                 email: email,
                 password: password
             }
-            // create your request to your resource or $http request
+            // post $http request to /auth/login
 
-            $http.post(config.apiUrl + '/auth/login', data).success(function(data){
-                $log.info("login successful", arguments);
-                ipCookie('loggedin', "true", { path: '/'});
-                LoginService.setUserAuthenticated(true);
-                $state.transitionTo('users.list');
-                loginSuccessful = true;
-                console.log("loginSuccessful value: ", loginSuccessful);
-            })
+            $http.post(config.apiUrl + '/auth/login', data)
+                .success(function (data) {
 
-            // console.log("loginSuccessful value outside http req:", loginSuccessful);
-            // return loginSuccessful;
+                    ipCookie('loggedin', "true", {
+                        path: '/'
+                    });
+                    LoginService.setUserAuthenticated(true);
 
-            /*if (email === dummyUser.email && password === dummyUser.password) {
-                ipCookie('loggedin', "true", { path: '/'});
-                LoginService.setUserAuthenticated(true);
-                // $log.info("Auth service", LoginService.getUserAuthenticated());
-                return true;
-            } else {
-                ipCookie.remove('loggedin', { path: '/'});
-                LoginService.setUserAuthenticated(false);
-                // $log.info("Auth service", LoginService.getUserAuthenticated());
-                return false;
-            }*/
+                    $http.get(config.apiUrl + '/apps')
+                        .success(function (data) {
+                            $log.info("loggedin Apps: ", data);
+                            LoggedInAppService.setLoggedInApps(
+                                data);
 
+                            if (LoggedInAppService.getLoggedInApps()
+                                .length) {
+                                $state.go('users.list');
+                            } else {
+                                $state.go('onboarding');
+                            }
+
+                        })
+                        .error(function () {
+                            $log.error("error in fetching /apps");
+                            // TODO
+                        })
+
+
+                    // loginSuccessful = true;
+
+                })
         };
 
         this.logout = function () {
             //http post request
-            $http.post(config.apiUrl + '/auth/logout').success(function(){
-                ipCookie.remove('loggedin', { path: '/'});
-                LoginService.setUserAuthenticated(false);
-                $log.info(arguments);
-                $location.path('/login');
-            })
+            $http.post(config.apiUrl + '/auth/logout')
+                .success(function () {
+                    ipCookie.remove('loggedin', {
+                        path: '/'
+                    });
+                    LoginService.setUserAuthenticated(false);
+                    $log.info(arguments);
+                    $location.path('/login');
+                })
         }
 
         return this;
