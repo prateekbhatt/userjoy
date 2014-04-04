@@ -22,7 +22,7 @@ describe('Model App', function () {
   describe('#findByKey', function () {
 
     it('should fetch app using provided test key', function (done) {
-      App.findByKey(saved.apps.first.testKey, function (err, app) {
+      App.findByKey('test', saved.apps.first.testKey, function (err, app) {
         expect(err)
           .to.be.null;
         expect(app)
@@ -34,7 +34,7 @@ describe('Model App', function () {
     });
 
     it('should fetch app using provided live key', function (done) {
-      App.findByKey(saved.apps.first.liveKey, function (err, app) {
+      App.findByKey('live', saved.apps.first.liveKey, function (err, app) {
         expect(err)
           .to.be.null;
         expect(app)
@@ -47,7 +47,7 @@ describe('Model App', function () {
 
 
     it('should return null if key does not exist', function (done) {
-      App.findByKey('random.testKey', function (err, app) {
+      App.findByKey('test', 'random.testKey', function (err, app) {
         expect(err)
           .to.be.null;
         expect(app)
@@ -63,7 +63,7 @@ describe('Model App', function () {
     var fetchedApp;
 
     before(function (done) {
-      App.findByKey(saved.apps.first.liveKey, function (err, app) {
+      App.findByKey('live', saved.apps.first.liveKey, function (err, app) {
         fetchedApp = app;
         done(err);
       });

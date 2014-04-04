@@ -116,11 +116,12 @@ AppSchema.statics.findByAccountId = function (accountId, cb) {
 
 /**
  * Gets app with the key provided
+ *
+ * @param  {string}   mode test/live
  * @param  {string}   key
  * @param  {function} cb callback function
  */
-AppSchema.statics.findByKey = function (key, cb) {
-  var mode = key.split('_')[0];
+AppSchema.statics.findByKey = function (mode, key, cb) {
   var query = {};
 
   mode === 'live' ? (query.liveKey = key) : (query.testKey = key);
