@@ -114,6 +114,39 @@ AppSchema.statics.findByAccountId = function (accountId, cb) {
 };
 
 
+/**
+ * Gets app with the key provided
+ * @param  {string}   key
+ * @param  {function} cb callback function
+ */
+AppSchema.statics.findByKey = function (key, cb) {
+  var mode = key.split('_')[0];
+  var query = {};
+
+  mode === 'live' ? (query.liveKey = key) : (query.testKey = key);
+
+  App
+    .findOne(query)
+    .exec(cb);
+};
+
+
+/**
+ * Checks if request domain matches app domain
+ * Used to authenticate event calls
+ *
+ * @param {string} domain url
+ * @return {boolean}
+ */
+
+AppSchema.methods.checkDomain = function (domain) {
+  if (!domain) {
+    throw new Error('Invalid Domain');
+  }
+  return (this.domain === domain);
+};
+
+
 var App = mongoose.model('App', AppSchema);
 
 module.exports = App;
