@@ -71,7 +71,7 @@ module.exports.session = function loadSessionMiddleware(app) {
     key: 'dodatado.sid',
     cookie: {
       domain: cookieDomain,
-      maxAge: 60000
+      maxAge: 3600000
     },
     store: sessionStore
   }));
