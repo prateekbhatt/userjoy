@@ -21,7 +21,8 @@ angular.module('dodatado', [
     'do.popupmessage',
     'nvd3ChartDirectives',
     'do.login',
-    'do.signup'
+    'do.signup',
+    'do.install'
 ])
 
 .config(function myAppConfig($stateProvider, $urlRouterProvider,

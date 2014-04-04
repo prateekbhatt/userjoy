@@ -9,9 +9,9 @@ angular.module('do.login', [])
                     "main": {
                         templateUrl: '/templates/login.html',
                         controller: 'LoginCtrl',
-                        authenticate: false
                     }
-                }
+                }, 
+                authenticate: false
             })
 
     }
