@@ -1,4 +1,4 @@
-describe.only('Resource /apps', function () {
+describe('Resource /apps', function () {
 
   var newApp = {
     name: 'My New App'
