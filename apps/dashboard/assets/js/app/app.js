@@ -26,9 +26,14 @@ angular.module('dodatado', [
 ])
 
 .config(function myAppConfig($stateProvider, $urlRouterProvider,
-    $locationProvider) {
+    $locationProvider, $httpProvider) {
     $urlRouterProvider.otherwise('/404');
     $locationProvider.html5Mode(true);
+
+    // for making cross domain authentication requests
+    $httpProvider.defaults.useXDomain = true;
+    $httpProvider.defaults.withCredentials = true;
+    delete $httpProvider.defaults.headers.common['X-Requested-With'];
 })
 
 .run(['LoginService', 'ipCookie', '$log',

@@ -7,12 +7,12 @@ angular.module('services.LoginService', [])
         var userIsAuthenticated = false;
 
         this.setUserAuthenticated = function (value) {
-            $log.info('setUserAuthenticated', value);
+            // $log.info('setUserAuthenticated', value);
             userIsAuthenticated = value;
         };
 
         this.getUserAuthenticated = function () {
-            $log.info('getUserAuthenticated', userIsAuthenticated);
+            // $log.info('getUserAuthenticated', userIsAuthenticated);
             return userIsAuthenticated;
         };
 

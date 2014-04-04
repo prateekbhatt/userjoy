@@ -30,15 +30,25 @@ angular.module('do.install', [])
 .controller('installOnboardingAppCtrl', ['$scope', '$http', 'config', '$state',
     function ($scope, $http, config, $state) {
 
-        var data = {
-            name: $scope.appname,
-            domain: $scope.domain
-        }
 
-        $scope.installapp = function() {
-            $http.post(config.apiUrl + '/apps', data).success(function(data){
-                $state.transitionTo('addcode');
-            })
+        $scope.installapp = function () {
+
+            if ($scope.app_form.$valid) {
+
+            } else {
+                $scope.submitted = true;
+            }
+
+            var data = {
+                name: $scope.name,
+                domain: $scope.domain
+            };
+
+            $http
+                .post(config.apiUrl + '/apps', data)
+                .success(function (data) {
+                    $state.transitionTo('addcode');
+                })
         }
     }
 ])
