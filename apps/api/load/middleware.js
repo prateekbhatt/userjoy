@@ -113,7 +113,9 @@ module.exports.cors = function loadCorsMiddleware(app) {
     origin: function (origin, callback) {
       var originIsWhitelisted = whitelist.indexOf(origin) !== -1;
       callback(null, originIsWhitelisted);
-    }
+    },
+    exposedHeaders: ['Set-Cookie', 'set-cookie'],
+    credentials: true
   };
 
   app.use(cors(corsOptions));
