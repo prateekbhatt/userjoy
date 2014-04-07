@@ -57,6 +57,10 @@ var CompanySchema = new Schema({
     type: Date
   },
 
+  createdAt: {
+    type: Date
+  },
+
   // billing data is stored in both company and user models
   billing: {
     status: {
@@ -86,10 +90,6 @@ var CompanySchema = new Schema({
 
     unit: {
       type: String
-    },
-
-    createdAt: {
-      type: Date
     }
   }
 
