@@ -203,8 +203,9 @@ Stores companies of a specific account
 - name
 - totalSessions
 - meta (object containing additonal info about users)
-- createdAt
+- createdAt (should be passed by js snippet)
 - updatedAt
+- tags [] just like user tags
 - billing: {
   status: ['trial', 'free', 'paying', 'cancelled']
 
@@ -213,6 +214,7 @@ Stores companies of a specific account
 ##### Notes:
 
 - Billing data is stored both in Company and User models
+- createdAt property should not be automatically added on company creation
 
 
 

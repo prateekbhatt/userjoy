@@ -86,6 +86,10 @@ var CompanySchema = new Schema({
 
     unit: {
       type: String
+    },
+
+    createdAt: {
+      type: Date
     }
   }
 
@@ -93,11 +97,10 @@ var CompanySchema = new Schema({
 
 
 /**
- * Adds createdAt and updatedAt timestamps
+ * Adds updatedAt timestamps
  */
 
 CompanySchema.plugin(troop.timestamp, {
-  createdPath: 'createdAt',
   modifiedPath: 'updatedAt',
   useVirtual: false
 });
