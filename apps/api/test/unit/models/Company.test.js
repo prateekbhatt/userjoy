@@ -13,7 +13,38 @@ describe('Model Company', function () {
    */
 
   var randomId = '532d6bf862d673ba7131812a';
+  var savedCompany;
 
+
+  describe('#create', function () {
+    it('should create company', function (done) {
+
+      var newCompany = {
+        name: 'Do Data Do 2',
+        appId: randomId
+      };
+
+      Company.create(newCompany, function (err, com) {
+        expect(err)
+          .to.not.exist;
+        expect(com)
+          .to.be.an('object');
+
+        savedCompany = com;
+
+        expect(com.name)
+          .to.eql(newCompany.name);
+        done();
+      });
+
+    });
+
+    it('should not add createdAt unless passed', function () {
+      expect(savedCompany)
+        .not.to.have.property('createdAt');
+    });
+
+  });
 
 
   describe('#getOrCreate', function () {
@@ -29,14 +60,13 @@ describe('Model Company', function () {
 
     it('should return company if company exists', function (done) {
       Company.getOrCreate(randomId, newCompany, function (err, com) {
+
         expect(err)
           .to.not.exist;
         expect(com)
           .to.be.ok;
         expect(com.name)
           .to.eql(newCompany.name);
-        expect(com)
-          .to.have.property('createdAt');
         done();
       });
     });
@@ -48,14 +78,14 @@ describe('Model Company', function () {
       };
 
       Company.getOrCreate(randomId, newCompany, function (err, com) {
+        // TODO: this test needs to be updated, it only needs to check if
+        // User.create is called with the right params (using sinon.spy)
         expect(err)
           .to.not.exist;
         expect(com)
           .to.be.ok;
         expect(com.name)
           .to.eql(newCompany.name);
-        expect(com)
-          .to.have.property('createdAt');
         done();
       });
 
