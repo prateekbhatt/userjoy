@@ -31,7 +31,7 @@ body {
 /* Remove box-shadow from focussed inputs */
 .form-control:focus {
   box-shadow: none;
-  border-width: 2px;
+  border-width: 1px;
 }
 
 /* Wrapper for page content to push down footer */
@@ -201,6 +201,52 @@ For more info and more free Bootstrap 3 HTML themes, visit http://startbootstrap
   .navbar-inverse .navbar-nav>li>a:hover,
   .navbar-inverse .navbar-nav>li>a:focus {
   background-color: #080808;
+  }
+
+  a {
+    color: #428bca;
+    text-decoration: none;
+  }
+
+  a:hover, a:focus {
+    color: #2a6496;
+    text-decoration: underline;
+  }
+
+  .form-control: -moz-placeholder {
+    color: #000000;
+  }
+  .form-control: : -moz-placeholder {
+    color: #000000;
+  }
+
+  .form-control {
+    border: 1px solid #ccc;
+  }
+
+  .form-control:focus {
+    border-color: #66afe9;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+  }
+
+  .btn-info {
+    color: #ffffff;
+    background-color: #5bc0de;
+    border-color: #46b8da;
+  }
+
+  .btn-info:hover, .btn-info:focus, .btn-info:active, .btn-info.active, .open .dropdown-toggle.btn-info {
+    color: #ffffff;
+    background-color: #39b3d7;
+    border-color: #3498db;
+  }
+
+  .alert-danger {
+    background-color: #f2dede;
+    border-color: #ebccd1;
+    color: #a94442;
   }
 
 }
