@@ -1,4 +1,4 @@
-describe.only('Model User', function () {
+describe('Model User', function () {
 
   /**
    * Models
@@ -48,12 +48,6 @@ describe.only('Model User', function () {
     it('should add updatedAt timestamp to user', function () {
       expect(savedUser)
         .to.have.property('updatedAt');
-    });
-
-
-    it('should add firstSessionAt timestamp to user', function () {
-      expect(savedUser)
-        .to.have.property('firstSessionAt');
     });
 
     it('should not add createdAt timestamp unless provided', function () {
