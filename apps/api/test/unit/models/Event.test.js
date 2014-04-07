@@ -1,4 +1,4 @@
-describe.only('Model Event', function () {
+describe('Model Event', function () {
 
 
   /**
