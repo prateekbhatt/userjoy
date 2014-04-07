@@ -1,8 +1,74 @@
-describe('Model User', function () {
+describe.only('Model User', function () {
+
+  /**
+   * Models
+   */
 
   var User = require('../../../api/models/User');
 
+
+  /**
+   * Test variables
+   */
+
   var randomId = '532d6bf862d673ba7131812a';
+  var savedUser;
+
+
+  describe('#create', function () {
+
+    it('should create user', function (done) {
+
+      var newUser = {
+        email: 'savinay@dodatado.com'
+      };
+
+      User.getOrCreate(randomId, newUser, function (err, usr) {
+        expect(err)
+          .to.not.exist;
+        expect(usr)
+          .to.be.an('object');
+
+        savedUser = usr;
+
+        expect(usr.email)
+          .to.eql(newUser.email);
+        done();
+      });
+
+    });
+
+
+    it('should add firstSessionAt timestamp to user', function () {
+      expect(savedUser)
+        .to.have.property('firstSessionAt');
+    });
+
+
+    it('should add updatedAt timestamp to user', function () {
+      expect(savedUser)
+        .to.have.property('updatedAt');
+    });
+
+
+    it('should add firstSessionAt timestamp to user', function () {
+      expect(savedUser)
+        .to.have.property('firstSessionAt');
+    });
+
+    it('should not add createdAt timestamp unless provided', function () {
+      expect(savedUser)
+        .not.to.have.property('createdAt');
+    });
+
+    it('should have totalSessions as 1 when the user is created',
+      function () {
+        expect(savedUser.totalSessions)
+          .to.eql(1);
+      });
+
+  });
+
 
   describe('#getOrCreate', function () {
 
@@ -23,8 +89,6 @@ describe('Model User', function () {
           .to.be.ok;
         expect(usr.email)
           .to.eql(newUser.email);
-        expect(usr)
-          .to.have.property('createdAt');
         done();
       });
     });
@@ -39,11 +103,12 @@ describe('Model User', function () {
         expect(err)
           .to.not.exist;
         expect(usr)
-          .to.be.ok;
+          .to.be.an('object');
+
+        savedUser = usr;
+
         expect(usr.email)
           .to.eql(newUser.email);
-        expect(usr)
-          .to.have.property('createdAt');
         done();
       });
 

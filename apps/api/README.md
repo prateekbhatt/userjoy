@@ -79,6 +79,9 @@ Stores all apps belonging to accounts on DoDataDo
 - team [accountIds of team]
 - testKey
 - liveKey
+- tags [] stores all tags that the app has used for its users
+- customKeysUser [] stores all the keys of custom data that the app is passing
+- customKeysCompany [] stores all the keys of custom data that the app is passing
 - createdAt
 - updatedAt
 
@@ -122,9 +125,10 @@ Create new user for every new unique identifier for an app
 - unsubscribedThrough (messageId)
 - createdAt
 - updatedAt
+- firstSessionAt
 - totalSessions
-- lastContacted
-- lastSession
+- lastContactedAt
+- lastSessionAt
 - lastHeardFrom
 - healthScore (latest value from User Health)
 - tags [] Stores tags for categorizing users
@@ -140,7 +144,8 @@ Create new user for every new unique identifier for an app
     - totalSessions
     - billing
 
-
+- The firstSessionAt attribute is added when a new user is created
+- createdAt property needs to be provided to the js snippet
 - Health score should be calculated based on total sessions in last 30 days, total time spent on site [?]
 
 - Ignoring: user acquisition data like (since we do not have data for non loggedin users):

@@ -60,7 +60,11 @@ var UserSchema = new Schema({
 
   totalSessions: {
     type: Number,
-    default: 0
+    default: 1
+  },
+
+  createdAt: {
+    type: Date
   },
 
   lastSessionAt: {
@@ -84,11 +88,11 @@ var UserSchema = new Schema({
 
 
 /**
- * Adds createdAt and updatedAt timestamps
+ * Adds firstSessionAt and updatedAt timestamps
  */
 
 UserSchema.plugin(troop.timestamp, {
-  createdPath: 'createdAt',
+  createdPath: 'firstSessionAt',
   modifiedPath: 'updatedAt',
   useVirtual: false
 });
