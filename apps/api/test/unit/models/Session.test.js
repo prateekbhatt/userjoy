@@ -1,4 +1,4 @@
-describe.only('Model Session', function () {
+describe('Model Session', function () {
 
 
   /**
@@ -19,10 +19,6 @@ describe.only('Model Session', function () {
 
   describe('#create', function () {
 
-
-    // before(function (done) {
-    //   Session.create(newSession, done);
-    // });
 
     it('should return error if appId is not present', function (done) {
 
