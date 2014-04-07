@@ -1,25 +1,39 @@
 angular.module('do.navbar', [])
 
-// .config(['$stateProvider',
-//     function ($stateProvider) {
-//         $stateProvider.state('navbar', {
-//             url: '',
-//             views: {
-//                 "navbar": {
-//                     controller: 'NavbarCtrl',
-//                     templateUrl: '../views/homepage.ejs'
-//                 }
-//             }
-//         });
-//     }
-// ])
+/*.config(['$stateProvider',
+    function ($stateProvider) {
+        $stateProvider.state('navbar', {
+            url: '/',
+            views: {
+                "navbar": {
+                    templateUrl: '/templates/navbar.html',
+                    controller: 'NavbarCtrl'
+                }
+            }
+        });
+    }
+])*/
 
-.controller('NavbarCtrl', ['$scope',
-    function ($scope) {
-        $scope.items = [
-          '<span class=\"glyphicon glyphicon-cog\"></span>&nbsp;&nbsp;&nbsp;&nbsp;Settings',
-          '<i class=\"fa fa-book\"></i>&nbsp;&nbsp;&nbsp;&nbsp;Docs',
-          '<span class=\"glyphicon glyphicon-off\"></span>&nbsp;&nbsp;&nbsp;&nbsp;Logout'
-        ];
+
+.controller('NavbarCtrl', ['$scope', 'AuthService', 'LoginService',
+    '$location', '$log',
+    function ($scope, AuthService, LoginService, $location, $log) {
+
+        $scope.loggedIn = false;
+
+        $scope.showDropdown = function () {
+            // console.log("user authentication: ", LoginService.getUserAuthenticated());
+            $scope.visibleDropdown = true;
+        };
+
+        $scope.logout = function () {
+            AuthService.logout();
+            $location.path('/login');
+        };
+
+        $scope.$watch(LoginService.getUserAuthenticated, function () {
+            $log.info("Navbar watch", arguments);
+            $scope.loggedIn = LoginService.getUserAuthenticated();
+        });
     }
 ]);

@@ -8,7 +8,8 @@ angular.module('do.signup', [])
                     views: {
                         "main": {
                             templateUrl: '/templates/signup.html',
-                            controller: 'SignupCtrl'
+                            controller: 'SignupCtrl',
+                            authenticate: false
                         }
                     }
                 });

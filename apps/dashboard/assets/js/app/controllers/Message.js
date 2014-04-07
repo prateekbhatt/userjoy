@@ -8,45 +8,50 @@ angular.module('do.message', [])
                 views: {
                     "main": {
                         templateUrl: '/templates/message.html',
-                        controller: 'InboxCtrl'
+                        controller: 'InboxCtrl'                        
                     }
-                }
+                },
+                authenticate: true
             })
             .state('message.inbox', {
                 url: '/inbox',
                 views: {
                     "messageapp": {
                         templateUrl: '/templates/message.inbox.html',
-                        controller: 'InboxCtrl'
+                        controller: 'InboxCtrl'                       
                     }
-                }
+                },
+                authenticate: true
             })
             .state('message.id', {
                 url: '/inbox/1',
                 views: {
                     "messageapp": {
                         templateUrl: '/templates/message.inbox.id.html',
-                        controller: 'MessageBodyCtrl'
+                        controller: 'MessageBodyCtrl',
                     }
-                }
+                },
+                authenticate: true
             })
             .state('message.sent', {
                 url: '/sent',
                 views: {
                     "messageapp": {
                         templateUrl: '/templates/message.sent.html',
-                        controller: 'SentCtrl'
+                        controller: 'SentCtrl',
                     }
-                }
+                },
+                authenticate: true
 
             })
             .state('message.compose', {
                 url: '/compose',
                 views: {
                     "messageapp": {
-                        templateUrl: '/templates/message.compose.html'
+                        templateUrl: '/templates/message.compose.html',
                     }
-                }
+                },
+                authenticate: true
 
             })
             .state('message.automate', {
@@ -54,9 +59,10 @@ angular.module('do.message', [])
                 views: {
                     "messageapp": {
                         templateUrl: '/templates/message.compose.automate.html',
-                        controller: 'messageAutomateCtrl'
+                        controller: 'messageAutomateCtrl',
                     }
-                }
+                },
+                authenticate: true
 
             })
             .state('message.manual', {
@@ -64,9 +70,10 @@ angular.module('do.message', [])
                 views: {
                     "messageapp": {
                         templateUrl: '/templates/message.compose.manual.html',
-                        controller: 'messageManualCtrl'
+                        controller: 'messageManualCtrl',
                     }
-                }
+                },
+                authenticate: true
 
             })
             .state('message.write', {
@@ -74,9 +81,10 @@ angular.module('do.message', [])
                 views: {
                     "messageapp": {
                         templateUrl: '/templates/message.compose.automate.write.html',
-                        controller: 'textAngularCtrl'
+                        controller: 'textAngularCtrl',
                     }
-                }
+                },
+                authenticate: true
 
             })
             .state('message.template', {
@@ -84,9 +92,10 @@ angular.module('do.message', [])
                 views: {
                     "messageapp": {
                         templateUrl: '/templates/message.compose.template.html',
-                        controller: 'templateCtrl'
+                        controller: 'templateCtrl',
                     }
-                }
+                },
+                authenticate: true
 
             });
 
