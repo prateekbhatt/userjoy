@@ -1,12 +1,37 @@
-var loadApp = require('../load'),
-  loadFixtures = require('./fixtures'),
-  mongoose = require('mongoose'),
-  async = require('async'),
-  _ = require('lodash'),
-  expect = require('chai').expect,
-  sinon = require('sinon'),
+/**
+ * NPM dependencies
+ */
 
-  TEST_URL = 'http://localhost:8002';
+var _ = require('lodash');
+var async = require('async');
+var chai = require('chai');
+var mongoose = require('mongoose');
+var sinon = require('sinon');
+var sinonChai = require('sinon-chai');
+
+chai.use(sinonChai);
+var expect = chai.expect;
+
+
+/**
+ * Load application
+ */
+
+var loadApp = require('../load');
+
+
+/**
+ * DB Fixtures
+ */
+
+var loadFixtures = require('./fixtures');
+
+
+/**
+ * Test url for superagent to work on
+ */
+
+var TEST_URL = 'http://localhost:8002';
 
 
 /**

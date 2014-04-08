@@ -28,7 +28,8 @@
     "segmentio/top-domain": "0.0.1",
     "visionmedia/debug": "0.7.4",
     "yields/prevent": "0.0.2",
-    "lodash/lodash": "2.4.1"
+    "lodash/lodash": "2.4.1",
+    "visionmedia/node-querystring": "*"
   },
   "scripts": [
     "lib/index.js",
