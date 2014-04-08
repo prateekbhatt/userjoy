@@ -7,7 +7,7 @@ angular.module('do.signup', [])
                     url: '/signup',
                     views: {
                         "main": {
-                            templateUrl: '/templates/signup.html',
+                            templateUrl: '/templates/LoginSignup/signup.html',
                             controller: 'SignupCtrl',
                             authenticate: false
                         }

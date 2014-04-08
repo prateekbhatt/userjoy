@@ -7,7 +7,7 @@ angular.module('do.install', [])
                 url: '/onboarding',
                 views: {
                     "main": {
-                        templateUrl: '/templates/installation.onboarding.html',
+                        templateUrl: '/templates/onboardingAppmodule/installation.onboarding.html',
                         controller: 'installOnboardingAppCtrl'
                     }
                 },
@@ -17,7 +17,7 @@ angular.module('do.install', [])
                 url: '/addcode',
                 views: {
                     "main": {
-                        templateUrl: '/templates/installation.addcode.html',
+                        templateUrl: '/templates/onboardingAppmodule/installation.addcode.html',
                         controller: 'installAddcodeAppCtrl'
                     }
                 },
