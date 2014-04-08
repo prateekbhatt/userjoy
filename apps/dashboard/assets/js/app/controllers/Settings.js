@@ -89,10 +89,18 @@ angular.module('do.settings', [])
     }
 ])
 
-.controller('changePasswordCtrl', ['$scope',
-    function ($scope) {
+.controller('changePasswordCtrl', ['$scope', 'AccountModel', '$log', 
+    function ($scope, AccountModel, $log) {
+
         $scope.changePassword = function () {
-            // var data = 
+            AccountModel.updatePwd($scope.current_pwd, $scope.new_pwd, function(err, data){
+                if(err) {
+                    $log.error('failed to update pwd:', err);
+                    return;
+                } 
+
+                $log.info("password changed successfully!")
+            })
         }
     }
 ])

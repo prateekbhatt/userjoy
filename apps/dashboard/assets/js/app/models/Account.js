@@ -29,5 +29,19 @@ angular
                     .error(cb)
 
             }
+
+            this.updatePwd = function (currPwd, newPwd, cb) {
+                var data = {
+                    currentPassword: currPwd,
+                    newPassword: newPwd
+                }
+                console.log("data: ", data);
+
+                $http.put(config.apiUrl + '/account/password/update', data)
+                    .success(function (data) {
+                        cb(null, data);
+                    })
+                    .error(cb)
+            }
         }
     ])
