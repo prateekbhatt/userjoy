@@ -61,6 +61,73 @@ describe('Model User', function () {
           .to.eql(1);
       });
 
+
+    it('should store billing data if billing data object is present',
+      function (done) {
+
+        var testUser = {
+          email: 'care@dodatado.com'
+        };
+
+        var billing = {
+          status: 'paying',
+          plan: 'Basic',
+          currency: 'USD'
+        };
+
+        testUser.billing = billing;
+
+        User.getOrCreate(randomId, testUser, function (err, usr) {
+          expect(err)
+            .not.to.exist;
+
+          expect(usr)
+            .to.be.an('object');
+
+          expect(usr.email)
+            .to.eql(testUser.email);
+
+          expect(usr.billing.status)
+            .to.eql(billing.status);
+
+          done();
+        });
+      });
+
+
+    it(
+      'should return error if billing status is not in [trial, free, paying, cancelled]',
+      function (done) {
+
+        var testUser = {
+          user_id: 'unique_user_id_here'
+        };
+
+        var billing = {
+          status: 'randomStatus',
+          plan: 'Basic',
+          currency: 'USD'
+        };
+
+        testUser.billing = billing;
+
+        User.create(testUser, function (err, usr) {
+
+          expect(err)
+            .to.exist;
+
+          expect(err.message)
+            .to.eql('Validation failed');
+
+          expect(err.errors['billing.status'].message)
+            .to.eql(
+              "Billing status must be one of 'trial', 'free', 'paying' or 'cancelled'"
+          );
+
+          done();
+        });
+      });
+
   });
 
 
