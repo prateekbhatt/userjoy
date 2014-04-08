@@ -8,7 +8,7 @@ angular.module('do.install', [])
                 views: {
                     "main": {
                         templateUrl: '/templates/installation.onboarding.html',
-                        controller: 'installOnboardingAppCtrl',
+                        controller: 'installOnboardingAppCtrl'
                     }
                 },
                 authenticate: true
@@ -18,7 +18,7 @@ angular.module('do.install', [])
                 views: {
                     "main": {
                         templateUrl: '/templates/installation.addcode.html',
-                        controller: 'installAddcodeAppCtrl',
+                        controller: 'installAddcodeAppCtrl'
                     }
                 },
                 authenticate: true
@@ -28,11 +28,14 @@ angular.module('do.install', [])
 ])
 
 .controller('installOnboardingAppCtrl', ['$scope', '$http', 'config', '$state',
-    function ($scope, $http, config, $state) {
+    'LoggedInAppService', '$log',
+    function ($scope, $http, config, $state, LoggedInAppService, $log) {
 
 
         $scope.installapp = function () {
 
+            $log.info($scope.name);
+            $log.info($scope.domain);
             if ($scope.app_form.$valid) {
 
             } else {
@@ -44,10 +47,23 @@ angular.module('do.install', [])
                 domain: $scope.domain
             };
 
+            var appStack = [];
+
             $http
                 .post(config.apiUrl + '/apps', data)
                 .success(function (data) {
                     $state.transitionTo('addcode');
+                    var finalElement = LoggedInAppService.getLoggedInApps()
+                        .length;
+
+                    for (var i = LoggedInAppService.getLoggedInApps()
+                        .length - 1; i >= 0; i--) {
+                        appStack.push(LoggedInAppService.getLoggedInApps()[
+                            i]);
+                    };
+                    appStack.push(data);
+                    LoggedInAppService.setLoggedInApps(data);
+                    console.log("apps created: ", LoggedInAppService.getLoggedInApps());
                 })
         }
     }

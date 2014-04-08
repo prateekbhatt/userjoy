@@ -8,7 +8,7 @@ angular.module('do.message', [])
                 views: {
                     "main": {
                         templateUrl: '/templates/message.html',
-                        controller: 'InboxCtrl'                        
+                        controller: 'messageCtrl'
                     }
                 },
                 authenticate: true
@@ -18,7 +18,7 @@ angular.module('do.message', [])
                 views: {
                     "messageapp": {
                         templateUrl: '/templates/message.inbox.html',
-                        controller: 'InboxCtrl'                       
+                        controller: 'InboxCtrl'
                     }
                 },
                 authenticate: true
@@ -100,6 +100,18 @@ angular.module('do.message', [])
             });
 
 
+
+    }
+])
+
+.controller('messageCtrl', ['$scope', '$location',
+    function ($scope, $location) {
+
+        // TODO : change in production
+        if (window.location.href ===
+            'http://app.do.localhost/messages') {
+            $location.path('/messages/inbox');
+        }
 
     }
 ])

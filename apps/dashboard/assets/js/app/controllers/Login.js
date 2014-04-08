@@ -10,7 +10,7 @@ angular.module('do.login', [])
                         templateUrl: '/templates/login.html',
                         controller: 'LoginCtrl',
                     }
-                }, 
+                },
                 authenticate: false
             })
 
@@ -21,7 +21,7 @@ angular.module('do.login', [])
     '$log',
     function ($scope, LoginService, AuthService, $state, $log) {
 
-        $log.info('LoginCtrl', LoginService.getUserAuthenticated())
+        $log.info('LoginCtrl', LoginService.getUserAuthenticated());
 
         // If user is logged in send them to home page
         if (LoginService.getUserAuthenticated()) {
@@ -32,6 +32,9 @@ angular.module('do.login', [])
         $scope.attemptLogin = function () {
 
             AuthService.attemptLogin($scope.email, $scope.password);
+            console.log("loginctrl: ", LoginService.getUserAuthenticated());
+
+
             /*$log.info("login success: ", success);
             if (success) {
                 $state.transitionTo('users.list');
