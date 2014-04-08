@@ -66,7 +66,8 @@ describe('Model User', function () {
       function (done) {
 
         var testUser = {
-          email: 'care@dodatado.com'
+          email: 'care@dodatado.com',
+          appId: randomId
         };
 
         var billing = {
@@ -77,7 +78,7 @@ describe('Model User', function () {
 
         testUser.billing = billing;
 
-        User.getOrCreate(randomId, testUser, function (err, usr) {
+        User.create(testUser, function (err, usr) {
           expect(err)
             .not.to.exist;
 
