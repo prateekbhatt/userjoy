@@ -20,12 +20,7 @@ var validate = require('mongoose-validator')
  * Validators
  */
 
-var billingStatusValidator = [validate({
-    message: "Billing status must be one of 'trial', 'free', 'paying' or 'cancelled'",
-    passIfEmpty: true
-  },
-  'isIn', ['trial', 'free', 'paying', 'cancelled']
-)];
+var billingStatusValidator = require('../../helpers/billing-status-validator');
 
 
 /**
