@@ -263,6 +263,79 @@ describe('Resource /account', function () {
   });
 
 
+  describe('PUT /account/password/update', function () {
+
+    var newPass = 'WowCoolPassword';
+    var currPass;
+
+    before(function (done) {
+      currPass = saved.accounts.first.password;
+      logoutUser(done);
+    });
+
+    it('should return unauthorized error if not logged in', function (done) {
+
+      request
+        .put('/account/password/update')
+        .send({
+          newPassword: newPass,
+          currentPassword: currPass
+        })
+        .expect('Content-Type', /json/)
+        .expect(401)
+        .expect({
+          status: 401,
+          error: 'Unauthorized'
+        })
+        .end(done);
+
+    });
+
+    it('logging in user', function (done) {
+      loginUser(done)
+    });
+
+    it('should return badRequest error if incorrect current password',
+      function (done) {
+
+        request
+          .put('/account/password/update')
+          .set('cookie', loginCookie)
+          .send({
+            newPassword: newPass,
+            currentPassword: 'randomoldPass'
+          })
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            status: 400,
+            error: 'Please provide the correct current password'
+          })
+          .end(done);
+
+      });
+
+    it('should update password', function (done) {
+
+      request
+        .put('/account/password/update')
+        .set('cookie', loginCookie)
+        .send({
+          newPassword: newPass,
+          currentPassword: currPass
+        })
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .expect({
+          message: 'Password updated'
+        })
+        .end(done);
+
+    });
+
+  });
+
+
 
   describe('PUT /account/reset-password', function () {
 

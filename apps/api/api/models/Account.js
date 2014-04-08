@@ -241,6 +241,45 @@ AccountSchema.statics.createResetPasswordToken = function (email, fn) {
 
 
 /**
+ * Updates account password
+ * @param  {string}   currPass current password of the account
+ * @param  {string}   newPass new password
+ * @param  {function} cb      callback function
+ */
+AccountSchema.methods.updatePassword = function (currPass, newPass, cb) {
+  var self = this;
+
+  // in schema, password field has attribute select: false
+  // so the password field needs to retrieved again
+  Account
+    .findById(self._id)
+    .select('password')
+    .exec(function (err, usr) {
+
+      if (err) {
+        return cb(err);
+      }
+
+      self = usr;
+
+      self.comparePassword(currPass, function (err, isMatch) {
+        if (err) {
+          return cb(err);
+        }
+
+        if (!isMatch) {
+          return cb(new Error('Incorrect Password'));
+        }
+
+        self.password = newPass;
+        self.save(cb);
+      });
+    });
+
+};
+
+
+/**
  * Generate a random token for:
  * - email verification
  * - password reset
