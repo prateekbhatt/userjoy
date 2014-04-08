@@ -79,6 +79,9 @@ Stores all apps belonging to accounts on DoDataDo
 - team [accountIds of team]
 - testKey
 - liveKey
+- tags [] stores all tags that the app has used for its users
+- customKeysUser [] stores all the keys of custom data that the app is passing
+- customKeysCompany [] stores all the keys of custom data that the app is passing
 - createdAt
 - updatedAt
 
@@ -112,7 +115,7 @@ Create new user for every new unique identifier for an app
 ##### Columns:
 
 - appId
-- appUserId (to allow the app to recognize a user even if the user changes email/username)
+- user_id (to allow the app to recognize a user even if the user changes email/username)
 - email (required)
 - name
 - username
@@ -122,19 +125,37 @@ Create new user for every new unique identifier for an app
 - unsubscribedThrough (messageId)
 - createdAt
 - updatedAt
+- firstSessionAt
 - totalSessions
-- lastContacted
-- lastSession
+- lastContactedAt
+- lastSessionAt
 - lastHeardFrom
 - healthScore (latest value from User Health)
-- tags [all tags this user belongs to]
+- tags [] Stores tags for categorizing users
 - notes
 - status (Free, Paying, Cancelled)
-- companyId
+- companies [{companyId, companyName, billing{}, healthScore, totalSessions}]
+- billing {
+    status,
+    plan,
+    currency,
+    amount,
+    licenses,
+    usage,
+    unit
+  }
 
 ##### Notes:
 
+- User can belong to multiple companies (In our case, a user can belong to multiple apps)
+  If so, we need to calculate the following attribute of a user on a per company basis:
+    - healthScore
+    - totalSessions
+    - billing
 
+- Billing status must be one of [trial, free, paying, cancelled]
+- The firstSessionAt attribute is added when a new user is created
+- createdAt property needs to be provided to the js snippet
 - Health score should be calculated based on total sessions in last 30 days, total time spent on site [?]
 
 - Ignoring: user acquisition data like (since we do not have data for non loggedin users):
@@ -165,30 +186,20 @@ Create new user for every new unique identifier for an app
 >
 > - This should be an embedded document in the Users model
 
-### User Tags
-
-Stores tags for categorizing users
-
-##### Columns:
-
-- appId
-- name
-- users [userIds of all users belonging to this tag]
-- createdAt
-- updatedAt
 
 ### User Health
 
-Stores the healtscore of a user
+Stores the healtscore of a user for a specific company
 
 - appId
+- companyId
 - userId
 - score
 - createdAt
 
 ##### Notes:
 
-- Cron job should update a user's health score daily
+- Cron job should update a user's health score daily for each company that he belongs to
 - Storing data in this manner will allow us to visualize the trend in an user's health over a period of time
 
 ### Companies
@@ -198,11 +209,30 @@ Stores companies of a specific account
 ##### Columns:
 
 - appId
-- appCompanyId (similar to appUserId)
+- company_id (similar to user_id)
 - name
 - totalSessions
 - meta (object containing additonal info about users)
-- created
+- createdAt (should be passed by js snippet)
+- updatedAt
+- tags [] just like user tags
+- billing {
+    status,
+    plan,
+    currency,
+    amount,
+    licenses,
+    usage,
+    unit
+  }
+
+##### Notes:
+
+- Billing data is stored both in Company and User models
+- Billing status must be one of [trial, free, paying, cancelled]
+- createdAt property should not be automatically added on company creation
+
+
 
 ### Segments
 
@@ -264,6 +294,8 @@ Create a new session if the user does not have any events in the last 30 minutes
 ##### Notes
 
 - Get city, country data from (api.hostinfo or Maxmind)
+- Can add user data (name / email) to sessions
+- Session time needs to be updated when a new event is created
 
 
 ### Events

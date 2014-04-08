@@ -58,7 +58,6 @@ router
     Account
       .create(newAccount, function (err, acc) {
 
-        console.log('api account post', newAccount, err, acc);
         if (err) {
           return next(err);
         }
@@ -162,5 +161,36 @@ router
     });
 
   });
+
+
+/**
+ * PUT /account/password/update
+ * Update account password
+ */
+
+router
+  .route('/password/update')
+  .put(isAuthenticated)
+  .put(function (req, res, next) {
+
+    var currPass = req.body.currentPassword;
+    var newPass = req.body.newPassword;
+
+    req.user.updatePassword(currPass, newPass, function (err) {
+
+      if (err) {
+        if (err.message === 'Incorrect Password') {
+          return res.badRequest(
+            'Please provide the correct current password');
+        }
+
+        return next(err);
+      }
+
+      res.json({ message: 'Password updated'});
+    });
+
+  });
+
 
 module.exports = router;
