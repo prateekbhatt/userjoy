@@ -7,7 +7,7 @@ angular.module('do.users', [])
                 url: '/users',
                 views: {
                     "main": {
-                        templateUrl: '/templates/users.html',
+                        templateUrl: '/templates/usersmodule/users.html',
                         controller: 'UserSegmentCtrl',
                     }
                 },
@@ -17,7 +17,7 @@ angular.module('do.users', [])
                 url: '/segment',
                 views: {
                     "panel": {
-                        templateUrl: '/templates/users.segment.html',
+                        templateUrl: '/templates/usersmodule/users.segment.html',
                     }
                 },
                 authenticate: true
@@ -26,10 +26,10 @@ angular.module('do.users', [])
                 url: '/list',
                 views: {
                     "panel": {
-                        templateUrl: '/templates/users.list.html',
+                        templateUrl: '/templates/usersmodule/users.list.html',
                     },
                     "table": {
-                        templateUrl: '/templates/users.list.table.html',
+                        templateUrl: '/templates/usersmodule/users.list.table.html',
                         controller: 'TableCtrl'
                     }
                 },
@@ -40,7 +40,7 @@ angular.module('do.users', [])
                 url: '/users/profile/id',
                 views: {
                     "main": {
-                        templateUrl: '/templates/users.profile.html',
+                        templateUrl: '/templates/usersmodule/users.profile.html',
                         controller: 'ProfileCtrl',
                     }
                 },

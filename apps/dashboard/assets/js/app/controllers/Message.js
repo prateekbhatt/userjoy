@@ -7,7 +7,7 @@ angular.module('do.message', [])
                 url: '/messages',
                 views: {
                     "main": {
-                        templateUrl: '/templates/message.html',
+                        templateUrl: '/templates/messagesmodule/message.html',
                         controller: 'messageCtrl'
                     }
                 },
@@ -17,7 +17,7 @@ angular.module('do.message', [])
                 url: '/inbox',
                 views: {
                     "messageapp": {
-                        templateUrl: '/templates/message.inbox.html',
+                        templateUrl: '/templates/messagesmodule/message.inbox.html',
                         controller: 'InboxCtrl'
                     }
                 },
@@ -27,7 +27,7 @@ angular.module('do.message', [])
                 url: '/inbox/1',
                 views: {
                     "messageapp": {
-                        templateUrl: '/templates/message.inbox.id.html',
+                        templateUrl: '/templates/messagesmodule/message.inbox.id.html',
                         controller: 'MessageBodyCtrl',
                     }
                 },
@@ -37,7 +37,7 @@ angular.module('do.message', [])
                 url: '/sent',
                 views: {
                     "messageapp": {
-                        templateUrl: '/templates/message.sent.html',
+                        templateUrl: '/templates/messagesmodule/message.sent.html',
                         controller: 'SentCtrl',
                     }
                 },
@@ -48,7 +48,7 @@ angular.module('do.message', [])
                 url: '/compose',
                 views: {
                     "messageapp": {
-                        templateUrl: '/templates/message.compose.html',
+                        templateUrl: '/templates/messagesmodule/message.compose.html',
                     }
                 },
                 authenticate: true
@@ -58,7 +58,7 @@ angular.module('do.message', [])
                 url: '/compose/automate',
                 views: {
                     "messageapp": {
-                        templateUrl: '/templates/message.compose.automate.html',
+                        templateUrl: '/templates/messagesmodule/message.compose.automate.html',
                         controller: 'messageAutomateCtrl',
                     }
                 },
@@ -69,7 +69,7 @@ angular.module('do.message', [])
                 url: '/compose/manual',
                 views: {
                     "messageapp": {
-                        templateUrl: '/templates/message.compose.manual.html',
+                        templateUrl: '/templates/messagesmodule/message.compose.manual.html',
                         controller: 'messageManualCtrl',
                     }
                 },
@@ -80,7 +80,7 @@ angular.module('do.message', [])
                 url: '/compose/automate/write',
                 views: {
                     "messageapp": {
-                        templateUrl: '/templates/message.compose.automate.write.html',
+                        templateUrl: '/templates/messagesmodule/message.compose.automate.write.html',
                         controller: 'textAngularCtrl',
                     }
                 },
@@ -91,7 +91,7 @@ angular.module('do.message', [])
                 url: '/compose/template',
                 views: {
                     "messageapp": {
-                        templateUrl: '/templates/message.compose.template.html',
+                        templateUrl: '/templates/messagesmodule/message.compose.template.html',
                         controller: 'templateCtrl',
                     }
                 },

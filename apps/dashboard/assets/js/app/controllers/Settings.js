@@ -7,7 +7,7 @@ angular.module('do.settings', [])
                 url: '/settings',
                 views: {
                     "main": {
-                        templateUrl: '/templates/settings.html',
+                        templateUrl: '/templates/settingsmodule/settings.html',
                         controller: 'profileSettingsCtrl'
                     }
                 },
@@ -17,7 +17,7 @@ angular.module('do.settings', [])
                 url: '/settings/profile',
                 views: {
                     "main": {
-                        templateUrl: '/templates/settings.profile.html',
+                        templateUrl: '/templates/settingsmodule/settings.profile.html',
                         controller: 'profileSettingsCtrl',
                     }
                 },
@@ -27,7 +27,7 @@ angular.module('do.settings', [])
                 url: '/settings/changePassword',
                 views: {
                     "main": {
-                        templateUrl: '/templates/settings.profile.changePassword.html',
+                        templateUrl: '/templates/settingsmodule/settings.profile.changePassword.html',
                         controller: 'changePasswordCtrl',
                     }
                 },
@@ -37,7 +37,7 @@ angular.module('do.settings', [])
                 url: '/settings/app',
                 views: {
                     "main": {
-                        templateUrl: '/templates/settings.app.html',
+                        templateUrl: '/templates/settingsmodule/settings.app.html',
                         controller: 'appSettingsCtrl',
                     }
                 },
@@ -107,6 +107,8 @@ angular.module('do.settings', [])
 
 .controller('appSettingsCtrl', ['$scope', '$log', '$state',
     function ($scope, $log, $state) {
+
+        $scope.App = 'Userjoy';
 
         if (window.location.href ===
             'http://app.do.localhost/settings') {

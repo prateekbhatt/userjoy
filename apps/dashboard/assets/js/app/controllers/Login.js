@@ -7,7 +7,7 @@ angular.module('do.login', [])
                 url: '/login',
                 views: {
                     "main": {
-                        templateUrl: '/templates/login.html',
+                        templateUrl: '/templates/LoginSignup/login.html',
                         controller: 'LoginCtrl',
                     }
                 },
