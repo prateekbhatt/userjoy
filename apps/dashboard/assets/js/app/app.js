@@ -22,7 +22,8 @@ angular.module('dodatado', [
     'nvd3ChartDirectives',
     'do.login',
     'do.signup',
-    'do.install'
+    'do.install',
+    'do.settings'
 ])
 
 .config(function myAppConfig($stateProvider, $urlRouterProvider,
@@ -38,13 +39,25 @@ angular.module('dodatado', [
 
 .run(['LoginService', 'ipCookie', '$log',
     function (LoginService, ipCookie, $log) {
-    
-    // check cookie to set if user is authenticated
-    if (ipCookie('loggedin')) {
-        // $log.info('app.run setUserAuthenticated');
-        LoginService.setUserAuthenticated(true);
+
+        // check cookie to set if user is authenticated
+        if (ipCookie('loggedin')) {
+            // $log.info('app.run setUserAuthenticated');
+            LoginService.setUserAuthenticated(true);
+        }
     }
-}])
+])
+
+.run(['AccountService', 'AccountModel', '$log',
+    function (AccountService, AccountModel, $log) {
+        AccountModel.get(function (err, acc) {
+            if (err) {
+                return;
+            }
+            AccountService.set(acc);
+        });
+    }
+])
 
 .run(['$state', 'LoginService', '$rootScope',
     function ($state, LoginService, $rootScope) {
