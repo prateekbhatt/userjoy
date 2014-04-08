@@ -135,6 +135,15 @@ Create new user for every new unique identifier for an app
 - notes
 - status (Free, Paying, Cancelled)
 - companies [{companyId, companyName, billing{}, healthScore, totalSessions}]
+- billing {
+    status,
+    plan,
+    currency,
+    amount,
+    licenses,
+    usage,
+    unit
+  }
 
 ##### Notes:
 
@@ -144,6 +153,7 @@ Create new user for every new unique identifier for an app
     - totalSessions
     - billing
 
+- Billing status must be one of [trial, free, paying, cancelled]
 - The firstSessionAt attribute is added when a new user is created
 - createdAt property needs to be provided to the js snippet
 - Health score should be calculated based on total sessions in last 30 days, total time spent on site [?]
@@ -206,14 +216,20 @@ Stores companies of a specific account
 - createdAt (should be passed by js snippet)
 - updatedAt
 - tags [] just like user tags
-- billing: {
-  status: ['trial', 'free', 'paying', 'cancelled']
-
-}
+- billing {
+    status,
+    plan,
+    currency,
+    amount,
+    licenses,
+    usage,
+    unit
+  }
 
 ##### Notes:
 
 - Billing data is stored both in Company and User models
+- Billing status must be one of [trial, free, paying, cancelled]
 - createdAt property should not be automatically added on company creation
 
 

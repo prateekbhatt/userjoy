@@ -17,6 +17,13 @@ var mongoose = require('mongoose'),
 
 
 /**
+ * Validators
+ */
+
+var billingStatusValidator = require('../../helpers/billing-status-validator');
+
+
+/**
  * Define schema
  */
 
@@ -77,6 +84,38 @@ var UserSchema = new Schema({
 
   healthScore: {
     type: Number
+  },
+
+  // billing data is stored in both company and user models
+  billing: {
+    status: {
+      type: String,
+      validate: billingStatusValidator
+    },
+
+    plan: {
+      type: String
+    },
+
+    currency: {
+      type: String
+    },
+
+    amount: {
+      type: Number
+    },
+
+    licenses: {
+      type: Number
+    },
+
+    usage: {
+      type: Number
+    },
+
+    unit: {
+      type: String
+    }
   }
 
   // tags [all tags this user belongs to]
@@ -142,7 +181,14 @@ UserSchema.statics.getOrCreate = function (appId, user, cb) {
       User
         .create(user, function (err, usr2) {
 
-          if (err) return cb(err);
+          if (err) {
+            if (err.message === 'Validation failed') {
+              if (err.errors['billing.status']) {
+                return cb(new Error(err.errors['billing.status'].message));
+              }
+            }
+            return cb(err);
+          }
 
           if (!usr2) return cb(new Error('Error while creating user'));
 
