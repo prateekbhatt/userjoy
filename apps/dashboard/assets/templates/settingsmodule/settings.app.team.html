@@ -1,0 +1,47 @@
+<div class="row">
+    <form id="settings_team_form" class="form-horizontal" role="form" ng-submit="addTeamMember()" novalidate name="name_update_form">
+        <div style="padding-top:30px">
+            <label for="teamMember" class="col-md-3 control-label" style="font-size: 17px; padding-left: 0px"><strong>Add Team Member</strong></label>
+            <div class="col-md-7">
+                <input class="form-control" type="email" name="teamMember"  ng-model="teamMember" placeholder="Email Address" required>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-info pull-right" style="padding-top:10px" ng-disabled="!teamMember.length">Send Invite</button>
+            </div>
+        </div>
+    </form>
+</div>
+<br>
+<hr>
+<br>
+<div class="row">
+    <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading"><h4>Team Members</h4></div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="text-center">Name</th>
+                    <th class="text-center">Email Id</th>
+                    <th class="text-center">Incoming Email</th>
+                    <th class="text-center"></th>
+                </tr>
+            </thead>
+            <tbody>
+            <!-- TODO: Get Data from Backend -->
+                <tr>
+                    <td>Savinay Narendra</td>
+                    <th>savinay.90@gmail.com</th>
+                    <td>savinay.90@gmail.mail.dodatado.io</td>
+                    <td class="fa fa-times-circle-o"></td>
+                </tr>
+                <tr>
+                    <td>Savinay Narendra</td>
+                    <th>savinay.90@gmail.com</th>
+                    <td>savinay.90@gmail.mail.dodatado.io</td>
+                    <td class="fa fa-times-circle-o"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

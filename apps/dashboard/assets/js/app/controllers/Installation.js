@@ -50,19 +50,20 @@ angular.module('do.install', [])
             var appStack = [];
 
             $http
-                .post(config.apiUrl + '/apps', data)
+                .post(config.apiUrl + '/apps', newApp)
                 .success(function (data) {
                     $state.transitionTo('addcode');
                     var finalElement = LoggedInAppService.getLoggedInApps()
                         .length;
 
+                    // AppService.new(newApp);
                     for (var i = LoggedInAppService.getLoggedInApps()
                         .length - 1; i >= 0; i--) {
                         appStack.push(LoggedInAppService.getLoggedInApps()[
                             i]);
                     };
-                    appStack.push(data);
-                    LoggedInAppService.setLoggedInApps(data);
+                    appStack.push(newApp);
+                    LoggedInAppService.setLoggedInApps(newApp);
                     console.log("apps created: ", LoggedInAppService.getLoggedInApps());
                 })
         }

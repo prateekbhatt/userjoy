@@ -4,16 +4,22 @@ angular.module('services.LoggedInAppService', [])
 
     function ($log) {
 
-        var loggedinApps = {};
+        var apps = [];
 
-        this.setLoggedInApps = function (value) {
-            // $log.info('setUserAuthenticated', value);
-            loggedinApps = value;
+        this.new = function (newApp) {
+            apps.push(newApp);
+        };
+
+        this.setLoggedInApps = function (apps) {
+            if (apps instanceof Array) {
+                angular.forEach(apps, function (app) {
+                    apps.push(app);
+                });
+            }
         };
 
         this.getLoggedInApps = function () {
-            // $log.info('getUserAuthenticated', userIsAuthenticated);
-            return loggedinApps;
+            return apps;
         };
 
         return this;
