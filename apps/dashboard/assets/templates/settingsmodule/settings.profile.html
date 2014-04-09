@@ -7,7 +7,7 @@
                     <ul class="sidebar-nav">
                         <li class="sidebar-brand"><strong>Account Settings </strong>
                         </li>
-                        <li><a ui-sref="profilesettings">Profile</a>
+                        <li><a ui-sref="accountsettings">Profile</a>
                         </li>
                         <li><a ui-sref="changePassword">Change Password</a>
                         </li>
@@ -15,6 +15,7 @@
                 </div>
             </div>
         </div>
+        <div ui-view="tab">
         <div class="col-md-8" id="page-wrapper-settings">
             <form id="settings_profile_form" class="form-horizontal" role="form" ng-submit="changeProfileName()" novalidate name="name_update_form">
                 <div style="padding-top:30px">
@@ -27,6 +28,7 @@
                     </div>
                 </div>
             </form>
+        </div>
         </div>
     </div>
 </div>

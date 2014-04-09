@@ -59,6 +59,16 @@ angular.module('dodatado', [
     }
 ])
 
+.run(['LoggedInAppService', 'AppModel', '$log',
+    function (LoggedInAppService, AppModel, $log) {
+        AppModel.get(function (err, apps) {
+            if (err) {
+                return;
+            }
+            LoggedInAppService.setLoggedInApps(apps);
+        });
+    }
+])
 .run(['$state', 'LoginService', '$rootScope',
     function ($state, LoginService, $rootScope) {
 

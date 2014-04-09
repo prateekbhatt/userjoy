@@ -6,5 +6,6 @@
 angular.module('models', [
     'models.user',
     'models.auth',
-    'models.account'
+    'models.account',
+    'models.apps'
 ]);
