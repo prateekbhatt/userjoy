@@ -129,6 +129,57 @@ describe('Model User', function () {
         });
       });
 
+    it('should store company data if exists', function (done) {
+      var testUser = {
+        email: 'care@dodatado.com',
+        appId: randomId,
+        companies: [{
+          cid: randomId,
+          name: 'helloworld'
+        }]
+      };
+
+      User.create(testUser, function (err, usr) {
+        expect(err)
+          .not.to.exist;
+
+        expect(usr)
+          .to.be.an('object');
+
+        expect(usr.companies)
+          .to.be.an('array');
+
+        expect(usr.companies.length)
+          .to.eql(1);
+
+        expect(usr.companies[0].name)
+          .to.eql('helloworld');
+        done();
+      });
+    });
+
+
+    it('should return error if company data doesnot have cid',
+      function (done) {
+        var testUser = {
+          email: 'care@dodatado.com',
+          appId: randomId,
+          companies: [{
+            name: 'helloworld'
+          }]
+        };
+
+        User.create(testUser, function (err, usr) {
+
+          expect(err)
+            .to.exist;
+          expect(err.message)
+            .to.eql('Validation failed');
+
+          done();
+        });
+      });
+
   });
 
 
