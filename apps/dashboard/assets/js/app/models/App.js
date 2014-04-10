@@ -21,7 +21,7 @@ angular
                     name: name
                 };
 
-                var putUrl = config.apiUrl + '/apps/' + id + '/name';
+                var putUrl = config.apiUrl + '/apps/' + appId + '/name';
 
                 $http
                     .put(putUrl, data)
@@ -31,6 +31,5 @@ angular
                     .error(cb)
 
             }
-
         }
     ])

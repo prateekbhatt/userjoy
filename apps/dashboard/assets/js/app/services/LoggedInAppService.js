@@ -5,14 +5,15 @@ angular.module('services.LoggedInAppService', [])
     function ($log) {
 
         var apps = [];
+        var defaultApp = {};
 
         this.new = function (newApp) {
             apps.push(newApp);
         };
 
-        this.setLoggedInApps = function (apps) {
-            if (apps instanceof Array) {
-                angular.forEach(apps, function (app) {
+        this.setLoggedInApps = function (value) {
+            if (value instanceof Array) {
+                angular.forEach(value, function (app) {
                     apps.push(app);
                 });
             }
@@ -21,6 +22,14 @@ angular.module('services.LoggedInAppService', [])
         this.getLoggedInApps = function () {
             return apps;
         };
+
+        this.setCurrentApp = function (value) {
+            defaultApp = value;
+        }
+
+        this.getCurrentApp = function () {
+            return defaultApp;
+        }
 
         return this;
 
