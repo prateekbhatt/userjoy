@@ -24,7 +24,26 @@ var billingStatusValidator = require('../../helpers/billing-status-validator');
 
 
 /**
- * Define schema
+ * Define UserCompany schema
+ */
+
+var UserCompanySchema = new Schema({
+
+  cid: {
+    type: Schema.Types.ObjectId,
+    ref: 'Company',
+    required: true
+  },
+
+  name: {
+    type: String
+  }
+
+});
+
+
+/**
+ * Define User schema
  */
 
 var UserSchema = new Schema({
@@ -116,7 +135,9 @@ var UserSchema = new Schema({
     unit: {
       type: String
     }
-  }
+  },
+
+  companies: [UserCompanySchema]
 
   // tags [all tags this user belongs to]
   // notes
