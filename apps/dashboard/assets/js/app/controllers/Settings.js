@@ -4,7 +4,7 @@ angular.module('do.settings', [])
     function ($stateProvider) {
         $stateProvider
             .state('settings', {
-                url: '/settings',
+                url: '/account',
                 views: {
                     "main": {
                         templateUrl: '/templates/settingsmodule/settings.html',
@@ -142,8 +142,8 @@ angular.module('do.settings', [])
 
 
         if (window.location.href ===
-            'http://app.do.localhost/account/settings') {
-            $location.path('/settings/profile');
+            'http://app.do.localhost/account') {
+            $location.path('/users/list');
         }
 
         $scope.changeProfileName = function () {
@@ -204,7 +204,57 @@ angular.module('do.settings', [])
 
 .controller('appSettingsHealthCtrl', ['$scope', '$log', '$state',
     function ($scope, $log, $state) {
+        $scope.activitydropdown = [{
+            text: 'Daily'
+        }, {
+            text: 'Weekly'
+        }, {
+            text: 'Monthly'
+        }, {
+            text: 'Inactive'
+        }];
 
+        $scope.spenttimedropdown = [{
+            text: '10 mins'
+        }, {
+            text: '30 mins'
+        }, {
+            text: '1 hr'
+        }, {
+            text: '2 hrs'
+        }, {
+            text: '5 hrs'
+        }];
+
+        $scope.pulsedropdown = [{
+            text: '20%'
+        }, {
+            text: '30%'
+        }, {
+            text: '40%'
+        }, {
+            text: '50%'
+        }, {
+            text: '60%'
+        }, {
+            text: '70%'
+        }, {
+            text: '80%'
+        }, {
+            text: '90%'
+        }, {
+            text: '100%'
+        }];
+
+        $scope.purchasedlicensesdropdown = [{
+            text: '20%'
+        }, {
+            text: '40%'
+        }, {
+            text: '60%'
+        }, {
+            text: '80%'
+        }];
     }
 ])
 

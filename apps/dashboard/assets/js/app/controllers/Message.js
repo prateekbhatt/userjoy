@@ -690,6 +690,8 @@ angular.module('do.message', [])
 
         }
 
+        $scope.replytext = '';
+
         $scope.today = new Date();
 
         // Get Data from Backend TODO
