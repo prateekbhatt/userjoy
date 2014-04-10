@@ -21,20 +21,24 @@ angular.module('models.auth', ['services'])
                     ipCookie('loggedin', "true", {
                         path: '/'
                     });
+
                     LoginService.setUserAuthenticated(true);
 
                     $http.get(config.apiUrl + '/apps')
                         .success(function (data) {
-                            $log.info("loggedin Apps: ", data);
+                            console.log("loggedin Apps: ", data);
+                    
                             LoggedInAppService.setLoggedInApps(
                                 data);
 
                             if (LoggedInAppService.getLoggedInApps()
                                 .length) {
+                                console.log(LoggedInAppService.getLoggedInApps());
                                 $state.go('users.list');
                             } else {
                                 $state.go('onboarding');
                             }
+                            // window.location.reload();
 
                         })
                         .error(function () {

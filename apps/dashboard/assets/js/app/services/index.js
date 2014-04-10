@@ -4,4 +4,5 @@ angular.module('services', [
     'services.segmentQueryService',
     'services.LoginService',
     'services.LoggedInAppService',
+    'services.AccountService',
 ]);
