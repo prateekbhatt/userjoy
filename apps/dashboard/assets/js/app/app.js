@@ -66,6 +66,8 @@ angular.module('dodatado', [
                 return;
             }
             LoggedInAppService.setLoggedInApps(apps);
+            console.log("apps log", LoggedInAppService.getLoggedInApps());
+            LoggedInAppService.setCurrentApp(apps[0]);
         });
     }
 ])

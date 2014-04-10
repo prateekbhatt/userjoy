@@ -191,7 +191,22 @@ angular.module('do.settings', [])
 ])
 
 .controller('appSettingsGeneralCtrl', ['$scope', '$log', '$state',
-    function ($scope, $log, $state) {
+    'LoggedInAppService', 'AppModel',
+    function ($scope, $log, $state, LoggedInAppService, AppModel) {
+        $scope.name = LoggedInAppService.getCurrentApp()
+            .name;
+        var appId = LoggedInAppService.getCurrentApp()
+            ._id;
+
+        $scope.changeAppName = function () {
+            AppModel.updateName($scope.name, appId, function (err, data) {
+                if (err) {
+                    $log.info("Error in updating app name");
+                    return;
+                }
+                $log.info("app name changed successfully!")
+            })
+        }
 
     }
 ])
@@ -199,6 +214,23 @@ angular.module('do.settings', [])
 .controller('appSettingsTeamCtrl', ['$scope', '$log', '$state',
     function ($scope, $log, $state) {
 
+        // TODO: Get data from backend
+        $scope.team = [{
+            name: 'Savinay Narendra',
+            email: 'savinay.90@gmail.com',
+            incomingEmail: 'savinay.90@gmail.mail.dodatado.io'
+        }, {
+            name: 'Savinay Narendra',
+            email: 'savinay.90@gmail.com',
+            incomingEmail: 'savinay.90@gmail.mail.dodatado.io'
+        }]
+
+        $scope.removeTeamMember = function (teamMember) {
+            // TODO: Add code to remove team member
+            $log.info("team member removed function called");
+            var index = $scope.team.indexOf(teamMember);
+            $scope.team.splice(index,1);
+        }
     }
 ])
 
@@ -265,8 +297,11 @@ angular.module('do.settings', [])
 ])
 
 .controller('appSettingsEnvironmentCtrl', ['$scope', '$log', '$state',
-    function ($scope, $log, $state) {
-
+    'LoggedInAppService',
+    function ($scope, $log, $state, LoggedInAppService) {
+        $scope.numLimit = 10;
+        $scope.appsEnvironment = [];
+        $scope.appsEnvironment = LoggedInAppService.getLoggedInApps();
     }
 ])
 

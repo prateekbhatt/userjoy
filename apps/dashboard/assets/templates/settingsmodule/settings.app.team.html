@@ -29,17 +29,11 @@
             </thead>
             <tbody>
             <!-- TODO: Get Data from Backend -->
-                <tr>
-                    <td>Savinay Narendra</td>
-                    <th>savinay.90@gmail.com</th>
-                    <td>savinay.90@gmail.mail.dodatado.io</td>
-                    <td class="fa fa-times-circle-o"></td>
-                </tr>
-                <tr>
-                    <td>Savinay Narendra</td>
-                    <th>savinay.90@gmail.com</th>
-                    <td>savinay.90@gmail.mail.dodatado.io</td>
-                    <td class="fa fa-times-circle-o"></td>
+                <tr ng-repeat="member in team">
+                    <td>{{member.name}}</td>
+                    <th>{{member.email}}</th>
+                    <td>{{member.incomingEmail}}</td>
+                    <td><a class="btn btn-sm btn-default fa fa-times-circle-o" ng-click="removeTeamMember(member)"></a></td>
                 </tr>
             </tbody>
         </table>
