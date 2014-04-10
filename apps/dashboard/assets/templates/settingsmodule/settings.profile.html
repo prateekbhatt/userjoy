@@ -1,0 +1,34 @@
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="col-md-4">
+            <div id="wrapper-settings">
+                <!-- Sidebar -->
+                <div id="sidebar-wrapper-settings">
+                    <ul class="sidebar-nav">
+                        <li class="sidebar-brand"><strong>Account Settings </strong>
+                        </li>
+                        <li><a ui-sref="accountsettings">Profile</a>
+                        </li>
+                        <li><a ui-sref="changePassword">Change Password</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div ui-view="tab">
+        <div class="col-md-8" id="page-wrapper-settings">
+            <form id="settings_profile_form" class="form-horizontal" role="form" ng-submit="changeProfileName()" novalidate name="name_update_form">
+                <div style="padding-top:30px">
+                    <label for="name" class="col-md-3 control-label" style="font-size: 20px; padding-left: 0px"><strong>Your Name</strong></label>
+                    <div class="col-md-7">
+                        <input class="form-control" type="text" name="name"  ng-model="name" required>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-info pull-right" style="padding-top:10px" ng-disabled="!name.length">Update</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        </div>
+    </div>
+</div>

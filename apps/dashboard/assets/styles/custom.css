@@ -319,10 +319,14 @@ hr {
     height: 200px;
     width: 400px;
 }
-
 .alert-danger {
     background-color: #f2dede;
     border-color: #ebccd1;
     color: #a94442;
+}
+.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+    color: #fff;
+    background-color: #39b3d7;
+    border-color: #269abc;
 }
 }

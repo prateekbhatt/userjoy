@@ -7,7 +7,7 @@ angular.module('do.popupmessage', [])
                 url: '/popup',
                 views: {
                     "main": {
-                        templateUrl: '/templates/popupmessage.html',
+                        templateUrl: '/templates/messagesmodule/popupmessage.html',
                         controller: 'PopupCtrl'
                     }
                 }
