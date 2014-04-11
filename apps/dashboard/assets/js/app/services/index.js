@@ -5,4 +5,5 @@ angular.module('services', [
     'services.LoginService',
     'services.LoggedInAppService',
     'services.AccountService',
+    'services.ErrorMessageService',
 ]);

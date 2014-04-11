@@ -1,9 +1,9 @@
 angular.module('models.auth', ['services'])
 
 .service('AuthService', ['$http', 'utils', 'ipCookie', 'LoginService',
-    '$log', 'config', '$state', '$location', 'LoggedInAppService',
+    '$log', 'config', '$state', '$location', 'LoggedInAppService', 'ErrorMessageService', 
     function ($http, utils, ipCookie, LoginService, $log, config, $state,
-        $location, LoggedInAppService) {
+        $location, LoggedInAppService, ErrorMessageService) {
 
         this.attemptLogin = function (email, password) {
 
@@ -27,7 +27,7 @@ angular.module('models.auth', ['services'])
                     $http.get(config.apiUrl + '/apps')
                         .success(function (data) {
                             console.log("loggedin Apps: ", data);
-                    
+
                             LoggedInAppService.setLoggedInApps(
                                 data);
 
@@ -45,10 +45,11 @@ angular.module('models.auth', ['services'])
                             $log.error("error in fetching /apps");
                             // TODO
                         })
-
-
-                    // loginSuccessful = true;
-
+                })
+                .error(function (err) {
+                    $log.error("error in signing in");
+                    console.log(err.error);
+                    ErrorMessageService.setErrorMessage(err.error);
                 })
         };
 

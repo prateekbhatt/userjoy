@@ -30,7 +30,7 @@ angular.module('do.navbar', [])
         }
 
         var appsconnected;
-        $scope.apps = [];  
+        $scope.apps = [];
 
         /*$scope.apps = LoggedInAppService.getLoggedInApps();
         console.log("navbar apps: ", $scope.apps);*/
@@ -56,8 +56,9 @@ angular.module('do.navbar', [])
         $scope.$watch(LoggedInAppService.getLoggedInApps, function () {
             $log.info("Navbar watch LoggedInAppService", arguments);
             $scope.apps = LoggedInAppService.getLoggedInApps();
-            console.log("navbar apps: ", $scope.apps);
-            if(LoggedInAppService.getLoggedInApps().length){
+            console.log("navbar apps: ", $scope.apps, LoggedInAppService.getLoggedInApps());
+            if (LoggedInAppService.getLoggedInApps()
+                .length) {
                 $scope.connectedapps = true;
             } else {
                 $scope.connectedapps = false;
