@@ -50,17 +50,17 @@
                         </i>
                         </a>
                         <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" ng-show="visibleDropdownApp">
-                            <li role="presentation" ng-show="!connectedapps">
+                            <li role="presentation" ng-show="!apps">
                                 <a role="menuitem" tabindex="-1"  href="/onboarding">
                                 <span>No Apps are connected</span>
                                 <br>
                                 <span>Click here to connect an app</span></a>
                             </li>
                             <li role="presentation" ng-repeat="app in apps">
-                                <a role="menuitem" tabindex="-1" href="#" ng-show="connectedapps">
+                                <a role="menuitem" tabindex="-1" href="#" ng-show="apps">
                                 &nbsp;&nbsp;&nbsp;&nbsp;{{app.name}}
                                 </a>
-                                &nbsp;&nbsp;<a href="#" style="padding-top: 0px; color: #07c; background-color: #fff; font-size: 14px" ng-show="connectedapps"><span class="glyphicon glyphicon-cog">&nbsp;Settings for {{app.name}}</span></a>
+                                &nbsp;&nbsp;<a href="#" style="padding-top: 0px; color: #07c; background-color: #fff; font-size: 14px" ng-show="apps"><span class="glyphicon glyphicon-cog">&nbsp;Settings for {{app.name}}</span></a>
                                 <hr ng-show="!$last">
                                 <!-- <button class="gylphicon glyphicon"></button> -->
                             </li>
