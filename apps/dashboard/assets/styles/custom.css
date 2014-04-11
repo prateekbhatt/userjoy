@@ -329,4 +329,9 @@ hr {
     background-color: #39b3d7;
     border-color: #269abc;
 }
+.ta-editor.form-control{
+    height: auto;
+    min-height: 200px;
+}
+
 }
