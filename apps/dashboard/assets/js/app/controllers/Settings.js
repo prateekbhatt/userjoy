@@ -167,6 +167,13 @@ angular.module('do.settings', [])
         $scope.showError = false;
         $scope.pwdChangedSuccess = false;
         $scope.errMsg = '';
+        $scope.hideErrorAlert = function () {
+            $scope.showError = false;
+        }
+
+        $scope.hideSuccessAlert = function () {
+            $scope.pwdChangedSuccess = false;
+        }
         $scope.changePassword = function () {
             AccountModel.updatePwd($scope.current_pwd, $scope.new_pwd,
                 function (err, data) {
