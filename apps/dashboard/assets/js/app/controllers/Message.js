@@ -546,7 +546,7 @@ angular.module('do.message', [])
 
         $scope.$watch('textAngularOpts.textAngularEditors.textArea2.html',
             function (val, newVal) {
-                console.log(newVal);
+                // console.log(newVal);
             }, true);
     }
 ])
