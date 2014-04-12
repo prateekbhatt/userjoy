@@ -452,7 +452,7 @@ angular.module('do.message', [])
 
 .controller('textAngularCtrl', ['$scope',
     function ($scope) {
-        $scope.taRegisterTool = {
+        /*$scope.taRegisterTool = {
             textAngularEditors: {
                 demo1: {
                     toolbar: [{
@@ -541,7 +541,7 @@ angular.module('do.message', [])
                 }
 
             }
-        };
+        };*/
 
         $scope.$watch('textAngularOpts.textAngularEditors.textArea2.html',
             function (val, newVal) {
