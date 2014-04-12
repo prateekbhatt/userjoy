@@ -13,6 +13,16 @@ angular.module('do.login', [])
                 },
                 authenticate: false
             })
+            .state('forgotPassword', {
+                url: '/forgotPassword',
+                views: {
+                    "main": {
+                        templateUrl: '/templates/LoginSignup/forgotPassword.html',
+                        controller: 'forgotPasswordCtrl',
+                    }
+                },
+                authenticate: false
+            })
 
     }
 ])
@@ -43,4 +53,9 @@ angular.module('do.login', [])
 
         };
     }
-]);
+])
+    .controller('forgotPasswordCtrl', ['$scope',
+        function ($scope) {
+
+        }
+    ]);
