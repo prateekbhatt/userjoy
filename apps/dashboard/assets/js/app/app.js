@@ -48,13 +48,12 @@ angular.module('dodatado', [
                     "</span>",
                 action: function (size) {
                     if (size !== '' && typeof (size) === "string") {
-                        console.log("type: ", typeof (size));
-                        console.log("value: ", size);
                         size = size + " ";
                         return this.$editor()
                             .wrapSelection('insertText', size);
                     }
                 },
+                // TODO: Get data from backend
                 options: [{
                     name: 'App Name',
                     value: '{{app_name}}'
