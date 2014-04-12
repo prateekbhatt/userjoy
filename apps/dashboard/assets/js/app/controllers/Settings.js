@@ -162,15 +162,22 @@ angular.module('do.settings', [])
 .controller('changePasswordCtrl', ['$scope', 'AccountModel', '$log',
     function ($scope, AccountModel, $log) {
 
+        // $scope.newPwdLen = true;
+        $scope.new_pwd = '';
+        $scope.showError = false;
+        $scope.pwdChangedSuccess = false;
+        $scope.errMsg = '';
         $scope.changePassword = function () {
             AccountModel.updatePwd($scope.current_pwd, $scope.new_pwd,
                 function (err, data) {
                     if (err) {
                         $log.error('failed to update pwd:', err);
+                        $scope.showError = true;
+                        $scope.errMsg = err.error;
                         return;
                     }
-
-                    $log.info("password changed successfully!")
+                    $scope.pwdChangedSuccess = true;
+                    $log.info("password changed successfully!");
                 })
         }
     }
