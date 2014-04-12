@@ -27,7 +27,7 @@ angular.module('dodatado', [
 ])
 
 .config(function myAppConfig($stateProvider, $urlRouterProvider,
-    $locationProvider, $httpProvider) {
+    $locationProvider, $httpProvider, $provide) {
     $urlRouterProvider.otherwise('/404');
     $locationProvider.html5Mode(true);
 
@@ -35,6 +35,54 @@ angular.module('dodatado', [
     $httpProvider.defaults.useXDomain = true;
     $httpProvider.defaults.withCredentials = true;
     delete $httpProvider.defaults.headers.common['X-Requested-With'];
+
+    // adding custom tool to textAngular
+    $provide.decorator('taOptions', ['taRegisterTool', '$delegate',
+        function (taRegisterTool, taOptions) {
+            // $delegate is the taOptions we are decorating
+            // register the tool with textAngular
+            taRegisterTool('dropdown', {
+                display: "<span class='dropdown'>" +
+                    "<button class='btn btn-default dropdown-toggle' type='button' ng-disabled='showHtml()'><i class='fa fa-caret-down'></i></button>" +
+                    "<ul class='dropdown-menu'><li ng-repeat='o in options' ng-model='o.value' ng-click='action(o.value)'>{{o.name}}</li></ul>" +
+                    "</span>",
+                action: function (size) {
+                    if (size !== '' && typeof (size) === "string") {
+                        console.log("type: ", typeof (size));
+                        console.log("value: ", size);
+                        size = size + " ";
+                        return this.$editor()
+                            .wrapSelection('insertText', size);
+                    }
+                },
+                options: [{
+                    name: 'App Name',
+                    value: '{{app_name}}'
+                }, {
+                    name: 'First Name',
+                    value: '{{first_name}}'
+                }, {
+                    name: 'Last Name',
+                    value: '{{last_name}}'
+                }, {
+                    name: 'Email',
+                    value: '{{email}}'
+                }, {
+                    name: 'User Id',
+                    value: '{{user_id}}'
+                }, {
+                    name: 'status',
+                    value: '{{status}}'
+                }]
+            });
+
+            // add the button to the default toolbar definition
+            taOptions.toolbar[1].push('dropdown');
+            return taOptions;
+        }
+    ]);
+
+
 })
 
 .run(['LoginService', 'ipCookie', '$log',
