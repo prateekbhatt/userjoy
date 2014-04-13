@@ -48,6 +48,7 @@ describe.only('Lib query', function () {
     }];
 
     queryObj = {
+      op: '$and',
       filters: filters
     };
 
@@ -82,6 +83,13 @@ describe.only('Lib query', function () {
 
       expect(newQuery.endDate)
         .to.exist;
+    });
+
+
+    it('should set rootOperator', function () {
+
+      expect(newQuery.rootOperator)
+        .to.eql('$and');
     });
 
 
@@ -490,6 +498,7 @@ describe.only('Lib query', function () {
           key: 'val'
         }]
       };
+      Query.prototype.rootOperator = ['$and'];
       Query.prototype.countFilters = ['notEmpty'];
       Query.prototype.attrFilters = ['notEmpty'];
       Query.prototype.countFilterUserIds = ['notEmpty'];
@@ -503,6 +512,9 @@ describe.only('Lib query', function () {
       Query.prototype.reset();
 
       expect(Query.prototype.appId)
+        .not.to.exist;
+
+      expect(Query.prototype.rootOperator)
         .not.to.exist;
 
       expect(Query.prototype.query)
@@ -612,7 +624,8 @@ describe.only('Lib query', function () {
       expect(cond.c_0.$sum.$cond.then)
         .to.eql(1);
 
-      expect(cond.c_0.$sum.$cond.else)
+      expect(cond.c_0.$sum.$cond.
+        else)
         .to.eql(0);
 
     });
