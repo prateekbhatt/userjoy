@@ -16,6 +16,13 @@ describe.only('Lib query', function () {
 
 
   /**
+   * Fixtures
+   */
+
+  var createUserFixtures = require('../../fixtureUser');
+
+
+  /**
    * Test variables
    */
 
@@ -449,6 +456,36 @@ describe.only('Lib query', function () {
 
       });
 
+  });
+
+
+  describe('#runAttrQuery', function () {
+
+    before(function (done) {
+      createUserFixtures(saved.apps.first._id, 100, done);
+    });
+
+    it('should fetch users', function (done) {
+
+      Query.prototype.appId = saved.apps.first._id;
+      Query.prototype.countFilterUserIds = [];
+      Query.prototype.attrFilters = [];
+
+      Query.prototype.runAttrQuery(function (err, users) {
+
+        expect(err)
+          .not.to.exist;
+
+        expect(users)
+          .to.be.an('array');
+
+        expect(users.length)
+          .to.eql(100);
+
+        done();
+      });
+
+    });
   });
 
 

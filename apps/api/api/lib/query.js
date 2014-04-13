@@ -371,7 +371,7 @@ Query.prototype.runAttrQuery = function (cb) {
 
   var self = this;
 
-  Users
+  User
     .find(self.genUserMatchCond())
     .exec(function (err, users) {
       cb(err, users);
