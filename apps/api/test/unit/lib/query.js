@@ -520,4 +520,103 @@ describe.only('Lib query', function () {
 
   });
 
+
+  describe('#genCountGroupCond', function () {
+
+    var spy;
+
+    var countFilters = [
+
+      {
+        method: 'count',
+        name: 'Clicked login btn',
+        op: '$gt',
+        val: 10
+      },
+
+      {
+        method: 'count',
+        name: 'Clicked logout btn',
+        op: '$eq',
+        val: 0
+      },
+
+    ];
+
+    beforeEach(function () {
+      Query.prototype.reset();
+      spy = sinon.spy(Query.prototype, 'getCountFilterCond');
+    });
+
+    afterEach(function () {
+      spy.restore();
+    });
+
+
+    it('should add $userId as _id for group operator', function () {
+
+      var cond = Query.prototype.genCountGroupCond();
+      expect(cond._id)
+        .to.eql('$userId');
+    });
+
+
+    it('should add $userId as _id for group operator', function () {
+
+      Query.prototype.countFilters = countFilters;
+      var cond = Query.prototype.genCountGroupCond();
+
+      expect(cond._id)
+        .to.eql('$userId');
+    });
+
+
+    it('should call getCountFilterCond if valid countFilters', function () {
+
+      Query.prototype.countFilters = countFilters;
+      var cond = Query.prototype.genCountGroupCond();
+
+      expect(spy)
+        .to.have.been.calledTwice;
+
+      expect(spy.args[0][0])
+        .to.eql(countFilters[0]);
+
+      expect(spy.args[1][0])
+        .to.eql(countFilters[1]);
+    });
+
+
+    it('should create keys c_[i] for each new count query', function () {
+
+      Query.prototype.countFilters = countFilters;
+      var cond = Query.prototype.genCountGroupCond();
+
+      expect(cond)
+        .to.have.property("c_0");
+
+    });
+
+
+    it('should add $sum[$cond] property for each condition', function () {
+
+      Query.prototype.countFilters = countFilters;
+      var cond = Query.prototype.genCountGroupCond();
+
+      expect(cond.c_0)
+        .to.have.property("$sum");
+
+      expect(cond.c_0.$sum)
+        .to.have.property("$cond");
+
+      expect(cond.c_0.$sum.$cond.then)
+        .to.eql(1);
+
+      expect(cond.c_0.$sum.$cond.else)
+        .to.eql(0);
+
+    });
+
+  });
+
 });
