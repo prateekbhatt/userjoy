@@ -159,6 +159,25 @@ function Query(appId, query) {
 
 
 /**
+ * Resets all query vars
+ * Useful during testing
+ *
+ * @return {Query}
+ */
+
+Query.prototype.reset = function () {
+  this.appId = null;
+  this.query = {};
+
+  this.countFilters = [];
+  this.attrFilters = [];
+  this.countFilterUserIds = [];
+
+  return this;
+};
+
+
+/**
  * Updates a hasnotdone method into a count method
  *
  * Example:
