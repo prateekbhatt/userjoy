@@ -127,7 +127,7 @@ angular.module('do.message', [])
 
         $scope.showTableInbox = function () {
             console.log("inside showTableInbox");
-            $scope.showTable = true;
+            $scope.showTable = true;Write a Message:
         }
 
 
@@ -287,7 +287,7 @@ angular.module('do.message', [])
 
 .controller('SentCtrl', ['$scope', '$filter', 'ngTableParams',
     function ($scope, $filter, ngTableParams) {
-
+        // TODO: Get data from backend
         var data = [{
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',

@@ -40,6 +40,10 @@ angular.module('do.login', [])
             $state.transitionTo('users.list');
         }
 
+        $scope.hideErrorAlert = function () {
+            $scope.showError = false;
+        }
+
         // attempt login to your api
         $scope.attemptLogin = function () {
 
