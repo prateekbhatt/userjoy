@@ -56,8 +56,7 @@ module.exports = Query;
  *
  * TODO:
  *
- * - rename countQuery and attrQuery into countFilter and attrFilter
- * - rename most queries into filters
+ * - attr queries should adhere to the rootOperator specification
  *
  *
  * PSEUDO CODE:
@@ -71,7 +70,7 @@ module.exports = Query;
  *
  * {
  *   list: 'users',
- *   op: 'and',
+ *   op: '$and',
  *   filters: [
  *       {
  *         method: 'count',
@@ -512,6 +511,7 @@ Query.prototype.genCountMatchCond = function () {
 Query.prototype.getCountFilterCond = function (filter) {
 
   var cond = {};
+  filter = filter || {};
 
   cond[this.rootOperator] = [];
 

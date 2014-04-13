@@ -632,4 +632,87 @@ describe.only('Lib query', function () {
 
   });
 
+
+  describe('#getCountFilterCond', function () {
+
+
+    beforeEach(function () {
+      Query.prototype.reset();
+      Query.prototype.rootOperator = '$or';
+    });
+
+    it('should return condition based on the rootOperator', function () {
+      var cond = Query.prototype.getCountFilterCond();
+
+      expect(cond)
+        .to.be.an("object");
+      expect(cond.$or)
+        .to.be.an('array');
+
+    });
+
+    it('should return condition with atleast the event.type equality',
+      function () {
+
+        var filter = {
+          method: 'count',
+          type: 'feature'
+        };
+
+        var cond = Query.prototype.getCountFilterCond(filter);
+
+        expect(cond.$or[0])
+          .to.eql({
+            '$eq': ['$events.type', 'feature']
+          });
+
+
+      });
+
+
+    it(
+      'should add events.name condition if name attr present',
+      function () {
+
+        var filter = {
+          method: 'count',
+          type: 'feature',
+          name: 'Clicked login btn',
+          op: '$gt',
+          val: 10
+        };
+
+        var cond = Query.prototype.getCountFilterCond(filter);
+
+        expect(cond.$or[1])
+          .to.eql({
+            '$eq': ['$events.name', 'Clicked login btn']
+          });
+
+      });
+
+    it(
+      'should add events.feature condition if feature attr present',
+      function () {
+
+        var filter = {
+          method: 'count',
+          type: 'feature',
+          feature: 'Authentication',
+          name: 'Clicked login btn',
+          op: '$gt',
+          val: 10
+        };
+
+        var cond = Query.prototype.getCountFilterCond(filter);
+
+        expect(cond.$or[2])
+          .to.eql({
+            '$eq': ['$events.feature', 'Authentication']
+          });
+
+      });
+
+  });
+
 });
