@@ -10,6 +10,10 @@ $('#signup_form_submit')
             dataType: 'json',
             success: function (data) {
                 console.log('signup success', arguments);
+                $("#signupsuccess")
+                    .css("display", "block");
+                $('#successtext')
+                    .text("Signup successful! A verfication email has been sent to your email id.");
                 //redirect to login
             },
             error: function (error) {
@@ -32,8 +36,9 @@ $('#signup_form_submit')
 // })
 
 $(function () {
-        console.log("inside validate jquery");
-        $("#signup_form").validate({
+    console.log("inside validate jquery");
+    $("#signup_form")
+        .validate({
             rules: {
                 email: {
                     required: true,
@@ -55,11 +60,11 @@ $(function () {
                 }
             },
 
-            submitHandler: function(form) {
+            submitHandler: function (form) {
                 form.submit();
             }
         });
-    });
+});
 
 function displayError(err) {
     $("#signupalert")
