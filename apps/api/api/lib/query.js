@@ -16,7 +16,6 @@ var moment = require('moment');
  * Models
  */
 
-var App = require('../models/App');
 var User = require('../models/User');
 var Sessions = require('../models/Session');
 
@@ -45,6 +44,15 @@ module.exports = Query;
  * - Run in two sequential queries: the count aggregate query (Session
  * collection) should be run before the attr find query (User collection)
  * - This will make sure the user dataset always fetched in the second query
+ *
+ * - Operations allowed on frontend:
+ *  - equals
+ *  - does not equal ($ne)
+ *  - less than ($lt)
+ *  - greater than ($gt)
+ *  - contains
+ *  - does not contain
+ *
  *
  * TODO:
  *
@@ -122,11 +130,9 @@ function Query(appId, query) {
   this.appId = appId;
   this.query = query || {};
 
-  this.userQuery = {};
-  this.sessionQuery = {};
-  this.countQueries = [];
-  this.attrQueries = [];
-  this.countQueryFilteredUserIds = [];
+  this.countFilters = [];
+  this.attrFilters = [];
+  this.countFilterUserIds = [];
 
   var filters = query.filters;
 
@@ -144,7 +150,7 @@ function Query(appId, query) {
 
   // separate Session count queries and User attribute queries
   this.setIntoCount(filters);
-  this.setQueries(filters);
+  this.setFilters(filters);
 
 
   return this;
@@ -253,41 +259,23 @@ Query.prototype.setIntoCount = function (filters) {
 
 
 /**
- * Sets this.countQueries and this.attrQueries
+ * Sets this.countFilters and this.attrFilters
  *
  * @param {array} filters
  * @return {Query}
  */
 
-Query.prototype.setQueries = function (filters) {
+Query.prototype.setFilters = function (filters) {
   var self = this;
 
-  this.countQueries = _.filter(filters, {
+  this.countFilters = _.filter(filters, {
     'method': 'count'
   });
-  this.attrQueries = _.filter(filters, {
+  this.attrFilters = _.filter(filters, {
     'method': 'attr'
   });
 
   return this;
-};
-
-
-Query.prototype.aggFromUser = function (cb) {
-
-  User
-    .aggregate()
-    .match({
-      appId: this.appId
-    })
-    .match({})
-
-};
-
-
-Query.prototype.aggFromSession = function (cb) {
-
-  Ses
 };
 
 
@@ -301,7 +289,7 @@ Query.prototype.run = function (cb) {
       runCountQuery: function (cb) {
 
         // if there are no count queries to be made, move on
-        if (!self.countQueries.length) {
+        if (!self.countFilters.length) {
           return cb();
         }
 
@@ -311,7 +299,7 @@ Query.prototype.run = function (cb) {
             return cb(err);
           }
 
-          self.countQueryFilteredUserIds = userIds;
+          self.countFilterUserIds = userIds;
 
           return cb();
         });
@@ -391,19 +379,37 @@ Query.prototype.runAttrQuery = function (cb) {
 };
 
 
+/**
+ * Creates the condition object for querying through users collection
+ *
+ * @return {object} conditions
+ */
+
 Query.prototype.genUserMatchCond = function () {
   var cond = {
     appId: this.appId
   };
 
-  _.each(this.userQuery, function (filter) {
-    cond[filter.name] = {};
-    cond[filter.name][filter.op] = filter[val];
+  _.each(this.attrFilters, function (filter) {
+    var operation = filter.op;
+
+    if (operation === '$eq') {
+
+      cond[filter.name] = filter['val'];
+
+    } else {
+
+      // FIXME: add checks for contains, does not contain operations
+
+      cond[filter.name] = {};
+      cond[filter.name][filter.op] = filter['val'];
+    }
+
   });
 
-  if (this.countQueryFilteredUserIds.length) {
+  if (this.countFilterUserIds.length) {
     cond['_id'] = {
-      '$in': this.countQueryFilteredUserIds
+      '$in': this.countFilterUserIds
     };
   }
 
@@ -411,6 +417,12 @@ Query.prototype.genUserMatchCond = function () {
 };
 
 
+/**
+ * Creates a 'group' pipe for Session aggregation
+ * It groups by usedid and provides a count of all given events
+ *
+ * @return {object} pipeline group query object
+ */
 
 Query.prototype.genCountPipe = function () {
   var self = this;
@@ -419,7 +431,7 @@ Query.prototype.genCountPipe = function () {
     _id: '$userId'
   };
 
-  _.each(self.countQueries, function (filter, i) {
+  _.each(self.countFilters, function (filter, i) {
     var key = 'c_' + i;
 
     pipe[key] = {
@@ -442,43 +454,20 @@ Query.prototype.genMatchAfterCountPipe = function () {
 
   var self = this;
 
-  var pipe = {};
+  var pipe = {
+    $and: []
+  };
 
-  _.each(self.countQueries, function (filter, i) {
+  _.each(self.countFilters, function (filter, i) {
     var key = 'c_' + i;
 
-    pipe[key] = {};
-    pipe[key][filter['$op']] = filter['val'];
+    pipe['$and'][key] = {};
+    pipe['$and'][key][filter['$op']] = filter['val'];
   });
 
   return pipe;
 
 };
-
-
-Query.prototype.getCountFilterCond = function (filter) {
-
-  var cond = {
-    $and: {}
-  };
-
-  // event type is a compulsory field
-  cond['$and']['$eq'] = ['$events.type', type];
-
-
-  if (filter.name) {
-    cond['$and']['$eq'] = ['$events.name', name];
-  }
-
-  if (filter.feature) {
-    cond['$and']['$eq'] = ['$events.feature', feature];
-  }
-
-  return cond;
-
-};
-
-
 
 
 /**
@@ -489,127 +478,28 @@ Query.prototype.getCountFilterCond = function (filter) {
  * @return {object} condition
  */
 
-Query.prototype.groupCountCondition = function (countQuery) {
+Query.prototype.getCountFilterCond = function (filter) {
 
   var cond = {
     $and: []
   };
 
+  // event type is a compulsory field
   cond['$and'].push({
-    '$eq': ['$events.type', q.type]
+    '$eq': ['$events.type', filter.type]
   });
 
-  if (q.name) {
+  if (filter.name) {
     cond['$and'].push({
-      '$eq': ['$events.name', q.name]
+      '$eq': ['$events.name', filter.name]
     });
   }
 
-  if (q.feature) {
+  if (filter.feature) {
     cond['$and'].push({
-      '$eq': ['$events.feature', q.feature]
+      '$eq': ['$events.feature', filter.feature]
     });
   }
 
   return cond;
-};
-
-
-/**
- * Creates a 'group' pipe for Session aggregation
- * It groups by usedid and provides a count of all given events
- *
- * @return {object} pipeline group query object
- */
-
-// Query.prototype.pipeGroup = function () {
-
-//   var self = this;
-
-//   var pipe = {
-//     _id: '$userId'
-//   };
-
-//   _.each(self.countQueries, function (q, i) {
-
-//     var key = 'c_' + i;
-
-//     pipe[key] = {
-//       $sum: {
-//         $cond: {
-//           if :self.groupCountCondition(q),
-//           then: 1,
-//           else :0
-//         }
-//       }
-//     };
-
-//   });
-
-//   return pipe;
-// };
-
-Query.prototype.countOf = function (type, name, cb) {
-
-  var firstEventQuery = {};
-
-  if (name) {
-
-    firstEventQuery = {
-      $and: [{
-        $eq: ['events.type', type]
-      }, {
-        $eq: ['events.name', name]
-      }]
-    }
-
-  } else {
-
-    firstEventQuery = {
-      $eq: ['events.type', type]
-    }
-
-  }
-
-  Session
-    .aggregate()
-    .match({
-      appId: this.appId,
-      createdAt: {
-        $gte: this.startDate
-      }
-    })
-    .unwind('events')
-    .group({
-      _id: 'userId',
-      count: {
-        $sum: {
-          $cond: {
-            if :firstEventQuery,
-            then: 1,
-            else :0
-          }
-        }
-      }
-    })
-    .skip(this.skip)
-    .limit(this.limit)
-    .exec(function (err, val) {
-
-      if (err) {
-        cb(err);
-      }
-
-      // TODO check for fail case below
-      cb(null, val['result'][0]['count']);
-
-    });
-
-
-  Event
-    .find()
-
-
-  return this;
-
 };
