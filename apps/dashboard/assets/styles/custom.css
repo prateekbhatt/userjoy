@@ -225,7 +225,7 @@ height: 100%;
 .dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus {
     text-decoration: none;
     color: #ffffff;
-    background-color: #222;
+    background-color: #7b8a8b;
 }
 .navbar-inverse .navbar-right .navbar-nav > li.dropdown > a:hover, .navbar-inverse .navbar-right .navbar-nav > li.dropdown > a:focus {
     color: #fff;
@@ -237,7 +237,7 @@ height: 100%;
 .dropdown-menu > .active > a, .dropdown-menu > .active > a:hover, .dropdown-menu > .active > a:focus {
     color: #fff;
     text-decoration: none;
-    background-color: #000;
+    background-color: #222;
     outline: 0;
 }
 .pagination > .disabled > span, .pagination > .disabled > a, .pagination > .disabled > a:hover, .pagination > .disabled > a:focus {
@@ -343,5 +343,73 @@ hr {
     border-color: #d6e9c6;
     color: #3c763d;
 }
-
+.message-template {
+    margin: 20px 0;
+    padding: 20px;
+    border-left: 5px solid #eee;
+}
+.message-template-danger {
+    background-color: #fdf7f7;
+    border-color: #d9534f;
+    border-right: 1px solid #d9534f;
+    border-top: 1px solid #d9534f;
+    border-bottom: 1px solid #d9534f;
+    border-radius: 4px;
+}
+.message-template-warning {
+    background-color: #fcf8f2;
+    border-color: #f0ad4e;
+    border-right: 1px solid #fcf8f2;
+    border-top: 1px solid #fcf8f2;
+    border-bottom: 1px solid #fcf8f2;
+    border-radius: 4px;
+}
+.message-template-info {
+    background-color: #f4f8fa;
+    border-color: #5bc0de;
+    border-right: 1px solid #f4f8fa;
+    border-top: 1px solid #f4f8fa;
+    border-bottom: 1px solid #f4f8fa;
+    border-radius: 4px;
+}
+.message-template-success {
+    background-color: #F4FDF0;
+    border-color: #3C763D;
+    border-right: 1px solid #F4FDF0;
+    border-top: 1px solid #F4FDF0;
+    border-bottom: 1px solid #F4FDF0;
+    border-radius: 4px;
+}
+.message-template-default {
+    background-color: #EEE;
+    border-color: #B4B4B4;
+    border-right: 1px solid #EEE;
+    border-top: 1px solid #EEE;
+    border-bottom: 1px solid #EEE;
+    border-radius: 4px;
+}
+.message-template-notice {
+    background-color: #FCFCDD;
+    border-color: #BDBD89;
+    border-right: 1px solid #FCFCDD;
+    border-top: 1px solid #FCFCDD;
+    border-bottom: 1px solid #FCFCDD;
+    border-radius: 4px;
+}
+.dropdown-menu > li > a {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: normal;
+    line-height: 1.42857143;
+    color: #7b8a8b;
+    white-space: nowrap;
+}
+.message-email-success {
+    border-color: #BDBD89;
+    border-right: 1px solid #bdc3c7;
+    border-top: 1px solid #bdc3c7;
+    border-bottom: 1px solid #bdc3c7;
+    border-radius: 4px;    
+}
 }
