@@ -13,7 +13,9 @@ $('#signup_form_submit')
                 $("#signupsuccess")
                     .css("display", "block");
                 $('#successtext')
-                    .text("Signup successful! A verfication email has been sent to your email id.");
+                    .text(
+                        "Signup successful! A verfication email has been sent to your email id."
+                );
                 //redirect to login
             },
             error: function (error) {
