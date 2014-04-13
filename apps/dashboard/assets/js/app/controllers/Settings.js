@@ -127,6 +127,7 @@ angular.module('do.settings', [])
             var account = AccountService.get();
             if (typeof account === 'object') {
                 $scope.name = account.name;
+                console.log("profile name: ", $scope.name, account.name);
             }
         }
 
@@ -147,6 +148,7 @@ angular.module('do.settings', [])
         }
 
         $scope.changeProfileName = function () {
+            console.log("updating profile name");
             AccountModel.updateName($scope.name, function (err, acc) {
                 if (err) {
                     $log.error('failed to update name', err);

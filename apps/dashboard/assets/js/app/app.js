@@ -101,6 +101,7 @@ angular.module('dodatado', [
             if (err) {
                 return;
             }
+            console.log("accounts", acc);
             AccountService.set(acc);
         });
     }
