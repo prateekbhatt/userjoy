@@ -346,8 +346,8 @@ Query.prototype.runCountQuery = function (cb) {
       }
     })
     .unwind('events')
-    .group(self.genCountPipe())
-    .match(self.genMatchAfterCountPipe())
+    .group(self.genCountGroupCond())
+    .match(self.genCountMatchCond())
     .project({
       _id: 1
     })
@@ -433,7 +433,7 @@ Query.prototype.genAttrMatchCond = function () {
  * @return {object} pipeline group query object
  */
 
-Query.prototype.genCountPipe = function () {
+Query.prototype.genCountGroupCond = function () {
   var self = this;
 
   var pipe = {
@@ -459,7 +459,7 @@ Query.prototype.genCountPipe = function () {
 };
 
 
-Query.prototype.genMatchAfterCountPipe = function () {
+Query.prototype.genCountMatchCond = function () {
 
   var self = this;
 
