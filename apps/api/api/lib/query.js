@@ -133,6 +133,9 @@ function Query(appId, query) {
   this.attrFilters = [];
   this.countFilterUserIds = [];
 
+  // root level operator $and/$or
+  this.rootOperator = query.op;
+
   var filters = query.filters;
 
   // all event queries will operate for events since the startDate and till
@@ -171,6 +174,7 @@ Query.prototype.reset = function () {
   this.countFilters = [];
   this.attrFilters = [];
   this.countFilterUserIds = [];
+  this.rootOperator = null;
 
   return this;
 };
@@ -507,23 +511,23 @@ Query.prototype.genCountMatchCond = function () {
 
 Query.prototype.getCountFilterCond = function (filter) {
 
-  var cond = {
-    $and: []
-  };
+  var cond = {};
+
+  cond[this.rootOperator] = [];
 
   // event type is a compulsory field
-  cond['$and'].push({
+  cond[this.rootOperator].push({
     '$eq': ['$events.type', filter.type]
   });
 
   if (filter.name) {
-    cond['$and'].push({
+    cond[this.rootOperator].push({
       '$eq': ['$events.name', filter.name]
     });
   }
 
   if (filter.feature) {
-    cond['$and'].push({
+    cond[this.rootOperator].push({
       '$eq': ['$events.feature', filter.feature]
     });
   }
