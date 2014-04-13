@@ -367,15 +367,24 @@ Query.prototype.runCountQuery = function (cb) {
 };
 
 
+/**
+ * Run attribute queries on the Users collection
+ *
+ * @param {function} cb callback function
+ * @return {Query}
+ */
+
 Query.prototype.runAttrQuery = function (cb) {
 
   var self = this;
 
   User
-    .find(self.genUserMatchCond())
+    .find(self.genAttrMatchCond())
     .exec(function (err, users) {
       cb(err, users);
     })
+
+  return this;
 };
 
 
@@ -385,7 +394,7 @@ Query.prototype.runAttrQuery = function (cb) {
  * @return {object} conditions
  */
 
-Query.prototype.genUserMatchCond = function () {
+Query.prototype.genAttrMatchCond = function () {
   var cond = {
     appId: this.appId
   };

@@ -364,7 +364,7 @@ describe.only('Lib query', function () {
 
 
 
-  describe('#genUserMatchCond', function () {
+  describe('#genAttrMatchCond', function () {
 
     var cond;
 
@@ -403,7 +403,7 @@ describe.only('Lib query', function () {
 
       Query.prototype.filters = filters;
       Query.prototype.setFilters(filters);
-      cond = Query.prototype.genUserMatchCond();
+      cond = Query.prototype.genAttrMatchCond();
     });
 
 
@@ -447,7 +447,7 @@ describe.only('Lib query', function () {
 
         Query.prototype.countFilterUserIds = countFilterUserIds;
 
-        cond = Query.prototype.genUserMatchCond();
+        cond = Query.prototype.genAttrMatchCond();
 
         expect(cond._id)
           .to.eql({
