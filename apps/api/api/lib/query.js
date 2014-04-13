@@ -501,10 +501,10 @@ Query.prototype.genCountMatchCond = function () {
 
 
 /**
- * For a countQuery, it takes the count object and creates a boolean condition
+ * For a countFilter, it takes the count object and creates a boolean condition
  * to check if the event ocurred
  *
- * @param {object} countQuery
+ * @param {object} countFilter
  * @return {object} condition
  */
 
@@ -513,21 +513,21 @@ Query.prototype.getCountFilterCond = function (filter) {
   var cond = {};
   filter = filter || {};
 
-  cond[this.rootOperator] = [];
+  cond['$and'] = [];
 
   // event type is a compulsory field
-  cond[this.rootOperator].push({
+  cond['$and'].push({
     '$eq': ['$events.type', filter.type]
   });
 
   if (filter.name) {
-    cond[this.rootOperator].push({
+    cond['$and'].push({
       '$eq': ['$events.name', filter.name]
     });
   }
 
   if (filter.feature) {
-    cond[this.rootOperator].push({
+    cond['$and'].push({
       '$eq': ['$events.feature', filter.feature]
     });
   }

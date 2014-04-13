@@ -641,13 +641,15 @@ describe.only('Lib query', function () {
       Query.prototype.rootOperator = '$or';
     });
 
-    it('should return condition based on the rootOperator', function () {
+    it('should return with base condition as $and', function () {
       var cond = Query.prototype.getCountFilterCond();
 
       expect(cond)
         .to.be.an("object");
-      expect(cond.$or)
+      expect(cond.$and)
         .to.be.an('array');
+      expect(cond)
+        .not.to.have.property('$or');
 
     });
 
@@ -661,7 +663,7 @@ describe.only('Lib query', function () {
 
         var cond = Query.prototype.getCountFilterCond(filter);
 
-        expect(cond.$or[0])
+        expect(cond.$and[0])
           .to.eql({
             '$eq': ['$events.type', 'feature']
           });
@@ -684,7 +686,7 @@ describe.only('Lib query', function () {
 
         var cond = Query.prototype.getCountFilterCond(filter);
 
-        expect(cond.$or[1])
+        expect(cond.$and[1])
           .to.eql({
             '$eq': ['$events.name', 'Clicked login btn']
           });
@@ -706,7 +708,7 @@ describe.only('Lib query', function () {
 
         var cond = Query.prototype.getCountFilterCond(filter);
 
-        expect(cond.$or[2])
+        expect(cond.$and[2])
           .to.eql({
             '$eq': ['$events.feature', 'Authentication']
           });
