@@ -123,6 +123,17 @@ angular.module('do.settings', [])
     function ($scope, $log, $state, $location, $http, config,
         AccountService, AccountModel) {
 
+        $scope.profileNameChangeSuccess = false;
+        $scope.profileNameChangeError = false;
+        $scope.hideSuccessAlert = function () {
+            $scope.profileNameChangeSuccess = false;
+        }
+
+        $scope.hideErrorAlert = function () {
+            $scope.profileNameChangeError = false;
+        }
+
+
         function setName() {
             var account = AccountService.get();
             if (typeof account === 'object') {
@@ -152,9 +163,10 @@ angular.module('do.settings', [])
             AccountModel.updateName($scope.name, function (err, acc) {
                 if (err) {
                     $log.error('failed to update name', err);
+                    $scope.profileNameChangeError = true;
                     return;
                 }
-
+                $scope.profileNameChangeSuccess = true;
                 AccountService.set(acc);
             });
         }
