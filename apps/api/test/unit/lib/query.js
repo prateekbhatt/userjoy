@@ -34,7 +34,7 @@ describe.only('Lib query', function () {
     var newQuery;
     var queryObj;
     var setIntoCountSpy;
-    var setQueriesSpy;
+    var setFiltersSpy;
     var filters = [{
       method: 'hasdone',
       name: 'Create new object'
@@ -46,13 +46,13 @@ describe.only('Lib query', function () {
 
     beforeEach(function () {
       setIntoCountSpy = sinon.spy(Query.prototype, 'setIntoCount');
-      setQueriesSpy = sinon.spy(Query.prototype, 'setQueries');
+      setFiltersSpy = sinon.spy(Query.prototype, 'setFilters');
       newQuery = new Query(saved.apps.first._id, queryObj);
     });
 
     afterEach(function () {
       Query.prototype.setIntoCount.restore();
-      Query.prototype.setQueries.restore();
+      Query.prototype.setFilters.restore();
     });
 
 
@@ -86,6 +86,19 @@ describe.only('Lib query', function () {
     });
 
 
+    it('should set default endDate', function () {
+
+      expect(newQuery.countFilterUserIds)
+        .to.exist;
+
+      expect(newQuery.countFilterUserIds)
+        .to.be.an('array');
+
+      expect(newQuery.countFilterUserIds.length)
+        .to.eql(0);
+    });
+
+
     it('should call #setIntoCount', function () {
 
       expect(setIntoCountSpy)
@@ -96,12 +109,12 @@ describe.only('Lib query', function () {
     });
 
 
-    it('should call #setQueries', function () {
+    it('should call #setFilters', function () {
 
-      expect(setQueriesSpy)
+      expect(setFiltersSpy)
         .to.have.been.calledOnce;
 
-      expect(setQueriesSpy)
+      expect(setFiltersSpy)
         .to.have.been.calledWithExactly(filters);
     });
 
@@ -281,38 +294,10 @@ describe.only('Lib query', function () {
   });
 
 
-  describe('#setQueries', function () {
+  describe('#setFilters', function () {
 
 
-    it('should set countQueries', function () {
-
-      var filters = [{
-          method: 'count',
-          name: 'Clicked login btn',
-          op: '$eq',
-          val: 0
-        },
-
-        {
-          method: 'attr',
-          name: 'platform',
-          val: 'Android'
-        }
-
-      ];
-
-      Query.prototype.setQueries(filters);
-
-      expect(Query.prototype.countQueries)
-        .to.be.an('array');
-
-      expect(Query.prototype.countQueries.length)
-        .to.eql(1);
-
-    });
-
-
-    it('should set attrQueries', function () {
+    it('should set countFilters', function () {
 
       var filters = [{
           method: 'count',
@@ -324,20 +309,146 @@ describe.only('Lib query', function () {
         {
           method: 'attr',
           name: 'platform',
+          op: '$eq',
           val: 'Android'
         }
 
       ];
 
-      Query.prototype.setQueries(filters);
+      Query.prototype.setFilters(filters);
 
-      expect(Query.prototype.attrQueries)
+      expect(Query.prototype.countFilters)
         .to.be.an('array');
 
-      expect(Query.prototype.attrQueries.length)
+      expect(Query.prototype.countFilters.length)
         .to.eql(1);
 
     });
+
+
+    it('should set attrFilters', function () {
+
+      var filters = [{
+          method: 'count',
+          name: 'Clicked login btn',
+          op: '$eq',
+          val: 0
+        },
+
+        {
+          method: 'attr',
+          name: 'platform',
+          op: '$eq',
+          val: 'Android'
+        }
+
+      ];
+
+      Query.prototype.setFilters(filters);
+
+      expect(Query.prototype.attrFilters)
+        .to.be.an('array');
+
+      expect(Query.prototype.attrFilters.length)
+        .to.eql(1);
+
+    });
+  });
+
+
+
+  describe('#genUserMatchCond', function () {
+
+    var cond;
+
+    beforeEach(function () {
+      Query.prototype.appId = 'BlaBlaID';
+      Query.prototype.countFilterUserIds = [];
+
+      var filters = [{
+          method: 'count',
+          name: 'Clicked login btn',
+          op: '$eq',
+          val: 0
+        },
+
+        {
+          method: 'attr',
+          name: 'platform',
+          op: '$eq',
+          val: 'Android'
+        },
+
+        {
+          method: 'attr',
+          name: 'amount',
+          op: '$lt',
+          val: 100
+        },
+
+        {
+          method: 'attr',
+          name: 'totalSessions',
+          op: '$gt',
+          val: 999
+        }
+      ];
+
+      Query.prototype.filters = filters;
+      Query.prototype.setFilters(filters);
+      cond = Query.prototype.genUserMatchCond();
+    });
+
+
+    it('should return condition with appId', function () {
+
+      expect(cond.appId)
+        .to.eql('BlaBlaID');
+    });
+
+
+    it('should handle $eq operator', function () {
+
+      expect(cond.platform)
+        .to.eql('Android');
+    });
+
+
+    it('should handle $lt operator', function () {
+
+      expect(cond.amount)
+        .to.eql({
+          '$lt': 100
+        });
+    });
+
+
+    it('should handle $gt operator', function () {
+
+      expect(cond.totalSessions)
+        .to.eql({
+          '$gt': 999
+        });
+    });
+
+    it('should set $in filter on _id if countFilterUserIds is valid',
+      function () {
+        var countFilterUserIds = [
+          randomId,
+          '5313123131'
+        ];
+
+        Query.prototype.countFilterUserIds = countFilterUserIds;
+
+        cond = Query.prototype.genUserMatchCond();
+
+        expect(cond._id)
+          .to.eql({
+            '$in': countFilterUserIds
+          });
+
+      });
+
   });
 
 
