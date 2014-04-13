@@ -489,4 +489,43 @@ describe.only('Lib query', function () {
   });
 
 
+  describe('#reset', function () {
+
+    before(function () {
+      Query.prototype.appId = 'randomId';
+      Query.prototype.query = {
+        $and: [{
+          key: 'val'
+        }]
+      };
+      Query.prototype.countFilters = ['notEmpty'];
+      Query.prototype.attrFilters = ['notEmpty'];
+      Query.prototype.countFilterUserIds = ['notEmpty'];
+    });
+
+    it('should reset all query params', function () {
+
+      expect(Query.prototype.appId)
+        .to.exist;
+
+      Query.prototype.reset();
+
+      expect(Query.prototype.appId)
+        .not.to.exist;
+
+      expect(Query.prototype.query)
+        .to.be.empty;
+
+      expect(Query.prototype.countFilters)
+        .to.be.empty;
+
+      expect(Query.prototype.attrFilters)
+        .to.be.empty;
+
+      expect(Query.prototype.countFilterUserIds)
+        .to.be.empty;
+    });
+
+  });
+
 });
