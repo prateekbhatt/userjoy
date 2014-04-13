@@ -128,7 +128,6 @@ function Query(appId, query) {
 
 
   this.appId = appId;
-  this.query = query || {};
 
   this.countFilters = [];
   this.attrFilters = [];

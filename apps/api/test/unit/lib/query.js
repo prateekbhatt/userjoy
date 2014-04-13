@@ -70,14 +70,6 @@ describe.only('Lib query', function () {
         .to.eql(saved.apps.first._id);
     });
 
-    it('should set query', function () {
-
-      expect(newQuery.query)
-        .to.be.an('object');
-
-      expect(newQuery.query)
-        .to.eql(queryObj);
-    });
 
     it('should set default startDate', function () {
 
