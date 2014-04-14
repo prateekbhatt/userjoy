@@ -480,19 +480,37 @@ Query.prototype.genCountGroupCond = function () {
 };
 
 
+/**
+ * Generates the condition for the match operator in runCountQuery
+ *
+ * @return {object} match pipe condition
+ */
+
 Query.prototype.genCountMatchCond = function () {
 
   var self = this;
+  var pipe = {};
 
-  var pipe = {
-    $and: []
-  };
+  pipe[self.rootOperator] = [];
 
   _.each(self.countFilters, function (filter, i) {
-    var key = 'c_' + i;
 
-    pipe['$and'][key] = {};
-    pipe['$and'][key][filter['$op']] = filter['val'];
+    var key = 'c_' + i;
+    var cond = {};
+
+    if (filter.op === '$eq') {
+
+      cond[key] = filter.val;
+
+    } else {
+
+      cond[key] = {};
+      cond[key][filter.op] = filter.val;
+
+    }
+
+    pipe[self.rootOperator].push(cond);
+
   });
 
   return pipe;
