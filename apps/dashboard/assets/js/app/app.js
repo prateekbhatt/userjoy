@@ -23,7 +23,8 @@ angular.module('dodatado', [
     'do.login',
     'do.signup',
     'do.install',
-    'do.settings'
+    'do.settings',
+    'do.feed'
 ])
 
 .config(function myAppConfig($stateProvider, $urlRouterProvider,
