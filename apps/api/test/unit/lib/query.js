@@ -717,4 +717,107 @@ describe.only('Lib query', function () {
 
   });
 
+
+  describe('#genCountMatchCond', function () {
+
+    var spy;
+    var countFilters = [
+
+      {
+        method: 'count',
+        name: 'Clicked login btn',
+        op: '$gt',
+        val: 10
+      },
+
+      {
+        method: 'count',
+        name: 'Clicked logout btn',
+        op: '$eq',
+        val: 0
+      },
+
+    ];
+
+    beforeEach(function () {
+      Query.prototype.reset();
+      spy = sinon.spy(Query.prototype, 'getCountFilterCond');
+    });
+
+    afterEach(function () {
+      spy.restore();
+    });
+
+    it('should add conditions based on the rootOperator (and/or)',
+      function () {
+
+        Query.prototype.rootOperator = '$and';
+        Query.prototype.countFilters = countFilters;
+        var cond = Query.prototype.genCountMatchCond();
+
+        expect(cond.$and)
+          .to.be.an('array');
+      });
+
+
+    it('should add a match conditon for each countFilter',
+      function () {
+
+        Query.prototype.rootOperator = '$and';
+        Query.prototype.countFilters = countFilters;
+        var cond = Query.prototype.genCountMatchCond();
+
+        expect(cond.$and.length)
+          .to.eql(countFilters.length);
+      });
+
+
+    it('should add a match conditon with key c_[i] for each countFilter',
+      function () {
+
+        Query.prototype.rootOperator = '$and';
+        Query.prototype.countFilters = countFilters;
+        var cond = Query.prototype.genCountMatchCond();
+
+        expect(cond.$and[0].c_0)
+          .to.exist;
+
+        expect(cond.$and[1].c_1)
+          .to.exist;
+      });
+
+    it(
+      'should not add additional $eq operand for countFilters with op=$eq',
+      function () {
+
+        Query.prototype.rootOperator = '$and';
+        Query.prototype.countFilters = countFilters;
+        var cond = Query.prototype.genCountMatchCond();
+
+        expect(cond.$and[1].c_1)
+          .not.to.have.property('$eq');
+
+        expect(cond.$and[1].c_1)
+          .to.eql(0);
+      });
+
+    it(
+      'should add additional operand ($gt, $lt) for non-equality countFilters',
+      function () {
+
+        Query.prototype.rootOperator = '$and';
+        Query.prototype.countFilters = countFilters;
+        var cond = Query.prototype.genCountMatchCond();
+
+        expect(cond.$and[0].c_0)
+          .to.have.property('$gt');
+
+        expect(cond.$and[0].c_0)
+          .to.eql({
+            '$gt': 10
+          });
+      });
+
+  });
+
 });
