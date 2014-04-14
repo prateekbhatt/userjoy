@@ -459,7 +459,7 @@ angular.module('do.message', [])
         console.log("selectedIcon: ", $scope.selectedIcon);
         $scope.icons = [{
             value: "Notification",
-            label: '<i class="fa fa-warning"></i> Notification'
+            label: '<i class="fa fa-bell"></i> Notification'
         }, {
             value: "Email",
             label: '<i class="fa fa-envelope"></i> Email'
