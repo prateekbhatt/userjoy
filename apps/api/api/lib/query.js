@@ -10,6 +10,8 @@
 var _ = require('lodash');
 var async = require('async');
 var moment = require('moment');
+var ObjectId = require('mongoose')
+  .Types.ObjectId;
 
 
 /**
@@ -17,7 +19,7 @@ var moment = require('moment');
  */
 
 var User = require('../models/User');
-var Sessions = require('../models/Session');
+var Session = require('../models/Session');
 
 
 /**
@@ -361,12 +363,11 @@ Query.prototype.runCountQuery = function (cb) {
   var self = this;
 
   Session
-    .aggregate({
-      $match: {
-        appId: self.appId
-      }
+    .aggregate()
+    .match({
+      aid: new ObjectId(self.appId)
     })
-    .unwind('events')
+    .unwind('ev')
     .group(self.genCountGroupCond())
     .match(self.genCountMatchCond())
     .project({
@@ -377,10 +378,7 @@ Query.prototype.runCountQuery = function (cb) {
       if (err) {
         return cb(err);
       }
-
-      console.log('runCountQuery res', result);
-
-      var userIds = _.pluck(result['result'], '_id');
+      var userIds = _.pluck(result, '_id');
 
       cb(null, userIds);
     });
@@ -458,16 +456,17 @@ Query.prototype.genCountGroupCond = function () {
   var self = this;
 
   var pipe = {
-    _id: '$userId'
+    _id: '$uid'
   };
 
   _.each(self.countFilters, function (filter, i) {
     var key = 'c_' + i;
+    var countFilterCond = self.getCountFilterCond(filter);
 
     pipe[key] = {
       $sum: {
         $cond: {
-          if :self.getCountFilterCond(filter),
+          if :countFilterCond,
           then: 1,
           else :0
         }
@@ -535,18 +534,18 @@ Query.prototype.getCountFilterCond = function (filter) {
 
   // event type is a compulsory field
   cond['$and'].push({
-    '$eq': ['$events.type', filter.type]
+    $eq: ['$ev.t', filter.type]
   });
 
   if (filter.name) {
     cond['$and'].push({
-      '$eq': ['$events.name', filter.name]
+      $eq: ['$ev.n', filter.name]
     });
   }
 
   if (filter.feature) {
     cond['$and'].push({
-      '$eq': ['$events.feature', filter.feature]
+      $eq: ['$ev.f', filter.feature]
     });
   }
 

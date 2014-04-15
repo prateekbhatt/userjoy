@@ -111,7 +111,7 @@ var SessionSchema = new Schema({
   },
 
 
-  // company
+  // country
   co: {
     type: String
   },
@@ -136,12 +136,6 @@ var SessionSchema = new Schema({
 
   // ip address
   ip: {
-    type: String
-  },
-
-
-  // operating system
-  os: {
     type: String
   },
 
