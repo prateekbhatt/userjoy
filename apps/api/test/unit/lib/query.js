@@ -20,6 +20,7 @@ describe.only('Lib query', function () {
    */
 
   var createUserFixtures = require('../../fixtureUser');
+  var createSessionFixtures = require('../../fixtureSession');
 
 
   /**
@@ -565,21 +566,21 @@ describe.only('Lib query', function () {
     });
 
 
-    it('should add $userId as _id for group operator', function () {
+    it('should add $uid as _id for group operator', function () {
 
       var cond = Query.prototype.genCountGroupCond();
       expect(cond._id)
-        .to.eql('$userId');
+        .to.eql('$uid');
     });
 
 
-    it('should add $userId as _id for group operator', function () {
+    it('should add $uid as _id for group operator', function () {
 
       Query.prototype.countFilters = countFilters;
       var cond = Query.prototype.genCountGroupCond();
 
       expect(cond._id)
-        .to.eql('$userId');
+        .to.eql('$uid');
     });
 
 
@@ -633,7 +634,7 @@ describe.only('Lib query', function () {
   });
 
 
-  describe('#getCountFilterCond', function () {
+  describe('#genCountFilterCond', function () {
 
 
     beforeEach(function () {
@@ -665,7 +666,7 @@ describe.only('Lib query', function () {
 
         expect(cond.$and[0])
           .to.eql({
-            '$eq': ['$events.type', 'feature']
+            '$eq': ['$ev.t', 'feature']
           });
 
 
@@ -688,7 +689,7 @@ describe.only('Lib query', function () {
 
         expect(cond.$and[1])
           .to.eql({
-            '$eq': ['$events.name', 'Clicked login btn']
+            '$eq': ['$ev.n', 'Clicked login btn']
           });
 
       });
@@ -710,7 +711,7 @@ describe.only('Lib query', function () {
 
         expect(cond.$and[2])
           .to.eql({
-            '$eq': ['$events.feature', 'Authentication']
+            '$eq': ['$ev.f', 'Authentication']
           });
 
       });
@@ -818,6 +819,55 @@ describe.only('Lib query', function () {
           });
       });
 
+  });
+
+
+  describe('#runCountQuery', function () {
+
+    var countFilters = [
+
+      {
+        method: 'count',
+        type: 'pageview',
+        name: 'Define Segment',
+        op: '$gt',
+        val: 0
+      },
+
+      {
+        method: 'count',
+        name: 'Clicked logout btn',
+        op: '$lt',
+        val: 1000000000
+      },
+
+    ];
+
+    before(function (done) {
+      createSessionFixtures(saved.apps.first._id, 100, done);
+    });
+
+    it('should aggregate user ids', function (done) {
+
+      Query.prototype.appId = saved.apps.first._id;
+      Query.prototype.countFilters = countFilters;
+
+
+      Query.prototype.runCountQuery(function (err, uids) {
+
+        expect(err)
+          .not.to.exist;
+
+        expect(uids)
+          .to.be.an('array');
+
+        expect(uids)
+          .to.have.length.above(0);
+
+        done();
+      });
+
+    });
   });
 
 });
