@@ -25,7 +25,9 @@
     "connect-redis": "^1.5.0",
     "cors": "^2.2.0",
     "method-override": "^1.0.0",
-    "qs": "^0.6.6"
+    "qs": "^0.6.6",
+    "email-templates": "~0.1.8",
+    "nodemailer": "~0.6.2"
   },
   "author": "Prateek Bhatt <prattbhatt@gmail.com>",
   "license": "",
