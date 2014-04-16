@@ -357,6 +357,12 @@ Query.prototype.run = function (cb) {
 };
 
 
+/**
+ * Run count queries on the Session collection
+ *
+ * @param {function} cb callback function
+ * @return {Query}
+ */
 
 Query.prototype.runCountQuery = function (cb) {
 
@@ -383,6 +389,7 @@ Query.prototype.runCountQuery = function (cb) {
       cb(null, userIds);
     });
 
+  return this;
 };
 
 

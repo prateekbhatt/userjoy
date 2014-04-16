@@ -847,11 +847,14 @@ describe.only('Lib query', function () {
       createSessionFixtures(saved.apps.first._id, 100, done);
     });
 
-    it('should aggregate user ids', function (done) {
-
+    beforeEach(function () {
+      Query.prototype.reset();
       Query.prototype.appId = saved.apps.first._id;
       Query.prototype.countFilters = countFilters;
+      Query.prototype.rootOperator = '$and';
+    });
 
+    it('should aggregate user ids', function (done) {
 
       Query.prototype.runCountQuery(function (err, uids) {
 
@@ -864,6 +867,40 @@ describe.only('Lib query', function () {
         expect(uids)
           .to.have.length.above(0);
 
+        done();
+      });
+
+    });
+
+
+    it('should call #genCountGroupCond', function (done) {
+
+      var spy = sinon.spy(Query.prototype, 'genCountGroupCond');
+
+
+      Query.prototype.runCountQuery(function (err, uids) {
+
+        expect(spy)
+          .to.be.calledOnce;
+
+        Query.prototype.genCountGroupCond.restore();
+        done();
+      });
+
+    });
+
+
+    it('should call #genCountMatchCond', function (done) {
+
+      var spy = sinon.spy(Query.prototype, 'genCountMatchCond');
+
+
+      Query.prototype.runCountQuery(function (err, uids) {
+
+        expect(spy)
+          .to.be.calledOnce;
+
+        Query.prototype.genCountMatchCond.restore();
         done();
       });
 
