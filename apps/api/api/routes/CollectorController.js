@@ -1,5 +1,5 @@
 /**
- * Module dependencies
+ * NPM dependencies
  */
 
 var router = require('express')
@@ -12,10 +12,14 @@ var router = require('express')
  */
 
 var User = require('../models/User');
+var App = require('../models/App');
 
 
+/**
+ * Lib
+ */
 
-
+var track = require('../lib/track');
 
 
 /**
@@ -25,13 +29,18 @@ var User = require('../models/User');
  * =======================
  * PSEUDOCODE
  * =======================
+ * NOTES:
  *
+ * - create a user cookie (dodatado.uid, 2 years) for an identified user
+ * - create a session cookie (dodatado.sid, 30 minutes) for an user session
+ * - create a company cookie (dodatado.cid, 2 years) for an user session
  * =======================
  * Input
  * =======================
  *
+ *  app
  *  session
- *  user
+ *  user || user cookie
  *  company (optional)
  *  event
  *
@@ -88,15 +97,33 @@ router
 
 
     var data = req.query;
-    var appId = data.app_id;
+    var appKey = data.app_id;
     var user = data.user;
-    var email, user_id;
+    var domain = req.host;
+    console.log('   /track', req.cookies);
 
-    if (!appId) {
+    var mode;
+
+
+    // fetch values from cookies
+    var uid = req.cookies['dodatado.uid'];
+    var sid = req.cookies['dodatado.sid'];
+    var cid = req.cookies['dodatado.cid'];
+
+
+    // Validations
+
+    if (!appKey) {
       return res.badRequest('Please send app_id with the params');
     }
 
-    if (!user) {
+    // check if the request is in test / live mode
+    mode = appKey.split('_')[0];
+
+
+    // if both the user identifier and user cookie are not present, respond
+    // with an error
+    if (!(user || uid)) {
       return res.badRequest('Please send user_id or email to identify user');
     }
 
@@ -109,23 +136,159 @@ router
 
     async.waterfall([
 
-        function (cb) {
-          User.getOrCreate(appId, user, function (err, usr) {
-            cb(err, usr);
+        function findAndVerifyApp(cb) {
+
+          App
+            .findByKey(mode, appKey, function (err, app) {
+              if (err) {
+                return cb(err);
+              }
+
+              if (!app) {
+                return cb(new Error('App Not Found'));
+              }
+
+              // in test mode do not check if domain is matching
+              // however, in live mode the request domain must match the
+              // app domain
+
+              if (mode !== 'test') {
+                if (!app.checkDomain(domain)) {
+                  return cb(new Error('Domain Not Matching'));
+                }
+              }
+
+              cb(null, app);
+
+            });
+
+        },
+
+        function checkOrCreateCompany(cb) {
+
+          // if valid cid, move on
+          // else if no valid company object, move on
+          // else getOrCreate company
+
+          if (cid) {
+            return cb();
+          }
+
+          if (!company) {
+            return cb();
+          }
+
+          // TODO : getOrCreate company here
+          cb();
+
+        },
+
+
+        function checkOrCreateUser(app, cb) {
+
+          // if valid uid, move on
+          // else getOrCreate user
+
+          if (uid) {
+            return cb(null, uid);
+          }
+
+          User.getOrCreate(app._id, user, function (err, usr) {
+            cb(err, usr._id);
           });
+
+        },
+
+
+        function checkOrCreateSession(cb) {
+
+          // if valid session id, move on
+          // else create new session
+
+          if (sid) {
+            return cb();
+          }
+
+          // TODO create new session
+          cb();
+        },
+
+
+        function createEvent(arguments) {
+
         }
+
 
       ],
 
       function (err, results) {
-        // console.log('/track callback', arguments);
 
         if (err) return next(err);
-        res.json();
+
+        var resObj = {
+          userId: 'user_id',
+          companyId: 'company_id',
+          sessionId: 'session_id'
+        };
+
+        res.jsonp(resObj);
 
       });
 
   });
 
 
+/**
+ * Expose router
+ */
+
 module.exports = router;
+
+
+
+
+/**
+ * Finds app using key and mode
+ * Authenticates domain in live mode
+ *
+ * @param  {string}   mode   test/live
+ * @param  {string}   appKey
+ * @param  {string}   domain
+ * @param  {Function} cb     callback function
+ */
+
+function _findAndVerifyApp(mode, appKey, domain, cb) {
+
+  App
+    .findByKey(mode, appKey, function (err, app) {
+
+      if (err) {
+        return cb(err);
+      }
+
+      if (!app) {
+        return cb(new Error('App Not Found'));
+      }
+
+      // in test mode do not check if domain is matching
+      // however, in live mode the request domain must match the
+      // app domain
+
+      if (mode !== 'test') {
+        if (!app.checkDomain(domain)) {
+          return cb(new Error('Domain Not Matching'));
+        }
+      }
+
+      cb(null, app);
+
+    });
+
+}
+
+
+/**
+ * Expose private functions for testing
+ */
+
+module.exports._findAndVerifyApp = _findAndVerifyApp;

@@ -10,7 +10,7 @@ var faker = require('Faker');
  * models
  */
 
-var Session = require('../api/models/Session');
+var Session = require('../../api/models/Session');
 
 
 /**

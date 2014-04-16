@@ -19,8 +19,8 @@ describe('Lib query', function () {
    * Fixtures
    */
 
-  var createUserFixtures = require('../../fixtureUser');
-  var createSessionFixtures = require('../../fixtureSession');
+  var createUserFixtures = require('../../fixtures/User');
+  var createSessionFixtures = require('../../fixtures/Session');
 
 
   /**
