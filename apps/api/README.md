@@ -4,9 +4,25 @@ This app contains an expressjs api which exposes a rest interface for the db.
 
 ## Notes
 
+###### Definitions
+
+Show the list of defined features, actions and sent events for an app
+
 ###### Query engine
 
 The user event data will be exposed using [express-restify-mongoose](https://github.com/florianholzapfel/express-restify-mongoose) package
+
+Primary Collections for segmentation:
+
+- User
+- Company
+- Session (Events)
+
+Types of queries on Session:
+
+- count
+- exists (findOne with projection (_id: 1))
+- does not exist (findOne with projection (_id: 1))
 
 ###### Visits
 
@@ -15,6 +31,8 @@ A 'Visit' can be defined as a 30-minute long session. Any event that occurs for 
 ###### Events & Visits
 
 For the above, 'Events' can be embedded documents in the 'Session' collection **OR** the session document could have an array of object ids of all the events belonging to it
+
+UPDATE: Will go on with the first approach and store events in an embedded document inside the session schema
 
 ###### Apps
 
