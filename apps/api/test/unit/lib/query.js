@@ -1,4 +1,4 @@
-describe.only('Lib query', function () {
+describe('Lib query', function () {
 
   /**
    * Lib
@@ -905,6 +905,149 @@ describe.only('Lib query', function () {
       });
 
     });
+  });
+
+
+  describe('#run', function () {
+
+    var countFilters = [
+
+      {
+        method: 'count',
+        type: 'pageview',
+        name: 'Define Segment',
+        op: '$gt',
+        val: 0
+      }
+
+    ];
+
+    var attrFilters = [
+
+      {
+        method: 'attr',
+        type: 'email',
+        op: '$eq',
+        val: email
+      }
+
+    ];
+
+    var aid;
+    var email = 'p@userjoy.co'
+
+    before(function (done) {
+
+      aid = saved.apps.first._id;
+
+      createSessionFixtures(aid, 100, function (err) {
+
+        // TODO: user id should not be hardcoded here like this
+        // It would break if the uid the changed in fixtureSession.js
+
+        User.create({
+          _id: '532d6bf862d673ba7131812a',
+          appId: aid,
+          email: email
+        }, done);
+      });
+    });
+
+    beforeEach(function () {
+      Query.prototype.reset();
+      Query.prototype.countFilters = countFilters;
+      Query.prototype.attrFilters = attrFilters;
+      Query.prototype.appId = aid;
+      Query.prototype.rootOperator = '$and';
+      Query.prototype.countFilterUserIds = [];
+      Query.prototype.filteredUsers = [];
+    });
+
+    it('should not call #runCountQuery if no countFilters',
+      function (done) {
+
+        var spy = sinon.spy(Query.prototype, 'runCountQuery');
+        Query.prototype.countFilters = [];
+
+        Query.prototype.run(function (err) {
+
+          expect(spy)
+            .not.to.have.been.called;
+
+          Query.prototype.runCountQuery.restore();
+
+          done();
+        });
+
+      });
+
+
+    it('should call #runCountQuery if countFilters exist',
+      function (done) {
+
+        var spy = sinon.spy(Query.prototype, 'runCountQuery');
+
+        Query.prototype.run(function (err) {
+
+          expect(spy)
+            .to.have.been.calledOnce;
+
+          Query.prototype.runCountQuery.restore();
+
+          done();
+        });
+
+      });
+
+
+    it('should call #runCountAttrQuery',
+      function (done) {
+
+        var spy = sinon.spy(Query.prototype, 'runAttrQuery');
+
+        Query.prototype.run(function (err) {
+
+          expect(spy)
+            .to.have.been.calledOnce;
+
+          Query.prototype.runAttrQuery.restore();
+
+          done();
+        });
+
+      });
+
+
+    it('should set countFilterUserIds',
+      function (done) {
+
+        Query.prototype.run(function (err) {
+
+          expect(Query.prototype.countFilterUserIds)
+            .to.have.length.above(0);
+          done();
+        });
+
+      });
+
+
+    it('should set filteredUsers', function (done) {
+
+      Query.prototype.run(function (err, users) {
+
+        expect(Query.prototype.filteredUsers)
+          .to.have.length.above(0);
+
+        expect(users)
+          .to.have.length.above(0);
+
+        expect(users[0].email)
+          .to.eql(email);
+
+        done();
+      });
+    });
+
   });
 
 });
