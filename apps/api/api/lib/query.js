@@ -309,7 +309,7 @@ Query.prototype.run = function (cb) {
 
   async.series({
 
-      runCountQuery: function (cb) {
+      countQuery: function (cb) {
 
         // if there are no count queries to be made, move on
         if (!self.countFilters.length) {
@@ -329,7 +329,7 @@ Query.prototype.run = function (cb) {
 
       },
 
-      runAttrQuery: function (cb) {
+      attrQuery: function (cb) {
 
         self.runAttrQuery(function (err, users) {
 
