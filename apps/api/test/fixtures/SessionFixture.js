@@ -98,7 +98,7 @@ function genFakeEvent() {
  * a fake session
  */
 
-function genFakeSession(aid) {
+function genFakeSession(aid, uid) {
 
   var aFakeSession = {
 
@@ -112,7 +112,7 @@ function genFakeSession(aid) {
     ev: [],
     ip: faker.Internet.ip(),
     pl: randomFromArray(platformTypes),
-    uid: randomId
+    uid: uid
 
   };
 
@@ -131,9 +131,9 @@ function genFakeSession(aid) {
  * function which sends a post request to create a new session
  */
 
-function createSession(aid, cb) {
+function createSession(aid, uid, cb) {
 
-  var session = genFakeSession(aid);
+  var session = genFakeSession(aid, uid);
 
   Session.create(session, cb);
 }
@@ -141,9 +141,14 @@ function createSession(aid, cb) {
 
 /**
  * load the application and create a set of sessions in the database
+ *
+ * @param {string}  aid  app id
+ * @param {array} uids array of uids to randomly choose values from
+ * @param {number} no number of sessions to create
+ * @param {function} cb callback function
  */
 
-module.exports = function (aid, no, cb) {
+module.exports = function (aid, uids, no, cb) {
   var count = 0;
   var total = no || 100;
 
@@ -153,7 +158,8 @@ module.exports = function (aid, no, cb) {
     },
     function (cb) {
       count++;
-      createSession(aid, cb);
+      var uid = randomFromArray(uids);
+      createSession(aid, uid, cb);
     },
     function (err) {
 
