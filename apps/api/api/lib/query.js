@@ -371,7 +371,7 @@ Query.prototype.runCountQuery = function (cb) {
   Session
     .aggregate()
     .match({
-      aid: new ObjectId(self.appId)
+      aid: new ObjectId(self.appId.toString())
     })
     .unwind('ev')
     .group(self.genCountGroupCond())
