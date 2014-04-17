@@ -99,8 +99,6 @@ router
           return next(err);
         }
 
-        // TODO : Send Verification Email Here
-
         res.json(app, 201);
       });
 
