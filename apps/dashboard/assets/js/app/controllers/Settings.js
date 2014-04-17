@@ -123,10 +123,22 @@ angular.module('do.settings', [])
     function ($scope, $log, $state, $location, $http, config,
         AccountService, AccountModel) {
 
+        $scope.profileNameChangeSuccess = false;
+        $scope.profileNameChangeError = false;
+        $scope.hideSuccessAlert = function () {
+            $scope.profileNameChangeSuccess = false;
+        }
+
+        $scope.hideErrorAlert = function () {
+            $scope.profileNameChangeError = false;
+        }
+
+
         function setName() {
             var account = AccountService.get();
             if (typeof account === 'object') {
                 $scope.name = account.name;
+                console.log("profile name: ", $scope.name, account.name);
             }
         }
 
@@ -147,12 +159,14 @@ angular.module('do.settings', [])
         }
 
         $scope.changeProfileName = function () {
+            console.log("updating profile name");
             AccountModel.updateName($scope.name, function (err, acc) {
                 if (err) {
                     $log.error('failed to update name', err);
+                    $scope.profileNameChangeError = true;
                     return;
                 }
-
+                $scope.profileNameChangeSuccess = true;
                 AccountService.set(acc);
             });
         }
@@ -162,15 +176,29 @@ angular.module('do.settings', [])
 .controller('changePasswordCtrl', ['$scope', 'AccountModel', '$log',
     function ($scope, AccountModel, $log) {
 
+        // $scope.newPwdLen = true;
+        $scope.new_pwd = '';
+        $scope.showError = false;
+        $scope.pwdChangedSuccess = false;
+        $scope.errMsg = '';
+        $scope.hideErrorAlert = function () {
+            $scope.showError = false;
+        }
+
+        $scope.hideSuccessAlert = function () {
+            $scope.pwdChangedSuccess = false;
+        }
         $scope.changePassword = function () {
             AccountModel.updatePwd($scope.current_pwd, $scope.new_pwd,
                 function (err, data) {
                     if (err) {
                         $log.error('failed to update pwd:', err);
+                        $scope.showError = true;
+                        $scope.errMsg = err.error;
                         return;
                     }
-
-                    $log.info("password changed successfully!")
+                    $scope.pwdChangedSuccess = true;
+                    $log.info("password changed successfully!");
                 })
         }
     }
