@@ -844,7 +844,10 @@ describe('Lib query', function () {
     ];
 
     before(function (done) {
-      createSessionFixtures(saved.apps.first._id, 100, done);
+      var aid = saved.apps.first._id;
+      var uid = randomId;
+      var uids = [uid];
+      createSessionFixtures(aid, uids, 100, done);
     });
 
     beforeEach(function () {
@@ -933,13 +936,15 @@ describe('Lib query', function () {
     ];
 
     var aid;
+    var uid;
     var email = 'p@userjoy.co'
 
     before(function (done) {
 
       aid = saved.apps.first._id;
-
-      createSessionFixtures(aid, 100, function (err) {
+      uid = randomId;
+      var uids = [uid];
+      createSessionFixtures(aid, uids, 100, function (err) {
 
         // TODO: user id should not be hardcoded here like this
         // It would break if the uid the changed in fixtureSession.js
