@@ -1,10 +1,16 @@
 /**
  * Bootstrap the test database
  * before running tests
- *
- * Fixtures are being created using
- * Mocha and Supertest
  */
+
+
+/**
+ * models
+ */
+
+var Account = require('../../api/models/Account');
+var App = require('../../api/models/App');
+
 
 var accounts = {
 
@@ -32,66 +38,26 @@ var accounts = {
       name: 'Second App',
       domain: 'secondapp.co'
     }
-  },
-
-  savedFirstAccount,
-  savedSecondAccount,
-  savedApp,
-
-  loginCookie;
+  };
 
 
 function createAccount(account, fn) {
 
   var rawPassword = account.password;
-
-  request
-    .post('/account')
-    .send(account)
-    .expect(201)
-    .expect(function (res) {
-
-      // replace password with raw/original password
-      // for the purpose of testing
-      res.body.password = rawPassword;
-    })
-    .end(function (err, res) {
-
-      if (err) return fn(err);
-      fn(null, res.body);
-
-    });
+  Account.create(account, function (err, acc) {
+    if (err) return fn(err);
+    acc.password = rawPassword;
+    fn(null, acc);
+  });
 
 }
 
-function createApp(app, fn) {
+function createApp(accId, app, fn) {
 
-  request
-    .post('/apps')
-    .set('cookie', loginCookie)
-    .send(app)
-    .expect(201)
-    .end(function (err, res) {
-      if (err) return fn(err);
-      fn(null, res.body);
-    });
+  app.admin = accId;
+  App.create(app, fn);
 
 }
-
-function loginUser(email, password, done) {
-
-  request
-    .post('/auth/login')
-    .send({
-      email: email,
-      password: password
-    })
-    .expect({
-      message: 'Logged In Successfully'
-    })
-    .expect(200)
-    .end(done);
-};
 
 
 module.exports = function loadFixtures(callback) {
@@ -118,19 +84,9 @@ module.exports = function loadFixtures(callback) {
 
     },
 
-    loginFirstAccount: function (cb) {
-
-      loginUser(accounts.first.email, accounts.first.password, function (err,
-        res) {
-        loginCookie = res.headers['set-cookie'];
-        cb(err);
-      });
-
-    },
-
     createFirstApp: function (cb) {
 
-      createApp(apps.first, function (err, app) {
+      createApp(accounts.first._id, apps.first, function (err, app) {
         if (err) return cb(err);
         apps.first = app;
         cb();
@@ -138,36 +94,15 @@ module.exports = function loadFixtures(callback) {
 
     },
 
-    logout: function (cb) {
-      logoutUser(cb);
-    },
-
-
-    loginSecondAccount: function (cb) {
-
-      loginUser(accounts.second.email, accounts.second.password, function (
-        err,
-        res) {
-        loginCookie = res.headers['set-cookie'];
-        cb(err);
-      });
-
-    },
-
     createSecondApp: function (cb) {
 
-      createApp(apps.second, function (err, app) {
+      createApp(accounts.second._id, apps.second, function (err, app) {
         if (err) return cb(err);
         apps.second = app;
         cb();
       });
 
     },
-
-    logout: function (cb) {
-      logoutUser(cb);
-    },
-
 
   }, function (err) {
 
