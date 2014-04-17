@@ -72,18 +72,37 @@ angular.module('do.users', [])
 
 
         $scope.segments = segment.get.all();
-        $scope.selectedSegment = segment.get.selected();
+        // $scope.selectedSegment = segment.get.selected();
+        $scope.segmenticons = [];
+        $scope.selectedIcon = $scope.segments[0].name;
 
+        for (var i = $scope.segments.length - 1; i >= 0; i--) {
+            console.log($scope.segments[i].name);
+            $scope.segmenticons.push({
+                value: $scope.segments[i].name,
+                label: $scope.segments[i].name
+            })
+        };
 
 
         $scope.queries = queryMatching.get.all();
         $scope.query = [];
+        $scope.queryDisplayed = $scope.queries[0].name;
         $scope.selectedQuery = queryMatching.get.selected();
         for (var i = $scope.queries.length - 1; i >= 0; i--) {
             $scope.query.push({
                 text: $scope.queries[i]['name']
             })
         };
+        $scope.selectedqueries = [];
+        for (var i = $scope.queries.length - 1; i >= 0; i--) {
+            console.log($scope.queries[i].name);
+            $scope.selectedqueries.push({
+                value: $scope.queries[i].name,
+                label: $scope.queries[i].name
+            })
+        };
+
 
 
         $scope.text = 'AND';
@@ -109,6 +128,19 @@ angular.module('do.users', [])
                 $scope.text = 'AND'
             }
         }
+
+        // $scope.selectedIcon = "Users";
+
+        /*$scope.segmenticons = [{
+            value: "Paying Users",
+            label: 'Paying Users'
+        }, {
+            value: "Android Users",
+            label: 'Android Users'
+        }, {
+            value: "Phone Users",
+            label: 'Phone Users'
+        }]*/
     }
 ])
 

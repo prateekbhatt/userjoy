@@ -63,6 +63,7 @@ var jsFilesToInject = [
   'bower_components/angularjs-nvd3-directives/dist/angularjs-nvd3-directives.js',
   'bower_components/angular-cookie/angular-cookie.js',
   'bower_components/colorpicker.js',
+  'bower_components/angular-http-auth/src/http-auth-interceptor.js',
   // 'bower_components/textAngular/textAngular-sanitize.js',
   // 'js/app/textAng.js',
 

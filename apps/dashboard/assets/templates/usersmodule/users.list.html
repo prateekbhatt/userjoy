@@ -7,14 +7,20 @@
             <div>
                 <div class="caption-full">
                     <div class="row">
-                        <div class="col-md-1 col-md-offset-1 text-center">
-                            <p style="font-size:20px">LIST &nbsp;&nbsp;</p>
+                        <label class="col-md-1 col-md-offset-1 control-label" style="font-size: 20px; padding-left: 0px">List: </label>
+                        <div class="col-md-10">
+                            <button type="button" class="btn btn-default" ng-model="selectedIcon" data-html="1" ng-options="segmenticon.value as segmenticon.label for segmenticon in segmenticons" bs-select style=".dropdown-menu > li > a:hover,.dropdown-menu > li > a:focus { background-color: #7b8a8b}">
+                            Users <span class="caret"></span>
+                            </button>
+                        </div>
+                        <!-- <div class="col-md-1 col-md-offset-1 text-center">
+                                                        <p style="font-size:20px">LIST &nbsp;&nbsp;</p>
                         </div>
                         <div class="col-md-10">
                             <button type="button" class="btn btn-default" bs-dropdown="dropdown">Users
                             <i class="fa fa-caret-down"> </i>
                             </button>
-                        </div>
+                        </div> -->
                         <br>
                         <br>
                         <br>
@@ -22,21 +28,23 @@
                     <div class="form-group">
                         <div class="row" ng-show="true" ng-repeat="filter in filters">
                             <div class="col-md-1 col-md-offset-1 text-center">
-                                <p style="font-size:20px" ng-show="$first">FILTER</p>
+                                <label style="font-size:20px" ng-show="$first">Filter: </label>
                                 <a style="font-size:20px; cursor:pointer; cursor:hand" ng-show="!$first" ng-click="switchAndOr()">{{text}}</a>
                             </div>
                             <div class="col-md-10">
                                 <div class="row">
                                     <div class="col-md-3">
-                                        <button type="button" class="btn btn-default" bs-dropdown="dropdown" value="filter.segment">
+                                        <!-- <button type="button" class="btn btn-default" bs-dropdown="dropdown" value="filter.segment">
                                         <span>{{selectedSegment.name}}</span>
                                         <i class="fa fa-caret-down"> </i>
+                                        </button> -->
+                                        <button type="button" class="btn btn-default" ng-model="selectedIcon" data-html="1" ng-options="segmenticon.value as segmenticon.label for segmenticon in segmenticons" bs-select style=".dropdown-menu > li > a:hover,.dropdown-menu > li > a:focus { background-color: #7b8a8b}">
+                                        Users <span class="caret"></span>
                                         </button>
                                     </div>
                                     <div class="col-md-3">
-                                        <button type="button" class="btn btn-default" bs-dropdown="query">
-                                        <span>{{selectedQuery.name}}</span>
-                                        <i class="fa fa-caret-down"> </i>
+                                        <button type="button" class="btn btn-default" ng-model="queryDisplayed" data-html="1" ng-options="selectedquery.value as selectedquery.label for selectedquery in selectedqueries" bs-select style=".dropdown-menu > li > a:hover,.dropdown-menu > li > a:focus { background-color: #7b8a8b}">
+                                        Users <span class="caret"></span>
                                         </button>
                                     </div>
                                     <div class="col-md-4">
@@ -67,4 +75,3 @@
     </div>
 </div>
 <br>
-

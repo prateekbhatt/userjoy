@@ -1,9 +1,10 @@
 angular.module('models.auth', ['services'])
 
 .service('AuthService', ['$http', 'utils', 'ipCookie', 'LoginService',
-    '$log', 'config', '$state', '$location', 'LoggedInAppService', 'ErrorMessageService', 
+    '$log', 'config', '$state', '$location', 'LoggedInAppService', 
+    'ErrorMessageService', 'authService',  
     function ($http, utils, ipCookie, LoginService, $log, config, $state,
-        $location, LoggedInAppService, ErrorMessageService) {
+        $location, LoggedInAppService, ErrorMessageService, authService) {
 
         this.attemptLogin = function (email, password) {
 
@@ -18,6 +19,7 @@ angular.module('models.auth', ['services'])
             $http.post(config.apiUrl + '/auth/login', data)
                 .success(function (data) {
 
+                    authService.loginConfirmed();
                     ipCookie('loggedin', "true", {
                         path: '/'
                     });
