@@ -27,9 +27,9 @@
                                     <p style="font-size:20px">TYPE &nbsp;&nbsp;</p>
                                 </div>
                                 <div class="col-md-10">
-                                    <button type="button" class="btn btn-default" bs-dropdown="dropdown">Choose
-                                    <i class="fa fa-caret-down"> </i>
-                                    </button>
+                                    <button type="button" class="btn btn-default" ng-model="selectedIcon" data-html="1" ng-options="segmenticon.value as segmenticon.label for segmenticon in segmenticons" bs-select style=".dropdown-menu > li > a:hover,.dropdown-menu > li > a:focus { background-color: #7b8a8b}">
+                                        Users <span class="caret"></span>
+                                        </button>
                                 </div>
                                 <br>
                                 <br>
@@ -45,16 +45,14 @@
                                 <div class="col-md-10">
                                     <div class="row">
                                         <div class="col-md-3">
-                                            <button type="button" class="btn btn-default" bs-dropdown="dropdown" value="filter.segment">
-                                            <span>{{selectedSegment.name}}</span>
-                                            <i class="fa fa-caret-down"> </i>
-                                            </button>
+                                            <button type="button" class="btn btn-default" ng-model="selectedIcon" data-html="1" ng-options="segmenticon.value as segmenticon.label for segmenticon in segmenticons" bs-select style=".dropdown-menu > li > a:hover,.dropdown-menu > li > a:focus { background-color: #7b8a8b}">
+                                        Users <span class="caret"></span>
+                                        </button>
                                         </div>
                                         <div class="col-md-3">
-                                            <button type="button" class="btn btn-default" bs-dropdown="query" >
-                                            <span>{{selectedQuery.name}}</span>
-                                            <i class="fa fa-caret-down"> </i>
-                                            </button>
+                                            <button type="button" class="btn btn-default" ng-model="queryDisplayed" data-html="1" ng-options="selectedquery.value as selectedquery.label for selectedquery in selectedqueries" bs-select style=".dropdown-menu > li > a:hover,.dropdown-menu > li > a:focus { background-color: #7b8a8b}">
+                                        Users <span class="caret"></span>
+                                        </button>
                                         </div>
                                         <div class="col-md-4">
                                             <input type="text" class="form-control" placeholder="Value" ng-model="filter.value">

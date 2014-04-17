@@ -24,11 +24,13 @@ angular.module('dodatado', [
     'do.signup',
     'do.install',
     'do.settings',
-    'do.feed'
+    'do.feed',
+    'http-auth-interceptor'
 ])
 
-.config(function myAppConfig($stateProvider, $urlRouterProvider,
+.config(function ($stateProvider, $urlRouterProvider,
     $locationProvider, $httpProvider, $provide) {
+
     $urlRouterProvider.otherwise('/404');
     $locationProvider.html5Mode(true);
 
@@ -85,6 +87,60 @@ angular.module('dodatado', [
 
 })
 
+/*.directive('authDemoApplication', function () {
+    return {
+        restrict: 'C',
+        link: function (scope, elem, attrs) {
+            //once Angular is started, remove class:
+            elem.removeClass('waiting-for-angular');
+
+            var login = elem.find('#login-holder');
+            var main = elem.find('#content');
+
+            login.hide();
+
+            scope.$on('event:auth-loginRequired', function () {
+                login.slideDown('slow', function () {
+                    main.hide();
+                });
+            });
+            scope.$on('event:auth-loginConfirmed', function () {
+                main.show();
+                login.slideUp();
+            });
+        }
+    }
+})*/
+
+// .config(['$httpProvider',
+//     function ($httpProvider) {
+//         /**
+//          * $http interceptor.
+//          * On 401 response (without 'ignoreAuthModule' option) stores the request
+//          * and broadcasts 'event:angular-auth-loginRequired'.
+//          */
+//         $httpProvider.interceptors.push(['$rootScope', '$q', 'AuthService',
+//             function ($rootScope, $q, AuthService) {
+//                 return {
+//                     responseError: function (rejection) {
+//                         if (rejection.status === 401 && !rejection.config
+//                             .ignoreAuthModule) {
+//                             var deferred = $q.defer();
+//                             console.log('\n\nhttp-auth-interceptor', rejection);
+//                             // httpBuffer.append(rejection.config,
+//                             //     deferred);
+//                             AuthService.logout();
+//                             return deferred.promise;
+//                         }
+//                         // otherwise, default behaviour
+//                         return $q.reject(rejection);
+//                     }
+//                 };
+//             }
+//         ]);
+//     }
+// ])
+
 .run(['LoginService', 'ipCookie', '$log',
     function (LoginService, ipCookie, $log) {
 
@@ -120,20 +176,21 @@ angular.module('dodatado', [
         });
     }
 ])
-    .run(['$state', 'LoginService', '$rootScope',
-        function ($state, LoginService, $rootScope) {
+.run(['$state', 'LoginService', '$rootScope',
+    function ($state, LoginService, $rootScope) {
 
-            // check if user needs to be logged in to view a specific page
-            $rootScope.$on("$stateChangeStart", function (event, toState,
-                toParams, fromState, fromParams) {
-                if (toState.authenticate && !LoginService.getUserAuthenticated()) {
-                    // User isn’t authenticated
-                    $state.go("login");
-                    event.preventDefault();
-                }
-            });
-        }
-    ])
+        // check if user needs to be logged in to view a specific page
+        $rootScope.$on("$stateChangeStart", function (event,
+            toState,
+            toParams, fromState, fromParams) {
+            if (toState.authenticate && !LoginService.getUserAuthenticated()) {
+                // User isn’t authenticated
+                $state.go("login");
+                event.preventDefault();
+            }
+        });
+    }
+])
 
 .run(['segment', 'queryMatching',
     function (segment, queryMatching) {
