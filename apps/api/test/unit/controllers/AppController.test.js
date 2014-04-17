@@ -204,7 +204,7 @@ describe('Resource /apps', function () {
           .set('cookie', loginCookie)
           .expect('Content-Type', /json/)
           .expect(function (res) {
-            if (res.body.admin !== saved.accounts.first._id) {
+            if (res.body.admin.toString() !== saved.accounts.first._id.toString()) {
               return 'Could not fetch saved app';
             }
           })
