@@ -15,9 +15,16 @@
                 </div>
             </div>
         </div>
-        <div ui-view="tab">
         <div class="col-md-8" id="page-wrapper-settings">
             <form id="settings_profile_form" class="form-horizontal" role="form" ng-submit="changeProfileName()" novalidate name="name_update_form">
+                <div ng-show="profileNameChangeSuccess" class="alert alert-success">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="hideSuccessAlert()">&times;</button>
+                    Profile Name Changed Successfully
+                </div>
+                <div ng-show="profileNameChangeError" class="alert alert-danger">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="hideErrorAlert()">&times;</button>
+                    Error in changing profile name
+                </div>
                 <div style="padding-top:30px">
                     <label for="name" class="col-md-3 control-label" style="font-size: 20px; padding-left: 0px"><strong>Your Name</strong></label>
                     <div class="col-md-7">
@@ -28,7 +35,6 @@
                     </div>
                 </div>
             </form>
-        </div>
         </div>
     </div>
 </div>

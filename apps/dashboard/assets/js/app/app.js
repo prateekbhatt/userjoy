@@ -23,11 +23,14 @@ angular.module('dodatado', [
     'do.login',
     'do.signup',
     'do.install',
-    'do.settings'
+    'do.settings',
+    'do.feed',
+    'http-auth-interceptor'
 ])
 
-.config(function myAppConfig($stateProvider, $urlRouterProvider,
-    $locationProvider, $httpProvider) {
+.config(function ($stateProvider, $urlRouterProvider,
+    $locationProvider, $httpProvider, $provide) {
+
     $urlRouterProvider.otherwise('/404');
     $locationProvider.html5Mode(true);
 
@@ -35,7 +38,108 @@ angular.module('dodatado', [
     $httpProvider.defaults.useXDomain = true;
     $httpProvider.defaults.withCredentials = true;
     delete $httpProvider.defaults.headers.common['X-Requested-With'];
+
+    // adding custom tool to textAngular
+    $provide.decorator('taOptions', ['taRegisterTool', '$delegate',
+        function (taRegisterTool, taOptions) {
+            // $delegate is the taOptions we are decorating
+            // register the tool with textAngular
+            taRegisterTool('dropdown', {
+                display: "<span class='dropdown'>" +
+                    "<button class='btn btn-default dropdown-toggle' type='button' ng-disabled='showHtml()'><i class='fa fa-caret-down'></i></button>" +
+                    "<ul class='dropdown-menu'><li ng-repeat='o in options' ng-model='o.value' ng-click='action(o.value)'>{{o.name}}</li></ul>" +
+                    "</span>",
+                action: function (size) {
+                    if (size !== '' && typeof (size) === "string") {
+                        size = size + " ";
+                        return this.$editor()
+                            .wrapSelection('insertText', size);
+                    }
+                },
+                // TODO: Get data from backend
+                options: [{
+                    name: 'App Name',
+                    value: '{{app_name}}'
+                }, {
+                    name: 'First Name',
+                    value: '{{first_name}}'
+                }, {
+                    name: 'Last Name',
+                    value: '{{last_name}}'
+                }, {
+                    name: 'Email',
+                    value: '{{email}}'
+                }, {
+                    name: 'User Id',
+                    value: '{{user_id}}'
+                }, {
+                    name: 'status',
+                    value: '{{status}}'
+                }]
+            });
+
+            // add the button to the default toolbar definition
+            taOptions.toolbar[1].push('dropdown');
+            return taOptions;
+        }
+    ]);
+
+
 })
+
+/*.directive('authDemoApplication', function () {
+    return {
+        restrict: 'C',
+        link: function (scope, elem, attrs) {
+            //once Angular is started, remove class:
+            elem.removeClass('waiting-for-angular');
+
+            var login = elem.find('#login-holder');
+            var main = elem.find('#content');
+
+            login.hide();
+
+            scope.$on('event:auth-loginRequired', function () {
+                login.slideDown('slow', function () {
+                    main.hide();
+                });
+            });
+            scope.$on('event:auth-loginConfirmed', function () {
+                main.show();
+                login.slideUp();
+            });
+        }
+    }
+})*/
+
+// .config(['$httpProvider',
+//     function ($httpProvider) {
+//         /**
+//          * $http interceptor.
+//          * On 401 response (without 'ignoreAuthModule' option) stores the request
+//          * and broadcasts 'event:angular-auth-loginRequired'.
+//          */
+//         $httpProvider.interceptors.push(['$rootScope', '$q', 'AuthService',
+//             function ($rootScope, $q, AuthService) {
+//                 return {
+//                     responseError: function (rejection) {
+//                         if (rejection.status === 401 && !rejection.config
+//                             .ignoreAuthModule) {
+//                             var deferred = $q.defer();
+//                             console.log('\n\nhttp-auth-interceptor', rejection);
+//                             // httpBuffer.append(rejection.config,
+//                             //     deferred);
+//                             AuthService.logout();
+//                             return deferred.promise;
+//                         }
+//                         // otherwise, default behaviour
+//                         return $q.reject(rejection);
+//                     }
+//                 };
+//             }
+//         ]);
+//     }
+// ])
 
 .run(['LoginService', 'ipCookie', '$log',
     function (LoginService, ipCookie, $log) {
@@ -54,6 +158,7 @@ angular.module('dodatado', [
             if (err) {
                 return;
             }
+            console.log("accounts", acc);
             AccountService.set(acc);
         });
     }
@@ -75,7 +180,8 @@ angular.module('dodatado', [
     function ($state, LoginService, $rootScope) {
 
         // check if user needs to be logged in to view a specific page
-        $rootScope.$on("$stateChangeStart", function (event, toState,
+        $rootScope.$on("$stateChangeStart", function (event,
+            toState,
             toParams, fromState, fromParams) {
             if (toState.authenticate && !LoginService.getUserAuthenticated()) {
                 // User isn’t authenticated

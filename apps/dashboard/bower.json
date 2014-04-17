@@ -33,14 +33,15 @@
     "angular-motion": "~0.3.2",
     "angular-sanitize": "~1.2.14",
     "angular-route": "~1.2.14",
-    "textAngular": "~1.2.0",
     "d3": "~3.4.4",
     "nvd3": "~1.1.15-beta",
     "angularjs-nvd3-directives": "~0.0.5-beta",
-    "angular-cookie": "*"
+    "angular-cookie": "*",
+    "textAngular": "~1.2.0",
+    "angular-http-auth": "~1.2.1"
   },
   "resolutions": {
-    "angular": "~1.2.15",
+    "angular": "~1.2.x",
     "d3": "~3.4.4",
     "nvd3": "~1.1.15-beta"
   }

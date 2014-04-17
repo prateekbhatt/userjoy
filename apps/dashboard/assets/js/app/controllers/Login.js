@@ -13,32 +13,53 @@ angular.module('do.login', [])
                 },
                 authenticate: false
             })
+            .state('forgotPassword', {
+                url: '/forgotPassword',
+                views: {
+                    "main": {
+                        templateUrl: '/templates/LoginSignup/forgotPassword.html',
+                        controller: 'forgotPasswordCtrl',
+                    }
+                },
+                authenticate: false
+            })
 
     }
 ])
 
 .controller('LoginCtrl', ['$scope', 'LoginService', 'AuthService', '$state',
-    '$log',
-    function ($scope, LoginService, AuthService, $state, $log) {
+    '$log', 'ErrorMessageService',
+    function ($scope, LoginService, AuthService, $state, $log,
+        ErrorMessageService) {
 
         $log.info('LoginCtrl', LoginService.getUserAuthenticated());
-
+        $scope.errMsg = '';
+        $scope.showError = false;
         // If user is logged in send them to home page
         if (LoginService.getUserAuthenticated()) {
             $state.transitionTo('users.list');
+        }
+
+        $scope.hideErrorAlert = function () {
+            $scope.showError = false;
         }
 
         // attempt login to your api
         $scope.attemptLogin = function () {
 
             AuthService.attemptLogin($scope.email, $scope.password);
-            console.log("loginctrl: ", LoginService.getUserAuthenticated());
+            $scope.$watch(ErrorMessageService.getErrorMessage, function () {
+                if (ErrorMessageService.getErrorMessage()) {
+                    $scope.showError = true;
+                    $scope.errMsg = ErrorMessageService.getErrorMessage();
+                }
+            })
 
-
-            /*$log.info("login success: ", success);
-            if (success) {
-                $state.transitionTo('users.list');
-            }*/
         };
     }
-]);
+])
+    .controller('forgotPasswordCtrl', ['$scope',
+        function ($scope) {
+
+        }
+    ]);

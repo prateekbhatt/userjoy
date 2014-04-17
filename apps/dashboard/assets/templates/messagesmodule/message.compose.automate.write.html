@@ -1,25 +1,57 @@
 <div class="panel panel-default">
     <div id="wrapper">
         <div id="page-wrapper">
-            <div class="row" style="padding-top:50px">
-                <div class="text-center">
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-default">Select Users</button>
-                        <button type="button" class="btn btn-default active">Save Messages</button>
+            <div class="row" style="padding-top: 50px;">
+                <div class="col-md-6">
+                    <label class="col-md-2 col-md-offset-2 control-label" style="font-size: 20px; padding-left: 0px">Type: </label>
+                    <div class="col-md-6 col-md-offset-1">
+                        <button type="button" class="btn btn-default" ng-model="selectedIcon" data-html="1" ng-options="icon.value as icon.label for icon in icons" bs-select style=".dropdown-menu > li > a:hover,.dropdown-menu > li > a:focus { background-color: #7b8a8b}">
+                        Action <span class="caret"></span>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="col-md-2 col-md-offset-2 control-label" style="font-size: 20px; padding-left: 0px">From: </label>
+                    <div class="col-md-8">
+                        <input class="form-control disabled" ng-model="email">
                     </div>
                 </div>
             </div>
-            
             <div class="row" style="padding-top:70px">
                 <div class="col-md-12">
                     <div class="text-center">
-                        <p style="padding-left:40px">Write a Message: </p>
+                        <p style="padding-left:40px; font-size: 20px;"><strong>Write Message: </strong></p>
                     </div>
-                    <!-- <div class="btn-toolbar" role="toolbar" style="margin:0">
-                        <text-angular textAngular-toolbar="[['html','h1','h2','pre', 'bold','italics', 'p', 'ul', 'ol']]"></text-angular>
-                    </div> -->
+                    <div text-angular ta-toolbar="[['h1','h2','h3','p', 'pre'], ['bold','italics','ul', 'ol'],['justifyLeft','justifyCenter','justifyRight'],['html', 'insertImage', 'insertLink', 'dropdown']]" ng-model="htmlVariable"></div>
+                    <br>
+                    <br>
+                    <div class="text-center">
+                        <p style="padding-left:40px; font-size: 20px;"><strong>Preview: </strong></p>
+                    </div>
+                    <!-- TODO: Replace template color with the color entered by the user -->
+                    <div class="col-md-6 col-md-offset-3" ng-show="showNotification">
+                        <div class="message-template message-template-danger" style="min-height: 200px; overflow: auto;">
+                            <p ng-bind-html="htmlVariable"></p>
+                        </div>
+                        <div class="panel-footer" ng-show="showNotification" style="margin-top: -23px;">
+                            <div class="input-group">
+                                <input id="btn-input" type="text" class="form-control input-sm" placeholder="Type your message here..." disabled="disabled"/>
+                                <span class="input-group-btn">
+                                <button class="btn btn-danger btn-sm disabled" id="btn-chat">
+                                Send</button>
+                                </span>
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+                    <!-- TODO: Replace template color with the color entered by the user -->
+                    <div class="col-md-8 col-md-offset-2" ng-show="showEmail">
+                        <div class="message-template message-email-success" style="min-height: 300px; overflow: auto">
+                            <p ng-bind-html="htmlVariable"></p>
+                        </div>
+                    </div>
                     <!-- <div text-angular text-angular-name="demo1"></div> -->
-                    <div text-angular ng-model="htmlVariable"></div>
+                    <!-- <div text-angular ng-model="htmlContent" name="demo-editor" ta-text-editor-class="border-around container" ta-html-editor-class="border-around"></div> -->
                 </div>
             </div>
         </div>
