@@ -1,5 +1,16 @@
 describe('Resource /account', function () {
 
+  /**
+   * models
+   */
+
+  var Account = require('../../../api/models/Account');
+
+
+  /**
+   * Test variables
+   */
+
   var randomObjectId = '5303570d9c554e7356000017',
 
     randomEmail = 'randomEmail@example.com',
@@ -337,9 +348,37 @@ describe('Resource /account', function () {
 
 
 
-  describe('PUT /account/reset-password', function () {
+  describe.only('PUT /account/reset-password', function () {
 
-    it('creates a reset password token', function (done) {
+    var spy;
+
+    beforeEach(function () {
+      spy = sinon.spy(Account, 'createResetPasswordToken');
+    });
+
+
+    afterEach(function () {
+      Account.createResetPasswordToken.restore();
+    });
+
+
+    it('should return success message', function (done) {
+
+      request
+        .put('/account/reset-password')
+        .send({
+          email: saved.accounts.first.email
+        })
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .expect({
+          message: 'Reset password email sent'
+        })
+        .end(done);
+
+    });
+
+    it('should call Account#createResetPasswordToken', function (done) {
 
       request
         .put('/account/reset-password')
@@ -349,15 +388,14 @@ describe('Resource /account', function () {
         .expect('Content-Type', /json/)
         .expect(200)
         .expect(function (res) {
-          if (!res.body.passwordResetToken) {
-            return 'passwordResetToken was not created';
-          }
+          expect(spy)
+            .to.have.been.calledOnce;
         })
         .end(done);
 
     });
 
-    it('returns error if email is not provided', function (done) {
+    it('should return error if email is not provided', function (done) {
 
       request
         .put('/account/reset-password')
@@ -367,11 +405,15 @@ describe('Resource /account', function () {
           error: 'Provide a valid email',
           status: 400
         })
+        .expect(function (res) {
+          expect(spy)
+            .to.have.been.calledOnce;
+        })
         .end(done);
 
     });
 
-    it('returns error if account with given email is not found',
+    it('should return error if account with given email is not found',
       function (done) {
 
         request
@@ -384,6 +426,10 @@ describe('Resource /account', function () {
           .expect({
             error: 'Provide a valid email',
             status: 404
+          })
+          .expect(function (res) {
+            expect(spy)
+              .to.have.been.calledOnce;
           })
           .end(done);
 
