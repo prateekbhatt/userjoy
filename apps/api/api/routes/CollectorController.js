@@ -228,7 +228,7 @@ router
         var resObj = {
           uid: 'user_id',
           cid: 'company_id',
-          sessionId: 'session_id'
+          sid: 'session_id'
         };
 
         res.jsonp(resObj);
