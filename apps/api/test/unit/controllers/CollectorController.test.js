@@ -106,7 +106,7 @@ describe('Resource /track', function () {
 
     });
 
-    it('should return the userId, companyId and sessionId', function (done) {
+    it('should return the uid, companyId and sessionId', function (done) {
 
       var url = '/track?' +
         'app_id=' +
@@ -116,8 +116,8 @@ describe('Resource /track', function () {
 
       function hasIds(res) {
         var obj = res.body;
-        if (!(obj.userId && obj.companyId && obj.sessionId)) {
-          return 'userId/companyId/sessionId missing';
+        if (!(obj.uid && obj.companyId && obj.sessionId)) {
+          return 'uid/companyId/sessionId missing';
         }
       }
 
