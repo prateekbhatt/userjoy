@@ -227,7 +227,7 @@ router
 
         var resObj = {
           uid: 'user_id',
-          companyId: 'company_id',
+          cid: 'company_id',
           sessionId: 'session_id'
         };
 

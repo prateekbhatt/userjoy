@@ -142,7 +142,7 @@ var UserSchema = new Schema({
   // tags [all tags this user belongs to]
   // notes
   // status (Free, Paying, Cancelled)
-  // companies [{companyId, companyName}]
+  // companies [{cid, companyName}]
 
 });
 
