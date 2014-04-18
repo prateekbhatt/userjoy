@@ -138,7 +138,7 @@ Invite        |                         | tokens of team members that have been 
 - healthScore (latest value from User Health)
 - x tags [] Stores tags for categorizing users
 - x notes
-- companies [{companyId, companyName, billing{}, healthScore, totalSessions}]
+- companies [{cid, companyName, billing{}, healthScore, totalSessions}]
 - billing {
     status,
     plan,
@@ -196,7 +196,7 @@ Invite        |                         | tokens of team members that have been 
 ##### Columns:
 
 - aid
-- companyId
+- cid
 - uid
 - score
 - createdAt
