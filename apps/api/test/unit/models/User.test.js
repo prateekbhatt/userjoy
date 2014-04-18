@@ -45,9 +45,9 @@ describe('Model User', function () {
     });
 
 
-    it('should add updatedAt timestamp to user', function () {
+    it('should add ut timestamp to user', function () {
       expect(savedUser)
-        .to.have.property('updatedAt');
+        .to.have.property('ut');
     });
 
     it('should not add ct timestamp unless provided', function () {

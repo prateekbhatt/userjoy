@@ -148,12 +148,12 @@ var UserSchema = new Schema({
 
 
 /**
- * Adds firstSessionAt and updatedAt timestamps
+ * Adds firstSessionAt and ut timestamps
  */
 
 UserSchema.plugin(troop.timestamp, {
   createdPath: 'firstSessionAt',
-  modifiedPath: 'updatedAt',
+  modifiedPath: 'ut',
   useVirtual: false
 });
 

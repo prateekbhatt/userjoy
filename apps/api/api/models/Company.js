@@ -92,11 +92,11 @@ var CompanySchema = new Schema({
 
 
 /**
- * Adds updatedAt timestamps
+ * Adds ut timestamps
  */
 
 CompanySchema.plugin(troop.timestamp, {
-  modifiedPath: 'updatedAt',
+  modifiedPath: 'ut',
   useVirtual: false
 });
 
