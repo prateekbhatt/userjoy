@@ -123,6 +123,33 @@ describe('Model Session', function () {
     });
 
 
+    it('should add created timestamp (ct) to new event', function (
+      done) {
+      var newSession = {
+        pl: 'Desktop',
+        aid: randomId,
+        uid: randomId,
+        ev: [{
+          t: 'pageview',
+          d: 'app.dodatado.com',
+          p: '/login',
+          n: 'Login Page',
+          f: 'Authentication'
+        }]
+      };
+
+      Session.create(newSession, function (err, sess) {
+        expect(err)
+          .to.not.exist;
+
+        expect(sess.ev[0])
+          .to.have.property('ct');
+
+        done();
+      });
+    });
+
+
     it('should return error if event document does not have domain',
       function (done) {
         var newSession = {
@@ -180,6 +207,35 @@ describe('Model Session', function () {
         });
       });
 
+
+    it(
+      'should return error if event type is not present',
+      function (done) {
+        var newSession = {
+          pl: 'Desktop',
+          aid: randomId,
+          uid: randomId,
+          ev: [{
+            d: 'dodatado.com',
+            p: '/login',
+            n: 'Login Page',
+            f: 'Authentication'
+          }]
+        };
+
+        Session.create(newSession, function (err, sess) {
+          expect(err)
+            .to.exist;
+
+          expect(sess)
+            .to.not.exist;
+
+          expect(err.errors['ev.0.t'].message)
+            .to.eql("Event type is required");
+
+          done();
+        });
+      });
 
     it(
       'should return error if event type is not in ["feature", "pageview"]',

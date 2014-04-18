@@ -63,7 +63,7 @@ var EventSchema = new Schema({
   // type of the event
   t: {
     type: String,
-    required: true,
+    required: [true, 'Event type is required'],
     validate: eventTypeValidator
   }
 
