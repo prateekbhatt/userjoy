@@ -88,7 +88,7 @@ Invite        |                         | tokens of team members that have been 
 - verifyToken
 - emailVerified (boolean)
 - passwordResetToken
-- createdAt
+- ct
 - updatedAt
 
 ##### Notes:
@@ -105,7 +105,7 @@ Invite        |                         | tokens of team members that have been 
 - testKey
 - liveKey
 - tags [] stores all tags that the app has used for its users
-- createdAt
+- ct
 - updatedAt
 
 ##### Notes:
@@ -128,7 +128,7 @@ Invite        |                         | tokens of team members that have been 
 - unsubscribed (boolean)
 - unsubscribedAt (date)
 - unsubscribedThrough (messageId, subject)
-- createdAt
+- ct
 - updatedAt
 - firstSessionAt
 - totalSessions
@@ -159,7 +159,7 @@ Invite        |                         | tokens of team members that have been 
 
 - Billing status must be one of [trial, free, paying, cancelled]
 - The firstSessionAt attribute is added when a new user is created
-- createdAt property needs to be provided to the js snippet
+- ct property needs to be provided to the js snippet
 - Health score should be calculated based on total sessions in last 30 days, total time spent on site [?]
 
 - Ignoring: user acquisition data like (since we do not have data for non loggedin users):
@@ -183,7 +183,7 @@ Invite        |                         | tokens of team members that have been 
 >
 > - note
 > - createdBy (accountId)
-> - createdAt
+> - ct
 > - updatedAt
 >
 > Notes:
@@ -199,7 +199,7 @@ Invite        |                         | tokens of team members that have been 
 - cid
 - uid
 - score
-- createdAt
+- ct
 
 ##### Notes:
 
@@ -215,7 +215,7 @@ Invite        |                         | tokens of team members that have been 
 - name
 - totalSessions
 - x meta (object containing additonal info about users)
-- createdAt (should be passed by js snippet)
+- ct (should be passed by js snippet)
 - updatedAt
 - x tags [] just like user tags
 - billing {
@@ -232,7 +232,7 @@ Invite        |                         | tokens of team members that have been 
 
 - Billing data is stored both in Company and User models
 - Billing status must be one of [trial, free, paying, cancelled]
-- createdAt property should not be automatically added on company creation
+- ct property should not be automatically added on company creation
 
 
 
@@ -356,7 +356,7 @@ Invite        |                         | tokens of team members that have been 
 - by (accountId)
 - for (aid)
 - token
-- createdAt
+- ct
 - status (pending / cancelled / joined)
 
 ##### Notes:

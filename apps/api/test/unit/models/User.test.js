@@ -50,9 +50,9 @@ describe('Model User', function () {
         .to.have.property('updatedAt');
     });
 
-    it('should not add createdAt timestamp unless provided', function () {
+    it('should not add ct timestamp unless provided', function () {
       expect(savedUser)
-        .not.to.have.property('createdAt');
+        .not.to.have.property('ct');
     });
 
     it('should have totalSessions as 1 when the user is created',

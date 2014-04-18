@@ -52,7 +52,7 @@ var CompanySchema = new Schema({
     type: Date
   },
 
-  createdAt: {
+  ct: {
     type: Date
   },
 

@@ -89,7 +89,7 @@ var UserSchema = new Schema({
     default: 1
   },
 
-  createdAt: {
+  ct: {
     type: Date
   },
 
