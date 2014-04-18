@@ -66,9 +66,9 @@ describe('Lib query', function () {
 
 
 
-    it('should set appId', function () {
+    it('should set aid', function () {
 
-      expect(newQuery.appId)
+      expect(newQuery.aid)
         .to.eql(saved.apps.first._id);
     });
 
@@ -370,7 +370,7 @@ describe('Lib query', function () {
     var cond;
 
     beforeEach(function () {
-      Query.prototype.appId = 'BlaBlaID';
+      Query.prototype.aid = 'BlaBlaID';
       Query.prototype.countFilterUserIds = [];
 
       var filters = [{
@@ -408,9 +408,9 @@ describe('Lib query', function () {
     });
 
 
-    it('should return condition with appId', function () {
+    it('should return condition with aid', function () {
 
-      expect(cond.appId)
+      expect(cond.aid)
         .to.eql('BlaBlaID');
     });
 
@@ -468,7 +468,7 @@ describe('Lib query', function () {
 
     it('should fetch users', function (done) {
 
-      Query.prototype.appId = saved.apps.first._id;
+      Query.prototype.aid = saved.apps.first._id;
       Query.prototype.countFilterUserIds = [];
       Query.prototype.attrFilters = [];
 
@@ -493,7 +493,7 @@ describe('Lib query', function () {
   describe('#reset', function () {
 
     before(function () {
-      Query.prototype.appId = 'randomId';
+      Query.prototype.aid = 'randomId';
       Query.prototype.query = {
         $and: [{
           key: 'val'
@@ -507,12 +507,12 @@ describe('Lib query', function () {
 
     it('should reset all query params', function () {
 
-      expect(Query.prototype.appId)
+      expect(Query.prototype.aid)
         .to.exist;
 
       Query.prototype.reset();
 
-      expect(Query.prototype.appId)
+      expect(Query.prototype.aid)
         .not.to.exist;
 
       expect(Query.prototype.rootOperator)
@@ -852,7 +852,7 @@ describe('Lib query', function () {
 
     beforeEach(function () {
       Query.prototype.reset();
-      Query.prototype.appId = saved.apps.first._id;
+      Query.prototype.aid = saved.apps.first._id;
       Query.prototype.countFilters = countFilters;
       Query.prototype.rootOperator = '$and';
     });
@@ -951,7 +951,7 @@ describe('Lib query', function () {
 
         User.create({
           _id: '532d6bf862d673ba7131812a',
-          appId: aid,
+          aid: aid,
           email: email
         }, done);
       });
@@ -961,7 +961,7 @@ describe('Lib query', function () {
       Query.prototype.reset();
       Query.prototype.countFilters = countFilters;
       Query.prototype.attrFilters = attrFilters;
-      Query.prototype.appId = aid;
+      Query.prototype.aid = aid;
       Query.prototype.rootOperator = '$and';
       Query.prototype.countFilterUserIds = [];
       Query.prototype.filteredUsers = [];

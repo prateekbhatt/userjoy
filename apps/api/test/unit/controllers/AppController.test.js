@@ -168,7 +168,7 @@ describe('Resource /apps', function () {
 
   });
 
-  describe('GET /apps/:appId', function () {
+  describe('GET /apps/:aid', function () {
 
 
     before(function (done) {
@@ -249,7 +249,7 @@ describe('Resource /apps', function () {
   });
 
 
-  describe('PUT /apps/:appId/name', function () {
+  describe('PUT /apps/:aid/name', function () {
 
     before(function (done) {
       logoutUser(done);

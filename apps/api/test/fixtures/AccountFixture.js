@@ -35,11 +35,11 @@ function randomFromArray(arr) {
  * a fake account
  */
 
-function genFakeAccount(appId) {
+function genFakeAccount(aid) {
 
   var aFakeAccount = {
 
-    appId: appId || randomId,
+    aid: aid || randomId,
 
     email: faker.Internet.email(),
 
@@ -80,9 +80,9 @@ function genFakeAccount(appId) {
  * function which sends a post request to create a new account
  */
 
-function createAccount(appId, cb) {
+function createAccount(aid, cb) {
 
-  var account = genFakeAccount(appId);
+  var account = genFakeAccount(aid);
 
   Account.create(account, function (err, acc) {
     if (cb) cb(err, acc);
@@ -94,7 +94,7 @@ function createAccount(appId, cb) {
  * load the application and create a set of accounts in the database
  */
 
-module.exports = function (appId, no, cb) {
+module.exports = function (aid, no, cb) {
   var count = 0;
   var total = no || 100;
 
@@ -104,7 +104,7 @@ module.exports = function (appId, no, cb) {
     },
     function (cb) {
       count++;
-      createAccount(appId, cb);
+      createAccount(aid, cb);
     },
     function (err) {
 

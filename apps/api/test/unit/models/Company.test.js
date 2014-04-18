@@ -21,7 +21,7 @@ describe('Model Company', function () {
 
       var newCompany = {
         name: 'Do Data Do 2',
-        appId: randomId
+        aid: randomId
       };
 
       Company.create(newCompany, function (err, com) {
@@ -54,7 +54,7 @@ describe('Model Company', function () {
     };
 
     before(function (done) {
-      newCompany.appId = randomId;
+      newCompany.aid = randomId;
       Company.create(newCompany, done);
     });
 

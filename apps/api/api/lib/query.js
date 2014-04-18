@@ -119,16 +119,16 @@ module.exports = Query;
  *
  *
  *
- * @param {string} appId
+ * @param {string} aid
  * @param {object} query
  *
  * return {Query}
  */
 
-function Query(appId, query) {
+function Query(aid, query) {
 
 
-  this.appId = appId;
+  this.aid = aid;
 
   this.countFilters = [];
   this.attrFilters = [];
@@ -169,7 +169,7 @@ function Query(appId, query) {
  */
 
 Query.prototype.reset = function () {
-  this.appId = null;
+  this.aid = null;
   this.query = {};
 
   this.countFilters = [];
@@ -371,7 +371,7 @@ Query.prototype.runCountQuery = function (cb) {
   Session
     .aggregate()
     .match({
-      aid: new ObjectId(self.appId.toString())
+      aid: new ObjectId(self.aid.toString())
     })
     .unwind('ev')
     .group(self.genCountGroupCond())
@@ -422,7 +422,7 @@ Query.prototype.runAttrQuery = function (cb) {
 
 Query.prototype.genAttrMatchCond = function () {
   var cond = {
-    appId: this.appId
+    aid: this.aid
   };
 
   _.each(this.attrFilters, function (filter) {
