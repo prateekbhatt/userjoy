@@ -89,7 +89,7 @@ Invite        |                         | tokens of team members that have been 
 - emailVerified (boolean)
 - passwordResetToken
 - ct
-- updatedAt
+- ut
 
 ##### Notes:
 
@@ -106,7 +106,7 @@ Invite        |                         | tokens of team members that have been 
 - liveKey
 - tags [] stores all tags that the app has used for its users
 - ct
-- updatedAt
+- ut
 
 ##### Notes:
 
@@ -129,7 +129,7 @@ Invite        |                         | tokens of team members that have been 
 - unsubscribedAt (date)
 - unsubscribedThrough (messageId, subject)
 - ct
-- updatedAt
+- ut
 - firstSessionAt
 - totalSessions
 - lastContactedAt
@@ -184,7 +184,7 @@ Invite        |                         | tokens of team members that have been 
 > - note
 > - createdBy (accountId)
 > - ct
-> - updatedAt
+> - ut
 >
 > Notes:
 >
@@ -216,7 +216,7 @@ Invite        |                         | tokens of team members that have been 
 - totalSessions
 - x meta (object containing additonal info about users)
 - ct (should be passed by js snippet)
-- updatedAt
+- ut
 - x tags [] just like user tags
 - billing {
     status,
