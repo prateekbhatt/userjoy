@@ -48,7 +48,7 @@ var UserCompanySchema = new Schema({
 
 var UserSchema = new Schema({
 
-  appId: {
+  aid: {
     type: Schema.Types.ObjectId,
     ref: 'App',
     required: true
@@ -166,7 +166,7 @@ UserSchema.plugin(troop.timestamp, {
  * @param {Function} callback function
  */
 
-UserSchema.statics.getOrCreate = function (appId, user, cb) {
+UserSchema.statics.getOrCreate = function (aid, user, cb) {
 
   var email = user.email;
   var user_id = user.user_id;
@@ -176,11 +176,11 @@ UserSchema.statics.getOrCreate = function (appId, user, cb) {
     return cb(new Error('Please send user_id or email to identify user'));
   }
 
-  // add appId to user
-  user.appId = appId;
+  // add aid to user
+  user.aid = aid;
 
-  // appId to query
-  query.appId = appId;
+  // aid to query
+  query.aid = aid;
 
   // add user_id or email to query
   if (user_id) {

@@ -64,7 +64,7 @@ var track = require('../lib/track');
  *   create session
  * else
  *   fetch session
- *   if not valid session (userId, appId)
+ *   if not valid session (userId, aid)
  *     create new session
  *
  * create event

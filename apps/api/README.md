@@ -195,7 +195,7 @@ Invite        |                         | tokens of team members that have been 
 
 ##### Columns:
 
-- appId
+- aid
 - companyId
 - userId
 - score
@@ -210,7 +210,7 @@ Invite        |                         | tokens of team members that have been 
 
 ##### Columns:
 
-- appId
+- aid
 - company_id (similar to user_id)
 - name
 - totalSessions
@@ -354,7 +354,7 @@ Invite        |                         | tokens of team members that have been 
 
 - to (email)
 - by (accountId)
-- for (appId)
+- for (aid)
 - token
 - createdAt
 - status (pending / cancelled / joined)

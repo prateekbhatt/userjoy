@@ -66,7 +66,7 @@ function genFakeUser(aid) {
 
   var aFakeUser = {
 
-    appId: aid,
+    aid: aid,
 
     email: faker.Internet.email(),
 

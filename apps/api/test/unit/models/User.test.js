@@ -67,7 +67,7 @@ describe('Model User', function () {
 
         var testUser = {
           email: 'care@dodatado.com',
-          appId: randomId
+          aid: randomId
         };
 
         var billing = {
@@ -132,7 +132,7 @@ describe('Model User', function () {
     it('should store company data if exists', function (done) {
       var testUser = {
         email: 'care@dodatado.com',
-        appId: randomId,
+        aid: randomId,
         companies: [{
           cid: randomId,
           name: 'helloworld'
@@ -163,7 +163,7 @@ describe('Model User', function () {
       function (done) {
         var testUser = {
           email: 'care@dodatado.com',
-          appId: randomId,
+          aid: randomId,
           companies: [{
             name: 'helloworld'
           }]
@@ -190,7 +190,7 @@ describe('Model User', function () {
     };
 
     before(function (done) {
-      newUser.appId = randomId;
+      newUser.aid = randomId;
       User.create(newUser, done);
     });
 
