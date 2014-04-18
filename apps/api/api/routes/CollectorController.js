@@ -64,7 +64,7 @@ var track = require('../lib/track');
  *   create session
  * else
  *   fetch session
- *   if not valid session (userId, aid)
+ *   if not valid session (uid, aid)
  *     create new session
  *
  * create event
@@ -226,7 +226,7 @@ router
         if (err) return next(err);
 
         var resObj = {
-          userId: 'user_id',
+          uid: 'user_id',
           companyId: 'company_id',
           sessionId: 'session_id'
         };

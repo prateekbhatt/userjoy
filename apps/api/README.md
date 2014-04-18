@@ -197,7 +197,7 @@ Invite        |                         | tokens of team members that have been 
 
 - aid
 - companyId
-- userId
+- uid
 - score
 - createdAt
 

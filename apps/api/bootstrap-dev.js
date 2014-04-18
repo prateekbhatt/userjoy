@@ -67,9 +67,9 @@ function bootstrapDevDB(cb) {
 
         console.log('loading user fixtures ...');
 
-        createUsers(aid, 1000, function (err, userIds) {
+        createUsers(aid, 1000, function (err, uids) {
           if (err) return cb(err);
-          uids = userIds;
+          uids = uids;
           cb();
         });
 

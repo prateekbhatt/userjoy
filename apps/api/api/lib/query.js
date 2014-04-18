@@ -316,13 +316,13 @@ Query.prototype.run = function (cb) {
           return cb();
         }
 
-        self.runCountQuery(function (err, userIds) {
+        self.runCountQuery(function (err, uids) {
 
           if (err) {
             return cb(err);
           }
 
-          self.countFilterUserIds = userIds;
+          self.countFilterUserIds = uids;
 
           return cb();
         });
@@ -384,9 +384,9 @@ Query.prototype.runCountQuery = function (cb) {
       if (err) {
         return cb(err);
       }
-      var userIds = _.pluck(result, '_id');
+      var uids = _.pluck(result, '_id');
 
-      cb(null, userIds);
+      cb(null, uids);
     });
 
   return this;

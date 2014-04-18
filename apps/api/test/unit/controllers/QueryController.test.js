@@ -34,8 +34,8 @@ describe('Resource /query', function () {
         createUserFixtures: function (cb) {
 
           aid = saved.apps.first._id;
-          UserFixture(aid, 10, function (err, userIds) {
-            uids = userIds;
+          UserFixture(aid, 10, function (err, uids) {
+            uids = uids;
             cb(err);
           });
 
