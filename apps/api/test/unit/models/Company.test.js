@@ -39,9 +39,9 @@ describe('Model Company', function () {
 
     });
 
-    it('should not add createdAt unless passed', function () {
+    it('should not add ct unless passed', function () {
       expect(savedCompany)
-        .not.to.have.property('createdAt');
+        .not.to.have.property('ct');
     });
 
   });

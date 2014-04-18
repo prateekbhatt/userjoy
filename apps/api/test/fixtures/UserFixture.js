@@ -72,7 +72,7 @@ function genFakeUser(aid) {
 
     totalSessions: faker.Helpers.randomNumber(10000),
 
-    createdAt: faker.Date.recent(10000),
+    ct: faker.Date.recent(10000),
 
     lastSessionAt: faker.Date.recent(10),
 

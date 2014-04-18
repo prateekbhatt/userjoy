@@ -63,11 +63,11 @@ var AccountSchema = new Schema({
 
 
 /**
- * Adds createdAt and updatedAt timestamps
+ * Adds ct and updatedAt timestamps
  */
 
 AccountSchema.plugin(troop.timestamp, {
-  createdPath: 'createdAt',
+  createdPath: 'ct',
   modifiedPath: 'updatedAt',
   useVirtual: false
 });
