@@ -348,7 +348,7 @@ describe('Resource /account', function () {
 
 
 
-  describe.only('PUT /account/reset-password', function () {
+  describe('PUT /account/reset-password', function () {
 
     var spy;
 

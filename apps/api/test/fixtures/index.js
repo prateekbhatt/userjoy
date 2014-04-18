@@ -5,6 +5,13 @@
 
 
 /**
+ * npm dependencies
+ */
+
+var async = require('async');
+
+
+/**
  * models
  */
 
@@ -16,8 +23,8 @@ var accounts = {
 
   first: {
     name: 'Prateek',
-    email: 'prateek@example.com',
-    password: 'testingnewapp'
+    email: 'test@userjoy.co',
+    password: 'testtest'
   },
 
   second: {
