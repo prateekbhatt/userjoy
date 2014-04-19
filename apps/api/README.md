@@ -177,18 +177,12 @@ Invite        |                         | tokens of team members that have been 
 
 > ### Note
 >
-> Stores notes related to a user
->
 > Columns:
 >
 > - note
 > - createdBy (accountId)
 > - ct
 > - ut
->
-> Notes:
->
-> - This should be an embedded document in the Users model
 
 
 ### Health
@@ -245,7 +239,20 @@ Invite        |                         | tokens of team members that have been 
  - ut
  - list
  - op
- - filters
+ - filters (embedded documents)
+
+##### Embedded Documents:
+
+> ### Filter
+>
+> Columns:
+>
+> - method
+> - type
+> - name
+> - feature
+> - op
+> - val
 
 
 ### Session
