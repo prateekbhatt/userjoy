@@ -229,6 +229,11 @@ angular.module('do.users', [])
             //     $scope.filters[parentindex].op = newValue;       
             // });
         }
+
+        $scope.runQuery = function () {
+            console.log("run Query: ", $scope.filters);
+        }
+
         console.log("queryDisplayed: ", $scope.queryDisplayed);
 
         $scope.text = 'AND';
