@@ -27,73 +27,6 @@
                                     <a style="font-size:20px; cursor:pointer; cursor:hand" ng-show="!$first" ng-click="switchAndOr()">{{text}}</a>
                                 </div>
                                 <div>
-                                    <!-- <div class="col-md-10">
-                                        <div class="row">
-                                            <div class="col-md-4" ng-if="!hasDoneOrHasNotDone">
-                                                <button type="button" class="btn btn-default dropdown-toggle form-control" data-toggle="dropdown"> <span data-bind="label" id="buttonText_{{$index}}"></span>&nbsp;<span class="caret"></span>
-                                                </button>
-                                                <ul class="select dropdown-menu" role="select" style="left: 15px">
-                                                    <li class="dropdown dropdown-submenu">
-                                                        <a style="cursor: default">Has done</a>
-                                                        <ul class="dropdown-menu">
-                                                            <li ng-repeat="hasDoneItem in hasDoneItems">
-                                                                <a style="cursor: default" ng-click="changeFilterHasDone($index, $event)">{{hasDoneItem.name}}
-                                                                </a>
-                                                            </li>                         </ul>
-                                                    </li>
-                                                    <li class="dropdown dropdown-submenu"><a style="cursor: default">Has not done</a>
-                                                        <ul class="dropdown-menu">
-                                                            <li ng-repeat="hasNotDoneItem in hasNotDoneItems"><a style="cursor: default" ng-click="changeFilterHasNotDone($index, $event)">{{hasNotDoneItem.name}}</a></li>
-                                                        </ul>
-                                                    </li>
-                                                    <li class="dropdown dropdown-submenu"><a style="cursor: default">Count of</a>
-                                                        <ul class="dropdown-menu">
-                                                            <li ng-repeat="countOfItem in countOfItems"><a style="cursor: default" ng-click="changeFilterCountOf($index, $event)">{{countOfItem.name}}</a></li>
-                                                        </ul>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <div class="col-md-3" ng-if="hasDoneOrHasNotDone">
-                                                <button type="button" class="btn btn-default dropdown-toggle form-control" data-toggle="dropdown"> <span data-bind="label">{{selectFilter}}</span>&nbsp;<span class="caret"></span>
-                                                </button>
-                                                <ul class="select dropdown-menu" role="select" style="left: 15px">
-                                                    <li class="dropdown dropdown-submenu">
-                                                        <a style="cursor: default">Has done</a>
-                                                        <ul class="dropdown-menu">
-                                                            <li ng-repeat="hasDoneItem in hasDoneItems">
-                                                                <a style="cursor: default" ng-click="changeFilterHasDone($index, $event)">{{hasDoneItem.name}}
-                                                                </a>
-                                                            </li>                        </ul>
-                                                    </li>
-                                                    <li class="dropdown dropdown-submenu"><a style="cursor: default">Has not done</a>
-                                                        <ul class="dropdown-menu">
-                                                            <li ng-repeat="hasNotDoneItem in hasNotDoneItems"><a style="cursor: default" ng-click="changeFilterHasNotDone($index, $event)">{{hasNotDoneItem.name}}</a></li>
-                                                        </ul>
-                                                    </li>
-                                                    <li class="dropdown dropdown-submenu"><a style="cursor: default">Count of</a>
-                                                        <ul class="dropdown-menu">
-                                                            <li ng-repeat="countOfItem in countOfItems"><a style="cursor: default" ng-click="changeFilterCountOf($index, $event)">{{countOfItem.name}}</a></li>
-                                                        </ul>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <div class="col-md-3" ng-if="!hasDoneOrHasNotDone">
-                                                <button type="button" class="btn btn-default" ng-model="queryDisplayed" data-html="1" ng-options="selectedquery.value as selectedquery.label for selectedquery in selectedqueries" bs-select style=".dropdown-menu > li > a:hover,.dropdown-menu > li > a:focus { background-color: #7b8a8b}">
-                                                Users <span class="caret"></span>
-                                                </button>
-                                            </div>
-                                            <div class="col-md-3" ng-if="!hasDoneOrHasNotDone">
-                                                <input type="text" class="form-control" placeholder="Value" ng-model="filter.value">
-                                            </div>
-                                            <div class="col-md-6" ng-if="hasDoneOrHasNotDone">
-                                                <input type="text" class="form-control" ng-model="textHasDoneNotHasDone">
-                                            </div>
-
-                                            <div class="col-md-2">
-                                                <a class="btn btn-default fa fa-times" ng-click="removeFilter(filter)"></a>
-                                            </div>
-                                        </div>
-                                    </div> -->
                                     <div class="col-md-10">
                                         <div class="row">
                                             <div class="col-md-4">
@@ -143,51 +76,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- <div ng-repeat="filter in filters"  ng-show="hasDoneOrHasNotDone($index)">
-                            <div class="row">
-                                <br>
-                                <div class="col-md-1 col-md-offset-1 text-center">
-                                    <label style="font-size:20px" ng-show="$first">Filter: </label>
-                                    <a style="font-size:20px; cursor:pointer; cursor:hand" ng-show="!$first" ng-click="switchAndOr()">{{text}}</a>
-                                </div>
-                                <div>
-                                    <div class="col-md-10">
-                                        <div class="row">
-                                            <div class="col-md-3">
-                                                <button type="button" class="btn btn-default dropdown-toggle form-control" data-toggle="dropdown"> <span data-bind="label">{{selectFilter}}</span>&nbsp;<span class="caret"></span>
-                                                </button>
-                                                <ul class="select dropdown-menu" role="select" style="left: 15px">
-                                                    <li class="dropdown dropdown-submenu">
-                                                        <a style="cursor: default">Has done</a>
-                                                        <ul class="dropdown-menu">
-                                                            <li ng-repeat="hasDoneItem in hasDoneItems">
-                                                                <a style="cursor: default" ng-click="changeFilterHasDone($index, $event)">{{hasDoneItem.name}}
-                                                                </a>
-                                                            </li>                        </ul>
-                                                    </li>
-                                                    <li class="dropdown dropdown-submenu"><a style="cursor: default">Has not done</a>
-                                                        <ul class="dropdown-menu">
-                                                            <li ng-repeat="hasNotDoneItem in hasNotDoneItems"><a style="cursor: default" ng-click="changeFilterHasNotDone($index, $event)">{{hasNotDoneItem.name}}</a></li>
-                                                        </ul>
-                                                    </li>
-                                                    <li class="dropdown dropdown-submenu"><a style="cursor: default">Count of</a>
-                                                        <ul class="dropdown-menu">
-                                                            <li ng-repeat="countOfItem in countOfItems"><a style="cursor: default" ng-click="changeFilterCountOf($index, $event)">{{countOfItem.name}}</a></li>
-                                                        </ul>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <input type="text" class="form-control" ng-model="textHasDoneNotHasDone">
-                                            </div>
-                                            <div class="col-md-2">
-                                                <a class="btn btn-default fa fa-times" ng-click="removeFilter(filter)"></a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> -->
 
                         <br>
                         <div class="row">
@@ -195,6 +83,14 @@
                                 <button class="btn btn-info" ng-click="addAnotherFilter()" ng-show="true">
                                 <i class="fa fa-plus-square"></i>
                                 Add Filter
+                                </button>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-push-1">
+                                <button class="btn btn-info" ng-click="runQuery()">
+                                Run Query
                                 </button>
                             </div>
                         </div>
