@@ -52,10 +52,124 @@ angular.module('do.users', [])
 ])
 
 .controller('UserSegmentCtrl', ['$scope', '$location', 'segment',
-    'queryMatching', '$filter',
-    'ngTableParams',
+    'queryMatching', '$filter', 'countOfActions', 'hasNotDone',
+    'hasDoneActions', 'ngTableParams',
     function ($scope, $location, segment, queryMatching, $filter,
+        countOfActions, hasNotDone, hasDoneActions,
         ngTableParams) {
+
+
+
+        $scope.method = 'count';
+        $scope.checkMethod = true;
+        // $scope.btntext = ''
+
+        $scope.rootOperator = 'and';
+        $scope.newFilterArray = [
+            {
+                method: 'hasdone',
+                name: 'Create new chat',
+                op: '',
+                val: ''
+            },
+
+            {
+                method: 'count',
+                name: 'Logged In',
+                op: 'gt',
+                val: 20
+            }
+        ]
+
+
+        $scope.selectFilter = 'Users';
+        $scope.hasNotDoneItems = [];
+        $scope.hasNotDoneItems = hasNotDone.getAllHasNotDoneActions();
+        $scope.hasDoneItems = [];
+        $scope.hasDoneItems = hasDoneActions.getAllHasDoneActions();
+        $scope.countOfItems = [];
+        $scope.countOfItems = countOfActions.getCountOfActions();
+        $scope.hasDoneOrHasNotDoneClicked = false;
+        $scope.hasCountOfClicked = true;
+
+        $scope.changeFilterHasDone = function (parentindex, index, evt) {
+            $scope.method = 'hasdone';
+            $scope.filters[parentindex].checkMethod = false;
+            console.log("has done: ", parentindex);
+            $scope.filters[parentindex].btntext = 'Has Done';
+            $scope.filters[parentindex].method = 'hasdone';
+            $scope.filters[parentindex].name = $scope.hasDoneItems[index].name;
+            $scope.filters[parentindex].op = '';
+            $scope.filters[parentindex].optext = '';
+            $scope.filters[parentindex].val = '';
+
+            /*$scope.selectFilter = 'Has ' + $scope.hasDoneItems[index]
+                .name;*/
+            $scope.hasDoneOrHasNotDone = true;
+            $scope.textHasDoneNotHasDone = $scope.hasDoneItems[index].name;
+            $scope.hasDoneOrHasNotDoneClicked = true;
+            $scope.hasCountOfClicked = false;
+            $scope.selectFilterHasOrHasNotDone = 'Has done ';
+            console.log("index: ", index);
+            /*var elem = document.getElementById("buttonText_" + index);
+            console.log("button Id: ", elem);
+            elem.innerText = 'Has ' + $scope.hasNotDoneItems[
+                index].name;*/
+        }
+
+        $scope.changeFilterHasNotDone = function (parentindex, index, evt) {
+            $scope.method = 'hasnotdone';
+            $scope.filters[parentindex].checkMethod = false;
+            console.log("has not done: ", parentindex);
+            $scope.filters[parentindex].method = 'hasnotdone';
+            $scope.filters[parentindex].btntext = 'Has Not Done ';
+            $scope.filters[parentindex].name = $scope.hasNotDoneItems[index].name;
+            $scope.filters[parentindex].op = '';
+            $scope.filters[parentindex].optext = '';
+            $scope.filters[parentindex].val = '';
+            console.log($scope.filters);
+
+
+            
+            // $scope.selectFilter = 'Has not ' + $scope.hasNotDoneItems[
+            //     index].name;
+            $scope.hasDoneOrHasNotDone  = true;
+            $scope.textHasDoneNotHasDone = $scope.hasDoneItems[index].name;
+            $scope.hasDoneOrHasNotDoneClicked = true;
+            $scope.hasCountOfClicked = false;
+            $scope.selectFilterHasOrHasNotDone = 'Has not done';
+            console.log("index: ", index);
+            /*var elem = document.getElementById("buttonText_" + index);
+            console.log("button Id: ", elem);
+            elem.innerText = 'Has not ' + $scope.hasNotDoneItems[
+                index].name;*/
+        }
+
+        /*$scope.selectFilter = function(index) {
+            return 
+        }*/
+
+
+        $scope.changeFilterCountOf = function (parentindex, index, evt) {
+            $scope.method = 'count';
+            $scope.filters[parentindex].checkMethod = true;
+            console.log("count: ", parentindex);
+            $scope.filters[parentindex].method = 'count';
+            $scope.filters[parentindex].btntext = 'Count Of ' + $scope.countOfItems[index].name;
+
+
+
+            // $scope.selectFilter = 'Count of ' + $scope.countOfItems[index]
+            //     .name;
+            $scope.hasDoneOrHasNotDone  = false;
+            $scope.hasCountOfClicked = true;
+            $scope.hasDoneOrHasNotDoneClicked = false;
+            console.log("index: ", index);
+            /*var elem = document.getElementById("buttonText_" + index);
+            console.log("button Id: ", elem);
+            elem.innerText = 'Count of ' + $scope.hasNotDoneItems[
+                index].name;*/
+        }
 
         $scope.isActive = function (viewLocation) {
             return viewLocation === $location.path();
@@ -77,7 +191,6 @@ angular.module('do.users', [])
         $scope.selectedIcon = $scope.segments[0].name;
 
         for (var i = $scope.segments.length - 1; i >= 0; i--) {
-            console.log($scope.segments[i].name);
             $scope.segmenticons.push({
                 value: $scope.segments[i].name,
                 label: $scope.segments[i].name
@@ -89,14 +202,13 @@ angular.module('do.users', [])
         $scope.query = [];
         $scope.queryDisplayed = $scope.queries[0].name;
         $scope.selectedQuery = queryMatching.get.selected();
-        for (var i = $scope.queries.length - 1; i >= 0; i--) {
+        /*for (var i = $scope.queries.length - 1; i >= 0; i--) {
             $scope.query.push({
                 text: $scope.queries[i]['name']
             })
-        };
+        };*/
         $scope.selectedqueries = [];
-        for (var i = $scope.queries.length - 1; i >= 0; i--) {
-            console.log($scope.queries[i].name);
+        for (var i = 0; i <= $scope.queries.length - 1; i++) {
             $scope.selectedqueries.push({
                 value: $scope.queries[i].name,
                 label: $scope.queries[i].name
@@ -104,22 +216,54 @@ angular.module('do.users', [])
         };
 
 
+        $scope.chngquery = function (parentindex, index) {
+            console.log("parentindex: ", parentindex);
+            $scope.filters[parentindex].optext = $scope.queries[index].name;
+            $scope.filters[parentindex].op = $scope.queries[index].key;
+            console.log($scope.filters[parentindex].op);
+            console.log($scope.filters);
+            // console.log($scope.queryDisplayed);
+            // $scope.$watch('$scope.queryDisplayed', function(newValue, oldValue, scope) {
+            //     console.log("query new: ", newValue);
+            //     console.log("query old: ", oldValue);
+            //     $scope.filters[parentindex].op = newValue;       
+            // });
+        }
+        console.log("queryDisplayed: ", $scope.queryDisplayed);
 
         $scope.text = 'AND';
         $scope.segmentFilterCtrl = segment.get.selected();
         $scope.queryFilterCtrl = queryMatching.get.selected();
         $scope.filters = [];
         $scope.addAnotherFilter = function addAnotherFilter() {
+            $scope.checkMethod = true;
             $scope.filters.push({
-                segment: $scope.segmentFilterCtrl,
-                type: $scope.queryFilterCtrl
+                method: 'count',
+                btntext: 'Users',
+                checkMethod: 'true',
+                name: '',
+                op: 'eq',
+                optext: 'equals',
+                val: ''
             })
+            $scope.hasDoneOrHasNotDone = false;
+            $scope.hasCountOfClicked = true;
         }
+
+        /*$scope.hasDoneOrHasNotDone = function (index) {
+            if($scope.hasDoneOrHasNotDoneClicked) {
+                return true;
+            } else {
+                return false;
+            }
+        }*/
+
         $scope.removeFilter = function removeFilter(
             filterToRemove) {
             var index = $scope.filters.indexOf(
                 filterToRemove);
             $scope.filters.splice(index, 1);
+            // $scope.hasDoneOrHasNotDone = false;
         }
         $scope.switchAndOr = function switchAndOr() {
             if ($scope.text === 'AND') {
@@ -128,19 +272,6 @@ angular.module('do.users', [])
                 $scope.text = 'AND'
             }
         }
-
-        // $scope.selectedIcon = "Users";
-
-        /*$scope.segmenticons = [{
-            value: "Paying Users",
-            label: 'Paying Users'
-        }, {
-            value: "Android Users",
-            label: 'Android Users'
-        }, {
-            value: "Phone Users",
-            label: 'Phone Users'
-        }]*/
     }
 ])
 
