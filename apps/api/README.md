@@ -15,7 +15,7 @@ This app contains an expressjs api which exposes a rest interface for the db.
 | ci    | city                  |
 | cid   | company id            |
 | co    | country               |
-| coid  | conversation id       |
+| coId  | conversation id       |
 | ct    | created at timestamp  |
 | d     | domain                |
 | dv    | device type           |
@@ -69,16 +69,16 @@ name          | embedded documents      | description
 -----         | ----------------------  | -----------
 Account       |                         | accounts on Userjoy
 App           | team                    | apps belonging to an account
-User          | companies, notes        | users of a specific app. create a new user for every new unique identifier for an app
-Health        |                         | the healthscore of a user for a specific company
 Company       |                         | companies of a specific account
+Conversation  |                         | conversation threads between users and accounts
+Health        |                         | the healthscore of a user for a specific company
+Invite        |                         | tokens of team members that have been invited to use an app
+Message       |                         | messages between users and accounts
 Segment       | filters                 | all the segments defined for an app
 Session       | events (ev)             | sessions of a user, and events belonging to the session
 Template      |                         | templates of the messages to be sent
-Message       |                         | messages between users and accounts
-Conversation  |                         | conversation threads between users and accounts
-Invite        |                         | tokens of team members that have been invited to use an app
 Trigger       |                         | triggers for sending auto emails / notifications
+User          | companies, notes        | users of a specific app. create a new user for every new unique identifier for an app
 
 
 
@@ -126,9 +126,9 @@ Trigger       |                         | triggers for sending auto emails / not
 - aid
 - user_id (to allow the app to recognize a user even if the user changes email/username)
 - email (required)
-x name
-x username
-x meta (object containing additonal info about users)
+- x name
+- x username
+- x meta (object containing additonal info about users)
 - unsubscribed (boolean)
 - unsubscribedAt (date)
 - unsubscribedThrough (messageId, subject)
@@ -140,8 +140,8 @@ x meta (object containing additonal info about users)
 - lastSessionAt
 - lastHeardAt
 - healthScore (latest value from User Health)
-x tags [] Stores tags for categorizing users
-x notes
+- x tags [] Stores tags for categorizing users
+- x notes
 - companies [{cid, companyName, billing{}, healthScore, totalSessions}]
 - billing {
     status,
@@ -212,10 +212,10 @@ x notes
 - company_id (similar to user_id)
 - name
 - totalSessions
-x meta (object containing additonal info about users)
+- x meta (object containing additonal info about users)
 - ct (should be passed by js snippet)
 - ut
-x tags [] just like user tags
+- x tags [] just like user tags
 - billing {
     status,
     plan,
@@ -332,19 +332,20 @@ x tags [] just like user tags
 
 ##### Columns:
 
-- coid
 - accid
-- uid
-- type (email / notification)
-- text
-- sent (boolean)
-- seen (boolean)
-- replied (boolean)
+- aid
 - clicked (boolean)
+- coId
 - ct
-- ut
 - from (enum: [user, account]) (is it sent from a 'user' or an 'account')
 - name (name / email of sender)
+- replied (boolean)
+- seen (boolean)
+- sent (boolean)
+- text
+- type (email / notification)
+- uid
+- ut
 
 ### Conversation
 
@@ -355,7 +356,7 @@ x tags [] just like user tags
 - closed (boolean)
 - ct
 - sub (for email)
-x tid
+- x tid
 - uid
 - ut
 
