@@ -37,7 +37,7 @@ var ConversationSchema = new Schema({
   },
 
 
-  // subject
+  // is the conversation closed
   closed: {
     type: Boolean,
     default: false
