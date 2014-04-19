@@ -15,6 +15,7 @@ This app contains an expressjs api which exposes a rest interface for the db.
 | ci    | city                  |
 | cid   | company id            |
 | co    | country               |
+| coid  | conversation id       |
 | ct    | created at timestamp  |
 | d     | domain                |
 | dv    | device type           |
@@ -26,6 +27,7 @@ This app contains an expressjs api which exposes a rest interface for the db.
 | p     | path (event url)      |
 | pl    | platform              |
 | sid   | session id            |
+| seId  | segment id            |
 | t     | type (event)          |
 | tid   | templateId            |
 | uid   | user id               |
@@ -75,6 +77,7 @@ Template      |                         | templates of the messages to be sent
 Message       |                         | messages between users and accounts
 Conversation  |                         | conversation threads between users and accounts
 Invite        |                         | tokens of team members that have been invited to use an app
+Trigger       |                         | triggers for sending auto emails / notifications
 
 
 
@@ -122,9 +125,9 @@ Invite        |                         | tokens of team members that have been 
 - aid
 - user_id (to allow the app to recognize a user even if the user changes email/username)
 - email (required)
-- x name
-- x username
-- x meta (object containing additonal info about users)
+x name
+x username
+x meta (object containing additonal info about users)
 - unsubscribed (boolean)
 - unsubscribedAt (date)
 - unsubscribedThrough (messageId, subject)
@@ -136,8 +139,8 @@ Invite        |                         | tokens of team members that have been 
 - lastSessionAt
 - lastHeardAt
 - healthScore (latest value from User Health)
-- x tags [] Stores tags for categorizing users
-- x notes
+x tags [] Stores tags for categorizing users
+x notes
 - companies [{cid, companyName, billing{}, healthScore, totalSessions}]
 - billing {
     status,
@@ -208,10 +211,10 @@ Invite        |                         | tokens of team members that have been 
 - company_id (similar to user_id)
 - name
 - totalSessions
-- x meta (object containing additonal info about users)
+x meta (object containing additonal info about users)
 - ct (should be passed by js snippet)
 - ut
-- x tags [] just like user tags
+x tags [] just like user tags
 - billing {
     status,
     plan,
@@ -328,8 +331,9 @@ Invite        |                         | tokens of team members that have been 
 
 ##### Columns:
 
-- conversationId
-- accid (sent to/from account)
+- coid
+- accid
+- uid
 - type (email / notification)
 - text
 - sent (boolean)
@@ -338,7 +342,8 @@ Invite        |                         | tokens of team members that have been 
 - clicked (boolean)
 - ct
 - ut
-- createdBy
+- from (enum: [user, account]) (is it sent from a 'user' or an 'account')
+- name (name / email of sender)
 
 ### Conversation
 
@@ -346,14 +351,27 @@ Invite        |                         | tokens of team members that have been 
 
 - aid (sent to/from app)
 - uid (sent to/from user)
-- auto (boolean)
-- tid (if automated else null)
+x tid
 - subject (for email)
 - closed (boolean)
-- assigned [accounts assigned to this conversation]
+- assignee (accid)
 - ct
 - ut
-- createdBy
+
+
+### Triggers
+
+##### Columns:
+
+- aid
+- seId
+- tid
+- subject (for email)
+- active (boolean)
+- creator (accid)
+- ct
+- ut
+
 
 ### Invite
 
