@@ -314,19 +314,22 @@ User          | companies, notes        | users of a specific app. create a new 
 
 ##### Columns:
 
+- accid
 - aid
-- createdBy (accountId)
-- type (email / notification)
-- name
-- title
-- sub (for email type)
-- trigger [TODO]
-- totalSent
-- totalSeen
-- totalReplied
-- totalClicked
+- clicked
 - ct
+- name
+- replied
+- seen
+- sent
+- sub (for email type)
+- title
+- type (email / notification)
 - ut
+
+#####
+
+- Difference between name and title?
 
 ### Message
 
