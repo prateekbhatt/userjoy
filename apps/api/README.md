@@ -26,8 +26,9 @@ This app contains an expressjs api which exposes a rest interface for the db.
 | op    | operator (and / or)   |
 | p     | path (event url)      |
 | pl    | platform              |
-| sid   | session id            |
 | seId  | segment id            |
+| sid   | session id            |
+| sub   | email subject         |
 | t     | type (event)          |
 | tid   | templateId            |
 | uid   | user id               |
@@ -318,7 +319,7 @@ x tags [] just like user tags
 - type (email / notification)
 - name
 - title
-- subject (for email type)
+- sub (for email type)
 - trigger [TODO]
 - totalSent
 - totalSeen
@@ -349,13 +350,13 @@ x tags [] just like user tags
 
 ##### Columns:
 
-- aid (sent to/from app)
-- uid (sent to/from user)
-x tid
-- subject (for email)
-- closed (boolean)
+- aid
 - assignee (accid)
+- closed (boolean)
 - ct
+- sub (for email)
+x tid
+- uid
 - ut
 
 
@@ -366,7 +367,7 @@ x tid
 - aid
 - seId
 - tid
-- subject (for email)
+- sub (for email)
 - active (boolean)
 - creator (accid)
 - ct
