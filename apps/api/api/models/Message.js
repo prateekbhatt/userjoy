@@ -66,7 +66,8 @@ var MessageSchema = new Schema({
 
   // name / email of sender
   name: {
-    type: String
+    type: String,
+    required: [true, 'Provide name/email of user']
   },
 
 

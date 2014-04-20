@@ -19,7 +19,7 @@ describe('Model Message', function () {
   describe('#create', function () {
 
     it(
-      'should return error if accid/aid/coId/from/text/type/uid is not provided',
+      'should return error if accid/aid/coId/from/name/text/type/uid is not provided',
       function (done) {
 
         var newCon = {};
@@ -31,7 +31,7 @@ describe('Model Message', function () {
 
           expect(Object.keys(err.errors)
             .length)
-            .to.eql(7);
+            .to.eql(8);
 
           expect(err.errors.accid.message)
             .to.eql('Invalid account id');
@@ -44,6 +44,9 @@ describe('Model Message', function () {
 
           expect(err.errors.from.message)
             .to.eql('Provide valid from type, either user/account');
+
+          expect(err.errors.name.message)
+            .to.eql('Provide name/email of user');
 
           expect(err.errors.text.message)
             .to.eql('Provide message text');
@@ -70,6 +73,7 @@ describe('Model Message', function () {
         aid: randomId,
         coId: randomId,
         from: 'user',
+        name: 'Prateek Bhatt',
         text: 'Hello World',
         type: 'email',
         uid: randomId,
@@ -145,6 +149,7 @@ describe('Model Message', function () {
         aid: aid,
         coId: randomId,
         from: 'user',
+        name: 'Prateek Bhatt',
         text: 'Hello World',
         type: 'email',
         uid: randomId,
