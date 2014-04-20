@@ -30,7 +30,7 @@
                                     <div class="col-md-10">
                                         <div class="row">
                                             <div class="col-md-4">
-                                            <button type="button" class="btn btn-default dropdown-toggle form-control" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.btntext}}</span>&nbsp;<span class="caret"></span></button>
+                                            <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.btntext}}</span>&nbsp;<span class="caret"></span></button>
                                                 <ul class="select dropdown-menu" role="select" style="left: 15px">
                                                     <li class="dropdown dropdown-submenu">
                                                         <a style="cursor: default">Has done</a>
@@ -54,7 +54,7 @@
                                                 </ul>
                                             </div>
                                             <div class="col-md-3" ng-if="filter.checkMethod">
-                                                <button type="button" class="btn btn-default dropdown-toggle form-control" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
+                                                <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
                                                 <ul class="select dropdown-menu" role="select" style="left: 15px">
                                                     <li ng-repeat="query in selectedqueries">
                                                         <a style="cursor: default;" ng-click="chngquery($parent.$index, $index)">{{query.value}}
@@ -63,7 +63,13 @@
                                                 </ul>
                                             </div>
                                             <div class="col-md-6" ng-if="!filter.checkMethod">
-                                                <input type="text" class="form-control" placeholder="Value" ng-model="filter.name">
+                                                <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.name}}</span>&nbsp;<span class="caret"></span></button>
+                                                <ul class="dropdown-menu" style="left: 15px">
+                                                    <li ng-repeat="hasDoneItem in hasDoneItems">
+                                                        <a style="cursor: default" ng-click="changeFilterHasDone($parent.$index, $index, $event)">{{hasDoneItem.name}}
+                                                        </a>
+                                                    </li>                         
+                                                </ul>
                                             </div>
                                             <div class="col-md-3" ng-if="filter.checkMethod">
                                                 <input type="text" class="form-control" placeholder="Value" ng-model="filter.val">
