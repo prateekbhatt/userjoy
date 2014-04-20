@@ -30,7 +30,7 @@ This app contains an expressjs api which exposes a rest interface for the db.
 | sid   | session id            |
 | sub   | email subject         |
 | t     | type (event)          |
-| tid   | templateId            |
+| tId   | templateId            |
 | uid   | user id               |
 | ut    | updated at timestamp  |
 
@@ -359,7 +359,7 @@ User          | companies, notes        | users of a specific app. create a new 
 - closed (boolean)
 - ct
 - sub (for email)
-- x tid
+- x tId
 - uid
 - ut
 
@@ -368,13 +368,12 @@ User          | companies, notes        | users of a specific app. create a new 
 
 ##### Columns:
 
-- aid
-- seId
-- tid
-- sub (for email)
 - active (boolean)
+- aid
 - creator (accid)
 - ct
+- seId
+- tId
 - ut
 
 
@@ -382,12 +381,12 @@ User          | companies, notes        | users of a specific app. create a new 
 
 ##### Columns:
 
-- to (email)
 - by (accountId)
-- for (aid)
-- token
 - ct
+- for (aid)
 - status (pending / cancelled / joined)
+- to (email)
+- token
 
 ##### Notes:
 
