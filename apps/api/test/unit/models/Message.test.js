@@ -141,6 +141,7 @@ describe('Model Message', function () {
   describe('#findByAppId', function () {
 
     var aid = '532d6bf862d673ba7131812d';
+    var fetchedMessage = {};
 
     before(function (done) {
 
@@ -169,6 +170,8 @@ describe('Model Message', function () {
         expect(msg)
           .to.be.an("array");
 
+        fetchedMessage = msg[0];
+
         expect(msg)
           .to.have.length(1);
 
@@ -178,6 +181,28 @@ describe('Model Message', function () {
         done();
 
       });
+    });
+
+    it('should return ct/name/replied/seen/text', function () {
+
+      expect(fetchedMessage)
+        .to.have.property("ct");
+
+      expect(fetchedMessage)
+        .to.have.property("name");
+
+      expect(fetchedMessage)
+        .to.have.property("replied");
+
+      expect(fetchedMessage)
+        .to.have.property("seen");
+
+      expect(fetchedMessage)
+        .to.have.property("text");
+
+      expect(fetchedMessage)
+        .to.not.have.property("aid");
+
     });
 
   });

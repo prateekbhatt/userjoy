@@ -56,6 +56,7 @@ var MessageSchema = new Schema({
     default: Date.now
   },
 
+
   // is it from a user or an account
   from: {
     type: String,
@@ -64,7 +65,7 @@ var MessageSchema = new Schema({
   },
 
 
-  // name / email of sender
+  // name / email of user
   name: {
     type: String,
     required: [true, 'Provide name/email of user']
@@ -145,8 +146,15 @@ MessageSchema.statics.findByAppId = function (aid, cb) {
       aid: aid,
       from: 'user'
     })
+    .select({
+      ct: 1,
+      name: 1,
+      replied: 1,
+      seen: 1,
+      text: 1
+    })
     .sort({
-      ut: -1
+      ct: -1
     })
     .exec(cb);
 
