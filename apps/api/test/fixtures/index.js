@@ -9,6 +9,8 @@
  */
 
 var async = require('async');
+var ObjectId = require('mongoose')
+  .Types.ObjectId;
 
 
 /**
@@ -17,6 +19,7 @@ var async = require('async');
 
 var Account = require('../../api/models/Account');
 var App = require('../../api/models/App');
+var Message = require('../../api/models/Message');
 
 
 var accounts = {
@@ -45,6 +48,29 @@ var accounts = {
       name: 'Second App',
       domain: 'secondapp.co'
     }
+  },
+
+  messages = {
+
+    first: {
+      accid: null,
+      aid: null,
+      coId: ObjectId(),
+      from: 'user',
+      text: 'Hello World',
+      type: 'email',
+      uid: ObjectId(),
+    },
+
+    second: {
+      accid: null,
+      aid: null,
+      coId: ObjectId(),
+      from: 'user',
+      text: 'Hello World 2',
+      type: 'email',
+      uid: ObjectId(),
+    }
   };
 
 
@@ -63,6 +89,14 @@ function createApp(accId, app, fn) {
 
   app.admin = accId;
   App.create(app, fn);
+
+}
+
+function createMessage(accId, aid, message, fn) {
+
+  message.accid = accId;
+  message.aid = aid;
+  Message.create(message, fn);
 
 }
 
@@ -111,11 +145,40 @@ module.exports = function loadFixtures(callback) {
 
     },
 
+    createFirstMessage: function (cb) {
+
+      var aid = apps.first._id;
+      var accId = accounts.first._id;
+      var message = messages.first;
+
+      createMessage(accId, aid, message, function (err, msg) {
+        if (err) return cb(err);
+        messages.first = msg;
+        cb();
+      });
+
+    },
+
+    createSecondMessage: function (cb) {
+
+      var aid = apps.first._id;
+      var accId = accounts.first._id;
+      var message = messages.second;
+
+      createMessage(accId, aid, message, function (err, msg) {
+        if (err) return cb(err);
+        messages.second = msg;
+        cb();
+      });
+
+    },
+
   }, function (err) {
 
     callback(err, {
       accounts: accounts,
-      apps: apps
+      apps: apps,
+      messages: messages
     });
 
   });
