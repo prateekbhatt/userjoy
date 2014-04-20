@@ -129,6 +129,27 @@ MessageSchema.pre('save', function (next) {
 });
 
 
+/**
+ * Finds messages belonging to an app, sorted by updated timestamp
+ *
+ * @param {string} aid app id
+ * @param {function} cb callback
+ */
+
+MessageSchema.statics.findByAppId = function (aid, cb) {
+
+  Message
+    .find({
+      aid: aid
+    })
+    .sort({
+      ut: -1
+    })
+    .exec(cb);
+
+};
+
+
 var Message = mongoose.model('Message', MessageSchema);
 
 module.exports = Message;

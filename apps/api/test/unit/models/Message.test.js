@@ -134,4 +134,48 @@ describe('Model Message', function () {
   });
 
 
+  describe('#findByAppId', function () {
+
+    var aid = '532d6bf862d673ba7131812d';
+
+    before(function (done) {
+
+      var newMessage = {
+        accid: randomId,
+        aid: aid,
+        coId: randomId,
+        from: 'user',
+        text: 'Hello World',
+        type: 'email',
+        uid: randomId,
+      };
+
+      Message.create(newMessage, done);
+
+    });
+
+    it('should return messages belonging to an app', function (done) {
+
+      Message.findByAppId(aid, function (err, msg) {
+
+        expect(err)
+          .to.not.exist;
+
+        expect(msg)
+          .to.be.an("array");
+
+        expect(msg)
+          .to.have.length(1);
+
+        expect(msg[0].text)
+          .to.eql('Hello World');
+
+        done();
+
+      });
+    });
+
+  });
+
+
 });
