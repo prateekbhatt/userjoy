@@ -471,4 +471,14 @@ hr {
 .selectwidthauto {
     width: auto !important;
 }
+.error {
+    color: #a94442;
+}
+.form-control.error {
+    border-color: #A94442;
+}
+.form-control:focus.error {
+    border-color: #843534;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 6px #CE8483;
+}
 }

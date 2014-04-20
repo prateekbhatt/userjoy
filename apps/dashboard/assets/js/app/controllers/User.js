@@ -59,14 +59,12 @@ angular.module('do.users', [])
         ngTableParams) {
 
 
-
+        $scope.state = 'form-control';
+        $scope.isErr = '';
         $scope.method = 'count';
         $scope.checkMethod = true;
-        // $scope.btntext = ''
-
         $scope.rootOperator = 'and';
-        $scope.newFilterArray = [
-            {
+        $scope.newFilterArray = [{
                 method: 'hasdone',
                 name: 'Create new chat',
                 op: '',
@@ -103,18 +101,13 @@ angular.module('do.users', [])
             $scope.filters[parentindex].optext = '';
             $scope.filters[parentindex].val = '';
 
-            /*$scope.selectFilter = 'Has ' + $scope.hasDoneItems[index]
-                .name;*/
+
             $scope.hasDoneOrHasNotDone = true;
             $scope.textHasDoneNotHasDone = $scope.hasDoneItems[index].name;
             $scope.hasDoneOrHasNotDoneClicked = true;
             $scope.hasCountOfClicked = false;
             $scope.selectFilterHasOrHasNotDone = 'Has done ';
             console.log("index: ", index);
-            /*var elem = document.getElementById("buttonText_" + index);
-            console.log("button Id: ", elem);
-            elem.innerText = 'Has ' + $scope.hasNotDoneItems[
-                index].name;*/
         }
 
         $scope.changeFilterHasNotDone = function (parentindex, index, evt) {
@@ -123,31 +116,23 @@ angular.module('do.users', [])
             console.log("has not done: ", parentindex);
             $scope.filters[parentindex].method = 'hasnotdone';
             $scope.filters[parentindex].btntext = 'Has Not Done ';
-            $scope.filters[parentindex].name = $scope.hasNotDoneItems[index].name;
+            $scope.filters[parentindex].name = $scope.hasNotDoneItems[
+                index].name;
             $scope.filters[parentindex].op = '';
             $scope.filters[parentindex].optext = '';
             $scope.filters[parentindex].val = '';
             console.log($scope.filters);
 
 
-            
-            // $scope.selectFilter = 'Has not ' + $scope.hasNotDoneItems[
-            //     index].name;
-            $scope.hasDoneOrHasNotDone  = true;
+
+            $scope.hasDoneOrHasNotDone = true;
             $scope.textHasDoneNotHasDone = $scope.hasDoneItems[index].name;
             $scope.hasDoneOrHasNotDoneClicked = true;
             $scope.hasCountOfClicked = false;
             $scope.selectFilterHasOrHasNotDone = 'Has not done';
             console.log("index: ", index);
-            /*var elem = document.getElementById("buttonText_" + index);
-            console.log("button Id: ", elem);
-            elem.innerText = 'Has not ' + $scope.hasNotDoneItems[
-                index].name;*/
         }
 
-        /*$scope.selectFilter = function(index) {
-            return 
-        }*/
 
 
         $scope.changeFilterCountOf = function (parentindex, index, evt) {
@@ -155,20 +140,16 @@ angular.module('do.users', [])
             $scope.filters[parentindex].checkMethod = true;
             console.log("count: ", parentindex);
             $scope.filters[parentindex].method = 'count';
-            $scope.filters[parentindex].btntext = 'Count Of ' + $scope.countOfItems[index].name;
+            $scope.filters[parentindex].btntext = 'Count Of ' + $scope.countOfItems[
+                index].name;
 
 
 
-            // $scope.selectFilter = 'Count of ' + $scope.countOfItems[index]
-            //     .name;
-            $scope.hasDoneOrHasNotDone  = false;
+
+            $scope.hasDoneOrHasNotDone = false;
             $scope.hasCountOfClicked = true;
             $scope.hasDoneOrHasNotDoneClicked = false;
             console.log("index: ", index);
-            /*var elem = document.getElementById("buttonText_" + index);
-            console.log("button Id: ", elem);
-            elem.innerText = 'Count of ' + $scope.hasNotDoneItems[
-                index].name;*/
         }
 
         $scope.isActive = function (viewLocation) {
@@ -186,7 +167,6 @@ angular.module('do.users', [])
 
 
         $scope.segments = segment.get.all();
-        // $scope.selectedSegment = segment.get.selected();
         $scope.segmenticons = [];
         $scope.selectedIcon = $scope.segments[0].name;
 
@@ -202,11 +182,6 @@ angular.module('do.users', [])
         $scope.query = [];
         $scope.queryDisplayed = $scope.queries[0].name;
         $scope.selectedQuery = queryMatching.get.selected();
-        /*for (var i = $scope.queries.length - 1; i >= 0; i--) {
-            $scope.query.push({
-                text: $scope.queries[i]['name']
-            })
-        };*/
         $scope.selectedqueries = [];
         for (var i = 0; i <= $scope.queries.length - 1; i++) {
             $scope.selectedqueries.push({
@@ -222,12 +197,6 @@ angular.module('do.users', [])
             $scope.filters[parentindex].op = $scope.queries[index].key;
             console.log($scope.filters[parentindex].op);
             console.log($scope.filters);
-            // console.log($scope.queryDisplayed);
-            // $scope.$watch('$scope.queryDisplayed', function(newValue, oldValue, scope) {
-            //     console.log("query new: ", newValue);
-            //     console.log("query old: ", oldValue);
-            //     $scope.filters[parentindex].op = newValue;       
-            // });
         }
 
         $scope.runQuery = function () {
@@ -251,24 +220,13 @@ angular.module('do.users', [])
                 optext: 'equal',
                 val: ''
             })
-            $scope.hasDoneOrHasNotDone = false;
-            $scope.hasCountOfClicked = true;
         }
-
-        /*$scope.hasDoneOrHasNotDone = function (index) {
-            if($scope.hasDoneOrHasNotDoneClicked) {
-                return true;
-            } else {
-                return false;
-            }
-        }*/
 
         $scope.removeFilter = function removeFilter(
             filterToRemove) {
             var index = $scope.filters.indexOf(
                 filterToRemove);
             $scope.filters.splice(index, 1);
-            // $scope.hasDoneOrHasNotDone = false;
         }
         $scope.switchAndOr = function switchAndOr() {
             if ($scope.text === 'AND') {
@@ -278,8 +236,30 @@ angular.module('do.users', [])
             }
         }
 
+        $scope.showErr = false;
+        $scope.errMsg = 'Enter the outlined fields';
+        $scope.errorclass = '';
+
+        $scope.hideErrorAlert = function () {
+            $scope.showErr = false;
+        }
+
+        $scope.isErr = 'error';
+
         $scope.signupForm = function () {
             console.log($scope.filters);
+            for (var i = 0; i < $scope.filters.length; i++) {
+                console.log("val: ", $scope.filters[i].val);
+                if ($scope.filters[i].val == '') {
+                    console.log("val: ", $scope.filters[i].val);
+                    $scope.showErr = true;
+                    // $scope.isErr = 'error';
+                    // console.log("error class", $scope.isErr);
+                } else {
+                    $scope.showErr = false;
+                    // $scope.isErr = '';
+                }
+            };
         }
     }
 ])
