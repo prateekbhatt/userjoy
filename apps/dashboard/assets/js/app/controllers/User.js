@@ -244,11 +244,11 @@ angular.module('do.users', [])
             $scope.checkMethod = true;
             $scope.filters.push({
                 method: 'count',
-                btntext: 'Users',
+                btntext: 'Choose',
                 checkMethod: 'true',
                 name: '',
                 op: 'eq',
-                optext: 'equals',
+                optext: 'equal',
                 val: ''
             })
             $scope.hasDoneOrHasNotDone = false;
@@ -276,6 +276,10 @@ angular.module('do.users', [])
             } else {
                 $scope.text = 'AND'
             }
+        }
+
+        $scope.signupForm = function () {
+            console.log($scope.filters);
         }
     }
 ])
