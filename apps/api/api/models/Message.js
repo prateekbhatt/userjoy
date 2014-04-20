@@ -130,7 +130,8 @@ MessageSchema.pre('save', function (next) {
 
 
 /**
- * Finds messages belonging to an app, sorted by updated timestamp
+ * Finds messages belonging to an app, sent from users, sorted by updated
+ * timestamp
  *
  * @param {string} aid app id
  * @param {function} cb callback
@@ -140,7 +141,8 @@ MessageSchema.statics.findByAppId = function (aid, cb) {
 
   Message
     .find({
-      aid: aid
+      aid: aid,
+      from: 'user'
     })
     .sort({
       ut: -1
