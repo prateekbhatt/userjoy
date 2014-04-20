@@ -21,6 +21,7 @@ This app contains an expressjs api which exposes a rest interface for the db.
 | dv    | device type           |
 | ev    | events (Session)      |
 | f     | feature (event)       |
+| h     | health                |
 | ip    | ip address            |
 | n     | name (action)         |
 | op    | operator (and / or)   |
@@ -195,9 +196,9 @@ User          | companies, notes        | users of a specific app. create a new 
 
 - aid
 - cid
-- uid
-- score
 - ct
+- h
+- uid
 
 ##### Notes:
 
