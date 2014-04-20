@@ -381,16 +381,17 @@ User          | companies, notes        | users of a specific app. create a new 
 
 ##### Columns:
 
-- by (accountId)
+- aid
 - ct
-- for (aid)
+- from (accountId)
 - status (pending / cancelled / joined)
 - to (email)
-- token
+- ut
 
 ##### Notes:
 
 - Invites should be deleted once accepted (?)
+- Use mongo objectId as invite token
 
 #### TODO
 
