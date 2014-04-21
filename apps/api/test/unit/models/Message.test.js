@@ -138,7 +138,7 @@ describe('Model Message', function () {
   });
 
 
-  describe('#findByAppId', function () {
+  describe('#fetchInbox', function () {
 
     var aid = '532d6bf862d673ba7131812d';
     var fetchedMessage = {};
@@ -162,7 +162,7 @@ describe('Model Message', function () {
 
     it('should return messages belonging to an app', function (done) {
 
-      Message.findByAppId(aid, function (err, msg) {
+      Message.fetchInbox(aid, function (err, msg) {
 
         expect(err)
           .to.not.exist;

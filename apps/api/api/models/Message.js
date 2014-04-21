@@ -139,7 +139,7 @@ MessageSchema.pre('save', function (next) {
  * @param {function} cb callback
  */
 
-MessageSchema.statics.findByAppId = function (aid, cb) {
+MessageSchema.statics.fetchInbox = function (aid, cb) {
 
   Message
     .find({
