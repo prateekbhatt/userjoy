@@ -15,10 +15,10 @@
 var App = require('../models/App');
 
 
-module.exports = function hasAccess(req, res, next, appId) {
+module.exports = function hasAccess(req, res, next, aid) {
 
   App
-    .findById(appId)
+    .findById(aid)
     .exec(function (err, app) {
 
       if (err) {

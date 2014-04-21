@@ -10,7 +10,7 @@ var faker = require('Faker');
  * models
  */
 
-var User = require('../api/models/User');
+var User = require('../../api/models/User');
 
 
 /**
@@ -62,17 +62,17 @@ function genFakeCompany() {
  * a fake user
  */
 
-function genFakeUser(appId) {
+function genFakeUser(aid) {
 
   var aFakeUser = {
 
-    appId: appId || randomId,
+    aid: aid,
 
     email: faker.Internet.email(),
 
     totalSessions: faker.Helpers.randomNumber(10000),
 
-    createdAt: faker.Date.recent(10000),
+    ct: faker.Date.recent(10000),
 
     lastSessionAt: faker.Date.recent(10),
 
@@ -107,9 +107,9 @@ function genFakeUser(appId) {
  * function which sends a post request to create a new user
  */
 
-function createUser(appId, cb) {
+function createUser(aid, cb) {
 
-  var user = genFakeUser(appId);
+  var user = genFakeUser(aid);
 
   User.create(user, function (err, usr) {
     if (cb) cb(err, usr);
@@ -121,9 +121,12 @@ function createUser(appId, cb) {
  * load the application and create a set of users in the database
  */
 
-module.exports = function (appId, no, cb) {
+module.exports = function (aid, no, cb) {
   var count = 0;
   var total = no || 100;
+
+  // array of created uids
+  var uids = [];
 
   async.whilst(
     function () {
@@ -131,11 +134,18 @@ module.exports = function (appId, no, cb) {
     },
     function (cb) {
       count++;
-      createUser(appId, cb);
+      createUser(aid, function (err, usr) {
+
+        if (usr) {
+          uids.push(usr._id.toString());
+        }
+
+        cb(err, usr);
+      });
     },
     function (err) {
 
-      if (cb) return cb();
+      if (cb) return cb(err, uids);
       process.exit(!!err);
     }
   );

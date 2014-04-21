@@ -29,7 +29,7 @@ var billingStatusValidator = require('../../helpers/billing-status-validator');
 
 var CompanySchema = new Schema({
 
-  appId: {
+  aid: {
     type: Schema.Types.ObjectId,
     ref: 'App',
     required: true
@@ -52,7 +52,7 @@ var CompanySchema = new Schema({
     type: Date
   },
 
-  createdAt: {
+  ct: {
     type: Date
   },
 
@@ -92,11 +92,11 @@ var CompanySchema = new Schema({
 
 
 /**
- * Adds updatedAt timestamps
+ * Adds ut timestamps
  */
 
 CompanySchema.plugin(troop.timestamp, {
-  modifiedPath: 'updatedAt',
+  modifiedPath: 'ut',
   useVirtual: false
 });
 
@@ -109,7 +109,7 @@ CompanySchema.plugin(troop.timestamp, {
  * @param {Function} callback function
  */
 
-CompanySchema.statics.getOrCreate = function (appId, company, cb) {
+CompanySchema.statics.getOrCreate = function (aid, company, cb) {
 
   var name = company.name;
   var company_id = company.company_id;
@@ -119,11 +119,11 @@ CompanySchema.statics.getOrCreate = function (appId, company, cb) {
     return cb(new Error('Please send company_id or name to identify company'));
   }
 
-  // add appId to company
-  company.appId = appId;
+  // add aid to company
+  company.aid = aid;
 
-  // appId to query
-  query.appId = appId;
+  // aid to query
+  query.aid = aid;
 
   // add company_id or name to query
   if (company_id) {

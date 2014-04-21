@@ -32,7 +32,7 @@ router.use(isAuthenticated);
 
 
 /**
- * For all routes with the ':appId'
+ * For all routes with the ':aid'
  * param, we need to check if the
  * logged in user has access to the app
  *
@@ -41,7 +41,7 @@ router.use(isAuthenticated);
  * e.g. req.app
  */
 
-router.param('appId', hasAccess);
+router.param('aid', hasAccess);
 
 
 /**
@@ -99,8 +99,6 @@ router
           return next(err);
         }
 
-        // TODO : Send Verification Email Here
-
         res.json(app, 201);
       });
 
@@ -109,26 +107,26 @@ router
 
 
 /**
- * GET /apps/:appId
+ * GET /apps/:aid
  *
  * Return app if it belongs to current logged in user
  */
 
 router
-  .route('/:appId')
+  .route('/:aid')
   .get(function (req, res, next) {
     res.json(req.app);
   });
 
 
 /**
- * PUT /apps/:appId/name
+ * PUT /apps/:aid/name
  *
  * Update the name of the app
  */
 
 router
-  .route('/:appId/name')
+  .route('/:aid/name')
   .put(function (req, res, next) {
 
     req.app.name = req.body.name;
@@ -139,7 +137,7 @@ router
       }
 
       if (!app) {
-        return next(new Error('Error in PUT /apps/:appId/name'));
+        return next(new Error('Error in PUT /apps/:aid/name'));
       }
 
       res.json(app);

@@ -10,6 +10,8 @@
 var _ = require('lodash');
 var async = require('async');
 var moment = require('moment');
+var ObjectId = require('mongoose')
+  .Types.ObjectId;
 
 
 /**
@@ -17,7 +19,7 @@ var moment = require('moment');
  */
 
 var User = require('../models/User');
-var Sessions = require('../models/Session');
+var Session = require('../models/Session');
 
 
 /**
@@ -117,16 +119,16 @@ module.exports = Query;
  *
  *
  *
- * @param {string} appId
+ * @param {string} aid
  * @param {object} query
  *
  * return {Query}
  */
 
-function Query(appId, query) {
+function Query(aid, query) {
 
 
-  this.appId = appId;
+  this.aid = aid;
 
   this.countFilters = [];
   this.attrFilters = [];
@@ -167,7 +169,7 @@ function Query(appId, query) {
  */
 
 Query.prototype.reset = function () {
-  this.appId = null;
+  this.aid = null;
   this.query = {};
 
   this.countFilters = [];
@@ -307,27 +309,27 @@ Query.prototype.run = function (cb) {
 
   async.series({
 
-      runCountQuery: function (cb) {
+      countQuery: function (cb) {
 
         // if there are no count queries to be made, move on
         if (!self.countFilters.length) {
           return cb();
         }
 
-        self.runCountQuery(function (err, userIds) {
+        self.runCountQuery(function (err, uids) {
 
           if (err) {
             return cb(err);
           }
 
-          self.countFilterUserIds = userIds;
+          self.countFilterUserIds = uids;
 
           return cb();
         });
 
       },
 
-      runAttrQuery: function (cb) {
+      attrQuery: function (cb) {
 
         self.runAttrQuery(function (err, users) {
 
@@ -355,18 +357,23 @@ Query.prototype.run = function (cb) {
 };
 
 
+/**
+ * Run count queries on the Session collection
+ *
+ * @param {function} cb callback function
+ * @return {Query}
+ */
 
 Query.prototype.runCountQuery = function (cb) {
 
   var self = this;
 
   Session
-    .aggregate({
-      $match: {
-        appId: self.appId
-      }
+    .aggregate()
+    .match({
+      aid: new ObjectId(self.aid.toString())
     })
-    .unwind('events')
+    .unwind('ev')
     .group(self.genCountGroupCond())
     .match(self.genCountMatchCond())
     .project({
@@ -377,14 +384,12 @@ Query.prototype.runCountQuery = function (cb) {
       if (err) {
         return cb(err);
       }
+      var uids = _.pluck(result, '_id');
 
-      console.log('runCountQuery res', result);
-
-      var userIds = _.pluck(result['result'], '_id');
-
-      cb(null, userIds);
+      cb(null, uids);
     });
 
+  return this;
 };
 
 
@@ -417,7 +422,7 @@ Query.prototype.runAttrQuery = function (cb) {
 
 Query.prototype.genAttrMatchCond = function () {
   var cond = {
-    appId: this.appId
+    aid: this.aid
   };
 
   _.each(this.attrFilters, function (filter) {
@@ -458,16 +463,17 @@ Query.prototype.genCountGroupCond = function () {
   var self = this;
 
   var pipe = {
-    _id: '$userId'
+    _id: '$uid'
   };
 
   _.each(self.countFilters, function (filter, i) {
     var key = 'c_' + i;
+    var countFilterCond = self.getCountFilterCond(filter);
 
     pipe[key] = {
       $sum: {
         $cond: {
-          if :self.getCountFilterCond(filter),
+          if :countFilterCond,
           then: 1,
           else :0
         }
@@ -480,19 +486,37 @@ Query.prototype.genCountGroupCond = function () {
 };
 
 
+/**
+ * Generates the condition for the match operator in runCountQuery
+ *
+ * @return {object} match pipe condition
+ */
+
 Query.prototype.genCountMatchCond = function () {
 
   var self = this;
+  var pipe = {};
 
-  var pipe = {
-    $and: []
-  };
+  pipe[self.rootOperator] = [];
 
   _.each(self.countFilters, function (filter, i) {
-    var key = 'c_' + i;
 
-    pipe['$and'][key] = {};
-    pipe['$and'][key][filter['$op']] = filter['val'];
+    var key = 'c_' + i;
+    var cond = {};
+
+    if (filter.op === '$eq') {
+
+      cond[key] = filter.val;
+
+    } else {
+
+      cond[key] = {};
+      cond[key][filter.op] = filter.val;
+
+    }
+
+    pipe[self.rootOperator].push(cond);
+
   });
 
   return pipe;
@@ -517,18 +541,18 @@ Query.prototype.getCountFilterCond = function (filter) {
 
   // event type is a compulsory field
   cond['$and'].push({
-    '$eq': ['$events.type', filter.type]
+    $eq: ['$ev.t', filter.type]
   });
 
   if (filter.name) {
     cond['$and'].push({
-      '$eq': ['$events.name', filter.name]
+      $eq: ['$ev.n', filter.name]
     });
   }
 
   if (filter.feature) {
     cond['$and'].push({
-      '$eq': ['$events.feature', filter.feature]
+      $eq: ['$ev.f', filter.feature]
     });
   }
 

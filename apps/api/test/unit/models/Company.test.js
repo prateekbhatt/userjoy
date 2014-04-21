@@ -21,7 +21,7 @@ describe('Model Company', function () {
 
       var newCompany = {
         name: 'Do Data Do 2',
-        appId: randomId
+        aid: randomId
       };
 
       Company.create(newCompany, function (err, com) {
@@ -39,9 +39,9 @@ describe('Model Company', function () {
 
     });
 
-    it('should not add createdAt unless passed', function () {
+    it('should not add ct unless passed', function () {
       expect(savedCompany)
-        .not.to.have.property('createdAt');
+        .not.to.have.property('ct');
     });
 
   });
@@ -54,7 +54,7 @@ describe('Model Company', function () {
     };
 
     before(function (done) {
-      newCompany.appId = randomId;
+      newCompany.aid = randomId;
       Company.create(newCompany, done);
     });
 
