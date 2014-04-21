@@ -16,6 +16,11 @@ describe('Model Message', function () {
   var savedMessage;
 
 
+  before(function (done) {
+    setupTestDb(done)
+  });
+
+
   describe('#create', function () {
 
     it(
@@ -207,5 +212,66 @@ describe('Model Message', function () {
 
   });
 
+
+  describe('#fetchUnseen', function () {
+
+    var aid;
+    var fetchedMessage = {};
+
+    before(function () {
+      aid = saved.messages.first.aid;
+    });
+
+    it('should return unseen messages belonging to an app', function (done) {
+
+      Message.fetchUnseen(aid, function (err, msg) {
+
+        expect(err)
+          .to.not.exist;
+
+        expect(msg)
+          .to.be.an("array");
+
+        fetchedMessage = msg[0];
+
+        expect(msg)
+          .to.have.length(2);
+
+        expect(msg[0].text)
+          .to.eql('Hello World 2');
+
+        _.each(msg, function (val, key) {
+          expect(val.seen)
+            .to.eql(false);
+        });
+
+        done();
+
+      });
+    });
+
+    it('should return ct/name/replied/seen/text', function () {
+
+      expect(fetchedMessage)
+        .to.have.property("ct");
+
+      expect(fetchedMessage)
+        .to.have.property("name");
+
+      expect(fetchedMessage)
+        .to.have.property("replied");
+
+      expect(fetchedMessage)
+        .to.have.property("seen");
+
+      expect(fetchedMessage)
+        .to.have.property("text");
+
+      expect(fetchedMessage)
+        .to.not.have.property("aid");
+
+    });
+
+  });
 
 });
