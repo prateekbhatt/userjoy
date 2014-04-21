@@ -1,5 +1,10 @@
 describe('Resource /track', function () {
 
+  var CollectorController = require(
+    '../../../api/routes/CollectorController');
+  var AppModel = require(
+    '../../../api/models/App');
+
   // define test variables
   var newSession = {
     'hello': 'world'
@@ -8,13 +13,17 @@ describe('Resource /track', function () {
     email: 'prattbhatt@gmail.com',
   };
   var randomId = '532d6bf862d673ba7131812a';
+  var appKey;
 
 
 
   before(function (done) {
     newSession = JSON.stringify(newSession);
     newUser = JSON.stringify(newUser);
-    setupTestDb(done);
+    setupTestDb(function (err) {
+      appKey = saved.apps.first.testKey;
+      done(err);
+    });
   });
 
   describe('GET /track', function () {
@@ -43,7 +52,7 @@ describe('Resource /track', function () {
 
         var url = '/track?' +
           'app_id=' +
-          randomId;
+          appKey;
 
         request
           .get(url)
@@ -64,7 +73,7 @@ describe('Resource /track', function () {
 
         var url = '/track?' +
           'app_id=' +
-          randomId +
+          appKey +
           '&user=' +
           user;
 
@@ -82,11 +91,11 @@ describe('Resource /track', function () {
 
     it('should create user if user does not exist', function (done) {
 
-        var url = '/track?' +
-          'app_id=' +
-          randomId +
-          '&user=' +
-          newUser;
+      var url = '/track?' +
+        'app_id=' +
+        appKey +
+        '&user=' +
+        newUser;
 
 
       request
@@ -96,6 +105,47 @@ describe('Resource /track', function () {
         .end(done);
 
     });
+
+    it('should return the uid, cid and sid', function (done) {
+
+      var url = '/track?' +
+        'app_id=' +
+        appKey +
+        '&user=' +
+        newUser;
+
+      function hasIds(res) {
+        var obj = res.body;
+        if (!(obj.uid && obj.cid && obj.sid)) {
+          return 'uid/cid/sid missing';
+        }
+      }
+
+      request
+        .get(url)
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .expect(hasIds)
+        .end(done);
+
+    });
+
+
+    // it('should getOrCreate user if user cookie is not present',
+    //   function (done) {
+
+    //   });
+
+    // it(
+    //   'should getOrCreate company if company cookie is not present and company object is present',
+    //   function (done) {
+
+    //   });
+
+    // it('should create new session if session cookie is not present',
+    //   function (done) {
+
+    //   });
 
     // it('should return error if no user object input',
 
@@ -112,6 +162,86 @@ describe('Resource /track', function () {
     //       .end(done);
 
     //   });
+
+  });
+
+  describe('#_findAndVerifyApp', function () {
+
+    it('should return error if app not found', function (done) {
+
+      var mode = 'test';
+      var appKey = 'randomAppKey';
+      var domain = 'randomDomain.com';
+
+      CollectorController._findAndVerifyApp(mode, appKey, domain,
+        function (err, app) {
+
+          expect(err)
+            .to.exist;
+
+          expect(err.message)
+            .to.equal('App Not Found');
+
+          expect(app)
+            .not.to.exist;
+
+          done();
+
+        });
+    });
+
+    // it('should checkDomain in live mode', function (done) {
+
+    // });
+
+    // it('should not checkDomain in test mode', function (done) {
+
+    // });
+
+    it('should return error if incorrect domain in live mode',
+      function (done) {
+
+        var mode = 'live';
+        var appKey = saved.apps.first.liveKey;
+        var domain = 'randomDomain.com';
+
+        CollectorController._findAndVerifyApp(mode, appKey, domain,
+          function (err, app) {
+
+            expect(err)
+              .to.exist;
+
+            expect(err.message)
+              .to.equal('Domain Not Matching');
+
+            expect(app)
+              .not.to.exist;
+
+            done();
+
+          });
+
+      });
+
+    it('should return app in callback', function (done) {
+
+      var mode = 'live';
+      var appKey = saved.apps.first.liveKey;
+      var domain = saved.apps.first.domain;
+
+      CollectorController._findAndVerifyApp(mode, appKey, domain,
+        function (err, app) {
+
+          expect(err)
+            .not.to.exist;
+
+          expect(app)
+            .to.be.an('object');
+
+          done();
+
+        });
+    });
 
   });
 

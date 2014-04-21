@@ -69,12 +69,12 @@ var AppSchema = new Schema({
 
 
 /**
- * Adds createdAt and updatedAt timestamps
+ * Adds ct and ut timestamps
  */
 
 AppSchema.plugin(troop.timestamp, {
-  createdPath: 'createdAt',
-  modifiedPath: 'updatedAt',
+  createdPath: 'ct',
+  modifiedPath: 'ut',
   useVirtual: false
 });
 

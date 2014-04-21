@@ -48,7 +48,7 @@ var UserCompanySchema = new Schema({
 
 var UserSchema = new Schema({
 
-  appId: {
+  aid: {
     type: Schema.Types.ObjectId,
     ref: 'App',
     required: true
@@ -89,7 +89,7 @@ var UserSchema = new Schema({
     default: 1
   },
 
-  createdAt: {
+  ct: {
     type: Date
   },
 
@@ -142,18 +142,18 @@ var UserSchema = new Schema({
   // tags [all tags this user belongs to]
   // notes
   // status (Free, Paying, Cancelled)
-  // companies [{companyId, companyName}]
+  // companies [{cid, companyName}]
 
 });
 
 
 /**
- * Adds firstSessionAt and updatedAt timestamps
+ * Adds firstSessionAt and ut timestamps
  */
 
 UserSchema.plugin(troop.timestamp, {
   createdPath: 'firstSessionAt',
-  modifiedPath: 'updatedAt',
+  modifiedPath: 'ut',
   useVirtual: false
 });
 
@@ -166,7 +166,7 @@ UserSchema.plugin(troop.timestamp, {
  * @param {Function} callback function
  */
 
-UserSchema.statics.getOrCreate = function (appId, user, cb) {
+UserSchema.statics.getOrCreate = function (aid, user, cb) {
 
   var email = user.email;
   var user_id = user.user_id;
@@ -176,11 +176,11 @@ UserSchema.statics.getOrCreate = function (appId, user, cb) {
     return cb(new Error('Please send user_id or email to identify user'));
   }
 
-  // add appId to user
-  user.appId = appId;
+  // add aid to user
+  user.aid = aid;
 
-  // appId to query
-  query.appId = appId;
+  // aid to query
+  query.aid = aid;
 
   // add user_id or email to query
   if (user_id) {

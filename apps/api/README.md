@@ -4,27 +4,86 @@ This app contains an expressjs api which exposes a rest interface for the db.
 
 ## Notes
 
+###### Key Reference
+
+| key   | def                   |
+| ----- | --------------------- |
+| accid | account id            |
+| aid   | app id                |
+| br    | browser               |
+| brv   | browser version       |
+| ci    | city                  |
+| cid   | company id            |
+| co    | country               |
+| coId  | conversation id       |
+| ct    | created at timestamp  |
+| d     | domain                |
+| dv    | device type           |
+| ev    | events (Session)      |
+| f     | feature (event)       |
+| h     | health                |
+| ip    | ip address            |
+| n     | name (action)         |
+| op    | operator (and / or)   |
+| p     | path (event url)      |
+| pl    | platform              |
+| seId  | segment id            |
+| sid   | session id            |
+| sub   | email subject         |
+| t     | type (event)          |
+| tId   | templateId            |
+| uid   | user id               |
+| ut    | updated at timestamp  |
+
+
+###### Definitions
+
+Show the list of defined features, actions and sent events for an app
+
 ###### Query engine
 
-The user event data will be exposed using [express-restify-mongoose](https://github.com/florianholzapfel/express-restify-mongoose) package
+Primary Collections for segmentation:
 
-###### Visits
+- User
+- Company
+- Session (Events)
 
-A 'Visit' can be defined as a 30-minute long session. Any event that occurs for a user within 30 minutes of his previous session will be added to the previous session.
+Types of queries:
 
-###### Events & Visits
+- count
+- hasdone
+- hasnotdone
+- attr
 
-For the above, 'Events' can be embedded documents in the 'Session' collection **OR** the session document could have an array of object ids of all the events belonging to it
+###### Sessions
+
+All events that the user triggers within a 30 minute period of each-other are part of a single session.
 
 ###### Apps
 
-Allow multiple 'Apps' per account ?
+A account on Userjoy can have multiple apps.
 
 ## Models
 
-### Accounts (DoDataDo)
 
-Stores accounts on DoDataDo
+name          | embedded documents      | description
+-----         | ----------------------  | -----------
+Account       |                         | accounts on Userjoy
+App           | team                    | apps belonging to an account
+Company       |                         | companies of a specific account
+Conversation  |                         | conversation threads between users and accounts
+Health        |                         | the healthscore of a user for a specific company
+Invite        |                         | tokens of team members that have been invited to use an app
+Message       |                         | messages between users and accounts
+Segment       | filters                 | all the segments defined for an app
+Session       | events (ev)             | sessions of a user, and events belonging to the session
+Template      |                         | templates of the messages to be sent
+Trigger       |                         | triggers for sending auto emails / notifications
+User          | companies, notes        | users of a specific app. create a new user for every new unique identifier for an app
+
+
+
+### Account
 
 ##### Columns:
 
@@ -34,107 +93,57 @@ Stores accounts on DoDataDo
 - verifyToken
 - emailVerified (boolean)
 - passwordResetToken
-- createdAt
-- updatedAt
+- ct
+- ut
 
 ##### Notes:
 
 - No need to store the reporting hour
 
-##### Embedded Documents:
-
-> ### Account Tokens
->
-> Stores the password reset tokens, and email confirmation > tokens
->
-> ##### Columns:
->
-> - type (reset, confirmation)
-> - token
-> - createdAt
->
-> ##### Notes:
->
-> - Should be valid for 24 hours since createdAt.
-> - Cron job should delete tokens older than 24 hours.
-> - UPDATE: Currently tokens are being stored in Account Model in `verifyToken` and `passwordResetToken` fields
->
-> ### Account Sessions
->
-> Stores sessions on DoDataDo dashboard of an account.
-> Would be used to enable remember me feature
->
-> ##### Notes:
->
-> Initially this can be implemented using a Redis store and > adding max-age (?)
-
-### Apps (DoDataDo)
-
-Stores all apps belonging to accounts on DoDataDo
+### App
 
 ##### Columns:
 
 - name
-- admin (accountId)
-- team [accountIds of team]
+- admin (accId)
+- team [accIds]
 - testKey
 - liveKey
 - tags [] stores all tags that the app has used for its users
-- customKeysUser [] stores all the keys of custom data that the app is passing
-- customKeysCompany [] stores all the keys of custom data that the app is passing
-- createdAt
-- updatedAt
+- ct
+- ut
 
 ##### Notes:
 
-- Admin can add / remove access to team members
-- On adding / removing access both Accounts and Apps collections have to be updated
-- The Account should also be notified by email
+- Admin can add / remove access to team members. On adding / removing access both Accounts and Apps collections have to be updated. The Account should also be notified by email.
 - Keys should be used because they can be easily switched
 - test key should be used in test environment
 - live key should be used in production environment
 
-### Features
-
-Stores features defined by an account
-
-Should be features be an embedded document inside Apps?
+### User
 
 ##### Columns:
 
-- appId
-- name
-- actions []
-
-### Users
-
-Stores users of a specific account
-
-Create new user for every new unique identifier for an app
-
-##### Columns:
-
-- appId
+- aid
 - user_id (to allow the app to recognize a user even if the user changes email/username)
 - email (required)
-- name
-- username
-- meta (object containing additonal info about users)
+- x name
+- x username
+- x meta (object containing additonal info about users)
 - unsubscribed (boolean)
-- unsubscribedOn (date)
-- unsubscribedThrough (messageId)
-- createdAt
-- updatedAt
+- unsubscribedAt (date)
+- unsubscribedThrough (messageId, subject)
+- ct
+- ut
 - firstSessionAt
 - totalSessions
 - lastContactedAt
 - lastSessionAt
-- lastHeardFrom
+- lastHeardAt
 - healthScore (latest value from User Health)
-- tags [] Stores tags for categorizing users
-- notes
-- status (Free, Paying, Cancelled)
-- companies [{companyId, companyName, billing{}, healthScore, totalSessions}]
+- x tags [] Stores tags for categorizing users
+- x notes
+- companies [{cid, companyName, billing{}, healthScore, totalSessions}]
 - billing {
     status,
     plan,
@@ -147,7 +156,7 @@ Create new user for every new unique identifier for an app
 
 ##### Notes:
 
-- User can belong to multiple companies (In our case, a user can belong to multiple apps)
+- User can belong to multiple companies (In Userjoy's case, a user can belong to multiple apps)
   If so, we need to calculate the following attribute of a user on a per company basis:
     - healthScore
     - totalSessions
@@ -155,7 +164,7 @@ Create new user for every new unique identifier for an app
 
 - Billing status must be one of [trial, free, paying, cancelled]
 - The firstSessionAt attribute is added when a new user is created
-- createdAt property needs to be provided to the js snippet
+- ct property needs to be provided to the js snippet
 - Health score should be calculated based on total sessions in last 30 days, total time spent on site [?]
 
 - Ignoring: user acquisition data like (since we do not have data for non loggedin users):
@@ -171,51 +180,43 @@ Create new user for every new unique identifier for an app
 
 ##### Embedded Documents:
 
-> ### User Notes
->
-> Stores notes related to a user
+> ### Note
 >
 > Columns:
 >
 > - note
 > - createdBy (accountId)
-> - createdAt
-> - updatedAt
->
-> Notes:
->
-> - This should be an embedded document in the Users model
+> - ct
+> - ut
 
 
-### User Health
+### Health
 
-Stores the healtscore of a user for a specific company
+##### Columns:
 
-- appId
-- companyId
-- userId
-- score
-- createdAt
+- aid
+- cid
+- ct
+- h
+- uid
 
 ##### Notes:
 
 - Cron job should update a user's health score daily for each company that he belongs to
 - Storing data in this manner will allow us to visualize the trend in an user's health over a period of time
 
-### Companies
-
-Stores companies of a specific account
+### Company
 
 ##### Columns:
 
-- appId
+- aid
 - company_id (similar to user_id)
 - name
 - totalSessions
-- meta (object containing additonal info about users)
-- createdAt (should be passed by js snippet)
-- updatedAt
-- tags [] just like user tags
+- x meta (object containing additonal info about users)
+- ct (should be passed by js snippet)
+- ut
+- x tags [] just like user tags
 - billing {
     status,
     plan,
@@ -230,66 +231,52 @@ Stores companies of a specific account
 
 - Billing data is stored both in Company and User models
 - Billing status must be one of [trial, free, paying, cancelled]
-- createdAt property should not be automatically added on company creation
+- ct property should not be automatically added on company creation
 
 
 
-### Segments
-
-Stores all the segments defined for an app
-
-appId
-query: {
-  where: {
-      and: [{
-          "scalar": {
-              "type": "field",
-              "name": "name",
-              "custom": "user"
-          },
-          "op": "contains",
-          "val": "P"
-      }, {
-          "scalar": {
-              "type": "field",
-              "name": "joindate",
-              "custom": ""
-          },
-          "op": "<=",
-          "val": 1393871400000
-      }]
-  },
-  "main": {
-      "type": "object",
-      "name": "Phone Users"
-  },
-  "page": {
-      "num": 1,
-      "size": 10
-  }
-},
-"type": "empty",
-"time": 1394720988005
-
-
-### User Sessions
-
-Create a new session if the user does not have any events in the last 30 minutes
+### Segment
 
 ##### Columns:
 
-- appId
-- userId
-- platform
-- country
-- city
+ - aid
+ - ct
+ - ut
+ - list
+ - op
+ - filters (embedded documents)
+
+##### Embedded Documents:
+
+> ### Filter
+>
+> Columns:
+>
+> - method
+> - type
+> - name
+> - feature
+> - op
+> - val
+
+
+### Session
+
+##### Columns:
+
+- aid
+- br
+- brv
+- ci
+- cid
+- co
+- ct
+- dv (desktop, mobile, tablet)
+- ev [EventSchema]
 - ip
-- os
-- browser
-- browserVersion
-- deviceType (desktop, mobile, tablet)
-- createdAt
-- updatedAt
+- pl
+- uid
+- ut
 
 ##### Notes
 
@@ -298,110 +285,117 @@ Create a new session if the user does not have any events in the last 30 minutes
 - Session time needs to be updated when a new event is created
 
 
-### Events
+##### Embedded documents
 
-Stores events happening on an app
+> ### Events
+>
+> Stores events happening on an app
+>
+> ##### Columns:
+>
+> - ct
+> - d
+> - f
+> - n
+> - p
+> - t (feature, pageview)
+>
+> ##### Notes:
+>
+> Ignoring the following:
+>
+> - type (click, submit, change)
+> - targetTag
+> - targetId
+> - targetClass
+> - targetText
+>
+
+### Template
 
 ##### Columns:
 
-- appId
-- userId
-- sessionId
-- type (feature, pageview)
-- featureId
-- actionId
-- domain
-- path
+- accid
+- aid
+- clicked
+- ct
+- name
+- replied
+- seen
+- sent
+- sub (for email type)
 - title
-- createdAt
-- updatedAt
+- type (email / notification)
+- ut
 
-##### Notes:
+#####
 
-Ignoring the following:
+- Difference between name and title?
 
-- type (click, submit, change)
-- targetTag
-- targetId
-- targetClass
-- targetText
-
-
-### Message Templates
-
-Stores the templates of the messages to be sent
+### Message
 
 ##### Columns:
 
-- appId
-- createdBy (accountId)
-- type (email / notification)
-- template
-- title
-- subject (for email type)
-- trigger [TODO]
-- total_sent
-- total_seen
-- total_replied
-- total_clicked
-- createdAt
-- updatedAt
-
-### Messages
-
-Stores the messages between users and accounts
-
-##### Columns:
-
-- conversationId
-- accountId (sent to/from account)
-- type (email / notification)
-- text
-- sent (boolean)
-- seen (boolean)
-- replied (boolean)
+- accid
+- aid
 - clicked (boolean)
-- createdAt
-- createdBy
+- coId
+- ct
+- from (enum: [user, account]) (is it sent from a 'user' or an 'account')
+- name (name / email of sender)
+- replied (boolean)
+- seen (boolean)
+- sent (boolean)
+- text
+- type (email / notification)
+- uid
+- ut
 
-### Conversations
-
-Stores conversation threads between users and accounts
+### Conversation
 
 ##### Columns:
 
-- appId (sent to/from app)
-- userId (sent to/from user)
-- auto (boolean)
-- templateId (if automated else null)
-- subject (for email)
+- aid
+- assignee (accid)
 - closed (boolean)
-- assigned [accounts assigned to this conversation]
-- createdAt
-- updatedAt
-- createdBy
+- ct
+- sub (for email)
+- x tId
+- uid
+- ut
 
-### Invites
 
-Stores tokens of team members that have been invited to use an app
+### Triggers
 
 ##### Columns:
 
-- to (email)
-- by (accountId)
-- for (appId)
-- token
-- createdAt
+- active (boolean)
+- aid
+- creator (accid)
+- ct
+- seId
+- tId
+- ut
+
+
+### Invite
+
+##### Columns:
+
+- aid
+- ct
+- from (accountId)
 - status (pending / cancelled / joined)
+- to (email)
+- ut
 
 ##### Notes:
 
 - Invites should be deleted once accepted (?)
+- Use mongo objectId as invite token
 
 #### TODO
 
 - How to store plan, license, amount info?
 - How to store customer journey info?
-- What event data to store?
 - How to handle conversations and messages?
-- How to store queries (segments)?

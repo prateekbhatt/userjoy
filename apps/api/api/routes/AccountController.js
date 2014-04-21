@@ -156,7 +156,9 @@ router
 
       // TODO : Send reset password mail here
 
-      res.json(account);
+      res.json({
+        message: 'Reset password email sent'
+      });
 
     });
 
@@ -187,7 +189,9 @@ router
         return next(err);
       }
 
-      res.json({ message: 'Password updated'});
+      res.json({
+        message: 'Password updated'
+      });
     });
 
   });

@@ -45,14 +45,14 @@ describe('Model User', function () {
     });
 
 
-    it('should add updatedAt timestamp to user', function () {
+    it('should add ut timestamp to user', function () {
       expect(savedUser)
-        .to.have.property('updatedAt');
+        .to.have.property('ut');
     });
 
-    it('should not add createdAt timestamp unless provided', function () {
+    it('should not add ct timestamp unless provided', function () {
       expect(savedUser)
-        .not.to.have.property('createdAt');
+        .not.to.have.property('ct');
     });
 
     it('should have totalSessions as 1 when the user is created',
@@ -67,7 +67,7 @@ describe('Model User', function () {
 
         var testUser = {
           email: 'care@dodatado.com',
-          appId: randomId
+          aid: randomId
         };
 
         var billing = {
@@ -132,7 +132,7 @@ describe('Model User', function () {
     it('should store company data if exists', function (done) {
       var testUser = {
         email: 'care@dodatado.com',
-        appId: randomId,
+        aid: randomId,
         companies: [{
           cid: randomId,
           name: 'helloworld'
@@ -163,7 +163,7 @@ describe('Model User', function () {
       function (done) {
         var testUser = {
           email: 'care@dodatado.com',
-          appId: randomId,
+          aid: randomId,
           companies: [{
             name: 'helloworld'
           }]
@@ -190,7 +190,7 @@ describe('Model User', function () {
     };
 
     before(function (done) {
-      newUser.appId = randomId;
+      newUser.aid = randomId;
       User.create(newUser, done);
     });
 

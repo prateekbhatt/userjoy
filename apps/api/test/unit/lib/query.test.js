@@ -1,4 +1,4 @@
-describe.only('Lib query', function () {
+describe('Lib query', function () {
 
   /**
    * Lib
@@ -19,7 +19,8 @@ describe.only('Lib query', function () {
    * Fixtures
    */
 
-  var createUserFixtures = require('../../fixtureUser');
+  var createUserFixtures = require('../../fixtures/UserFixture');
+  var createSessionFixtures = require('../../fixtures/SessionFixture');
 
 
   /**
@@ -65,9 +66,9 @@ describe.only('Lib query', function () {
 
 
 
-    it('should set appId', function () {
+    it('should set aid', function () {
 
-      expect(newQuery.appId)
+      expect(newQuery.aid)
         .to.eql(saved.apps.first._id);
     });
 
@@ -369,7 +370,7 @@ describe.only('Lib query', function () {
     var cond;
 
     beforeEach(function () {
-      Query.prototype.appId = 'BlaBlaID';
+      Query.prototype.aid = 'BlaBlaID';
       Query.prototype.countFilterUserIds = [];
 
       var filters = [{
@@ -407,9 +408,9 @@ describe.only('Lib query', function () {
     });
 
 
-    it('should return condition with appId', function () {
+    it('should return condition with aid', function () {
 
-      expect(cond.appId)
+      expect(cond.aid)
         .to.eql('BlaBlaID');
     });
 
@@ -467,7 +468,7 @@ describe.only('Lib query', function () {
 
     it('should fetch users', function (done) {
 
-      Query.prototype.appId = saved.apps.first._id;
+      Query.prototype.aid = saved.apps.first._id;
       Query.prototype.countFilterUserIds = [];
       Query.prototype.attrFilters = [];
 
@@ -492,7 +493,7 @@ describe.only('Lib query', function () {
   describe('#reset', function () {
 
     before(function () {
-      Query.prototype.appId = 'randomId';
+      Query.prototype.aid = 'randomId';
       Query.prototype.query = {
         $and: [{
           key: 'val'
@@ -506,12 +507,12 @@ describe.only('Lib query', function () {
 
     it('should reset all query params', function () {
 
-      expect(Query.prototype.appId)
+      expect(Query.prototype.aid)
         .to.exist;
 
       Query.prototype.reset();
 
-      expect(Query.prototype.appId)
+      expect(Query.prototype.aid)
         .not.to.exist;
 
       expect(Query.prototype.rootOperator)
@@ -565,21 +566,21 @@ describe.only('Lib query', function () {
     });
 
 
-    it('should add $userId as _id for group operator', function () {
+    it('should add $uid as _id for group operator', function () {
 
       var cond = Query.prototype.genCountGroupCond();
       expect(cond._id)
-        .to.eql('$userId');
+        .to.eql('$uid');
     });
 
 
-    it('should add $userId as _id for group operator', function () {
+    it('should add $uid as _id for group operator', function () {
 
       Query.prototype.countFilters = countFilters;
       var cond = Query.prototype.genCountGroupCond();
 
       expect(cond._id)
-        .to.eql('$userId');
+        .to.eql('$uid');
     });
 
 
@@ -633,7 +634,7 @@ describe.only('Lib query', function () {
   });
 
 
-  describe('#getCountFilterCond', function () {
+  describe('#genCountFilterCond', function () {
 
 
     beforeEach(function () {
@@ -665,7 +666,7 @@ describe.only('Lib query', function () {
 
         expect(cond.$and[0])
           .to.eql({
-            '$eq': ['$events.type', 'feature']
+            '$eq': ['$ev.t', 'feature']
           });
 
 
@@ -688,7 +689,7 @@ describe.only('Lib query', function () {
 
         expect(cond.$and[1])
           .to.eql({
-            '$eq': ['$events.name', 'Clicked login btn']
+            '$eq': ['$ev.n', 'Clicked login btn']
           });
 
       });
@@ -710,10 +711,346 @@ describe.only('Lib query', function () {
 
         expect(cond.$and[2])
           .to.eql({
-            '$eq': ['$events.feature', 'Authentication']
+            '$eq': ['$ev.f', 'Authentication']
           });
 
       });
+
+  });
+
+
+  describe('#genCountMatchCond', function () {
+
+    var spy;
+    var countFilters = [
+
+      {
+        method: 'count',
+        name: 'Clicked login btn',
+        op: '$gt',
+        val: 10
+      },
+
+      {
+        method: 'count',
+        name: 'Clicked logout btn',
+        op: '$eq',
+        val: 0
+      },
+
+    ];
+
+    beforeEach(function () {
+      Query.prototype.reset();
+      spy = sinon.spy(Query.prototype, 'getCountFilterCond');
+    });
+
+    afterEach(function () {
+      spy.restore();
+    });
+
+    it('should add conditions based on the rootOperator (and/or)',
+      function () {
+
+        Query.prototype.rootOperator = '$and';
+        Query.prototype.countFilters = countFilters;
+        var cond = Query.prototype.genCountMatchCond();
+
+        expect(cond.$and)
+          .to.be.an('array');
+      });
+
+
+    it('should add a match conditon for each countFilter',
+      function () {
+
+        Query.prototype.rootOperator = '$and';
+        Query.prototype.countFilters = countFilters;
+        var cond = Query.prototype.genCountMatchCond();
+
+        expect(cond.$and.length)
+          .to.eql(countFilters.length);
+      });
+
+
+    it('should add a match conditon with key c_[i] for each countFilter',
+      function () {
+
+        Query.prototype.rootOperator = '$and';
+        Query.prototype.countFilters = countFilters;
+        var cond = Query.prototype.genCountMatchCond();
+
+        expect(cond.$and[0].c_0)
+          .to.exist;
+
+        expect(cond.$and[1].c_1)
+          .to.exist;
+      });
+
+    it(
+      'should not add additional $eq operand for countFilters with op=$eq',
+      function () {
+
+        Query.prototype.rootOperator = '$and';
+        Query.prototype.countFilters = countFilters;
+        var cond = Query.prototype.genCountMatchCond();
+
+        expect(cond.$and[1].c_1)
+          .not.to.have.property('$eq');
+
+        expect(cond.$and[1].c_1)
+          .to.eql(0);
+      });
+
+    it(
+      'should add additional operand ($gt, $lt) for non-equality countFilters',
+      function () {
+
+        Query.prototype.rootOperator = '$and';
+        Query.prototype.countFilters = countFilters;
+        var cond = Query.prototype.genCountMatchCond();
+
+        expect(cond.$and[0].c_0)
+          .to.have.property('$gt');
+
+        expect(cond.$and[0].c_0)
+          .to.eql({
+            '$gt': 10
+          });
+      });
+
+  });
+
+
+  describe('#runCountQuery', function () {
+
+    var countFilters = [
+
+      {
+        method: 'count',
+        type: 'pageview',
+        name: 'Define Segment',
+        op: '$gt',
+        val: 0
+      },
+
+      {
+        method: 'count',
+        name: 'Clicked logout btn',
+        op: '$lt',
+        val: 1000000000
+      },
+
+    ];
+
+    before(function (done) {
+      var aid = saved.apps.first._id;
+      var uid = randomId;
+      var uids = [uid];
+      createSessionFixtures(aid, uids, 100, done);
+    });
+
+    beforeEach(function () {
+      Query.prototype.reset();
+      Query.prototype.aid = saved.apps.first._id;
+      Query.prototype.countFilters = countFilters;
+      Query.prototype.rootOperator = '$and';
+    });
+
+    it('should aggregate user ids', function (done) {
+      Query.prototype.runCountQuery(function (err, uids) {
+
+        expect(err)
+          .not.to.exist;
+
+        expect(uids)
+          .to.be.an('array');
+
+        expect(uids)
+          .to.have.length.above(0);
+
+        done();
+      });
+
+    });
+
+
+    it('should call #genCountGroupCond', function (done) {
+
+      var spy = sinon.spy(Query.prototype, 'genCountGroupCond');
+
+
+      Query.prototype.runCountQuery(function (err, uids) {
+
+        expect(spy)
+          .to.be.calledOnce;
+
+        Query.prototype.genCountGroupCond.restore();
+        done();
+      });
+
+    });
+
+
+    it('should call #genCountMatchCond', function (done) {
+
+      var spy = sinon.spy(Query.prototype, 'genCountMatchCond');
+
+
+      Query.prototype.runCountQuery(function (err, uids) {
+
+        expect(spy)
+          .to.be.calledOnce;
+
+        Query.prototype.genCountMatchCond.restore();
+        done();
+      });
+
+    });
+  });
+
+
+  describe('#run', function () {
+
+    var countFilters = [
+
+      {
+        method: 'count',
+        type: 'pageview',
+        name: 'Define Segment',
+        op: '$gt',
+        val: 0
+      }
+
+    ];
+
+    var attrFilters = [
+
+      {
+        method: 'attr',
+        type: 'email',
+        op: '$eq',
+        val: email
+      }
+
+    ];
+
+    var aid;
+    var uid;
+    var email = 'p@userjoy.co'
+
+    before(function (done) {
+
+      aid = saved.apps.first._id;
+      uid = randomId;
+      var uids = [uid];
+      createSessionFixtures(aid, uids, 100, function (err) {
+
+        // TODO: user id should not be hardcoded here like this
+        // It would break if the uid the changed in fixtureSession.js
+
+        User.create({
+          _id: '532d6bf862d673ba7131812a',
+          aid: aid,
+          email: email
+        }, done);
+      });
+    });
+
+    beforeEach(function () {
+      Query.prototype.reset();
+      Query.prototype.countFilters = countFilters;
+      Query.prototype.attrFilters = attrFilters;
+      Query.prototype.aid = aid;
+      Query.prototype.rootOperator = '$and';
+      Query.prototype.countFilterUserIds = [];
+      Query.prototype.filteredUsers = [];
+    });
+
+    it('should not call #runCountQuery if no countFilters',
+      function (done) {
+
+        var spy = sinon.spy(Query.prototype, 'runCountQuery');
+        Query.prototype.countFilters = [];
+
+        Query.prototype.run(function (err) {
+
+          expect(spy)
+            .not.to.have.been.called;
+
+          Query.prototype.runCountQuery.restore();
+
+          done();
+        });
+
+      });
+
+
+    it('should call #runCountQuery if countFilters exist',
+      function (done) {
+
+        var spy = sinon.spy(Query.prototype, 'runCountQuery');
+
+        Query.prototype.run(function (err) {
+
+          expect(spy)
+            .to.have.been.calledOnce;
+
+          Query.prototype.runCountQuery.restore();
+
+          done();
+        });
+
+      });
+
+
+    it('should call #runCountAttrQuery',
+      function (done) {
+
+        var spy = sinon.spy(Query.prototype, 'runAttrQuery');
+
+        Query.prototype.run(function (err) {
+
+          expect(spy)
+            .to.have.been.calledOnce;
+
+          Query.prototype.runAttrQuery.restore();
+
+          done();
+        });
+
+      });
+
+
+    it('should set countFilterUserIds',
+      function (done) {
+
+        Query.prototype.run(function (err) {
+
+          expect(Query.prototype.countFilterUserIds)
+            .to.have.length.above(0);
+          done();
+        });
+
+      });
+
+
+    it('should set filteredUsers', function (done) {
+
+      Query.prototype.run(function (err, users) {
+
+        expect(Query.prototype.filteredUsers)
+          .to.have.length.above(0);
+
+        expect(users)
+          .to.have.length.above(0);
+
+        expect(users[0].email)
+          .to.eql(email);
+
+        done();
+      });
+    });
 
   });
 
