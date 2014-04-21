@@ -214,5 +214,66 @@ describe.only('Resource /apps/:aid/messages', function () {
 
   });
 
+  describe('GET /apps/:aid/messages/unseen', function () {
+
+    var unseenPath;
+
+    before(function (done) {
+      unseenPath = basePath + '/unseen';
+      logoutUser(done);
+    });
+
+
+    it('should return error if not logged in',
+
+      function (done) {
+
+        request
+          .get(unseenPath)
+          .expect('Content-Type', /json/)
+          .expect(401)
+          .expect({
+            status: 401,
+            error: 'Unauthorized'
+          })
+          .end(done);
+
+      });
+
+
+    it('logging in user',
+
+      function (done) {
+        loginUser(done);
+      });
+
+
+    it('should return all messages belonging to app',
+
+      function (done) {
+
+        request
+          .get(unseenPath)
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(function (res) {
+
+            if (!Array.isArray(res.body)) {
+              return 'Should return an array';
+            }
+
+            var seenMsgs = _.filter(res.body, 'seen');
+
+            expect(seenMsgs)
+              .to.be.empty;
+
+          })
+          .expect(200)
+          .end(done);
+
+      });
+
+
+  });
 
 });
