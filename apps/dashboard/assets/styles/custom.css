@@ -222,19 +222,39 @@ height: 100%;
     color: #fff;
     background-color: #000;
 }
+
+.navbar-inverse .navbar-nav > li > a:active {
+    color: #fff;
+    background-color: #000;
+}
+
 .dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus {
     text-decoration: none;
     color: #ffffff;
     background-color: #7b8a8b;
 }
+
+.navbar-header .
+
 .navbar-inverse .navbar-right .navbar-nav > li.dropdown > a:hover, .navbar-inverse .navbar-right .navbar-nav > li.dropdown > a:focus {
     color: #fff;
     background-color: #000;
 }
+
+.navbar-inverse .navbar-right .navbar-nav > li.dropdown > a:active {
+    color: #fff;
+    background-color: #000;
+}
+
+.navbar-inverse .navbar-right .navbar-nav > li.dropdown > a:hover, .navbar-inverse .navbar-right .navbar-nav > li.dropdown > a:visited {
+    color: #fff;
+    background-color: #000;
+}
+
 .navbar-inverse .navbar-header > a:hover, .navbar-inverse .navbar-header > a:focus {
     color: #fff;
 }
-.dropdown-menu > .active > a, .dropdown-menu > .active > a:hover, .dropdown-menu > .active > a:focus {
+.dropdown-menu > .active > a, .dropdown-menu > .active > a:hover, .dropdown-menu > .active > a:focus, .dropdown-menu > .active > a:active {
     color: #fff;
     text-decoration: none;
     background-color: #222;
@@ -480,5 +500,8 @@ hr {
 .form-control:focus.error {
     border-color: #843534;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 6px #CE8483;
+}
+.container {
+    width: 1245px;
 }
 }
