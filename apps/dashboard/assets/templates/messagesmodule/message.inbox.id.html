@@ -28,12 +28,12 @@
                             </div>
                         </div>
                         <div class="panel-body">
-                            <div class="col-md-12" ng-repeat="message in messages">
+                            <div class="col-md-12" ng-repeat="message in messagesWithSrc">
                                 <br ng-show="!$first">
                                 <br ng-show="!$first">
                                 <div class="blockquote-box clearfix">
                                     <div class="square pull-left">
-                                        <img src="http://placehold.it/60/8e44ad/FFF&text=B" alt="" class="" />
+                                        <img src={{message.src}} alt="" class="" />
                                     </div>
 
                                     <div class="col-md-3">
@@ -62,12 +62,12 @@
                                 <br>
                                     <div class="blockquote-box clearfix">
                                         <div class="square pull-left">
-                                            <img src="http://placehold.it/60/8e44ad/FFF&text=B" alt="" class="" />
+                                            <img src={{replysrc}} alt="" class="" />
                                         </div>
 
                                         <div class="col-md-3">
                                             <h4>
-                                            <strong>Savinay</strong></h4>
+                                            <strong>{{user}}</strong></h4>
                                         </div>
                                         <div class="col-md-push-3 col-md-6">
                                             <em>
