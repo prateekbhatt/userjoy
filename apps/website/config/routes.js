@@ -34,7 +34,25 @@ module.exports.routes = {
         view: 'signup'
     },
 
+    '/legal/terms': {
+        view: 'termsofservice'
+    },
 
+    '/legal/privacy': {
+        view: 'privacypolicy'
+    },
+    
+    '/legal/refund': {
+        view: 'refundpolicy'
+    },
+
+    '/contact': {
+        view: 'contact'
+    },
+
+    '/pricing': {
+        view: 'pricing'
+    },
     // Custom routes here...
 
 
