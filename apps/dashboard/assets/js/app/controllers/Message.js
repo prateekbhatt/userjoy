@@ -667,6 +667,10 @@ angular.module('do.message', [])
             messagebody: 'Hi, this is Larry Page. Thanks for such an offer. It was great.... Lorem Ipsum.......',
             createdby: 'Savinay',
             createdat: '26th March, 2014'
+        }, {
+            messagebody: 'Hi, this is Larry Page. Thanks for such an offer. It was great.... Lorem Ipsum.......',
+            createdby: 'Jill',
+            createdat: '26th March, 2014'
         }];
 
         /* function getUniqueUsers() {
@@ -734,13 +738,17 @@ angular.module('do.message', [])
         // TODO : Get data from backend and match it based on uid
 
         // $scope.user = '';
-        $scope.user = 'John';
+        $scope.user = 'Savinay';
         $scope.replysrc = '';
 
         for (var i = 0; i < $scope.messagesWithSrc.length; i++) {
-            if($scope.user == $scope.messagesWithSrc[i].createdby) {
+            if ($scope.user == $scope.messagesWithSrc[i].createdby) {
                 $scope.replysrc = $scope.messagesWithSrc[i].src;
                 break;
+            } else {
+                var colorReply = getRandomColor();
+                $scope.replysrc = 'http://placehold.it/60/' + colorReply +
+                    '/FFF&text=' + $scope.user.charAt(0);
             }
         };
 
