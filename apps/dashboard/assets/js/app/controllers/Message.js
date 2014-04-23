@@ -671,6 +671,10 @@ angular.module('do.message', [])
             messagebody: 'Hi, this is Larry Page. Thanks for such an offer. It was great.... Lorem Ipsum.......',
             createdby: 'Jill',
             createdat: '26th March, 2014'
+        }, {
+            messagebody: 'Hi, this is Larry Page. Thanks for such an offer. It was great.... Lorem Ipsum.......',
+            createdby: 'John',
+            createdat: '26th March, 2014'
         }];
 
         /* function getUniqueUsers() {
