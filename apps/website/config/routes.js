@@ -53,6 +53,10 @@ module.exports.routes = {
     '/pricing': {
         view: 'pricing'
     },
+
+    '/register': {
+        view: 'signupwufoo'
+    },
     // Custom routes here...
 
 
