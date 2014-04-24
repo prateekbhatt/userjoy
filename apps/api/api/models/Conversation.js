@@ -22,18 +22,19 @@ var Schema = mongoose.Schema;
 var ConversationSchema = new Schema({
 
 
+  // assignee
+  accId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Account',
+    required: [true, 'Invalid accId']
+  },
+
+
   // app Id
   aid: {
     type: Schema.Types.ObjectId,
     ref: 'App',
     required: [true, 'Invalid aid']
-  },
-
-
-  assignee: {
-    type: Schema.Types.ObjectId,
-    ref: 'Account',
-    required: [true, 'Invalid assignee']
   },
 
 
