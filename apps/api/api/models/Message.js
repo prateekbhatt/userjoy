@@ -65,6 +65,13 @@ var MessageSchema = new Schema({
   },
 
 
+  // parent message id
+  mId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Message'
+  },
+
+
   // name / email of user
   name: {
     type: String,
