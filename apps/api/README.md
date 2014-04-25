@@ -24,6 +24,7 @@ This app contains an expressjs api which exposes a rest interface for the db.
 | h     | health                |
 | ip    | ip address            |
 | n     | name (action)         |
+| mId   | message id            |
 | op    | operator (and / or)   |
 | p     | path (event url)      |
 | pl    | platform              |
@@ -342,6 +343,7 @@ User          | companies, notes        | users of a specific app. create a new 
 - coId
 - ct
 - from (enum: [user, account]) (is it sent from a 'user' or an 'account')
+- mId (id of parent message)
 - name (name / email of sender)
 - replied (boolean)
 - seen (boolean)
@@ -356,7 +358,7 @@ User          | companies, notes        | users of a specific app. create a new 
 ##### Columns:
 
 - aid
-- assignee (accid)
+- accid
 - closed (boolean)
 - ct
 - sub (for email)

@@ -78,6 +78,7 @@ describe('Model Message', function () {
         aid: randomId,
         coId: randomId,
         from: 'user',
+        mId: randomId,
         name: 'Prateek Bhatt',
         text: 'Hello World',
         type: 'email',
@@ -96,6 +97,9 @@ describe('Model Message', function () {
 
         expect(msg.aid.toString())
           .to.eql(newMessage.aid);
+
+        expect(msg.mId.toString())
+          .to.eql(newMessage.mId);
 
         expect(msg.text)
           .to.eql(newMessage.text);
