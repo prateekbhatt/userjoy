@@ -23,10 +23,10 @@ angular.module('do.message', [])
                 },
                 authenticate: true
             })
-            .state('message.id', {
-                url: '/inbox/1',
+            .state('id', {
+                url: '/messages/inbox/1',
                 views: {
-                    "messageapp": {
+                    "main": {
                         templateUrl: '/templates/messagesmodule/message.inbox.id.html',
                         controller: 'MessageBodyCtrl',
                     }
@@ -617,6 +617,12 @@ angular.module('do.message', [])
 
 .controller('MessageBodyCtrl', ['$scope',
     function ($scope) {
+
+        $scope.healthScore = '50';
+        $scope.plan = 'Basic';
+        $scope.planValue = '$25';
+        $scope.renewal = '25 Mar 2014';
+
         $scope.openReplyBox = function () {
             $log.info("Inside replybox");
 
@@ -752,6 +758,20 @@ angular.module('do.message', [])
             } else {
                 var colorReply = getRandomColor();
                 $scope.replysrc = 'http://placehold.it/60/' + colorReply +
+                    '/FFF&text=' + $scope.user.charAt(0);
+            }
+        };
+
+        $scope.customer = 'John';
+        $scope.custsrc = '';
+
+        for (var i = 0; i < $scope.messagesWithSrc.length; i++) {
+            if ($scope.customer == $scope.messagesWithSrc[i].createdby) {
+                $scope.custsrc = $scope.messagesWithSrc[i].src;
+                break;
+            } else {
+                var colorReply = getRandomColor();
+                $scope.custsrc = 'http://placehold.it/60/' + colorReply +
                     '/FFF&text=' + $scope.user.charAt(0);
             }
         };

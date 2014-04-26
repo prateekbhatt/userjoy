@@ -1,127 +1,123 @@
-<div class="panel panel-default">
-    <div id="wrapper">
-        <div id="page-wrapper">
-            <!-- /.row -->
-            <div class="row">
-                <div class="col-lg-12">
-                    <br>
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-inbox"></i> Messages
+<div id="wrapper">
+    <!-- /.row -->
+    <div class="row">
+        <div class="col-lg-12">
+            <br>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <i class="fa fa-inbox"></i> Messages
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <tbody>
+                                        <tr ng-repeat="automessage in automessages">
+                                            <td class="text-center"> Draft </td>
+                                            <td class="text-center">
+                                                <span class="label label-success">Automatic </span>
+                                            </td>
+                                            <td>{{automessage}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.table-responsive -->
                         </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered">
-                                            <tbody>
-                                                <tr ng-repeat="automessage in automessages">
-                                                    <td class="text-center"> Draft </td>
-                                                    <td class="text-center">
-                                                        <span class="label label-success">Automatic </span>
-                                                    </td>
-                                                    <td>{{automessage}}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <!-- /.table-responsive -->
-                                </div>
+                    </div>
+                    <div class="row" style="padding-top:50px">
+                        <div class="text-center">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default">Select Users</button>
+                                <button type="button" class="btn btn-default active">Save Messages</button>
                             </div>
-                            <div class="row" style="padding-top:50px">
-                                <div class="text-center">
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-default">Select Users</button>
-                                        <button type="button" class="btn btn-default active">Save Messages</button>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                    <div style="border: 1px solid #ecf0f1;">
+                        <br>
+                        <br>
+                        <div>
+                            <div>
+                                <div class="caption-full">
+                                    <div class="row">
+                                        <div class="col-md-1 col-md-offset-1 text-center">
+                                            <p style="font-size:20px">LIST &nbsp;&nbsp;</p>
+                                        </div>
+                                        <div class="col-md-10">
+                                            <button type="button" class="btn btn-default" bs-dropdown="dropdown">Users
+                                            <i class="fa fa-caret-down"> </i>
+                                            </button>
+                                        </div>
+                                        <br>
+                                        <br>
+                                        <br>
                                     </div>
-                                </div>
-                            </div>
-                            <br>
-                            <br>
-                            <div style="border: 1px solid #ecf0f1;">
-                            <br>
-                            <br>
-                                <div>
-                                    <div>
-                                        <div class="caption-full">
-                                            <div class="row">
-                                                <div class="col-md-1 col-md-offset-1 text-center">
-                                                    <p style="font-size:20px">LIST &nbsp;&nbsp;</p>
-                                                </div>
-                                                <div class="col-md-10">
-                                                    <button type="button" class="btn btn-default" bs-dropdown="dropdown">Users
-                                                    <i class="fa fa-caret-down"> </i>
-                                                    </button>
-                                                </div>
-                                                <br>
-                                                <br>
-                                                <br>
+                                    <div class="form-group">
+                                        <div class="row" ng-show="true" ng-repeat="filter in filters">
+                                            <div class="col-md-1 col-md-offset-1 text-center">
+                                                <p style="font-size:20px" ng-show="$first">FILTER &nbsp;&nbsp;</p>
+                                                <a style="font-size:20px; cursor:pointer; cursor:hand" ng-show="!$first" ng-click="switchAndOr()">{{text}}</a>
                                             </div>
-                                            <div class="form-group">
-                                                <div class="row" ng-show="true" ng-repeat="filter in filters">
-                                                    <div class="col-md-1 col-md-offset-1 text-center">
-                                                        <p style="font-size:20px" ng-show="$first">FILTER &nbsp;&nbsp;</p>
-                                                        <a style="font-size:20px; cursor:pointer; cursor:hand" ng-show="!$first" ng-click="switchAndOr()">{{text}}</a>
-                                                    </div>
-                                                    <div class="col-md-10">
-                                                        <div class="row">
-                                                            <div class="col-md-3">
-                                                                <button type="button" class="btn btn-default" bs-dropdown="dropdown" value="filter.segment">
-                                                                <span>{{selectedSegment.name}}</span>
-                                                                <i class="fa fa-caret-down"> </i>
-                                                                </button>
-                                                            </div>
-                                                            <div class="col-md-3">
-                                                                <button type="button" class="btn btn-default" bs-dropdown="query">
-                                                                <span>{{selectedQuery.name}}</span>
-                                                                <i class="fa fa-caret-down"> </i>
-                                                                </button>
-                                                            </div>
-                                                            <div class="col-md-4">
-                                                                <input type="text" class="form-control" placeholder="Value" ng-model="filter.value">
-                                                            </div>
-                                                            <div class="col-md-2">
-                                                                <a class="btn btn-default fa fa-times" ng-click="removeFilter(filter)"></a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <br>
-                                                    <br>
-                                                    <br>
-                                                </div>
-                                                <br>
+                                            <div class="col-md-10">
                                                 <div class="row">
-                                                    <div class="col-md-4 col-sm-push-1">
-                                                        <button class="btn btn-info" ng-click="addAnotherFilter()" ng-show="true">
-                                                        <i class="fa fa-plus-square"></i>
-                                                        Add Filter
+                                                    <div class="col-md-3">
+                                                        <button type="button" class="btn btn-default" bs-dropdown="dropdown" value="filter.segment">
+                                                        <span>{{selectedSegment.name}}</span>
+                                                        <i class="fa fa-caret-down"> </i>
                                                         </button>
                                                     </div>
+                                                    <div class="col-md-3">
+                                                        <button type="button" class="btn btn-default" bs-dropdown="query">
+                                                        <span>{{selectedQuery.name}}</span>
+                                                        <i class="fa fa-caret-down"> </i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <input type="text" class="form-control" placeholder="Value" ng-model="filter.value">
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <a class="btn btn-default fa fa-times" ng-click="removeFilter(filter)"></a>
+                                                    </div>
                                                 </div>
+                                            </div>
+                                            <br>
+                                            <br>
+                                            <br>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-md-4 col-sm-push-1">
+                                                <button class="btn btn-info" ng-click="addAnotherFilter()" ng-show="true">
+                                                <i class="fa fa-plus-square"></i>
+                                                Add Filter
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- /.row -->
-                            <br>
-                            <br>
-                            <div class="row col-md-3 col-md-push-10">
-                                <a type="button" class="btn btn-info" ui-sref="message.write">Write Message</a>
-                            </div>
                         </div>
-                        <!-- /.panel-body -->
                     </div>
-                    <!-- /.panel -->
-                    <!-- /.panel -->
+                    <!-- /.row -->
+                    <br>
+                    <br>
+                    <div class="row col-md-3 col-md-push-10">
+                        <a type="button" class="btn btn-info" ui-sref="message.write">Write Message</a>
+                    </div>
                 </div>
-                <!-- /.col-lg-8 -->
-                <!-- /.col-lg-4 -->
+                <!-- /.panel-body -->
             </div>
-            <!-- /.row -->
+            <!-- /.panel -->
+            <!-- /.panel -->
         </div>
-        <!-- /#page-wrapper -->
+        <!-- /.col-lg-8 -->
+        <!-- /.col-lg-4 -->
     </div>
-    <!-- /#wrapper -->
+    <!-- /.row -->
 </div>
+<!-- /#page-wrapper -->
+<!-- /#wrapper -->
