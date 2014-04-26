@@ -41,12 +41,12 @@ var accounts = {
 
     first: {
       name: 'First App',
-      domain: 'firstapp.co'
+      url: 'firstapp.co'
     },
 
     second: {
       name: 'Second App',
-      domain: 'secondapp.co'
+      url: 'secondapp.co'
     }
   },
 
@@ -87,16 +87,21 @@ function createAccount(account, fn) {
 
 }
 
-function createApp(accId, app, fn) {
+function createApp(accid, app, fn) {
 
-  app.admin = accId;
+  app.team = [];
+  app.team.push({
+    accid: accid,
+    admin: true
+  });
+
   App.create(app, fn);
 
 }
 
-function createMessage(accId, aid, message, fn) {
+function createMessage(accid, aid, message, fn) {
 
-  message.accid = accId;
+  message.accid = accid;
   message.aid = aid;
   Message.create(message, fn);
 
@@ -150,10 +155,10 @@ module.exports = function loadFixtures(callback) {
     createFirstMessage: function (cb) {
 
       var aid = apps.first._id;
-      var accId = accounts.first._id;
+      var accid = accounts.first._id;
       var message = messages.first;
 
-      createMessage(accId, aid, message, function (err, msg) {
+      createMessage(accid, aid, message, function (err, msg) {
         if (err) return cb(err);
         messages.first = msg;
         cb();
@@ -164,10 +169,10 @@ module.exports = function loadFixtures(callback) {
     createSecondMessage: function (cb) {
 
       var aid = apps.first._id;
-      var accId = accounts.first._id;
+      var accid = accounts.first._id;
       var message = messages.second;
 
-      createMessage(accId, aid, message, function (err, msg) {
+      createMessage(accid, aid, message, function (err, msg) {
         if (err) return cb(err);
         messages.second = msg;
         cb();
