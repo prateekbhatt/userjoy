@@ -1,9 +1,6 @@
 <div class="col-md-9">
     <div style="border-left: 1px solid #ecf0f1;">
         <br>
-        <br>
-        <br>
-        <div>
             <div>
                 <div class="caption-full">
                     <div class="row">
@@ -16,7 +13,6 @@
                         <br>
                         <br>
                     </div>
-                    <br>
                     <br>
                     <div class="form-group">
                         <div ng-repeat="filter in filters" ng-init="ind = $index">
@@ -85,7 +81,7 @@
 
                         <br>
                         <div class="row">
-                            <div class="col-md-4 col-sm-push-1">
+                            <div class="col-md-4" style="margin-left: 20px">
                                 <button class="btn btn-info" ng-click="addAnotherFilter()" ng-show="true">
                                 <i class="fa fa-plus-square"></i>
                                 Add Filter
@@ -94,7 +90,7 @@
                         </div>
                         <br>
                         <div class="row">
-                            <div class="col-md-4 col-sm-push-1">
+                            <div class="col-md-4" style="margin-left: 20px">
                                 <button class="btn btn-info fa fa-toggle-right" ng-click="runQuery()" style="font-size: 16px; padding: 11px 27px">
                                 Run
                                 </button>
