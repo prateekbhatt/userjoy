@@ -5,6 +5,7 @@ describe('Model App', function () {
   var randomId = '532d6bf862d673ba7131812a';
 
   before(function (done) {
+    console.log('beforealllll');
     setupTestDb(done);
   });
 
@@ -15,6 +16,25 @@ describe('Model App', function () {
         .to.have.property("testKey");
       expect(saved.apps.first)
         .to.have.property("liveKey");
+    });
+
+
+    it('should add account to team and as admin', function () {
+
+      var team = saved.apps.first.team;
+
+      expect(team)
+        .to.be.an("array");
+
+      expect(team)
+        .to.have.length(1);
+
+      expect(team[0].accid)
+        .to.eql(saved.accounts.first._id);
+
+      expect(team[0].admin)
+        .to.be.true;
+
     });
 
   });
@@ -58,7 +78,7 @@ describe('Model App', function () {
 
   });
 
-  describe('#checkDomain', function () {
+  describe('#checkUrl', function () {
 
     var fetchedApp;
 
@@ -69,19 +89,19 @@ describe('Model App', function () {
       });
     });
 
-    it('should throw error if no domain is provided', function () {
-      expect(fetchedApp.checkDomain)
+    it('should throw error if no url is provided', function () {
+      expect(fetchedApp.checkUrl)
         .to.
-      throw ();
+      throw ('Invalid Url');
     });
 
-    it('should return false if domain does not match', function () {
-      expect(fetchedApp.checkDomain('blablarandom.com'))
+    it('should return false if url does not match', function () {
+      expect(fetchedApp.checkUrl('blablarandom.com'))
         .to.be.false;
     });
 
-    it('should return true if domain matches stored domain', function () {
-      expect(fetchedApp.checkDomain(saved.apps.first.domain))
+    it('should return true if url matches stored url', function () {
+      expect(fetchedApp.checkUrl(saved.apps.first.url))
         .to.be.true;
     });
   });
