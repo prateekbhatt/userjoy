@@ -1,4 +1,4 @@
-describe.only('Resource /apps/:aid/messages', function () {
+describe('Resource /apps/:aid/messages', function () {
 
 
   /**
