@@ -218,6 +218,103 @@ describe('Model Message', function () {
   });
 
 
+  describe('#fetchThread', function () {
+
+    var aid;
+    var parentMessageId;
+    var replyingAccount;
+    var fetchedMessage = {};
+    var currentMessageId;
+
+    before(function (done) {
+      aid = saved.apps.first._id;
+      parentMessageId = saved.messages.first._id;
+      replyingAccount = saved.accounts.first._id;
+
+
+      var replyMessage = {
+        accid: replyingAccount,
+        aid: aid,
+        coId: saved.messages.first.coId,
+        from: 'account',
+        mId: parentMessageId,
+        name: 'Prateek Bhatt',
+        text: 'This is a reply from admin',
+        type: 'email',
+        uid: randomId,
+      };
+
+      Message.create(replyMessage, function (err, msg) {
+        if (err) return done(err);
+        currentMessageId = msg._id;
+        done();
+      });
+
+    });
+
+    it('should return messages belonging to a thread', function (done) {
+
+      Message.fetchThread(aid, currentMessageId, function (err, msgs) {
+
+        expect(err)
+          .to.not.exist;
+
+        expect(msgs)
+          .to.be.an("array");
+
+        fetchedMessage = msgs[0];
+
+        expect(msgs)
+          .to.have.length(2);
+
+        expect(msgs[0].text)
+          .to.eql('Hello World');
+
+        expect(msgs[1].text)
+          .to.eql('This is a reply from admin');
+
+
+        var uniqConvIds = _.chain(msgs)
+          .pluck('coIds')
+          .uniq()
+          .value();
+
+        expect(uniqConvIds)
+          .to.have.length(1);
+
+        done();
+
+      });
+    });
+
+    it('should return aid/coId/ct/name/replied/seen/text', function () {
+
+      expect(fetchedMessage)
+        .to.have.property("ct");
+
+      expect(fetchedMessage)
+        .to.have.property("name");
+
+      expect(fetchedMessage)
+        .to.have.property("replied");
+
+      expect(fetchedMessage)
+        .to.have.property("seen");
+
+      expect(fetchedMessage)
+        .to.have.property("text");
+
+      expect(fetchedMessage)
+        .to.have.property("aid");
+
+      expect(fetchedMessage)
+        .to.have.property("coId");
+
+    });
+
+  });
+
+
   describe('#fetchUnseen', function () {
 
     var aid;
