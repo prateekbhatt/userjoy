@@ -255,7 +255,6 @@ For more info and more free Bootstrap 3 HTML themes, visit http://startbootstrap
 
   .form-control.error {
     border-color: #A94442;
-    /*box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 6px #CE8483;*/
   }
 
   .form-control:focus.error {
@@ -267,6 +266,45 @@ For more info and more free Bootstrap 3 HTML themes, visit http://startbootstrap
     background-color: #dff0d8;
     border-color: #d6e9c6;
     color: #3c763d;
+  }
+
+  .container {
+    width: 1245px;
+  }
+
+  .lead { 
+    font-size: 33px;margin-bottom:0px; 
+  }
+
+  .panel-info {
+    border-color: #bce8f1;
+  }
+  .panel-info > .panel-heading {
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+  }
+
+  .panel-primary {
+    border-color: #428bca;
+  }
+
+  .panel-primary>.panel-heading {
+    color: #fff;
+    background-color: #428bca;
+    border-color: #428bca;
+  }
+
+  .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open .dropdown-toggle.btn-primary {
+    color: #fff;
+    background-color: #3276b1;
+    border-color: #285e8e;
+  }
+
+  .btn-primary {
+    color: #fff;
+    background-color: #428bca;
+    border-color: #357ebd;
   }
   
 }

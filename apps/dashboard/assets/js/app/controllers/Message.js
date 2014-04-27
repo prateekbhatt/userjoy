@@ -23,10 +23,10 @@ angular.module('do.message', [])
                 },
                 authenticate: true
             })
-            .state('message.id', {
-                url: '/inbox/1',
+            .state('id', {
+                url: '/messages/inbox/1',
                 views: {
-                    "messageapp": {
+                    "main": {
                         templateUrl: '/templates/messagesmodule/message.inbox.id.html',
                         controller: 'MessageBodyCtrl',
                     }
@@ -465,12 +465,12 @@ angular.module('do.message', [])
             label: '<i class="fa fa-envelope"></i> Email'
         }]
         $scope.$watch('selectedIcon', function () {
-            if($scope.selectedIcon === "Notification") {
+            if ($scope.selectedIcon === "Notification") {
                 $scope.showNotification = true;
                 $scope.showEmail = false;
             }
 
-            if($scope.selectedIcon === "Email") {
+            if ($scope.selectedIcon === "Email") {
                 $scope.showNotification = false;
                 $scope.showEmail = true;
             }
@@ -617,9 +617,27 @@ angular.module('do.message', [])
 
 .controller('MessageBodyCtrl', ['$scope',
     function ($scope) {
+
+        $scope.healthScore = '50';
+        $scope.plan = 'Basic';
+        $scope.planValue = '$25';
+        $scope.renewal = '25 Mar 2014';
+
         $scope.openReplyBox = function () {
             $log.info("Inside replybox");
 
+        }
+
+        function getRandomColor(initials) {
+            var letters = '0123456789ABCDEF'.split('');
+            var color = '';
+            // var imgsrc = '';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            // imgsrc = 'http://placehold.it/60/' + color + '/FFF&text=' +
+            //     initials;
+            return color;
         }
 
         $scope.replytext = '';
@@ -635,7 +653,128 @@ angular.module('do.message', [])
             messagebody: 'Hi, this is Sergey Brin. Thanks for such an offer. It was great.... Lorem Ipsum.......cadilus quasum irium idler sherlock holmes',
             createdby: 'John',
             createdat: '24th March, 2014'
+        }, {
+            messagebody: 'Hi, this is Larry Page. Thanks for such an offer. It was great.... Lorem Ipsum.......',
+            createdby: 'Savinay',
+            createdat: '26th March, 2014'
+        }, {
+            messagebody: 'Hi, this is Sergey Brin. Thanks for such an offer. It was great.... Lorem Ipsum.......cadilus quasum irium idler sherlock holmes',
+            createdby: 'John',
+            createdat: '24th March, 2014'
+        }, {
+            messagebody: 'Hi, this is Larry Page. Thanks for such an offer. It was great.... Lorem Ipsum.......',
+            createdby: 'Savinay',
+            createdat: '26th March, 2014'
+        }, {
+            messagebody: 'Hi, this is Larry Page. Thanks for such an offer. It was great.... Lorem Ipsum.......',
+            createdby: 'Savinay',
+            createdat: '26th March, 2014'
+        }, {
+            messagebody: 'Hi, this is Larry Page. Thanks for such an offer. It was great.... Lorem Ipsum.......',
+            createdby: 'Savinay',
+            createdat: '26th March, 2014'
+        }, {
+            messagebody: 'Hi, this is Larry Page. Thanks for such an offer. It was great.... Lorem Ipsum.......',
+            createdby: 'Jill',
+            createdat: '26th March, 2014'
+        }, {
+            messagebody: 'Hi, this is Larry Page. Thanks for such an offer. It was great.... Lorem Ipsum.......',
+            createdby: 'John',
+            createdat: '26th March, 2014'
         }];
+
+        /* function getUniqueUsers() {
+            console.log("inside getcolor: ", name);
+            var colorUser = _.chain($scope.messages)
+                .pluck('createdby')
+                .uniq()
+                .map(function (by) {
+                    return {
+                        createdby: by,
+                        color: getRandomColor(name.charAt(0))
+                    }
+                })
+            console.log("colorUser: ", colorUser);
+            return colorUsers;
+        }*/
+
+        $scope.messagesWithSrc = [];
+
+        for (var i = 0; i < $scope.messages.length; i++) {
+            console.log("value of i :");
+            var imgsrc = '';
+            var count = 0;
+            var storedimgsrc = ''
+            console.log("message object: ", $scope.messages[i]);
+            var name = $scope.messages[i].createdby;
+            var initials = name.charAt(0);
+            var color = getRandomColor();
+            for (var j = 0; j < i; j++) {
+                console.log("i: ", i);
+                // TODO : Get data from backend and match it based on uid
+                if ($scope.messages[j].createdby == $scope.messages[i].createdby) {
+                    count++;
+                    storedimgsrc = $scope.messagesWithSrc[j].src;
+                    break;
+                }
+            }
+
+            console.log("storedimgsrc: ", storedimgsrc);
+            /*if(count == 1) {
+                imgsrc = $scope.messagesWithSrc[i].src;
+            }*/
+
+            if (count < 1) {
+                imgsrc = 'http://placehold.it/60/' + color + '/FFF&text=' +
+                    initials;
+                $scope.messagesWithSrc.push({
+                    messagebody: $scope.messages[i].messagebody,
+                    createdby: $scope.messages[i].createdby,
+                    createdat: $scope.messages[i].createdat,
+                    src: imgsrc
+                })
+            } else {
+                $scope.messagesWithSrc.push({
+                    messagebody: $scope.messages[i].messagebody,
+                    createdby: $scope.messages[i].createdby,
+                    createdat: $scope.messages[i].createdat,
+                    src: storedimgsrc
+                })
+            }
+            console.log("src generated: ", $scope.messagesWithSrc[i].src);
+            console.log("with src: ", $scope.messagesWithSrc);
+        };
+
+        // TODO : Get data from backend and match it based on uid
+
+        // $scope.user = '';
+        $scope.user = 'Savinay';
+        $scope.replysrc = '';
+
+        for (var i = 0; i < $scope.messagesWithSrc.length; i++) {
+            if ($scope.user == $scope.messagesWithSrc[i].createdby) {
+                $scope.replysrc = $scope.messagesWithSrc[i].src;
+                break;
+            } else {
+                var colorReply = getRandomColor();
+                $scope.replysrc = 'http://placehold.it/60/' + colorReply +
+                    '/FFF&text=' + $scope.user.charAt(0);
+            }
+        };
+
+        $scope.customer = 'John';
+        $scope.custsrc = '';
+
+        for (var i = 0; i < $scope.messagesWithSrc.length; i++) {
+            if ($scope.customer == $scope.messagesWithSrc[i].createdby) {
+                $scope.custsrc = $scope.messagesWithSrc[i].src;
+                break;
+            } else {
+                var colorReply = getRandomColor();
+                $scope.custsrc = 'http://placehold.it/60/' + colorReply +
+                    '/FFF&text=' + $scope.user.charAt(0);
+            }
+        };
 
 
         $scope.replies = [];
