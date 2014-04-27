@@ -168,6 +168,46 @@ MessageSchema.statics.fetchInbox = function (aid, cb) {
 
 
 /**
+ * Finds messages belonging to a conversation, sorted by created
+ * timestamp
+ *
+ * @param {string} aid app id
+ * @param {string} mId message id
+ * @param {function} cb callback
+ */
+
+MessageSchema.statics.fetchThread = function (aid, mId, cb) {
+
+  async.waterfall(
+    [
+
+      function (cb) {
+        Message
+          .findById(mId)
+          .exec(function (err, msg) {
+            cb(err, msg);
+          });
+      },
+
+      function (msg, cb) {
+        Message
+          .find({
+            coId: msg.coId
+          })
+          .exec(function (err, msgs) {
+            cb(err, msgs);
+          });
+      }
+
+    ],
+
+    cb
+  );
+
+};
+
+
+/**
  * Finds unseen messages belonging to an app, sent from users, sorted by
  * created timestamp
  *
