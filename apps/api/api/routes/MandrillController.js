@@ -36,12 +36,13 @@ function Event(event) {
   this.subject = event.msg.subject;
   this.text = event.msg.text;
   this.toEmail = event.msg.email;
+  this.metadata = event.msg.metadata;
 
 
   this.accid = null;
   this.aid = this.getAppId();
   this.coId = null;
-  this.mId = this.getMIdFromToEmail();
+  this.mId = this.getMId();
   this.uid = null;
 
 
@@ -102,38 +103,68 @@ Event.prototype.createMessage = function (cb) {
 
 
 /**
- * Extracts message id of the parent message from the to-email
+ *
+ * if inbound event,
+ *   Extracts message id of the parent message from the to-email
+ * else if send, open event
+ *   gets message id from metadata
  *
  * @return {string} message id
  */
 
-Event.prototype.getMIdFromToEmail = function () {
+Event.prototype.getMId = function () {
 
-  var localName = this.toEmail.split('@')[0];
-  var idSplit = localName.split('+');
   var mId;
 
-  if (idSplit.length === 2) {
-    mId = idSplit[1];
+  if (this.type === 'inbound') {
+    var localName = this.toEmail.split('@')[0];
+    var idSplit = localName.split('+');
+
+    if (idSplit.length === 2) {
+      mId = idSplit[1];
+    }
+
+  } else if (this.metadata) {
+
+    mId = this.metadata.mId;
   }
+
 
   return mId;
 }
 
 
-Event.prototype.findAndUpdateMessage = function (cb) {
+/**
+ * Updates message status to true as follows:
+ * - replied (if this.mId = true)
+ * - sent (if this.type sent)
+ * - open (if this.type open)
+ * - click (if type click)
+ *
+ * @param {function} cb callback
+ */
+
+Event.prototype.findAndUpdateMessageStatus = function (cb) {
 
   var self = this;
+  var statusUpdate = {};
+
+  if ((self.type === 'inbound') && self.mId) {
+    statusUpdate.replied = true;
+  } else if (self.type === 'send') {
+    statusUpdate.sent = true;
+  } else if (self.type === 'open') {
+    statusUpdate.seen = true;
+  } else if (self.type === 'click') {
+    statusUpdate.clicked = true;
+  } else {
+    return cb(new Error('Invalid Status Update'));
+  }
 
   Message
     .findByIdAndUpdate(
-
-      self.mId,
-
-      {
-        $set: {
-          replied: true
-        }
+      self.mId, {
+        $set: statusUpdate
       },
 
       function (err, msg) {
@@ -170,7 +201,7 @@ Event.prototype.processReply = function (cb) {
 
       // fetchParentMessage and update 'replied' status to true
       function (cb) {
-        self.findAndUpdateMessage.call(self, cb);
+        self.findAndUpdateMessageStatus.call(self, cb);
       },
 
       // createMessage
@@ -334,35 +365,17 @@ function processMandrillEvents(events, cb) {
       var event = new Event(e);
 
       // according to mandrill's docs, incoming emails will have the event of 'inbound'
+      if (event.type === 'inbound' && event.mId) {
+        return event.processReply.call(event, cb);
+      }
+
       if (event.type === 'inbound') {
-        console.log('received inbound event');
-
-        if (event.mId) {
-          return event.processReply.call(event, cb);
-        }
-
         return event.processNewMessage.call(event, cb);
       }
 
-      // FIXME check the event types are correct or not
-      if (e.event === 'send') {
-
-        console.log('received send event');
-        return cb();
-
-        // return processSentEvent(e, cb);
+      if (_.contains(['send', 'open', 'click'], event.type)) {
+        return event.findAndUpdateMessageStatus.call(event, cb);
       }
-
-      if (e.event === 'open') {
-        console.log('received open event');
-        return cb();
-
-        // return processOpenEvent(e, cb);
-      }
-
-      // if (e.event === 'click') {
-      //   return processClickEvent(e, cb);
-      // }
 
       cb(new Error('Event type ' + e.event + ' not found'));
     },
@@ -385,14 +398,13 @@ router
 
     var events = JSON.parse(req.body.mandrill_events);
 
-    _.each(events, function (val, key) {
-      console.log(key, val);
-      console.log('\n\n\n');
-    });
+    // _.each(events, function (val, key) {
+    //   console.log(key, val);
+    //   console.log('\n\n\n');
+    // });
 
     processMandrillEvents(events, function (err, result) {
       console.log('final output', err, result);
-      // if (err) return res.json('', 500);
       res.json();
     });
 
