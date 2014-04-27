@@ -8,6 +8,7 @@ var ObjectId = require('mongoose')
   .Types.ObjectId;
 var router = require('express')
   .Router();
+var winston = require('winston');
 
 
 /**
@@ -38,10 +39,9 @@ function Event(event) {
 
 
   this.accid = null;
-  this.aid = null;
+  this.aid = this.getAppId();
   this.coId = null;
   this.mId = this.getMIdFromToEmail();
-  this.teamMemberId = this.getTeamMemberId();
   this.uid = null;
 
 
@@ -51,16 +51,16 @@ function Event(event) {
 
 
 /**
- * extracts team member id from the toEmail
+ * extracts app id from the toEmail
  *
- * @returns {string} team member id
+ * @returns {string} app id
  */
 
-Event.prototype.getTeamMemberId = function () {
+Event.prototype.getAppId = function () {
   var localName = this.toEmail.split('@')[0];
   var idSplit = localName.split('+');
 
-  return  idSplit[0];
+  return idSplit[0];
 };
 
 
@@ -121,40 +121,6 @@ Event.prototype.getMIdFromToEmail = function () {
 }
 
 
-/**
- * Finds app from team member id
- *
- * @param {function} cb callback
- */
-
-Event.prototype.getAppFromTeamMemberId = function (cb) {
-
-  var self = this;
-
-  App
-    .findOne({
-      'team._id': self.teamMemberId
-    })
-    .exec(function (err, app) {
-      if (err) return cb(err);
-
-      if (!app) return cb(new Error('App Not Found'));
-
-      var member = _
-        .find(app.team, {
-          _id: ObjectId(self.teamMemberId)
-        });
-
-
-      self.aid = app._id;
-      self.accid = member.accid;
-
-      cb(null, app);
-
-    });
-};
-
-
 Event.prototype.findAndUpdateMessage = function (cb) {
 
   var self = this;
@@ -202,11 +168,6 @@ Event.prototype.processReply = function (cb) {
 
     [
 
-      // fetch app data
-      function (cb) {
-        self.getAppFromTeamMemberId.call(self, cb);
-      },
-
       // fetchParentMessage and update 'replied' status to true
       function (cb) {
         self.findAndUpdateMessage.call(self, cb);
@@ -224,6 +185,9 @@ Event.prototype.processReply = function (cb) {
     ],
 
     function (err) {
+
+      winston.error(err);
+
       cb(err, savedReply);
     });
 
@@ -237,13 +201,6 @@ Event.prototype.processNewMessage = function (cb) {
   async.waterfall(
 
     [
-
-      // get app data from team member id
-      function (cb) {
-        self.getAppFromTeamMemberId(function (err) {
-          cb(err);
-        });
-      },
 
       // getOrCreate user
       function (cb) {
@@ -378,7 +335,7 @@ function processMandrillEvents(events, cb) {
 
       // according to mandrill's docs, incoming emails will have the event of 'inbound'
       if (event.type === 'inbound') {
-
+        console.log('received inbound event');
 
         if (event.mId) {
           return event.processReply.call(event, cb);
@@ -388,13 +345,20 @@ function processMandrillEvents(events, cb) {
       }
 
       // FIXME check the event types are correct or not
-      // if (e.event === 'send') {
-      //   return processSentEvent(e, cb);
-      // }
+      if (e.event === 'send') {
 
-      // if (e.event === 'open') {
-      //   return processOpenEvent(e, cb);
-      // }
+        console.log('received send event');
+        return cb();
+
+        // return processSentEvent(e, cb);
+      }
+
+      if (e.event === 'open') {
+        console.log('received open event');
+        return cb();
+
+        // return processOpenEvent(e, cb);
+      }
 
       // if (e.event === 'click') {
       //   return processClickEvent(e, cb);
@@ -424,11 +388,11 @@ router
     _.each(events, function (val, key) {
       console.log(key, val);
       console.log('\n\n\n');
-    })
+    });
 
     processMandrillEvents(events, function (err, result) {
-      console.log(err, result);
-      if (err) return res.json('', 500);
+      console.log('final output', err, result);
+      // if (err) return res.json('', 500);
       res.json();
     });
 
