@@ -25,8 +25,7 @@ var ConversationSchema = new Schema({
   // assignee
   accId: {
     type: Schema.Types.ObjectId,
-    ref: 'Account',
-    required: [true, 'Invalid accId']
+    ref: 'Account'
   },
 
 

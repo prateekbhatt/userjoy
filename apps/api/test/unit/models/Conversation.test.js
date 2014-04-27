@@ -18,7 +18,7 @@ describe('Model Conversation', function () {
 
   describe('#create', function () {
 
-    it('should return error if accId or aid or uid is not provided',
+    it('should return error if aid or uid is not provided',
       function (done) {
 
         var newCon = {};
@@ -30,16 +30,13 @@ describe('Model Conversation', function () {
 
           expect(Object.keys(err.errors)
             .length)
-            .to.eql(3);
+            .to.eql(2);
 
           expect(err.errors.uid.message)
             .to.eql('Invalid uid');
 
           expect(err.errors.aid.message)
             .to.eql('Invalid aid');
-
-          expect(err.errors.accId.message)
-            .to.eql('Invalid accId');
 
           expect(con)
             .to.not.exist;
