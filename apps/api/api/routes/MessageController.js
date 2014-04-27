@@ -75,28 +75,28 @@ router
 //  * Creates and sends a new message
 //  */
 
-// router
-//   .route('/')
-//   .post(function (req, res, next) {
+router
+  .route('/')
+  .post(function (req, res, next) {
 
-//     var newMessage = req.body;
-
-
-//     // add admin to newMessage
-//     newMessage.admin = req.user._id;
+    var newMessage = req.body;
 
 
-//     Message
-//       .create(newMessage, function (err, app) {
+    // add admin to newMessage
+    newMessage.admin = req.user._id;
 
-//         if (err) {
-//           return next(err);
-//         }
 
-//         res.json(app, 201);
-//       });
+    Message
+      .create(newMessage, function (err, app) {
 
-//   });
+        if (err) {
+          return next(err);
+        }
+
+        res.json(app, 201);
+      });
+
+  });
 
 
 /**

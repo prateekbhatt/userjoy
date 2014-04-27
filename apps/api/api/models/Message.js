@@ -24,8 +24,7 @@ var MessageSchema = new Schema({
 
   accid: {
     type: Schema.Types.ObjectId,
-    ref: 'Account',
-    required: [true, 'Invalid account id']
+    ref: 'Account'
   },
 
 
