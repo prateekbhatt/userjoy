@@ -1,5 +1,9 @@
 describe('Model Message', function () {
 
+  // TODO
+  // Write test to check that if the message is created by a 'account', then
+  // the accid is required
+
 
   /**
    * Models
@@ -24,7 +28,7 @@ describe('Model Message', function () {
   describe('#create', function () {
 
     it(
-      'should return error if accid/aid/coId/from/name/text/type/uid is not provided',
+      'should return error if aid/coId/from/name/text/type/uid is not provided',
       function (done) {
 
         var newCon = {};
@@ -36,10 +40,7 @@ describe('Model Message', function () {
 
           expect(Object.keys(err.errors)
             .length)
-            .to.eql(8);
-
-          expect(err.errors.accid.message)
-            .to.eql('Invalid account id');
+            .to.eql(7);
 
           expect(err.errors.aid.message)
             .to.eql('Invalid aid');
