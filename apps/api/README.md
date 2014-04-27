@@ -353,6 +353,10 @@ User          | companies, notes        | users of a specific app. create a new 
 - uid
 - ut
 
+##### Notes:
+
+- accid is required only when the message is created by an account. If a user has sent the message, then it is not required for the message to have an accid
+
 ### Conversation
 
 ##### Columns:
@@ -365,6 +369,10 @@ User          | companies, notes        | users of a specific app. create a new 
 - x tId
 - uid
 - ut
+
+##### Notes:
+
+- accId should not be required. It is possible that the conversation is a new one and is not assigned to any team member. In this case we will send emails to all team members/ only admin (?)
 
 
 ### Triggers
