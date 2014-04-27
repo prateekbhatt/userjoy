@@ -23,19 +23,16 @@ function Mailer(locals) {
   this.subject = locals.subject;
   this.template = null;
 
-  this.fromTeamMemberId = locals.fromTeamMemberId;
   this.toEmail = locals.toEmail;
   this.fromName = locals.fromName;
   this.fromEmail = locals.fromEmail;
   this.aid = locals.aid;
-  this.coId = locals.coId;
   this.mId = locals.mId;
 
 
   this.from = this.createFromAddress();
   this.replyTo = this.createReplyToAddress();
   this.to = this.createToAddress();
-
 
   // Prepare nodemailer transport object
   this.transport = nodemailer.createTransport("SMTP", {
@@ -53,21 +50,17 @@ function Mailer(locals) {
 
 
 /**
- * from email should consist of the team member id
- * e.g. team: [{
- *   _id: '3',
- *   accid: '4',
- *   admin: false,
- *   name: 'prateek'
- * }]
- * fromEmail should be "prateek <3@mail.userjoy.co>"
+ * from email should consist of the app id
+ * and the name of the sender
+ *
+ * e.g. if aid is 34324242, then "prateek <34324242@mail.userjoy.co>"
  *
  * @returns {string}  fromEmail address
  */
 
 Mailer.prototype.createFromAddress = function () {
 
-  var email = this.fromTeamMemberId + '@' + INBOUND_MAIL_DOMAIN;
+  var email = this.aid + '@' + INBOUND_MAIL_DOMAIN;
 
   if (this.fromName) {
     email = this.fromName + ' <' + email + '>';
@@ -79,7 +72,7 @@ Mailer.prototype.createFromAddress = function () {
 
 /**
  * Prepend name to email
- * e.g. Prateek Bhatt <prattbhatt@gmail.com>
+ * e.g. "Prateek Bhatt <prattbhatt@gmail.com>"
  *
  * @return {string} full email address
  */
@@ -100,22 +93,19 @@ Mailer.prototype.createToAddress = function () {
  * append message id to from email to get the reply-to email
  *
  * if message id is '1234' and fromEmail is 'prateek <567@mail.userjoy.co>',
- * then reply-to email should be 'prateek <567+1234@mail.userjoy.co>'
+ * then reply-to email should be 'Reply to prateek <567+1234@mail.userjoy.co>'
  *
  * @return {string} replyTo email address
  */
 
 Mailer.prototype.createReplyToAddress = function () {
 
-  var aid = this.aid;
-  var coId = this.coId;
   var mId = this.mId;
 
   var emailSplit = this.from.split('@');
-  var emailName = emailSplit[0];
-  var emailDomain = emailSplit[1];
-  var ids = [mId];
-  var email = emailName + '+' + ids.join('_') + '@' + emailDomain;
+  var local = emailSplit[0];
+  var domain = emailSplit[1];
+  var email = 'Reply to ' + local + '+' + mId + '@' + domain;
 
   return email;
 };
@@ -128,8 +118,6 @@ Mailer.prototype.createReplyToAddress = function () {
 Mailer.prototype.send = function () {
 
   var self = this;
-  console.log(templatesDir);
-
 
   async.waterfall(
     [

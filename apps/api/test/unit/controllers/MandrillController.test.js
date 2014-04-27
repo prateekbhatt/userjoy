@@ -1,4 +1,4 @@
-describe('Resource /mandrill', function () {
+describe.only('Resource /mandrill', function () {
 
   var MandrillCtrl = require('../../../api/routes/MandrillController');
   var Event = MandrillCtrl._test.Event;
@@ -14,7 +14,7 @@ describe('Resource /mandrill', function () {
   var clickEvent;
   var sentEvent;
   var parentMessageId;
-  var teamMemberId;
+  var aid;
 
 
   before(function (done) {
@@ -28,15 +28,15 @@ describe('Resource /mandrill', function () {
 
   beforeEach(function () {
     parentMessageId = saved.messages.first._id;
-    teamMemberId = saved.apps.first.team[0]._id;
+    aid = saved.apps.first.team[0]._id;
 
-    var replyToEmail = teamMemberId +
+    var replyToEmail = aid +
       '+' +
       parentMessageId +
       '@mail.userjoy.co';
 
 
-    var newMessageToEmail = teamMemberId + '@mail.userjoy.co';
+    var newMessageToEmail = aid + '@mail.userjoy.co';
 
 
     // create reply event
@@ -129,8 +129,8 @@ describe('Resource /mandrill', function () {
       expect(event.mId)
         .to.eql(parentMessageId.toString());
 
-      expect(event.teamMemberId)
-        .to.eql(teamMemberId.toString());
+      expect(event.aid)
+        .to.eql(aid.toString());
 
       expect(event.text)
         .to.eql(replyEvent.msg.text);
