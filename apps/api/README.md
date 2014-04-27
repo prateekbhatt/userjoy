@@ -64,6 +64,14 @@ All events that the user triggers within a 30 minute period of each-other are pa
 
 A account on Userjoy can have multiple apps.
 
+###### Mandrill and Mailer
+
+Every app has a default inbound email address which is "aid@mail.userjoy.co", where aid is primary key of the app on mongodb.
+
+To create threads, we append the parent message id to the app email address, and create the reply-ro email. e.g. Reply to UserJoy <1234+5678@mail.userjoy.co> where aid = 1234 and message id = 5678
+So, we need the inbound message is a reply to message with id 5678
+
+
 ## Models
 
 
