@@ -26,6 +26,7 @@ angular.module('services.segmentQueryService', [])
         };
     }
 ])
+
 .service('queryMatching', [
 
     function () {
@@ -52,3 +53,54 @@ angular.module('services.segmentQueryService', [])
         };
     }
 ])
+
+.service('countOfActions', [
+
+    function () {
+        var allCountOfActions = [];
+
+        this.setCountOfActions = function (value) {
+            allCountOfActions = value;
+        }
+
+        this.getCountOfActions = function () {
+            return allCountOfActions;
+        }
+
+        return this;
+    }
+])
+
+.service('hasNotDone', [
+
+    function () {
+        var allHasNotDoneActions = [];
+
+        this.setAllHasNotDoneActions = function (value) {
+            allHasNotDoneActions = value;
+        }
+
+        this.getAllHasNotDoneActions = function () {
+            return allHasNotDoneActions;
+        }
+
+        return this;
+    }
+])
+
+.service('hasDoneActions', [
+
+    function () {
+        var allHasDoneActions = [];
+
+        this.setAllHasDoneActions = function (value) {
+            allHasDoneActions = value;
+        }
+
+        this.getAllHasDoneActions = function () {
+            return allHasDoneActions;
+        }
+
+        return this;
+    }
+]);
