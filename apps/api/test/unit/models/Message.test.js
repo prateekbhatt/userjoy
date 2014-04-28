@@ -28,7 +28,7 @@ describe('Model Message', function () {
   describe('#create', function () {
 
     it(
-      'should return error if aid/coId/from/name/text/type/uid is not provided',
+      'should return error if aid/coId/fEmail/from/tEmail/text/type/uid is not provided',
       function (done) {
 
         var newCon = {};
@@ -40,7 +40,7 @@ describe('Model Message', function () {
 
           expect(Object.keys(err.errors)
             .length)
-            .to.eql(7);
+            .to.eql(8);
 
           expect(err.errors.aid.message)
             .to.eql('Invalid aid');
@@ -48,11 +48,14 @@ describe('Model Message', function () {
           expect(err.errors.coId.message)
             .to.eql('Invalid conversation id');
 
+          expect(err.errors.fEmail.message)
+            .to.eql('Provide from-email');
+
           expect(err.errors.from.message)
             .to.eql('Provide valid from type, either user/account');
 
-          expect(err.errors.name.message)
-            .to.eql('Provide name/email of user');
+          expect(err.errors.tEmail.message)
+            .to.eql('Provide to-email');
 
           expect(err.errors.text.message)
             .to.eql('Provide message text');
@@ -78,9 +81,11 @@ describe('Model Message', function () {
         accid: randomId,
         aid: randomId,
         coId: randomId,
+        fEmail: 'randomuser@world.co',
+        fName: 'Prateek Bhatt',
         from: 'user',
         mId: randomId,
-        name: 'Prateek Bhatt',
+        tEmail: 'randomaccount@mail.userjoy.co',
         text: 'Hello World',
         type: 'email',
         uid: randomId,
@@ -159,9 +164,12 @@ describe('Model Message', function () {
         accid: randomId,
         aid: aid,
         coId: randomId,
+        fEmail: 'randomuser@world.co',
+        fName: 'Prateek Bhatt',
         from: 'user',
-        name: 'Prateek Bhatt',
+        tEmail: 'randomaccount@mail.userjoy.co',
         text: 'Hello World',
+        tName: 'Cheenu',
         type: 'email',
         uid: randomId,
       };
@@ -193,27 +201,37 @@ describe('Model Message', function () {
       });
     });
 
-    it('should return ct/name/replied/seen/text', function () {
+    it('should return ct/fEmail/fName/replied/seen/tEmail/text/tName',
+      function () {
 
-      expect(fetchedMessage)
-        .to.have.property("ct");
+        expect(fetchedMessage)
+          .to.not.have.property("aid");
 
-      expect(fetchedMessage)
-        .to.have.property("name");
+        expect(fetchedMessage)
+          .to.have.property("ct");
 
-      expect(fetchedMessage)
-        .to.have.property("replied");
+        expect(fetchedMessage)
+          .to.have.property("fEmail");
 
-      expect(fetchedMessage)
-        .to.have.property("seen");
+        expect(fetchedMessage)
+          .to.have.property("fName");
 
-      expect(fetchedMessage)
-        .to.have.property("text");
+        expect(fetchedMessage)
+          .to.have.property("replied");
 
-      expect(fetchedMessage)
-        .to.not.have.property("aid");
+        expect(fetchedMessage)
+          .to.have.property("seen");
 
-    });
+        expect(fetchedMessage)
+          .to.have.property("tEmail");
+
+        expect(fetchedMessage)
+          .to.have.property("text");
+
+        expect(fetchedMessage)
+          .to.have.property("tName");
+
+      });
 
   });
 
@@ -236,10 +254,13 @@ describe('Model Message', function () {
         accid: replyingAccount,
         aid: aid,
         coId: saved.messages.first.coId,
+        fEmail: 'randomemail@email.co',
+        fName: 'Random Name',
         from: 'account',
         mId: parentMessageId,
-        name: 'Prateek Bhatt',
+        tEmail: 'randomemail@email.co',
         text: 'This is a reply from admin',
+        tName: 'Random Name',
         type: 'email',
         uid: randomId,
       };
@@ -290,75 +311,19 @@ describe('Model Message', function () {
     it('should return aid/coId/ct/name/replied/seen/text', function () {
 
       expect(fetchedMessage)
-        .to.have.property("ct");
-
-      expect(fetchedMessage)
-        .to.have.property("name");
-
-      expect(fetchedMessage)
-        .to.have.property("replied");
-
-      expect(fetchedMessage)
-        .to.have.property("seen");
-
-      expect(fetchedMessage)
-        .to.have.property("text");
-
-      expect(fetchedMessage)
         .to.have.property("aid");
 
       expect(fetchedMessage)
         .to.have.property("coId");
 
-    });
-
-  });
-
-
-  describe('#fetchUnseen', function () {
-
-    var aid;
-    var fetchedMessage = {};
-
-    before(function () {
-      aid = saved.messages.first.aid;
-    });
-
-    it('should return unseen messages belonging to an app', function (done) {
-
-      Message.fetchUnseen(aid, function (err, msg) {
-
-        expect(err)
-          .to.not.exist;
-
-        expect(msg)
-          .to.be.an("array");
-
-        fetchedMessage = msg[0];
-
-        expect(msg)
-          .to.have.length(2);
-
-        expect(msg[0].text)
-          .to.eql('Hello World 2');
-
-        _.each(msg, function (val, key) {
-          expect(val.seen)
-            .to.eql(false);
-        });
-
-        done();
-
-      });
-    });
-
-    it('should return ct/name/replied/seen/text', function () {
-
       expect(fetchedMessage)
         .to.have.property("ct");
 
       expect(fetchedMessage)
-        .to.have.property("name");
+        .to.have.property("fEmail");
+
+      expect(fetchedMessage)
+        .to.have.property("fName");
 
       expect(fetchedMessage)
         .to.have.property("replied");
@@ -367,10 +332,13 @@ describe('Model Message', function () {
         .to.have.property("seen");
 
       expect(fetchedMessage)
+        .to.have.property("tEmail");
+
+      expect(fetchedMessage)
         .to.have.property("text");
 
       expect(fetchedMessage)
-        .to.not.have.property("aid");
+        .to.have.property("tName");
 
     });
 

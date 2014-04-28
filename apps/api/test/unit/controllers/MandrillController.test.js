@@ -1,4 +1,4 @@
-describe.only('Resource /mandrill', function () {
+describe('Resource /mandrill', function () {
 
   var MandrillCtrl = require('../../../api/routes/MandrillController');
   var Event = MandrillCtrl._test.Event;

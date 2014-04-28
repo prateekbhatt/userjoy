@@ -36,6 +36,7 @@ function Event(event) {
   this.subject = event.msg.subject;
   this.text = event.msg.text;
   this.toEmail = event.msg.email;
+  this.toName = null; // TODO : get this from the event body
   this.metadata = event.msg.metadata;
 
 
@@ -81,12 +82,16 @@ Event.prototype.createMessage = function (cb) {
     aid: self.aid,
     ct: self.ct,
     coId: self.coId,
+    fEmail: self.fromEmail,
+    fName: self.fromName,
     from: 'user',
-    name: self.fromName || self.fromEmail,
+    tEmail: self.toEmail,
 
     // TODO: remove previous messages from text before saving
     // text: removeQuotedText(toEmail, message.msg.text),
     text: self.text,
+
+    tName: self.toName,
     type: 'email',
     sent: true,
     uid: self.uid
@@ -216,9 +221,6 @@ Event.prototype.processReply = function (cb) {
     ],
 
     function (err) {
-
-      winston.error(err);
-
       cb(err, savedReply);
     });
 
@@ -275,20 +277,7 @@ Event.prototype.processNewMessage = function (cb) {
       // create new message
       function (cb) {
 
-        var newMsg = {
-          accid: self.accid,
-          aid: self.aid,
-          ct: self.ct,
-          coId: self.coId,
-          from: 'user',
-          name: self.fromName || self.fromEmail,
-          text: self.text,
-          type: 'email',
-          sent: true,
-          uid: self.uid
-        };
-
-        Message.create(newMsg, function (err, savedMsg) {
+        self.createMessage.call(self, function (err, savedMsg) {
           cb(err, savedMsg);
         });
       }
@@ -404,7 +393,7 @@ router
     // });
 
     processMandrillEvents(events, function (err, result) {
-      console.log('final output', err, result);
+      // console.log('final output', err, result);
       res.json();
     });
 
