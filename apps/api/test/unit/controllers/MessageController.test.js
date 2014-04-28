@@ -35,11 +35,10 @@ describe('Resource /apps/:aid/messages', function () {
 
   before(function (done) {
     setupTestDb(function (err) {
-      if (!err) {
-        aid = saved.apps.first._id;
-        basePath = '/apps/' + aid + '/messages';
-      }
-      done(err);
+      if (err) return done(err);
+      aid = saved.apps.first._id;
+      basePath = '/apps/' + aid + '/messages';
+      done();
     });
   });
 
@@ -124,6 +123,87 @@ describe('Resource /apps/:aid/messages', function () {
 
   });
 
+
+  describe('POST /apps/:aid/messages/:mId', function () {
+
+    var parentMessageId;
+    var testUrl;
+
+    before(function (done) {
+      parentMessageId = saved.messages.first._id;
+      testUrl = basePath + '/' + parentMessageId;
+      logoutUser(done);
+    });
+
+
+    it('returns error if not logged in',
+
+      function (done) {
+
+        request
+          .post(testUrl)
+          .send({})
+          .expect('Content-Type', /json/)
+          .expect(401)
+          .expect({
+            status: 401,
+            error: 'Unauthorized'
+          })
+          .end(done);
+
+      });
+
+
+    it('logging in user',
+
+      function (done) {
+        loginUser(done);
+      });
+
+    it('should return error if text/type is not provided',
+
+      function (done) {
+
+        var newMessage = {};
+        // TODO: fix this test, and the validation method in the MessageController
+        request
+          .post(testUrl)
+          .set('cookie', loginCookie)
+          .send(newMessage)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            status: 400,
+            error: 'Missing uid/sub/text/type'
+          })
+          .end(done);
+
+      });
+
+    it('should create new message',
+
+      function (done) {
+
+        var newMessage = {
+          text: 'This is the message I want to send',
+          type: 'email'
+        };
+
+        request
+          .post(testUrl)
+          .set('cookie', loginCookie)
+          .send(newMessage)
+          .expect('Content-Type', /json/)
+          .expect(201)
+          .expect(function (res) {
+            expect(res.body.text)
+              .to.eql(newMessage.text);
+          })
+          .end(done);
+
+      });
+
+  });
 
   describe('GET /apps/:aid/messages', function () {
 
