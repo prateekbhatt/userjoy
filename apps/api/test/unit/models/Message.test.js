@@ -28,7 +28,7 @@ describe('Model Message', function () {
   describe('#create', function () {
 
     it(
-      'should return error if aid/coId/fEmail/from/tEmail/text/type/uid is not provided',
+      'should return error if aid/coId/fEmail/from/sub/tEmail/text/type/uid is not provided',
       function (done) {
 
         var newCon = {};
@@ -40,7 +40,7 @@ describe('Model Message', function () {
 
           expect(Object.keys(err.errors)
             .length)
-            .to.eql(8);
+            .to.eql(9);
 
           expect(err.errors.aid.message)
             .to.eql('Invalid aid');
@@ -53,6 +53,9 @@ describe('Model Message', function () {
 
           expect(err.errors.from.message)
             .to.eql('Provide valid from type, either user/account');
+
+          expect(err.errors.sub.message)
+            .to.eql('Provide subject');
 
           expect(err.errors.tEmail.message)
             .to.eql('Provide to-email');
@@ -88,6 +91,7 @@ describe('Model Message', function () {
         tEmail: 'randomaccount@mail.userjoy.co',
         text: 'Hello World',
         type: 'email',
+        sub: 'Subject I Am',
         uid: randomId,
       };
 
@@ -109,6 +113,9 @@ describe('Model Message', function () {
 
         expect(msg.text)
           .to.eql(newMessage.text);
+
+        expect(msg.sub)
+          .to.eql(newMessage.sub);
 
         expect(msg.uid.toString())
           .to.eql(newMessage.uid);
@@ -167,6 +174,7 @@ describe('Model Message', function () {
         fEmail: 'randomuser@world.co',
         fName: 'Prateek Bhatt',
         from: 'user',
+        sub: 'New subject',
         tEmail: 'randomaccount@mail.userjoy.co',
         text: 'Hello World',
         tName: 'Cheenu',
@@ -258,6 +266,7 @@ describe('Model Message', function () {
         fName: 'Random Name',
         from: 'account',
         mId: parentMessageId,
+        sub: 'New subject',
         tEmail: 'randomemail@email.co',
         text: 'This is a reply from admin',
         tName: 'Random Name',

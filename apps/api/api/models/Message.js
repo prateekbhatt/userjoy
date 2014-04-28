@@ -129,6 +129,12 @@ var MessageSchema = new Schema({
   },
 
 
+  sub: {
+    type: String,
+    required: [true, 'Provide subject']
+  },
+
+
   // user Id
   uid: {
     type: Schema.Types.ObjectId,
