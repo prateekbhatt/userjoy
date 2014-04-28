@@ -36,7 +36,6 @@ function Event(event) {
   this.subject = event.msg.subject;
   this.text = event.msg.text;
   this.toEmail = event.msg.email;
-  this.toName = null; // TODO : get this from the event body
   this.metadata = event.msg.metadata;
 
 
@@ -82,19 +81,16 @@ Event.prototype.createMessage = function (cb) {
     aid: self.aid,
     ct: self.ct,
     coId: self.coId,
-    fEmail: self.fromEmail,
-    fName: self.fromName,
     from: 'user',
+    sent: true,
+    sName: self.fromName,
     sub: self.subject,
-    tEmail: self.toEmail,
 
     // TODO: remove previous messages from text before saving
     // text: removeQuotedText(toEmail, message.msg.text),
     text: self.text,
 
-    tName: self.toName,
     type: 'email',
-    sent: true,
     uid: self.uid
 
   };

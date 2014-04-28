@@ -28,7 +28,7 @@ describe('Model Message', function () {
   describe('#create', function () {
 
     it(
-      'should return error if aid/coId/fEmail/from/sub/tEmail/text/type/uid is not provided',
+      'should return error if aid/coId/from/sub/text/type/uid is not provided',
       function (done) {
 
         var newCon = {};
@@ -40,7 +40,7 @@ describe('Model Message', function () {
 
           expect(Object.keys(err.errors)
             .length)
-            .to.eql(9);
+            .to.eql(7);
 
           expect(err.errors.aid.message)
             .to.eql('Invalid aid');
@@ -48,17 +48,11 @@ describe('Model Message', function () {
           expect(err.errors.coId.message)
             .to.eql('Invalid conversation id');
 
-          expect(err.errors.fEmail.message)
-            .to.eql('Provide from-email');
-
           expect(err.errors.from.message)
             .to.eql('Provide valid from type, either user/account');
 
           expect(err.errors.sub.message)
             .to.eql('Provide subject');
-
-          expect(err.errors.tEmail.message)
-            .to.eql('Provide to-email');
 
           expect(err.errors.text.message)
             .to.eql('Provide message text');
@@ -84,13 +78,11 @@ describe('Model Message', function () {
         accid: randomId,
         aid: randomId,
         coId: randomId,
-        fEmail: 'randomuser@world.co',
-        fName: 'Prateek Bhatt',
         from: 'user',
         mId: randomId,
-        tEmail: 'randomaccount@mail.userjoy.co',
         text: 'Hello World',
         type: 'email',
+        sName: 'Prateek Bhatt',
         sub: 'Subject I Am',
         uid: randomId,
       };
@@ -171,13 +163,10 @@ describe('Model Message', function () {
         accid: randomId,
         aid: aid,
         coId: randomId,
-        fEmail: 'randomuser@world.co',
-        fName: 'Prateek Bhatt',
         from: 'user',
+        sName: 'Prateek Bhatt',
         sub: 'New subject',
-        tEmail: 'randomaccount@mail.userjoy.co',
         text: 'Hello World',
-        tName: 'Cheenu',
         type: 'email',
         uid: randomId,
       };
@@ -209,7 +198,7 @@ describe('Model Message', function () {
       });
     });
 
-    it('should return ct/fEmail/fName/replied/seen/tEmail/text/tName',
+    it('should return ct/replied/seen/sName/text',
       function () {
 
         expect(fetchedMessage)
@@ -219,25 +208,16 @@ describe('Model Message', function () {
           .to.have.property("ct");
 
         expect(fetchedMessage)
-          .to.have.property("fEmail");
-
-        expect(fetchedMessage)
-          .to.have.property("fName");
-
-        expect(fetchedMessage)
           .to.have.property("replied");
 
         expect(fetchedMessage)
           .to.have.property("seen");
 
         expect(fetchedMessage)
-          .to.have.property("tEmail");
+          .to.have.property("sName");
 
         expect(fetchedMessage)
           .to.have.property("text");
-
-        expect(fetchedMessage)
-          .to.have.property("tName");
 
       });
 
@@ -262,14 +242,11 @@ describe('Model Message', function () {
         accid: replyingAccount,
         aid: aid,
         coId: saved.messages.first.coId,
-        fEmail: 'randomemail@email.co',
-        fName: 'Random Name',
         from: 'account',
         mId: parentMessageId,
+        sName: 'Random Name',
         sub: 'New subject',
-        tEmail: 'randomemail@email.co',
         text: 'This is a reply from admin',
-        tName: 'Random Name',
         type: 'email',
         uid: randomId,
       };
@@ -292,7 +269,7 @@ describe('Model Message', function () {
         expect(msgs)
           .to.be.an("array");
 
-        fetchedMessage = msgs[0];
+        fetchedMessage = msgs[2];
 
         expect(msgs)
           .to.have.length(3);
@@ -329,25 +306,16 @@ describe('Model Message', function () {
         .to.have.property("ct");
 
       expect(fetchedMessage)
-        .to.have.property("fEmail");
-
-      expect(fetchedMessage)
-        .to.have.property("fName");
-
-      expect(fetchedMessage)
         .to.have.property("replied");
 
       expect(fetchedMessage)
         .to.have.property("seen");
 
       expect(fetchedMessage)
-        .to.have.property("tEmail");
+        .to.have.property("sName");
 
       expect(fetchedMessage)
         .to.have.property("text");
-
-      expect(fetchedMessage)
-        .to.have.property("tName");
 
     });
 
