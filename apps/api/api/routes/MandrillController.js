@@ -85,6 +85,7 @@ Event.prototype.createMessage = function (cb) {
     fEmail: self.fromEmail,
     fName: self.fromName,
     from: 'user',
+    sub: self.subject,
     tEmail: self.toEmail,
 
     // TODO: remove previous messages from text before saving
