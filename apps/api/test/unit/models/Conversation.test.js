@@ -18,7 +18,7 @@ describe('Model Conversation', function () {
 
   describe('#create', function () {
 
-    it('should return error if aid or uid is not provided',
+    it('should return error if aid/sub/uid is not provided',
       function (done) {
 
         var newCon = {};
@@ -30,13 +30,17 @@ describe('Model Conversation', function () {
 
           expect(Object.keys(err.errors)
             .length)
-            .to.eql(2);
+            .to.eql(3);
 
           expect(err.errors.uid.message)
             .to.eql('Invalid uid');
 
           expect(err.errors.aid.message)
             .to.eql('Invalid aid');
+
+          expect(err.errors.sub.message)
+            .to.eql('Provide subject');
+
 
           expect(con)
             .to.not.exist;
@@ -52,6 +56,7 @@ describe('Model Conversation', function () {
       var newConversation = {
         aid: randomId,
         accId: randomId,
+        sub: 'My new subject',
         uid: randomId
       };
 
@@ -70,6 +75,9 @@ describe('Model Conversation', function () {
 
         expect(con.accId.toString())
           .to.eql(newConversation.accId);
+
+        expect(con.sub)
+          .to.eql(newConversation.sub);
 
         expect(con.uid.toString())
           .to.eql(newConversation.uid);
