@@ -19,6 +19,7 @@ var ObjectId = require('mongoose')
 
 var Account = require('../../api/models/Account');
 var App = require('../../api/models/App');
+var Conversation = require('../../api/models/Conversation');
 var Message = require('../../api/models/Message');
 
 
@@ -50,12 +51,22 @@ var accounts = {
     }
   },
 
+  conversations = {
+
+    first: {
+      accId: null,
+      aid: null,
+      sub: 'First Conversation!',
+      uid: ObjectId()
+    }
+  },
+
   messages = {
 
     first: {
       accid: null,
       aid: null,
-      coId: ObjectId(),
+      coId: null,
       from: 'user',
       name: 'Prateek Bhatt',
       text: 'Hello World',
@@ -66,7 +77,7 @@ var accounts = {
     second: {
       accid: null,
       aid: null,
-      coId: ObjectId(),
+      coId: null,
       from: 'user',
       name: 'Prattbhatt',
       text: 'Hello World 2',
@@ -99,10 +110,17 @@ function createApp(accid, app, fn) {
 
 }
 
-function createMessage(accid, aid, message, fn) {
+function createConversation(accid, aid, con, fn) {
+  con.accId = accid;
+  con.aid = aid;
+  Conversation.create(con, fn);
+}
+
+function createMessage(accid, aid, coId, message, fn) {
 
   message.accid = accid;
   message.aid = aid;
+  message.coId = coId;
   Message.create(message, fn);
 
 }
@@ -152,13 +170,26 @@ module.exports = function loadFixtures(callback) {
 
     },
 
+    createFirstConversation: function (cb) {
+      var accid = accounts.first._id;
+      var aid = apps.first._id;
+      var newCon = conversations.first;
+
+      createConversation(accid, aid, newCon, function (err, con) {
+        if (err) return cb(err);
+        conversations.first = con;
+        cb();
+      });
+    },
+
     createFirstMessage: function (cb) {
 
       var aid = apps.first._id;
       var accid = accounts.first._id;
+      var coId = conversations.first._id;
       var message = messages.first;
 
-      createMessage(accid, aid, message, function (err, msg) {
+      createMessage(accid, aid, coId, message, function (err, msg) {
         if (err) return cb(err);
         messages.first = msg;
         cb();
@@ -170,9 +201,10 @@ module.exports = function loadFixtures(callback) {
 
       var aid = apps.first._id;
       var accid = accounts.first._id;
+      var coId = conversations.first._id;
       var message = messages.second;
 
-      createMessage(accid, aid, message, function (err, msg) {
+      createMessage(accid, aid, coId, message, function (err, msg) {
         if (err) return cb(err);
         messages.second = msg;
         cb();
@@ -182,11 +214,14 @@ module.exports = function loadFixtures(callback) {
 
   }, function (err) {
 
-    callback(err, {
+    var savedObj = {
       accounts: accounts,
       apps: apps,
+      conversations: conversations,
       messages: messages
-    });
+    };
+
+    callback(err, savedObj);
 
   });
 }
