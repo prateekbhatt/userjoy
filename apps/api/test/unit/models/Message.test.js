@@ -265,12 +265,12 @@ describe('Model Message', function () {
         fetchedMessage = msgs[0];
 
         expect(msgs)
-          .to.have.length(2);
+          .to.have.length(3);
 
         expect(msgs[0].text)
           .to.eql('Hello World');
 
-        expect(msgs[1].text)
+        expect(msgs[2].text)
           .to.eql('This is a reply from admin');
 
 
