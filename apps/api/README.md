@@ -429,6 +429,7 @@ User          | companies, notes        | users of a specific app. create a new 
 
 ##### Request
 
+```js
 {
   sName: 'Prateek Bhatt',
   sub: 'Welcome to UserJoy!',
@@ -436,9 +437,11 @@ User          | companies, notes        | users of a specific app. create a new 
   type: 'email',
   uid: '535e5aafddda18934d1a2c6f'
 }
+```
 
 ##### Response
 
+```js
 {
   sName: 'Prateek Bhatt',
   sub: 'Welcome to UserJoy!',
@@ -457,4 +460,37 @@ User          | companies, notes        | users of a specific app. create a new 
   ct: '2014-04-28T13:42:07.352Z',
   clicked: false
 }
+```
 
+#### POST /apps/:aid/messages/:mId
+
+##### Request
+
+```js
+{
+  text: 'This is the message I want to send'
+}
+```
+
+##### Response
+
+```js
+{
+  __v: 0,
+  text: 'This is the message I want to send',
+  type: 'email',
+  accid: 535e67a2455135db1815b072,
+  aid: 535e67a2455135db1815b074,
+  coId: 535e67a2455135db1815b078,
+  from: 'account',
+  sub: 'New Subject',
+  uid: 535e67a1455135db1815b06f,
+  _id: 535e67a2455135db1815b07b,
+  ut: Mon Apr 28 2014 20:07:22 GMT+0530 (IST),
+  sent: false,
+  seen: false,
+  replied: false,
+  ct: Mon Apr 28 2014 20:07:22 GMT+0530 (IST),
+  clicked: false
+}
+```

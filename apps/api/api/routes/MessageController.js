@@ -174,30 +174,96 @@ router
   });
 
 
-// /**
-//  * GET /apps/:aid/messages/unseen
-//  *
-//  * Returns all unseen messages
-//  */
+/**
+ * POST /apps/:aid/messages/:mId
+ *
+ * Creates and sends a reply for a message
+ */
 
-// router
-//   .route('/:aid/messages/unseen')
-//   .get(function (req, res, next) {
+router
+  .route('/:aid/messages/:mId')
+  .post(function (req, res, next) {
 
-//     var aid = req.app._id;
+    var reply = req.body;
+    var accid = req.user._id;
+    var aid = req.app._id;
+    var mId = req.params.mId;
 
-//     Message
-//       .fetchUnseen(aid, function (err, messages) {
+    // since this is a multi-query request (transaction), we need to make all
+    // input validations upfront
+    // text, type
+    if (!(reply.text && reply.type)) {
+      return res.badRequest('Missing uid/sub/text/type');
+    }
 
-//         if (err) {
-//           return next(err);
-//         }
+    async.waterfall(
+      [
 
-//         res.json(messages || []);
+        // fetch parent message
+        function (cb) {
 
-//       });
+          Message
+            .findOneAndUpdate(
 
-//   });
+              {
+                _id: mId,
+                aid: aid
+              },
+
+              {
+                $set: {
+                  replied: true
+                }
+              },
+
+              function (err, msg) {
+                if (err) return cb(err);
+                if (!msg) return cb(new Error('Parent Message Not Found'));
+                cb(err, msg);
+              });
+        },
+
+
+        // create new message
+        function (parentMsg, cb) {
+
+          reply.accid = accid;
+          reply.aid = aid;
+          reply.coId = parentMsg.coId;
+
+          // add from as 'account'
+          reply.from = 'account';
+          reply.sub = parentMsg.sub;
+          reply.uid = parentMsg.uid;
+
+          // reply type is always email
+          reply.type = 'email';
+
+          Message.create(reply, function (err, msg) {
+            cb(err, msg);
+          });
+
+        },
+
+        // send message through mandrill
+        function (msg, cb) {
+          // TODO : send the message through mandrill is type is email
+          cb(null, msg);
+        }
+
+      ],
+
+      function (err, msg) {
+
+        if (err) {
+          return next(err);
+        }
+
+        res.json(msg, 201);
+      }
+    );
+
+  });
 
 
 module.exports = router;
