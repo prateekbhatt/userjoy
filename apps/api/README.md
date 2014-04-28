@@ -419,3 +419,42 @@ User          | companies, notes        | users of a specific app. create a new 
 - How to store customer journey info?
 - How to handle conversations and messages?
 - Using Mandrill, it is possible to assign unique readable email ids for each team member of an app, e.g. "prateek@dodatado.mail.userjoy.co"
+
+
+## API
+
+### Message
+
+#### POST /apps/:aid/messages
+
+##### Request
+
+{
+  sName: 'Prateek Bhatt',
+  sub: 'Welcome to UserJoy!',
+  text: 'This is the message you want to send',
+  type: 'email',
+  uid: '535e5aafddda18934d1a2c6f'
+}
+
+##### Response
+
+{
+  sName: 'Prateek Bhatt',
+  sub: 'Welcome to UserJoy!',
+  text: 'This is the message I want to send',
+  type: 'email',
+  uid: '535e5aafddda18934d1a2c6f',
+  from: 'account',
+  accid: '535e5aaeddda18934d1a2c66',
+  aid: '535e5aafddda18934d1a2c68',
+  coId: '535e5aafddda18934d1a2c70',
+  _id: '535e5aafddda18934d1a2c71',
+  ut: '2014-04-28T13:42:07.353Z',
+  sent: false,
+  seen: false,
+  replied: false,
+  ct: '2014-04-28T13:42:07.352Z',
+  clicked: false
+}
+
