@@ -56,19 +56,6 @@ var MessageSchema = new Schema({
   },
 
 
-  // from email
-  fEmail:{
-    type: String,
-    required: [true, 'Provide from-email']
-  },
-
-
-  // from name
-  fName: {
-    type: String
-  },
-
-
   // is it from a user or an account
   from: {
     type: String,
@@ -90,25 +77,11 @@ var MessageSchema = new Schema({
   },
 
 
-  // to email
-  tEmail: {
-    type: String,
-    required: [true, 'Provide to-email']
-  },
-
-
   // message text
   text: {
     type: String,
     required: [true, 'Provide message text']
   },
-
-
-  // to name
-  tName: {
-    type: String
-  },
-
 
   type: {
     type: String,
@@ -126,6 +99,12 @@ var MessageSchema = new Schema({
   sent: {
     type: Boolean,
     default: false
+  },
+
+
+  // sender name (user or account)
+  sName: {
+    type: String
   },
 
 
@@ -180,13 +159,10 @@ MessageSchema.statics.fetchInbox = function (aid, cb) {
     })
     .select({
       ct: 1,
-      fEmail: 1,
-      fName: 1,
       replied: 1,
       seen: 1,
-      tEmail: 1,
-      text: 1,
-      tName: 1
+      sName: 1,
+      text: 1
     })
     .sort({
       ct: -1

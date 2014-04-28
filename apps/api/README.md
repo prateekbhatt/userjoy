@@ -21,8 +21,6 @@ This app contains an expressjs api which exposes a rest interface for the db.
 | dv    | device type           |
 | ev    | events (Session)      |
 | f     | feature (event)       |
-| femail| from email (message)  |
-| fname | from name (message)   |
 | h     | health                |
 | ip    | ip address            |
 | n     | name (action)         |
@@ -32,11 +30,10 @@ This app contains an expressjs api which exposes a rest interface for the db.
 | pl    | platform              |
 | seId  | segment id            |
 | sid   | session id            |
+| sname | sender name (message) |
 | sub   | email subject         |
 | t     | type (event)          |
-| temail| to email (message)    |
 | tId   | templateId            |
-| tname | to name (message)     |
 | uid   | user id               |
 | ut    | updated at timestamp  |
 
@@ -353,17 +350,14 @@ User          | companies, notes        | users of a specific app. create a new 
 - clicked (boolean)
 - coId
 - ct
-- fEmail
-- fName
 - from (enum: [user, account]) (is it sent from a 'user' or an 'account')
 - mId (id of parent message)
 - replied (boolean)
 - seen (boolean)
 - sent (boolean)
+- sName
 - sub
-- tEmail
 - text
-- tName
 - type (email / notification)
 - uid
 - ut
