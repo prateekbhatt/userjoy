@@ -53,7 +53,8 @@ var ConversationSchema = new Schema({
 
   // subject
   sub: {
-    type: String
+    type: String,
+    required: [true, 'Provide subject']
   },
 
 

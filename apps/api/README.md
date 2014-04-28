@@ -360,6 +360,7 @@ User          | companies, notes        | users of a specific app. create a new 
 - replied (boolean)
 - seen (boolean)
 - sent (boolean)
+- sub
 - tEmail
 - text
 - tName
@@ -379,7 +380,7 @@ User          | companies, notes        | users of a specific app. create a new 
 - accid
 - closed (boolean)
 - ct
-- sub (for email)
+- sub
 - x tId
 - uid
 - ut
