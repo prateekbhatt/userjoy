@@ -212,6 +212,82 @@ MessageSchema.statics.fetchThread = function (aid, mId, cb) {
 };
 
 
+/**
+ * Updates message status to true for following actions:
+ * - clicked
+ * - replied
+ * - seen
+ * - sent
+ *
+ * @param {string} id message id
+ * @param {string} action clicked/replied/seen/sent
+ * @param {function} cb callback
+ *
+ * @api private
+ */
+
+function findAndUpdateStatus(id, action, cb) {
+
+  if (!_.contains(['clicked', 'replied', 'seen', 'sent'], action)) {
+    return cb(new Error('Invalid Status Update Action'));
+  }
+
+  var updateQuery = {};
+  updateQuery['$set'] = {};
+  updateQuery['$set'][action] = true;
+
+  Message.findByIdAndUpdate(id, updateQuery, cb);
+};
+
+
+/**
+ * Updates clicked status to true
+ *
+ * @param {string} id message-id
+ * @param {function} cb callback
+ */
+
+MessageSchema.statics.clicked = function (id, cb) {
+  findAndUpdateStatus(id, 'clicked', cb);
+};
+
+
+/**
+ * Updates seen status to true
+ *
+ * @param {string} id message-id
+ * @param {function} cb callback
+ */
+
+MessageSchema.statics.opened = function (id, cb) {
+  findAndUpdateStatus(id, 'seen', cb);
+};
+
+
+/**
+ * Updates sent status to true
+ *
+ * @param {string} id message-id
+ * @param {function} cb callback
+ */
+
+MessageSchema.statics.sent = function (id, cb) {
+  findAndUpdateStatus(id, 'sent', cb);
+};
+
+
+/**
+ * Updates replied status to true
+ *
+ * @param {string} id message-id
+ * @param {function} cb callback
+ */
+
+MessageSchema.statics.replied = function (id, cb) {
+  findAndUpdateStatus(id, 'replied', cb);
+};
+
+
 var Message = mongoose.model('Message', MessageSchema);
 
 module.exports = Message;
