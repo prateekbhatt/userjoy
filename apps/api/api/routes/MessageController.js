@@ -11,6 +11,7 @@ var router = require('express')
  * Models
  */
 
+var Conversation = require('../models/Conversation');
 var Message = require('../models/Message');
 
 
@@ -69,51 +70,21 @@ router
   });
 
 
-// /**
-//  * POST /apps/:aid/messages
-//  *
-//  * Creates and sends a new message
-//  */
-
-// router
-//   .route('/')
-//   .post(function (req, res, next) {
-
-//     var newMessage = req.body;
-
-
-//     // add admin to newMessage
-//     newMessage.admin = req.user._id;
-
-
-//     Message
-//       .create(newMessage, function (err, app) {
-
-//         if (err) {
-//           return next(err);
-//         }
-
-//         res.json(app, 201);
-//       });
-
-//   });
-
-
 /**
- * GET /apps/:aid/messages/unseen
+ * GET /apps/:aid/messages/:mId
  *
- * Returns all unseen messages
+ * Returns all messages belonging to message thread
  */
 
 router
-  .route('/:aid/messages/unseen')
+  .route('/:aid/messages/:mId')
   .get(function (req, res, next) {
 
     var aid = req.app._id;
+    var mId = req.params.mId;
 
     Message
-      .fetchUnseen(aid, function (err, messages) {
-
+      .fetchThread(aid, mId, function (err, messages) {
         if (err) {
           return next(err);
         }
@@ -125,17 +96,174 @@ router
   });
 
 
-// /**
-//  * GET /apps/:aid/messages/:id
-//  *
-//  * Returns conversation thread
-//  */
+/**
+ * POST /apps/:aid/messages
+ *
+ * Creates and sends a new message
+ */
 
-// router
-//   .route('/all')
-//   .get(function (req, res, next) {
-//     res.json(req.app);
-//   });
+router
+  .route('/:aid/messages')
+  .post(function (req, res, next) {
+
+    var newMessage = req.body;
+    var accid = req.user._id;
+    var aid = req.app._id;
+    var sub = newMessage.sub;
+    var uid = newMessage.uid;
+
+    // since this is a multi-query request (transaction), we need to make all
+    // input validations upfront
+    // uid, subject, text, type
+    if (!(uid && aid && sub && newMessage.text && newMessage.type)) {
+      return res.badRequest('Missing uid/sub/text/type');
+    }
+
+    async.waterfall(
+      [
+
+        // create new conversation
+        function (cb) {
+
+          var newConversation = {
+            accId: accid,
+            aid: aid,
+            sub: sub,
+            uid: uid
+          };
+
+          Conversation.create(newConversation, function (err, con) {
+            cb(err, con);
+          });
+        },
+
+
+        // create new message
+        function (conversation, cb) {
+
+          // add from as 'account'
+          newMessage.from = 'account';
+          newMessage.accid = accid;
+          newMessage.aid = aid;
+          newMessage.coId = conversation._id;
+
+          Message.create(newMessage, function (err, msg) {
+            cb(err, msg);
+          });
+
+        },
+
+        // send message through mandrill
+        function (msg, cb) {
+          // TODO : send the message through mandrill
+          cb(null, msg);
+        }
+
+      ],
+
+      function (err, msg) {
+
+        if (err) {
+          return next(err);
+        }
+
+        res.json(msg, 201);
+      }
+    );
+
+  });
+
+
+/**
+ * POST /apps/:aid/messages/:mId
+ *
+ * Creates and sends a reply for a message
+ */
+
+router
+  .route('/:aid/messages/:mId')
+  .post(function (req, res, next) {
+
+    var reply = req.body;
+    var accid = req.user._id;
+    var aid = req.app._id;
+    var mId = req.params.mId;
+
+    // since this is a multi-query request (transaction), we need to make all
+    // input validations upfront
+    // text, type
+    if (!(reply.text && reply.type)) {
+      return res.badRequest('Missing uid/sub/text/type');
+    }
+
+    async.waterfall(
+      [
+
+        // fetch parent message
+        function (cb) {
+
+          Message
+            .findOneAndUpdate(
+
+              {
+                _id: mId,
+                aid: aid
+              },
+
+              {
+                $set: {
+                  replied: true
+                }
+              },
+
+              function (err, msg) {
+                if (err) return cb(err);
+                if (!msg) return cb(new Error('Parent Message Not Found'));
+                cb(err, msg);
+              });
+        },
+
+
+        // create new message
+        function (parentMsg, cb) {
+
+          reply.accid = accid;
+          reply.aid = aid;
+          reply.coId = parentMsg.coId;
+
+          // add from as 'account'
+          reply.from = 'account';
+          reply.sub = parentMsg.sub;
+          reply.uid = parentMsg.uid;
+
+          // reply type is always email
+          reply.type = 'email';
+
+          Message.create(reply, function (err, msg) {
+            cb(err, msg);
+          });
+
+        },
+
+        // send message through mandrill
+        function (msg, cb) {
+          // TODO : send the message through mandrill is type is email
+          cb(null, msg);
+        }
+
+      ],
+
+      function (err, msg) {
+
+        if (err) {
+          return next(err);
+        }
+
+        res.json(msg, 201);
+      }
+    );
+
+  });
 
 
 module.exports = router;

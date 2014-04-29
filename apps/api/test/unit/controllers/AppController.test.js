@@ -47,7 +47,7 @@ describe('Resource /apps', function () {
     it('should return error if name is not present', function (done) {
 
       var newApp = {
-        domain: 'dodatado.com'
+        url: 'dodatado.com'
       };
 
       request
@@ -66,7 +66,7 @@ describe('Resource /apps', function () {
 
     });
 
-    it('should return error if domain is not present', function (done) {
+    it('should return error if url is not present', function (done) {
 
       var newApp = {
         name: 'my-new-app'
@@ -80,7 +80,7 @@ describe('Resource /apps', function () {
         .expect(400)
         .expect({
           "error": [
-            "domain is required"
+            "url is required"
           ],
           "status": 400
         })
@@ -94,7 +94,7 @@ describe('Resource /apps', function () {
 
         var newApp = {
           name: 'new-app',
-          domain: 'new-app.co'
+          url: 'new-app.co'
         };
 
         request
@@ -204,7 +204,7 @@ describe('Resource /apps', function () {
           .set('cookie', loginCookie)
           .expect('Content-Type', /json/)
           .expect(function (res) {
-            if (res.body.admin.toString() !== saved.accounts.first._id.toString()) {
+            if (res.body.team[0].accid.toString() !== saved.accounts.first._id.toString()) {
               return 'Could not fetch saved app';
             }
           })

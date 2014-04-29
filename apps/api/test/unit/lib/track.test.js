@@ -167,34 +167,34 @@ describe('Lib event', function () {
       newEvent = new Event({
         appKey: saved.apps.first.liveKey,
         cookies: {},
-        domain: 'randomDomain.com'
+        url: 'randomUrl.com'
       });
       newEvent._findApp(done);
     });
 
-    it('should call #checkDomain in live mode', function (done) {
+    it('should call #checkUrl in live mode', function (done) {
 
-      var spy = sinon.spy(App.prototype, 'checkDomain');
+      var spy = sinon.spy(App.prototype, 'checkUrl');
 
       newEvent._verifyApp(function (err) {
         expect(spy)
           .to.be.called;
-        App.prototype.checkDomain.restore();
+        App.prototype.checkUrl.restore();
         done();
       });
 
     });
 
-    it('should not call #checkDomain in test mode', function (done) {
+    it('should not call #checkUrl in test mode', function (done) {
 
       newEvent.mode = 'test';
 
-      var spy = sinon.spy(App.prototype, 'checkDomain');
+      var spy = sinon.spy(App.prototype, 'checkUrl');
 
       newEvent._verifyApp(function (err) {
         expect(spy)
           .not.to.be.called;
-        App.prototype.checkDomain.restore();
+        App.prototype.checkUrl.restore();
         done();
       });
 
@@ -214,7 +214,7 @@ describe('Lib event', function () {
 
     });
 
-    it('should return error if incorrect domain in live mode',
+    it('should return error if incorrect url in live mode',
       function (done) {
 
         newEvent._verifyApp(function (err) {
@@ -223,7 +223,7 @@ describe('Lib event', function () {
             .to.exist;
 
           expect(err.message)
-            .to.equal('Domain Not Matching');
+            .to.equal('Url Not Matching');
 
           done();
 

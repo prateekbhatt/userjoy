@@ -27,14 +27,14 @@ module.exports = Track;
 
 /**
  * Track constructor
- * @param {object} obj contains appKey, domain, cookies, user, company,
+ * @param {object} obj contains appKey, url, cookies, user, company,
  *                     session, event
  */
 
 function Track(obj) {
 
   this.appKey = obj.appKey;
-  this.domain = obj.domain;
+  this.url = obj.url;
   this.mode = null;
   this.app = null;
   this.uid = null;
@@ -101,13 +101,13 @@ Track.prototype._verifyApp = function (cb) {
 
   var self = this;
 
-  // in test mode do not check if domain is matching
-  // however, in live mode the request domain must match the
-  // app domain
+  // in test mode do not check if url is matching
+  // however, in live mode the request url must match the
+  // app url
 
   if (self.mode !== 'test') {
-    if (!self.app.checkDomain(self.domain)) {
-      return cb(new Error('Domain Not Matching'));
+    if (!self.app.checkUrl(self.url)) {
+      return cb(new Error('Url Not Matching'));
     }
   }
 
