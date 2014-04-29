@@ -89,7 +89,11 @@ router
 
 
     // add admin to newApp
-    newApp.admin = req.user._id;
+    newApp.team = [];
+    newApp.team.push({
+      accid: req.user._id,
+      admin: true
+    });
 
 
     App
