@@ -6,6 +6,14 @@ describe('Model Message', function () {
 
 
   /**
+   * npm dependencies
+   */
+
+  var ObjectId = require('mongoose')
+    .Types.ObjectId;
+
+
+  /**
    * Models
    */
 
@@ -340,6 +348,27 @@ describe('Model Message', function () {
 
         expect(updatedMsg.clicked)
           .to.be.true;
+
+        done();
+      })
+    });
+
+    it('should return error if message not found', function (done) {
+
+      var randomMessageId = ObjectId();
+
+      Message.clicked(randomMessageId, function (err, updatedMsg) {
+
+        expect(err)
+          .to.exist;
+
+        expect(err)
+          .to.eql(
+            'Message, for which status-update request was made, was not found'
+        );
+
+        expect(updatedMsg)
+          .to.not.exist;
 
         done();
       })
