@@ -11,8 +11,8 @@ describe('Resource /mandrill', function () {
   var replyEvent;
   var newMessageEvent;
   var openEvent;
+  var sendEvent;
   var clickEvent;
-  var sentEvent;
   var parentMessageId;
   var aid;
 
@@ -37,6 +37,7 @@ describe('Resource /mandrill', function () {
 
 
     var newMessageToEmail = aid + '@mail.userjoy.co';
+    var savedMessageId = saved.messages.first._id;
 
 
     // create reply event
@@ -72,7 +73,59 @@ describe('Resource /mandrill', function () {
         text_flowed: false
       },
       ts: 1368214102
-    }
+    };
+
+
+    openEvent = {
+      "event": "open",
+      "ts": 1398261345,
+      "msg": {
+        "ts": 1398261262,
+        "_id": "7d37f10c41e647e993745d5791e37992",
+        "state": "sent",
+        "subject": "Welcome to DoDataDo",
+        "email": "prattbhatt@gmail.com",
+        "metadata": {
+          "mId": savedMessageId
+        },
+        "sender": "example1@mail.userjoy.co",
+        "template": null
+      }
+    };
+
+    sendEvent = {
+      "event": "send",
+      "ts": 1398261345,
+      "msg": {
+        "ts": 1398261262,
+        "_id": "7d37f10c41e647e993745d5791e37992",
+        "state": "sent",
+        "subject": "Welcome to DoDataDo",
+        "email": "prattbhatt@gmail.com",
+        "metadata": {
+          "mId": savedMessageId
+        },
+        "sender": "example1@mail.userjoy.co",
+        "template": null
+      }
+    };
+
+    clickEvent = {
+      "event": "open",
+      "ts": 1398261345,
+      "msg": {
+        "ts": 1398261262,
+        "_id": "7d37f10c41e647e993745d5791e37992",
+        "state": "sent",
+        "subject": "Welcome to DoDataDo",
+        "email": "prattbhatt@gmail.com",
+        "metadata": {
+          "mId": savedMessageId
+        },
+        "sender": "example1@mail.userjoy.co",
+        "template": null
+      }
+    };
 
   });
 
@@ -113,6 +166,56 @@ describe('Resource /mandrill', function () {
 
     });
 
+
+    it('should handle open events', function (done) {
+
+      var postData = {
+        mandrill_events: JSON.stringify([openEvent])
+      };
+
+      request
+        .post('/mandrill')
+        .send(postData)
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(done);
+
+
+    });
+
+
+    it('should handle send events', function (done) {
+
+      var postData = {
+        mandrill_events: JSON.stringify([sendEvent])
+      };
+
+      request
+        .post('/mandrill')
+        .send(postData)
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(done);
+
+
+    });
+
+
+    it('should handle click events', function (done) {
+
+      var postData = {
+        mandrill_events: JSON.stringify([clickEvent])
+      };
+
+      request
+        .post('/mandrill')
+        .send(postData)
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(done);
+
+
+    });
 
   });
 

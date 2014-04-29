@@ -101,7 +101,7 @@ Event.prototype.createMessage = function (cb) {
 
   Message.create(newMessage, cb);
 
-}
+};
 
 
 /**
@@ -137,53 +137,6 @@ Event.prototype.getMId = function () {
 
 
 /**
- * Updates message status to true as follows:
- * - replied (if this.mId = true)
- * - sent (if this.type sent)
- * - open (if this.type open)
- * - click (if type click)
- *
- * @param {function} cb callback
- */
-
-Event.prototype.findAndUpdateMessageStatus = function (cb) {
-
-  var self = this;
-  var statusUpdate = {};
-
-  if ((self.type === 'inbound') && self.mId) {
-    statusUpdate.replied = true;
-  } else if (self.type === 'send') {
-    statusUpdate.sent = true;
-  } else if (self.type === 'open') {
-    statusUpdate.seen = true;
-  } else if (self.type === 'click') {
-    statusUpdate.clicked = true;
-  } else {
-    return cb(new Error('Invalid Status Update'));
-  }
-
-  Message
-    .findByIdAndUpdate(
-      self.mId, {
-        $set: statusUpdate
-      },
-
-      function (err, msg) {
-
-        if (err) return cb(err);
-
-        if (!msg) return cb(new Error('Message Not Found'));
-
-        self.coId = msg.coId;
-        self.uid = msg.uid;
-
-        cb(err, msg);
-      });
-};
-
-
-/**
  * Creates a reply for a sent message
  * - Updates replied status to true
  * - Fetches conversation
@@ -203,7 +156,15 @@ Event.prototype.processReply = function (cb) {
 
       // fetchParentMessage and update 'replied' status to true
       function (cb) {
-        self.findAndUpdateMessageStatus.call(self, cb);
+
+        Message.replied(self.mId, function (err, msg) {
+          if (err) return cb(err);
+
+          self.coId = msg.coId;
+          self.uid = msg.uid;
+
+          cb(null, msg);
+        });
       },
 
       // createMessage
@@ -349,21 +310,31 @@ function processMandrillEvents(events, cb) {
     function (e, cb) {
 
       var event = new Event(e);
+      var type = event.type;
+      var mId = event.mId;
 
       // according to mandrill's docs, incoming emails will have the event of 'inbound'
-      if (event.type === 'inbound' && event.mId) {
+      if (type === 'inbound' && mId) {
         return event.processReply.call(event, cb);
       }
 
-      if (event.type === 'inbound') {
+      if (type === 'inbound') {
         return event.processNewMessage.call(event, cb);
       }
 
-      if (_.contains(['send', 'open', 'click'], event.type)) {
-        return event.findAndUpdateMessageStatus.call(event, cb);
+      if (type === 'send') {
+        return Message.sent(mId, cb);
       }
 
-      cb(new Error('Event type ' + e.event + ' not found'));
+      if (type === 'open') {
+        return Message.opened(mId, cb);
+      }
+
+      if (type === 'click') {
+        return Message.clicked(mId, cb);
+      }
+
+      cb(new Error('Event type ' + type + ' not found'));
     },
 
     cb
@@ -391,6 +362,7 @@ router
 
     processMandrillEvents(events, function (err, result) {
       // console.log('final output', err, result);
+      // TODO: send error to admin email
       res.json();
     });
 
