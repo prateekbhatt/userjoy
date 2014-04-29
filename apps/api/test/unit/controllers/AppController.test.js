@@ -14,6 +14,7 @@ describe('Resource /apps', function () {
 
   describe('POST /apps', function () {
 
+    var createdApp;
 
     before(function (done) {
       logoutUser(done);
@@ -104,12 +105,28 @@ describe('Resource /apps', function () {
           .expect('Content-Type', /json/)
           .expect(201)
           .expect(function (res) {
+            createdApp = res.body;
             if (res.body.name !== newApp.name) {
               return 'Saved app\'s name does not match';
             }
           })
           .end(done);
 
+      });
+
+    it('should add the app creator to the team and make him admin',
+      function () {
+
+        var loginUserAccid = saved.accounts.first._id;
+
+        expect(createdApp.team)
+          .to.have.length(1);
+
+        expect(createdApp.team[0].admin)
+          .to.eql(true);
+
+        expect(createdApp.team[0].accid.toString())
+          .to.eql(loginUserAccid.toString());
       });
 
   });
@@ -204,7 +221,8 @@ describe('Resource /apps', function () {
           .set('cookie', loginCookie)
           .expect('Content-Type', /json/)
           .expect(function (res) {
-            if (res.body.team[0].accid.toString() !== saved.accounts.first._id.toString()) {
+            if (res.body.team[0].accid.toString() !== saved.accounts.first
+              ._id.toString()) {
               return 'Could not fetch saved app';
             }
           })
