@@ -321,4 +321,107 @@ describe('Model Message', function () {
 
   });
 
+  describe('#clicked', function () {
+
+    it('should update clicked status to true', function (done) {
+
+      var msg = saved.messages.first;
+
+      expect(msg.clicked)
+        .to.be.false;
+
+      Message.clicked(msg._id, function (err, updatedMsg) {
+
+        expect(err)
+          .to.not.exist;
+
+        expect(updatedMsg._id)
+          .to.eql(msg._id);
+
+        expect(updatedMsg.clicked)
+          .to.be.true;
+
+        done();
+      })
+    });
+  });
+
+
+  describe('#opened', function () {
+
+    it('should update seen status to true', function (done) {
+
+      var msg = saved.messages.first;
+
+      expect(msg.seen)
+        .to.be.false;
+
+      Message.opened(msg._id, function (err, updatedMsg) {
+
+        expect(err)
+          .to.not.exist;
+
+        expect(updatedMsg._id)
+          .to.eql(msg._id);
+
+        expect(updatedMsg.seen)
+          .to.be.true;
+
+        done();
+      })
+    });
+  });
+
+
+  describe('#replied', function () {
+
+    it('should update replied status to true', function (done) {
+
+      var msg = saved.messages.first;
+
+      expect(msg.replied)
+        .to.be.false;
+
+      Message.replied(msg._id, function (err, updatedMsg) {
+
+        expect(err)
+          .to.not.exist;
+
+        expect(updatedMsg._id)
+          .to.eql(msg._id);
+
+        expect(updatedMsg.replied)
+          .to.be.true;
+
+        done();
+      })
+    });
+  });
+
+
+  describe('#sent', function () {
+
+    it('should update sent status to true', function (done) {
+
+      var msg = saved.messages.first;
+
+      expect(msg.sent)
+        .to.be.false;
+
+      Message.sent(msg._id, function (err, updatedMsg) {
+
+        expect(err)
+          .to.not.exist;
+
+        expect(updatedMsg._id)
+          .to.eql(msg._id);
+
+        expect(updatedMsg.sent)
+          .to.be.true;
+
+        done();
+      })
+    });
+  });
+
 });
