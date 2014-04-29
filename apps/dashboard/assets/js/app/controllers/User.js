@@ -251,7 +251,8 @@ angular.module('do.users', [])
             console.log($scope.filters);
             for (var i = 0; i < $scope.filters.length; i++) {
                 console.log("val: ", $scope.filters[i].val);
-                if ($scope.filters[i].val == '' && $scope.filters[i].method == 'count') {
+                if ($scope.filters[i].val == '' && $scope.filters[i].method ==
+                    'count') {
                     console.log("val: ", $scope.filters[i].val);
                     $scope.showErr = true;
                     // $scope.isErr = 'error';
@@ -464,7 +465,8 @@ angular.module('do.users', [])
             console.log($scope.filters);
             for (var i = 0; i < $scope.filters.length; i++) {
                 console.log("val: ", $scope.filters[i].val);
-                if ($scope.filters[i].val == '' && $scope.filters[i].method == 'count') {
+                if ($scope.filters[i].val == '' && $scope.filters[i].method ==
+                    'count') {
                     console.log("val: ", $scope.filters[i].val);
                     $scope.showErr = true;
                     // $scope.isErr = 'error';
@@ -478,8 +480,22 @@ angular.module('do.users', [])
     }
 ])
 
-.controller('TableCtrl', ['$scope', '$filter', 'ngTableParams',
-    function ($scope, $filter, ngTableParams) {
+.controller('TableCtrl', ['$scope', '$filter', 'ngTableParams', '$modal',
+    function ($scope, $filter, ngTableParams, $modal) {
+
+        $scope.title = "Write Message";
+        // $scope.content = "Hello Modal<br />This is a multiline message!";
+
+        var popupModal = $modal({
+            scope: $scope,
+            template: '/templates/usersmodule/message.modal.html',
+            show: false
+        });
+
+        $scope.openModal = function () {
+            popupModal.show();
+        };
+
         var data = [{
             name: "Moroni",
             email: 'a@b.com',
@@ -642,6 +658,15 @@ angular.module('do.users', [])
 
         }
 
+    }
+])
+
+.controller('sendMessageCtrl', ['$scope', 'MsgService',
+    function ($scope, MsgService) {
+        console.log("inside send message ctrl");
+        $scope.sendManualMessage = function () {
+            MsgService.sendManualMessage($scope.sub, $scope.text)
+        }
     }
 ])
 

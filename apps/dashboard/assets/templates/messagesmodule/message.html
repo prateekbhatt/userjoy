@@ -8,10 +8,10 @@
                         <div id="sidebar-wrapper-settings">
                             <ul class="sidebar-nav">
                                 <li>
-                                    <a ui-sref="message.inbox" ng-click="showTableInbox()"><i class="fa fa-inbox"></i> Inbox</a>
+                                    <a ui-sref="message.inbox" ng-click="showTableInbox()"><i class="fa fa-inbox"></i> All Conversations</a>
                                 </li>
                                 <li>
-                                    <a ui-sref="message.sent"><i class="fa fa-mail-forward"></i> Sent Messages</a>
+                                    <a ui-sref="message.unread"><i class="fa fa-exclamation"></i>&nbsp; Unread Conversations</a>
                                 </li>
                                 <li>
                                     <a ui-sref="message.automate"><i class="fa fa-edit"></i> Automate Messages </a>
@@ -20,10 +20,10 @@
                                     <a ui-sref="message.template"><span class="glyphicon glyphicon-list-alt"></span> Choose Templates</a>
                                 </li>
                                 <li>
-                                    <a ui-sref="#" style="cursor: pointer"><i class="fa fa-paperclip"></i> Labels
+                                    <a ui-sref="#" style="cursor: pointer"><i class="fa fa-paperclip"></i> Smart Filters
                                     <ul style="list-style: none;">
                                         <li>
-                                            <div class="progress" style="margin-left: 30px; margin-right: 30px;">
+                                            <div class="progress" style="margin-left: 30px;">
                                                 <a ui-sref="#goodhealth" style="cursor: pointer">
                                                 <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #5cb85c;">
                                                     <span class="progress-type pull-left"><strong>Good Health</strong></span>
@@ -32,7 +32,7 @@
                                             </div>
                                         </li>
                                         <li>
-                                            <div class="progress" style="margin-left: 30px; margin-right: 30px;">
+                                            <div class="progress" style="margin-left: 30px;">
                                                 <a ui-sref="#goodhealth" style="cursor: pointer">
                                                 <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #428bca;">
                                                     <span class="progress-type pull-left"><strong>Normal Health</strong></span>
@@ -41,7 +41,7 @@
                                             </div>
                                         </li>
                                         <li>
-                                            <div class="progress" style="margin-left: 30px; margin-right: 30px;">
+                                            <div class="progress" style="margin-left: 30px;">
                                                 <a ui-sref="#goodhealth" style="cursor: pointer">
                                                 <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #d9534f;">
                                                     <span class="progress-type pull-left"><strong>Poor Health</strong></span>
@@ -50,7 +50,7 @@
                                             </div>
                                         </li>
                                         <li>
-                                            <div class="progress" style="margin-left: 30px; margin-right: 30px;">
+                                            <div class="progress" style="margin-left: 30px;">
                                                 <a ui-sref="#goodhealth" style="cursor: pointer">
                                                 <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #f0ad4e;">
                                                     <span class="progress-type pull-left"><strong>Open Conversations</strong></span>
@@ -59,7 +59,16 @@
                                             </div>
                                         </li>
                                         <li>
-                                            <div class="progress" style="margin-left: 30px; margin-right: 30px;">
+                                            <div class="progress" style="margin-left: 30px;">
+                                                <a ui-sref="#goodhealth" style="cursor: pointer">
+                                                <div class="progress-bar progress-bar-default" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #999;">
+                                                    <span class="progress-type pull-left"><strong>Closed Conversations</strong></span>
+                                                </div>
+                                                </a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="progress" style="margin-left: 30px;">
                                                 <a ui-sref="#goodhealth" style="cursor: pointer">
                                                 <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #5bc0de;">
                                                     <span class="progress-type pull-left"><strong>Paying Customers</strong></span>
@@ -77,7 +86,7 @@
                 </div>
                 <!-- /.navbar-static-side -->
                 <div class="col-md-9">
-                    <div ui-view="messageapp" id="page-wrapper-settings">
+                    <div ui-view="messageapp">
                     </div>
                 </div>
             </div>

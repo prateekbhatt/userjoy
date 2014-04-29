@@ -28,14 +28,14 @@ angular.module('do.install', [])
 ])
 
 .controller('installOnboardingAppCtrl', ['$scope', '$http', 'config', '$state',
-    'LoggedInAppService', '$log',
-    function ($scope, $http, config, $state, LoggedInAppService, $log) {
+    'AppService', '$log', 'AppModel',
+    function ($scope, $http, config, $state, AppService, $log, AppModel) {
 
 
         $scope.installapp = function () {
 
             $log.info($scope.name);
-            $log.info($scope.domain);
+            $log.info($scope.url);
             if ($scope.app_form.$valid) {
 
             } else {
@@ -44,27 +44,10 @@ angular.module('do.install', [])
 
             var data = {
                 name: $scope.name,
-                domain: $scope.domain
+                url: $scope.url
             };
 
-            var appStack = [];
-
-            $http
-                .post(config.apiUrl + '/apps', data)
-                .success(function (data) {
-                    $state.transitionTo('addcode');
-                    var finalElement = LoggedInAppService.getLoggedInApps()
-                        .length;
-
-                    for (var i = LoggedInAppService.getLoggedInApps()
-                        .length - 1; i >= 0; i--) {
-                        appStack.push(LoggedInAppService.getLoggedInApps()[
-                            i]);
-                    };
-                    appStack.push(data);
-                    LoggedInAppService.setLoggedInApps(data);
-                    console.log("apps created: ", LoggedInAppService.getLoggedInApps());
-                })
+            AppModel.addNewApp(data);
         }
     }
 ])

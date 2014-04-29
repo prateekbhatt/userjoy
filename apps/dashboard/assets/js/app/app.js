@@ -110,33 +110,34 @@ angular.module('dodatado', [
     }
 ])
 
-.run(['LoggedInAppService', 'AppModel', '$log',
-    function (LoggedInAppService, AppModel, $log) {
+.run(['AppService', 'AppModel', '$log',
+    function (AppService, AppModel, $log) {
         AppModel.get(function (err, apps) {
+            console.log("apps log", err, apps);
             if (err) {
+                console.log("err apps: ", err);
                 return;
             }
-            LoggedInAppService.setLoggedInApps(apps);
-            console.log("apps log", LoggedInAppService.getLoggedInApps());
-            LoggedInAppService.setCurrentApp(apps[0]);
+            AppService.setLoggedInApps(apps);
+            AppService.setCurrentApp(apps[0]);
         });
     }
 ])
-    .run(['$state', 'LoginService', '$rootScope',
-        function ($state, LoginService, $rootScope) {
+.run(['$state', 'LoginService', '$rootScope',
+    function ($state, LoginService, $rootScope) {
 
-            // check if user needs to be logged in to view a specific page
-            $rootScope.$on("$stateChangeStart", function (event,
-                toState,
-                toParams, fromState, fromParams) {
-                if (toState.authenticate && !LoginService.getUserAuthenticated()) {
-                    // User isn’t authenticated
-                    $state.go("login");
-                    event.preventDefault();
-                }
-            });
-        }
-    ])
+        // check if user needs to be logged in to view a specific page
+        $rootScope.$on("$stateChangeStart", function (event,
+            toState,
+            toParams, fromState, fromParams) {
+            if (toState.authenticate && !LoginService.getUserAuthenticated()) {
+                // User isn’t authenticated
+                $state.go("login");
+                event.preventDefault();
+            }
+        });
+    }
+])
 
 .run(['segment', 'queryMatching', 'countOfActions', 'hasNotDone',
     'hasDoneActions',

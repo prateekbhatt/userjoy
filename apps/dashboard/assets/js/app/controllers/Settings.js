@@ -219,11 +219,11 @@ angular.module('do.settings', [])
 ])
 
 .controller('appSettingsGeneralCtrl', ['$scope', '$log', '$state',
-    'LoggedInAppService', 'AppModel',
-    function ($scope, $log, $state, LoggedInAppService, AppModel) {
-        $scope.name = LoggedInAppService.getCurrentApp()
+    'AppService', 'AppModel',
+    function ($scope, $log, $state, AppService, AppModel) {
+        $scope.name = AppService.getCurrentApp()
             .name;
-        var appId = LoggedInAppService.getCurrentApp()
+        var appId = AppService.getCurrentApp()
             ._id;
 
         $scope.changeAppName = function () {
@@ -325,11 +325,11 @@ angular.module('do.settings', [])
 ])
 
 .controller('appSettingsEnvironmentCtrl', ['$scope', '$log', '$state',
-    'LoggedInAppService',
-    function ($scope, $log, $state, LoggedInAppService) {
+    'AppService',
+    function ($scope, $log, $state, AppService) {
         $scope.numLimit = 10;
         $scope.appsEnvironment = [];
-        $scope.appsEnvironment = LoggedInAppService.getLoggedInApps();
+        $scope.appsEnvironment = AppService.getLoggedInApps();
     }
 ])
 
