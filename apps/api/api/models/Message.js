@@ -236,7 +236,12 @@ function findAndUpdateStatus(id, action, cb) {
   updateQuery['$set'] = {};
   updateQuery['$set'][action] = true;
 
-  Message.findByIdAndUpdate(id, updateQuery, cb);
+  Message.findByIdAndUpdate(id, updateQuery, function (err, msg) {
+    if (err) return cb(err);
+    if (!msg) return cb(
+      'Message, for which status-update request was made, was not found');
+    cb(null, msg);
+  });
 };
 
 
