@@ -18,7 +18,27 @@ var apiKey = require('../../helpers/api-key');
 
 
 /**
- * Define schema
+ * Team members schema
+ */
+
+var TeamMemberSchema = new Schema({
+
+  accid: {
+    type: Schema.Types.ObjectId,
+    ref: 'Account',
+    required: [true, 'accid is required']
+  },
+
+  // is he admin/owner of the app
+  admin: {
+    type: Boolean,
+    default: false
+  }
+});
+
+
+/**
+ * Define App schema
  */
 
 var AppSchema = new Schema({
@@ -29,7 +49,7 @@ var AppSchema = new Schema({
     // validate: appNameValidator
   },
 
-  domain: {
+  url: {
     type: String,
     required: [true, 'Domain url is required']
   },
@@ -44,26 +64,16 @@ var AppSchema = new Schema({
     unique: true
   },
 
-  // admin/owner of the app
-  admin: {
-    type: Schema.Types.ObjectId,
-    ref: 'Account',
-    required: true
-  },
-
   // isActive is set to true when we start recieveing data from the app
   isActive: {
     type: Boolean,
     default: false
-  }
+  },
 
   // TODO : Allow to add team members
   //
   // other members added by the admin
-  // team: [{
-  //   type: Schema.Types.ObjectId,
-  //   ref: 'Account'
-  // }]
+  team: [TeamMemberSchema]
 
 });
 
@@ -107,7 +117,7 @@ AppSchema.statics.findByAccountId = function (accountId, cb) {
 
   App
     .find({
-      admin: accountId
+      'team.accid': accountId
     })
     .exec(cb);
 
@@ -133,18 +143,18 @@ AppSchema.statics.findByKey = function (mode, key, cb) {
 
 
 /**
- * Checks if request domain matches app domain
+ * Checks if request url matches app url
  * Used to authenticate event calls
  *
- * @param {string} domain url
+ * @param {string} url
  * @return {boolean}
  */
 
-AppSchema.methods.checkDomain = function (domain) {
-  if (!domain) {
-    throw new Error('Invalid Domain');
+AppSchema.methods.checkUrl = function (url) {
+  if (!url) {
+    throw new Error('Invalid Url');
   }
-  return (this.domain === domain);
+  return (this.url === url);
 };
 
 

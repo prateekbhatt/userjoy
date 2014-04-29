@@ -171,9 +171,9 @@ describe('Resource /track', function () {
 
       var mode = 'test';
       var appKey = 'randomAppKey';
-      var domain = 'randomDomain.com';
+      var url = 'randomUrl.com';
 
-      CollectorController._findAndVerifyApp(mode, appKey, domain,
+      CollectorController._findAndVerifyApp(mode, appKey, url,
         function (err, app) {
 
           expect(err)
@@ -190,29 +190,29 @@ describe('Resource /track', function () {
         });
     });
 
-    // it('should checkDomain in live mode', function (done) {
+    // it('should checkUrl in live mode', function (done) {
 
     // });
 
-    // it('should not checkDomain in test mode', function (done) {
+    // it('should not checkUrl in test mode', function (done) {
 
     // });
 
-    it('should return error if incorrect domain in live mode',
+    it('should return error if incorrect url in live mode',
       function (done) {
 
         var mode = 'live';
         var appKey = saved.apps.first.liveKey;
-        var domain = 'randomDomain.com';
+        var url = 'randomUrl.com';
 
-        CollectorController._findAndVerifyApp(mode, appKey, domain,
+        CollectorController._findAndVerifyApp(mode, appKey, url,
           function (err, app) {
 
             expect(err)
               .to.exist;
 
             expect(err.message)
-              .to.equal('Domain Not Matching');
+              .to.equal('Url Not Matching');
 
             expect(app)
               .not.to.exist;
@@ -227,9 +227,9 @@ describe('Resource /track', function () {
 
       var mode = 'live';
       var appKey = saved.apps.first.liveKey;
-      var domain = saved.apps.first.domain;
+      var url = saved.apps.first.url;
 
-      CollectorController._findAndVerifyApp(mode, appKey, domain,
+      CollectorController._findAndVerifyApp(mode, appKey, url,
         function (err, app) {
 
           expect(err)

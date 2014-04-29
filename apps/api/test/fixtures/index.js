@@ -19,6 +19,7 @@ var ObjectId = require('mongoose')
 
 var Account = require('../../api/models/Account');
 var App = require('../../api/models/App');
+var Conversation = require('../../api/models/Conversation');
 var Message = require('../../api/models/Message');
 
 
@@ -41,12 +42,22 @@ var accounts = {
 
     first: {
       name: 'First App',
-      domain: 'firstapp.co'
+      url: 'firstapp.co'
     },
 
     second: {
       name: 'Second App',
-      domain: 'secondapp.co'
+      url: 'secondapp.co'
+    }
+  },
+
+  conversations = {
+
+    first: {
+      accId: null,
+      aid: null,
+      sub: 'First Conversation!',
+      uid: ObjectId()
     }
   },
 
@@ -55,9 +66,10 @@ var accounts = {
     first: {
       accid: null,
       aid: null,
-      coId: ObjectId(),
+      coId: null,
       from: 'user',
-      name: 'Prateek Bhatt',
+      sName: 'Prateek Bhatt',
+      sub: 'New Subject',
       text: 'Hello World',
       type: 'email',
       uid: ObjectId(),
@@ -66,10 +78,11 @@ var accounts = {
     second: {
       accid: null,
       aid: null,
-      coId: ObjectId(),
+      coId: null,
       from: 'user',
-      name: 'Prattbhatt',
-      text: 'Hello World 2',
+      sName: 'Prateek Bhatt',
+      sub: 'New Subject',
+      text: 'Hello World',
       type: 'email',
       uid: ObjectId(),
     }
@@ -87,17 +100,29 @@ function createAccount(account, fn) {
 
 }
 
-function createApp(accId, app, fn) {
+function createApp(accid, app, fn) {
 
-  app.admin = accId;
+  app.team = [];
+  app.team.push({
+    accid: accid,
+    admin: true
+  });
+
   App.create(app, fn);
 
 }
 
-function createMessage(accId, aid, message, fn) {
+function createConversation(accid, aid, con, fn) {
+  con.accId = accid;
+  con.aid = aid;
+  Conversation.create(con, fn);
+}
 
-  message.accid = accId;
+function createMessage(accid, aid, coId, message, fn) {
+
+  message.accid = accid;
   message.aid = aid;
+  message.coId = coId;
   Message.create(message, fn);
 
 }
@@ -147,13 +172,26 @@ module.exports = function loadFixtures(callback) {
 
     },
 
+    createFirstConversation: function (cb) {
+      var accid = accounts.first._id;
+      var aid = apps.first._id;
+      var newCon = conversations.first;
+
+      createConversation(accid, aid, newCon, function (err, con) {
+        if (err) return cb(err);
+        conversations.first = con;
+        cb();
+      });
+    },
+
     createFirstMessage: function (cb) {
 
       var aid = apps.first._id;
-      var accId = accounts.first._id;
+      var accid = accounts.first._id;
+      var coId = conversations.first._id;
       var message = messages.first;
 
-      createMessage(accId, aid, message, function (err, msg) {
+      createMessage(accid, aid, coId, message, function (err, msg) {
         if (err) return cb(err);
         messages.first = msg;
         cb();
@@ -164,10 +202,11 @@ module.exports = function loadFixtures(callback) {
     createSecondMessage: function (cb) {
 
       var aid = apps.first._id;
-      var accId = accounts.first._id;
+      var accid = accounts.first._id;
+      var coId = conversations.first._id;
       var message = messages.second;
 
-      createMessage(accId, aid, message, function (err, msg) {
+      createMessage(accid, aid, coId, message, function (err, msg) {
         if (err) return cb(err);
         messages.second = msg;
         cb();
@@ -177,11 +216,14 @@ module.exports = function loadFixtures(callback) {
 
   }, function (err) {
 
-    callback(err, {
+    var savedObj = {
       accounts: accounts,
       apps: apps,
+      conversations: conversations,
       messages: messages
-    });
+    };
+
+    callback(err, savedObj);
 
   });
 }

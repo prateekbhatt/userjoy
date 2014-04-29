@@ -1,5 +1,9 @@
 describe('Model Message', function () {
 
+  // TODO
+  // Write test to check that if the message is created by a 'account', then
+  // the accid is required
+
 
   /**
    * Models
@@ -24,7 +28,7 @@ describe('Model Message', function () {
   describe('#create', function () {
 
     it(
-      'should return error if accid/aid/coId/from/name/text/type/uid is not provided',
+      'should return error if aid/coId/from/sub/text/type/uid is not provided',
       function (done) {
 
         var newCon = {};
@@ -36,10 +40,7 @@ describe('Model Message', function () {
 
           expect(Object.keys(err.errors)
             .length)
-            .to.eql(8);
-
-          expect(err.errors.accid.message)
-            .to.eql('Invalid account id');
+            .to.eql(7);
 
           expect(err.errors.aid.message)
             .to.eql('Invalid aid');
@@ -50,8 +51,8 @@ describe('Model Message', function () {
           expect(err.errors.from.message)
             .to.eql('Provide valid from type, either user/account');
 
-          expect(err.errors.name.message)
-            .to.eql('Provide name/email of user');
+          expect(err.errors.sub.message)
+            .to.eql('Provide subject');
 
           expect(err.errors.text.message)
             .to.eql('Provide message text');
@@ -78,9 +79,11 @@ describe('Model Message', function () {
         aid: randomId,
         coId: randomId,
         from: 'user',
-        name: 'Prateek Bhatt',
+        mId: randomId,
         text: 'Hello World',
         type: 'email',
+        sName: 'Prateek Bhatt',
+        sub: 'Subject I Am',
         uid: randomId,
       };
 
@@ -97,8 +100,14 @@ describe('Model Message', function () {
         expect(msg.aid.toString())
           .to.eql(newMessage.aid);
 
+        expect(msg.mId.toString())
+          .to.eql(newMessage.mId);
+
         expect(msg.text)
           .to.eql(newMessage.text);
+
+        expect(msg.sub)
+          .to.eql(newMessage.sub);
 
         expect(msg.uid.toString())
           .to.eql(newMessage.uid);
@@ -155,7 +164,8 @@ describe('Model Message', function () {
         aid: aid,
         coId: randomId,
         from: 'user',
-        name: 'Prateek Bhatt',
+        sName: 'Prateek Bhatt',
+        sub: 'New subject',
         text: 'Hello World',
         type: 'email',
         uid: randomId,
@@ -188,75 +198,112 @@ describe('Model Message', function () {
       });
     });
 
-    it('should return ct/name/replied/seen/text', function () {
+    it('should return ct/replied/seen/sName/text',
+      function () {
 
-      expect(fetchedMessage)
-        .to.have.property("ct");
+        expect(fetchedMessage)
+          .to.not.have.property("aid");
 
-      expect(fetchedMessage)
-        .to.have.property("name");
+        expect(fetchedMessage)
+          .to.have.property("ct");
 
-      expect(fetchedMessage)
-        .to.have.property("replied");
+        expect(fetchedMessage)
+          .to.have.property("replied");
 
-      expect(fetchedMessage)
-        .to.have.property("seen");
+        expect(fetchedMessage)
+          .to.have.property("seen");
 
-      expect(fetchedMessage)
-        .to.have.property("text");
+        expect(fetchedMessage)
+          .to.have.property("sName");
 
-      expect(fetchedMessage)
-        .to.not.have.property("aid");
+        expect(fetchedMessage)
+          .to.have.property("text");
 
-    });
+      });
 
   });
 
 
-  describe('#fetchUnseen', function () {
+  describe('#fetchThread', function () {
 
     var aid;
+    var parentMessageId;
+    var replyingAccount;
     var fetchedMessage = {};
+    var currentMessageId;
 
-    before(function () {
-      aid = saved.messages.first.aid;
+    before(function (done) {
+      aid = saved.apps.first._id;
+      parentMessageId = saved.messages.first._id;
+      replyingAccount = saved.accounts.first._id;
+
+
+      var replyMessage = {
+        accid: replyingAccount,
+        aid: aid,
+        coId: saved.messages.first.coId,
+        from: 'account',
+        mId: parentMessageId,
+        sName: 'Random Name',
+        sub: 'New subject',
+        text: 'This is a reply from admin',
+        type: 'email',
+        uid: randomId,
+      };
+
+      Message.create(replyMessage, function (err, msg) {
+        if (err) return done(err);
+        currentMessageId = msg._id;
+        done();
+      });
+
     });
 
-    it('should return unseen messages belonging to an app', function (done) {
+    it('should return messages belonging to a thread', function (done) {
 
-      Message.fetchUnseen(aid, function (err, msg) {
+      Message.fetchThread(aid, currentMessageId, function (err, msgs) {
 
         expect(err)
           .to.not.exist;
 
-        expect(msg)
+        expect(msgs)
           .to.be.an("array");
 
-        fetchedMessage = msg[0];
+        fetchedMessage = msgs[2];
 
-        expect(msg)
-          .to.have.length(2);
+        expect(msgs)
+          .to.have.length(3);
 
-        expect(msg[0].text)
-          .to.eql('Hello World 2');
+        expect(msgs[0].text)
+          .to.eql('Hello World');
 
-        _.each(msg, function (val, key) {
-          expect(val.seen)
-            .to.eql(false);
-        });
+        expect(msgs[2].text)
+          .to.eql('This is a reply from admin');
+
+
+        var uniqConvIds = _.chain(msgs)
+          .pluck('coIds')
+          .uniq()
+          .value();
+
+        expect(uniqConvIds)
+          .to.have.length(1);
 
         done();
 
       });
     });
 
-    it('should return ct/name/replied/seen/text', function () {
+    it('should return aid/coId/ct/name/replied/seen/text', function () {
+
+      expect(fetchedMessage)
+        .to.have.property("aid");
+
+      expect(fetchedMessage)
+        .to.have.property("coId");
 
       expect(fetchedMessage)
         .to.have.property("ct");
-
-      expect(fetchedMessage)
-        .to.have.property("name");
 
       expect(fetchedMessage)
         .to.have.property("replied");
@@ -265,10 +312,10 @@ describe('Model Message', function () {
         .to.have.property("seen");
 
       expect(fetchedMessage)
-        .to.have.property("text");
+        .to.have.property("sName");
 
       expect(fetchedMessage)
-        .to.not.have.property("aid");
+        .to.have.property("text");
 
     });
 

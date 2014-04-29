@@ -24,8 +24,7 @@ var MessageSchema = new Schema({
 
   accid: {
     type: Schema.Types.ObjectId,
-    ref: 'Account',
-    required: [true, 'Invalid account id']
+    ref: 'Account'
   },
 
 
@@ -65,10 +64,10 @@ var MessageSchema = new Schema({
   },
 
 
-  // name / email of user
-  name: {
-    type: String,
-    required: [true, 'Provide name/email of user']
+  // parent message id
+  mId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Message'
   },
 
 
@@ -78,11 +77,11 @@ var MessageSchema = new Schema({
   },
 
 
+  // message text
   text: {
     type: String,
     required: [true, 'Provide message text']
   },
-
 
   type: {
     type: String,
@@ -100,6 +99,18 @@ var MessageSchema = new Schema({
   sent: {
     type: Boolean,
     default: false
+  },
+
+
+  // sender name (user or account)
+  sName: {
+    type: String
+  },
+
+
+  sub: {
+    type: String,
+    required: [true, 'Provide subject']
   },
 
 
@@ -148,9 +159,9 @@ MessageSchema.statics.fetchInbox = function (aid, cb) {
     })
     .select({
       ct: 1,
-      name: 1,
       replied: 1,
       seen: 1,
+      sName: 1,
       text: 1
     })
     .sort({
@@ -162,32 +173,41 @@ MessageSchema.statics.fetchInbox = function (aid, cb) {
 
 
 /**
- * Finds unseen messages belonging to an app, sent from users, sorted by
- * created timestamp
+ * Finds messages belonging to a conversation, sorted by created
+ * timestamp
  *
  * @param {string} aid app id
+ * @param {string} mId message id
  * @param {function} cb callback
  */
 
-MessageSchema.statics.fetchUnseen = function (aid, cb) {
+MessageSchema.statics.fetchThread = function (aid, mId, cb) {
 
-  Message
-    .find({
-      aid: aid,
-      from: 'user',
-      seen: false
-    })
-    .select({
-      ct: 1,
-      name: 1,
-      replied: 1,
-      seen: 1,
-      text: 1
-    })
-    .sort({
-      ct: -1
-    })
-    .exec(cb);
+  async.waterfall(
+    [
+
+      function (cb) {
+        Message
+          .findById(mId)
+          .exec(function (err, msg) {
+            cb(err, msg);
+          });
+      },
+
+      function (msg, cb) {
+        Message
+          .find({
+            coId: msg.coId
+          })
+          .exec(function (err, msgs) {
+            cb(err, msgs);
+          });
+      }
+
+    ],
+
+    cb
+  );
 
 };
 

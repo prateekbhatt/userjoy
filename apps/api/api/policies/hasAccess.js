@@ -9,6 +9,13 @@
 
 
 /**
+ * npm dependencies
+ */
+
+var _ = require('lodash');
+
+
+/**
  * Models
  */
 
@@ -29,7 +36,9 @@ module.exports = function hasAccess(req, res, next, aid) {
         return res.notFound();
       }
 
-      if (app.admin.toString() !== req.user._id.toString()) {
+      var isTeamMember = _.find(app.team, { accid: req.user._id });
+
+      if (!isTeamMember) {
         return res.forbidden();
       }
 

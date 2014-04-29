@@ -49,7 +49,7 @@ var track = require('../lib/track');
  * =======================
  *
  * fetch app with apikey = dodatado id
- * check if domain == request domain
+ * check if url == request url
  * else return
  *
  *
@@ -99,7 +99,7 @@ router
     var data = req.query;
     var appKey = data.app_id;
     var user = data.user;
-    var domain = req.host;
+    var url = req.host;
     console.log('   /track', req.cookies);
 
     var mode;
@@ -148,13 +148,13 @@ router
                 return cb(new Error('App Not Found'));
               }
 
-              // in test mode do not check if domain is matching
-              // however, in live mode the request domain must match the
-              // app domain
+              // in test mode do not check if url is matching
+              // however, in live mode the request url must match the
+              // app url
 
               if (mode !== 'test') {
-                if (!app.checkDomain(domain)) {
-                  return cb(new Error('Domain Not Matching'));
+                if (!app.checkUrl(url)) {
+                  return cb(new Error('Url Not Matching'));
                 }
               }
 
@@ -249,15 +249,15 @@ module.exports = router;
 
 /**
  * Finds app using key and mode
- * Authenticates domain in live mode
+ * Authenticates url in live mode
  *
  * @param  {string}   mode   test/live
  * @param  {string}   appKey
- * @param  {string}   domain
+ * @param  {string}   url
  * @param  {Function} cb     callback function
  */
 
-function _findAndVerifyApp(mode, appKey, domain, cb) {
+function _findAndVerifyApp(mode, appKey, url, cb) {
 
   App
     .findByKey(mode, appKey, function (err, app) {
@@ -270,13 +270,13 @@ function _findAndVerifyApp(mode, appKey, domain, cb) {
         return cb(new Error('App Not Found'));
       }
 
-      // in test mode do not check if domain is matching
-      // however, in live mode the request domain must match the
-      // app domain
+      // in test mode do not check if url is matching
+      // however, in live mode the request url must match the
+      // app url
 
       if (mode !== 'test') {
-        if (!app.checkDomain(domain)) {
-          return cb(new Error('Domain Not Matching'));
+        if (!app.checkUrl(url)) {
+          return cb(new Error('Url Not Matching'));
         }
       }
 
