@@ -179,6 +179,7 @@ Event.prototype.processReply = function (cb) {
     ],
 
     function (err) {
+      console.log(err, savedReply);
       cb(err, savedReply);
     });
 
@@ -256,7 +257,7 @@ Event.prototype.processNewMessage = function (cb) {
 
 // function removeQuotedText(email, text) {
 
-//   var delimeter = email;
+//   var delimeter = '##- Please type your reply above this line -##';
 
 //   // escaping the dot in .com, so it doesn't affect our regex pattern below
 //   delimeter.replace('.', '\\.');
@@ -361,7 +362,7 @@ router
     // });
 
     processMandrillEvents(events, function (err, result) {
-      // console.log('final output', err, result);
+      console.log('final output', arguments);
       // TODO: send error to admin email
       res.json();
     });
