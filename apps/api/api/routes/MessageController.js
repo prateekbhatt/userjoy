@@ -201,26 +201,9 @@ router
 
         // fetch parent message
         function (cb) {
-
-          Message
-            .findOneAndUpdate(
-
-              {
-                _id: mId,
-                aid: aid
-              },
-
-              {
-                $set: {
-                  replied: true
-                }
-              },
-
-              function (err, msg) {
-                if (err) return cb(err);
-                if (!msg) return cb(new Error('Parent Message Not Found'));
-                cb(err, msg);
-              });
+          Message.replied(mId, function (err, msg) {
+            cb(err, msg);
+          });
         },
 
 
