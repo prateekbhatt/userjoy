@@ -7,4 +7,5 @@ angular.module('services', [
     'services.AccountService',
     'services.ErrorMessageService',
     'services.InboxMessagesService',
+    'services.UidService',
 ]);

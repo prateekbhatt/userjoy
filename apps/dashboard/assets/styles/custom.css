@@ -239,10 +239,10 @@ height: 100%;
     color: #fff;
     background-color: #000;
 }
-.navbar-inverse .navbar-right .navbar-nav > li.dropdown > a:hover, .navbar-inverse .navbar-right .navbar-nav > li.dropdown > a:visited {
+/*.navbar-inverse .navbar-right .navbar-nav > li.dropdown > a:hover, .navbar-inverse .navbar-right .navbar-nav > li.dropdown > a:visited {
     color: #fff;
     background-color: #000;
-}
+}*/
 .navbar-inverse .navbar-header > a:hover, .navbar-inverse .navbar-header > a:focus {
     color: #fff;
 }
