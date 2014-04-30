@@ -1,14 +1,16 @@
 angular.module('models.message', ['services'])
 
-.service('MsgService', ['$http', 'config', 'AppService', 'InboxMessagesService',
-    function ($http, config, AppService, InboxMessagesService) {
-        this.sendManualMessage = function (sub, text) {
+.service('MsgService', ['$http', 'config', 'AppService',
+    'InboxMessagesService', '$modal',
+    function ($http, config, AppService, InboxMessagesService, $modal) {
+        this.sendManualMessage = function (sub, text, uid) {
+            console.log("uid: ", uid)
             var data = {
                 sName: 'Savinay',
                 sub: sub,
                 text: text,
                 type: 'email',
-                uid: '535e5aafddda18934d1a2c6f'
+                uid: uid
             }
             console.log("message data: ", data);
             console.log("LIAS", AppService.getCurrentApp());
@@ -16,9 +18,11 @@ angular.module('models.message', ['services'])
                 ._id;
 
 
-            $http.post(config.apiUrl + '/apps/' + appId + '/messages', data)
+            $http.post(config.apiUrl + '/apps/' + appId + '/messages',
+                data)
                 .success(function (data) {
                     console.log("success");
+
                 })
                 .error(function () {
                     console.log("error");
@@ -26,18 +30,19 @@ angular.module('models.message', ['services'])
 
         }
 
-        this.getManualMessage = function(appId) {
+        this.getManualMessage = function (appId) {
 
             $http.get(config.apiUrl + '/apps/' + appId + '/messages')
-                .success(function(data){
+                .success(function (data) {
                     InboxMessagesService.setInboxMessage(data);
                     console.log("success");
                     console.log(data);
-                }).error(function(){
+                })
+                .error(function () {
                     console.log("error");
                 })
 
-            return InboxMessagesService.getInboxMessage(); 
+            return InboxMessagesService.getInboxMessage();
 
         }
     }

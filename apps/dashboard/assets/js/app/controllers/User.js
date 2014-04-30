@@ -480,8 +480,8 @@ angular.module('do.users', [])
     }
 ])
 
-.controller('TableCtrl', ['$scope', '$filter', 'ngTableParams', '$modal',
-    function ($scope, $filter, ngTableParams, $modal) {
+.controller('TableCtrl', ['$scope', '$filter', 'ngTableParams', '$modal', 'UidService',
+    function ($scope, $filter, ngTableParams, $modal, UidService) {
 
         $scope.title = "Write Message";
         // $scope.content = "Hello Modal<br />This is a multiline message!";
@@ -494,105 +494,129 @@ angular.module('do.users', [])
 
         $scope.openModal = function () {
             popupModal.show();
+            console.log(_.keys($scope.checkboxes.items));
+            UidService.set(_.keys($scope.checkboxes.items));
+
         };
 
+        /*$scope.hideModal = function () {
+            popupModal.hide();
+        }*/
+
         var data = [{
+            id: '1',
             name: "Moroni",
             email: 'a@b.com',
             userkarma: 56,
             datejoined: '3rd Aug',
             status: 'risky'
         }, {
+            id: '2',
             name: "Tiancum",
             email: 'a@b.com',
             userkarma: 56,
             datejoined: '3rd Aug',
             status: 'risky'
         }, {
+            id: '3',
             name: "Jacob",
             email: 'a@b.com',
             userkarma: 56,
             datejoined: '3rd Aug',
             status: 'risky'
         }, {
+            id: '4',
             name: "Nephi",
             email: 'a@b.com',
             userkarma: 56,
             datejoined: '3rd Aug',
             status: 'risky'
         }, {
+            id: '5',
             name: "Enos",
             email: 'a@b.com',
             userkarma: 56,
             datejoined: '3rd Aug',
             status: 'risky'
         }, {
+            id: '6',
             name: "Tiancum",
             email: 'a@b.com',
             userkarma: 56,
             datejoined: '3rd Aug',
             status: 'risky'
         }, {
+            id: '7',
             name: "Jacob",
             email: 'a@b.com',
             userkarma: 56,
             datejoined: '3rd Aug',
             status: 'risky'
         }, {
+            id: '8',
             name: "Nephi",
             email: 'a@b.com',
             userkarma: 56,
             datejoined: '3rd Aug',
             status: 'risky'
         }, {
+            id: '9',
             name: "Enos",
             email: 'a@b.com',
             userkarma: 56,
             datejoined: '3rd Aug',
             status: 'risky'
         }, {
+            id: '10',
             name: "Tiancum",
             email: 'a@b.com',
             userkarma: 56,
             datejoined: '3rd Aug',
             status: 'risky'
         }, {
+            id: '11',
             name: "Jacob",
             email: 'a@b.com',
             userkarma: 56,
             datejoined: '3rd Aug',
             status: 'risky'
         }, {
+            id: '12',
             name: "Nephi",
             email: 'a@b.com',
             userkarma: 56,
             datejoined: '3rd Aug',
             status: 'risky'
         }, {
+            id: '13',
             name: "Enos",
             email: 'a@b.com',
             userkarma: 56,
             datejoined: '3rd Aug',
             status: 'risky'
         }, {
+            id: '14',
             name: "Tiancum",
             email: 'a@b.com',
             userkarma: 56,
             datejoined: '3rd Aug',
             status: 'risky'
         }, {
+            id: '15',
             name: "Jacob",
             email: 'a@b.com',
             userkarma: 56,
             datejoined: '4th Aug',
             status: 'risky'
         }, {
+            id: '16',
             name: "Nephi",
             email: 'a@b.com',
             userkarma: 56,
             datejoined: '3rd Aug',
             status: 'risky'
         }, {
+            id: '17',
             name: "Enos",
             email: 'a@b.com',
             userkarma: 56,
@@ -600,6 +624,10 @@ angular.module('do.users', [])
             status: 'risky'
         }];
         $scope.columns = [{
+            title: '',
+            field: 'checkbox',
+            visible: true
+        }, {
             title: 'Name',
             field: 'name',
             visible: true,
@@ -654,6 +682,47 @@ angular.module('do.users', [])
             }
         });
 
+        $scope.checkboxes = {
+            'checked': false,
+            items: {}
+        };
+
+        console.log("checkboxes: ", $scope.checkboxes);
+
+        $scope.$watch('checkboxes.items', function (values) {
+            console.log("$watch checkboxes: ", $scope.checkboxes.items);
+        })
+
+        // watch for check all checkbox
+        /*$scope.$watch('checkboxes.checked', function (value) {
+            console.log("checkbox value: ", value)
+            angular.forEach($scope.data, function (item) {
+                if (angular.isDefined(item.id)) {
+                    $scope.checkboxes.items[item.id] = value;
+                }
+            });
+        });
+
+        $scope.$watch('checkboxes.items', function (values) {
+            if (!$scope.data) {
+                return;
+            }
+            var checked = 0,
+                unchecked = 0,
+                total = $scope.data.length;
+            angular.forEach($scope.data, function (item) {
+                checked += ($scope.checkboxes.items[item.id]) || 0;
+                unchecked += (!$scope.checkboxes.items[item.id]) ||
+                    0;
+            });
+            if ((unchecked == 0) || (checked == 0)) {
+                $scope.checkboxes.checked = (checked == total);
+            }
+            // grayed checkbox
+            angular.element(document.getElementById("select_all"))
+                .prop("indeterminate", (checked != 0 && unchecked != 0));
+        }, true);*/
+
         $scope.tabledropdown = {
 
         }
@@ -661,11 +730,11 @@ angular.module('do.users', [])
     }
 ])
 
-.controller('sendMessageCtrl', ['$scope', 'MsgService',
-    function ($scope, MsgService) {
+.controller('sendMessageCtrl', ['$scope', 'MsgService', '$modal', 'UidService',
+    function ($scope, MsgService, $modal, UidService) {
         console.log("inside send message ctrl");
         $scope.sendManualMessage = function () {
-            MsgService.sendManualMessage($scope.sub, $scope.text)
+            MsgService.sendManualMessage($scope.sub, $scope.text, UidService.get());
         }
     }
 ])
