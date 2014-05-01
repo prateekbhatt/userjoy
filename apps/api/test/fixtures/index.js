@@ -57,6 +57,13 @@ var accounts = {
     first: {
       aid: null,
       email: 'prattbhatt@gmail.com',
+    },
+
+
+    // second user is used in development env for testing the dashboard app
+    second: {
+      aid: null,
+      email: 'savinay.90@gmail.com'
     }
 
   },
@@ -199,8 +206,16 @@ module.exports = function loadFixtures(callback) {
         users.first = usr;
         cb();
       });
+    },
 
-
+    createSecondUser: function (cb) {
+      var aid = apps.first._id;
+      var newUser = users.second;
+      createUser(aid, newUser, function (err, usr) {
+        if (err) return cb(err);
+        users.second = usr;
+        cb();
+      });
     },
 
     createFirstConversation: function (cb) {
