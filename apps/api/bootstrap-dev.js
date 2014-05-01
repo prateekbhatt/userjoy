@@ -57,6 +57,7 @@ function bootstrapDevDB(cb) {
           if (err) return cb(err);
           savedAccount = saved.accounts.first;
           savedApp = saved.apps.first;
+          savedUser = saved.users.second;
           aid = savedApp._id;
           cb();
         });
@@ -70,6 +71,7 @@ function bootstrapDevDB(cb) {
         createUsers(aid, 1000, function (err, uids) {
           if (err) return cb(err);
           uids = uids;
+          uids.push(savedUser._id);
           cb();
         });
 
@@ -95,8 +97,14 @@ function bootstrapDevDB(cb) {
 
         console.log('\n\n');
         console.log('Use the following account:');
-        console.log(savedAccount);
-        console.log('\n\n');
+        console.log('');
+        console.log('email:', savedAccount.email);
+        console.log('password:', savedAccount.password);
+        console.log('\n');
+        console.log('To test email use the following user:');
+        console.log('');
+        console.log('uid:', savedUser._id);
+        console.log('email:', savedUser.email);
 
       }
 
