@@ -1,4 +1,4 @@
-describe('Model Message', function () {
+describe.only('Model Message', function () {
 
   // TODO
   // Write test to check that if the message is created by a 'account', then
@@ -183,7 +183,7 @@ describe('Model Message', function () {
 
     });
 
-    it('should return messages belonging to an app', function (done) {
+    it('should return unseen messages belonging to an app', function (done) {
 
       Message.fetchInbox(aid, function (err, msg) {
 
@@ -201,12 +201,17 @@ describe('Model Message', function () {
         expect(msg[0].text)
           .to.eql('Hello World');
 
+        _.each(msg, function (m) {
+          expect(m.seen)
+            .to.be.false;
+        });
+
         done();
 
       });
     });
 
-    it('should return ct/replied/seen/sName/sub/text',
+    it('should return ct/coId/replied/seen/sName/sub/text',
       function () {
 
         expect(fetchedMessage)
@@ -214,6 +219,9 @@ describe('Model Message', function () {
 
         expect(fetchedMessage)
           .to.have.property("ct");
+
+        expect(fetchedMessage)
+          .to.have.property("coId");
 
         expect(fetchedMessage)
           .to.have.property("replied");
