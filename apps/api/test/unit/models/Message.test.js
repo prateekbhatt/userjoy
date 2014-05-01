@@ -206,7 +206,7 @@ describe('Model Message', function () {
       });
     });
 
-    it('should return ct/replied/seen/sName/text',
+    it('should return ct/replied/seen/sName/sub/text',
       function () {
 
         expect(fetchedMessage)
@@ -223,6 +223,9 @@ describe('Model Message', function () {
 
         expect(fetchedMessage)
           .to.have.property("sName");
+
+        expect(fetchedMessage)
+          .to.have.property("sub");
 
         expect(fetchedMessage)
           .to.have.property("text");

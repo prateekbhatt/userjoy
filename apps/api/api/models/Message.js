@@ -162,6 +162,7 @@ MessageSchema.statics.fetchInbox = function (aid, cb) {
       replied: 1,
       seen: 1,
       sName: 1,
+      sub: 1,
       text: 1
     })
     .sort({
