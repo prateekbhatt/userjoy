@@ -98,13 +98,13 @@ describe('Resource /apps/:aid/messages', function () {
     it('should create new message',
 
       function (done) {
-
+        var uid = saved.users.first._id;
         var newMessage = {
           sName: 'Prateek Bhatt',
           sub: 'Welcome to UserJoy!',
           text: 'This is the message I want to send',
           type: 'email',
-          uid: ObjectId(),
+          uid: uid,
         };
 
         request
@@ -174,7 +174,7 @@ describe('Resource /apps/:aid/messages', function () {
           .expect(400)
           .expect({
             status: 400,
-            error: 'Missing uid/sub/text/type'
+            error: 'Missing text'
           })
           .end(done);
 
@@ -185,8 +185,8 @@ describe('Resource /apps/:aid/messages', function () {
       function (done) {
 
         var newMessage = {
-          text: 'This is the message I want to send',
-          type: 'email'
+          sName: 'Prateek Bhatt',
+          text: 'This is the message I want to send'
         };
 
         request
