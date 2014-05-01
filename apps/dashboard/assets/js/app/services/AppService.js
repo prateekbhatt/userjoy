@@ -1,6 +1,6 @@
-angular.module('services.LoggedInAppService', [])
+angular.module('services.AppService', [])
 
-.service('LoggedInAppService', ['$log',
+.service('AppService', ['$log',
 
     function ($log) {
 

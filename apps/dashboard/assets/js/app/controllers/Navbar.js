@@ -16,9 +16,9 @@ angular.module('do.navbar', [])
 
 
 .controller('NavbarCtrl', ['$scope', 'AuthService', 'LoginService',
-    '$location', '$log', 'LoggedInAppService', '$http', 'config',
+    '$location', '$log', 'AppService', '$http', 'config',
     function ($scope, AuthService, LoginService, $location, $log,
-        LoggedInAppService, $http, config) {
+        AppService, $http, config) {
         $scope.loggedIn = false;
 
         $scope.showDropdown = function () {
@@ -32,12 +32,12 @@ angular.module('do.navbar', [])
         var appsconnected;
         $scope.apps = [];
 
-        /*$scope.apps = LoggedInAppService.getLoggedInApps();
+        /*$scope.apps = AppService.getLoggedInApps();
         console.log("navbar apps: ", $scope.apps);*/
 
 
 
-        /*var loggedInapps = LoggedInAppService.getLoggedInApps();
+        /*var loggedInapps = AppService.getLoggedInApps();
         console.log(loggedInapps);*/
         console.log("apps length: ", $scope.apps.length);
 
@@ -53,11 +53,11 @@ angular.module('do.navbar', [])
         });
 
 
-        $scope.$watch(LoggedInAppService.getLoggedInApps, function () {
-            $log.info("Navbar watch LoggedInAppService", arguments);
-            $scope.apps = LoggedInAppService.getLoggedInApps();
-            console.log("navbar apps: ", $scope.apps, LoggedInAppService.getLoggedInApps());
-            if (LoggedInAppService.getLoggedInApps()
+        $scope.$watch(AppService.getLoggedInApps, function () {
+            $log.info("Navbar watch AppService", arguments);
+            $scope.apps = AppService.getLoggedInApps();
+            console.log("navbar apps: ", $scope.apps, AppService.getLoggedInApps());
+            if (AppService.getLoggedInApps()
                 .length) {
                 $scope.connectedapps = true;
             } else {

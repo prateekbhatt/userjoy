@@ -1,10 +1,10 @@
 angular.module('models.auth', ['services'])
 
 .service('AuthService', ['$http', 'utils', 'ipCookie', 'LoginService',
-    '$log', 'config', '$state', '$location', 'LoggedInAppService', 
+    '$log', 'config', '$state', '$location', 'AppService', 
     'ErrorMessageService', 'authService',  
     function ($http, utils, ipCookie, LoginService, $log, config, $state,
-        $location, LoggedInAppService, ErrorMessageService, authService) {
+        $location, AppService, ErrorMessageService, authService) {
 
         this.attemptLogin = function (email, password) {
 
@@ -30,12 +30,12 @@ angular.module('models.auth', ['services'])
                         .success(function (data) {
                             console.log("loggedin Apps: ", data);
 
-                            LoggedInAppService.setLoggedInApps(
+                            AppService.setLoggedInApps(
                                 data);
 
-                            if (LoggedInAppService.getLoggedInApps()
+                            if (AppService.getLoggedInApps()
                                 .length) {
-                                console.log(LoggedInAppService.getLoggedInApps());
+                                console.log(AppService.getLoggedInApps());
                                 $state.go('users.list');
                             } else {
                                 $state.go('onboarding');

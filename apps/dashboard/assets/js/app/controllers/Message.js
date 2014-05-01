@@ -24,7 +24,7 @@ angular.module('do.message', [])
                 authenticate: true
             })
             .state('id', {
-                url: '/messages/inbox/1',
+                url: '/messages/inbox/:messageId',
                 views: {
                     "main": {
                         templateUrl: '/templates/messagesmodule/message.inbox.id.html',
@@ -33,12 +33,12 @@ angular.module('do.message', [])
                 },
                 authenticate: true
             })
-            .state('message.sent', {
-                url: '/sent',
+            .state('message.unread', {
+                url: '/unread',
                 views: {
                     "messageapp": {
-                        templateUrl: '/templates/messagesmodule/message.sent.html',
-                        controller: 'SentCtrl',
+                        templateUrl: '/templates/messagesmodule/message.unread.html',
+                        controller: 'UnreadCtrl',
                     }
                 },
                 authenticate: true
@@ -117,8 +117,8 @@ angular.module('do.message', [])
 ])
 
 .controller('InboxCtrl', ['$scope', '$filter', 'ngTableParams', '$log',
-    '$location',
-    function ($scope, $filter, ngTableParams, $log, $location) {
+    'MsgService', '$location', 'AppService',
+    function ($scope, $filter, ngTableParams, $log, MsgService, $location, AppService) {
 
         $scope.replytext = 'hello world';
 
@@ -133,92 +133,132 @@ angular.module('do.message', [])
 
 
         // Get Data from backend TODO
+        // TODO: Replace ng-table with normal table 
+        var msg = MsgService.getManualMessage(AppService.getCurrentApp()
+                ._id)
+
+        console.log(msg);
+
 
         var data = [{
             id: '1',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM'
+            time: '3:29 PM',
+            close: 'Close',
+            assign: 'Assign'
         }, {
             id: '2',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM'
+            time: '3:29 PM',
+            close: 'Close',
+            assign: 'Assign'
         }, {
             id: '3',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM'
+            time: '3:29 PM',
+            close: 'Close',
+            assign: 'Assign'
         }, {
             id: '4',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM'
+            time: '3:29 PM',
+            close: 'Close',
+            assign: 'Assign'
         }, {
             id: '5',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM'
+            time: '3:29 PM',
+            close: 'Close',
+            assign: 'Assign'
         }, {
             id: '6',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM'
+            time: '3:29 PM',
+            close: 'Close',
+            assign: 'Assign'
         }, {
             id: '7',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM'
+            time: '3:29 PM',
+            close: 'Close',
+            assign: 'Assign'
         }, {
             id: '8',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM'
+            time: '3:29 PM',
+            close: 'Close',
+            assign: 'Assign'
         }, {
             id: '9',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM'
+            time: '3:29 PM',
+            close: 'Close',
+            assign: 'Assign'
         }, {
             id: '10',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM'
+            time: '3:29 PM',
+            close: 'Close',
+            assign: 'Assign'
         }, {
             id: '11',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM'
+            time: '3:29 PM',
+            close: 'Close',
+            assign: 'Assign'
         }, {
             id: '12',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM'
+            time: '3:29 PM',
+            close: 'Close',
+            assign: 'Assign'
         }, {
             id: '13',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM'
+            time: '3:29 PM',
+            close: 'Close',
+            assign: 'Assign'
         }, {
             id: '14',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM'
+            time: '3:29 PM',
+            close: 'Close',
+            assign: 'Assign'
         }, {
             id: '15',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM'
+            time: '3:29 PM',
+            close: 'Close',
+            assign: 'Assign'
         }, {
             id: '16',
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM'
+            time: '3:29 PM',
+            close: 'Close',
+            assign: 'Assign'
         }, {
             id: '17',
             name: 'Larro Page',
             subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM'
+            time: '3:29 PM',
+            close: 'Close',
+            assign: 'Assign'
         }];
 
         // Get Data from backend TODO
@@ -243,12 +283,20 @@ angular.module('do.message', [])
                 'name': 'text'
             }
         }, {
-            title: 'Text',
+            title: 'Subject',
             field: 'subject',
             visible: true
         }, {
             title: 'When',
             field: 'time',
+            visible: true
+        }, {
+            title: '',
+            field: 'close',
+            visible: true
+        }, {
+            title: '',
+            field: 'assign',
             visible: true
         }];
 
@@ -285,111 +333,129 @@ angular.module('do.message', [])
     }
 ])
 
-.controller('SentCtrl', ['$scope', '$filter', 'ngTableParams',
+.controller('UnreadCtrl', ['$scope', '$filter', 'ngTableParams',
     function ($scope, $filter, ngTableParams) {
         // TODO: Get data from backend
+        // TODO: Replace ng-table with normal table
         var data = [{
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM',
-            opened: 'Yes',
-            replied: 'No'
+            close: 'Close',
+            reply: 'Reply',
+            assign: 'Assign'
         }, {
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM',
-            opened: 'Yes',
-            replied: 'No'
+            close: 'Close',
+            reply: 'Reply',
+            assign: 'Assign'
         }, {
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM',
-            opened: 'Yes',
-            replied: 'No'
+            close: 'Close',
+            reply: 'Reply',
+            assign: 'Assign'
         }, {
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM',
-            opened: 'Yes',
-            replied: 'No'
+            close: 'Close',
+            reply: 'Reply',
+            assign: 'Assign'
         }, {
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM',
-            opened: 'Yes',
-            replied: 'No'
+            close: 'Close',
+            reply: 'Reply',
+            assign: 'Assign'
         }, {
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM',
-            opened: 'Yes',
-            replied: 'No'
+            close: 'Close',
+            reply: 'Reply',
+            assign: 'Assign'
         }, {
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM',
-            opened: 'Yes',
-            replied: 'No'
+            close: 'Close',
+            reply: 'Reply',
+            assign: 'Assign'
         }, {
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM',
-            opened: 'Yes',
-            replied: 'No'
+            close: 'Close',
+            reply: 'Reply',
+            assign: 'Assign'
         }, {
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM',
-            opened: 'Yes',
-            replied: 'No'
+            close: 'Close',
+            reply: 'Reply',
+            assign: 'Assign'
         }, {
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM',
-            opened: 'Yes',
-            replied: 'No'
+            close: 'Close',
+            reply: 'Reply',
+            assign: 'Assign'
         }, {
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM',
-            opened: 'Yes',
-            replied: 'No'
+            close: 'Close',
+            reply: 'Reply',
+            assign: 'Assign'
         }, {
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM',
-            opened: 'Yes',
-            replied: 'No'
+            close: 'Close',
+            reply: 'Reply',
+            assign: 'Assign'
         }, {
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM',
-            opened: 'Yes',
-            replied: 'No'
+            close: 'Close',
+            reply: 'Reply',
+            assign: 'Assign'
         }, {
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM',
-            opened: 'Yes',
-            replied: 'No'
+            close: 'Close',
+            reply: 'Reply',
+            assign: 'Assign'
         }, {
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM',
-            opened: 'Yes',
-            replied: 'No'
+            close: 'Close',
+            reply: 'Reply',
+            assign: 'Assign'
         }, {
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM',
-            opened: 'Yes',
-            replied: 'No'
+            close: 'Close',
+            reply: 'Reply',
+            assign: 'Assign'
         }, {
             name: 'Larro Page',
             subject: 'Hi, Thanks for such an offer. I really....',
             time: '3:29 PM',
-            opened: 'Yes',
-            replied: 'No'
+            close: 'Close',
+            reply: 'Reply',
+            assign: 'Assign'
         }];
 
         $scope.columnsSent = [{
@@ -408,12 +474,16 @@ angular.module('do.message', [])
             field: 'time',
             visible: true
         }, {
-            title: 'Opened',
-            field: 'opened',
+            title: '',
+            field: 'close',
             visible: 'true'
         }, {
-            title: 'Replied',
-            field: 'replied',
+            title: '',
+            field: 'reply',
+            visible: 'true'
+        }, {
+            title: '',
+            field: 'assign',
             visible: 'true'
         }];
 

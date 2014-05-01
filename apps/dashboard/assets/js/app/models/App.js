@@ -1,7 +1,7 @@
 angular
     .module('models.apps', ['services'])
-    .service('AppModel', ['$http', 'config',
-        function ($http, config) {
+    .service('AppModel', ['$http', 'config', '$state', 'AppService',
+        function ($http, config, $state, AppService) {
 
             this.get = function (cb) {
 
@@ -30,6 +30,17 @@ angular
                     })
                     .error(cb)
 
+            }
+
+            this.addNewApp = function (data) {
+                $http
+                    .post(config.apiUrl + '/apps', data)
+                    .success(function (savedApp) {
+                        $state.transitionTo('addcode');
+                        AppService.new(savedApp);
+                        console.log("apps created: ", AppService.getLoggedInApps(),
+                            savedApp);
+                    })
             }
         }
     ])
