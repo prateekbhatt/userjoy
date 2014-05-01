@@ -13,6 +13,7 @@ var router = require('express')
 
 var Conversation = require('../models/Conversation');
 var Message = require('../models/Message');
+var User = require('../models/User');
 
 
 /**
@@ -21,6 +22,82 @@ var Message = require('../models/Message');
 
 var hasAccess = require('../policies/hasAccess');
 var isAuthenticated = require('../policies/isAuthenticated');
+
+
+/**
+ * Services
+ */
+
+var mailer = require('../services/mailer.js');
+
+
+/**
+ * Helpers
+ */
+
+var appEmail = require('../../helpers/app-email');
+
+
+/**
+ * e.g. '532d6bf862d673ba7131812e+535d131c67d02dc60b2b1764@mail.userjoy.co'
+ */
+
+function replyToEmail(fromEmail, messageId) {
+  var emailSplit = fromEmail.split('@');
+  var emailLocal = emailSplit[0];
+  var emailDomain = emailSplit[1];
+  var email = emailLocal + '+' + messageId + '@' + emailDomain;
+  return email;
+}
+
+
+/**
+ * if name is 'Prateek',
+ * replyTo name is 'Reply to Prateek'
+ *
+ * @param {string} fromName name of the sender
+ * @return {string} reply-to name
+ */
+
+function replyToName(fromName) {
+  var prepend = 'Reply to';
+  var name = prepend + ' ' + fromName;
+  return name;
+}
+
+
+/**
+ * This sends email from an app admin to one of its users
+ *
+ * @param {object} msg the message object
+ * @param {function} cb callback
+ */
+
+function sendMailToUser(msg, cb) {
+
+  User
+    .findById(msg.uid)
+    .exec(function (err, usr) {
+      if (err) return cb(err);
+      if (!usr) return cb(new Error('User Not Found'));
+
+      var fromEmail = appEmail(msg.aid);
+      var locals = {
+        fromEmail: fromEmail,
+        fromName: msg.sName,
+        metadata: {
+          'mId': msg._id
+        },
+        replyToEmail: replyToEmail(fromEmail, msg._id),
+        replyToName: replyToName(msg.sName),
+        subject: msg.sub,
+        toEmail: usr.email,
+        toName: usr.name, // TODO : User Model should have a default name key
+        text: msg.text
+      };
+      mailer.sendToUser(locals, cb);
+    });
+}
 
 
 /**
@@ -111,6 +188,7 @@ router
     var aid = req.app._id;
     var sub = newMessage.sub;
     var uid = newMessage.uid;
+    var fromEmail = appEmail(aid);
 
     // since this is a multi-query request (transaction), we need to make all
     // input validations upfront
@@ -155,8 +233,9 @@ router
 
         // send message through mandrill
         function (msg, cb) {
-          // TODO : send the message through mandrill
-          cb(null, msg);
+          sendMailToUser(msg, function (err) {
+            cb(err, msg);
+          });
         }
 
       ],
@@ -192,8 +271,8 @@ router
     // since this is a multi-query request (transaction), we need to make all
     // input validations upfront
     // text, type
-    if (!(reply.text && reply.type)) {
-      return res.badRequest('Missing uid/sub/text/type');
+    if (!(reply.text)) {
+      return res.badRequest('Missing text');
     }
 
     async.waterfall(
@@ -201,26 +280,9 @@ router
 
         // fetch parent message
         function (cb) {
-
-          Message
-            .findOneAndUpdate(
-
-              {
-                _id: mId,
-                aid: aid
-              },
-
-              {
-                $set: {
-                  replied: true
-                }
-              },
-
-              function (err, msg) {
-                if (err) return cb(err);
-                if (!msg) return cb(new Error('Parent Message Not Found'));
-                cb(err, msg);
-              });
+          Message.replied(mId, function (err, msg) {
+            cb(err, msg);
+          });
         },
 
 
@@ -247,8 +309,9 @@ router
 
         // send message through mandrill
         function (msg, cb) {
-          // TODO : send the message through mandrill is type is email
-          cb(null, msg);
+          sendMailToUser(msg, function (err) {
+            cb(err, msg);
+          });
         }
 
       ],

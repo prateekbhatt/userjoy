@@ -1,12 +1,17 @@
-// # node-email-templates
-
-// ## Example with [Nodemailer](https://github.com/andris9/Nodemailer)
+/**
+ * npm dependencies
+ */
 
 var async = require('async');
 var emailTemplates = require('email-templates');
+var ejs = require('ejs');
 var nodemailer = require('nodemailer');
 var path = require('path');
 
+
+/**
+ * directory path vars
+ */
 
 var templatesDir = path.resolve(__dirname, '../..', 'email_templates');
 
@@ -14,7 +19,8 @@ var templatesDir = path.resolve(__dirname, '../..', 'email_templates');
 var MANDRILL_USER = 'prateek@dodatado.com';
 var MANDRILL_PASS = 'yhR70QpRFKF76wmlM7wNRg';
 var INBOUND_MAIL_DOMAIN = 'mail.userjoy.co';
-
+var UJ_SUPPORT_EMAIL = 'support@userjoy.co';
+var UJ_SUPPORT_NAME = 'UserJoy';
 
 
 function Mailer(locals) {
@@ -23,142 +29,136 @@ function Mailer(locals) {
   this.subject = locals.subject;
   this.template = null;
 
-  this.toEmail = locals.toEmail;
-  this.fromName = locals.fromName;
-  this.fromEmail = locals.fromEmail;
   this.aid = locals.aid;
+  this.fromEmail = locals.fromEmail;
+  this.fromName = locals.fromName;
   this.mId = locals.mId;
+  this.text = locals.text || null;
+  this.replyToEmail = locals.replyToEmail;
+  this.replyToName = locals.replyToName;
+  this.toEmail = locals.toEmail;
+  this.toName = locals.toName;
 
-
-  this.from = this.createFromAddress();
-  this.replyTo = this.createReplyToAddress();
-  this.to = this.createToAddress();
-
-  // Prepare nodemailer transport object
-  this.transport = nodemailer.createTransport("SMTP", {
-    // secureConnection: true,
-    host: 'smtp.mandrillapp.com',
-    port: 587,
-    auth: {
-      user: MANDRILL_USER,
-      pass: MANDRILL_PASS
-    }
-  });
+  this.html = null;
 
   return this;
 }
 
 
-/**
- * from email should consist of the app id
- * and the name of the sender
- *
- * e.g. if aid is 34324242, then "prateek <34324242@mail.userjoy.co>"
- *
- * @returns {string}  fromEmail address
- */
-
-Mailer.prototype.createFromAddress = function () {
-
-  var email = this.aid + '@' + INBOUND_MAIL_DOMAIN;
-
-  if (this.fromName) {
-    email = this.fromName + ' <' + email + '>';
+// Prepare nodemailer transport object
+Mailer.prototype.transport = nodemailer.createTransport("SMTP", {
+  // secureConnection: true,
+  host: 'smtp.mandrillapp.com',
+  port: 587,
+  auth: {
+    user: MANDRILL_USER,
+    pass: MANDRILL_PASS
   }
-
-  return email;
-}
+});
 
 
 /**
  * Prepend name to email
  * e.g. "Prateek Bhatt <prattbhatt@gmail.com>"
  *
+ * @param {string} email
+ * @param {string} name
  * @return {string} full email address
  */
 
-Mailer.prototype.createToAddress = function () {
-
-  var email = this.toEmail;
-
-  if (this.toName) {
-    email = this.toName + ' <' + email + '>';
+Mailer.prototype.createAddress = function (email, name) {
+  if (name) {
+    email = name + ' <' + email + '>';
   }
-
-  return email;
-}
-
-
-/**
- * append message id to from email to get the reply-to email
- *
- * if message id is '1234' and fromEmail is 'prateek <567@mail.userjoy.co>',
- * then reply-to email should be 'Reply to prateek <567+1234@mail.userjoy.co>'
- *
- * @return {string} replyTo email address
- */
-
-Mailer.prototype.createReplyToAddress = function () {
-
-  var mId = this.mId;
-
-  var emailSplit = this.from.split('@');
-  var local = emailSplit[0];
-  var domain = emailSplit[1];
-  var email = 'Reply to ' + local + '+' + mId + '@' + domain;
-
   return email;
 };
+
+
+Mailer.prototype.options = function () {
+
+  var opts = {
+    from: this.createAddress(this.fromEmail, this.fromName),
+    to: this.createAddress(this.toEmail, this.toName),
+    subject: this.subject,
+    html: this.html,
+    generateTextFromHTML: true
+  };
+
+  if (this.replyToEmail) {
+    opts.replyTo = this.createAddress(this.replyToEmail, this.replyToName);
+  }
+
+
+  if (this.metadata) {
+    opts.headers = {
+      'X-MC-Metadata': this.metadata
+    };
+  }
+
+  return opts;
+
+};
+
+
+Mailer.prototype.renderTemplateFile = function (cb) {
+
+  var self = this;
+
+  // get template
+  emailTemplates(templatesDir, function (err, template) {
+    if (err) return cb(err);
+
+    // render template
+    template(self.template, self.locals, cb);
+  });
+};
+
+
+Mailer.prototype.renderTemplateString = function (cb) {
+  var self = this;
+  var text = self.text;
+  var renderedText = ejs.render(text);
+
+  cb(null, renderedText);
+};
+
 
 
 /**
  * sends email with the proper template
  */
 
-Mailer.prototype.send = function () {
+Mailer.prototype.send = function (cb) {
 
   var self = this;
 
   async.waterfall(
     [
 
-      // get template
-      function (cb) {
-        emailTemplates(templatesDir, function (err, template) {
-          cb(err, template);
-        });
-      },
-
-
       // render template
-      function (template, cb) {
+      function (cb) {
 
-        template(self.template, self.locals, function (err, html, text) {
-          cb(err, html, text);
-        });
+        var callback = function (err, html, text) {
+          self.html = html;
+          cb(err);
+        };
+
+        if (self.template) {
+          self.renderTemplateFile.call(self, callback);
+        } else {
+          self.renderTemplateString.call(self, callback);
+        }
+
+
       },
 
 
       // TODO: save html/text message to db here
 
       // send email
-      function (html, text, cb) {
+      function (cb) {
 
-        var opts = {
-          from: self.from,
-          to: self.to,
-          replyTo: self.replyTo,
-          headers: {
-            "X-MC-Metadata": {
-              "mId": self.locals.mId
-            },
-            messageId: this.mId
-          },
-          subject: self.subject,
-          html: html,
-          generateTextFromHTML: true
-        };
-
+        var opts = self.options();
 
         self.transport.sendMail(opts, function (err, responseStatus) {
           cb(err, responseStatus);
@@ -168,14 +168,8 @@ Mailer.prototype.send = function () {
 
     ],
 
-
     function (err, responseStatus) {
-
-      if (err) {
-        console.log(err);
-      } else {
-        console.log(responseStatus.message);
-      }
+      cb(err, responseStatus);
     }
   )
 
@@ -183,12 +177,29 @@ Mailer.prototype.send = function () {
 
 
 /**
- * Sends the news letter
+ * Sends signup email
+ *
  * @param  {object} locals contains the email and other local variables
  */
+
 exports.sendSignupMail = function (locals) {
   var mailer = new Mailer(locals);
-  mailer.subject = 'Welcome to DoDataDo2';
+  mailer.fromName = UJ_SUPPORT_NAME;
+  mailer.fromEmail = UJ_SUPPORT_EMAIL;
+  mailer.subject = 'Welcome to DoDataDo';
   mailer.template = 'signup';
   mailer.send();
+};
+
+
+/**
+ * Sends mail from an app to a user
+ *
+ * @param {object} locals
+ * @param {function} cb callback
+ */
+
+exports.sendToUser = function (locals, cb) {
+  var mailer = new Mailer(locals);
+  mailer.send(cb);
 };

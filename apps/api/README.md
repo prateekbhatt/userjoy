@@ -71,6 +71,11 @@ Every app has a default inbound email address which is "aid@mail.userjoy.co", wh
 
 To create threads, we append the parent message id to the app email address, and create the reply-ro email. e.g. "Reply to UserJoy <1234+5678@mail.userjoy.co>" where aid = 1234 and message id = 5678. So, we know that the inbound message is a reply to message with id 5678
 
+###### MetaData
+
+We allow the apps to pass custom attributes related to users, companies and events. These attributes should be stored in a metadata field using (```metadata: [{ key: 'key', value: 'value'}]```) array. [Reference](http://calv.info/indexing-schemaless-documents-in-mongo/)
+
+
 
 ## Models
 
@@ -468,6 +473,7 @@ User          | companies, notes        | users of a specific app. create a new 
 
 ```js
 {
+  sName: 'John Sender',
   text: 'This is the message I want to send'
 }
 ```
@@ -479,18 +485,18 @@ User          | companies, notes        | users of a specific app. create a new 
   __v: 0,
   text: 'This is the message I want to send',
   type: 'email',
-  accid: 535e67a2455135db1815b072,
-  aid: 535e67a2455135db1815b074,
-  coId: 535e67a2455135db1815b078,
+  accid: '535e67a2455135db1815b072',
+  aid: '535e67a2455135db1815b074',
+  coId: '535e67a2455135db1815b078',
   from: 'account',
   sub: 'New Subject',
-  uid: 535e67a1455135db1815b06f,
-  _id: 535e67a2455135db1815b07b,
-  ut: Mon Apr 28 2014 20:07:22 GMT+0530 (IST),
+  uid: '535e67a1455135db1815b06f',
+  _id: '535e67a2455135db1815b07b',
+  ut: 'Mon Apr 28 2014 20:07:22 GMT+0530 (IST)',
   sent: false,
   seen: false,
   replied: false,
-  ct: Mon Apr 28 2014 20:07:22 GMT+0530 (IST),
+  ct: 'Mon Apr 28 2014 20:07:22 GMT+0530 (IST)',
   clicked: false
 }
 ```
