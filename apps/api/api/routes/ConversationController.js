@@ -64,7 +64,7 @@ router
 
 
     // TODO: also take the aid as an input param as an additional check
-    Conversation.close(coId, function (err, msg) {
+    Conversation.closed(coId, function (err, msg) {
       if (err) return next(err);
 
       res
