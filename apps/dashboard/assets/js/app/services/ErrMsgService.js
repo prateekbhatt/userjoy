@@ -1,6 +1,6 @@
-angular.module('services.ErrorMessageService', [])
+angular.module('services.ErrMsgService', [])
 
-.service('ErrorMessageService', ['$log',
+.service('ErrMsgService', ['$log',
 
     function ($log) {
 

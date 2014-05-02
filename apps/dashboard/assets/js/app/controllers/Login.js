@@ -28,9 +28,9 @@ angular.module('do.login', [])
 ])
 
 .controller('LoginCtrl', ['$scope', 'LoginService', 'AuthService', '$state',
-    '$log', 'ErrorMessageService',
+    '$log', 'ErrMsgService',
     function ($scope, LoginService, AuthService, $state, $log,
-        ErrorMessageService) {
+        ErrMsgService) {
 
         $log.info('LoginCtrl', LoginService.getUserAuthenticated());
         $scope.errMsg = '';
@@ -48,10 +48,10 @@ angular.module('do.login', [])
         $scope.attemptLogin = function () {
 
             AuthService.attemptLogin($scope.email, $scope.password);
-            $scope.$watch(ErrorMessageService.getErrorMessage, function () {
-                if (ErrorMessageService.getErrorMessage()) {
+            $scope.$watch(ErrMsgService.getErrorMessage, function () {
+                if (ErrMsgService.getErrorMessage()) {
                     $scope.showError = true;
-                    $scope.errMsg = ErrorMessageService.getErrorMessage();
+                    $scope.errMsg = ErrMsgService.getErrorMessage();
                 }
             })
 

@@ -13,10 +13,10 @@ angular.module('do.message', [])
                 },
                 authenticate: true
             })
-            .state('message.inbox', {
-                url: '/inbox',
+            .state('inbox', {
+                url: '/messages/inbox',
                 views: {
-                    "messageapp": {
+                    "main": {
                         templateUrl: '/templates/messagesmodule/message.inbox.html',
                         controller: 'InboxCtrl'
                     }
@@ -33,10 +33,10 @@ angular.module('do.message', [])
                 },
                 authenticate: true
             })
-            .state('message.unread', {
-                url: '/unread',
+            .state('unread', {
+                url: '/messages/unread',
                 views: {
-                    "messageapp": {
+                    "main": {
                         templateUrl: '/templates/messagesmodule/message.unread.html',
                         controller: 'UnreadCtrl',
                     }
@@ -107,6 +107,8 @@ angular.module('do.message', [])
 .controller('messageCtrl', ['$scope', '$location',
     function ($scope, $location) {
 
+        console.log("inside home msg ctrl");
+
         // TODO : change in production
         if (window.location.href ===
             'http://app.do.localhost/messages') {
@@ -117,8 +119,11 @@ angular.module('do.message', [])
 ])
 
 .controller('InboxCtrl', ['$scope', '$filter', 'ngTableParams', '$log',
-    'MsgService', '$location', 'AppService',
-    function ($scope, $filter, ngTableParams, $log, MsgService, $location, AppService) {
+    'MsgService', '$location', 'AppService', 'InboxMsgService',
+    function ($scope, $filter, ngTableParams, $log, MsgService, $location,
+        AppService, InboxMsgService) {
+
+        console.log("entering inboxctrl");
 
         $scope.replytext = 'hello world';
 
@@ -130,137 +135,84 @@ angular.module('do.message', [])
             $scope.showTable = true;
         }
 
-
-
         // Get Data from backend TODO
-        // TODO: Replace ng-table with normal table 
-        var msg = MsgService.getManualMessage(AppService.getCurrentApp()
-                ._id)
+        console.log(AppService.getCurrentApp()
+            ._id);
+        var msg = [];
+        $scope.data = [];
+        MsgService.getManualMessage(AppService.getCurrentApp()
+            ._id);
+        $scope.$watch(InboxMsgService.getInboxMessage, function () {
+            msg = InboxMsgService.getInboxMessage();
+            for (var i = 0; i < msg.length; i++) {
+                $scope.data.push({
+                    id: msg[i]._id,
+                    name: msg[i].sName,
+                    subject: 'Subject',
+                    time: msg[i].ct,
+                    close: 'Close',
+                    assign: 'Assign'
+                })
+            };
 
-        console.log(msg);
+            $scope.columnsInbox = [{
+                title: 'User',
+                field: 'name',
+                visible: true,
+                filter: {
+                    'name': 'text'
+                }
+            }, {
+                title: 'Subject',
+                field: 'subject',
+                visible: true
+            }, {
+                title: 'When',
+                field: 'time',
+                visible: true
+            }, {
+                title: '',
+                field: 'close',
+                visible: true
+            }, {
+                title: '',
+                field: 'assign',
+                visible: true
+            }];
 
+            $scope.tableParamsInbox = new ngTableParams({
+                page: 1, // show first page
+                count: 10, // count per page
+                filter: {
+                    name: 'M' // initial filter
+                },
+                sorting: {
+                    name: 'asc'
+                }
+            }, {
+                total: $scope.data.length, // length of data
+                getData: function ($defer, params) {
+                    // use build-in angular filter
+                    var filteredData = params.filter() ?
+                        $filter('filter')($scope.data, params
+                            .filter()) :
+                        $scope.data;
+                    var orderedData = params.sorting() ?
+                        $filter('orderBy')($scope.data,
+                            params.orderBy()) :
+                        $scope.data;
+                    params.total(orderedData.length); // set total for recalc paginationemail
 
-        var data = [{
-            id: '1',
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            assign: 'Assign'
-        }, {
-            id: '2',
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            assign: 'Assign'
-        }, {
-            id: '3',
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            assign: 'Assign'
-        }, {
-            id: '4',
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            assign: 'Assign'
-        }, {
-            id: '5',
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            assign: 'Assign'
-        }, {
-            id: '6',
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            assign: 'Assign'
-        }, {
-            id: '7',
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            assign: 'Assign'
-        }, {
-            id: '8',
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            assign: 'Assign'
-        }, {
-            id: '9',
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            assign: 'Assign'
-        }, {
-            id: '10',
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            assign: 'Assign'
-        }, {
-            id: '11',
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            assign: 'Assign'
-        }, {
-            id: '12',
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            assign: 'Assign'
-        }, {
-            id: '13',
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            assign: 'Assign'
-        }, {
-            id: '14',
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            assign: 'Assign'
-        }, {
-            id: '15',
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            assign: 'Assign'
-        }, {
-            id: '16',
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            assign: 'Assign'
-        }, {
-            id: '17',
-            name: 'Larro Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            assign: 'Assign'
-        }];
+                    $defer.resolve(orderedData.slice((
+                            params.page() -
+                            1) * params.count(),
+                        params.page() *
+                        params.count()));
+                }
+            });
 
+            console.log("msg: ", $scope.data);
+        })
         // Get Data from backend TODO
 
         $scope.messagebody =
@@ -275,61 +227,7 @@ angular.module('do.message', [])
         }
 
 
-        $scope.columnsInbox = [{
-            title: 'User',
-            field: 'name',
-            visible: true,
-            filter: {
-                'name': 'text'
-            }
-        }, {
-            title: 'Subject',
-            field: 'subject',
-            visible: true
-        }, {
-            title: 'When',
-            field: 'time',
-            visible: true
-        }, {
-            title: '',
-            field: 'close',
-            visible: true
-        }, {
-            title: '',
-            field: 'assign',
-            visible: true
-        }];
 
-        $scope.tableParamsInbox = new ngTableParams({
-            page: 1, // show first page
-            count: 10, // count per page
-            filter: {
-                name: 'M' // initial filter
-            },
-            sorting: {
-                name: 'asc'
-            }
-        }, {
-            total: data.length, // length of data
-            getData: function ($defer, params) {
-                // use build-in angular filter
-                var filteredData = params.filter() ?
-                    $filter('filter')(data, params
-                        .filter()) :
-                    data;
-                var orderedData = params.sorting() ?
-                    $filter('orderBy')(data,
-                        params.orderBy()) :
-                    data;
-                params.total(orderedData.length); // set total for recalc paginationemail
-
-                $defer.resolve(orderedData.slice((
-                        params.page() -
-                        1) * params.count(),
-                    params.page() *
-                    params.count()));
-            }
-        });
     }
 ])
 
@@ -337,6 +235,9 @@ angular.module('do.message', [])
     function ($scope, $filter, ngTableParams) {
         // TODO: Get data from backend
         // TODO: Replace ng-table with normal table
+
+        console.log("inside UnreadCtrl");
+
         var data = [{
             name: 'Larry Page',
             subject: 'Hi, Thanks for such an offer. I really....',
@@ -555,6 +456,9 @@ angular.module('do.message', [])
 .controller('messageAutomateCtrl', ['$scope', '$location', 'segment',
     'queryMatching', '$filter',
     function ($scope, $location, segment, queryMatching, $filter) {
+
+        console.log("inside automate ctrl");
+
         $scope.automessages = ["In App welcome message for start ups",
             "Discount for users from Uganda", "As above", "As above1"
         ];
@@ -679,6 +583,7 @@ angular.module('do.message', [])
 
 .controller('templateCtrl', ['$scope',
     function ($scope) {
+        console.log("inside templateCtrl");
         $scope.options = {
             color: ['Blue', 'Red', 'Green', 'Cyan']
         };

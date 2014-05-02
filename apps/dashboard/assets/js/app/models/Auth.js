@@ -2,9 +2,9 @@ angular.module('models.auth', ['services'])
 
 .service('AuthService', ['$http', 'utils', 'ipCookie', 'LoginService',
     '$log', 'config', '$state', '$location', 'AppService', 
-    'ErrorMessageService', 'authService',  
+    'ErrMsgService', 'authService',  
     function ($http, utils, ipCookie, LoginService, $log, config, $state,
-        $location, AppService, ErrorMessageService, authService) {
+        $location, AppService, ErrMsgService, authService) {
 
         this.attemptLogin = function (email, password) {
 
@@ -51,7 +51,7 @@ angular.module('models.auth', ['services'])
                 .error(function (err) {
                     $log.error("error in signing in");
                     console.log(err.error);
-                    ErrorMessageService.setErrorMessage(err.error);
+                    ErrMsgService.setErrorMessage(err.error);
                 })
         };
 

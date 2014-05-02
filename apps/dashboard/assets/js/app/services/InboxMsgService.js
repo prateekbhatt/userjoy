@@ -1,12 +1,13 @@
-angular.module('services.InboxMessagesService', [])
+angular.module('services.InboxMsgService', [])
 
-.service('InboxMessagesService', ['$log',
+.service('InboxMsgService', ['$log',
 
     function ($log) {
 
         var inboxMsg = [];
 
         this.setInboxMessage = function (value) {
+            console.log("setting inbox msg");
             inboxMsg = value;
         };
 

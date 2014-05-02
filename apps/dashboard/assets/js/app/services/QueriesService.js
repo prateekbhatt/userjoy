@@ -1,4 +1,4 @@
-angular.module('services.segmentQueryService', [])
+angular.module('services.QueriesService', [])
 
 .service('segment', [
 
