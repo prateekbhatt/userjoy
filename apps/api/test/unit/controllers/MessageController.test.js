@@ -262,8 +262,10 @@ describe('Resource /apps/:aid/messages', function () {
 
   describe('GET /apps/:aid/messages/:mId', function () {
 
+    var testMessage;
 
     before(function (done) {
+      testMessage = saved.messages.first;
       logoutUser(done);
     });
 
@@ -273,7 +275,7 @@ describe('Resource /apps/:aid/messages', function () {
       function (done) {
 
         request
-          .get(basePath + '/' + saved.messages.first._id)
+          .get(basePath + '/' + testMessage._id)
           .expect('Content-Type', /json/)
           .expect(401)
           .expect({
@@ -299,19 +301,49 @@ describe('Resource /apps/:aid/messages', function () {
       function (done) {
 
         request
-          .get(basePath + '/' + saved.messages.first._id)
+          .get(basePath + '/' + testMessage._id)
           .set('cookie', loginCookie)
           .expect('Content-Type', /json/)
-          .expect(function (res) {
-            if (!Array.isArray(res.body)) {
-              return 'Should return an array';
-            }
-            if (!res.body.length) {
-              return 'Should have returned to two messages';
-            }
-          })
           .expect(200)
-          .end(done);
+          .end(function (err, res) {
+
+            expect(res.body)
+              .to.be.an("array");
+
+            expect(res.body)
+              .to.have.length.above(0);
+
+            done();
+          });
+
+      });
+
+
+    // this test depends on the output of the previous test, hence it should be
+    // below
+    it(
+      'should update seen status to true for all messages, in the thread, sent from user',
+      function (done) {
+
+        Message
+          .find({
+            coId: testMessage.coId
+          })
+          .exec(function (err, msgs) {
+
+            if (err) return done(err);
+
+            _.chain(msgs)
+              .each(function (m) {
+                if (m.from === 'user') {
+                  expect(m.seen)
+                    .to.be.true;
+                }
+              })
+              .value();
+
+            done();
+          });
 
       });
 
