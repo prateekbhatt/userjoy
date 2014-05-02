@@ -99,6 +99,16 @@ function sendMailToUser(msg, cb) {
     });
 }
 
+// /**
+//  * Add a delimiter on top of the function
+//  * Used to extract out the text of the current message
+//  */
+
+// function addDelimiter(text) {
+//   var delimiter = '## Please reply above to send message ##';
+//   return delimiter
+// }
+
 
 /**
  * All routes on /apps
@@ -131,6 +141,31 @@ router
   .route('/:aid/messages')
   .get(function (req, res, next) {
 
+    var aid = req.app._id;
+
+    Message
+      .fetchAll(aid, function (err, messages) {
+
+        if (err) {
+          return next(err);
+        }
+
+        res.json(messages || []);
+
+      });
+
+  });
+
+
+/**
+ * GET /apps/:aid/messages/unread
+ *
+ * Returns all unread messages for app
+ */
+
+router
+  .route('/:aid/messages/unread')
+  .get(function (req, res, next) {
     var aid = req.app._id;
 
     Message
