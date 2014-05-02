@@ -16,6 +16,10 @@ describe('Model Conversation', function () {
   var savedConversation;
 
 
+  before(function (done) {
+    setupTestDb(done);
+  });
+
   describe('#create', function () {
 
     it('should return error if aid/sub/uid is not provided',
@@ -112,6 +116,34 @@ describe('Model Conversation', function () {
         .to.eql(false);
 
     });
+
+  });
+
+
+  describe('#close', function () {
+
+
+    it('should update closed status of conversation to true',
+      function (done) {
+
+        var savedCon = saved.conversations.first;
+
+        expect(savedCon.closed)
+          .to.be.false;
+
+        Conversation.close(savedCon._id, function (err, con) {
+
+          expect(err)
+            .to.not.exist;
+
+          expect(con.closed)
+            .to.be.true;
+
+          done();
+
+        });
+
+      });
 
   });
 
