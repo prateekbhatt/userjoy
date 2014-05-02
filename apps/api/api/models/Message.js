@@ -143,8 +143,8 @@ MessageSchema.pre('save', function (next) {
 
 
 /**
- * Finds messages belonging to an app, sent from users, sorted by created
- * timestamp
+ * Finds messages belonging to an app, sent from users, and are unread,
+ * sorted by created timestamp
  *
  * @param {string} aid app id
  * @param {function} cb callback
@@ -155,13 +155,16 @@ MessageSchema.statics.fetchInbox = function (aid, cb) {
   Message
     .find({
       aid: aid,
-      from: 'user'
+      from: 'user',
+      seen: false
     })
     .select({
       ct: 1,
+      coId: 1,
       replied: 1,
       seen: 1,
       sName: 1,
+      sub: 1,
       text: 1
     })
     .sort({
@@ -290,6 +293,36 @@ MessageSchema.statics.sent = function (id, cb) {
 
 MessageSchema.statics.replied = function (id, cb) {
   findAndUpdateStatus(id, 'replied', cb);
+};
+
+
+/**
+ * When a conversation thread is opened by an app team member, all the messages
+ * from the user in the thread are considered opened
+ *
+ * @param {array} messageIds ids of all messages in a thread
+ * @param {function} cb callback
+ */
+
+MessageSchema.statics.openedByTeamMember = function (messageIds, cb) {
+
+  var conditions = {
+    '_id': {
+      '$in': messageIds
+    },
+    from: 'user'
+  };
+
+  var update = {
+    'seen': true
+  };
+
+  var options = {
+    'multi': true
+  };
+
+  Message.update(conditions, update, options, cb);
+
 };
 
 

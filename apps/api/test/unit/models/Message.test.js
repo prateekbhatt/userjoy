@@ -183,7 +183,7 @@ describe('Model Message', function () {
 
     });
 
-    it('should return messages belonging to an app', function (done) {
+    it('should return unseen messages belonging to an app', function (done) {
 
       Message.fetchInbox(aid, function (err, msg) {
 
@@ -201,12 +201,17 @@ describe('Model Message', function () {
         expect(msg[0].text)
           .to.eql('Hello World');
 
+        _.each(msg, function (m) {
+          expect(m.seen)
+            .to.be.false;
+        });
+
         done();
 
       });
     });
 
-    it('should return ct/replied/seen/sName/text',
+    it('should return ct/coId/replied/seen/sName/sub/text',
       function () {
 
         expect(fetchedMessage)
@@ -216,6 +221,9 @@ describe('Model Message', function () {
           .to.have.property("ct");
 
         expect(fetchedMessage)
+          .to.have.property("coId");
+
+        expect(fetchedMessage)
           .to.have.property("replied");
 
         expect(fetchedMessage)
@@ -223,6 +231,9 @@ describe('Model Message', function () {
 
         expect(fetchedMessage)
           .to.have.property("sName");
+
+        expect(fetchedMessage)
+          .to.have.property("sub");
 
         expect(fetchedMessage)
           .to.have.property("text");
@@ -451,6 +462,59 @@ describe('Model Message', function () {
         done();
       })
     });
+  });
+
+  describe('#openedByTeamMember', function () {
+
+    var mIds = [];
+
+    before(function (done) {
+
+      var savedMsg = saved.messages.first;
+      mIds = _.pluck(saved.messages, '_id');
+
+
+      var adminReply = {
+        accid: savedMsg.accid,
+        aid: savedMsg.aid,
+        coId: savedMsg.coId,
+        from: 'account',
+        sName: 'Prateek Sender',
+        sub: savedMsg.sub,
+        text: 'This is a new reply',
+        type: 'email',
+        uid: savedMsg.uid
+      };
+
+
+      Message
+        .create(adminReply, function (err, newReply) {
+          mIds.push(newReply._id);
+          done();
+        });
+
+
+    });
+
+    it('should update seen status of all messages from user to true',
+      function (done) {
+
+        Message
+          .openedByTeamMember(mIds, function (err, numberAffected) {
+
+            expect(mIds)
+              .to.have.length(3);
+
+            expect(err)
+              .to.not.exist;
+
+            expect(numberAffected)
+              .to.eql(2);
+
+            done()
+          })
+
+      });
   });
 
 });
