@@ -160,15 +160,19 @@ router
     var aid = req.app._id;
     var mId = req.params.mId;
 
-    Message
-      .fetchThread(aid, mId, function (err, messages) {
-        if (err) {
-          return next(err);
-        }
+    Message.fetchThread(aid, mId, function (err, messages) {
+      if (err) return next(err);
+      var mIds = _.pluck(messages, '_id');
 
+
+      // update seen status to true for all messages sent from user, which
+      // belong to this thread
+      Message.openedByTeamMember(mIds, function (err) {
+        if (err) return next(err);
         res.json(messages || []);
-
       });
+
+    });
 
   });
 
