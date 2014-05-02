@@ -123,6 +123,7 @@ angular.module('do.message', [])
     function ($scope, $filter, ngTableParams, $log, MsgService, $location,
         AppService, InboxMsgService) {
 
+        $scope.data = [];
         console.log("entering inboxctrl");
 
         $scope.replytext = 'hello world';
@@ -139,7 +140,6 @@ angular.module('do.message', [])
         console.log(AppService.getCurrentApp()
             ._id);
         var msg = [];
-        $scope.data = [];
         MsgService.getManualMessage(AppService.getCurrentApp()
             ._id);
         $scope.$watch(InboxMsgService.getInboxMessage, function () {
@@ -213,6 +213,13 @@ angular.module('do.message', [])
 
             console.log("msg: ", $scope.data);
         })
+    
+        $scope.showMessageThread = function (index) {
+            console.log("index: ", index);
+            console.log(InboxMsgService.getInboxMessage());
+            // $location.path('/messages/inbox/' + msgId);
+        }
+        
         // Get Data from backend TODO
 
         $scope.messagebody =
@@ -220,10 +227,12 @@ angular.module('do.message', [])
 
 
 
-        $scope.showSelectedMail = function () {
+        $scope.showSelectedMail = function (id) {
             // console.log("inside selected mail");
             // $scope.showTable = false;
-            $location.path('/messages/inbox/1');
+            MsgService.getMessageThread(AppService.getCurrentApp()._id, id);
+
+
         }
 
 
@@ -590,8 +599,8 @@ angular.module('do.message', [])
     }
 ])
 
-.controller('MessageBodyCtrl', ['$scope',
-    function ($scope) {
+.controller('MessageBodyCtrl', ['$scope', 'MsgService', 'AppService', 'ThreadService',
+    function ($scope, MsgService, AppService, ThreadService) {
 
         $scope.healthScore = '50';
         $scope.plan = 'Basic';
@@ -620,7 +629,23 @@ angular.module('do.message', [])
         $scope.today = new Date();
 
         // Get Data from Backend TODO
-        $scope.messages = [{
+        
+        console.log(ThreadService.getThread());
+        var msgThread = ThreadService.getThread();
+        console.log("msg thread: -> ->", msgThread);
+        /*$scope.messages.push({
+            messagebody: msgThread
+        })*/
+        
+        $scope.messages = [];
+        for (var i = 0; i < msgThread.length; i++) {
+            $scope.messages.push ({
+                messagebody: msgThread[i].text,
+                createdby: msgThread[i].sName,
+                createdat: msgThread[i].ut
+            })
+        };
+        /*$scope.messages = [{
             messagebody: 'Hi, this is Larry Page. Thanks for such an offer. It was great.... Lorem Ipsum.......',
             createdby: 'Savinay',
             createdat: '23rd March, 2014'
@@ -656,7 +681,7 @@ angular.module('do.message', [])
             messagebody: 'Hi, this is Larry Page. Thanks for such an offer. It was great.... Lorem Ipsum.......',
             createdby: 'John',
             createdat: '26th March, 2014'
-        }];
+        }];*/
 
         /* function getUniqueUsers() {
             console.log("inside getcolor: ", name);

@@ -1,8 +1,8 @@
 angular.module('models.message', ['services'])
 
 .service('MsgService', ['$http', 'config', 'AppService',
-    'InboxMsgService', '$modal',
-    function ($http, config, AppService, InboxMsgService, $modal) {
+    'InboxMsgService', '$modal', '$location', 'ThreadService',
+    function ($http, config, AppService, InboxMsgService, $modal, $location, ThreadService) {
         this.sendManualMessage = function (sub, text, uid) {
             console.log("uid: ", uid)
             var data = {
@@ -42,5 +42,19 @@ angular.module('models.message', ['services'])
                     console.log("error");
                 })
         };
+
+        this.getMessageThread = function (appId, msgId) {
+            $http.get(config.apiUrl + '/apps/' + appId + '/messages/' +
+                msgId)
+                .success(function (data) {
+                    console.log("success getting msg thread");
+                    $location.path('/messages/inbox/' + msgId);
+                    console.log("msg thread: ", data);
+                    ThreadService.setThread(data);
+                })
+                .error(function () {
+                    console.log("error");
+                })
+        }
     }
 ])
