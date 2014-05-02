@@ -30,31 +30,28 @@ angular.module('models.message', ['services'])
 
         };
 
-        this.getManualMessage = function (appId) {
+        this.getManualMessage = function (appId, callback) {
             console.log("going to fetch msgs");
             $http.get(config.apiUrl + '/apps/' + appId + '/messages')
                 .success(function (data) {
                     console.log("success getting messages");
                     InboxMsgService.setInboxMessage(data);
                     console.log("setting msg: ", InboxMsgService.getInboxMessage());
+                    callback();
                 })
-                .error(function () {
-                    console.log("error");
-                })
+                .error(callback);
         };
 
-        this.getMessageThread = function (appId, msgId) {
+        this.getMessageThread = function (appId, msgId, callback) {
             $http.get(config.apiUrl + '/apps/' + appId + '/messages/' +
                 msgId)
                 .success(function (data) {
                     console.log("success getting msg thread");
-                    $location.path('/messages/inbox/' + msgId);
                     console.log("msg thread: ", data);
                     ThreadService.setThread(data);
+                    callback();
                 })
-                .error(function () {
-                    console.log("error");
-                })
+                .error(callback);
         }
     }
 ])

@@ -33,7 +33,7 @@ angular.module('dodatado', [
 
     $urlRouterProvider.otherwise('/404');
     $locationProvider.html5Mode(true);
-console.log('\n\n setting authcredentials');
+    console.log('\n\n setting authcredentials');
     // for making cross domain authentication requests
     $httpProvider.defaults.useXDomain = true;
     $httpProvider.defaults.withCredentials = true;
@@ -124,19 +124,25 @@ console.log('\n\n setting authcredentials');
         });
     }
 ])
-.run(['$state', 'LoginService', '$rootScope',
-    function ($state, LoginService, $rootScope) {
+    .run(['$state', 'LoginService', '$rootScope',
+        function ($state, LoginService, $rootScope) {
 
-        // check if user needs to be logged in to view a specific page
-        $rootScope.$on("$stateChangeStart", function (event,
-            toState,
-            toParams, fromState, fromParams) {
-            if (toState.authenticate && !LoginService.getUserAuthenticated()) {
-                // User isn’t authenticated
-                $state.go("login");
-                event.preventDefault();
-            }
-        });
+            // check if user needs to be logged in to view a specific page
+            $rootScope.$on("$stateChangeStart", function (event,
+                toState,
+                toParams, fromState, fromParams) {
+                if (toState.authenticate && !LoginService.getUserAuthenticated()) {
+                    // User isn’t authenticated
+                    $state.go("login");
+                    event.preventDefault();
+                }
+            });
+        }
+    ])
+
+.run(['ThreadService', 'MsgService',
+    function (ThreadService, MsgService) {
+        window.location.pathname
     }
 ])
 
@@ -149,7 +155,7 @@ console.log('\n\n setting authcredentials');
         var allSegments = [{
             _id: "0",
             name: "Users"
-        },{
+        }, {
             _id: "1",
             name: "Phone Users"
         }, {
@@ -177,11 +183,11 @@ console.log('\n\n setting authcredentials');
             name: "does not contain",
             key: 'ncn'
         }, {
-            id:"4",
+            id: "4",
             name: 'greater than',
             key: 'gt'
         }, {
-            id:"5",
+            id: "5",
             name: 'less than',
             key: 'lt'
         }];

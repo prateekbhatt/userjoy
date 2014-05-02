@@ -24,7 +24,7 @@ angular.module('do.message', [])
                 authenticate: true
             })
             .state('id', {
-                url: '/messages/inbox/:messageId',
+                url: '/messages/:appId/conversations/:messageId',
                 views: {
                     "main": {
                         templateUrl: '/templates/messagesmodule/message.inbox.id.html',
@@ -140,9 +140,8 @@ angular.module('do.message', [])
         console.log(AppService.getCurrentApp()
             ._id);
         var msg = [];
-        MsgService.getManualMessage(AppService.getCurrentApp()
-            ._id);
-        $scope.$watch(InboxMsgService.getInboxMessage, function () {
+
+        function showManualMsg() {
             msg = InboxMsgService.getInboxMessage();
             for (var i = 0; i < msg.length; i++) {
                 $scope.data.push({
@@ -153,8 +152,8 @@ angular.module('do.message', [])
                     close: 'Close',
                     assign: 'Assign'
                 })
-            };
-
+            }
+            console.log("$scope.data: ", $scope.data);
             $scope.columnsInbox = [{
                 title: 'User',
                 field: 'name',
@@ -210,16 +209,26 @@ angular.module('do.message', [])
                         params.count()));
                 }
             });
+        }
 
-            console.log("msg: ", $scope.data);
-        })
-    
+        var showMsgCallback = function (err) {
+            if (err) {
+                return;
+            }
+            showManualMsg();
+        }
+
+        MsgService.getManualMessage(AppService.getCurrentApp()
+            ._id, showMsgCallback);
+        console.log("msg: ", $scope.data);
+
+
         $scope.showMessageThread = function (index) {
             console.log("index: ", index);
             console.log(InboxMsgService.getInboxMessage());
             // $location.path('/messages/inbox/' + msgId);
         }
-        
+
         // Get Data from backend TODO
 
         $scope.messagebody =
@@ -230,7 +239,8 @@ angular.module('do.message', [])
         $scope.showSelectedMail = function (id) {
             // console.log("inside selected mail");
             // $scope.showTable = false;
-            MsgService.getMessageThread(AppService.getCurrentApp()._id, id);
+            $location.path('/messages/' + AppService.getCurrentApp()
+                ._id + '/conversations/' + id);
 
 
         }
@@ -599,18 +609,11 @@ angular.module('do.message', [])
     }
 ])
 
-.controller('MessageBodyCtrl', ['$scope', 'MsgService', 'AppService', 'ThreadService',
+.controller('MessageBodyCtrl', ['$scope', 'MsgService', 'AppService',
+    'ThreadService',
     function ($scope, MsgService, AppService, ThreadService) {
 
-        $scope.healthScore = '50';
-        $scope.plan = 'Basic';
-        $scope.planValue = '$25';
-        $scope.renewal = '25 Mar 2014';
 
-        $scope.openReplyBox = function () {
-            $log.info("Inside replybox");
-
-        }
 
         function getRandomColor(initials) {
             var letters = '0123456789ABCDEF'.split('');
@@ -624,126 +627,102 @@ angular.module('do.message', [])
             return color;
         }
 
-        $scope.replytext = '';
-
-        $scope.today = new Date();
-
-        // Get Data from Backend TODO
-        
-        console.log(ThreadService.getThread());
-        var msgThread = ThreadService.getThread();
-        console.log("msg thread: -> ->", msgThread);
-        /*$scope.messages.push({
-            messagebody: msgThread
-        })*/
-        
-        $scope.messages = [];
-        for (var i = 0; i < msgThread.length; i++) {
-            $scope.messages.push ({
-                messagebody: msgThread[i].text,
-                createdby: msgThread[i].sName,
-                createdat: msgThread[i].ut
-            })
-        };
-        /*$scope.messages = [{
-            messagebody: 'Hi, this is Larry Page. Thanks for such an offer. It was great.... Lorem Ipsum.......',
-            createdby: 'Savinay',
-            createdat: '23rd March, 2014'
-        }, {
-            messagebody: 'Hi, this is Sergey Brin. Thanks for such an offer. It was great.... Lorem Ipsum.......cadilus quasum irium idler sherlock holmes',
-            createdby: 'John',
-            createdat: '24th March, 2014'
-        }, {
-            messagebody: 'Hi, this is Larry Page. Thanks for such an offer. It was great.... Lorem Ipsum.......',
-            createdby: 'Savinay',
-            createdat: '26th March, 2014'
-        }, {
-            messagebody: 'Hi, this is Sergey Brin. Thanks for such an offer. It was great.... Lorem Ipsum.......cadilus quasum irium idler sherlock holmes',
-            createdby: 'John',
-            createdat: '24th March, 2014'
-        }, {
-            messagebody: 'Hi, this is Larry Page. Thanks for such an offer. It was great.... Lorem Ipsum.......',
-            createdby: 'Savinay',
-            createdat: '26th March, 2014'
-        }, {
-            messagebody: 'Hi, this is Larry Page. Thanks for such an offer. It was great.... Lorem Ipsum.......',
-            createdby: 'Savinay',
-            createdat: '26th March, 2014'
-        }, {
-            messagebody: 'Hi, this is Larry Page. Thanks for such an offer. It was great.... Lorem Ipsum.......',
-            createdby: 'Savinay',
-            createdat: '26th March, 2014'
-        }, {
-            messagebody: 'Hi, this is Larry Page. Thanks for such an offer. It was great.... Lorem Ipsum.......',
-            createdby: 'Jill',
-            createdat: '26th March, 2014'
-        }, {
-            messagebody: 'Hi, this is Larry Page. Thanks for such an offer. It was great.... Lorem Ipsum.......',
-            createdby: 'John',
-            createdat: '26th March, 2014'
-        }];*/
-
-        /* function getUniqueUsers() {
-            console.log("inside getcolor: ", name);
-            var colorUser = _.chain($scope.messages)
-                .pluck('createdby')
-                .uniq()
-                .map(function (by) {
-                    return {
-                        createdby: by,
-                        color: getRandomColor(name.charAt(0))
-                    }
+        function setMessagesIntoScope() {
+            var msgThread = [];
+            msgThread = ThreadService.getThread();
+            console.log("msg thread: -> ->", msgThread);
+            for (var i = 0; i < msgThread.length; i++) {
+                $scope.messages.push({
+                    messagebody: msgThread[i].text,
+                    createdby: msgThread[i].sName,
+                    createdat: msgThread[i].ut
                 })
-            console.log("colorUser: ", colorUser);
-            return colorUsers;
-        }*/
+            };
+        }
 
-        $scope.messagesWithSrc = [];
+        function setAvatarColors() {
 
-        for (var i = 0; i < $scope.messages.length; i++) {
-            console.log("value of i :");
-            var imgsrc = '';
-            var count = 0;
-            var storedimgsrc = ''
-            console.log("message object: ", $scope.messages[i]);
-            var name = $scope.messages[i].createdby;
-            var initials = name.charAt(0);
-            var color = getRandomColor();
-            for (var j = 0; j < i; j++) {
-                console.log("i: ", i);
-                // TODO : Get data from backend and match it based on uid
-                if ($scope.messages[j].createdby == $scope.messages[i].createdby) {
-                    count++;
-                    storedimgsrc = $scope.messagesWithSrc[j].src;
-                    break;
+            for (var i = 0; i < $scope.messages.length; i++) {
+                console.log("value of i :");
+                var imgsrc = '';
+                var count = 0;
+                var storedimgsrc = ''
+                console.log("message object: ", $scope.messages[i]);
+                var name = $scope.messages[i].createdby;
+                var initials = name.charAt(0);
+                var color = getRandomColor();
+                for (var j = 0; j < i; j++) {
+                    console.log("i: ", i);
+                    // TODO : Get data from backend and match it based on uid
+                    if ($scope.messages[j].createdby == $scope.messages[i]
+                        .createdby) {
+                        count++;
+                        storedimgsrc = $scope.messagesWithSrc[j].src;
+                        break;
+                    }
                 }
-            }
 
-            console.log("storedimgsrc: ", storedimgsrc);
-            /*if(count == 1) {
+                console.log("storedimgsrc: ", storedimgsrc);
+                /*if(count == 1) {
                 imgsrc = $scope.messagesWithSrc[i].src;
             }*/
 
-            if (count < 1) {
-                imgsrc = 'http://placehold.it/60/' + color + '/FFF&text=' +
-                    initials;
-                $scope.messagesWithSrc.push({
-                    messagebody: $scope.messages[i].messagebody,
-                    createdby: $scope.messages[i].createdby,
-                    createdat: $scope.messages[i].createdat,
-                    src: imgsrc
-                })
-            } else {
-                $scope.messagesWithSrc.push({
-                    messagebody: $scope.messages[i].messagebody,
-                    createdby: $scope.messages[i].createdby,
-                    createdat: $scope.messages[i].createdat,
-                    src: storedimgsrc
-                })
-            }
-            console.log("src generated: ", $scope.messagesWithSrc[i].src);
-            console.log("with src: ", $scope.messagesWithSrc);
+                if (count < 1) {
+                    imgsrc = 'http://placehold.it/60/' + color +
+                        '/FFF&text=' +
+                        initials;
+                    $scope.messagesWithSrc.push({
+                        messagebody: $scope.messages[i].messagebody,
+                        createdby: $scope.messages[i].createdby,
+                        createdat: $scope.messages[i].createdat,
+                        src: imgsrc
+                    })
+                } else {
+                    $scope.messagesWithSrc.push({
+                        messagebody: $scope.messages[i].messagebody,
+                        createdby: $scope.messages[i].createdby,
+                        createdat: $scope.messages[i].createdat,
+                        src: storedimgsrc
+                    })
+                }
+                console.log("src generated: ", $scope.messagesWithSrc[i].src);
+                console.log("with src: ", $scope.messagesWithSrc);
+            };
+        }
+
+
+        $scope.healthScore = '50';
+        $scope.plan = 'Basic';
+        $scope.planValue = '$25';
+        $scope.renewal = '25 Mar 2014';
+
+        $scope.openReplyBox = function () {
+            $log.info("Inside replybox");
         };
+
+        $scope.replytext = '';
+        $scope.today = new Date();
+        $scope.messages = [];
+        $scope.messagesWithSrc = [];
+
+        // Get Data from Backend TODO
+
+        var pathArray = window.location.pathname.split('/');
+        var appId = pathArray[2];
+        console.log(appId);
+        var msgId = pathArray[4];
+
+        var msgServiceCallback = function (err) {
+            if (err) return $log.error(err);
+            setMessagesIntoScope();
+            setAvatarColors();
+            console.log("$scope.messages: ", $scope.messages);
+        };
+
+        MsgService.getMessageThread(appId, msgId, msgServiceCallback);
+
+
+
 
         // TODO : Get data from backend and match it based on uid
 
