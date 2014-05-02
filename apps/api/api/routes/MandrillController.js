@@ -156,6 +156,7 @@ Event.prototype.processReply = function (cb) {
 
       // fetchParentMessage and update 'replied' status to true
       function (cb) {
+console.log('mc::4')
 
         Message.replied(self.mId, function (err, msg) {
           if (err) return cb(err);
@@ -169,6 +170,8 @@ Event.prototype.processReply = function (cb) {
 
       // createMessage
       function (cb) {
+console.log('mc::5')
+
         self.createMessage.call(self, function (err, reply) {
           if (err) return cb(err);
           savedReply = reply;
@@ -179,6 +182,8 @@ Event.prototype.processReply = function (cb) {
     ],
 
     function (err) {
+console.log('mc::6', err, savedReply)
+
       console.log(err, savedReply);
       cb(err, savedReply);
     });
@@ -313,9 +318,12 @@ function processMandrillEvents(events, cb) {
       var event = new Event(e);
       var type = event.type;
       var mId = event.mId;
+console.log('mc::2', event)
 
       // according to mandrill's docs, incoming emails will have the event of 'inbound'
       if (type === 'inbound' && mId) {
+console.log('mc::3')
+
         return event.processReply.call(event, cb);
       }
 
@@ -356,11 +364,11 @@ router
 
     var events = JSON.parse(req.body.mandrill_events);
 
+console.log('mc::')
     // _.each(events, function (val, key) {
     //   console.log(key, val);
     //   console.log('\n\n\n');
     // });
-
     processMandrillEvents(events, function (err, result) {
       console.log('final output', arguments);
       // TODO: send error to admin email

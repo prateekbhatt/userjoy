@@ -1,11 +1,11 @@
 angular.module('services', [
     'services.config',
     'services.utils',
-    'services.segmentQueryService',
+    'services.QueriesService',
     'services.LoginService',
     'services.AppService',
     'services.AccountService',
-    'services.ErrorMessageService',
-    'services.InboxMessagesService',
+    'services.ErrMsgService',
+    'services.InboxMsgService',
     'services.UidService',
 ]);

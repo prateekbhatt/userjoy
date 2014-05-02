@@ -33,7 +33,7 @@ angular.module('dodatado', [
 
     $urlRouterProvider.otherwise('/404');
     $locationProvider.html5Mode(true);
-
+console.log('\n\n setting authcredentials');
     // for making cross domain authentication requests
     $httpProvider.defaults.useXDomain = true;
     $httpProvider.defaults.withCredentials = true;
@@ -120,6 +120,7 @@ angular.module('dodatado', [
             }
             AppService.setLoggedInApps(apps);
             AppService.setCurrentApp(apps[0]);
+            console.log("default app:", AppService.getCurrentApp());
         });
     }
 ])
@@ -147,12 +148,15 @@ angular.module('dodatado', [
         // FIXME : get data from backend
         var allSegments = [{
             _id: "0",
+            name: "Users"
+        },{
+            _id: "1",
             name: "Phone Users"
         }, {
-            _id: "1",
+            _id: "2",
             name: "Android Users"
         }, {
-            _id: "2",
+            _id: "3",
             name: "Paying Customers"
         }];
 

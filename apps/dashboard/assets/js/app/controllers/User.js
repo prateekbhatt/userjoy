@@ -273,7 +273,7 @@ angular.module('do.users', [])
         countOfActions, hasNotDone, hasDoneActions,
         ngTableParams) {
 
-
+        console.log("inside UserListCtrl");
         $scope.state = 'form-control';
         $scope.isErr = '';
         $scope.method = 'count';
