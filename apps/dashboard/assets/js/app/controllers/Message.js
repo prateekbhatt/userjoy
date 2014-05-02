@@ -147,10 +147,11 @@ angular.module('do.message', [])
                 $scope.data.push({
                     id: msg[i]._id,
                     name: msg[i].sName,
-                    subject: 'Subject',
+                    subject: msg[i].sub,
                     time: msg[i].ct,
                     close: 'Close',
-                    assign: 'Assign'
+                    assign: 'Assign',
+                    coid: msg[i].coId
                 })
             }
             console.log("$scope.data: ", $scope.data);
@@ -228,6 +229,11 @@ angular.module('do.message', [])
             console.log(InboxMsgService.getInboxMessage());
             // $location.path('/messages/inbox/' + msgId);
         }
+
+        $scope.closeConversation = function (coId) {
+            MsgService.closeConversationRequest(AppService.getCurrentApp()._id, coId);
+        }
+
 
         // Get Data from backend TODO
 

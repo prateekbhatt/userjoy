@@ -10,7 +10,7 @@ angular.module('models.message', ['services'])
                 sub: sub,
                 text: text,
                 type: 'email',
-                uid: '536205285617b6cd4fbd848a'
+                uid: '5363eaab4d0c83bf2cc813aa'
             }
             console.log("message data: ", data);
             console.log("LIAS", AppService.getCurrentApp());
@@ -52,6 +52,17 @@ angular.module('models.message', ['services'])
                     callback();
                 })
                 .error(callback);
+        }
+
+        this.closeConversationRequest = function (appId, coId) {
+
+            $http.put(config.apiUrl + '/apps/' + appId + '/conversations/' + coId + '/closed')
+                .success(function (data){
+                    console.log("success closing conversation");
+                })
+                .error(function(){
+                    console.log("error");
+                })
         }
     }
 ])
