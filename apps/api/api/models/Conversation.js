@@ -88,6 +88,24 @@ ConversationSchema.pre('save', function (next) {
 });
 
 
+/**
+ * Updates closed status of conversation to true
+ *
+ * TODO: Add closed_by to track the account id of the team member who has closed
+ * the conversation
+ *
+ * @param {string} coId conversation-id
+ */
+
+ConversationSchema.statics.close = function (coId, cb) {
+  var update = {
+    closed: true
+  };
+
+  Conversation.findByIdAndUpdate(coId, update, cb);
+};
+
+
 var Conversation = mongoose.model('Conversation', ConversationSchema);
 
 module.exports = Conversation;
