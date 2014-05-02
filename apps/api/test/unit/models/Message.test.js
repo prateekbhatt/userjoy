@@ -160,6 +160,70 @@ describe('Model Message', function () {
   });
 
 
+  describe('#fetchAll', function () {
+
+    var aid;
+    var fetchedMessage = {};
+
+    before(function () {
+      aid = saved.apps.first._id
+    });
+
+    it('should return all messages belonging to an app', function (done) {
+
+      Message.fetchAll(aid, function (err, msg) {
+
+        expect(err)
+          .to.not.exist;
+
+        expect(msg)
+          .to.be.an("array");
+
+        fetchedMessage = msg[0];
+
+        expect(msg)
+          .to.have.length(2);
+
+        expect(msg[0].text)
+          .to.eql('Hello World');
+
+        done();
+
+      });
+    });
+
+    it('should return ct/coId/replied/seen/sName/sub/text',
+      function () {
+
+        expect(fetchedMessage)
+          .to.not.have.property("aid");
+
+        expect(fetchedMessage)
+          .to.have.property("ct");
+
+        expect(fetchedMessage)
+          .to.have.property("coId");
+
+        expect(fetchedMessage)
+          .to.have.property("replied");
+
+        expect(fetchedMessage)
+          .to.have.property("seen");
+
+        expect(fetchedMessage)
+          .to.have.property("sName");
+
+        expect(fetchedMessage)
+          .to.have.property("sub");
+
+        expect(fetchedMessage)
+          .to.have.property("text");
+
+      });
+
+  });
+
+
   describe('#fetchInbox', function () {
 
     var aid = '532d6bf862d673ba7131812d';
