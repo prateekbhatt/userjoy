@@ -118,18 +118,18 @@
                                                         <br>
                                                         <br>
                                                         <tbody>
-                                                            <tr ng-repeat="user in data | filter:searchText" ng-click="showSelectedMail(user.id)" style="cursor:pointer">
+                                                            <tr ng-repeat="user in data | filter:searchText" >
                                                                 <td data-title="'User'" style="text-align:center">
                                                                     <span>{{user.name}}</span>
                                                                 </td>
-                                                                <td data-title="'Subject'" style="text-align:center">
+                                                                <td data-title="'Subject'" style="text-align:center; cursor:pointer" ng-click="showSelectedMail(user.id)">
                                                                     <span>{{user.subject}}</span>
                                                                 </td>
                                                                 <td data-title="'When'" style="text-align:center">
                                                                     <span>{{user.time}}</span>
                                                                 </td>
                                                                 <td data-title="''" style="text-align:center">
-                                                                    <a href="#" ng-click="expression">Close</a>
+                                                                    <a href="#" ng-click="closeConversation(user.coid)">Close</a>
                                                                 </td>
                                                                 <td data-title="''" style="text-align:center">
                                                                     <a href="#" ng-click="expression">Assign</a>
