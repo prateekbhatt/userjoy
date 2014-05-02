@@ -20,7 +20,7 @@
                                     <a ui-sref="message.template"><span class="glyphicon glyphicon-list-alt"></span> Choose Templates</a>
                                 </li>
                                 <li>
-                                    <a ui-sref="#" style="cursor: pointer"><i class="fa fa-paperclip"></i> Smart Filters
+                                    <a ui-sref="#" style="cursor: pointer"><i class="fa fa-paperclip"></i> Smart Filters</a>
                                     <ul style="list-style: none;">
                                         <li>
                                             <div class="progress" style="margin-left: 30px;">
@@ -118,8 +118,7 @@
                                                         <br>
                                                         <br>
                                                         <tbody>
-                                                            <a ui-sref="message.id">
-                                                            <tr ng-repeat="user in data | filter:searchText" ng-click="showSelectedMail(user)" style="cursor:pointer">
+                                                            <tr ng-repeat="user in data | filter:searchText" ng-click="showSelectedMail(user.id)" style="cursor:pointer">
                                                                 <td data-title="'User'" style="text-align:center">
                                                                     <span>{{user.name}}</span>
                                                                 </td>
@@ -137,7 +136,6 @@
                                                                 </td>
                                                                 <!-- <td ng-repeat="column in columnsInbox" ng-show="column.visible" sortable="column.field" class="text-center"></td> -->
                                                             </tr>
-                                                            </a>
                                                         </tbody>
                                                     </table>
                                                 </div>

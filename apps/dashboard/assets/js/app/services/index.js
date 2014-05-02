@@ -8,4 +8,5 @@ angular.module('services', [
     'services.ErrMsgService',
     'services.InboxMsgService',
     'services.UidService',
+    'services.ThreadService',
 ]);
