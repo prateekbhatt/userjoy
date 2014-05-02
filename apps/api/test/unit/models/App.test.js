@@ -5,7 +5,6 @@ describe('Model App', function () {
   var randomId = '532d6bf862d673ba7131812a';
 
   before(function (done) {
-    console.log('beforealllll');
     setupTestDb(done);
   });
 

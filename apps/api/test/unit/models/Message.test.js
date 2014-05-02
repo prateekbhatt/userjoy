@@ -1,4 +1,4 @@
-describe.only('Model Message', function () {
+describe('Model Message', function () {
 
   // TODO
   // Write test to check that if the message is created by a 'account', then
@@ -462,6 +462,59 @@ describe.only('Model Message', function () {
         done();
       })
     });
+  });
+
+  describe('#openedByTeamMember', function () {
+
+    var mIds = [];
+
+    before(function (done) {
+
+      var savedMsg = saved.messages.first;
+      mIds = _.pluck(saved.messages, '_id');
+
+
+      var adminReply = {
+        accid: savedMsg.accid,
+        aid: savedMsg.aid,
+        coId: savedMsg.coId,
+        from: 'account',
+        sName: 'Prateek Sender',
+        sub: savedMsg.sub,
+        text: 'This is a new reply',
+        type: 'email',
+        uid: savedMsg.uid
+      };
+
+
+      Message
+        .create(adminReply, function (err, newReply) {
+          mIds.push(newReply._id);
+          done();
+        });
+
+
+    });
+
+    it('should update seen status of all messages from user to true',
+      function (done) {
+
+        Message
+          .openedByTeamMember(mIds, function (err, numberAffected) {
+
+            expect(mIds)
+              .to.have.length(3);
+
+            expect(err)
+              .to.not.exist;
+
+            expect(numberAffected)
+              .to.eql(2);
+
+            done()
+          })
+
+      });
   });
 
 });

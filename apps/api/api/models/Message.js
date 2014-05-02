@@ -296,6 +296,36 @@ MessageSchema.statics.replied = function (id, cb) {
 };
 
 
+/**
+ * When a conversation thread is opened by an app team member, all the messages
+ * from the user in the thread are considered opened
+ *
+ * @param {array} messageIds ids of all messages in a thread
+ * @param {function} cb callback
+ */
+
+MessageSchema.statics.openedByTeamMember = function (messageIds, cb) {
+
+  var conditions = {
+    '_id': {
+      '$in': messageIds
+    },
+    from: 'user'
+  };
+
+  var update = {
+    'seen': true
+  };
+
+  var options = {
+    'multi': true
+  };
+
+  Message.update(conditions, update, options, cb);
+
+};
+
+
 var Message = mongoose.model('Message', MessageSchema);
 
 module.exports = Message;
