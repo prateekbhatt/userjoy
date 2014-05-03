@@ -36,6 +36,7 @@ var mailer = require('../services/mailer.js');
  */
 
 var appEmail = require('../../helpers/app-email');
+var logger = require('../../helpers/logger');
 
 
 /**
@@ -307,6 +308,9 @@ router
     var aid = req.app._id;
     var mId = req.params.mId;
 
+    // sName should be the name of the loggedin account or its primary email
+    var sName = req.user.name || req.user.email;
+
     // since this is a multi-query request (transaction), we need to make all
     // input validations upfront
     // text, type
@@ -334,6 +338,9 @@ router
 
           // add from as 'account'
           reply.from = 'account';
+
+          reply.sName = sName;
+
           reply.sub = parentMsg.sub;
           reply.uid = parentMsg.uid;
 
@@ -356,6 +363,13 @@ router
       ],
 
       function (err, msg) {
+
+        logger.trace('MessageController Reply', {
+          err: !!err,
+          msg: !!msg
+        });
+
+        // console.log(msg);
 
         if (err) {
           return next(err);
