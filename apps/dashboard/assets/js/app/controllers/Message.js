@@ -119,9 +119,9 @@ angular.module('do.message', [])
 ])
 
 .controller('InboxCtrl', ['$scope', '$filter', 'ngTableParams', '$log',
-    'MsgService', '$location', 'AppService', 'InboxMsgService',
+    'MsgService', '$location', 'AppService', 'InboxMsgService', '$moment',
     function ($scope, $filter, ngTableParams, $log, MsgService, $location,
-        AppService, InboxMsgService) {
+        AppService, InboxMsgService, $moment) {
 
         $scope.data = [];
         console.log("entering inboxctrl");
@@ -148,7 +148,8 @@ angular.module('do.message', [])
                     id: msg[i]._id,
                     name: msg[i].sName,
                     subject: msg[i].sub,
-                    time: msg[i].ct,
+                    time: $moment(msg[i].ct)
+                        .fromNow(),
                     close: 'Close',
                     assign: 'Assign',
                     coid: msg[i].coId
@@ -231,7 +232,8 @@ angular.module('do.message', [])
         }
 
         $scope.closeConversation = function (coId) {
-            MsgService.closeConversationRequest(AppService.getCurrentApp()._id, coId);
+            MsgService.closeConversationRequest(AppService.getCurrentApp()
+                ._id, coId);
         }
 
 
@@ -256,193 +258,112 @@ angular.module('do.message', [])
     }
 ])
 
-.controller('UnreadCtrl', ['$scope', '$filter', 'ngTableParams',
-    function ($scope, $filter, ngTableParams) {
+.controller('UnreadCtrl', ['$scope', '$filter', 'ngTableParams', 'AppService',
+    '$moment', 'MsgService', 'InboxMsgService', '$location',
+    function ($scope, $filter, ngTableParams, AppService, $moment,
+        MsgService, InboxMsgService, $location) {
         // TODO: Get data from backend
         // TODO: Replace ng-table with normal table
 
         console.log("inside UnreadCtrl");
+        $scope.data = [];
+        var msg = [];
+        var populateUnreadMsg = function () {
+            msg = InboxMsgService.getUnreadMessage();
+            for (var i = 0; i < msg.length; i++) {
+                $scope.data.push({
+                    id: msg[i]._id,
+                    name: msg[i].sName,
+                    subject: msg[i].sub,
+                    time: $moment(msg[i].ct)
+                        .fromNow(),
+                    close: 'Close',
+                    assign: 'Assign',
+                    coid: msg[i].coId
+                })
+            };
 
-        var data = [{
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            reply: 'Reply',
-            assign: 'Assign'
-        }, {
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            reply: 'Reply',
-            assign: 'Assign'
-        }, {
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            reply: 'Reply',
-            assign: 'Assign'
-        }, {
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            reply: 'Reply',
-            assign: 'Assign'
-        }, {
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            reply: 'Reply',
-            assign: 'Assign'
-        }, {
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            reply: 'Reply',
-            assign: 'Assign'
-        }, {
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            reply: 'Reply',
-            assign: 'Assign'
-        }, {
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            reply: 'Reply',
-            assign: 'Assign'
-        }, {
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            reply: 'Reply',
-            assign: 'Assign'
-        }, {
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            reply: 'Reply',
-            assign: 'Assign'
-        }, {
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            reply: 'Reply',
-            assign: 'Assign'
-        }, {
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            reply: 'Reply',
-            assign: 'Assign'
-        }, {
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            reply: 'Reply',
-            assign: 'Assign'
-        }, {
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            reply: 'Reply',
-            assign: 'Assign'
-        }, {
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            reply: 'Reply',
-            assign: 'Assign'
-        }, {
-            name: 'Larry Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            reply: 'Reply',
-            assign: 'Assign'
-        }, {
-            name: 'Larro Page',
-            subject: 'Hi, Thanks for such an offer. I really....',
-            time: '3:29 PM',
-            close: 'Close',
-            reply: 'Reply',
-            assign: 'Assign'
-        }];
+            $scope.columnsSent = [{
+                title: 'User',
+                field: 'name',
+                visible: true,
+                filter: {
+                    'name': 'text'
+                }
+            }, {
+                title: 'Text',
+                field: 'subject',
+                visible: true
+            }, {
+                title: 'When',
+                field: 'time',
+                visible: true
+            }, {
+                title: '',
+                field: 'close',
+                visible: 'true'
+            }, {
+                title: '',
+                field: 'assign',
+                visible: 'true'
+            }];
 
-        $scope.columnsSent = [{
-            title: 'User',
-            field: 'name',
-            visible: true,
-            filter: {
-                'name': 'text'
+            $scope.tableParamsSent = new ngTableParams({
+                page: 1, // show first page
+                count: 10, // count per page
+                filter: {
+                    name: 'M' // initial filter
+                },
+                sorting: {
+                    name: 'asc'
+                }
+            }, {
+                total: $scope.data.length, // length of data
+                getData: function ($defer, params) {
+                    // use build-in angular filter
+                    var filteredData = params.filter() ?
+                        $filter('filter')($scope.data, params
+                            .filter()) :
+                        $scope.data;
+                    var ordereddata = params.sorting() ?
+                        $filter('orderBy')($scope.data,
+                            params.orderBy()) :
+                        $scope.data;
+                    params.total(ordereddata.length); // set total for recalc paginationemail
+
+                    $defer.resolve(ordereddata.slice((
+                            params.page() -
+                            1) * params.count(),
+                        params.page() *
+                        params.count()));
+                }
+            });
+
+        }
+
+        var showUnreadMsgCallBack = function (err) {
+            if(err) {
+                return err;
             }
-        }, {
-            title: 'Text',
-            field: 'subject',
-            visible: true
-        }, {
-            title: 'When',
-            field: 'time',
-            visible: true
-        }, {
-            title: '',
-            field: 'close',
-            visible: 'true'
-        }, {
-            title: '',
-            field: 'reply',
-            visible: 'true'
-        }, {
-            title: '',
-            field: 'assign',
-            visible: 'true'
-        }];
+            populateUnreadMsg();
+        }
 
-        $scope.tableParamsSent = new ngTableParams({
-            page: 1, // show first page
-            count: 10, // count per page
-            filter: {
-                name: 'M' // initial filter
-            },
-            sorting: {
-                name: 'asc'
-            }
-        }, {
-            total: data.length, // length of data
-            getData: function ($defer, params) {
-                // use build-in angular filter
-                var filteredData = params.filter() ?
-                    $filter('filter')(data, params
-                        .filter()) :
-                    data;
-                var ordereddata = params.sorting() ?
-                    $filter('orderBy')(data,
-                        params.orderBy()) :
-                    data;
-                params.total(ordereddata.length); // set total for recalc paginationemail
+        MsgService.getUnreadMessages(AppService.getCurrentApp()
+            ._id, showUnreadMsgCallBack);
 
-                $defer.resolve(ordereddata.slice((
-                        params.page() -
-                        1) * params.count(),
-                    params.page() *
-                    params.count()));
-            }
-        });
+
+        $scope.closeConversation = function (coId) {
+            MsgService.closeConversationRequest(AppService.getCurrentApp()
+                ._id, coId);
+        }
+
+        $scope.showSelectedMail = function (id) {
+            // console.log("inside selected mail");
+            // $scope.showTable = false;
+            $location.path('/messages/' + AppService.getCurrentApp()
+                ._id + '/conversations/' + id);
+        }
+
     }
 ])
 
