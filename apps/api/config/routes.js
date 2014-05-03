@@ -3,6 +3,7 @@
  */
 
 var errorHelper = require('../helpers/errorHelper');
+var logger = require('../helpers/logger');
 
 var routes = require('include-all')({
   dirname: __dirname + '/../api/routes',
@@ -10,7 +11,7 @@ var routes = require('include-all')({
   excludeDirs: /^\.(git|svn)$/
 });
 
-console.log('All route files:', Object.keys(routes));
+logger.trace(Object.keys(routes));
 
 
 /**
