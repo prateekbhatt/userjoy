@@ -10,7 +10,7 @@ angular.module('models.message', ['services'])
                 sub: sub,
                 text: text,
                 type: 'email',
-                uid: '5364bf0984ad8b4d0799e708'
+                uid: '5364fb907ecf4bbd6e4bf0be'
             }
             console.log("message data: ", data);
             console.log("LIAS", AppService.getCurrentApp());
@@ -73,6 +73,24 @@ angular.module('models.message', ['services'])
                     callback();
                 })
                 .error(callback);
+        }
+
+        this.replyToMsg = function (appId, msgId, reply, accid, callback) {
+
+            var data = {
+                text: reply
+            }
+
+            console.log("data replyToMsg: ", data);
+
+            $http.post(config.apiUrl + '/apps/' + appId + '/messages/' + msgId, data)
+                .success(function(data) {
+                    console.log("success");
+                    ThreadService.setReply(data);
+                    callback();
+                })
+                .error(callback);
+
         }
     }
 ])

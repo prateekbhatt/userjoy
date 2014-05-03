@@ -52,7 +52,7 @@
                         </div>
                         <div class="col-md-push-3 col-md-6">
                             <em>
-                            <small>commented on {{message.createdat}}</small> &nbsp;
+                            <small>commented {{message.createdat}}</small> &nbsp;
                             <!-- <a class="glyphicon glyphicon-pencil"></a>
                             <a class="glyphicon glyphicon-remove"></a> -->
                             </em>
@@ -80,7 +80,7 @@
                             </div>
                             <div class="col-md-push-3 col-md-6">
                                 <em>
-                                <small>commented on {{today | date: 'dd MMMM, yyyy'}}</small> &nbsp;
+                                <small>commented {{today}}</small> &nbsp;
                                 <!-- <a class="glyphicon glyphicon-pencil"></a>
                                 <a class="glyphicon glyphicon-remove"></a> -->
                                 </em>
@@ -93,24 +93,36 @@
                         </div>
                     </div>
                 </div>
-                <div ng-show="!insideReplyBox">
+                <!-- <div ng-show="!insideReplyBox">
                     <textarea class="form-control" placeholder="Click here to Reply or Forward" ng-click="showReplyButton()"></textarea>
-                </div>
-                <div ng-show="insideReplyBox">
-                    <div class="col-md-5">
-                        <div class="alert alert-danger text-center" ng-show="showerror" style="background-color: #f2dede; border-color: #ebccd1; padding: 7px">
+                </div> -->
+                <div>
+                    <div class="col-md-5" style="padding-top: 30px;" ng-show="showerror">
+                        <div class="alert alert-danger text-center" style="background-color: #f2dede; border-color: #ebccd1; padding: 7px">
                             <small class="error" ng-show="showerror" style="color: #a94442">
                             There was an error. Reply cannot be blank.
                             </small>
                         </div>
                     </div>
-                    <textarea class="form-control" rows="5" ng-model="replytext" ng-change="changeButtonText()"></textarea>
                     <br>
-                    <div class="col-md-12">
-                        <div class="btn-toolbar">
-                            <button class="btn btn-info pull-right fa fa-trash-o col-md-1" ng-click="deleteReply()" style="height:42px"></button>&nbsp;&nbsp;
-                            <button class="btn btn-info col-md-2 pull-right" ng-click="closeTicket()">{{buttontext}}</button>&nbsp;&nbsp;
-                            <button type="submit" class="btn btn-info col-md-2 pull-right" ng-click="validateAndAddReply()">Reply</button>
+                    <br>
+                    <div class="col-md-12" style="padding-top: 45px;">
+                        <div>
+                            <div class="square pull-left">
+                                <img src={{replysrc}} alt="" class="" />
+                            </div>
+                        </div>
+                        <div class="col-md-10">
+                            <textarea class="form-control" rows="5" ng-model="replytext" ng-change="changeButtonText()"></textarea>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                    <br>
+                    <div class="col-md-12" style="padding-top: 45px;">
+                        <div class="btn-toolbar" style="padding-right: 34px;">
+                            <button class="btn btn-success col-md-2 pull-right" ng-click="closeTicket()">{{buttontext}}</button>&nbsp;&nbsp;
+                            <button type="submit" class="btn btn-success col-md-2 pull-right" ng-click="validateAndAddReply()">Reply</button>
                         </div>
                     </div>
                 </div>
