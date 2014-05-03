@@ -25,11 +25,17 @@ angular.module('dodatado', [
     'do.install',
     'do.settings',
     'do.feed',
-    'http-auth-interceptor'
+    'http-auth-interceptor',
+    'angular-momentjs'
 ])
 
 .config(function ($stateProvider, $urlRouterProvider,
-    $locationProvider, $httpProvider, $provide) {
+    $locationProvider, $httpProvider, $provide, $momentProvider) {
+
+    $momentProvider.asyncLoading(false)
+        .scriptUrl(
+            '//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js'
+    );
 
     $urlRouterProvider.otherwise('/404');
     $locationProvider.html5Mode(true);

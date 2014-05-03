@@ -126,7 +126,7 @@
                                                             </tr>
                                                             <tr>
                                                                 <th ng-repeat="column in columnsSent" ng-show="column.visible"
-                                                                    class="text-center sortable" ng-class="{
+                                                                    class="text-center" ng-class="{
                                                                     'sort-asc': tableParams.isSortBy(column.field, 'asc'),
                                                                     'sort-desc': tableParams.isSortBy(column.field, 'desc')
                                                                     }"
@@ -138,10 +138,26 @@
                                                         <br>
                                                         <br>
                                                         <tbody>
-                                                            <tr ng-repeat="user in $data | filter:searchText">
-                                                                <td ng-repeat="column in columnsSent" ng-show="column.visible" sortable="column.field" class="text-center">
-                                                                    {{user[column.field]}}
+                                                            <!-- <td ng-repeat="column in columnsSent" ng-show="column.visible" sortable="column.field" class="text-center">
+                                                                {{user[column.field]}}
+                                                            </td> -->
+                                                            <tr ng-repeat="user in data | filter:searchText" >
+                                                                <td data-title="'User'" style="text-align:center; cursor:pointer" ng-click="showSelectedMail(user.id)">
+                                                                    <span>{{user.name}}</span>
                                                                 </td>
+                                                                <td data-title="'Subject'" style="text-align:center; cursor:pointer" ng-click="showSelectedMail(user.id)">
+                                                                    <span>{{user.subject}}</span>
+                                                                </td>
+                                                                <td data-title="'When'" style="text-align:center; cursor:pointer;" ng-click="showSelectedMail(user.id)">
+                                                                    <span>{{user.time}}</span>
+                                                                </td>
+                                                                <td data-title="''" style="text-align:center">
+                                                                    <a href="#" ng-click="closeConversation(user.coid)">Close</a>
+                                                                </td>
+                                                                <td data-title="''" style="text-align:center">
+                                                                    <a href="#" ng-click="expression">Assign</a>
+                                                                </td>
+                                                                <!-- <td ng-repeat="column in columnsInbox" ng-show="column.visible" sortable="column.field" class="text-center"></td> -->
                                                             </tr>
                                                         </tbody>
                                                     </table>

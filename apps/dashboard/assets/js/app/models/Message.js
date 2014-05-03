@@ -10,7 +10,7 @@ angular.module('models.message', ['services'])
                 sub: sub,
                 text: text,
                 type: 'email',
-                uid: '5363eaab4d0c83bf2cc813aa'
+                uid: '5364bf0984ad8b4d0799e708'
             }
             console.log("message data: ", data);
             console.log("LIAS", AppService.getCurrentApp());
@@ -63,6 +63,16 @@ angular.module('models.message', ['services'])
                 .error(function(){
                     console.log("error");
                 })
+        }
+
+        this.getUnreadMessages = function (appId, callback) {
+            $http.get(config.apiUrl + '/apps/' + appId + '/messages/unread')
+                .success(function(data){
+                    console.log("success unread msgs");
+                    InboxMsgService.setUnreadMessage(data);
+                    callback();
+                })
+                .error(callback);
         }
     }
 ])

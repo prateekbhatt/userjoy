@@ -38,10 +38,11 @@
     "angularjs-nvd3-directives": "~0.0.5-beta",
     "angular-cookie": "*",
     "textAngular": "~1.2.0",
-    "angular-http-auth": "~1.2.1"
+    "angular-http-auth": "~1.2.1",
+    "angular-momentjs": "~0.1.8"
   },
   "resolutions": {
-    "angular": "~1.2.x",
+    "angular": "~1.2.15",
     "d3": "~3.4.4",
     "nvd3": "~1.1.15-beta"
   }
