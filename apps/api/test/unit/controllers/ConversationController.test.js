@@ -100,4 +100,60 @@ describe('Resource /apps/:aid/conversations', function () {
   });
 
 
+  describe('PUT /apps/:aid/conversations/:coId/reopened', function () {
+
+    var parentConversationId;
+    var testUrl;
+
+    before(function (done) {
+      parentConversationId = saved.conversations.first._id;
+      testUrl = basePath + '/' + parentConversationId + '/reopened';
+      logoutUser(done);
+    });
+
+
+    it('returns error if not logged in',
+
+      function (done) {
+
+        request
+          .put(testUrl)
+          .send({})
+          .expect('Content-Type', /json/)
+          .expect(401)
+          .expect({
+            status: 401,
+            error: 'Unauthorized'
+          })
+          .end(done);
+
+      });
+
+
+    it('logging in user',
+
+      function (done) {
+        loginUser(done);
+      });
+
+    it('should update conversation closed status to false',
+
+      function (done) {
+
+        request
+          .put(testUrl)
+          .set('cookie', loginCookie)
+          .send(newConversation)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .expect(function (res) {
+            expect(res.body.closed)
+              .to.be.false;
+          })
+          .end(done);
+
+      });
+
+  });
+
 });
