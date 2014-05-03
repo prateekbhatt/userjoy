@@ -5,6 +5,7 @@ angular.module('services.ThreadService', [])
     function ($log) {
 
         var threadMsg = [];
+        var reply = [];
 
         this.setThread = function (value) {
             console.log("setting thread conversation");
@@ -14,6 +15,14 @@ angular.module('services.ThreadService', [])
         this.getThread = function () {
             return threadMsg;
         };
+
+        this.setReply = function (value) {
+            reply = value;
+        }
+
+        this.getReply = function (value) {
+            return reply;
+        }
 
         return this;
 

@@ -342,7 +342,7 @@ angular.module('do.message', [])
         }
 
         var showUnreadMsgCallBack = function (err) {
-            if(err) {
+            if (err) {
                 return err;
             }
             populateUnreadMsg();
@@ -537,10 +537,12 @@ angular.module('do.message', [])
 ])
 
 .controller('MessageBodyCtrl', ['$scope', 'MsgService', 'AppService',
-    'ThreadService',
-    function ($scope, MsgService, AppService, ThreadService) {
+    'ThreadService', '$moment', 'InboxMsgService', 'AccountService',
+    function ($scope, MsgService, AppService, ThreadService, $moment,
+        InboxMsgService, AccountService) {
 
 
+        console.log(AccountService.get());
 
         function getRandomColor(initials) {
             var letters = '0123456789ABCDEF'.split('');
@@ -562,7 +564,8 @@ angular.module('do.message', [])
                 $scope.messages.push({
                     messagebody: msgThread[i].text,
                     createdby: msgThread[i].sName,
-                    createdat: msgThread[i].ut
+                    createdat: $moment(msgThread[i].ut)
+                        .fromNow()
                 })
             };
         }
@@ -615,6 +618,22 @@ angular.module('do.message', [])
                 console.log("src generated: ", $scope.messagesWithSrc[i].src);
                 console.log("with src: ", $scope.messagesWithSrc);
             };
+
+            $scope.replysrc = '';
+            console.log("USer loggedin: ", AccountService.get());
+            $scope.user = AccountService.get().name;
+
+            for (var i = 0; i < $scope.messagesWithSrc.length; i++) {
+                if ($scope.user == $scope.messagesWithSrc[i].createdby) {
+                    $scope.replysrc = $scope.messagesWithSrc[i].src;
+                    break;
+                } else {
+                    var colorReply = getRandomColor();
+                    $scope.replysrc = 'http://placehold.it/60/' +
+                        colorReply +
+                        '/FFF&text=' + $scope.user.charAt(0);
+                }
+            };
         }
 
 
@@ -628,7 +647,7 @@ angular.module('do.message', [])
         };
 
         $scope.replytext = '';
-        $scope.today = new Date();
+        $scope.today = $moment(new Date()).fromNow();
         $scope.messages = [];
         $scope.messagesWithSrc = [];
 
@@ -654,19 +673,7 @@ angular.module('do.message', [])
         // TODO : Get data from backend and match it based on uid
 
         // $scope.user = '';
-        $scope.user = 'Savinay';
-        $scope.replysrc = '';
 
-        for (var i = 0; i < $scope.messagesWithSrc.length; i++) {
-            if ($scope.user == $scope.messagesWithSrc[i].createdby) {
-                $scope.replysrc = $scope.messagesWithSrc[i].src;
-                break;
-            } else {
-                var colorReply = getRandomColor();
-                $scope.replysrc = 'http://placehold.it/60/' + colorReply +
-                    '/FFF&text=' + $scope.user.charAt(0);
-            }
-        };
 
         $scope.customer = 'John';
         $scope.custsrc = '';
@@ -724,7 +731,30 @@ angular.module('do.message', [])
             $scope.replyButtonClicked = true;
         };
 
+        var replyCallBack = function (err) {
+            if (err) {
+                console.log("error");
+                return;
+            }
+            if (ThreadService.getReply) {
+                $scope.replytextInDiv = $scope.replytext;
+                $scope.replytext = '';
+                $scope.replies.push({
+                    body: $scope.replytextInDiv,
+                    name: 'Savinay'
+                })
+                console.log('object of replies: ', $scope.replies);
+                $scope.buttontext = 'Close';
+                $scope.insideReplyBox = false;
+                console.log('validateReply', $scope.replytext);
+
+            }
+        }
+
         $scope.validateAndAddReply = function () {
+            var msgId = '';
+            // var msglength = InboxMsgService.getInboxMessage().length;
+            msgId = pathArray[4];
             console.log('reply text length is:', $scope.replytext.length);
             if (!$scope.replytext.length) {
                 console.log('error in reply');
@@ -733,17 +763,11 @@ angular.module('do.message', [])
             if ($scope.replytext.length > 0) {
                 console.log("reply button clicked and validated");
                 $scope.replyButtonClicked = true;
-                $scope.replytextInDiv = $scope.replytext;
-                $scope.replytext = '';
-                $scope.replies.push({
-                    body: $scope.replytextInDiv,
-                    name: 'Savinay'
-                })
-                console.log('obejct of replies: ', $scope.replies);
-                $scope.buttontext = 'Close';
-                $scope.insideReplyBox = false;
+                MsgService.replyToMsg(AppService.getCurrentApp()
+                    ._id, msgId, $scope.replytext, AccountService.get()
+                    ._id, replyCallBack);
+
             }
-            console.log('validateReply', $scope.replytext);
         }
 
         $scope.closeTicket = function () {
