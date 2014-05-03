@@ -75,4 +75,34 @@ router
   });
 
 
+/**
+ * PUT /apps/:aid/conversations/:coId/reopened
+ *
+ * Reopens closed conversation
+ */
+
+router
+  .route('/:aid/conversations/:coId/reopened')
+  .put(function (req, res, next) {
+
+    var aid = req.params.aid;
+    var coId = req.params.coId;
+
+    if (!(aid && coId)) {
+      return res.badRequest('Provide valid aid/coId');
+    }
+
+
+    // TODO: also take the aid as an input param as an additional check
+    Conversation.reopened(coId, function (err, msg) {
+      if (err) return next(err);
+
+      res
+        .status(200)
+        .json(msg);
+    });
+
+  });
+
+
 module.exports = router;

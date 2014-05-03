@@ -106,6 +106,21 @@ ConversationSchema.statics.closed = function (coId, cb) {
 };
 
 
+/**
+ * Reopens closed conversation
+ *
+ * @param {string} coId conversation-id
+ */
+
+ConversationSchema.statics.reopened = function (coId, cb) {
+  var update = {
+    closed: false
+  };
+
+  Conversation.findByIdAndUpdate(coId, update, cb);
+};
+
+
 var Conversation = mongoose.model('Conversation', ConversationSchema);
 
 module.exports = Conversation;

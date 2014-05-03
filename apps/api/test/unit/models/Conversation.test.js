@@ -148,4 +148,38 @@ describe('Model Conversation', function () {
   });
 
 
+  describe('#reopened', function () {
+
+    var savedCon;
+
+    before(function (done) {
+      savedCon = saved.conversations.first;
+      Conversation.closed(savedCon._id, function (err, con) {
+        savedCon = con;
+        done(err);
+      });
+    });
+
+    it('should reopen closed conversation',
+      function (done) {
+
+        expect(savedCon.closed)
+          .to.be.true;
+
+        Conversation.reopened(savedCon._id, function (err, con) {
+
+          expect(err)
+            .to.not.exist;
+
+          expect(con.closed)
+            .to.be.false;
+
+          done();
+
+        });
+
+      });
+
+  });
+
 });
