@@ -260,6 +260,70 @@ describe('Resource /apps/:aid/messages', function () {
 
   });
 
+  // TODO : create a message whose status is seen to clearly demostrate the
+  // results of fetchAll from fetchInbox (seen == false)
+
+  describe('GET /apps/:aid/messages/unread', function () {
+
+    var testPath;
+
+    before(function (done) {
+      testPath = basePath + '/unread'
+      logoutUser(done);
+    });
+
+
+    it('should return error if not logged in',
+
+      function (done) {
+
+        request
+          .get(testPath)
+          .expect('Content-Type', /json/)
+          .expect(401)
+          .expect({
+            status: 401,
+            error: 'Unauthorized'
+          })
+          .end(done);
+
+      });
+
+
+    it('logging in user',
+
+      function (done) {
+        loginUser(done);
+      });
+
+
+    it('should return all unseen messages belonging to app',
+
+      function (done) {
+        request
+          .get(testPath)
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(function (res) {
+
+            _.each(res.body, function (m) {
+              expect(m.seen)
+                .to.be.false;
+            });
+
+            if (!Array.isArray(res.body)) {
+              return 'Should return an array';
+            }
+            if (res.body.length !== 2) {
+              return 'Should have returned to two messages';
+            }
+          })
+          .end(done);
+
+      });
+
+  });
+
   describe('GET /apps/:aid/messages/:mId', function () {
 
     var testMessage;

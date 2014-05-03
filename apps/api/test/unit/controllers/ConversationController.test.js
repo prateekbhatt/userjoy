@@ -43,7 +43,7 @@ describe('Resource /apps/:aid/conversations', function () {
   });
 
 
-  describe('PUT /apps/:aid/conversations/:coId/close', function () {
+  describe('PUT /apps/:aid/conversations/:coId/closed', function () {
 
     var parentConversationId;
     var testUrl;

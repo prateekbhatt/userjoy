@@ -143,6 +143,38 @@ MessageSchema.pre('save', function (next) {
 
 
 /**
+ * Finds messages belonging to an app, sent from users,
+ * sorted by created timestamp
+ *
+ * @param {string} aid app id
+ * @param {function} cb callback
+ */
+
+MessageSchema.statics.fetchAll = function (aid, cb) {
+
+  Message
+    .find({
+      aid: aid,
+      from: 'user'
+    })
+    .select({
+      ct: 1,
+      coId: 1,
+      replied: 1,
+      seen: 1,
+      sName: 1,
+      sub: 1,
+      text: 1
+    })
+    .sort({
+      ct: -1
+    })
+    .exec(cb);
+
+};
+
+
+/**
  * Finds messages belonging to an app, sent from users, and are unread,
  * sorted by created timestamp
  *
