@@ -185,7 +185,6 @@ describe('Resource /apps/:aid/messages', function () {
       function (done) {
 
         var newMessage = {
-          sName: 'Prateek Bhatt',
           text: 'This is the message I want to send'
         };
 
@@ -198,6 +197,8 @@ describe('Resource /apps/:aid/messages', function () {
           .expect(function (res) {
             expect(res.body.text)
               .to.eql(newMessage.text);
+            expect(res.body.sName)
+              .to.exist;
           })
           .end(done);
 
