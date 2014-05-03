@@ -97,7 +97,7 @@ ConversationSchema.pre('save', function (next) {
  * @param {string} coId conversation-id
  */
 
-ConversationSchema.statics.close = function (coId, cb) {
+ConversationSchema.statics.closed = function (coId, cb) {
   var update = {
     closed: true
   };

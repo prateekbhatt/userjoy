@@ -120,7 +120,7 @@ describe('Model Conversation', function () {
   });
 
 
-  describe('#close', function () {
+  describe('#closed', function () {
 
 
     it('should update closed status of conversation to true',
@@ -131,7 +131,7 @@ describe('Model Conversation', function () {
         expect(savedCon.closed)
           .to.be.false;
 
-        Conversation.close(savedCon._id, function (err, con) {
+        Conversation.closed(savedCon._id, function (err, con) {
 
           expect(err)
             .to.not.exist;
