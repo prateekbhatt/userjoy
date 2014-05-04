@@ -143,6 +143,7 @@ angular.module('do.message', [])
 
         function showManualMsg() {
             msg = InboxMsgService.getInboxMessage();
+            console.log("msg show Manual Msg: ", msg);
             for (var i = 0; i < msg.length; i++) {
                 $scope.data.push({
                     id: msg[i]._id,
@@ -228,17 +229,7 @@ angular.module('do.message', [])
         $scope.showMessageThread = function (index) {
             console.log("index: ", index);
             console.log(InboxMsgService.getInboxMessage());
-            // $location.path('/messages/inbox/' + msgId);
         }
-
-        /*var deleteMsgRow = function (err, user) {
-            if (err) {
-                console.log("error")
-                return;
-            }
-            var index = $scope.data.indexOf(user);
-            $scope.data.splice(index, 1);
-        }*/
 
         $scope.closeConversation = function (coId, user) {
             MsgService.closeConversationRequest(AppService.getCurrentApp()
@@ -289,7 +280,7 @@ angular.module('do.message', [])
         var populateUnreadMsg = function () {
             msg = InboxMsgService.getUnreadMessage();
             console.log("unread msgs ---> ", msg);
-            if(!msg.length) {
+            if (!msg.length) {
                 $scope.showUnreadMsgs = false;
             }
 
@@ -560,7 +551,8 @@ angular.module('do.message', [])
 ])
 
 .controller('MessageBodyCtrl', ['$scope', 'MsgService', 'AppService',
-    'ThreadService', '$moment', 'InboxMsgService', 'AccountService', '$log',
+    'ThreadService', '$moment', 'InboxMsgService', 'AccountService',
+    '$log',
     function ($scope, MsgService, AppService, ThreadService, $moment,
         InboxMsgService, AccountService, $log) {
 
@@ -582,6 +574,11 @@ angular.module('do.message', [])
         function setMessagesIntoScope() {
             var msgThread = [];
             msgThread = ThreadService.getThread();
+            if (msgThread.closed) {
+                $scope.buttontext = 'Reopen';
+            } else {
+                $scope.buttontext = 'Close';
+            }
             console.log("msg thread: -> ->", msgThread);
             for (var i = 0; i < msgThread.messages.length; i++) {
                 $scope.messages.push({
@@ -721,31 +718,50 @@ angular.module('do.message', [])
 
         var closeButtonClicked = false;
 
-        $scope.showReplyButton = function () {
-            $scope.insideReplyBox = true;
-            console.log('inside show reply button');
-            $scope.replytext = '';
-            console.log($scope.replytext);
-            $scope.buttontext = 'Close';
-            /*if(!$scope.replytext.length){
-                
-                console.log('inside replytext length > 0');
-            } else {
-                $scope.buttontext = 'Close and Reply';
-            }*/
-        }
+        // $scope.showReplyButton = function () {
+        //     $scope.insideReplyBox = true;
+        //     console.log('inside show reply button');
+        //     $scope.replytext = '';
+        //     console.log($scope.replytext);
+        //     $scope.buttontext = 'Close';
+        //     /*if(!$scope.replytext.length){
+
+        //         console.log('inside replytext length > 0');
+        //     } else {
+        //         $scope.buttontext = 'Close and Reply';
+        //     }*/
+        // }
 
         $scope.changeButtonText = function () {
             // $scope.buttontext = 'Close and Reply';
             console.log("inside change button text");
+
             if ($scope.replytext.length > 0) {
-                console.log('replytext length: ', $scope.replytext.length);
+                if ($scope.buttontext == 'Close') {
+                    $scope.showerror = false;
+                    $scope.buttontext = 'Close & Reply';
+                } else {
+                    $scope.buttontext = 'Close';
+                }
+
+                if ($scope.buttontext == 'Reopen') {
+                    $scope.showerror = false;
+                    $scope.buttontext = 'Reopen & Reply';
+                } else {
+                    $scope.buttontext = 'Close';
+                }
+            }
+
+            /*if ($scope.replytext.length > 0 && $scope.buttontext == 'Close') {
                 $scope.showerror = false;
                 $scope.buttontext = 'Close & Reply';
+            } else if($scope.replytext.length > 0 && $scope.buttontext == 'Reopen') {
+                $scope.showerror = false;
+                $scope.buttontext = 'Reopen & Reply';
             } else {
                 // $scope.showerror = true;
                 $scope.buttontext = 'Close';
-            }
+            }*/
         }
 
         $scope.deleteReply = function () {
@@ -802,21 +818,59 @@ angular.module('do.message', [])
 
         $scope.closeTicket = function () {
             closeButtonClicked = true;
-            if ($scope.replytext.length > 0) {
-                $scope.replyButtonClicked = true;
-                $scope.replytextInDiv = $scope.replytext;
-                $scope.buttontext = 'Close & Reply';
-                $scope.replytext = '';
-                $scope.replies.push({
-                    body: $scope.replytextInDiv,
-                    name: 'Savinay'
-                })
-                MsgService.replyToMsg(AppService.getCurrentApp()
-                    ._id, coId, $scope.replytextInDiv, AccountService.get()
-                    ._id, replyCallBack);
-            }
-            // $scope.buttontext = 'Reopen';
 
+            if ($scope.buttontext == 'Close') {
+
+                if ($scope.replytext.length > 0) {
+                    $scope.replyButtonClicked = true;
+                    $scope.replytextInDiv = $scope.replytext;
+                    $scope.buttontext = 'Close & Reply';
+                    $scope.replytext = '';
+                    $scope.replies.push({
+                        body: $scope.replytextInDiv,
+                        name: 'Savinay'
+                    })
+                    MsgService.replyToMsg(AppService.getCurrentApp()
+                        ._id, coId, $scope.replytextInDiv, AccountService.get()
+                        ._id, replyCallBack);
+                }
+
+                MsgService.closeConversationRequest(AppService.getCurrentApp()
+                    ._id, coId, function (err, user) {
+                        if (err) {
+                            console.log("error");
+                            return;
+                        }
+                        $scope.buttontext = 'Reopen';
+                    });
+                // $scope.buttontext = 'Reopen';
+
+            }
+
+            if($scope.buttontext == 'Reopen') {
+                if ($scope.replytext.length > 0) {
+                    $scope.replyButtonClicked = true;
+                    $scope.replytextInDiv = $scope.replytext;
+                    $scope.buttontext = 'Reopen & Reply';
+                    $scope.replytext = '';
+                    $scope.replies.push({
+                        body: $scope.replytextInDiv,
+                        name: 'Savinay'
+                    })
+                    MsgService.replyToMsg(AppService.getCurrentApp()
+                        ._id, coId, $scope.replytextInDiv, AccountService.get()
+                        ._id, replyCallBack);
+                }
+
+                MsgService.reopenConversation(AppService.getCurrentApp()
+                    ._id, coId, function (err, user) {
+                        if (err) {
+                            console.log("error");
+                            return;
+                        }
+                        $scope.buttontext = 'Close';
+                    });
+            }
         }
 
         if (!$scope.replytext.length) {
