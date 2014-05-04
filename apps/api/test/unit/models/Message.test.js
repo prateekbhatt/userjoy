@@ -87,7 +87,6 @@ describe('Model Message', function () {
         aid: randomId,
         coId: randomId,
         from: 'user',
-        mId: randomId,
         text: 'Hello World',
         type: 'email',
         sName: 'Prateek Bhatt',
@@ -107,9 +106,6 @@ describe('Model Message', function () {
 
         expect(msg.aid.toString())
           .to.eql(newMessage.aid);
-
-        expect(msg.mId.toString())
-          .to.eql(newMessage.mId);
 
         expect(msg.text)
           .to.eql(newMessage.text);
@@ -141,12 +137,9 @@ describe('Model Message', function () {
     });
 
 
-    it('should add clicked/replied/seen/sent values as false', function () {
+    it('should add clicked/seen/sent values as false', function () {
 
       expect(savedMessage.clicked)
-        .to.eql(false);
-
-      expect(savedMessage.replied)
         .to.eql(false);
 
       expect(savedMessage.seen)
@@ -225,32 +218,6 @@ describe('Model Message', function () {
           .to.eql(msg._id);
 
         expect(updatedMsg.seen)
-          .to.be.true;
-
-        done();
-      })
-    });
-  });
-
-
-  describe('#replied', function () {
-
-    it('should update replied status to true', function (done) {
-
-      var msg = saved.messages.first;
-
-      expect(msg.replied)
-        .to.be.false;
-
-      Message.replied(msg._id, function (err, updatedMsg) {
-
-        expect(err)
-          .to.not.exist;
-
-        expect(updatedMsg._id)
-          .to.eql(msg._id);
-
-        expect(updatedMsg.replied)
           .to.be.true;
 
         done();
