@@ -63,20 +63,6 @@ var MessageSchema = new Schema({
     enum: ['user', 'account']
   },
 
-
-  // parent message id
-  mId: {
-    type: Schema.Types.ObjectId,
-    ref: 'Message'
-  },
-
-
-  replied: {
-    type: Boolean,
-    default: false
-  },
-
-
   // message text
   text: {
     type: String,
@@ -145,12 +131,11 @@ MessageSchema.pre('save', function (next) {
 /**
  * Updates message status to true for following actions:
  * - clicked
- * - replied
  * - seen
  * - sent
  *
  * @param {string} id message id
- * @param {string} action clicked/replied/seen/sent
+ * @param {string} action clicked/seen/sent
  * @param {function} cb callback
  *
  * @api private
@@ -158,7 +143,7 @@ MessageSchema.pre('save', function (next) {
 
 function findAndUpdateStatus(id, action, cb) {
 
-  if (!_.contains(['clicked', 'replied', 'seen', 'sent'], action)) {
+  if (!_.contains(['clicked', 'seen', 'sent'], action)) {
     return cb(new Error('Invalid Status Update Action'));
   }
 
@@ -208,18 +193,6 @@ MessageSchema.statics.opened = function (id, cb) {
 
 MessageSchema.statics.sent = function (id, cb) {
   findAndUpdateStatus(id, 'sent', cb);
-};
-
-
-/**
- * Updates replied status to true
- *
- * @param {string} id message-id
- * @param {function} cb callback
- */
-
-MessageSchema.statics.replied = function (id, cb) {
-  findAndUpdateStatus(id, 'replied', cb);
 };
 
 
