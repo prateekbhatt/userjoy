@@ -198,6 +198,8 @@ router
 /**
  * GET /apps/:aid/conversations
  *
+ * @query {string} filter  open/closed (optional)
+ *
  * Returns all open conversations for app
  */
 
@@ -206,12 +208,25 @@ router
   .get(function (req, res, next) {
 
     var aid = req.app._id;
+    var filter = req.query.filter;
+
+    var condition = {
+      aid: aid,
+      closed: false
+    };
+
+    if (filter === 'closed') {
+      condition.closed = true;
+    }
+
+    logger.debug({
+      at: 'GET /conversations',
+      condition: condition,
+      filter: filter
+    });
 
     Conversation
-      .find({
-        aid: aid,
-        closed: false
-      })
+      .find(condition)
       .sort({
         ct: -1
       })
@@ -371,7 +386,6 @@ router
     var reply = req.body;
     var accid = req.user._id;
     var aid = req.app._id;
-    var mId = req.params.mId;
     var coId = req.params.coId;
 
     // sName should be the name of the loggedin account or its primary email

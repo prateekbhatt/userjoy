@@ -73,6 +73,15 @@ var accounts = {
     first: {
       accId: null,
       aid: null,
+      closed: false,
+      sub: 'First Conversation!',
+      uid: ObjectId()
+    },
+
+    second: {
+      accId: null,
+      aid: null,
+      closed: true,
       sub: 'First Conversation!',
       uid: ObjectId()
     }
@@ -227,6 +236,19 @@ module.exports = function loadFixtures(callback) {
       createConversation(accid, aid, uid, newCon, function (err, con) {
         if (err) return cb(err);
         conversations.first = con;
+        cb();
+      });
+    },
+
+    createSecondConversation: function (cb) {
+      var accid = accounts.first._id;
+      var aid = apps.first._id;
+      var uid = users.first._id;
+      var newCon = conversations.second;
+
+      createConversation(accid, aid, uid, newCon, function (err, con) {
+        if (err) return cb(err);
+        conversations.second = con;
         cb();
       });
     },
