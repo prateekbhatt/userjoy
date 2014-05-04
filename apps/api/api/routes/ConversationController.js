@@ -26,6 +26,95 @@ var isAuthenticated = require('../policies/isAuthenticated');
 
 
 /**
+ * Services
+ */
+
+var mailer = require('../services/mailer');
+
+
+/**
+ * Helpers
+ */
+
+var appEmail = require('../../helpers/app-email');
+var logger = require('../../helpers/logger');
+
+
+/**
+ * e.g. '532d6bf862d673ba7131812e+535d131c67d02dc60b2b1764@mail.userjoy.co'
+ */
+
+function replyToEmail(fromEmail, conversationId) {
+  var emailSplit = fromEmail.split('@');
+  var emailLocal = emailSplit[0];
+  var emailDomain = emailSplit[1];
+  var email = emailLocal + '+' + conversationId + '@' + emailDomain;
+  return email;
+}
+
+
+/**
+ * if name is 'Prateek',
+ * replyTo name is 'Reply to Prateek'
+ *
+ * @param {string} fromName name of the sender
+ * @return {string} reply-to name
+ */
+
+function replyToName(fromName) {
+  var prepend = 'Reply to';
+  var name = prepend + ' ' + fromName;
+  return name;
+}
+
+
+/**
+ * This sends email from an app admin to one of its users
+ *
+ * @param {object} msg the message object
+ * @param {function} cb callback
+ */
+
+function sendMailToUser(msg, cb) {
+
+  User
+    .findById(msg.uid)
+    .exec(function (err, usr) {
+
+      if (err) return cb(err);
+      if (!usr) return cb(new Error('User Not Found'));
+
+      var fromEmail = appEmail(msg.aid);
+      var locals = {
+        fromEmail: fromEmail,
+        fromName: msg.sName,
+        metadata: {
+          'mId': msg._id
+        },
+        replyToEmail: replyToEmail(fromEmail, msg.coId),
+        replyToName: replyToName(msg.sName),
+        subject: msg.sub,
+        toEmail: usr.email,
+        toName: usr.name, // TODO : User Model should have a default name key
+        text: msg.text
+      };
+      mailer.sendToUser(locals, cb);
+    });
+}
+
+
+// /**
+//  * Add a delimiter on top of the function
+//  * Used to extract out the text of the current message
+//  */
+
+// function addDelimiter(text) {
+//   var delimiter = '## Please reply above to send message ##';
+//   return delimiter
+// }
+
+
+/**
  * All routes on /apps
  * need to be authenticated
  */
@@ -167,6 +256,84 @@ router
 
   });
 
+
+/**
+ * POST /apps/:aid/conversations/:coId
+ *
+ * Creates and sends a reply message to a conversation
+ */
+
+router
+  .route('/:aid/conversations/:coId')
+  .post(function (req, res, next) {
+
+    var reply = req.body;
+    var accid = req.user._id;
+    var aid = req.app._id;
+    var mId = req.params.mId;
+    var coId = req.params.coId;
+
+    // sName should be the name of the loggedin account or its primary email
+    var sName = req.user.name || req.user.email;
+
+    // since this is a multi-query request (transaction), we need to make all
+    // input validations upfront
+    // text
+    if (!(reply.text)) {
+      return res.badRequest('Missing text');
+    }
+
+    async.waterfall(
+      [
+
+        function findConversation(cb) {
+          Conversation
+            .findById(coId)
+            .exec(cb);
+        },
+
+        function createReplyMessage(conv, cb) {
+
+          reply.accid = accid;
+          reply.aid = aid;
+          reply.coId = conv._id;
+
+          // add from as 'account'
+          reply.from = 'account';
+
+          reply.sName = sName;
+
+          reply.sub = conv.sub;
+          reply.uid = conv.uid;
+
+          // reply type is always email
+          reply.type = 'email';
+
+          Message.create(reply, cb);
+
+        },
+
+        function sendEmail(msg, cb) {
+          sendMailToUser(msg, function (err) {
+            cb(err, msg);
+          });
+        }
+
+      ],
+
+      function (err, msg) {
+
+        logger.trace('ConversationController Reply', {
+          err: !! err,
+          msg: !! msg
+        });
+
+        if (err) return next(err);
+        res.json(msg, 201);
+      }
+    );
+
+  });
 
 
 module.exports = router;
