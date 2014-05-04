@@ -10,7 +10,7 @@ angular.module('models.message', ['services'])
                 sub: sub,
                 text: text,
                 type: 'email',
-                uid: '536610ba35b0f26b61fdb393'
+                uid: '53666d4ba95d798710e09be7'
             }
             console.log("message data: ", data);
             console.log("LIAS", AppService.getCurrentApp());
@@ -18,7 +18,7 @@ angular.module('models.message', ['services'])
                 ._id;
 
 
-            $http.post(config.apiUrl + '/apps/' + appId + '/messages',
+            $http.post(config.apiUrl + '/apps/' + appId + '/conversations',
                 data)
                 .success(function (data) {
                     console.log("success");
@@ -32,7 +32,7 @@ angular.module('models.message', ['services'])
 
         this.getManualMessage = function (appId, callback) {
             console.log("going to fetch msgs");
-            $http.get(config.apiUrl + '/apps/' + appId + '/messages')
+            $http.get(config.apiUrl + '/apps/' + appId + '/conversations')
                 .success(function (data) {
                     console.log("success getting messages");
                     InboxMsgService.setInboxMessage(data);
@@ -92,14 +92,13 @@ angular.module('models.message', ['services'])
 
         }
 
-        this.reopenConversation = function (appId, coId) {
+        this.reopenConversation = function (appId, coId, callback) {
             $http.put(config.apiUrl + '/apps/' + appId + '/conversations/' + coId + '/reopened')
                 .success(function (data){
                     console.log("success reopening conversation");
+                    callback();
                 })
-                .error(function(){
-                    console.log("error");
-                })
+                .error(callback);
         }
     }
 ])
