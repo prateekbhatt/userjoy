@@ -196,6 +196,34 @@ router
 
 
 /**
+ * GET /apps/:aid/conversations
+ *
+ * Returns all open conversations for app
+ */
+
+router
+  .route('/:aid/conversations')
+  .get(function (req, res, next) {
+
+    var aid = req.app._id;
+
+    Conversation
+      .find({
+        aid: aid,
+        closed: false
+      })
+      .sort({
+        ct: -1
+      })
+      .exec(function (err, conversations) {
+        if (err) return next(err);
+        res.json(conversations || []);
+      });
+
+  });
+
+
+/**
  * GET /apps/:aid/conversations/:coId
  *
  * Returns a conversation alongwith all messages
@@ -223,7 +251,7 @@ router
               coId: coId
             })
             .sort({
-              ct: -1
+              ct: 1
             })
             .exec(function (err, messages) {
               cb(err, con, messages)
@@ -252,6 +280,79 @@ router
         res.json(con);
       }
 
+    );
+
+  });
+
+
+/**
+ * POST /apps/:aid/conversations
+ *
+ * Creates a new conversation, a new message and sends message to user
+ */
+
+router
+  .route('/:aid/conversations')
+  .post(function (req, res, next) {
+
+    var newMessage = req.body;
+    var accid = req.user._id;
+    var aid = req.app._id;
+    var sub = newMessage.sub;
+    var uid = newMessage.uid;
+    var fromEmail = appEmail(aid);
+
+    // since this is a multi-query request (transaction), we need to make all
+    // input validations upfront
+    // uid, subject, text, type
+    if (!(uid && aid && sub && newMessage.text && newMessage.type)) {
+      return res.badRequest('Missing uid/sub/text/type');
+    }
+
+    async.waterfall(
+      [
+
+        // create new conversation
+        function (cb) {
+
+          var newConversation = {
+            accId: accid,
+            aid: aid,
+            sub: sub,
+            uid: uid
+          };
+
+          Conversation.create(newConversation, cb);
+        },
+
+
+        // create new message
+        function (conversation, cb) {
+
+          // add from as 'account'
+          newMessage.from = 'account';
+          newMessage.accid = accid;
+          newMessage.aid = aid;
+          newMessage.coId = conversation._id;
+
+          Message.create(newMessage, cb);
+
+        },
+
+        // send message through mandrill
+        function (msg, cb) {
+          sendMailToUser(msg, function (err) {
+            cb(err, msg);
+          });
+        }
+
+      ],
+
+      function (err, msg) {
+
+        if (err) return next(err);
+        res.json(msg, 201);
+      }
     );
 
   });
