@@ -8,7 +8,13 @@ var ObjectId = require('mongoose')
   .Types.ObjectId;
 var router = require('express')
   .Router();
-var winston = require('winston');
+
+
+/**
+ * Helpers
+ */
+
+var logger = require('../../helpers/logger');
 
 
 /**
@@ -41,7 +47,7 @@ function Event(event) {
 
   this.accid = null;
   this.aid = this.getAppId();
-  this.coId = null;
+  this.coId = this.getCoId();
   this.mId = this.getMId();
   this.uid = null;
 
@@ -95,45 +101,68 @@ Event.prototype.createMessage = function (cb) {
 
   };
 
-  if (self.mId) {
-    newMessage.mId = self.mId;
-  }
-
   Message.create(newMessage, cb);
 
 };
 
 
 /**
- *
  * if inbound event,
- *   Extracts message id of the parent message from the to-email
- * else if send, open event
+ *   Extracts conversation id of the parent message from the to-email
+ *
+ * @return {string} conversation id
+ */
+
+Event.prototype.getCoId = function () {
+
+  var coId;
+
+  if (this.type === 'inbound') {
+    var emailLocal = this.toEmail.split('@')[0];
+    var split = emailLocal.split('+');
+
+    if (split.length === 2) {
+      coId = split[1];
+    }
+
+  }
+
+  return coId;
+}
+
+
+/**
+ * if (send, open, click) event
  *   gets message id from metadata
  *
  * @return {string} message id
  */
 
 Event.prototype.getMId = function () {
-
-  var mId;
-
-  if (this.type === 'inbound') {
-    var localName = this.toEmail.split('@')[0];
-    var idSplit = localName.split('+');
-
-    if (idSplit.length === 2) {
-      mId = idSplit[1];
-    }
-
-  } else if (this.metadata) {
-
-    mId = this.metadata.mId;
-  }
-
-
-  return mId;
+  return this.metadata ? this.metadata.mId : null;
 }
+
+
+/**
+ * If user with email exists, then returns it
+ * else if user does not exist, creates a new user
+ *
+ * @param {function} cb callback
+ */
+
+Event.prototype.getOrCreateUser = function (cb) {
+
+  var self = this;
+  var aid = self.aid;
+
+  var newUser = {
+    email: self.fromEmail,
+    totalSessions: 0,
+    ct: self.ct
+  };
+
+  User.getOrCreate(aid, newUser, cb);
+};
 
 
 /**
@@ -150,45 +179,30 @@ Event.prototype.processReply = function (cb) {
   var self = this;
   var savedReply;
 
-  async.series(
+  async.waterfall(
 
     [
 
-      // fetchParentMessage and update 'replied' status to true
-      function (cb) {
-console.log('mc::4')
+      // TODO: update toReply status of Conversation
+      //
 
-        Message.replied(self.mId, function (err, msg) {
-          if (err) return cb(err);
-
-          self.coId = msg.coId;
-          self.uid = msg.uid;
-
-          cb(null, msg);
-        });
+      function getOrCreateUser(cb) {
+        self.getOrCreateUser.call(self, cb)
       },
 
-      // createMessage
-      function (cb) {
-console.log('mc::5')
+      function (user, cb) {
+        self.uid = user._id;
 
         self.createMessage.call(self, function (err, reply) {
-          if (err) return cb(err);
-          savedReply = reply;
-          cb();
+          cb(err, reply);
         });
       }
 
     ],
 
-    function (err) {
-console.log('mc::6', err, savedReply)
+    cb);
 
-      console.log(err, savedReply);
-      cb(err, savedReply);
-    });
-
-}
+};
 
 
 Event.prototype.processNewMessage = function (cb) {
@@ -199,27 +213,14 @@ Event.prototype.processNewMessage = function (cb) {
 
     [
 
-      // getOrCreate user
-      function (cb) {
-
-        var aid = self.aid;
-        var newUser = {
-          email: self.fromEmail,
-          totalSessions: 0,
-          ct: self.ct
-        };
-
-        User.getOrCreate(aid, newUser, function (err, usr) {
-          if (err) return cb(err);
-
-          self.uid = usr._id;
-          cb();
-        });
+      function getOrCreateUser(cb) {
+        self.getOrCreateUser(cb);
       },
 
 
-      // create new conversation
-      function (cb) {
+      function createConversation(user, cb) {
+
+        self.uid = user._id;
 
         var newConv = {
           accId: self.accid,
@@ -229,21 +230,16 @@ Event.prototype.processNewMessage = function (cb) {
           uid: self.uid
         };
 
-        Conversation.create(newConv, function (err, savedConv) {
+        Conversation.create(newConv, function (err, con) {
           if (err) return cb(err);
-
-          self.coId = savedConv._id;
+          self.coId = con._id;
           cb();
         });
       },
 
 
-      // create new message
-      function (cb) {
-
-        self.createMessage.call(self, function (err, savedMsg) {
-          cb(err, savedMsg);
-        });
+      function createMessage(cb) {
+        self.createMessage.call(self, cb);
       }
 
     ],
@@ -317,13 +313,11 @@ function processMandrillEvents(events, cb) {
 
       var event = new Event(e);
       var type = event.type;
+      var coId = event.coId;
       var mId = event.mId;
-console.log('mc::2', event)
 
       // according to mandrill's docs, incoming emails will have the event of 'inbound'
-      if (type === 'inbound' && mId) {
-console.log('mc::3')
-
+      if (type === 'inbound' && coId) {
         return event.processReply.call(event, cb);
       }
 
@@ -364,14 +358,29 @@ router
 
     var events = JSON.parse(req.body.mandrill_events);
 
-console.log('mc::')
     // _.each(events, function (val, key) {
     //   console.log(key, val);
     //   console.log('\n\n\n');
     // });
     processMandrillEvents(events, function (err, result) {
-      console.log('final output', arguments);
-      // TODO: send error to admin email
+
+      if (err) {
+
+        logger.crit({
+          at: 'MandrillController',
+          err: err,
+          result: result
+        });
+
+      } else {
+
+        logger.debug({
+          at: 'MandrillController',
+          result: result
+        });
+
+      }
+
       res.json();
     });
 

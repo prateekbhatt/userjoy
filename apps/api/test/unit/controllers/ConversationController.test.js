@@ -204,6 +204,32 @@ describe('Resource /apps/:aid/conversations', function () {
 
             expect(res.body)
               .to.not.be.empty;
+
+            expect(res.body[0].closed)
+              .to.be.false;
+          })
+          .end(done);
+
+      });
+
+
+    it(
+      'should return all closed conversations if query "?filter=closed"',
+      function (done) {
+
+        request
+          .get(basePath + '?filter=closed')
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(function (res) {
+            expect(res.body)
+              .to.be.an("array");
+
+            expect(res.body)
+              .to.not.be.empty;
+
+            expect(res.body[0].closed)
+              .to.be.true;
           })
           .end(done);
 

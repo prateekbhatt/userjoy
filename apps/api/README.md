@@ -356,8 +356,6 @@ User          | companies, notes        | users of a specific app. create a new 
 - coId
 - ct
 - from (enum: [user, account]) (is it sent from a 'user' or an 'account')
-- mId (id of parent message)
-- replied (boolean)
 - seen (boolean)
 - sent (boolean)
 - sName
@@ -426,7 +424,7 @@ User          | companies, notes        | users of a specific app. create a new 
 - Using Mandrill, it is possible to assign unique readable email ids for each team member of an app, e.g. "prateek@dodatado.mail.userjoy.co"
 
 
-## API
+## API (To be updated)
 
 ### Message
 
