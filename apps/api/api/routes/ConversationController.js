@@ -105,4 +105,67 @@ router
   });
 
 
+/**
+ * GET /apps/:aid/conversations/:coId
+ *
+ * Returns a conversation alongwith all messages
+ */
+
+router
+  .route('/:aid/conversations/:coId')
+  .get(function (req, res, next) {
+
+    var aid = req.app._id;
+    var coId = req.params.coId;
+
+    async.waterfall(
+      [
+
+        function findConversation(cb) {
+          Conversation
+            .findById(coId)
+            .exec(cb);
+        },
+
+        function findMessages(con, cb) {
+          Message
+            .find({
+              coId: coId
+            })
+            .sort({
+              ct: -1
+            })
+            .exec(function (err, messages) {
+              cb(err, con, messages)
+            });
+        },
+
+        function areOpened(con, messages, cb) {
+          var mIds = _.pluck(messages, '_id');
+
+          // update seen status to true for all messages sent from user, which
+          // belong to this thread
+          Message.openedByTeamMember(mIds, function (err) {
+            cb(err, con, messages);
+          });
+        }
+
+      ],
+
+      function (err, con, messages) {
+
+        if (err) return next(err);
+
+        con = con.toJSON();
+        con.messages = messages;
+
+        res.json(con);
+      }
+
+    );
+
+  });
+
+
+
 module.exports = router;
