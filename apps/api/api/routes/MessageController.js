@@ -197,19 +197,34 @@ router
     var aid = req.app._id;
     var mId = req.params.mId;
 
-    Message.fetchThread(aid, mId, function (err, messages) {
-      if (err) return next(err);
-      var mIds = _.pluck(messages, '_id');
+    async.waterfall(
+      [
 
+        function fetchThread(cb) {
+          Message.fetchThread(aid, mId, function (err, messages) {
+            cb(err, messages);
+          });
+        },
 
-      // update seen status to true for all messages sent from user, which
-      // belong to this thread
-      Message.openedByTeamMember(mIds, function (err) {
+        function areOpened(messages, cb) {
+          var mIds = _.pluck(messages, '_id');
+
+          // update seen status to true for all messages sent from user, which
+          // belong to this thread
+          Message.openedByTeamMember(mIds, function (err) {
+            cb(err, messages);
+          });
+        }
+
+      ],
+
+      function (err, messages) {
+
         if (err) return next(err);
         res.json(messages || []);
-      });
+      }
 
-    });
+    );
 
   });
 
@@ -283,10 +298,7 @@ router
 
       function (err, msg) {
 
-        if (err) {
-          return next(err);
-        }
-
+        if (err) return next(err);
         res.json(msg, 201);
       }
     );
@@ -366,16 +378,11 @@ router
       function (err, msg) {
 
         logger.trace('MessageController Reply', {
-          err: !!err,
-          msg: !!msg
+          err: !! err,
+          msg: !! msg
         });
 
-        // console.log(msg);
-
-        if (err) {
-          return next(err);
-        }
-
+        if (err) return next(err);
         res.json(msg, 201);
       }
     );
