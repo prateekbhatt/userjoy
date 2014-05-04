@@ -1,4 +1,4 @@
-describe('Resource /mandrill', function () {
+describe.only('Resource /mandrill', function () {
 
   var MandrillCtrl = require('../../../api/routes/MandrillController');
   var Event = MandrillCtrl._test.Event;
@@ -14,6 +14,7 @@ describe('Resource /mandrill', function () {
   var sendEvent;
   var clickEvent;
   var parentMessageId;
+  var conversationId;
   var aid;
 
 
@@ -28,11 +29,12 @@ describe('Resource /mandrill', function () {
 
   beforeEach(function () {
     parentMessageId = saved.messages.first._id;
+    conversationId = saved.conversations.first._id;
     aid = saved.apps.first.team[0]._id;
 
     var replyToEmail = aid +
       '+' +
-      parentMessageId +
+      conversationId +
       '@mail.userjoy.co';
 
 
@@ -229,8 +231,11 @@ describe('Resource /mandrill', function () {
       expect(event)
         .to.be.an("object");
 
+      expect(event.coId)
+        .to.eql(conversationId.toString());
+
       expect(event.mId)
-        .to.eql(parentMessageId.toString());
+        .to.not.exist;
 
       expect(event.aid)
         .to.eql(aid.toString());
@@ -262,8 +267,11 @@ describe('Resource /mandrill', function () {
         expect(savedReply)
           .to.not.be.empty;
 
+        expect(savedReply.coId)
+          .to.eql(conversationId);
+
         expect(savedReply.mId)
-          .to.eql(parentMessageId);
+          .to.not.exist;
 
         expect(savedReply.from)
           .to.eql('user');
