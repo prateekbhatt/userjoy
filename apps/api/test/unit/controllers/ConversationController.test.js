@@ -252,4 +252,88 @@ describe('Resource /apps/:aid/conversations', function () {
 
   });
 
+
+  describe('POST /apps/:aid/conversations/:coId', function () {
+
+    var savedCon;
+    var testUrl;
+
+    before(function (done) {
+      savedCon = saved.conversations.first;
+      testUrl = basePath + '/' + savedCon._id;
+      logoutUser(done);
+    });
+
+
+    it('returns error if not logged in',
+
+      function (done) {
+
+        request
+          .post(testUrl)
+          .send({})
+          .expect('Content-Type', /json/)
+          .expect(401)
+          .expect({
+            status: 401,
+            error: 'Unauthorized'
+          })
+          .end(done);
+
+      });
+
+
+    it('logging in user',
+
+      function (done) {
+        loginUser(done);
+      });
+
+    it('should return error if text is not provided',
+
+      function (done) {
+
+        var newMessage = {};
+        // TODO: fix this test, and the validation method in the ConversationController
+        request
+          .post(testUrl)
+          .set('cookie', loginCookie)
+          .send(newMessage)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            status: 400,
+            error: 'Missing text'
+          })
+          .end(done);
+
+      });
+
+    it('should create new message reply',
+
+      function (done) {
+
+        var newMessage = {
+          text: 'This is the message I want to reply'
+        };
+
+        request
+          .post(testUrl)
+          .set('cookie', loginCookie)
+          .send(newMessage)
+          .expect('Content-Type', /json/)
+          .expect(201)
+          .expect(function (res) {
+            console.log('res.bidy', res.body);
+            expect(res.body.text)
+              .to.eql(newMessage.text);
+            expect(res.body.sName)
+              .to.exist;
+          })
+          .end(done);
+
+      });
+
+  });
+
 });
