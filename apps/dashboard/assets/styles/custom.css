@@ -534,4 +534,18 @@ hr {
     background-color: #E6E6E6;
     padding: 20px 0;
 }
+.badge {
+    display: initial;
+    min-width: 10px;
+    padding: 3px 7px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #ffffff;
+    line-height: 1;
+    vertical-align: baseline;
+    white-space: nowrap;
+    text-align: center;
+    background-color: #95a5a6;
+    border-radius: 10px;
+}
 }

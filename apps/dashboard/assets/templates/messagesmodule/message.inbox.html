@@ -8,10 +8,10 @@
                         <div id="sidebar-wrapper-settings">
                             <ul class="sidebar-nav">
                                 <li>
-                                    <a ui-sref="inbox" ng-click="showTableInbox()"><i class="fa fa-inbox"></i> All Conversations</a>
+                                    <a ui-sref="inbox" ng-click="showTableInbox()"><i class="fa fa-inbox"></i> Open Conversations <span class="badge">12</span></a>
                                 </li>
                                 <li>
-                                    <a ui-sref="unread"><i class="fa fa-exclamation"></i>&nbsp; Unread Conversations</a>
+                                    <a ui-sref="unread"><i class="fa fa-exclamation"></i>&nbsp; Unread Conversations <span class="badge">26</span></a>
                                 </li>
                                 <li>
                                     <a ui-sref="message.automate"><i class="fa fa-edit"></i> Automate Messages </a>
@@ -102,8 +102,7 @@
                                                     <table ng-table="tableParamsInbox" show-filter="true" class="table table-bordered table-hover table-striped">
                                                         <thead>
                                                             <tr>
-                                                                <input class="form-control" ng-model="searchText" placeholder="Search Messages">
-                                                            </tr>
+                                                                <!-- <input class="form-control" ng-model="searchText" placeholder="Search Messages"> -->
                                                             <tr>
                                                                 <th ng-repeat="column in columnsInbox" ng-show="column.visible"
                                                                     class="text-center" ng-class="{
@@ -119,17 +118,17 @@
                                                         <br>
                                                         <tbody>
                                                             <tr ng-repeat="user in data | filter:searchText" >
-                                                                <td data-title="'User'" style="text-align:center; cursor:pointer" ng-click="showSelectedMail(user.id)">
+                                                                <td data-title="'User'" style="text-align:center; cursor:pointer" ng-click="showSelectedMail(user.coid)">
                                                                     <span>{{user.name}}</span>
                                                                 </td>
-                                                                <td data-title="'Subject'" style="text-align:center; cursor:pointer" ng-click="showSelectedMail(user.id)">
+                                                                <td data-title="'Subject'" style="text-align:center; cursor:pointer" ng-click="showSelectedMail(user.coid)">
                                                                     <span>{{user.subject}}</span>
                                                                 </td>
-                                                                <td data-title="'When'" style="text-align:center; cursor:pointer;" ng-click="showSelectedMail(user.id)">
+                                                                <td data-title="'When'" style="text-align:center; cursor:pointer;" ng-click="showSelectedMail(user.coid)">
                                                                     <span>{{user.time}}</span>
                                                                 </td>
                                                                 <td data-title="''" style="text-align:center">
-                                                                    <a href="#" ng-click="closeConversation(user.coid)">Close</a>
+                                                                    <a href="#" ng-click="closeConversation(user.coid, user)">Close</a>
                                                                 </td>
                                                                 <td data-title="''" style="text-align:center">
                                                                     <a href="#" ng-click="expression">Assign</a>

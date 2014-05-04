@@ -231,9 +231,25 @@ angular.module('do.message', [])
             // $location.path('/messages/inbox/' + msgId);
         }
 
-        $scope.closeConversation = function (coId) {
+        /*var deleteMsgRow = function (err, user) {
+            if (err) {
+                console.log("error")
+                return;
+            }
+            var index = $scope.data.indexOf(user);
+            $scope.data.splice(index, 1);
+        }*/
+
+        $scope.closeConversation = function (coId, user) {
             MsgService.closeConversationRequest(AppService.getCurrentApp()
-                ._id, coId);
+                ._id, coId, function (err, user) {
+                    if (err) {
+                        console.log("error");
+                        return;
+                    }
+                    var index = $scope.data.indexOf(user);
+                    $scope.data.splice(index, 1);
+                });
         }
 
 
@@ -265,11 +281,18 @@ angular.module('do.message', [])
         // TODO: Get data from backend
         // TODO: Replace ng-table with normal table
 
+        $scope.showUnreadMsgs = true;
+
         console.log("inside UnreadCtrl");
         $scope.data = [];
         var msg = [];
         var populateUnreadMsg = function () {
             msg = InboxMsgService.getUnreadMessage();
+            console.log("unread msgs ---> ", msg);
+            if(!msg.length) {
+                $scope.showUnreadMsgs = false;
+            }
+
             for (var i = 0; i < msg.length; i++) {
                 $scope.data.push({
                     id: msg[i]._id,
@@ -537,9 +560,9 @@ angular.module('do.message', [])
 ])
 
 .controller('MessageBodyCtrl', ['$scope', 'MsgService', 'AppService',
-    'ThreadService', '$moment', 'InboxMsgService', 'AccountService',
+    'ThreadService', '$moment', 'InboxMsgService', 'AccountService', '$log',
     function ($scope, MsgService, AppService, ThreadService, $moment,
-        InboxMsgService, AccountService) {
+        InboxMsgService, AccountService, $log) {
 
 
         console.log(AccountService.get());
@@ -560,11 +583,11 @@ angular.module('do.message', [])
             var msgThread = [];
             msgThread = ThreadService.getThread();
             console.log("msg thread: -> ->", msgThread);
-            for (var i = 0; i < msgThread.length; i++) {
+            for (var i = 0; i < msgThread.messages.length; i++) {
                 $scope.messages.push({
-                    messagebody: msgThread[i].text,
-                    createdby: msgThread[i].sName,
-                    createdat: $moment(msgThread[i].ut)
+                    messagebody: msgThread.messages[i].text,
+                    createdby: msgThread.messages[i].sName,
+                    createdat: $moment(msgThread.messages[i].ut)
                         .fromNow()
                 })
             };
@@ -621,7 +644,8 @@ angular.module('do.message', [])
 
             $scope.replysrc = '';
             console.log("USer loggedin: ", AccountService.get());
-            $scope.user = AccountService.get().name;
+            $scope.user = AccountService.get()
+                .name;
 
             for (var i = 0; i < $scope.messagesWithSrc.length; i++) {
                 if ($scope.user == $scope.messagesWithSrc[i].createdby) {
@@ -647,7 +671,8 @@ angular.module('do.message', [])
         };
 
         $scope.replytext = '';
-        $scope.today = $moment(new Date()).fromNow();
+        $scope.today = $moment(new Date())
+            .fromNow();
         $scope.messages = [];
         $scope.messagesWithSrc = [];
 
@@ -656,7 +681,7 @@ angular.module('do.message', [])
         var pathArray = window.location.pathname.split('/');
         var appId = pathArray[2];
         console.log(appId);
-        var msgId = pathArray[4];
+        var coId = pathArray[4];
 
         var msgServiceCallback = function (err) {
             if (err) return $log.error(err);
@@ -665,7 +690,7 @@ angular.module('do.message', [])
             console.log("$scope.messages: ", $scope.messages);
         };
 
-        MsgService.getMessageThread(appId, msgId, msgServiceCallback);
+        MsgService.getMessageThread(appId, coId, msgServiceCallback);
 
 
 
@@ -693,6 +718,8 @@ angular.module('do.message', [])
         $scope.replies = [];
 
         $scope.replyButtonClicked = false;
+
+        var closeButtonClicked = false;
 
         $scope.showReplyButton = function () {
             $scope.insideReplyBox = true;
@@ -744,7 +771,9 @@ angular.module('do.message', [])
                     name: 'Savinay'
                 })
                 console.log('object of replies: ', $scope.replies);
-                $scope.buttontext = 'Close';
+                if (closeButtonClicked) {
+                    $scope.buttontext = 'Reopen';
+                }
                 $scope.insideReplyBox = false;
                 console.log('validateReply', $scope.replytext);
 
@@ -752,35 +781,41 @@ angular.module('do.message', [])
         }
 
         $scope.validateAndAddReply = function () {
-            var msgId = '';
+            var coId = '';
             // var msglength = InboxMsgService.getInboxMessage().length;
-            msgId = pathArray[4];
+            coId = pathArray[4];
             console.log('reply text length is:', $scope.replytext.length);
             if (!$scope.replytext.length) {
                 console.log('error in reply');
                 $scope.showerror = true;
+                return;
             }
             if ($scope.replytext.length > 0) {
                 console.log("reply button clicked and validated");
                 $scope.replyButtonClicked = true;
                 MsgService.replyToMsg(AppService.getCurrentApp()
-                    ._id, msgId, $scope.replytext, AccountService.get()
+                    ._id, coId, $scope.replytext, AccountService.get()
                     ._id, replyCallBack);
 
             }
         }
 
         $scope.closeTicket = function () {
+            closeButtonClicked = true;
             if ($scope.replytext.length > 0) {
                 $scope.replyButtonClicked = true;
                 $scope.replytextInDiv = $scope.replytext;
+                $scope.buttontext = 'Close & Reply';
                 $scope.replytext = '';
                 $scope.replies.push({
                     body: $scope.replytextInDiv,
                     name: 'Savinay'
                 })
+                MsgService.replyToMsg(AppService.getCurrentApp()
+                    ._id, coId, $scope.replytextInDiv, AccountService.get()
+                    ._id, replyCallBack);
             }
-            $scope.buttontext = 'Reopen';
+            // $scope.buttontext = 'Reopen';
 
         }
 
@@ -790,7 +825,6 @@ angular.module('do.message', [])
 
         if ($scope.replytext.length > 0) {
             console.log('reply length:', $scope.replytext.length);
-            $scope.buttontext = 'Close & Reply';
         }
 
     }

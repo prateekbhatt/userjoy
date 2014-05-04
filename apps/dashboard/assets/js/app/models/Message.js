@@ -10,7 +10,7 @@ angular.module('models.message', ['services'])
                 sub: sub,
                 text: text,
                 type: 'email',
-                uid: '5364fb907ecf4bbd6e4bf0be'
+                uid: '536610ba35b0f26b61fdb393'
             }
             console.log("message data: ", data);
             console.log("LIAS", AppService.getCurrentApp());
@@ -42,9 +42,9 @@ angular.module('models.message', ['services'])
                 .error(callback);
         };
 
-        this.getMessageThread = function (appId, msgId, callback) {
-            $http.get(config.apiUrl + '/apps/' + appId + '/messages/' +
-                msgId)
+        this.getMessageThread = function (appId, coId, callback) {
+            $http.get(config.apiUrl + '/apps/' + appId + '/conversations/' +
+                coId)
                 .success(function (data) {
                     console.log("success getting msg thread");
                     console.log("msg thread: ", data);
@@ -54,15 +54,14 @@ angular.module('models.message', ['services'])
                 .error(callback);
         }
 
-        this.closeConversationRequest = function (appId, coId) {
+        this.closeConversationRequest = function (appId, coId, callback) {
 
             $http.put(config.apiUrl + '/apps/' + appId + '/conversations/' + coId + '/closed')
                 .success(function (data){
                     console.log("success closing conversation");
+                    callback();
                 })
-                .error(function(){
-                    console.log("error");
-                })
+                .error(callback);
         }
 
         this.getUnreadMessages = function (appId, callback) {
@@ -75,7 +74,7 @@ angular.module('models.message', ['services'])
                 .error(callback);
         }
 
-        this.replyToMsg = function (appId, msgId, reply, accid, callback) {
+        this.replyToMsg = function (appId, coId, reply, accid, callback) {
 
             var data = {
                 text: reply
@@ -83,7 +82,7 @@ angular.module('models.message', ['services'])
 
             console.log("data replyToMsg: ", data);
 
-            $http.post(config.apiUrl + '/apps/' + appId + '/messages/' + msgId, data)
+            $http.post(config.apiUrl + '/apps/' + appId + '/conversations/' + coId, data)
                 .success(function(data) {
                     console.log("success");
                     ThreadService.setReply(data);
@@ -91,6 +90,16 @@ angular.module('models.message', ['services'])
                 })
                 .error(callback);
 
+        }
+
+        this.reopenConversation = function (appId, coId) {
+            $http.put(config.apiUrl + '/apps/' + appId + '/conversations/' + coId + '/reopened')
+                .success(function (data){
+                    console.log("success reopening conversation");
+                })
+                .error(function(){
+                    console.log("error");
+                })
         }
     }
 ])
