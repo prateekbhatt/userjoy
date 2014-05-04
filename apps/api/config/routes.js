@@ -75,6 +75,15 @@ module.exports.error = function loadErrorRoutes(app) {
 
 
   app.use(function (err, req, res, next) {
+
+    logger.crit({
+      err: err,
+      path: req.path,
+      body: req.body,
+      params: req.params,
+      query: req.query
+    });
+
     var badRequestErr = errorHelper(err);
     res.json(badRequestErr, badRequestErr.status);
   });
