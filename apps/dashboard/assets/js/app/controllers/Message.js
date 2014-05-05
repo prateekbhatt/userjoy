@@ -585,9 +585,12 @@ angular.module('do.message', [])
         function setMessagesIntoScope() {
             var msgThread = [];
             msgThread = ThreadService.getThread();
+            console.log("msg is closed: ", msgThread.closed);
             if (msgThread.closed) {
+                console.log("buttontext: Reopen");
                 $scope.buttontext = 'Reopen';
             } else {
+                console.log("buttontext: Close");
                 $scope.buttontext = 'Close';
             }
             console.log("msg thread: -> ->", msgThread);
@@ -705,9 +708,6 @@ angular.module('do.message', [])
 
         // TODO : Get data from backend and match it based on uid
 
-        // $scope.user = '';
-
-
         $scope.customer = 'John';
         $scope.custsrc = '';
 
@@ -729,53 +729,38 @@ angular.module('do.message', [])
 
         var closeButtonClicked = false;
 
-        // $scope.showReplyButton = function () {
-        //     $scope.insideReplyBox = true;
-        //     console.log('inside show reply button');
-        //     $scope.replytext = '';
-        //     console.log($scope.replytext);
-        //     $scope.buttontext = 'Close';
-        //     /*if(!$scope.replytext.length){
-
-        //         console.log('inside replytext length > 0');
-        //     } else {
-        //         $scope.buttontext = 'Close and Reply';
-        //     }*/
-        // }
+        var lengthReply = $scope.replytext.length;
 
         $scope.changeButtonText = function () {
-            // $scope.buttontext = 'Close and Reply';
             console.log("inside change button text");
 
-            if ($scope.replytext.length > 0) {
-                if ($scope.buttontext == 'Close') {
+            if ($scope.buttontext == 'Close') {
+                console.log("reply text length: ", $scope.replytext,
+                    length);
+                if ($scope.replytext.length > 0) {
                     $scope.showerror = false;
                     $scope.buttontext = 'Close & Reply';
-                } else {
-                    $scope.buttontext = 'Close';
-                }
-
-                if ($scope.buttontext == 'Reopen') {
-                    $scope.showerror = false;
-                    $scope.buttontext = 'Reopen & Reply';
-                } else {
-                    $scope.buttontext = 'Close';
                 }
             }
 
-            /*if ($scope.replytext.length > 0 && $scope.buttontext == 'Close') {
-                $scope.showerror = false;
-                $scope.buttontext = 'Close & Reply';
-            } else if($scope.replytext.length > 0 && $scope.buttontext == 'Reopen') {
-                $scope.showerror = false;
-                $scope.buttontext = 'Reopen & Reply';
-            } else {
-                // $scope.showerror = true;
+            if ($scope.replytext.length == 0 && !ThreadService.getThread.closed) {
                 $scope.buttontext = 'Close';
-            }*/
+            }
+
+            if ($scope.buttontext == 'Reopen') {
+                if ($scope.replytext.length > 0) {
+                    $scope.showerror = false;
+                    $scope.buttontext = 'Reopen & Reply';
+                }
+            }
+
+            if ($scope.replytext.length == 0 && ThreadService.getThread.closed) {
+                $scope.buttontext = 'Reopen';
+            }
+
         }
 
-        $scope.deleteReply = function () {
+        /*$scope.deleteReply = function () {
             console.log('deleting text', $scope.replytext);
             // $scope.replytext = '';
             $scope.showerror = false;
@@ -783,7 +768,7 @@ angular.module('do.message', [])
             $scope.buttontext = 'Close';
             $scope.insideReplyBox = false;
             $scope.replyButtonClicked = true;
-        };
+        };*/
 
         var replyCallBack = function (err) {
             if (err) {
@@ -793,16 +778,37 @@ angular.module('do.message', [])
             if (ThreadService.getReply) {
                 $scope.replytextInDiv = $scope.replytext;
                 $scope.replytext = '';
+                console.log("pushing msg");
                 $scope.replies.push({
                     body: $scope.replytextInDiv,
                     name: 'Savinay'
                 })
                 console.log('object of replies: ', $scope.replies);
-                if (closeButtonClicked) {
-                    $scope.buttontext = 'Reopen';
-                }
                 $scope.insideReplyBox = false;
                 console.log('validateReply', $scope.replytext);
+
+                if (!ThreadService.getThread()
+                    .closed) {
+                    MsgService.closeConversationRequest(AppService.getCurrentApp()
+                        ._id, coId, function (err, user) {
+                            if (err) {
+                                console.log("error");
+                                return;
+                            }
+                            console.log("changing button text to reopen");
+                            $scope.buttontext = 'Reopen';
+                        });
+                } else {
+                    MsgService.reopenConversation(AppService.getCurrentApp()
+                        ._id, coId, function (err, user) {
+                            if (err) {
+                                console.log("error");
+                                return;
+                            }
+                            console.log("changing buttontext to close");
+                            $scope.buttontext = 'Close';
+                        });
+                }
 
             }
         }
@@ -830,77 +836,67 @@ angular.module('do.message', [])
         $scope.closeTicket = function () {
             closeButtonClicked = true;
 
-            if ($scope.buttontext == 'Close') {
+            if (!ThreadService.getThread()
+                .closed) {
 
                 if ($scope.replytext.length > 0) {
                     $scope.replyButtonClicked = true;
                     $scope.replytextInDiv = $scope.replytext;
-                    $scope.buttontext = 'Close & Reply';
-                    $scope.replytext = '';
-                    $scope.replies.push({
-                        body: $scope.replytextInDiv,
-                        name: 'Savinay'
-                    })
                     MsgService.replyToMsg(AppService.getCurrentApp()
                         ._id, coId, $scope.replytextInDiv, AccountService.get()
                         ._id, replyCallBack);
+                } else {
+                    MsgService.closeConversationRequest(AppService.getCurrentApp()
+                        ._id, coId, function (err, user) {
+                            if (err) {
+                                console.log("error");
+                                return;
+                            }
+                            console.log("changing button text to reopen");
+                            $scope.buttontext = 'Reopen';
+                        });
                 }
 
-                MsgService.closeConversationRequest(AppService.getCurrentApp()
-                    ._id, coId, function (err, user) {
-                        if (err) {
-                            console.log("error");
-                            return;
-                        }
-                        $scope.buttontext = 'Reopen';
-                    });
-                // $scope.buttontext = 'Reopen';
-
-            }
-
-            if ($scope.buttontext == 'Reopen') {
+            } else {
                 if ($scope.replytext.length > 0) {
                     $scope.replyButtonClicked = true;
                     $scope.replytextInDiv = $scope.replytext;
-                    $scope.buttontext = 'Reopen & Reply';
-                    $scope.replytext = '';
-                    $scope.replies.push({
-                        body: $scope.replytextInDiv,
-                        name: 'Savinay'
-                    })
                     MsgService.replyToMsg(AppService.getCurrentApp()
-                        ._id, coId, $scope.replytextInDiv, AccountService.get()
+                        ._id, coId, $scope.replytextInDiv,
+                        AccountService.get()
                         ._id, replyCallBack);
+                } else {
+                    MsgService.reopenConversation(AppService.getCurrentApp()
+                        ._id, coId, function (err, user) {
+                            if (err) {
+                                console.log("error");
+                                return;
+                            }
+                            console.log("changing buttontext to close");
+                            $scope.buttontext = 'Close';
+                        });
                 }
 
-                MsgService.reopenConversation(AppService.getCurrentApp()
-                    ._id, coId, function (err, user) {
-                        if (err) {
-                            console.log("error");
-                            return;
-                        }
-                        $scope.buttontext = 'Close';
-                    });
+
             }
-        }
-
-        if (!$scope.replytext.length) {
-            $scope.buttontext = 'Close';
-        }
-
-        if ($scope.replytext.length > 0) {
-            console.log('reply length:', $scope.replytext.length);
         }
 
     }
 ])
 
-.controller('closedConversationCtrl', ['$scope', 'MsgService', 'AppService', 'InboxMsgService', '$moment', '$filter', 'ngTableParams', '$log', '$location',
-    function ($scope, MsgService, AppService, InboxMsgService, $moment, $filter, ngTableParams, $log, $location) {
+.controller('closedConversationCtrl', ['$scope', 'MsgService',
+    'AppService',
+    'InboxMsgService', '$moment', '$filter', 'ngTableParams',
+    '$log',
+    '$location',
+    function ($scope, MsgService, AppService, InboxMsgService,
+        $moment,
+        $filter, ngTableParams, $log, $location) {
         console.log("inside closedConversationCtrl");
 
         $scope.data = [];
         var msg = [];
+
         function showClosedMsg() {
             msg = InboxMsgService.getClosedMessage();
             console.log("msg show Closed Msg -> -> ", msg);
@@ -973,9 +969,8 @@ angular.module('do.message', [])
 
 
 
-
-
-        MsgService.getClosedConversations(AppService.getCurrentApp()._id, showClosedMsgCallback);
+        MsgService.getClosedConversations(AppService.getCurrentApp()
+            ._id, showClosedMsgCallback);
 
         $scope.showClosedConversations = function (id) {
             $location.path('/messages/' + AppService.getCurrentApp()
