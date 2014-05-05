@@ -329,9 +329,9 @@ User          | companies, notes        | users of a specific app. create a new 
 
 ##### Columns:
 
-- accid
 - aid
 - clicked
+- creator (account id)
 - ct
 - name
 - replied

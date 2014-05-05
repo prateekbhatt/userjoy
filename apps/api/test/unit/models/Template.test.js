@@ -1,4 +1,4 @@
-describe('Model Template', function () {
+describe.only('Model Template', function () {
 
 
   /**
@@ -19,7 +19,7 @@ describe('Model Template', function () {
   describe('#create', function () {
 
     it(
-      'should return error if accid/aid/type is not provided',
+      'should return error if creator/aid/type is not provided',
       function (done) {
 
         var newTmp = {};
@@ -33,8 +33,8 @@ describe('Model Template', function () {
             .length)
             .to.eql(3);
 
-          expect(err.errors.accid.message)
-            .to.eql('Invalid account id');
+          expect(err.errors.creator.message)
+            .to.eql('Invalid creator account id');
 
           expect(err.errors.aid.message)
             .to.eql('Invalid aid');
@@ -54,7 +54,7 @@ describe('Model Template', function () {
     it('should create template', function (done) {
 
       var newTemplate = {
-        accid: randomId,
+        creator: randomId,
         aid: randomId,
         name: 'Hello World',
         type: 'email'
@@ -73,8 +73,8 @@ describe('Model Template', function () {
         expect(tmp.aid.toString())
           .to.eql(newTemplate.aid);
 
-        expect(tmp.accid.toString())
-          .to.eql(newTemplate.accid);
+        expect(tmp.creator.toString())
+          .to.eql(newTemplate.creator);
 
         expect(tmp.type)
           .to.eql(newTemplate.type);

@@ -22,10 +22,10 @@ var Schema = mongoose.Schema;
 var TemplateSchema = new Schema({
 
 
-  accid: {
+  creator: {
     type: Schema.Types.ObjectId,
     ref: 'Account',
-    required: [true, 'Invalid account id']
+    required: [true, 'Invalid creator account id']
   },
 
 
