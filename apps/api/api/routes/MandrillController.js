@@ -51,8 +51,15 @@ function Event(event) {
   this.mId = this.getMId();
   this.uid = null;
 
+  logger.debug({
+    at: 'MandrillController new event',
+    type: this.type,
+    fromEmail: this.fromEmail,
+    aid: this.aid,
+    mId: this.mId,
+    coId: this.coId
+  });
 
-  // console.log('\n\n\n create new event');
   return this;
 }
 
@@ -179,22 +186,27 @@ Event.prototype.processReply = function (cb) {
   var self = this;
   var savedReply;
 
+  logger.trace('MandrillController processReply');
+
   async.waterfall(
 
     [
 
-      // TODO: update toReply status of Conversation
-      //
-
       function getOrCreateUser(cb) {
-        self.getOrCreateUser.call(self, cb)
+        self.getOrCreateUser.call(self, function (err, user) {
+          if (err) return cb(err);
+          self.uid = user._id;
+          cb();
+        });
       },
 
-      function (user, cb) {
-        self.uid = user._id;
+      function createMessage(cb) {
+        self.createMessage.call(self, cb);
+      },
 
-        self.createMessage.call(self, function (err, reply) {
-          cb(err, reply);
+      function conversationToBeRead(msg, cb) {
+        Conversation.toBeRead(self.coId, function (err, con) {
+          cb(err, msg);
         });
       }
 
@@ -209,24 +221,29 @@ Event.prototype.processNewMessage = function (cb) {
 
   var self = this;
 
+  logger.trace('MandrillController processNewMessage');
+
   async.waterfall(
 
     [
 
       function getOrCreateUser(cb) {
-        self.getOrCreateUser(cb);
+        self.getOrCreateUser.call(self, function (err, user) {
+          if (err) return cb(err);
+          self.uid = user._id;
+          cb();
+        });
       },
 
 
-      function createConversation(user, cb) {
-
-        self.uid = user._id;
+      function createConversation(cb) {
 
         var newConv = {
           accId: self.accid,
           aid: self.aid,
           ct: self.ct,
           sub: self.subject,
+          toRead: true,
           uid: self.uid
         };
 
@@ -358,26 +375,18 @@ router
 
     var events = JSON.parse(req.body.mandrill_events);
 
-    // _.each(events, function (val, key) {
-    //   console.log(key, val);
-    //   console.log('\n\n\n');
-    // });
     processMandrillEvents(events, function (err, result) {
 
       if (err) {
 
         logger.crit({
-          at: 'MandrillController',
-          err: err,
-          result: result
+          at: 'MandrillController Output',
+          err: err
         });
 
       } else {
 
-        logger.debug({
-          at: 'MandrillController',
-          result: result
-        });
+        logger.debug('MandrillController Output');
 
       }
 

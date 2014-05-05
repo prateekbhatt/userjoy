@@ -599,7 +599,9 @@ angular.module('do.message', [])
                     messagebody: msgThread.messages[i].text,
                     createdby: msgThread.messages[i].sName,
                     createdat: $moment(msgThread.messages[i].ut)
-                        .fromNow()
+                        .fromNow(),
+                    seen: msgThread.messages[i].seen,
+                    from: msgThread.messages[i].from
                 })
             };
         }
@@ -639,14 +641,17 @@ angular.module('do.message', [])
                         messagebody: $scope.messages[i].messagebody,
                         createdby: $scope.messages[i].createdby,
                         createdat: $scope.messages[i].createdat,
-                        src: imgsrc
+                        src: imgsrc,
+                        seen: $scope.messages[i].seen,
+                        from: $scope.messages[i].from
                     })
                 } else {
                     $scope.messagesWithSrc.push({
                         messagebody: $scope.messages[i].messagebody,
                         createdby: $scope.messages[i].createdby,
                         createdat: $scope.messages[i].createdat,
-                        src: storedimgsrc
+                        src: storedimgsrc,
+                        seen: $scope.messages[i].seen
                     })
                 }
                 console.log("src generated: ", $scope.messagesWithSrc[i].src);
@@ -734,7 +739,8 @@ angular.module('do.message', [])
         $scope.changeButtonText = function () {
             console.log("inside change button text");
 
-            if (!ThreadService.getThread().closed) {
+            if (!ThreadService.getThread()
+                .closed) {
                 console.log("reply text length: ", $scope.replytext,
                     length);
                 if ($scope.replytext.length > 0) {
