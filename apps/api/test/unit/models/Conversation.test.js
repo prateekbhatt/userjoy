@@ -110,10 +110,15 @@ describe('Model Conversation', function () {
     it('should add closed value as false', function () {
 
       expect(savedConversation)
-        .to.have.property('closed');
+        .to.have.property('closed', false);
 
-      expect(savedConversation.closed)
-        .to.eql(false);
+    });
+
+
+    it('should add default toRead value as false', function () {
+
+      expect(savedConversation)
+        .to.have.property('toRead', false);
 
     });
 
@@ -179,6 +184,73 @@ describe('Model Conversation', function () {
         });
 
       });
+
+  });
+
+
+  describe('#toBeRead', function () {
+
+    var savedCon;
+
+    before(function (done) {
+      savedCon = saved.conversations.first;
+      done();
+    });
+
+
+    it('should mark conversation as to be read', function (done) {
+
+      expect(savedCon.toRead)
+        .to.be.false;
+
+      Conversation.toBeRead(savedCon._id, function (err, con) {
+
+        expect(err)
+          .to.not.exist;
+
+        expect(con.toRead)
+          .to.be.true;
+
+        done();
+
+      });
+
+    });
+
+  });
+
+
+  describe('#isRead', function(done) {
+
+    var savedCon;
+
+    before(function (done) {
+      savedCon = saved.conversations.first;
+      Conversation.toBeRead(savedCon._id, function(err, con) {
+        savedCon = con;
+        done(err);
+      });
+    });
+
+
+    it('should mark conversation as toRead', function(done) {
+
+      expect(savedCon.toRead)
+        .to.be.true;
+
+      Conversation.isRead(savedCon._id, function (err, con) {
+
+        expect(err)
+          .to.not.exist;
+
+        expect(con.toRead)
+          .to.be.false;
+
+        done();
+
+      });
+
+    });
 
   });
 
