@@ -6,6 +6,7 @@ angular.module('services.InboxMsgService', [])
 
         var inboxMsg = [];
         var unreadMsg = [];
+        var closedMsg = [];
 
         this.setInboxMessage = function (value) {
             console.log("setting inbox msg");
@@ -22,6 +23,14 @@ angular.module('services.InboxMsgService', [])
 
         this.getUnreadMessage = function () {
             return unreadMsg;
+        }
+
+        this.setClosedMessage = function (value) {
+            closedMsg = value;
+        }
+
+        this.getClosedMessage = function () {
+            return closedMsg;
         }
 
         return this;
