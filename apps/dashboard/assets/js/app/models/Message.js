@@ -119,21 +119,5 @@ angular.module('models.message', ['services'])
                 })
                 .error(callback);
         }
-
-        this.replyAndCloseConversation = function (appId, coId, reply,
-            accid, cb1, cb2) {
-            var data = {
-                text: reply
-            }
-
-            $http.post(config.apiUrl + '/apps/' + appId +
-                '/conversations/' + coId, data)
-                .success(function (data) {
-                    console.log("success");
-                    ThreadService.setReply(data);
-                    cb1(cb2);
-                })
-                .error(callback);
-        }
     }
 ])
