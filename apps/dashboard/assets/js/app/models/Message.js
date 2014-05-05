@@ -2,7 +2,8 @@ angular.module('models.message', ['services'])
 
 .service('MsgService', ['$http', 'config', 'AppService',
     'InboxMsgService', '$modal', '$location', 'ThreadService',
-    function ($http, config, AppService, InboxMsgService, $modal, $location, ThreadService) {
+    function ($http, config, AppService, InboxMsgService, $modal,
+        $location, ThreadService) {
         this.sendManualMessage = function (sub, text, uid) {
             console.log("uid: ", uid)
             var data = {
@@ -56,17 +57,20 @@ angular.module('models.message', ['services'])
 
         this.closeConversationRequest = function (appId, coId, callback) {
 
-            $http.put(config.apiUrl + '/apps/' + appId + '/conversations/' + coId + '/closed')
-                .success(function (data){
-                    console.log("success closing conversation");
+            $http.put(config.apiUrl + '/apps/' + appId + '/conversations/' +
+                coId + '/closed')
+                .success(function (data) {
+                    console.log("success closing conversation: ", data);
+                    ThreadService.setThread(data);
                     callback();
                 })
                 .error(callback);
         }
 
         this.getUnreadMessages = function (appId, callback) {
-            $http.get(config.apiUrl + '/apps/' + appId + '/messages/unread')
-                .success(function(data){
+            $http.get(config.apiUrl + '/apps/' + appId +
+                '/conversations?filter=unread')
+                .success(function (data) {
                     console.log("success unread msgs");
                     InboxMsgService.setUnreadMessage(data);
                     callback();
@@ -82,8 +86,9 @@ angular.module('models.message', ['services'])
 
             console.log("data replyToMsg: ", data);
 
-            $http.post(config.apiUrl + '/apps/' + appId + '/conversations/' + coId, data)
-                .success(function(data) {
+            $http.post(config.apiUrl + '/apps/' + appId +
+                '/conversations/' + coId, data)
+                .success(function (data) {
                     console.log("success");
                     ThreadService.setReply(data);
                     callback();
@@ -93,22 +98,42 @@ angular.module('models.message', ['services'])
         }
 
         this.reopenConversation = function (appId, coId, callback) {
-            $http.put(config.apiUrl + '/apps/' + appId + '/conversations/' + coId + '/reopened')
-                .success(function (data){
-                    console.log("success reopening conversation");
+            $http.put(config.apiUrl + '/apps/' + appId + '/conversations/' +
+                coId + '/reopened')
+                .success(function (data) {
+                    console.log("success reopening conversation: ",
+                        data);
+                    ThreadService.setThread(data);
                     callback();
                 })
                 .error(callback);
         }
 
-        this.getClosedConversations = function(appId, callback) {
-            $http.get(config.apiUrl + '/apps/' + appId + '/conversations?filter=closed')
-                .success(function(data) {
+        this.getClosedConversations = function (appId, callback) {
+            $http.get(config.apiUrl + '/apps/' + appId +
+                '/conversations?filter=closed')
+                .success(function (data) {
                     console.log("closed conversations: ", data);
                     InboxMsgService.setClosedMessage(data);
                     callback();
                 })
-                .error (callback);
+                .error(callback);
+        }
+
+        this.replyAndCloseConversation = function (appId, coId, reply,
+            accid, cb1, cb2) {
+            var data = {
+                text: reply
+            }
+
+            $http.post(config.apiUrl + '/apps/' + appId +
+                '/conversations/' + coId, data)
+                .success(function (data) {
+                    console.log("success");
+                    ThreadService.setReply(data);
+                    cb1(cb2);
+                })
+                .error(callback);
         }
     }
 ])
