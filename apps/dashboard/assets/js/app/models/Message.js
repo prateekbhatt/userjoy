@@ -100,5 +100,15 @@ angular.module('models.message', ['services'])
                 })
                 .error(callback);
         }
+
+        this.getClosedConversations = function(appId, callback) {
+            $http.get(config.apiUrl + '/apps/' + appId + '/conversations?filter=closed')
+                .success(function(data) {
+                    console.log("closed conversations: ", data);
+                    InboxMsgService.setClosedMessage(data);
+                    callback();
+                })
+                .error (callback);
+        }
     }
 ])

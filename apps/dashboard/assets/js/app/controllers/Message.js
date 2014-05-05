@@ -97,6 +97,17 @@ angular.module('do.message', [])
                 },
                 authenticate: true
 
+            })
+            .state('closed', {
+                url: '/messages/closed',
+                views: {
+                    "main": {
+                        templateUrl: '/templates/messagesmodule/message.filter.closed.conversations.html',
+                        controller: 'closedConversationCtrl',
+                    }
+                },
+                authenticate: true
+
             });
 
 
@@ -847,7 +858,7 @@ angular.module('do.message', [])
 
             }
 
-            if($scope.buttontext == 'Reopen') {
+            if ($scope.buttontext == 'Reopen') {
                 if ($scope.replytext.length > 0) {
                     $scope.replyButtonClicked = true;
                     $scope.replytextInDiv = $scope.replytext;
@@ -881,5 +892,96 @@ angular.module('do.message', [])
             console.log('reply length:', $scope.replytext.length);
         }
 
+    }
+])
+
+.controller('closedConversationCtrl', ['$scope', 'MsgService', 'AppService', 'InboxMsgService', '$moment', '$filter', 'ngTableParams', '$log', '$location',
+    function ($scope, MsgService, AppService, InboxMsgService, $moment, $filter, ngTableParams, $log, $location) {
+        console.log("inside closedConversationCtrl");
+
+        $scope.data = [];
+        var msg = [];
+        function showClosedMsg() {
+            msg = InboxMsgService.getClosedMessage();
+            console.log("msg show Closed Msg -> -> ", msg);
+            for (var i = 0; i < msg.length; i++) {
+                $scope.data.push({
+                    id: msg[i]._id,
+                    name: msg[i].sName,
+                    subject: msg[i].sub,
+                    time: $moment(msg[i].ct)
+                        .fromNow()
+                })
+            }
+            console.log("$scope.data: ", $scope.data);
+            $scope.columnsClosed = [{
+                title: 'User',
+                field: 'name',
+                visible: true,
+                filter: {
+                    'name': 'text'
+                }
+            }, {
+                title: 'Subject',
+                field: 'subject',
+                visible: true
+            }, {
+                title: 'When',
+                field: 'time',
+                visible: true
+            }];
+
+            $scope.tableParamsClosed = new ngTableParams({
+                page: 1, // show first page
+                count: 10, // count per page
+                filter: {
+                    name: 'M' // initial filter
+                },
+                sorting: {
+                    name: 'asc'
+                }
+            }, {
+                total: $scope.data.length, // length of data
+                getData: function ($defer, params) {
+                    // use build-in angular filter
+                    var filteredData = params.filter() ?
+                        $filter('filter')($scope.data, params
+                            .filter()) :
+                        $scope.data;
+                    var orderedData = params.sorting() ?
+                        $filter('orderBy')($scope.data,
+                            params.orderBy()) :
+                        $scope.data;
+                    params.total(orderedData.length); // set total for recalc paginationemail
+
+                    $defer.resolve(orderedData.slice((
+                            params.page() -
+                            1) * params.count(),
+                        params.page() *
+                        params.count()));
+                }
+            });
+        }
+
+        var showClosedMsgCallback = function (err) {
+            if (err) {
+                return;
+            }
+            showClosedMsg();
+        }
+
+
+
+
+
+
+        MsgService.getClosedConversations(AppService.getCurrentApp()._id, showClosedMsgCallback);
+
+        $scope.showClosedConversations = function (id) {
+            $location.path('/messages/' + AppService.getCurrentApp()
+                ._id + '/conversations/' + id);
+
+
+        }
     }
 ]);
