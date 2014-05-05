@@ -73,7 +73,6 @@ var accounts = {
     first: {
       accId: null,
       aid: null,
-      closed: false,
       sub: 'First Conversation!',
       uid: ObjectId()
     },
@@ -83,6 +82,7 @@ var accounts = {
       aid: null,
       closed: true,
       sub: 'First Conversation!',
+      toRead: true,
       uid: ObjectId()
     }
   },
