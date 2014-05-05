@@ -1,7 +1,14 @@
-describe.only('Resource /mandrill', function () {
+describe('Resource /mandrill', function () {
 
   var MandrillCtrl = require('../../../api/routes/MandrillController');
   var Event = MandrillCtrl._test.Event;
+
+
+  /**
+   * models
+   */
+
+  var Conversation = require('../../../api/models/Conversation');
 
 
   /**
@@ -113,7 +120,7 @@ describe.only('Resource /mandrill', function () {
     };
 
     clickEvent = {
-      "event": "open",
+      "event": "click",
       "ts": 1398261345,
       "msg": {
         "ts": 1398261262,
@@ -270,9 +277,6 @@ describe.only('Resource /mandrill', function () {
         expect(savedReply.coId)
           .to.eql(conversationId);
 
-        expect(savedReply.mId)
-          .to.not.exist;
-
         expect(savedReply.from)
           .to.eql('user');
 
@@ -288,6 +292,88 @@ describe.only('Resource /mandrill', function () {
         done();
       })
     });
+
+
+    it('should update the Conversation toRead status to true',
+      function (done) {
+
+        Conversation
+          .findById(event.coId)
+          .exec(function (err, con) {
+
+            expect(err)
+              .to.not.exist;
+
+            expect(con)
+              .to.have.property("toRead", true);
+
+            done();
+          });
+
+      });
+
+  });
+
+
+  describe('Event#processNewMessage', function () {
+
+    var event;
+    var savedNewMessage;
+
+    before(function () {
+      event = new Event(newMessageEvent);
+    });
+
+
+    it('should create new message', function (done) {
+
+      event.processNewMessage.call(event, function (err, savedMessage) {
+
+        expect(err)
+          .to.not.exist;
+
+        expect(savedMessage)
+          .to.not.be.empty;
+
+        savedNewMessage = savedMessage;
+
+        expect(savedMessage)
+          .to.have.property("coId");
+
+        expect(savedMessage)
+          .to.have.property("from", "user");
+
+        expect(savedMessage)
+          .to.have.property("type", "email");
+
+        expect(savedMessage)
+          .to.have.property("sent", true);
+
+        expect(savedMessage)
+          .to.have.property("text", newMessageEvent.msg.text);
+
+        done();
+      })
+    });
+
+    // this test depends on the previous test
+    it('should create new Conversation with toRead status as true',
+      function (done) {
+
+        Conversation
+          .findById(savedNewMessage.coId)
+          .exec(function (err, con) {
+
+            expect(err)
+              .to.not.exist;
+
+            expect(con)
+              .to.have.property("toRead", true);
+
+            done();
+          });
+
+      });
 
   });
 
