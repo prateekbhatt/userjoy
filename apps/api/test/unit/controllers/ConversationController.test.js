@@ -205,16 +205,71 @@ describe('Resource /apps/:aid/conversations', function () {
             expect(res.body)
               .to.not.be.empty;
 
-            expect(res.body[0].closed)
-              .to.be.false;
+            _.each(res.body, function (m) {
+              expect(m.closed)
+                .to.be.false;
+            });
+
           })
           .end(done);
 
       });
 
 
-    it(
-      'should return all closed conversations if query "?filter=closed"',
+    it('should return all open conversations if "?filter=open"',
+
+      function (done) {
+
+        request
+          .get(basePath + '?filter=open')
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(function (res) {
+            expect(res.body)
+              .to.be.an("array");
+
+            expect(res.body)
+              .to.not.be.empty;
+
+            _.each(res.body, function (m) {
+              expect(m.closed)
+                .to.be.false;
+            });
+
+          })
+          .end(done);
+
+      });
+
+
+    it('should return all unread conversations if "?filter=unread"',
+
+      function (done) {
+
+        request
+          .get(basePath + '?filter=unread')
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(function (res) {
+            expect(res.body)
+              .to.be.an("array");
+
+            expect(res.body)
+              .to.not.be.empty;
+
+            _.each(res.body, function (m) {
+              expect(m.toRead)
+                .to.be.true;
+            });
+
+          })
+          .end(done);
+
+      });
+
+
+
+    it('should return all closed conversations if query "?filter=closed"',
       function (done) {
 
         request
@@ -303,7 +358,7 @@ describe('Resource /apps/:aid/conversations', function () {
     // this test depends on the output of the previous test, hence it should be
     // below
     it(
-      'should update seen status to true for all messages, in the thread, sent from user',
+      'should update seen status to true for all messages in the thread, sent from user',
       function (done) {
 
         Message
@@ -325,6 +380,28 @@ describe('Resource /apps/:aid/conversations', function () {
                 }
               })
               .value();
+
+            done();
+          });
+
+      });
+
+
+    // this test depends on the output of a previous test, hence it should be
+    // below
+    // TODO: check if this test is right
+    it('should update toRead status of conversation to false',
+      function (done) {
+
+        Conversation
+          .findById(testCon._id)
+          .exec(function (err, con) {
+
+            expect(err)
+              .to.not.exist;
+
+            expect(con)
+              .to.have.property("toRead", false);
 
             done();
           });
