@@ -50,9 +50,12 @@
                             <h4>
                             <strong>{{message.createdby}}</strong></h4>
                         </div>
-                        <div class="col-md-push-3 col-md-6">
+                        <div class="col-md-push-3 col-md-3">
+                            <span class="label label-success" ng-show={{message.seen && message.from == 'account'}}>Seen</span>
+                        </div>
+                        <div class="col-md-push-1 col-md-3">
                             <em>
-                            <small>commented {{message.createdat}}</small> &nbsp;
+                            <small>messaged {{message.createdat}}</small> &nbsp;
                             <!-- <a class="glyphicon glyphicon-pencil"></a>
                             <a class="glyphicon glyphicon-remove"></a> -->
                             </em>
@@ -78,9 +81,12 @@
                                 <h4>
                                 <strong>{{user}}</strong></h4>
                             </div>
-                            <div class="col-md-push-3 col-md-6">
+                            <!-- <div class="col-md-push-3 col-md-3">
+                                <span class="label label-success">Seen</span>
+                            </div> -->
+                            <div class="col-md-push-4 col-md-3">
                                 <em>
-                                <small>commented {{today}}</small> &nbsp;
+                                <small>messaged {{today}}</small> &nbsp;
                                 <!-- <a class="glyphicon glyphicon-pencil"></a>
                                 <a class="glyphicon glyphicon-remove"></a> -->
                                 </em>
