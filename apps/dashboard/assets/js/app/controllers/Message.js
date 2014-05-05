@@ -734,30 +734,25 @@ angular.module('do.message', [])
         $scope.changeButtonText = function () {
             console.log("inside change button text");
 
-            if ($scope.buttontext == 'Close') {
+            if (!ThreadService.getThread().closed) {
                 console.log("reply text length: ", $scope.replytext,
                     length);
                 if ($scope.replytext.length > 0) {
                     $scope.showerror = false;
                     $scope.buttontext = 'Close & Reply';
                 }
-            }
-
-            if ($scope.replytext.length == 0 && !ThreadService.getThread.closed) {
-                $scope.buttontext = 'Close';
-            }
-
-            if ($scope.buttontext == 'Reopen') {
+                if ($scope.replytext.length == 0) {
+                    $scope.buttontext = 'Close';
+                }
+            } else {
                 if ($scope.replytext.length > 0) {
                     $scope.showerror = false;
                     $scope.buttontext = 'Reopen & Reply';
                 }
+                if ($scope.replytext.length == 0) {
+                    $scope.buttontext = 'Reopen';
+                }
             }
-
-            if ($scope.replytext.length == 0 && ThreadService.getThread.closed) {
-                $scope.buttontext = 'Reopen';
-            }
-
         }
 
         /*$scope.deleteReply = function () {
