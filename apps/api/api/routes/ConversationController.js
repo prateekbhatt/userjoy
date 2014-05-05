@@ -208,15 +208,29 @@ router
   .get(function (req, res, next) {
 
     var aid = req.app._id;
-    var filter = req.query.filter;
+    var filter = req.query.filter || 'open';
 
     var condition = {
-      aid: aid,
-      closed: false
+      aid: aid
     };
 
-    if (filter === 'closed') {
+    switch (filter) {
+
+    case 'open':
+      condition.closed = false;
+      break;
+
+    case 'closed':
       condition.closed = true;
+      break;
+
+    case 'unread':
+      condition.toRead = true;
+      break;
+
+    default:
+      // show open conversations by default
+      condition.closed = false;
     }
 
     logger.debug({
@@ -273,12 +287,18 @@ router
             });
         },
 
-        function areOpened(con, messages, cb) {
+        function messagesAreOpened(con, messages, cb) {
           var mIds = _.pluck(messages, '_id');
 
           // update seen status to true for all messages sent from user, which
           // belong to this thread
           Message.openedByTeamMember(mIds, function (err) {
+            cb(err, con, messages);
+          });
+        },
+
+        function conversationIsRead(con, messages, cb) {
+          Conversation.isRead(con._id, function (err) {
             cb(err, con, messages);
           });
         }
@@ -438,7 +458,7 @@ router
 
       function (err, msg) {
 
-        logger.trace('ConversationController Reply', {
+        logger.debug('ConversationController Reply', {
           err: !! err,
           msg: !! msg
         });
