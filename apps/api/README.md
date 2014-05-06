@@ -73,9 +73,13 @@ To create threads, we append the parent message id to the app email address, and
 
 ###### MetaData
 
-We allow the apps to pass custom attributes related to users, companies and events. These attributes should be stored in a metadata field using (```metadata: [{ key: 'key', value: 'value'}]```) array. [Reference](http://calv.info/indexing-schemaless-documents-in-mongo/)
+We allow the apps to pass custom attributes related to users, companies and events. These attributes should be stored in a metadata field using (```metadata: [{ k: 'key', v: 'value'}]```) array. [Reference](http://calv.info/indexing-schemaless-documents-in-mongo/)
 
+###### Email Types
 
+- behavioral (segments, interval-hourly/daily, initially  just daily): for each segment, a user can get this message only once
+- transactional (immediate): userjoy is not meant to send transactional messages
+- newsletter (once, manual): will deal with this later. we already allow the user to send manual messages, just need to also allow him to customize the templates.
 
 ## Models
 
@@ -313,6 +317,7 @@ User          | companies, notes        | users of a specific app. create a new 
 > - n
 > - p
 > - t (feature, pageview)
+> - metadata
 >
 > ##### Notes:
 >

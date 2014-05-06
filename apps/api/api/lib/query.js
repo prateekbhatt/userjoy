@@ -316,7 +316,7 @@ Query.prototype.run = function (cb) {
           return cb();
         }
 
-        self.runCountQuery(function (err, uids) {
+        self.runCountQuery.call(self, function (err, uids) {
 
           if (err) {
             return cb(err);
@@ -331,7 +331,7 @@ Query.prototype.run = function (cb) {
 
       attrQuery: function (cb) {
 
-        self.runAttrQuery(function (err, users) {
+        self.runAttrQuery.call(self, function (err, users) {
 
           if (err) {
             return cb(err);
@@ -374,8 +374,8 @@ Query.prototype.runCountQuery = function (cb) {
       aid: new ObjectId(self.aid.toString())
     })
     .unwind('ev')
-    .group(self.genCountGroupCond())
-    .match(self.genCountMatchCond())
+    .group(self.genCountGroupCond.call(self))
+    .match(self.genCountMatchCond.call(self))
     .project({
       _id: 1
     })
