@@ -54,10 +54,10 @@ angular.module('do.message', [])
                 authenticate: true
 
             })
-            .state('message.automate', {
-                url: '/compose/automate',
+            .state('automate', {
+                url: 'messages/compose/automate',
                 views: {
-                    "messageapp": {
+                    "main": {
                         templateUrl: '/templates/messagesmodule/message.compose.automate.html',
                         controller: 'messageAutomateCtrl',
                     }
@@ -71,17 +71,6 @@ angular.module('do.message', [])
                     "messageapp": {
                         templateUrl: '/templates/messagesmodule/message.compose.manual.html',
                         controller: 'messageManualCtrl',
-                    }
-                },
-                authenticate: true
-
-            })
-            .state('message.write', {
-                url: '/compose/automate/write',
-                views: {
-                    "messageapp": {
-                        templateUrl: '/templates/messagesmodule/message.compose.automate.write.html',
-                        controller: 'textAngularCtrl',
                     }
                 },
                 authenticate: true
@@ -104,6 +93,50 @@ angular.module('do.message', [])
                     "main": {
                         templateUrl: '/templates/messagesmodule/message.filter.closed.conversations.html',
                         controller: 'closedConversationCtrl',
+                    }
+                },
+                authenticate: true
+
+            })
+            .state('automateSegment', {
+                url: '/messages/automate/segment',
+                views: {
+                    "main": {
+                        templateUrl: '/templates/messagesmodule/message.automate.segment.html',
+                        controller: 'automateSegmentCtrl',
+                    }
+                },
+                authenticate: true
+
+            })
+            .state('automateWrite', {
+                url: '/messages/automate/write',
+                views: {
+                    "main": {
+                        templateUrl: '/templates/messagesmodule/message.compose.automate.write.html',
+                        controller: 'textAngularCtrl',
+                    }
+                },
+                authenticate: true
+
+            })
+            .state('automateTest', {
+                url: '/messages/automate/test',
+                views: {
+                    "main": {
+                        templateUrl: '/templates/messagesmodule/message.automate.test.email.html',
+                        controller: 'testEmailCtrl',
+                    }
+                },
+                authenticate: true
+
+            })
+            .state('automateLive', {
+                url: '/messages/automate/live',
+                views: {
+                    "main": {
+                        templateUrl: '/templates/messagesmodule/message.automate.live.html',
+                        controller: 'liveEmailCtrl',
                     }
                 },
                 authenticate: true
@@ -134,6 +167,7 @@ angular.module('do.message', [])
     function ($scope, $filter, ngTableParams, $log, MsgService, $location,
         AppService, InboxMsgService, $moment) {
 
+        $scope.showOpenConversations = true;
         $scope.data = [];
         console.log("entering inboxctrl");
 
@@ -154,6 +188,9 @@ angular.module('do.message', [])
 
         function showManualMsg() {
             msg = InboxMsgService.getInboxMessage();
+            if (!msg.length) {
+                $scope.showOpenConversations = false;
+            }
             console.log("msg show Manual Msg: ", msg);
             for (var i = 0; i < msg.length; i++) {
                 $scope.data.push({
@@ -195,28 +232,22 @@ angular.module('do.message', [])
 
             $scope.tableParamsInbox = new ngTableParams({
                 page: 1, // show first page
-                count: 10, // count per page
-                filter: {
-                    name: 'M' // initial filter
-                },
-                sorting: {
-                    name: 'asc'
-                }
+                count: 10 // count per page
             }, {
                 total: $scope.data.length, // length of data
                 getData: function ($defer, params) {
                     // use build-in angular filter
-                    var filteredData = params.filter() ?
-                        $filter('filter')($scope.data, params
-                            .filter()) :
-                        $scope.data;
-                    var orderedData = params.sorting() ?
-                        $filter('orderBy')($scope.data,
-                            params.orderBy()) :
-                        $scope.data;
-                    params.total(orderedData.length); // set total for recalc paginationemail
+                    // var filteredData = params.filter() ?
+                    //     $filter('filter')($scope.data, params
+                    //         .filter()) :
+                    //     $scope.data;
+                    // var orderedData = params.sorting() ?
+                    //     $filter('orderBy')($scope.data,
+                    //         params.orderBy()) :
+                    //     $scope.data;
+                    // params.total(orderedData.length); // set total for recalc paginationemail
 
-                    $defer.resolve(orderedData.slice((
+                    $defer.resolve($scope.data.slice((
                             params.page() -
                             1) * params.count(),
                         params.page() *
@@ -251,6 +282,13 @@ angular.module('do.message', [])
                     }
                     var index = $scope.data.indexOf(user);
                     $scope.data.splice(index, 1);
+                    console.log("closing open conversation: ",
+                        InboxMsgService.getInboxMessage()
+                        .length);
+                    if (InboxMsgService.getInboxMessage()
+                        .length == 1) {
+                        $scope.showOpenConversations = false;
+                    }
                 });
         }
 
@@ -392,37 +430,7 @@ angular.module('do.message', [])
     }
 ])
 
-.controller('textAngularCtrl', ['$scope',
-    function ($scope) {
-        $scope.showNotification = true;
-        $scope.showEmail = false;
-        $scope.email = "savinay@dodatado.com";
-        $scope.selectedIcon = "Notification";
-        console.log("selectedIcon: ", $scope.selectedIcon);
-        $scope.icons = [{
-            value: "Notification",
-            label: '<i class="fa fa-bell"></i> Notification'
-        }, {
-            value: "Email",
-            label: '<i class="fa fa-envelope"></i> Email'
-        }]
-        $scope.$watch('selectedIcon', function () {
-            if ($scope.selectedIcon === "Notification") {
-                $scope.showNotification = true;
-                $scope.showEmail = false;
-            }
 
-            if ($scope.selectedIcon === "Email") {
-                $scope.showNotification = false;
-                $scope.showEmail = true;
-            }
-        })
-        /*$scope.$watch('textAngularOpts.textAngularEditors.textArea2.html',
-            function (val, newVal) {
-                // console.log(newVal);
-            }, true);*/
-    }
-])
 
 .controller('messageAutomateCtrl', ['$scope', '$location', 'segment',
     'queryMatching', '$filter',
@@ -595,13 +603,17 @@ angular.module('do.message', [])
             }
             console.log("msg thread: -> ->", msgThread);
             for (var i = 0; i < msgThread.messages.length; i++) {
+                var isSeen = false;
+                if (msgThread.messages[i].seen && msgThread.messages[i].from ==
+                    'account') {
+                    isSeen = true;
+                }
                 $scope.messages.push({
                     messagebody: msgThread.messages[i].text,
                     createdby: msgThread.messages[i].sName,
                     createdat: $moment(msgThread.messages[i].ut)
                         .fromNow(),
-                    seen: msgThread.messages[i].seen,
-                    from: msgThread.messages[i].from
+                    seen: isSeen
                 })
             };
         }
@@ -612,7 +624,7 @@ angular.module('do.message', [])
                 console.log("value of i :");
                 var imgsrc = '';
                 var count = 0;
-                var storedimgsrc = ''
+                var storedimgsrc = '';
                 console.log("message object: ", $scope.messages[i]);
                 var name = $scope.messages[i].createdby;
                 var initials = name.charAt(0);
@@ -642,8 +654,7 @@ angular.module('do.message', [])
                         createdby: $scope.messages[i].createdby,
                         createdat: $scope.messages[i].createdat,
                         src: imgsrc,
-                        seen: $scope.messages[i].seen,
-                        from: $scope.messages[i].from
+                        seen: $scope.messages[i].seen
                     })
                 } else {
                     $scope.messagesWithSrc.push({
@@ -737,12 +748,9 @@ angular.module('do.message', [])
         var lengthReply = $scope.replytext.length;
 
         $scope.changeButtonText = function () {
-            console.log("inside change button text");
 
             if (!ThreadService.getThread()
                 .closed) {
-                console.log("reply text length: ", $scope.replytext,
-                    length);
                 if ($scope.replytext.length > 0) {
                     $scope.showerror = false;
                     $scope.buttontext = 'Close & Reply';
@@ -761,17 +769,23 @@ angular.module('do.message', [])
             }
         }
 
-        /*$scope.deleteReply = function () {
-            console.log('deleting text', $scope.replytext);
-            // $scope.replytext = '';
-            $scope.showerror = false;
-            console.log('deleting text', $scope.replytext);
-            $scope.buttontext = 'Close';
-            $scope.insideReplyBox = false;
-            $scope.replyButtonClicked = true;
-        };*/
-
         var replyCallBack = function (err) {
+            if (err) {
+                console.log("error");
+                return;
+            }
+            if (ThreadService.getReply) {
+                $scope.replytextInDiv = $scope.replytext;
+                $scope.replytext = '';
+                $scope.replies.push({
+                    body: $scope.replytextInDiv
+                })
+            }
+
+
+        }
+
+        var closeOrReopenReplyCallBack = function (err) {
             if (err) {
                 console.log("error");
                 return;
@@ -781,8 +795,7 @@ angular.module('do.message', [])
                 $scope.replytext = '';
                 console.log("pushing msg");
                 $scope.replies.push({
-                    body: $scope.replytextInDiv,
-                    name: 'Savinay'
+                    body: $scope.replytextInDiv
                 })
                 console.log('object of replies: ', $scope.replies);
                 $scope.insideReplyBox = false;
@@ -845,7 +858,7 @@ angular.module('do.message', [])
                     $scope.replytextInDiv = $scope.replytext;
                     MsgService.replyToMsg(AppService.getCurrentApp()
                         ._id, coId, $scope.replytextInDiv, AccountService.get()
-                        ._id, replyCallBack);
+                        ._id, closeOrReopenReplyCallBack);
                 } else {
                     MsgService.closeConversationRequest(AppService.getCurrentApp()
                         ._id, coId, function (err, user) {
@@ -865,7 +878,7 @@ angular.module('do.message', [])
                     MsgService.replyToMsg(AppService.getCurrentApp()
                         ._id, coId, $scope.replytextInDiv,
                         AccountService.get()
-                        ._id, replyCallBack);
+                        ._id, closeOrReopenReplyCallBack);
                 } else {
                     MsgService.reopenConversation(AppService.getCurrentApp()
                         ._id, coId, function (err, user) {
@@ -895,11 +908,15 @@ angular.module('do.message', [])
         $filter, ngTableParams, $log, $location) {
         console.log("inside closedConversationCtrl");
 
+        $scope.showClosedConversations = true;
         $scope.data = [];
         var msg = [];
 
         function showClosedMsg() {
             msg = InboxMsgService.getClosedMessage();
+            if (!msg.length) {
+                $scope.showClosedConversations = false;
+            }
             console.log("msg show Closed Msg -> -> ", msg);
             for (var i = 0; i < msg.length; i++) {
                 $scope.data.push({
@@ -979,5 +996,64 @@ angular.module('do.message', [])
 
 
         }
+    }
+])
+
+.controller('automateSegmentCtrl', ['$scope', 'segment',
+    function ($scope, segment) {
+        $scope.segments = segment.get.all();
+        $scope.segmenticons = [];
+        $scope.selectedIcon = $scope.segments[0].name;
+
+        for (var i = $scope.segments.length - 1; i >= 0; i--) {
+            $scope.segmenticons.push({
+                value: $scope.segments[i].name,
+                label: $scope.segments[i].name
+            })
+        };
+    }
+])
+
+.controller('textAngularCtrl', ['$scope',
+    function ($scope) {
+        $scope.showNotification = true;
+        $scope.showEmail = false;
+        $scope.email = "savinay@dodatado.com";
+        $scope.selectedMessageType = "Notification";
+        console.log("selectedIcon: ", $scope.selectedMessageType);
+        $scope.icons = [{
+            value: "Notification",
+            label: '<i class="fa fa-bell"></i> Notification'
+        }, {
+            value: "Email",
+            label: '<i class="fa fa-envelope"></i> Email'
+        }]
+        $scope.$watch('selectedIcon', function () {
+            if ($scope.selectedMessageType === "Notification") {
+                $scope.showNotification = true;
+                $scope.showEmail = false;
+            }
+
+            if ($scope.selectedMessageType === "Email") {
+                $scope.showNotification = false;
+                $scope.showEmail = true;
+            }
+        })
+        /*$scope.$watch('textAngularOpts.textAngularEditors.textArea2.html',
+            function (val, newVal) {
+                // console.log(newVal);
+            }, true);*/
+    }
+])
+
+.controller('testEmailCtrl', ['$scope',
+    function ($scope) {
+
+    }
+])
+
+.controller('liveEmailCtrl', ['$scope',
+    function ($scope) {
+
     }
 ]);

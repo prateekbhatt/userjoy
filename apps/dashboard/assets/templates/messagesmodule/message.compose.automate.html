@@ -1,123 +1,143 @@
-<div id="wrapper">
-    <!-- /.row -->
-    <div class="row">
-        <div class="col-lg-12">
-            <br>
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <i class="fa fa-inbox"></i> Messages
+<div ui-view="main">
+    <div class="panel" style="min-height: 500px;">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <div id="wrapper-settings" style="margin-top: 22px">
+                        <!-- Sidebar -->
+                        <div id="sidebar-wrapper-settings">
+                            <ul class="sidebar-nav">
+                                <li>
+                                    <a ui-sref="inbox" ng-click="showTableInbox()"><i class="fa fa-inbox"></i> Open Conversations <span class="badge">12</span></a>
+                                </li>
+                                <li>
+                                    <a ui-sref="unread"><i class="fa fa-exclamation"></i>&nbsp; Unread Conversations <span class="badge">26</span></a>
+                                </li>
+                                <li>
+                                    <a ui-sref="automate"><i class="fa fa-edit"></i> Automate Messages </a>
+                                </li>
+                                <li>
+                                    <a ui-sref="message.template"><span class="glyphicon glyphicon-list-alt"></span> Choose Templates</a>
+                                </li>
+                                <li>
+                                    <a ui-sref="#" style="cursor: pointer"><i class="fa fa-paperclip"></i> Smart Filters</a>
+                                    <ul style="list-style: none;">
+                                        <li>
+                                            <div class="progress" style="margin-left: 30px;">
+                                                <a ui-sref="#goodhealth" style="cursor: pointer">
+                                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #5cb85c;">
+                                                    <span class="progress-type pull-left"><strong>Good Health</strong></span>
+                                                </div>
+                                                </a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="progress" style="margin-left: 30px;">
+                                                <a ui-sref="#goodhealth" style="cursor: pointer">
+                                                <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #428bca;">
+                                                    <span class="progress-type pull-left"><strong>Normal Health</strong></span>
+                                                </div>
+                                                </a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="progress" style="margin-left: 30px;">
+                                                <a ui-sref="#goodhealth" style="cursor: pointer">
+                                                <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #d9534f;">
+                                                    <span class="progress-type pull-left"><strong>Poor Health</strong></span>
+                                                </div>
+                                                </a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="progress" style="margin-left: 30px;">
+                                                <a ui-sref="#goodhealth" style="cursor: pointer">
+                                                <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #f0ad4e;">
+                                                    <span class="progress-type pull-left"><strong>Unassigned</strong></span>
+                                                </div>
+                                                </a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="progress" style="margin-left: 30px;">
+                                                <a ui-sref="closed" style="cursor: pointer">
+                                                <div class="progress-bar progress-bar-default" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #999;">
+                                                    <span class="progress-type pull-left"><strong>Closed Conversations</strong></span>
+                                                </div>
+                                                </a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="progress" style="margin-left: 30px;">
+                                                <a ui-sref="#goodhealth" style="cursor: pointer">
+                                                <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #5bc0de;">
+                                                    <span class="progress-type pull-left"><strong>Paying Customers</strong></span>
+                                                </div>
+                                                </a>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <!-- /#side-menu -->
+                        </div>
+                        <!-- /.sidebar-collapse -->
+                    </div>
                 </div>
-                <!-- /.panel-heading -->
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <tbody>
-                                        <tr ng-repeat="automessage in automessages">
-                                            <td class="text-center"> Draft </td>
-                                            <td class="text-center">
-                                                <span class="label label-success">Automatic </span>
-                                            </td>
-                                            <td>{{automessage}}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <!-- /.table-responsive -->
-                        </div>
-                    </div>
-                    <div class="row" style="padding-top:50px">
-                        <div class="text-center">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-default">Select Users</button>
-                                <button type="button" class="btn btn-default active">Save Messages</button>
-                            </div>
-                        </div>
-                    </div>
-                    <br>
-                    <br>
-                    <div style="border: 1px solid #ecf0f1;">
-                        <br>
-                        <br>
-                        <div>
-                            <div>
-                                <div class="caption-full">
-                                    <div class="row">
-                                        <div class="col-md-1 col-md-offset-1 text-center">
-                                            <p style="font-size:20px">LIST &nbsp;&nbsp;</p>
+                <div class="col-md-9">
+                    <div id="wrapper">
+                        <!-- /.row -->
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <br>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <i class="fa fa-inbox"></i> Messages
+                                    </div>
+                                    <!-- /.panel-heading -->
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="table-responsive">
+                                                    <table class="table table-bordered">
+                                                        <tbody>
+                                                            <tr ng-repeat="automessage in automessages">
+                                                                <td class="text-center"> Draft </td>
+                                                                <td class="text-center">
+                                                                    <span class="label label-success">Automatic </span>
+                                                                </td>
+                                                                <td>{{automessage}}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <!-- /.table-responsive -->
+                                            </div>
                                         </div>
-                                        <div class="col-md-10">
-                                            <button type="button" class="btn btn-default" bs-dropdown="dropdown">Users
-                                            <i class="fa fa-caret-down"> </i>
-                                            </button>
-                                        </div>
-                                        <br>
                                         <br>
                                         <br>
                                     </div>
-                                    <div class="form-group">
-                                        <div class="row" ng-show="true" ng-repeat="filter in filters">
-                                            <div class="col-md-1 col-md-offset-1 text-center">
-                                                <p style="font-size:20px" ng-show="$first">FILTER &nbsp;&nbsp;</p>
-                                                <a style="font-size:20px; cursor:pointer; cursor:hand" ng-show="!$first" ng-click="switchAndOr()">{{text}}</a>
-                                            </div>
-                                            <div class="col-md-10">
-                                                <div class="row">
-                                                    <div class="col-md-3">
-                                                        <button type="button" class="btn btn-default" bs-dropdown="dropdown" value="filter.segment">
-                                                        <span>{{selectedSegment.name}}</span>
-                                                        <i class="fa fa-caret-down"> </i>
-                                                        </button>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <button type="button" class="btn btn-default" bs-dropdown="query">
-                                                        <span>{{selectedQuery.name}}</span>
-                                                        <i class="fa fa-caret-down"> </i>
-                                                        </button>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <input type="text" class="form-control" placeholder="Value" ng-model="filter.value">
-                                                    </div>
-                                                    <div class="col-md-2">
-                                                        <a class="btn btn-default fa fa-times" ng-click="removeFilter(filter)"></a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <br>
-                                            <br>
-                                            <br>
-                                        </div>
-                                        <br>
-                                        <div class="row">
-                                            <div class="col-md-4 col-sm-push-1">
-                                                <button class="btn btn-info" ng-click="addAnotherFilter()" ng-show="true">
-                                                <i class="fa fa-plus-square"></i>
-                                                Add Filter
-                                                </button>
-                                            </div>
+                                    <!-- /.panel-body -->
+                                </div>
+                                <!-- /.panel -->
+                                <!-- /.panel -->
+                                <div class="row" style="padding-top:50px">
+                                    <div class="text-center">
+                                        <div class="col-md-push-4 col-md-4">
+                                            <button class="btn btn-info btn-block" ui-sref="automateSegment">Create New Auto Message</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <!-- /.col-lg-8 -->
+                            <!-- /.col-lg-4 -->
                         </div>
+                        <!-- /.row -->
                     </div>
-                    <!-- /.row -->
-                    <br>
-                    <br>
-                    <div class="row col-md-3 col-md-push-10">
-                        <a type="button" class="btn btn-info" ui-sref="message.write">Write Message</a>
-                    </div>
+                    <!-- /#page-wrapper -->
+                    <!-- /#wrapper -->
                 </div>
-                <!-- /.panel-body -->
             </div>
-            <!-- /.panel -->
-            <!-- /.panel -->
         </div>
-        <!-- /.col-lg-8 -->
-        <!-- /.col-lg-4 -->
     </div>
-    <!-- /.row -->
 </div>
-<!-- /#page-wrapper -->
-<!-- /#wrapper -->
