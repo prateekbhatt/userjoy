@@ -19,11 +19,8 @@ This app contains an expressjs api which exposes a rest interface for the db.
 | ct    | created at timestamp  |
 | d     | domain                |
 | dv    | device type           |
-| ev    | events (Session)      |
-| f     | feature (event)       |
 | h     | health                |
 | ip    | ip address            |
-| n     | name (action)         |
 | mId   | message id            |
 | op    | operator (and / or)   |
 | p     | path (event url)      |
@@ -48,7 +45,7 @@ Primary Collections for segmentation:
 
 - User
 - Company
-- Session (Events)
+- Events
 
 Types of queries:
 
@@ -57,9 +54,6 @@ Types of queries:
 - hasnotdone
 - attr
 
-###### Sessions
-
-All events that the user triggers within a 30 minute period of each-other are part of a single session.
 
 ###### Apps
 
@@ -74,6 +68,19 @@ To create threads, we append the parent message id to the app email address, and
 ###### MetaData
 
 We allow the apps to pass custom attributes related to users, companies and events. These attributes should be stored in a metadata field using (```metadata: [{ k: 'key', v: 'value'}]```) array. [Reference](http://calv.info/indexing-schemaless-documents-in-mongo/)
+
+> #### Schema
+
+> ##### Columns:
+>
+> - k (key)
+> - v (value)
+>
+> ##### Notes:
+>
+> - Disabled creating an id for each subdocument
+>
+
 
 ###### Email Types
 
@@ -90,11 +97,11 @@ Account       |                         | accounts on Userjoy
 App           | team                    | apps belonging to an account
 Company       |                         | companies of a specific account
 Conversation  |                         | conversation threads between users and accounts
+Event         | d (metadata)            | events belonging to a user
 Health        |                         | the healthscore of a user for a specific company
 Invite        |                         | tokens of team members that have been invited to use an app
 Message       |                         | messages between users and accounts
 Segment       | filters                 | all the segments defined for an app
-Session       | events (ev)             | sessions of a user, and events belonging to the session
 Template      |                         | templates of the messages to be sent
 Trigger       |                         | triggers for sending auto emails / notifications
 User          | companies, notes        | users of a specific app. create a new user for every new unique identifier for an app
@@ -278,57 +285,15 @@ User          | companies, notes        | users of a specific app. create a new 
 > - val
 
 
-### Session
-
-##### Columns:
+### Event
 
 - aid
-- br
-- brv
-- ci
 - cid
-- co
 - ct
-- dv (desktop, mobile, tablet)
-- ev [EventSchema]
-- ip
-- pl
+- d [Metadata]
+- t
 - uid
-- ut
 
-##### Notes
-
-- Get city, country data from (api.hostinfo or Maxmind)
-- Can add user data (name / email) to sessions
-- Session time needs to be updated when a new event is created
-
-
-##### Embedded documents
-
-> ### Events
->
-> Stores events happening on an app
->
-> ##### Columns:
->
-> - ct
-> - d
-> - f
-> - n
-> - p
-> - t (feature, pageview)
-> - metadata
->
-> ##### Notes:
->
-> Ignoring the following:
->
-> - type (click, submit, change)
-> - targetTag
-> - targetId
-> - targetClass
-> - targetText
->
 
 ### Template
 

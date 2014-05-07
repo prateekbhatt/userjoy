@@ -1,4 +1,4 @@
-describe.only('Helper metadata', function () {
+describe('Helper metadata', function () {
 
   var metadata = require('../../../helpers/metadata');
 
