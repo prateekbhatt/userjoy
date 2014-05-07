@@ -215,14 +215,14 @@ angular.module('do.message', [])
             console.log(InboxMsgService.getInboxMessage());
         }
 
-        $scope.closeConversation = function (coId, user) {
+        $scope.closeConversation = function (coId, user, index) {
             MsgService.closeConversationRequest(AppService.getCurrentApp()
                 ._id, coId, function (err, user) {
                     if (err) {
                         console.log("error");
                         return;
                     }
-                    var index = $scope.data.indexOf(user);
+                    // var index = $scope.data.indexOf(coId);
                     $scope.data.splice(index, 1);
                     console.log("closing open conversation: ",
                         InboxMsgService.getInboxMessage()
@@ -371,7 +371,6 @@ angular.module('do.message', [])
 
     }
 ])
-
 
 
 
