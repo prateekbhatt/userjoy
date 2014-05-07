@@ -26,7 +26,8 @@ angular.module('dodatado', [
     'do.settings',
     'do.feed',
     'http-auth-interceptor',
-    'angular-momentjs'
+    'angular-momentjs',
+    'do.automate'
 ])
 
 .config(function ($stateProvider, $urlRouterProvider,

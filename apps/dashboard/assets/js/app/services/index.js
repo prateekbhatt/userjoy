@@ -9,4 +9,5 @@ angular.module('services', [
     'services.InboxMsgService',
     'services.UidService',
     'services.ThreadService',
+    'services.saveMsgService',
 ]);
