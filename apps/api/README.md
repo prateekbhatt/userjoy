@@ -97,7 +97,7 @@ Account       |                         | accounts on Userjoy
 App           | team                    | apps belonging to an account
 Company       |                         | companies of a specific account
 Conversation  |                         | conversation threads between users and accounts
-Event         | d (metadata)            | events belonging to a user
+Event         | meta (metadata)         | events belonging to a user
 Health        |                         | the healthscore of a user for a specific company
 Invite        |                         | tokens of team members that have been invited to use an app
 Message       |                         | messages between users and accounts
@@ -287,12 +287,14 @@ User          | companies, notes        | users of a specific app. create a new 
 
 ### Event
 
-- aid
+- aid (required)
 - cid
 - ct
-- d [Metadata]
-- t
-- uid
+- feature
+- meta [Metadata]
+- name (required)
+- type (required)
+- uid (required)
 
 
 ### Template

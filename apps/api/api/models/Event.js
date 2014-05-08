@@ -78,9 +78,28 @@ var EventSchema = new Schema({
   },
 
 
-  // metadata about the event
-  d: [MetaDataSchema],
+  // name of the feature : TODO: Rename feature to module
+  feature: String,
 
+
+  // metadata about the event
+  meta: [MetaDataSchema],
+
+
+  // name of the event
+  // NOTE: in case of pageview type, this stores the path
+  name: {
+    type: String,
+    required: [true, 'Invalid event name']
+  },
+
+
+  // type of the event
+  type: {
+    type: String,
+    required: [true, 'Event type is required'],
+    validate: eventTypeValidator
+  },
 
   // user Id
   uid: {
@@ -101,10 +120,6 @@ var EventSchema = new Schema({
  */
 
 EventSchema.pre('save', function (next) {
-
-
-  // TODO : check if proper type is there
-
   this.ct = new Date;
   next();
 });
@@ -120,69 +135,35 @@ EventSchema.pre('save', function (next) {
  * @param {function} cb callback
  */
 
-EventSchema.statics.feature = function (ids, action, feature, meta, cb) {
+EventSchema.statics.feature = function (ids, name, feature, meta, cb) {
 
-  meta = meta || {};
+  if (arguments.length !== 5) {
+    throw new Error('Event.feature: Expected five arguments');
+  }
 
   var newEvent = {
     aid: ids.aid,
-    uid: ids.uid,
-    cid: ids.cid
+    cid: ids.cid,
+    feature: feature,
+    meta: metadata.format(meta),
+    name: name,
+    type: 'feature',
+    uid: ids.uid
   };
-
-  var data = metadata.format(meta) || [];
-
-  data.push({
-    k: 'type',
-    v: 'feature'
-  });
-
-  data.push({
-    k: 'action',
-    v: action
-  });
-
-  data.push({
-    k: 'feature',
-    v: feature
-  });
-
-  newEvent.d = data;
 
   Event.create(newEvent, cb);
 };
 
 
-EventSchema.statics.pageview = function (ids, host, path, cb) {
+EventSchema.statics.pageview = function (ids, path, cb) {
 
   var newEvent = {
     aid: ids.aid,
+    cid: ids.cid,
+    name: path,
+    type: 'pageview',
     uid: ids.uid
   };
-
-  if (ids.cid) {
-    newEvent.cid = ids.cid;
-  }
-
-  var data = [
-
-    {
-      k: 'type',
-      v: 'pageview'
-    },
-
-    {
-      k: 'host',
-      v: host
-    },
-
-    {
-      k: 'path',
-      v: path
-    }
-  ];
-
-  newEvent.d = data;
 
   Event.create(newEvent, cb);
 };
