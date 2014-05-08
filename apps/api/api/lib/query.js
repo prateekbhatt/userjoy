@@ -1,5 +1,5 @@
 /**
- * This module contains functions to query the Users and Sessions
+ * This module contains functions to query the Users and Events
  * collections
  */
 
@@ -19,7 +19,7 @@ var ObjectId = require('mongoose')
  */
 
 var User = require('../models/User');
-var Session = require('../models/Session');
+var Event = require('../models/Event');
 
 
 /**
@@ -43,7 +43,7 @@ module.exports = Query;
  *
  * NOTES:
  *
- * - Run in two sequential queries: the count aggregate query (Session
+ * - Run in two sequential queries: the count aggregate query (Event
  * collection) should be run before the attr find query (User collection)
  * - This will make sure the user dataset always fetched in the second query
  *
@@ -151,7 +151,7 @@ function Query(aid, query) {
     .format();
 
 
-  // separate Session count queries and User attribute queries
+  // separate Event count queries and User attribute queries
   this.setIntoCount(filters);
   this.setFilters(filters);
 
@@ -358,7 +358,7 @@ Query.prototype.run = function (cb) {
 
 
 /**
- * Run count queries on the Session collection
+ * Run count queries on the Event collection
  *
  * @param {function} cb callback function
  * @return {Query}
@@ -368,12 +368,11 @@ Query.prototype.runCountQuery = function (cb) {
 
   var self = this;
 
-  Session
+  Event
     .aggregate()
     .match({
       aid: new ObjectId(self.aid.toString())
     })
-    .unwind('ev')
     .group(self.genCountGroupCond.call(self))
     .match(self.genCountMatchCond.call(self))
     .project({
@@ -453,8 +452,8 @@ Query.prototype.genAttrMatchCond = function () {
 
 
 /**
- * Creates a 'group' pipe for Session aggregation
- * It groups by usedid and provides a count of all given events
+ * Creates a 'group' pipe for Event aggregation
+ * It groups by uid and provides a count of all given events
  *
  * @return {object} pipeline group query object
  */
@@ -541,18 +540,18 @@ Query.prototype.getCountFilterCond = function (filter) {
 
   // event type is a compulsory field
   cond['$and'].push({
-    $eq: ['$ev.t', filter.type]
+    $eq: ['$type', filter.type]
   });
 
   if (filter.name) {
     cond['$and'].push({
-      $eq: ['$ev.n', filter.name]
+      $eq: ['$name', filter.name]
     });
   }
 
   if (filter.feature) {
     cond['$and'].push({
-      $eq: ['$ev.f', filter.feature]
+      $eq: ['$feature', filter.feature]
     });
   }
 

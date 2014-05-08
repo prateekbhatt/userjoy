@@ -20,7 +20,7 @@ describe('Lib query', function () {
    */
 
   var createUserFixtures = require('../../fixtures/UserFixture');
-  var createSessionFixtures = require('../../fixtures/SessionFixture');
+  var createEventFixtures = require('../../fixtures/EventFixture');
 
 
   /**
@@ -396,7 +396,7 @@ describe('Lib query', function () {
 
         {
           method: 'attr',
-          name: 'totalSessions',
+          name: 'totalEvents',
           op: '$gt',
           val: 999
         }
@@ -433,7 +433,7 @@ describe('Lib query', function () {
 
     it('should handle $gt operator', function () {
 
-      expect(cond.totalSessions)
+      expect(cond.totalEvents)
         .to.eql({
           '$gt': 999
         });
@@ -481,7 +481,7 @@ describe('Lib query', function () {
           .to.be.an('array');
 
         expect(users.length)
-          .to.eql(100);
+          .to.eql(102);
 
         done();
       });
@@ -666,15 +666,14 @@ describe('Lib query', function () {
 
         expect(cond.$and[0])
           .to.eql({
-            '$eq': ['$ev.t', 'feature']
+            '$eq': ['$type', 'feature']
           });
 
 
       });
 
 
-    it(
-      'should add events.name condition if name attr present',
+    it('should add events.name condition if name attr present',
       function () {
 
         var filter = {
@@ -689,13 +688,12 @@ describe('Lib query', function () {
 
         expect(cond.$and[1])
           .to.eql({
-            '$eq': ['$ev.n', 'Clicked login btn']
+            '$eq': ['$name', 'Clicked login btn']
           });
 
       });
 
-    it(
-      'should add events.feature condition if feature attr present',
+    it('should add events.feature condition if feature attr present',
       function () {
 
         var filter = {
@@ -711,7 +709,7 @@ describe('Lib query', function () {
 
         expect(cond.$and[2])
           .to.eql({
-            '$eq': ['$ev.f', 'Authentication']
+            '$eq': ['$feature', 'Authentication']
           });
 
       });
@@ -847,7 +845,7 @@ describe('Lib query', function () {
       var aid = saved.apps.first._id;
       var uid = randomId;
       var uids = [uid];
-      createSessionFixtures(aid, uids, 100, done);
+      createEventFixtures(aid, uids, 100, done);
     });
 
     beforeEach(function () {
@@ -944,10 +942,10 @@ describe('Lib query', function () {
       aid = saved.apps.first._id;
       uid = randomId;
       var uids = [uid];
-      createSessionFixtures(aid, uids, 100, function (err) {
+      createEventFixtures(aid, uids, 100, function (err) {
 
         // TODO: user id should not be hardcoded here like this
-        // It would break if the uid the changed in fixtureSession.js
+        // It would break if the uid the changed in fixtureEvent.js
 
         User.create({
           _id: '532d6bf862d673ba7131812a',
