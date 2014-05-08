@@ -20,58 +20,30 @@ describe('Model Event', function () {
 
     var savedEvent;
 
-    it('should return error if aid is not present', function (done) {
-
-      var newEvent = {
-        pl: 'Desktop',
-        uid: randomId
-      };
-
-      Event.create(newEvent, function (err, evn) {
-        expect(err)
-          .to.exist;
-        expect(err.errors.aid.message)
-          .to.eql('Invalid aid');
-        expect(evn)
-          .not.to.exist;
-        done();
-      });
-    });
-
-
-    it('should return error if uid is not present', function (done) {
-
-      var newEvent = {
-        platform: 'Desktop',
-        aid: randomId
-      };
-
-      Event.create(newEvent, function (err, evn) {
-        expect(err)
-          .to.exist;
-        expect(err.errors.uid.message)
-          .to.eql('Invalid uid');
-        expect(evn)
-          .not.to.exist;
-        done();
-      });
-    });
-
-
-    it('should return error when type is not given',
+    it('should return error if aid/name/type/uid is not given',
       function (done) {
 
-        var newEvent = {
-          aid: randomId,
-          uid: randomId
-        };
+        var newEvent = {};
 
         Event.create(newEvent, function (err, evn) {
 
           expect(evn)
             .to.not.exist;
 
-          expect(err.errors.t.message)
+          expect(Object.keys(err.errors)
+            .length)
+            .to.eql(4);
+
+          expect(err.errors.aid.message)
+            .to.eql('Invalid aid');
+
+          expect(err.errors.name.message)
+            .to.eql('Invalid event name');
+
+          expect(err.errors.uid.message)
+            .to.eql('Invalid uid');
+
+          expect(err.errors.type.message)
             .to.eql('Event type is required');
 
           done();
@@ -85,7 +57,8 @@ describe('Model Event', function () {
 
         var newEvent = {
           aid: randomId,
-          t: 'randomType',
+          name: 'Create App',
+          type: 'randomType',
           uid: randomId
         };
 
@@ -94,7 +67,7 @@ describe('Model Event', function () {
           expect(evn)
             .to.not.exist;
 
-          expect(err.errors.t.message)
+          expect(err.errors.type.message)
             .to.eql("Event type must be one of 'pageview' or 'feature'");
 
           done();
@@ -108,9 +81,10 @@ describe('Model Event', function () {
 
         var newEvent = {
           aid: randomId,
-          t: 'feature',
+          name: 'Create Action',
+          type: 'feature',
           uid: randomId,
-          d: [{
+          meta: [{
             k: 'status',
             v: 'paying'
           }]
@@ -122,7 +96,7 @@ describe('Model Event', function () {
             .to.not.exist;
 
           expect(evn)
-            .to.have.property("t", "feature");
+            .to.have.property("type", "feature");
 
           savedEvent = evn;
 
@@ -138,14 +112,14 @@ describe('Model Event', function () {
     });
 
 
-    it('should add event data into "d" embedded document', function () {
-      expect(savedEvent.d)
+    it('should add event metadata', function () {
+      expect(savedEvent.meta)
         .to.be.an("array");
 
-      expect(savedEvent.d)
+      expect(savedEvent.meta)
         .to.have.length(1);
 
-      expect(savedEvent.d[0])
+      expect(savedEvent.meta[0])
         .to.have.property("k", "status");
     });
 
@@ -154,6 +128,15 @@ describe('Model Event', function () {
 
   describe('#feature', function () {
 
+    it('should return error if less than 5 arguments are passed',
+      function () {
+
+        expect(Event.feature)
+          .to.
+        throw ('Event.feature: Expected five arguments');
+
+      });
+
     it('should create a new feature event', function (done) {
 
       var ids = {
@@ -161,39 +144,42 @@ describe('Model Event', function () {
         aid: randomId
       };
 
-      var action = 'Open chat';
+      var name = 'Open chat';
       var feature = 'Group';
 
       var meta = {
         members: 99
       };
 
-      Event.feature(ids, action, feature, meta, function (err, evn) {
+      Event.feature(ids, name, feature, meta, function (err, evn) {
 
         evn = evn.toJSON();
 
         expect(err)
           .to.not.exist;
 
-        expect(evn.d)
+        expect(evn.meta)
           .to.be.an("array");
 
-        expect(evn.d)
-          .to.have.length(3);
+        expect(evn.meta)
+          .to.have.length(1);
 
-        expect(evn.d)
+        expect(evn)
+          .to.have.property("type", "feature");
+
+        expect(evn)
+          .to.have.property("name", "Open chat");
+
+        expect(evn)
+          .to.have.property("feature", "Group");
+
+        expect(evn.meta)
           .to.eql([{
             k: 'members',
             v: 99
-          }, {
-            k: 'action',
-            v: 'Open chat'
-          }, {
-            k: 'feature',
-            v: 'Group'
           }]);
 
-        done(err);
+        done();
       });
     });
 
@@ -209,36 +195,25 @@ describe('Model Event', function () {
         aid: randomId
       };
 
-      var host = 'userjoy.co';
-      var path = '/login';
+      var name = '/login';
 
-      var meta = {
-        members: 99
-      };
-
-      Event.pageview(ids, host, path, function (err, evn) {
+      Event.pageview(ids, name, function (err, evn) {
 
         evn = evn.toJSON();
 
         expect(err)
           .to.not.exist;
 
-        expect(evn.d)
+        expect(evn.meta)
           .to.be.an("array");
 
-        expect(evn.d)
-          .to.have.length(2);
+        expect(evn)
+          .to.have.property("type", "pageview");
 
-        expect(evn.d)
-          .to.eql([{
-            k: 'host',
-            v: 'userjoy.co'
-          }, {
-            k: 'path',
-            v: '/login'
-          }]);
+        expect(evn)
+          .to.have.property("name", "/login");
 
-        done(err);
+        done();
       });
     });
 
