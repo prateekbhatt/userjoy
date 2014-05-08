@@ -28,16 +28,21 @@ angular.module('do.login', [])
 ])
 
 .controller('LoginCtrl', ['$scope', 'LoginService', 'AuthService', '$state',
-    '$log', 'ErrMsgService',
+    '$log', 'ErrMsgService', 'login', '$location', 
     function ($scope, LoginService, AuthService, $state, $log,
-        ErrMsgService) {
+        ErrMsgService, login, $location) {
 
-        $log.info('LoginCtrl', LoginService.getUserAuthenticated());
+        console.log('LoginProvider:', login.getLoggedIn());
         $scope.errMsg = '';
         $scope.showError = false;
+        login.setLoggedIn(true);
         // If user is logged in send them to home page
-        if (LoginService.getUserAuthenticated()) {
-            $state.transitionTo('users.list');
+        if (login.getLoggedIn()) {
+            $location.path('/login');
+        }
+
+        if(!login.getLoggedIn) {
+            $state.transitionTo('login');
         }
 
         $scope.hideErrorAlert = function () {

@@ -12,9 +12,9 @@
                     <a ui-sref="users.list" class="list-group-item" ng-click="{ active: isActive('/users/list')}">Filter Users</a>
                 </div>
             </div>
-            <div ui-view="panel"></div>
+            <div ui-view="panel" autoscroll="false"></div>
         </div>
     </div>
 
 </div>
-<div ui-view="table"></div>
+<div ui-view="table" autoscroll="false"></div>

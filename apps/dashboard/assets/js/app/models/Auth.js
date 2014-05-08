@@ -2,9 +2,9 @@ angular.module('models.auth', ['services'])
 
 .service('AuthService', ['$http', 'utils', 'ipCookie', 'LoginService',
     '$log', 'config', '$state', '$location', 'AppService', 
-    'ErrMsgService', 'authService',  
+    'ErrMsgService', 'authService', 'login', 
     function ($http, utils, ipCookie, LoginService, $log, config, $state,
-        $location, AppService, ErrMsgService, authService) {
+        $location, AppService, ErrMsgService, authService, login) {
 
         this.attemptLogin = function (email, password) {
 
@@ -25,7 +25,11 @@ angular.module('models.auth', ['services'])
                     });
 
                     LoginService.setUserAuthenticated(true);
-
+                    // login.setLoggedIn(true);
+                    console.log("loginProvider: ", login.getLoggedIn());
+                    if(login.getLoggedIn()) {
+                        $state.go('users.list');
+                    }
                     $http.get(config.apiUrl + '/apps')
                         .success(function (data) {
                             console.log("loggedin Apps: ", data);
@@ -63,6 +67,7 @@ angular.module('models.auth', ['services'])
                         path: '/'
                     });
                     LoginService.setUserAuthenticated(false);
+                    login.setLoggedIn(false);
                     $log.info(arguments);
                     $location.path('/login');
                 })
