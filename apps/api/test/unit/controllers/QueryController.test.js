@@ -1,4 +1,4 @@
-describe.only('Resource /query', function () {
+describe('Resource /query', function () {
 
   /**
    * npm dependencies
