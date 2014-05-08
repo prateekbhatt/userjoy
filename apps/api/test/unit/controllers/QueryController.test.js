@@ -1,4 +1,4 @@
-describe('Resource /query', function () {
+describe.only('Resource /query', function () {
 
   /**
    * npm dependencies
@@ -13,7 +13,7 @@ describe('Resource /query', function () {
    */
 
   var UserFixture = require('../../fixtures/UserFixture');
-  var SessionFixture = require('../../fixtures/SessionFixture');
+  var EventFixture = require('../../fixtures/EventFixture');
 
 
   /**
@@ -41,8 +41,8 @@ describe('Resource /query', function () {
 
         },
 
-        createSessionFixtures: function (cb) {
-          SessionFixture(aid, uids, 10, cb);
+        createEventFixtures: function (cb) {
+          EventFixture(aid, uids, 10, cb);
         }
 
       },
