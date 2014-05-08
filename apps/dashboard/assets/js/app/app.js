@@ -30,8 +30,24 @@ angular.module('dodatado', [
     'do.automate'
 ])
 
+.provider('login', [function () {
+    
+    var userIsAuthenticated = false;
+
+    this.$get = [function() {
+        return {
+            setLoggedIn : function (value) {
+                userIsAuthenticated = value;
+            },
+            getLoggedIn : function () {
+                return userIsAuthenticated;
+            }
+        };
+    }];
+}])
+
 .config(function ($stateProvider, $urlRouterProvider,
-    $locationProvider, $httpProvider, $provide, $momentProvider) {
+    $locationProvider, $httpProvider, $provide, $momentProvider, loginProvider) {
 
     $momentProvider.asyncLoading(false)
         .scriptUrl(
@@ -45,6 +61,36 @@ angular.module('dodatado', [
     $httpProvider.defaults.useXDomain = true;
     $httpProvider.defaults.withCredentials = true;
     delete $httpProvider.defaults.headers.common['X-Requested-With'];
+
+    $httpProvider.interceptors.push(function ($rootScope, $location, $q) {
+        return {
+            /*'request': function (request) {
+                // if we're not logged-in to the AngularJS app, redirect to login page
+                $rootScope.loggedIn = $rootScope.loggedIn ||
+                    $rootScope.username;
+                if (!$rootScope.loggedIn && $location.path() !=
+                    '/login') {
+                    $location.path('/login');
+                }
+                return request;
+            },*/
+            'responseError': function (rejection) {
+                // if we're not logged-in to the web service, redirect to login page
+                if (rejection.status === 401 && $location.path() !=
+                    '/login') {
+                    console.log("401 status logout");
+                    loginProvider.setLoggedIn = false;
+                    // $rootScope.loggedIn = false;
+                    // ipCookie.remove('loggedin', {
+                    //     path: '/'
+                    // });
+                    // LoginService.setUserAuthenticated(false);
+                    $location.path('/login');
+                }
+                return $q.reject(rejection);
+            }
+        };
+    });
 
     // adding custom tool to textAngular
     $provide.decorator('taOptions', ['taRegisterTool', '$delegate',
@@ -93,6 +139,14 @@ angular.module('dodatado', [
 
 
 })
+
+/*.service('api', ['authService', '$rootScope', '$location',
+    function () {
+        $rootScope.$on('event: auth-loginRequired', function () {
+            $location.path('/login');
+        })
+    }
+])*/
 
 .run(['LoginService', 'ipCookie', '$log',
     function (LoginService, ipCookie, $log) {
