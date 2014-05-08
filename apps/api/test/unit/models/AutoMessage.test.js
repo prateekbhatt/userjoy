@@ -1,11 +1,11 @@
-describe.only('Model Template', function () {
+describe('Model AutoMessage', function () {
 
 
   /**
    * Models
    */
 
-  var Template = require('../../../api/models/Template');
+  var AutoMessage = require('../../../api/models/AutoMessage');
 
 
   /**
@@ -13,18 +13,17 @@ describe.only('Model Template', function () {
    */
 
   var randomId = '532d6bf862d673ba7131812a';
-  var savedTemplate;
+  var savedAutoMessage;
 
 
   describe('#create', function () {
 
-    it(
-      'should return error if creator/aid/type is not provided',
+    it('should return error if creator/aid/type is not provided',
       function (done) {
 
-        var newTmp = {};
+        var newAutoMsg = {};
 
-        Template.create(newTmp, function (err, tmp) {
+        AutoMessage.create(newAutoMsg, function (err, amsg) {
 
           expect(err)
             .to.exist;
@@ -40,9 +39,9 @@ describe.only('Model Template', function () {
             .to.eql('Invalid aid');
 
           expect(err.errors.type.message)
-            .to.eql('Provide template type');
+            .to.eql('Provide automessage type');
 
-          expect(tmp)
+          expect(amsg)
             .to.not.exist;
 
           done();
@@ -51,36 +50,36 @@ describe.only('Model Template', function () {
       });
 
 
-    it('should create template', function (done) {
+    it('should create automessage', function (done) {
 
-      var newTemplate = {
+      var newAutoMessage = {
         creator: randomId,
         aid: randomId,
         name: 'Hello World',
         type: 'email'
       };
 
-      Template.create(newTemplate, function (err, tmp) {
+      AutoMessage.create(newAutoMessage, function (err, amsg) {
 
         expect(err)
           .to.not.exist;
 
-        expect(tmp)
+        expect(amsg)
           .to.be.an('object');
 
-        savedTemplate = tmp;
+        savedAutoMessage = amsg;
 
-        expect(tmp.aid.toString())
-          .to.eql(newTemplate.aid);
+        expect(amsg.aid.toString())
+          .to.eql(newAutoMessage.aid);
 
-        expect(tmp.creator.toString())
-          .to.eql(newTemplate.creator);
+        expect(amsg.creator.toString())
+          .to.eql(newAutoMessage.creator);
 
-        expect(tmp.type)
-          .to.eql(newTemplate.type);
+        expect(amsg.type)
+          .to.eql(newAutoMessage.type);
 
-        expect(tmp.name)
-          .to.eql(newTemplate.name);
+        expect(amsg.name)
+          .to.eql(newAutoMessage.name);
 
         done();
       });
@@ -89,7 +88,7 @@ describe.only('Model Template', function () {
 
     it('should add ct (created) timestamp', function () {
 
-      expect(savedTemplate)
+      expect(savedAutoMessage)
         .to.have.property('ct');
 
     });
@@ -97,7 +96,7 @@ describe.only('Model Template', function () {
 
     it('should add ut (updated) timestamp', function () {
 
-      expect(savedTemplate)
+      expect(savedAutoMessage)
         .to.have.property('ut');
 
     });
@@ -105,16 +104,16 @@ describe.only('Model Template', function () {
 
     it('should set clicked/replied/seen/sent values as 0', function () {
 
-      expect(savedTemplate.clicked)
+      expect(savedAutoMessage.clicked)
         .to.eql(0);
 
-      expect(savedTemplate.replied)
+      expect(savedAutoMessage.replied)
         .to.eql(0);
 
-      expect(savedTemplate.seen)
+      expect(savedAutoMessage.seen)
         .to.eql(0);
 
-      expect(savedTemplate.sent)
+      expect(savedAutoMessage.sent)
         .to.eql(0);
 
     });
