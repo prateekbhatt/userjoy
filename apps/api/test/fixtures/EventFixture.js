@@ -67,24 +67,9 @@ function createEvent(aid, uid, cb) {
     aid: aid,
     cid: randomId,
     uid: uid,
-    d: [
-
-      {
-        k: 'type',
-        v: randomFromArray(eventTypes)
-      },
-
-      {
-        k: 'name',
-        v: randomFromArray(eventNames)
-      },
-
-      {
-        k: 'feature',
-        v: randomFromArray(featureNames)
-      }
-
-    ]
+    type: randomFromArray(eventTypes),
+    name: randomFromArray(eventNames),
+    feature: randomFromArray(featureNames)
   };
 
   Event.create(aFakeEvent, cb);
