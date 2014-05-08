@@ -30,24 +30,29 @@ angular.module('dodatado', [
     'do.automate'
 ])
 
-.provider('login', [function () {
-    
-    var userIsAuthenticated = false;
+.provider('login', [
+    function () {
 
-    this.$get = [function() {
-        return {
-            setLoggedIn : function (value) {
-                userIsAuthenticated = value;
-            },
-            getLoggedIn : function () {
-                return userIsAuthenticated;
+        var userIsAuthenticated = false;
+
+        this.$get = [
+            function () {
+                return {
+                    setLoggedIn: function (value) {
+                        userIsAuthenticated = value;
+                    },
+                    getLoggedIn: function () {
+                        return userIsAuthenticated;
+                    }
+                };
             }
-        };
-    }];
-}])
+        ];
+    }
+])
 
 .config(function ($stateProvider, $urlRouterProvider,
-    $locationProvider, $httpProvider, $provide, $momentProvider, loginProvider) {
+    $locationProvider, $httpProvider, $provide, $momentProvider,
+    loginProvider) {
 
     $momentProvider.asyncLoading(false)
         .scriptUrl(
@@ -64,27 +69,12 @@ angular.module('dodatado', [
 
     $httpProvider.interceptors.push(function ($rootScope, $location, $q) {
         return {
-            /*'request': function (request) {
-                // if we're not logged-in to the AngularJS app, redirect to login page
-                $rootScope.loggedIn = $rootScope.loggedIn ||
-                    $rootScope.username;
-                if (!$rootScope.loggedIn && $location.path() !=
-                    '/login') {
-                    $location.path('/login');
-                }
-                return request;
-            },*/
             'responseError': function (rejection) {
                 // if we're not logged-in to the web service, redirect to login page
                 if (rejection.status === 401 && $location.path() !=
                     '/login') {
                     console.log("401 status logout");
                     loginProvider.setLoggedIn = false;
-                    // $rootScope.loggedIn = false;
-                    // ipCookie.remove('loggedin', {
-                    //     path: '/'
-                    // });
-                    // LoginService.setUserAuthenticated(false);
                     $location.path('/login');
                 }
                 return $q.reject(rejection);
