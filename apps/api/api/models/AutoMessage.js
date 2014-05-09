@@ -1,5 +1,5 @@
 /**
- * Model for templates belonging to an app
+ * Model for automessages belonging to an app
  */
 
 
@@ -16,16 +16,16 @@ var Schema = mongoose.Schema;
 
 
 /**
- * Define template schema
+ * Define automessage schema
  */
 
-var TemplateSchema = new Schema({
+var AutoMessageSchema = new Schema({
 
 
-  accid: {
+  creator: {
     type: Schema.Types.ObjectId,
     ref: 'Account',
-    required: [true, 'Invalid account id']
+    required: [true, 'Invalid creator account id']
   },
 
 
@@ -86,7 +86,7 @@ var TemplateSchema = new Schema({
 
   type: {
     type: String,
-    required: [true, 'Provide template type'],
+    required: [true, 'Provide automessage type'],
     enum: ['email', 'notification']
   },
 
@@ -105,12 +105,12 @@ var TemplateSchema = new Schema({
  * Created timestamp (ct) is added by default
  */
 
-TemplateSchema.pre('save', function (next) {
+AutoMessageSchema.pre('save', function (next) {
   this.ut = new Date;
   next();
 });
 
 
-var Template = mongoose.model('Template', TemplateSchema);
+var AutoMessage = mongoose.model('AutoMessage', AutoMessageSchema);
 
-module.exports = Template;
+module.exports = AutoMessage;
