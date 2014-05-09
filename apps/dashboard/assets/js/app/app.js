@@ -75,6 +75,7 @@ angular.module('dodatado', [
                     '/login') {
                     console.log("401 status logout");
                     loginProvider.setLoggedIn = false;
+                    $rootScope.loggedIn = false;
                     $location.path('/login');
                 }
                 return $q.reject(rejection);
@@ -138,13 +139,15 @@ angular.module('dodatado', [
     }
 ])*/
 
-.run(['LoginService', 'ipCookie', '$log',
-    function (LoginService, ipCookie, $log) {
+.run(['LoginService', 'ipCookie', '$log', 'login', '$rootScope',
+    function (LoginService, ipCookie, $log, login, $rootScope) {
 
         // check cookie to set if user is authenticated
         if (ipCookie('loggedin')) {
             // $log.info('app.run setUserAuthenticated');
             LoginService.setUserAuthenticated(true);
+            login.setLoggedIn(true);
+            $rootScope.loggedIn = true;
         }
     }
 ])

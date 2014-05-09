@@ -105,10 +105,11 @@ angular.module('do.message', [])
 ])
 
 .controller('InboxCtrl', ['$scope', '$filter', 'ngTableParams', '$log',
-    'MsgService', '$location', 'AppService', 'InboxMsgService', '$moment',
+    'MsgService', '$location', 'AppService', 'InboxMsgService', '$moment', 'login', 
     function ($scope, $filter, ngTableParams, $log, MsgService, $location,
-        AppService, InboxMsgService, $moment) {
+        AppService, InboxMsgService, $moment, login) {
 
+        console.log("loginProvider MsgCtrl:", login.getLoggedIn());
         $scope.showOpenConversations = true;
         $scope.data = [];
         console.log("entering inboxctrl");

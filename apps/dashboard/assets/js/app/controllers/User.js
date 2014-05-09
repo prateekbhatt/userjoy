@@ -268,12 +268,12 @@ angular.module('do.users', [])
 
 .controller('UserListCtrl', ['$scope', '$location', 'segment',
     'queryMatching', '$filter', 'countOfActions', 'hasNotDone',
-    'hasDoneActions', 'ngTableParams',
+    'hasDoneActions', 'ngTableParams', 'login',
     function ($scope, $location, segment, queryMatching, $filter,
         countOfActions, hasNotDone, hasDoneActions,
-        ngTableParams) {
+        ngTableParams, login) {
 
-        console.log("inside UserListCtrl");
+        console.log("inside UserListCtrl loginProvider: ", login.getLoggedIn());
         $scope.state = 'form-control';
         $scope.isErr = '';
         $scope.method = 'count';
