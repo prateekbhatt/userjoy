@@ -19,6 +19,7 @@ var ObjectId = require('mongoose')
 
 var Account = require('../../api/models/Account');
 var App = require('../../api/models/App');
+var AutoMessage = require('../../api/models/AutoMessage');
 var Conversation = require('../../api/models/Conversation');
 var Message = require('../../api/models/Message');
 var User = require('../../api/models/User');
@@ -114,53 +115,74 @@ var accounts = {
     }
   };
 
+var automessages = {
 
-function createAccount(account, fn) {
-
-  var rawPassword = account.password;
-  Account.create(account, function (err, acc) {
-    if (err) return fn(err);
-    acc.password = rawPassword;
-    fn(null, acc);
-  });
-
-}
-
-function createApp(accid, app, fn) {
-
-  app.team = [];
-  app.team.push({
-    accid: accid,
-    admin: true
-  });
-
-  App.create(app, fn);
-
-}
+  first: {
+    aid: null,
+    body: 'Hey, Welkom to CabanaLand!',
+    creator: null,
+    sub: 'Welkom!',
+    title: 'Welcome Message',
+    type: 'email'
+  }
+};
 
 
-function createUser(aid, user, fn) {
-  user.aid = aid;
-  User.create(user, fn);
-}
+  function createAccount(account, fn) {
+
+    var rawPassword = account.password;
+    Account.create(account, function (err, acc) {
+      if (err) return fn(err);
+      acc.password = rawPassword;
+      fn(null, acc);
+    });
+
+  }
+
+  function createApp(accid, app, fn) {
+
+    app.team = [];
+    app.team.push({
+      accid: accid,
+      admin: true
+    });
+
+    App.create(app, fn);
+
+  }
 
 
-function createConversation(accid, aid, uid, con, fn) {
-  con.accId = accid;
-  con.aid = aid;
-  con.uid = uid;
-  Conversation.create(con, fn);
-}
+  function createUser(aid, user, fn) {
+    user.aid = aid;
+    User.create(user, fn);
+  }
 
-function createMessage(accid, aid, coId, uid, message, fn) {
 
-  message.accid = accid;
-  message.aid = aid;
-  message.coId = coId;
-  message.uid = uid;
-  Message.create(message, fn);
+  function createConversation(accid, aid, uid, con, fn) {
+    con.accId = accid;
+    con.aid = aid;
+    con.uid = uid;
+    Conversation.create(con, fn);
+  }
 
-}
+  function createMessage(accid, aid, coId, uid, message, fn) {
+
+    message.accid = accid;
+    message.aid = aid;
+    message.coId = coId;
+    message.uid = uid;
+    Message.create(message, fn);
+
+  }
+
+
+  function createAutoMessage(accid, aid, automessage, fn) {
+
+    automessage.creator = accid;
+    automessage.aid = aid;
+
+    AutoMessage.create(automessage, fn);
+  }
 
 
 module.exports = function loadFixtures(callback) {
@@ -280,6 +302,21 @@ module.exports = function loadFixtures(callback) {
       createMessage(accid, aid, coId, uid, message, function (err, msg) {
         if (err) return cb(err);
         messages.second = msg;
+        cb();
+      });
+
+    },
+
+
+    createFirstAutoMessage: function (cb) {
+
+      var aid = apps.first._id;
+      var accid = accounts.first._id;
+      var automessage = automessages.first;
+
+      createAutoMessage(accid, aid, automessage, function (err, amsg) {
+        if (err) return cb(err);
+        automessages.first = amsg;
         cb();
       });
 
