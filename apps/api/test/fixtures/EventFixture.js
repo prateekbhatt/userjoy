@@ -100,7 +100,7 @@ module.exports = function (aid, uids, no, cb) {
     },
     function (err) {
 
-      if (cb) return cb();
+      if (cb) return cb(err);
       process.exit( !! err);
     }
   );
