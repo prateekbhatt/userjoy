@@ -2,9 +2,9 @@ angular.module('models.auth', ['services'])
 
 .service('AuthService', ['$http', 'utils', 'ipCookie', 'LoginService',
     '$log', 'config', '$state', '$location', 'AppService', 
-    'ErrMsgService', 'authService', 'login', 
+    'ErrMsgService', 'authService', 'login', '$rootScope', 
     function ($http, utils, ipCookie, LoginService, $log, config, $state,
-        $location, AppService, ErrMsgService, authService, login) {
+        $location, AppService, ErrMsgService, authService, login, $rootScope) {
 
         this.attemptLogin = function (email, password) {
 
@@ -26,10 +26,13 @@ angular.module('models.auth', ['services'])
 
                     LoginService.setUserAuthenticated(true);
                     // login.setLoggedIn(true);
-                    console.log("loginProvider: ", login.getLoggedIn());
-                    if(login.getLoggedIn()) {
-                        $state.go('users.list');
-                    }
+                    login.setLoggedIn(true);
+                    $rootScope.loggedIn = true;
+                    console.log("$rootScope loggIn: ", $rootScope.loggedIn);
+                    console.log("loginProvider Auth js: ", login.getLoggedIn());
+                    /*if(login.getLoggedIn()) {
+                        $location.path('/users/list');
+                    }*/
                     $http.get(config.apiUrl + '/apps')
                         .success(function (data) {
                             console.log("loggedin Apps: ", data);
@@ -68,6 +71,7 @@ angular.module('models.auth', ['services'])
                     });
                     LoginService.setUserAuthenticated(false);
                     login.setLoggedIn(false);
+                    $rootScope.loggedIn = false;
                     $log.info(arguments);
                     $location.path('/login');
                 })
