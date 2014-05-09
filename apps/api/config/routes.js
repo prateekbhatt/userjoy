@@ -48,9 +48,9 @@ module.exports.dashboard = function loadDashboardRoutes(app) {
   app.use('/account', routes.AccountController);
   app.use('/apps', routes.AppController);
   app.use('/apps', routes.ConversationController);
+  app.use('/apps', routes.QueryController);
   app.use('/auth', routes.AuthController);
   app.use('/mandrill', routes.MandrillController);
-  app.use('/query', routes.QueryController);
 
 
 
