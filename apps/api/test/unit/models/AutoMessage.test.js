@@ -18,7 +18,8 @@ describe('Model AutoMessage', function () {
 
   describe('#create', function () {
 
-    it('should return error if creator/aid/type is not provided',
+    it(
+      'should return error if aid/body/creator/title/type is not provided',
       function (done) {
 
         var newAutoMsg = {};
@@ -30,13 +31,19 @@ describe('Model AutoMessage', function () {
 
           expect(Object.keys(err.errors)
             .length)
-            .to.eql(3);
+            .to.eql(5);
+
+          expect(err.errors.aid.message)
+            .to.eql('Invalid aid');
+
+          expect(err.errors.body.message)
+            .to.eql('Provide automessage body');
 
           expect(err.errors.creator.message)
             .to.eql('Invalid creator account id');
 
-          expect(err.errors.aid.message)
-            .to.eql('Invalid aid');
+          expect(err.errors.title.message)
+            .to.eql('Provide automessage title');
 
           expect(err.errors.type.message)
             .to.eql('Provide automessage type');
@@ -53,33 +60,41 @@ describe('Model AutoMessage', function () {
     it('should create automessage', function (done) {
 
       var newAutoMessage = {
-        creator: randomId,
         aid: randomId,
-        name: 'Hello World',
+        body: 'Hey, Welkom to CabanaLand!',
+        creator: randomId,
+        sub: 'Welkom!',
+        title: 'Welcome Message',
         type: 'email'
       };
 
-      AutoMessage.create(newAutoMessage, function (err, amsg) {
+      AutoMessage.create(newAutoMessage, function (err, msg) {
 
         expect(err)
           .to.not.exist;
 
-        expect(amsg)
+        expect(msg)
           .to.be.an('object');
 
-        savedAutoMessage = amsg;
+        savedAutoMessage = msg;
 
-        expect(amsg.aid.toString())
+        expect(msg.aid.toString())
           .to.eql(newAutoMessage.aid);
 
-        expect(amsg.creator.toString())
+        expect(msg.body)
+          .to.eql(newAutoMessage.body);
+
+        expect(msg.creator.toString())
           .to.eql(newAutoMessage.creator);
 
-        expect(amsg.type)
-          .to.eql(newAutoMessage.type);
+        expect(msg.sub)
+          .to.eql(newAutoMessage.sub);
 
-        expect(amsg.name)
-          .to.eql(newAutoMessage.name);
+        expect(msg.title)
+          .to.eql(newAutoMessage.title);
+
+        expect(msg.type)
+          .to.eql(newAutoMessage.type);
 
         done();
       });
