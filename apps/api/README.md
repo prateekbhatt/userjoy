@@ -95,6 +95,7 @@ name          | embedded documents      | description
 -----         | ----------------------  | -----------
 Account       |                         | accounts on Userjoy
 App           | team                    | apps belonging to an account
+AutoMessage   |                         | automated messages
 Company       |                         | companies of a specific account
 Conversation  |                         | conversation threads between users and accounts
 Event         | meta (metadata)         | events belonging to a user
@@ -102,7 +103,6 @@ Health        |                         | the healthscore of a user for a specif
 Invite        |                         | tokens of team members that have been invited to use an app
 Message       |                         | messages between users and accounts
 Segment       | filters                 | all the segments defined for an app
-Template      |                         | templates of the messages to be sent
 Trigger       |                         | triggers for sending auto emails / notifications
 User          | companies, notes        | users of a specific app. create a new user for every new unique identifier for an app
 
@@ -297,26 +297,23 @@ User          | companies, notes        | users of a specific app. create a new 
 - uid (required)
 
 
-### Template
+### AutoMessage
 
 ##### Columns:
 
-- aid
+- aid (required)
+- body (required)
 - clicked
-- creator (account id)
+- creator (account id) (required)
 - ct
-- name
 - replied
 - seen
 - sent
 - sub (for email type)
-- title
-- type (email / notification)
+- title (required)
+- type (email / notification) (required)
 - ut
 
-#####
-
-- Difference between name and title?
 
 ### Message
 

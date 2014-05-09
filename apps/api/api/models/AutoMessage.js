@@ -22,18 +22,18 @@ var Schema = mongoose.Schema;
 var AutoMessageSchema = new Schema({
 
 
-  creator: {
-    type: Schema.Types.ObjectId,
-    ref: 'Account',
-    required: [true, 'Invalid creator account id']
-  },
-
-
   // app Id
   aid: {
     type: Schema.Types.ObjectId,
     ref: 'App',
     required: [true, 'Invalid aid']
+  },
+
+
+  // body of the message
+  body: {
+    type: String,
+    required: [true, 'Provide automessage body']
   },
 
 
@@ -43,15 +43,17 @@ var AutoMessageSchema = new Schema({
   },
 
 
+  creator: {
+    type: Schema.Types.ObjectId,
+    ref: 'Account',
+    required: [true, 'Invalid creator account id']
+  },
+
+
   // created at timestamp
   ct: {
     type: Date,
     default: Date.now
-  },
-
-
-  name: {
-    type: String
   },
 
 
@@ -75,12 +77,15 @@ var AutoMessageSchema = new Schema({
 
   // subject (for email type)
   sub: {
-    type: String
+    type: String,
+    // TODO: subject must be provided for type: email
   },
 
 
+  // a title should be provided to easily identify the AM in the dashboard
   title: {
-    type: String
+    type: String,
+    required: [true, 'Provide automessage title']
   },
 
 
@@ -93,8 +98,7 @@ var AutoMessageSchema = new Schema({
 
   // updated at timestamp
   ut: {
-    type: Date,
-    default: Date.now
+    type: Date
   }
 
 });
