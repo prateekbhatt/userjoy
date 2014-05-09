@@ -32,12 +32,12 @@ function bootstrapDevDB(cb) {
 
   var loadFixtures = require('./test/fixtures');
   var createUsers = require('./test/fixtures/UserFixture');
-  var createSessions = require('./test/fixtures/SessionFixture');
+  var createEvents = require('./test/fixtures/EventFixture');
 
 
   var savedAccount = {};
   var savedApp = {};
-  var uids = [];
+  var userIds = [];
   var aid;
 
 
@@ -70,18 +70,18 @@ function bootstrapDevDB(cb) {
 
         createUsers(aid, 1000, function (err, uids) {
           if (err) return cb(err);
-          uids = uids;
-          uids.push(savedUser._id);
+          userIds = uids;
+          userIds.push(savedUser._id);
           cb();
         });
 
       },
 
-      createSessions: function (cb) {
+      createEvents: function (cb) {
 
-        console.log('loading session fixtures ...');
+        console.log('loading event fixtures ...');
 
-        createSessions(aid, uids, 100, cb);
+        createEvents(aid, userIds, 10000, cb);
       }
 
     },
@@ -105,6 +105,9 @@ function bootstrapDevDB(cb) {
         console.log('');
         console.log('uid:', savedUser._id);
         console.log('email:', savedUser.email);
+        console.log('');
+        console.log('');
+        console.log('');
 
       }
 
