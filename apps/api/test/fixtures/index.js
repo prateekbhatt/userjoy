@@ -327,6 +327,7 @@ module.exports = function loadFixtures(callback) {
     var savedObj = {
       accounts: accounts,
       apps: apps,
+      automessages: automessages,
       conversations: conversations,
       messages: messages,
       users: users
