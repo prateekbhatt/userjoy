@@ -102,6 +102,14 @@ var SegmentSchema = new Schema({
   },
 
 
+  // account id of creator
+  creator: {
+    type: Schema.Types.ObjectId,
+    ref: 'Account',
+    required: [true, 'Invalid creator account id']
+  },
+
+
   // created at timestamp
   ct: {
     type: Date,

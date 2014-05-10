@@ -20,7 +20,7 @@ describe('Model Segment', function () {
   describe('#create', function () {
 
 
-    it('should return error if aid/list/op not provided', function (done) {
+    it('should return error if aid/creator/list/op not provided', function (done) {
 
       var newSegment = {};
 
@@ -31,10 +31,13 @@ describe('Model Segment', function () {
 
         expect(Object.keys(err.errors)
           .length)
-          .to.eql(3);
+          .to.eql(4);
 
         expect(err.errors.aid.message)
           .to.eql('Invalid aid');
+
+        expect(err.errors.creator.message)
+          .to.eql('Invalid creator account id');
 
         expect(err.errors.list.message)
           .to.eql('Invalid list');
@@ -44,6 +47,7 @@ describe('Model Segment', function () {
 
         expect(seg)
           .not.to.exist;
+
         done();
       });
     });
@@ -53,6 +57,7 @@ describe('Model Segment', function () {
 
       var newSegment = {
         aid: randomId,
+        creator: randomId,
         list: 'users',
         op: 'and'
       };
@@ -80,6 +85,7 @@ describe('Model Segment', function () {
 
         var newSegment = {
           aid: randomId,
+          creator: randomId,
           list: 'users',
           op: 'and',
           filters: [
@@ -119,6 +125,7 @@ describe('Model Segment', function () {
 
         var newSegment = {
           aid: randomId,
+          creator: randomId,
           list: 'users',
           op: 'and',
           filters: [
@@ -156,6 +163,7 @@ describe('Model Segment', function () {
 
       var newSegment = {
         aid: randomId,
+        creator: randomId,
         list: 'users',
         op: 'and',
         filters: [
@@ -308,32 +316,6 @@ describe('Model Segment', function () {
 
           expect(err.errors['filters.0.method'].message)
             .to.eql('Invalid filter method type');
-
-          done();
-        });
-      });
-
-    it('should add filter if present',
-      function (
-        done) {
-        var newSegment = {
-          aid: randomId,
-          list: 'companies',
-          op: 'and',
-          filters: [{
-            method: 'hasdone',
-            type: 'feature',
-            name: 'Create chat'
-          }]
-        };
-
-        Segment.create(newSegment, function (err, seg) {
-
-          expect(err)
-            .not.to.exist;
-
-          expect(seg.filters[0].name)
-            .to.eql('Create chat');
 
           done();
         });

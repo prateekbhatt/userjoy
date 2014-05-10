@@ -265,6 +265,7 @@ User          | companies, notes        | users of a specific app. create a new 
 ##### Columns:
 
  - aid
+ - creator (account id)
  - ct
  - ut
  - list
