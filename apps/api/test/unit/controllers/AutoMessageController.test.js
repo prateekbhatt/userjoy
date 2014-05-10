@@ -49,7 +49,7 @@ describe('Resource /apps/:aid/automessages', function () {
         loginUser(done);
       });
 
-    it('should return error if aid/body/creator/title/type is not present',
+    it('should return error if aid/body/creator/sid/title/type is not present',
       function (done) {
 
         request
@@ -62,6 +62,7 @@ describe('Resource /apps/:aid/automessages', function () {
             "error": [
               "type is required",
               "title is required",
+              "sid is required",
               "creator is required",
               "body is required",
               "aid is required"
@@ -81,6 +82,7 @@ describe('Resource /apps/:aid/automessages', function () {
           aid: randomId,
           body: 'Hey, Welkom to CabanaLand!',
           creator: randomId,
+          sid: randomId,
           sub: 'Welkom!',
           title: 'Welcome Message',
           type: 'email'
