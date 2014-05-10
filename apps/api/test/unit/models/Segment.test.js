@@ -20,8 +20,7 @@ describe('Model Segment', function () {
   describe('#create', function () {
 
 
-    it('should return error if aid, list or op are not present', function (
-      done) {
+    it('should return error if aid/list/op not provided', function (done) {
 
       var newSegment = {};
 
@@ -29,6 +28,11 @@ describe('Model Segment', function () {
 
         expect(err)
           .to.exist;
+
+        expect(Object.keys(err.errors)
+          .length)
+          .to.eql(3);
+
         expect(err.errors.aid.message)
           .to.eql('Invalid aid');
 
@@ -45,27 +49,140 @@ describe('Model Segment', function () {
     });
 
 
-    it('should create new segment if aid, list and op are present',
+    it('should return error if no filters are provided', function (done) {
+
+      var newSegment = {
+        aid: randomId,
+        list: 'users',
+        op: 'and'
+      };
+
+      Segment.create(newSegment, function (err, seg) {
+
+        expect(err)
+          .to.exist;
+
+        expect(err)
+          .to.have.property("message",
+            "Provide atleast one segment filter");
+
+        expect(seg)
+          .not.to.exist;
+        done();
+      });
+
+    });
+
+
+
+    it('should return error if filter method/name not provided',
       function (done) {
 
         var newSegment = {
           aid: randomId,
           list: 'users',
-          op: 'and'
+          op: 'and',
+          filters: [
+
+            {
+              val: 'hello'
+            }
+
+          ]
         };
 
-        Segment.create(newSegment, function (err, seg) {
-          expect(err)
-            .to.not.exist;
-          expect(seg)
-            .to.be.an('object');
 
-          savedSegment = seg;
+        Segment.create(newSegment, function (err, seg) {
+
+          expect(Object.keys(err.errors)
+            .length)
+            .to.eql(2);
+
+          expect(err.errors['filters.0.method'].message)
+            .to.eql('Filter method is required');
+
+          expect(err.errors['filters.0.name'].message)
+            .to.eql('Name is required in segment filter');
+
+          expect(seg)
+            .not.to.exist;
 
           done();
         });
 
+
       });
+
+
+    it('should return error if invalid filter type provided',
+      function (done) {
+
+        var newSegment = {
+          aid: randomId,
+          list: 'users',
+          op: 'and',
+          filters: [
+
+            {
+              method: 'count',
+              name: 'Create Notification',
+              type:'random',
+              val: 'hello'
+            }
+
+          ]
+        };
+
+
+        Segment.create(newSegment, function (err, seg) {
+
+          expect(Object.keys(err.errors)
+            .length)
+            .to.eql(1);
+
+          expect(err.errors['filters.0.type'].message)
+            .to.eql("Invalid filter method type");
+
+          expect(seg)
+            .not.to.exist;
+
+          done();
+        });
+
+
+      });
+
+    it('should create new segment', function (done) {
+
+      var newSegment = {
+        aid: randomId,
+        list: 'users',
+        op: 'and',
+        filters: [
+
+          {
+            method: 'hasdone',
+            type: 'feature',
+            name: 'Create Notification'
+          }
+
+        ]
+      };
+
+      Segment.create(newSegment, function (err, seg) {
+
+        expect(err)
+          .to.not.exist;
+
+        expect(seg)
+          .to.be.an('object');
+
+        savedSegment = seg;
+
+        done();
+      });
+
+    });
 
     it('should add ct (created) timestamp to new segment', function () {
       expect(savedSegment)
@@ -88,7 +205,7 @@ describe('Model Segment', function () {
           .to.be.an('array');
 
         expect(savedSegment.filters)
-          .to.be.empty;
+          .to.have.length(1);
 
       });
 
@@ -190,8 +307,7 @@ describe('Model Segment', function () {
             .to.exist;
 
           expect(err.errors['filters.0.method'].message)
-            .to.eql(
-              '`random` is not a valid enum value for path `method`.');
+            .to.eql('Invalid filter method type');
 
           done();
         });
