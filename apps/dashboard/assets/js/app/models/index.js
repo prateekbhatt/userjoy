@@ -8,5 +8,6 @@ angular.module('models', [
     'models.auth',
     'models.account',
     'models.apps',
-    'models.message'
+    'models.message',
+    'models.Query',
 ]);

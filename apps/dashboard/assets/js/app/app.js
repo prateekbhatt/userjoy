@@ -175,6 +175,7 @@ angular.module('dodatado', [
             AppService.setLoggedInApps(apps);
             AppService.setCurrentApp(apps[0]);
             console.log("default app:", AppService.getCurrentApp());
+            
         });
     }
 ])
@@ -194,31 +195,35 @@ angular.module('dodatado', [
         }
     ])
 
-.run(['ThreadService', 'MsgService',
+/*.run(['ThreadService', 'MsgService',
     function (ThreadService, MsgService) {
         window.location.pathname
     }
-])
+])*/
 
 .run(['segment', 'queryMatching', 'countOfActions', 'hasNotDone',
-    'hasDoneActions',
+    'hasDoneActions', 'modelsQuery', 'AppService',
     function (segment, queryMatching, countOfActions, hasNotDone,
-        hasDoneActions) {
+        hasDoneActions, modelsQuery, AppService) {
 
         // FIXME : get data from backend
+        
+        
         var allSegments = [{
             _id: "0",
             name: "Users"
-        }, {
-            _id: "1",
-            name: "Phone Users"
-        }, {
-            _id: "2",
-            name: "Android Users"
-        }, {
-            _id: "3",
-            name: "Paying Customers"
-        }];
+        }
+        // , {
+        //     _id: "1",
+        //     name: "Phone Users"
+        // }, {
+        //     _id: "2",
+        //     name: "Android Users"
+        // }, {
+        //     _id: "3",
+        //     name: "Paying Customers"
+        // }
+        ];
 
         var allQueries = [{
             id: "0",
@@ -245,6 +250,8 @@ angular.module('dodatado', [
             name: 'less than',
             key: 'lt'
         }];
+
+        
 
         var actions = [{
             name: 'Watched Intro Video'
