@@ -1,106 +1,108 @@
 <div class="col-md-9">
     <div style="border-left: 1px solid #ecf0f1;">
         <br>
-            <div>
-                <div class="caption-full">
-                    <div class="row">
-                        <label class="col-md-1 col-md-offset-1 control-label" style="font-size: 20px; padding-left: 13px">List: </label>
-                        <div class="col-md-10">
-                            <button type="button" class="btn btn-default" ng-model="selectedIcon" data-html="1" ng-options="segmenticon.value as segmenticon.label for segmenticon in segmenticons" bs-select style=".dropdown-menu > li > a:hover,.dropdown-menu > li > a:focus { background-color: #7b8a8b}">
-                            Users <span class="caret"></span>
-                            </button>
-                        </div>
-                        <br>
-                        <br>
+        <div>
+            <div class="caption-full">
+                <div class="row">
+                    <label class="col-md-1 col-md-offset-1 control-label" style="font-size: 20px; padding-left: 13px">List: </label>
+                    <div class="col-md-10">
+                        <button type="button" class="btn btn-default" ng-model="selectedIcon" data-html="1" ng-options="segmenticon.value as segmenticon.label for segmenticon in segmenticons" bs-select style=".dropdown-menu > li > a:hover,.dropdown-menu > li > a:focus { background-color: #7b8a8b}">
+                        Users <span class="caret"></span>
+                        </button>
                     </div>
                     <br>
-                    <div class="form-group">
-                        <div ng-repeat="filter in filters" ng-init="ind = $index">
-                            <div class="row">
-                                <br>
-                                <div class="col-md-1 col-md-offset-1 text-center">
-                                    <label style="font-size:20px" ng-show="$first">Filter: </label>
-                                    <a style="font-size:20px; cursor:pointer; cursor:hand" ng-show="!$first" ng-click="switchAndOr()">{{text}}</a>
-                                </div>
-                                <div>
-                                    <div class="col-md-10">
-                                        <div class="row">
-                                            <div class="col-md-4">
+                    <br>
+                </div>
+                <br>
+                <div class="form-group">
+                    <div ng-repeat="filter in filters" ng-init="ind = $index">
+                        <div class="row">
+                            <br>
+                            <div class="col-md-1 col-md-offset-1 text-center">
+                                <label style="font-size:20px" ng-show="$first">Filter: </label>
+                                <a style="font-size:20px; cursor:pointer; cursor:hand" ng-show="!$first" ng-click="switchAndOr()">{{text}}</a>
+                            </div>
+                            <div>
+                                <div class="col-md-10">
+                                    <div class="row">
+                                        <div class="col-md-4">
                                             <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.btntext}}</span>&nbsp;<span class="caret"></span></button>
-                                                <ul class="select dropdown-menu" role="select" style="left: 15px">
-                                                    <li class="dropdown dropdown-submenu">
-                                                        <a style="cursor: default">Has done</a>
-                                                        <ul class="dropdown-menu">
-                                                            <li ng-repeat="hasDoneItem in hasDoneItems">
-                                                                <a style="cursor: default" ng-click="changeFilterHasDone($parent.$index, $index, $event)">{{hasDoneItem.name}}
-                                                                </a>
-                                                            </li>                         
-                                                        </ul>
-                                                    </li>
-                                                    <li class="dropdown dropdown-submenu"><a style="cursor: default">Has not done</a>
-                                                        <ul class="dropdown-menu">
-                                                            <li ng-repeat="hasNotDoneItem in hasNotDoneItems"><a style="cursor: default" ng-click="changeFilterHasNotDone($parent.$index, $index, $event)">{{hasNotDoneItem.name}}</a></li>
-                                                        </ul>
-                                                    </li>
-                                                    <li class="dropdown dropdown-submenu"><a style="cursor: default">Count of</a>
-                                                        <ul class="dropdown-menu">
-                                                            <li ng-repeat="countOfItem in countOfItems"><a style="cursor: default" ng-click="changeFilterCountOf($parent.$index, $index, $event)">{{countOfItem.name}}</a></li>
-                                                        </ul>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <div class="col-md-3" ng-if="filter.checkMethod">
-                                                <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
-                                                <ul class="select dropdown-menu" role="select" style="left: 15px">
-                                                    <li ng-repeat="query in selectedqueries">
-                                                        <a style="cursor: default;" ng-click="chngquery($parent.$index, $index)">{{query.value}}
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <div class="col-md-6" ng-if="!filter.checkMethod">
-                                                <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.name}}</span>&nbsp;<span class="caret"></span></button>
-                                                <ul class="dropdown-menu" style="left: 15px">
-                                                    <li ng-repeat="hasDoneItem in hasDoneItems">
-                                                        <a style="cursor: default" ng-click="changeFilterHasDone($parent.$index, $index, $event)">{{hasDoneItem.name}}
-                                                        </a>
-                                                    </li>                         
-                                                </ul>
-                                            </div>
-                                            <div class="col-md-3" ng-if="filter.checkMethod">
-                                                <input type="text" class="form-control" placeholder="Value" ng-model="filter.val">
-                                            </div>
-                                            <div class="col-md-2">
-                                                <a class="btn btn-default fa fa-times" ng-click="removeFilter(filter)"></a>
-                                            </div>
+                                            <ul class="select dropdown-menu" role="select" style="left: 15px">
+                                                <li class="dropdown dropdown-submenu">
+                                                    <a style="cursor: default">Has done</a>
+                                                    <ul class="dropdown-menu">
+                                                        <li ng-repeat="hasDoneItem in hasDoneItems">
+                                                            <a style="cursor: default" ng-click="changeFilterHasDone($parent.$index, $index, $event)">{{hasDoneItem.name}}
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                                <li class="dropdown dropdown-submenu"><a style="cursor: default">Has not done</a>
+                                                    <ul class="dropdown-menu">
+                                                        <li ng-repeat="hasNotDoneItem in hasNotDoneItems"><a style="cursor: default" ng-click="changeFilterHasNotDone($parent.$index, $index, $event)">{{hasNotDoneItem.name}}</a></li>
+                                                    </ul>
+                                                </li>
+                                                <li class="dropdown dropdown-submenu"><a style="cursor: default">Count of</a>
+                                                    <ul class="dropdown-menu">
+                                                        <li ng-repeat="countOfItem in countOfItems"><a style="cursor: default" ng-click="changeFilterCountOf($parent.$index, $index, $event)">{{countOfItem.name}}</a></li>
+                                                    </ul>
+                                                </li>
+                                                <li role="presentation" class="divider"></li>
+                                               
+                                                <li ng-repeat="attribute in attributes" ><a style="cursor: default;" ng-click="changeFilterAttribute($parent.$index, $index, $event)">{{attribute.name}}</a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-3" ng-if="filter.checkMethod">
+                                            <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
+                                            <ul class="select dropdown-menu" role="select" style="left: 15px">
+                                                <li ng-repeat="query in selectedqueries">
+                                                    <a style="cursor: default;" ng-click="chngquery($parent.$index, $index)">{{query.value}}
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6" ng-if="!filter.checkMethod">
+                                            <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.name}}</span>&nbsp;<span class="caret"></span></button>
+                                            <ul class="dropdown-menu" style="left: 15px">
+                                                <li ng-repeat="hasDoneItem in hasDoneItems">
+                                                    <a style="cursor: default" ng-click="changeFilterHasDone($parent.$index, $index, $event)">{{hasDoneItem.name}}
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-3" ng-if="filter.checkMethod">
+                                            <input type="text" class="form-control" placeholder="Value" ng-model="filter.val">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <a class="btn btn-default fa fa-times" ng-click="removeFilter(filter)"></a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <br>
-                        <div class="row">
-                            <div class="col-md-4" style="margin-left: 20px">
-                                <button class="btn btn-info" ng-click="addAnotherFilter()" ng-show="true">
-                                <i class="fa fa-plus-square"></i>
-                                Add Filter
-                                </button>
-                            </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-4" style="margin-left: 20px">
+                            <button class="btn btn-info" ng-click="addAnotherFilter()" ng-show="true">
+                            <i class="fa fa-plus-square"></i>
+                            Add Filter
+                            </button>
                         </div>
-                        <br>
-                        <div class="row">
-                            <div class="col-md-4" style="margin-left: 20px">
-                                <button class="btn btn-info fa fa-toggle-right" ng-click="runQuery()" style="font-size: 16px; padding: 11px 27px">
-                                Run
-                                </button>
-                            </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-4" style="margin-left: 20px">
+                            <button class="btn btn-info fa fa-toggle-right" ng-click="runQuery()" style="font-size: 16px; padding: 11px 27px">
+                            Run
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 </div>
 <br>
 <br>
