@@ -116,18 +116,6 @@ var accounts = {
     }
   };
 
-var automessages = {
-
-  first: {
-    aid: null,
-    body: 'Hey, Welkom to CabanaLand!',
-    creator: null,
-    sub: 'Welkom!',
-    title: 'Welcome Message',
-    type: 'email'
-  }
-};
-
 var segments = {
   first: {
     aid: null,
@@ -143,6 +131,19 @@ var segments = {
       }
 
     ]
+  }
+};
+
+var automessages = {
+
+  first: {
+    aid: null,
+    body: 'Hey, Welkom to CabanaLand!',
+    creator: null,
+    sid: null,
+    sub: 'Welkom!',
+    title: 'Welcome Message',
+    type: 'email'
   }
 };
 
@@ -195,10 +196,11 @@ function createMessage(accid, aid, coId, uid, message, fn) {
 }
 
 
-function createAutoMessage(accid, aid, automessage, fn) {
+function createAutoMessage(accid, aid, sid, automessage, fn) {
 
   automessage.creator = accid;
   automessage.aid = aid;
+  automessage.sid = sid;
 
   AutoMessage.create(automessage, fn);
 }
@@ -336,21 +338,6 @@ module.exports = function loadFixtures(callback) {
     },
 
 
-    createFirstAutoMessage: function (cb) {
-
-      var aid = apps.first._id;
-      var accid = accounts.first._id;
-      var automessage = automessages.first;
-
-      createAutoMessage(accid, aid, automessage, function (err, amsg) {
-        if (err) return cb(err);
-        automessages.first = amsg;
-        cb();
-      });
-
-    },
-
-
     createFirstSegment: function (cb) {
 
       var aid = apps.first._id;
@@ -360,6 +347,22 @@ module.exports = function loadFixtures(callback) {
       createSegment(accid, aid, segment, function (err, seg) {
         if (err) return cb(err);
         segments.first = seg;
+        cb();
+      });
+
+    },
+
+
+    createFirstAutoMessage: function (cb) {
+
+      var aid = apps.first._id;
+      var accid = accounts.first._id;
+      var sid = segments.first._id;
+      var automessage = automessages.first;
+
+      createAutoMessage(accid, aid, sid, automessage, function (err, amsg) {
+        if (err) return cb(err);
+        automessages.first = amsg;
         cb();
       });
 
