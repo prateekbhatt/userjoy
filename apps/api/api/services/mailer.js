@@ -23,6 +23,30 @@ var UJ_SUPPORT_EMAIL = 'support@userjoy.co';
 var UJ_SUPPORT_NAME = 'UserJoy';
 
 
+//
+// USAGE:
+//
+// var locals = {
+//   fromEmail: '532d6bf862d673ba7131812e@mail.userjoy.co',
+//   fromName: 'Prateek from UserJoy',
+//   metadata: {
+//     'mId': '535d131c67d02dc60b2b1764'
+//   },
+//   // replyToEmail: '532d6bf862d673ba7131812e+535d131c67d02dc60b2b1764@mail.userjoy.co',
+//   // replyToName: 'Reply to Prateek from UserJoy',
+//   subject: 'Welcome to UserJoy',
+//   toEmail: 'prattbhatt@gmail.com',
+//   toName: 'Prateek Bhatt',
+//   text: 'This is what I want to send'
+// };
+// mailer.sendToUser(locals);
+//
+
+
+/**
+ * @constructor Mailer
+ */
+
 function Mailer(locals) {
 
   this.locals = locals;
