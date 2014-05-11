@@ -643,10 +643,10 @@ angular.module('do.users', [])
 ])
 
 .controller('TableCtrl', ['$scope', '$filter', 'ngTableParams', '$modal',
-    'UidService', '$moment', 'UserList',
+    'UidService', '$moment', 'UserList', '$timeout',
 
     function ($scope, $filter, ngTableParams, $modal, UidService, $moment,
-        UserList) {
+        UserList, $timeout) {
 
         $scope.title = "Write Message";
         // $scope.content = "Hello Modal<br />This is a multiline message!";
@@ -668,12 +668,15 @@ angular.module('do.users', [])
             popupModal.hide();
         }*/
 
-        $scope.data = [];
+        var data = [];
+        $scope.users = []
 
         $scope.$watch(UserList.getUsers, function () {
+
+            console.log("userlist: ", UserList.getUsers());
             for (var i = 0; i < UserList.getUsers()
                 .length; i++) {
-                $scope.data.push({
+                $scope.users.push({
                     id: UserList.getUsers()[i]._id,
                     email: UserList.getUsers()[i].email,
                     userkarma: UserList.getUsers()[i].healthScore,
@@ -682,31 +685,94 @@ angular.module('do.users', [])
                     unsubscribed: UserList.getUsers()[i].unsubscribed
                 })
             };
-            $scope.columns = [{
-                    title: '',
-                    field: 'checkbox',
-                    visible: true
-                },
-                {
-                    title: 'Email',
-                    field: 'email',
-                    visible: true
-                }, {
-                    title: 'User Karma',
-                    field: 'userkarma',
-                    visible: true
-                }, {
-                    title: 'Date Joined',
-                    field: 'datejoined',
-                    visible: true
-                }, {
-                    title: 'Unsubscribed',
-                    field: 'unsubscribed',
-                    visible: true
-                }
-            ];
 
-            $scope.tableParams = new ngTableParams({
+            // $scope.
+
+            // console.log("users: ", $scope.users);
+            // console.log("data: ", data);
+            $scope.columns = [{
+                title: '',
+                field: 'checkbox',
+                visible: true
+            }, {
+                title: 'Email',
+                field: 'email',
+                visible: true
+            }, {
+                title: 'User Karma',
+                field: 'userkarma',
+                visible: true
+            }, {
+                title: 'Date Joined',
+                field: 'datejoined',
+                visible: true
+            }, {
+                title: 'Unsubscribed',
+                field: 'unsubscribed',
+                visible: true
+            }];
+
+            // var Api = data;
+            // console.log("Api: ", Api);
+            // var data = [];
+            // for (var i = 0; i < 30; i++) {
+            //     data.push({
+            //         datejoined: new Date,
+            //         email: 'sa@dfaf.co',
+            //         unsubscribed: false,
+            //         userkarma: '80'
+            //     })
+            // };
+            // console.log("data: ", data);
+            
+            /*
+            Reference: http://plnkr.co/edit/dtlKAHwy99jdnWVU0pc8?p=preview
+             */
+            $scope.refreshTable = function () {
+                console.log('\n\n refreshing table')
+                $scope['tableParams'] = {
+                    reload: function () {},
+                    settings: function () {
+                        return {}
+                    }
+                };
+                $timeout(setTable, 100)
+            };
+            $scope.refreshTable();
+
+            function setTable(arguments) {
+
+                $scope.tableParams = new ngTableParams({
+                    page: 1, // show first page
+                    count: 10, // count per page
+                    filter: {
+                        name: '' // initial filter
+                    },
+                    sorting: {
+                        name: 'asc'
+                    }
+                }, {
+                    filterSwitch: true,
+                    total: $scope.users.length, // length of data
+                    getData: function ($defer, params) {
+                        // var filteredData = params.filter() ? $filter(
+                        //     'filter')(data, params.filter()) :
+                        //     data;
+                        console.log(
+                            '\n\nngTable getData called now')
+                        var orderedData = params.sorting() ?
+                            $filter('orderBy')($scope.users,
+                                params.orderBy()) :
+                            data;
+                        params.total(orderedData.length);
+                        $defer.resolve(orderedData.slice((params.page() -
+                                1) * params.count(), params.page() *
+                            params.count()));
+                    }
+                });
+            }
+
+            /*$scope.tableParams = new ngTableParams({
                 page: 1, 
                     count: 10, // count per page
                     filter: {
@@ -735,7 +801,53 @@ angular.module('do.users', [])
                             params.page() *
                             params.count()));
                     }
-                });
+                });*/
+
+            /*var requestParams = {
+                count: 10,
+                page: 1,
+                sorting: {
+                    name: "asc"
+                }
+            };
+            var params = new ngTableParams(requestParams);
+            data = params.filter() ? $filter('filter')(data, params.filter()) :
+                data;
+            data = params.sorting() ? $filter('orderBy')(data, params.orderBy()) :
+                data;
+
+            var total = data.length;
+            data = data.slice((params.page() - 1) * params.count(),
+                params.page() * params.count());
+
+            var Api = {
+                result: data,
+                total: total
+            };
+
+            console.log("APi: ", Api);
+            $scope.tableParams = new ngTableParams({
+                page: 1, // show first page
+                count: 10, // count per page
+                sorting: {
+                    name: 'asc' // initial sorting
+                }
+            }, {
+                total: 0, // length of data
+                getData: function ($defer, params) {
+                    // ajax request to api
+                    Api.get(params.url(), function (data) {
+                        $timeout(function () {
+                            // update table params
+                            params.total(data.total);
+                            // set new data
+                            $defer.resolve(data.result);
+                        }, 500);
+                    });
+                }
+            });*/
+
+
 
 
             $scope.currentPage = 0;
