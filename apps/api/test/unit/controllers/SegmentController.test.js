@@ -1,4 +1,4 @@
-describe('Resource /apps/:aid/automessages', function () {
+describe('Resource /apps/:aid/segments', function () {
 
   var randomId = '532d6bf862d673ba7131812a';
   var aid;
@@ -8,17 +8,17 @@ describe('Resource /apps/:aid/automessages', function () {
   before(function (done) {
     setupTestDb(function (err) {
       aid = saved.apps.first._id;
-      url = '/apps/' + aid + '/automessages';
+      url = '/apps/' + aid + '/segments';
       done(err);
     });
   });
 
 
-  describe('POST /apps/:aid/automessages', function () {
+  describe('POST /apps/:aid/segments', function () {
 
     var savedMsg;
 
-    var newAutoMsg = {};
+    var newSegment = {};
 
     before(function (done) {
       logoutUser(done);
@@ -49,62 +49,41 @@ describe('Resource /apps/:aid/automessages', function () {
         loginUser(done);
       });
 
-    it('should return error if aid/body/creator/sid/title/type is not present',
-      function (done) {
 
-        request
-          .post(url)
-          .set('cookie', loginCookie)
-          .send({})
-          .expect('Content-Type', /json/)
-          .expect(400)
-          .expect({
-            "error": [
-              "type is required",
-              "title is required",
-              "sid is required",
-              "creator is required",
-              "body is required",
-              "aid is required"
-            ],
-            "status": 400
-          })
-          .end(done);
-
-      });
-
-
-    it('should create new automessage',
+    it('should create new segment',
 
       function (done) {
 
-        var newAutoMsg = {
+        var newSegment = {
           aid: randomId,
-          body: 'Hey, Welkom to CabanaLand!',
-          creator: randomId,
-          sid: randomId,
-          sub: 'Welkom!',
-          title: 'Welcome Message',
-          type: 'email'
+          list: 'users',
+          op: 'and',
+          filters: [
+
+            {
+              method: 'count',
+              name: 'Create Notification',
+              type: 'feature',
+              val: 'hello'
+            }
+
+          ]
         };
 
         request
           .post(url)
           .set('cookie', loginCookie)
-          .send(newAutoMsg)
+          .send(newSegment)
           .expect('Content-Type', /json/)
           .expect(201)
           .expect(function (res) {
             savedMsg = res.body;
 
             expect(savedMsg)
-              .to.have.property("creator", newAutoMsg.creator);
+              .to.have.property("creator", newSegment.creator);
 
             expect(savedMsg)
-              .to.have.property("type", newAutoMsg.email);
-
-            expect(savedMsg)
-              .to.have.property("aid", newAutoMsg.aid.toString());
+              .to.have.property("aid", newSegment.aid.toString());
 
           })
           .end(done);
@@ -114,7 +93,7 @@ describe('Resource /apps/:aid/automessages', function () {
   });
 
 
-  describe('GET /apps/:aid/automessages', function () {
+  describe('GET /apps/:aid/segments', function () {
 
 
     before(function (done) {
@@ -147,7 +126,7 @@ describe('Resource /apps/:aid/automessages', function () {
       });
 
 
-    it('fetches all automessages belonging to app',
+    it('fetches all segments belonging to app',
 
       function (done) {
 
@@ -170,15 +149,15 @@ describe('Resource /apps/:aid/automessages', function () {
 
   });
 
-  describe('GET /apps/:aid/automessages/:amId', function () {
+  describe('GET /apps/:aid/segments/:sid', function () {
 
-    var savedAutoMessageId;
+    var savedSegmentId;
     var testUrl;
 
     before(function (done) {
       logoutUser(function (err) {
-        savedAutoMessageId = saved.automessages.first._id;
-        testUrl = url + '/' + savedAutoMessageId;
+        savedSegmentId = saved.segments.first._id;
+        testUrl = url + '/' + savedSegmentId;
         done(err);
       });
     });
@@ -203,7 +182,7 @@ describe('Resource /apps/:aid/automessages', function () {
       });
 
 
-    it('fetches automessage with given id',
+    it('fetches segment with given id',
 
       function (done) {
 
@@ -215,8 +194,11 @@ describe('Resource /apps/:aid/automessages', function () {
             expect(res.body)
               .to.not.be.empty;
 
-            expect(res.body.title)
-              .to.eql('Welcome Message');
+            expect(res.body.filters)
+              .to.be.an('array');
+
+            expect(res.body.filters)
+              .to.have.length(1);
           })
           .expect(200)
           .end(done);

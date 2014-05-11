@@ -50,6 +50,7 @@ module.exports.dashboard = function loadDashboardRoutes(app) {
   app.use('/apps', routes.ConversationController);
   app.use('/apps', routes.AutoMessageController);
   app.use('/apps', routes.QueryController);
+  app.use('/apps', routes.SegmentController);
   app.use('/auth', routes.AuthController);
   app.use('/mandrill', routes.MandrillController);
 

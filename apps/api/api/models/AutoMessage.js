@@ -75,6 +75,14 @@ var AutoMessageSchema = new Schema({
   },
 
 
+  // segment id
+  sid: {
+    type: Schema.Types.ObjectId,
+    ref: 'Segment',
+    required: [true, 'Invalid segment id']
+  },
+
+
   // subject (for email type)
   sub: {
     type: String,
