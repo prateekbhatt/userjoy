@@ -26,7 +26,7 @@ This app contains an expressjs api which exposes a rest interface for the db.
 | p     | path (event url)      |
 | pl    | platform              |
 | seId  | segment id            |
-| sid   | session id            |
+| sid   | segment id            |
 | sname | sender name (message) |
 | sub   | email subject         |
 | t     | type (event)          |
@@ -265,6 +265,7 @@ User          | companies, notes        | users of a specific app. create a new 
 ##### Columns:
 
  - aid
+ - creator (account id)
  - ct
  - ut
  - list
@@ -309,6 +310,7 @@ User          | companies, notes        | users of a specific app. create a new 
 - replied
 - seen
 - sent
+- sid
 - sub (for email type)
 - title (required)
 - type (email / notification) (required)

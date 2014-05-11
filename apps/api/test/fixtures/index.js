@@ -22,6 +22,7 @@ var App = require('../../api/models/App');
 var AutoMessage = require('../../api/models/AutoMessage');
 var Conversation = require('../../api/models/Conversation');
 var Message = require('../../api/models/Message');
+var Segment = require('../../api/models/Segment');
 var User = require('../../api/models/User');
 
 
@@ -115,12 +116,31 @@ var accounts = {
     }
   };
 
+var segments = {
+  first: {
+    aid: null,
+    creator: null,
+    list: 'users',
+    op: 'and',
+    filters: [
+
+      {
+        method: 'hasdone',
+        type: 'feature',
+        name: 'Create Notification'
+      }
+
+    ]
+  }
+};
+
 var automessages = {
 
   first: {
     aid: null,
     body: 'Hey, Welkom to CabanaLand!',
     creator: null,
+    sid: null,
     sub: 'Welkom!',
     title: 'Welcome Message',
     type: 'email'
@@ -128,61 +148,71 @@ var automessages = {
 };
 
 
-  function createAccount(account, fn) {
+function createAccount(account, fn) {
 
-    var rawPassword = account.password;
-    Account.create(account, function (err, acc) {
-      if (err) return fn(err);
-      acc.password = rawPassword;
-      fn(null, acc);
-    });
+  var rawPassword = account.password;
+  Account.create(account, function (err, acc) {
+    if (err) return fn(err);
+    acc.password = rawPassword;
+    fn(null, acc);
+  });
 
-  }
+}
 
-  function createApp(accid, app, fn) {
+function createApp(accid, app, fn) {
 
-    app.team = [];
-    app.team.push({
-      accid: accid,
-      admin: true
-    });
+  app.team = [];
+  app.team.push({
+    accid: accid,
+    admin: true
+  });
 
-    App.create(app, fn);
+  App.create(app, fn);
 
-  }
-
-
-  function createUser(aid, user, fn) {
-    user.aid = aid;
-    User.create(user, fn);
-  }
+}
 
 
-  function createConversation(accid, aid, uid, con, fn) {
-    con.accId = accid;
-    con.aid = aid;
-    con.uid = uid;
-    Conversation.create(con, fn);
-  }
-
-  function createMessage(accid, aid, coId, uid, message, fn) {
-
-    message.accid = accid;
-    message.aid = aid;
-    message.coId = coId;
-    message.uid = uid;
-    Message.create(message, fn);
-
-  }
+function createUser(aid, user, fn) {
+  user.aid = aid;
+  User.create(user, fn);
+}
 
 
-  function createAutoMessage(accid, aid, automessage, fn) {
+function createConversation(accid, aid, uid, con, fn) {
+  con.accId = accid;
+  con.aid = aid;
+  con.uid = uid;
+  Conversation.create(con, fn);
+}
 
-    automessage.creator = accid;
-    automessage.aid = aid;
+function createMessage(accid, aid, coId, uid, message, fn) {
 
-    AutoMessage.create(automessage, fn);
-  }
+  message.accid = accid;
+  message.aid = aid;
+  message.coId = coId;
+  message.uid = uid;
+  Message.create(message, fn);
+
+}
+
+
+function createAutoMessage(accid, aid, sid, automessage, fn) {
+
+  automessage.creator = accid;
+  automessage.aid = aid;
+  automessage.sid = sid;
+
+  AutoMessage.create(automessage, fn);
+}
+
+
+function createSegment(accid, aid, segment, fn) {
+
+  segment.creator = accid;
+  segment.aid = aid;
+
+  Segment.create(segment, fn);
+}
 
 
 module.exports = function loadFixtures(callback) {
@@ -308,13 +338,29 @@ module.exports = function loadFixtures(callback) {
     },
 
 
+    createFirstSegment: function (cb) {
+
+      var aid = apps.first._id;
+      var accid = accounts.first._id;
+      var segment = segments.first;
+
+      createSegment(accid, aid, segment, function (err, seg) {
+        if (err) return cb(err);
+        segments.first = seg;
+        cb();
+      });
+
+    },
+
+
     createFirstAutoMessage: function (cb) {
 
       var aid = apps.first._id;
       var accid = accounts.first._id;
+      var sid = segments.first._id;
       var automessage = automessages.first;
 
-      createAutoMessage(accid, aid, automessage, function (err, amsg) {
+      createAutoMessage(accid, aid, sid, automessage, function (err, amsg) {
         if (err) return cb(err);
         automessages.first = amsg;
         cb();
@@ -330,6 +376,7 @@ module.exports = function loadFixtures(callback) {
       automessages: automessages,
       conversations: conversations,
       messages: messages,
+      segments: segments,
       users: users
     };
 

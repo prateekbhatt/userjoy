@@ -10,7 +10,8 @@
 var _ = require('lodash');
 var async = require('async');
 var mongoose = require('mongoose');
-var troop = require('mongoose-troop');
+var validate = require('mongoose-validator')
+  .validate;
 
 var Schema = mongoose.Schema;
 
@@ -19,9 +20,25 @@ var Schema = mongoose.Schema;
  * validations
  */
 
+var EVENT_TYPES = ['pageview', 'feature'];
 var LIST_TYPES = ['users', 'companies'];
 var METHOD_TYPES = ['count', 'hasdone', 'hasnotdone', 'attr'];
 var OPERATOR_TYPES = ['or', 'and'];
+
+var methodValidator = [validate({
+    message: "Invalid filter method type",
+    passIfEmpty: true
+  },
+  'isIn', METHOD_TYPES
+)];
+
+
+var eventTypeValidator = [validate({
+    message: "Invalid filter method type",
+    passIfEmpty: true
+  },
+  'isIn', EVENT_TYPES
+)];
 
 
 /**
@@ -35,18 +52,20 @@ var SegmentFilterSchema = new Schema({
   method: {
     type: 'String',
     required: [true, 'Filter method is required'],
-    enum: METHOD_TYPES
+    validate: methodValidator
   },
 
 
   // event type
   type: {
-    type: String
+    type: String,
+    validate: eventTypeValidator
   },
 
 
   name: {
-    type: String
+    type: String,
+    required: [true, 'Name is required in segment filter']
   },
 
 
@@ -83,6 +102,14 @@ var SegmentSchema = new Schema({
   },
 
 
+  // account id of creator
+  creator: {
+    type: Schema.Types.ObjectId,
+    ref: 'Account',
+    required: [true, 'Invalid creator account id']
+  },
+
+
   // created at timestamp
   ct: {
     type: Date,
@@ -111,19 +138,25 @@ var SegmentSchema = new Schema({
 
   // updated at timestamp
   ut: {
-    type: Date,
-    default: Date.now
+    type: Date
   }
 
 });
 
 
 /**
+ * Validation to check if there is atleast one filter
  * Adds updated (ut) timestamps
  * Created timestamp (ct) is added by default
  */
 
 SegmentSchema.pre('save', function (next) {
+
+  // the segment should have atleast one filter
+  if (_.isEmpty(this.filters)) {
+    return next(new Error('Provide atleast one segment filter'));
+  }
+
   this.ut = new Date;
   next();
 });

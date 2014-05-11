@@ -19,7 +19,7 @@ describe('Model AutoMessage', function () {
   describe('#create', function () {
 
     it(
-      'should return error if aid/body/creator/title/type is not provided',
+      'should return error if aid/body/creator/sid/title/type is not provided',
       function (done) {
 
         var newAutoMsg = {};
@@ -31,7 +31,7 @@ describe('Model AutoMessage', function () {
 
           expect(Object.keys(err.errors)
             .length)
-            .to.eql(5);
+            .to.eql(6);
 
           expect(err.errors.aid.message)
             .to.eql('Invalid aid');
@@ -41,6 +41,9 @@ describe('Model AutoMessage', function () {
 
           expect(err.errors.creator.message)
             .to.eql('Invalid creator account id');
+
+          expect(err.errors.sid.message)
+            .to.eql('Invalid segment id');
 
           expect(err.errors.title.message)
             .to.eql('Provide automessage title');
@@ -63,6 +66,7 @@ describe('Model AutoMessage', function () {
         aid: randomId,
         body: 'Hey, Welkom to CabanaLand!',
         creator: randomId,
+        sid: randomId,
         sub: 'Welkom!',
         title: 'Welcome Message',
         type: 'email'
