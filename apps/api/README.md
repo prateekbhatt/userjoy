@@ -10,6 +10,7 @@ This app contains an expressjs api which exposes a rest interface for the db.
 | ----- | --------------------- |
 | accid | account id            |
 | aid   | app id                |
+| amId  | automessage id        |
 | br    | browser               |
 | brv   | browser version       |
 | ci    | city                  |
