@@ -643,8 +643,10 @@ angular.module('do.users', [])
 ])
 
 .controller('TableCtrl', ['$scope', '$filter', 'ngTableParams', '$modal',
-    'UidService',
-    function ($scope, $filter, ngTableParams, $modal, UidService) {
+    'UidService', '$moment', 'UserList',
+
+    function ($scope, $filter, ngTableParams, $modal, UidService, $moment,
+        UserList) {
 
         $scope.title = "Write Message";
         // $scope.content = "Hello Modal<br />This is a multiline message!";
@@ -666,184 +668,86 @@ angular.module('do.users', [])
             popupModal.hide();
         }*/
 
-        var data = [{
-            id: '1',
-            name: "Moroni",
-            email: 'a@b.com',
-            userkarma: 56,
-            datejoined: '3rd Aug',
-            status: 'risky'
-        }, {
-            id: '2',
-            name: "Tiancum",
-            email: 'a@b.com',
-            userkarma: 56,
-            datejoined: '3rd Aug',
-            status: 'risky'
-        }, {
-            id: '3',
-            name: "Jacob",
-            email: 'a@b.com',
-            userkarma: 56,
-            datejoined: '3rd Aug',
-            status: 'risky'
-        }, {
-            id: '4',
-            name: "Nephi",
-            email: 'a@b.com',
-            userkarma: 56,
-            datejoined: '3rd Aug',
-            status: 'risky'
-        }, {
-            id: '5',
-            name: "Enos",
-            email: 'a@b.com',
-            userkarma: 56,
-            datejoined: '3rd Aug',
-            status: 'risky'
-        }, {
-            id: '6',
-            name: "Tiancum",
-            email: 'a@b.com',
-            userkarma: 56,
-            datejoined: '3rd Aug',
-            status: 'risky'
-        }, {
-            id: '7',
-            name: "Jacob",
-            email: 'a@b.com',
-            userkarma: 56,
-            datejoined: '3rd Aug',
-            status: 'risky'
-        }, {
-            id: '8',
-            name: "Nephi",
-            email: 'a@b.com',
-            userkarma: 56,
-            datejoined: '3rd Aug',
-            status: 'risky'
-        }, {
-            id: '9',
-            name: "Enos",
-            email: 'a@b.com',
-            userkarma: 56,
-            datejoined: '3rd Aug',
-            status: 'risky'
-        }, {
-            id: '10',
-            name: "Tiancum",
-            email: 'a@b.com',
-            userkarma: 56,
-            datejoined: '3rd Aug',
-            status: 'risky'
-        }, {
-            id: '11',
-            name: "Jacob",
-            email: 'a@b.com',
-            userkarma: 56,
-            datejoined: '3rd Aug',
-            status: 'risky'
-        }, {
-            id: '12',
-            name: "Nephi",
-            email: 'a@b.com',
-            userkarma: 56,
-            datejoined: '3rd Aug',
-            status: 'risky'
-        }, {
-            id: '13',
-            name: "Enos",
-            email: 'a@b.com',
-            userkarma: 56,
-            datejoined: '3rd Aug',
-            status: 'risky'
-        }, {
-            id: '14',
-            name: "Tiancum",
-            email: 'a@b.com',
-            userkarma: 56,
-            datejoined: '3rd Aug',
-            status: 'risky'
-        }, {
-            id: '15',
-            name: "Jacob",
-            email: 'a@b.com',
-            userkarma: 56,
-            datejoined: '4th Aug',
-            status: 'risky'
-        }, {
-            id: '16',
-            name: "Nephi",
-            email: 'a@b.com',
-            userkarma: 56,
-            datejoined: '3rd Aug',
-            status: 'risky'
-        }, {
-            id: '17',
-            name: "Enos",
-            email: 'a@b.com',
-            userkarma: 56,
-            datejoined: '3rd Aug',
-            status: 'risky'
-        }];
-        $scope.columns = [{
-            title: '',
-            field: 'checkbox',
-            visible: true
-        }, {
-            title: 'Name',
-            field: 'name',
-            visible: true,
-            filter: {
-                'name': 'text'
-            }
-        }, {
-            title: 'Email',
-            field: 'email',
-            visible: true
-        }, {
-            title: 'User Karma',
-            field: 'userkarma',
-            visible: true
-        }, {
-            title: 'Date Joined',
-            field: 'datejoined',
-            visible: true
-        }, {
-            title: 'Status',
-            field: 'status',
-            visible: true
-        }];
-        $scope.tableParams = new ngTableParams({
-            page: 1, // show first page
-            count: 10, // count per page
-            filter: {
-                name: 'M' // initial filter
-            },
-            sorting: {
-                name: 'asc'
-            }
-        }, {
-            total: data.length, // length of data
-            getData: function ($defer, params) {
-                // use build-in angular filter
-                var filteredData = params.filter() ?
-                    $filter('filter')(data, params
-                        .filter()) :
-                    data;
-                var orderedData = params.sorting() ?
-                    $filter('orderBy')(data,
-                        params.orderBy()) :
-                    data;
-                params.total(orderedData.length); // set total for recalc paginationemail
+        $scope.data = [];
 
-                $defer.resolve(orderedData.slice((
-                        params.page() -
-                        1) * params.count(),
-                    params.page() *
-                    params.count()));
-            }
-        });
+        $scope.$watch(UserList.getUsers, function () {
+            for (var i = 0; i < UserList.getUsers()
+                .length; i++) {
+                $scope.data.push({
+                    id: UserList.getUsers()[i]._id,
+                    email: UserList.getUsers()[i].email,
+                    userkarma: UserList.getUsers()[i].healthScore,
+                    datejoined: moment(UserList.getUsers()[i].firstSessionAt)
+                        .format("MMMM Do YYYY"),
+                    unsubscribed: UserList.getUsers()[i].unsubscribed
+                })
+            };
+            $scope.columns = [{
+                    title: '',
+                    field: 'checkbox',
+                    visible: true
+                },
+                {
+                    title: 'Email',
+                    field: 'email',
+                    visible: true
+                }, {
+                    title: 'User Karma',
+                    field: 'userkarma',
+                    visible: true
+                }, {
+                    title: 'Date Joined',
+                    field: 'datejoined',
+                    visible: true
+                }, {
+                    title: 'Unsubscribed',
+                    field: 'unsubscribed',
+                    visible: true
+                }
+            ];
+
+            $scope.tableParams = new ngTableParams({
+                page: 1, 
+                    count: 10, // count per page
+                    filter: {
+                        name: 'M' // initial filter
+                    },
+                    sorting: {
+                        name: 'asc'
+                    }
+                }, {
+                    total: $scope.data.length, // length of data
+                    getData: function ($defer, params) {
+                        // use build-in angular filter
+                        var filteredData = params.filter() ?
+                            $filter('filter')($scope.data, params
+                                .filter()) :
+                            data;
+                        var orderedData = params.sorting() ?
+                            $filter('orderBy')($scope.data,
+                                params.orderBy()) :
+                            $scope.data;
+                        params.total(orderedData.length); // set total for recalc paginationemail
+
+                        $defer.resolve(orderedData.slice((
+                                params.page() -
+                                1) * params.count(),
+                            params.page() *
+                            params.count()));
+                    }
+                });
+
+
+            $scope.currentPage = 0;
+            $scope.pageSize = 20;
+
+
+            /*$scope.numberOfPages = function () {
+                return Math.ceil($scope.data.length / $scope.pageSize);
+            }*/
+        })
+
+
 
         $scope.checkboxes = {
             'checked': false,

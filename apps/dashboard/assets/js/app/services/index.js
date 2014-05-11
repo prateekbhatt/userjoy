@@ -10,4 +10,5 @@ angular.module('services', [
     'services.UidService',
     'services.ThreadService',
     'services.saveMsgService',
+    'services.UserList',
 ]);
