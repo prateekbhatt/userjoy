@@ -31,6 +31,13 @@ var logger = require('../../helpers/logger');
 
 
 /**
+ * Services
+ */
+
+var automessage = require('../services/automessage');
+
+
+/**
  * All routes on /apps
  * need to be authenticated
  */
@@ -67,7 +74,7 @@ router
       .find({
         aid: aid
       })
-      .exec(function(err, automessages) {
+      .exec(function (err, automessages) {
         if (err) return next(err);
         res
           .status(200)
@@ -78,7 +85,7 @@ router
 
 
 /**
- * GET /apps/:aid/automessages/:tid
+ * GET /apps/:aid/automessages/:amId
  *
  * Returns a automessage
  */
@@ -92,7 +99,7 @@ router
 
     AutoMessage
       .findById(amId)
-      .exec(function(err, automsg) {
+      .exec(function (err, automsg) {
         if (err) return next(err);
         res
           .status(200)
@@ -129,6 +136,50 @@ router
       });
 
   });
+
+
+/**
+ * PUT /apps/:aid/automessages/:amId/send
+ *
+ * Sends a test automessage
+ */
+
+router
+  .route('/:aid/automessages/:amId/send-test')
+  .put(function (req, res, next) {
+
+    var aid = req.params.aid;
+    var amId = req.params.amId;
+    var isTest = req.body.test || false;
+    var toEmail = req.user.email;
+    var toName = req.user.name || toEmail;
+
+    var to = [];
+    to.push({
+      name: toName,
+      email: toEmail
+    });
+
+    automessage(aid, amId, to, function (err, responseStatus) {
+
+      if (err) {
+
+        if (err.message === 'Message not found') {
+          return res.notFound(err.message);
+        }
+
+        return next(err);
+      }
+
+      res
+        .status(200)
+        .json({
+          message: 'Message is queued'
+        });
+
+
+    });
+  })
 
 
 module.exports = router;
