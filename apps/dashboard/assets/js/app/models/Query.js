@@ -1,7 +1,7 @@
 angular.module('models.Query', ['services'])
 
-.service('modelsQuery', ['$http', 'config', 'eventNames', 'userAttributes', 
-    function ($http, config, eventNames, userAttributes) {
+.service('modelsQuery', ['$http', 'config', 'eventNames', 'userAttributes', 'UserList',
+    function ($http, config, eventNames, userAttributes, UserList) {
         this.getQueries = function (appId, callback) {
 
             var url = config.apiUrl + '/apps/' + appId +
@@ -22,6 +22,7 @@ angular.module('models.Query', ['services'])
                 queryObj)
                 .success(function (data) {
                     console.log("success in running query: ", data);
+                    UserList.setUsers(data);
                 })
                 .error(function () {
                     console.log("error");
