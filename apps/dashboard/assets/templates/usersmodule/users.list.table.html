@@ -24,59 +24,59 @@
 <div class="panel panel-default ">
     <div class="container">
         <div class="row">
-            <!-- <table ng-table="tableParams" show-filter="true" class="table">
+            <table ng-table="tableParams" show-filter="true" class="table">
                 <thead>
-                        <tr>
-                                <th ng-repeat="column in columns" ng-show="column.visible"
-                                        class="text-center" ng-class="{
-                                        'sort-asc': tableParams.isSortBy(column.field, 'asc'),
-                                        'sort-desc': tableParams.isSortBy(column.field, 'desc'),
-                                        'sortable': !$first
-                                        }"
-                                        ng-click="tableParams.sorting(column.field, tableParams.isSortBy(column.field, 'asc') ? 'desc' : 'asc')">
-                                        <div>{{column.title}}</div>
-                                </th>
-                        </tr>
-                        
-                </thead>
-                <tr ng-repeat="user in data | filter:searchText">
-                        
-                        <td width="30" style="text-align: left">
-                                <input type="checkbox" ng-model="checkboxes.items[user.id]" />
-                        </td>
-                        
-                        <td data-title="'Email Id'" class="text-center" sortable="email" ng-show="columns[1].visible">
-                                <span>{{user.email}}</span>
-                        </td>
-                        <td data-title="'User Karma'" class="text-center" sortable="userkarma" ng-show="columns[2].visible">
-                                <span>{{user.userkarma}}</span>
-                        </td>
-                        <td data-title="'Date Joined'" class="text-center" sortable="datejoined" ng-show="columns[3].visible">
-                                <span>{{user.datejoined}}</span>
-                        </td>
-                        <td data-title="'Unsubscribed'" class="text-center" sortable="status" ng-show="columns[4].visible">
-                                <span>{{user.unsubscribed}}</span>
-                        </td>
-                </tr>
-            </table> -->
-            <table id="mytable" class="table table-bordred table-striped">
-                <thead>
-                    <th ng-repeat="column in columns" class="text-center">{{column.title}}</th>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="user in data | startFrom:currentPage*pageSize | limitTo:pageSize" class="text-center">
-                        <td><input type="checkbox" class="checkthis" /></td>
-                        <td>{{user.email}}</td>
-                        <td>{{user.userkarma}}</td>
-                        <td>{{user.datejoined}}</td>
-                        <td>{{user.unsubscribed}}</td>
+                    <tr>
+                        <th ng-repeat="column in columns" ng-show="column.visible"
+                            class="text-center" ng-class="{
+                            'sort-asc': tableParams.isSortBy(column.field, 'asc'),
+                            'sort-desc': tableParams.isSortBy(column.field, 'desc'),
+                            'sortable': !$first
+                            }"
+                            ng-click="tableParams.sorting(column.field, tableParams.isSortBy(column.field, 'asc') ? 'desc' : 'asc')">
+                            <div>{{column.title}}</div>
+                        </th>
                     </tr>
-                </tbody>
+
+                </thead>
+                <tr ng-repeat="user in $data">
+
+                    <td width="30" style="text-align: left">
+                        <input type="checkbox" ng-model="checkboxes.items[user.id]" />
+                    </td>
+
+                    <td data-title="'Email Id'" class="text-center" sortable="email" ng-show="columns[1].visible">
+                        <span>{{user.email}}</span>
+                    </td>
+                    <td data-title="'User Karma'" class="text-center" sortable="userkarma" ng-show="columns[2].visible">
+                        <span>{{user.userkarma}}</span>
+                    </td>
+                    <td data-title="'Date Joined'" class="text-center" sortable="datejoined" ng-show="columns[3].visible">
+                        <span>{{user.datejoined}}</span>
+                    </td>
+                    <td data-title="'Unsubscribed'" class="text-center" sortable="status" ng-show="columns[4].visible">
+                        <span>{{user.unsubscribed}}</span>
+                    </td>
+                </tr>
             </table>
-            <ul class="pager">
+            <!-- <table id="mytable" class="table table-bordred table-striped">
+                                <thead>
+                                        <th ng-repeat="column in columns" class="text-center">{{column.title}}</th>
+                                </thead>
+                                <tbody>
+                                        <tr ng-repeat="user in data | startFrom:currentPage*pageSize | limitTo:pageSize" class="text-center">
+                                                <td><input type="checkbox" class="checkthis" /></td>
+                                                <td>{{user.email}}</td>
+                                                <td>{{user.userkarma}}</td>
+                                                <td>{{user.datejoined}}</td>
+                                                <td>{{user.unsubscribed}}</td>
+                                        </tr>
+                                </tbody>
+            </table> -->
+            <!-- <ul class="pager">
                 <li ng-disabled="currentPage == 0" ng-click="currentPage=currentPage-1"><a href="#">Previous</a></li>
                 <li ng-disabled="currentPage >= data.length/pageSize - 1" ng-click="currentPage=currentPage+1"><a href="#">Next</a></li>
-            </ul>
+            </ul> -->
             <script type="text/ng-template" id="ng-table/headers/checkbox.html">
                 <input type="checkbox" ng-model="checkboxes.checked" id="select_all" name="filter-checkbox" value="" />
             </script>
