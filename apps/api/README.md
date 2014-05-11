@@ -303,6 +303,7 @@ User          | companies, notes        | users of a specific app. create a new 
 
 ##### Columns:
 
+- active (boolean)
 - aid (required)
 - body (required)
 - clicked

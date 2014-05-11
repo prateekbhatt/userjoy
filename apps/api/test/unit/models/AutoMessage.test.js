@@ -121,6 +121,12 @@ describe('Model AutoMessage', function () {
     });
 
 
+    it('should set active status to false by default', function () {
+      expect(savedAutoMessage)
+        .to.have.property('active', false);
+    });
+
+
     it('should set clicked/replied/seen/sent values as 0', function () {
 
       expect(savedAutoMessage.clicked)
