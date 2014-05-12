@@ -139,7 +139,7 @@ router
 
 
 /**
- * PUT /apps/:aid/automessages/:amId/send
+ * PUT /apps/:aid/automessages/:amId/send-test
  *
  * Sends a test automessage
  */
@@ -180,6 +180,64 @@ router
 
     });
   })
+
+
+/**
+ * PUT /apps/:aid/automessages/:amId/active/:status
+ *
+ * status should be either true or false
+ *
+ * Updates active status of automessage
+ */
+
+router
+  .route('/:aid/automessages/:amId/active/:status?')
+  .put(function (req, res, next) {
+
+    var aid = req.params.aid;
+    var amId = req.params.amId;
+    var status = req.params.status;
+
+    if (!_.contains(['true', 'false'], status)) {
+      return res.badRequest('Active status should be either true or false');
+    }
+
+
+    async.waterfall(
+      [
+
+        function findAutoMessage(cb) {
+          AutoMessage.findOne({
+            _id: amId,
+            aid: aid
+          }, function (err, amsg) {
+            if (err) return cb(err);
+            if (!amsg) return cb(new Error('AutoMessage not found'));
+            cb(null, amsg);
+          });
+        },
+
+        function updateActiveStatus(amsg, cb) {
+          amsg.active = status;
+          amsg.save(cb);
+        }
+      ],
+
+      function (err, amsg) {
+        if (err) {
+          if (err.message === 'AutoMessage not found') {
+            return res.notFound(err.message);
+          }
+          return next(err);
+        }
+
+        res
+          .status(200)
+          .json(amsg);
+      }
+    );
+
+  });
 
 
 module.exports = router;
