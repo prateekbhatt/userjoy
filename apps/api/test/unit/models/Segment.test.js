@@ -20,37 +20,41 @@ describe('Model Segment', function () {
   describe('#create', function () {
 
 
-    it('should return error if aid/creator/list/op not provided', function (done) {
+    it('should return error if aid/creator/list/name/op not provided',
+      function (done) {
 
-      var newSegment = {};
+        var newSegment = {};
 
-      Segment.create(newSegment, function (err, seg) {
+        Segment.create(newSegment, function (err, seg) {
 
-        expect(err)
-          .to.exist;
+          expect(err)
+            .to.exist;
 
-        expect(Object.keys(err.errors)
-          .length)
-          .to.eql(4);
+          expect(Object.keys(err.errors)
+            .length)
+            .to.eql(5);
 
-        expect(err.errors.aid.message)
-          .to.eql('Invalid aid');
+          expect(err.errors.aid.message)
+            .to.eql('Invalid aid');
 
-        expect(err.errors.creator.message)
-          .to.eql('Invalid creator account id');
+          expect(err.errors.creator.message)
+            .to.eql('Invalid creator account id');
 
-        expect(err.errors.list.message)
-          .to.eql('Invalid list');
+          expect(err.errors.list.message)
+            .to.eql('Invalid list');
 
-        expect(err.errors.op.message)
-          .to.eql('Invalid operator');
+          expect(err.errors.name.message)
+            .to.eql('Invalid segment name');
 
-        expect(seg)
-          .not.to.exist;
+          expect(err.errors.op.message)
+            .to.eql('Invalid operator');
 
-        done();
+          expect(seg)
+            .not.to.exist;
+
+          done();
+        });
       });
-    });
 
 
     it('should return error if no filters are provided', function (done) {
@@ -59,6 +63,7 @@ describe('Model Segment', function () {
         aid: randomId,
         creator: randomId,
         list: 'users',
+        name: 'New Segment',
         op: 'and'
       };
 
@@ -87,6 +92,7 @@ describe('Model Segment', function () {
           aid: randomId,
           creator: randomId,
           list: 'users',
+          name: 'New Segment',
           op: 'and',
           filters: [
 
@@ -127,13 +133,14 @@ describe('Model Segment', function () {
           aid: randomId,
           creator: randomId,
           list: 'users',
+          name: 'New Segment',
           op: 'and',
           filters: [
 
             {
               method: 'count',
               name: 'Create Notification',
-              type:'random',
+              type: 'random',
               val: 'hello'
             }
 
@@ -165,6 +172,7 @@ describe('Model Segment', function () {
         aid: randomId,
         creator: randomId,
         list: 'users',
+        name: 'New Segment',
         op: 'and',
         filters: [
 
