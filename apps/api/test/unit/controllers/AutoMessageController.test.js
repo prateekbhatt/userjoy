@@ -25,22 +25,20 @@ describe('Resource /apps/:aid/automessages', function () {
     });
 
 
-    it('returns error if not logged in',
+    it('returns error if not logged in', function (done) {
 
-      function (done) {
+      request
+        .post(url)
+        .send({})
+        .expect('Content-Type', /json/)
+        .expect(401)
+        .expect({
+          status: 401,
+          error: 'Unauthorized'
+        })
+        .end(done);
 
-        request
-          .post(url)
-          .send({})
-          .expect('Content-Type', /json/)
-          .expect(401)
-          .expect({
-            status: 401,
-            error: 'Unauthorized'
-          })
-          .end(done);
-
-      });
+    });
 
 
     it('logging in user',
@@ -49,7 +47,8 @@ describe('Resource /apps/:aid/automessages', function () {
         loginUser(done);
       });
 
-    it('should return error if aid/body/creator/sid/title/type is not present',
+    it(
+      'should return error if aid/body/creator/sid/title/type is not present',
       function (done) {
 
         request
@@ -258,5 +257,54 @@ describe('Resource /apps/:aid/automessages', function () {
       });
   });
 
+
+  describe('PUT /apps/:aid/automessages/:amId/send-test', function () {
+
+    var savedAutoMessageId;
+    var testUrl;
+
+    before(function (done) {
+      logoutUser(function (err) {
+        savedAutoMessageId = saved.automessages.first._id;
+        testUrl = url + '/' + savedAutoMessageId + '/send-test';
+        done(err);
+      });
+    });
+
+
+    it('returns error if not logged in',
+
+      function (done) {
+
+        request
+          .put(testUrl)
+          .expect('Content-Type', /json/)
+          .expect(401)
+          .end(done);
+      });
+
+
+    it('logging in user',
+
+      function (done) {
+        loginUser(done);
+      });
+
+
+    it('should send automessage to the user', function (done) {
+
+      request
+        .put(testUrl)
+        .set('cookie', loginCookie)
+        .expect('Content-Type', /json/)
+        .expect({
+          message: 'Message is queued'
+        })
+        .expect(200)
+        .end(done);
+
+    });
+
+  });
 
 });
