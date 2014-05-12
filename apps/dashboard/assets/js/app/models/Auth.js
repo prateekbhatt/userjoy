@@ -43,7 +43,7 @@ angular.module('models.auth', ['services'])
                             if (AppService.getLoggedInApps()
                                 .length) {
                                 console.log(AppService.getLoggedInApps());
-                                $state.go('users.list');
+                                $state.go('list');
                             } else {
                                 $state.go('onboarding');
                             }

@@ -22,14 +22,14 @@ angular.module('do.users', [])
                 },
                 authenticate: true
             })
-            .state('users.list', {
-                url: '/list',
+            .state('list', {
+                url: '/users/list',
                 views: {
-                    "panel": {
+                    "main": {
                         templateUrl: '/templates/usersmodule/users.list.html',
                         controller: 'UserListCtrl'
                     },
-                    "table": {
+                    "panel": {
                         templateUrl: '/templates/usersmodule/users.list.table.html',
                         controller: 'TableCtrl'
                     }
@@ -270,11 +270,13 @@ angular.module('do.users', [])
     'queryMatching', '$filter', 'countOfActions', 'hasNotDone',
     'hasDoneActions', 'ngTableParams', 'login', 'modelsQuery',
     'AppService', 'segment', 'queryMatching', 'eventNames',
-    'userAttributes', 'lodash',
+    'userAttributes', 'lodash', '$modal',
+    'UidService', '$moment', 'UserList', '$timeout', 'modelsSegment',
     function ($scope, $location, segment, queryMatching, $filter,
         countOfActions, hasNotDone, hasDoneActions,
         ngTableParams, login, modelsQuery, AppService, segment,
-        queryMatching, eventNames, userAttributes, lodash) {
+        queryMatching, eventNames, userAttributes, lodash, $modal,
+        UidService, $moment, UserList, $timeout, modelsSegment) {
 
         var _ = lodash;
 
@@ -575,12 +577,12 @@ angular.module('do.users', [])
                 }
             }
 
-            $scope.filtersBackend = [];
 
             $scope.queryObj = {};
 
 
             $scope.runQuery = function () {
+                $scope.filtersBackend = [];
                 console.log("run Query: ", $scope.filters);
                 for (var i = 0; i < $scope.filters.length; i++) {
                     $scope.filtersBackend.push({
@@ -596,11 +598,67 @@ angular.module('do.users', [])
                 $scope.queryObj.list = $scope.selectedIcon.toLowerCase();
                 $scope.queryObj.op = '$' + $scope.text.toLowerCase();
                 $scope.queryObj.filters = $scope.filtersBackend;
+
+                var stringifiedQuery = stringify($scope.queryObj);
                 console.log('queryObj', $scope.queryObj);
+                console.log('stringifiedQuery', stringifiedQuery);
 
                 modelsQuery.runQueryAndGetUsers(AppService.getCurrentApp()
-                    ._id, stringify($scope.queryObj));
+                    ._id, stringifiedQuery);
             }
+
+            // var myPopover = $popover({
+            //     scope: $scope,
+            //     template: '/templates/usersmodule/save.segments.html',
+            //     show: false
+            // });
+            $scope.saveQuery = function () {
+                // myPopover.show();
+                $scope.showPopover = !$scope.showPopover;
+            }
+
+            $scope.closePopover = function () {
+                $scope.showPopover = false;
+            }
+
+            $scope.createSegmentObj = {};
+console.log("segment Name: ", $scope.segmentName);
+            $scope.createSegment = function () {
+                $scope.filtersBackend = [];
+                console.log("create segment: ", $scope.filters);
+                for (var i = 0; i < $scope.filters.length; i++) {
+                    $scope.filtersBackend.push({
+                        method: $scope.filters[i].method,
+                        type: 'feature',
+                        name: $scope.filters[i].name,
+                        op: $scope.filters[i].op,
+                        val: $scope.filters[i].val
+
+                    })
+                };
+                $scope.createSegmentObj.list = $scope.selectedIcon.toLowerCase();
+                $scope.createSegmentObj.name = $scope.segmentName;
+                $scope.createSegmentObj.op = $scope.text.toLowerCase();
+                $scope.createSegmentObj.filters = $scope.filtersBackend;
+                console.log("createSegmentObj: ", $scope.createSegmentObj);
+
+                modelsSegment.createSegment(AppService.getCurrentApp()._id, $scope.createSegmentObj);
+
+
+            }
+
+            // $scope.popover = {
+            //     "title": "Title",
+            //     "content": "Hello Popover<br />This is a multiline message!"
+            // };
+
+
+
+            /* $scope.popover = {
+                "title": "Title",
+                "content": "Hello Popover<br />This is a multiline message!",
+                "saved": true
+            };*/
 
             $scope.showErr = false;
             $scope.errMsg = 'Enter the outlined fields';
@@ -620,11 +678,8 @@ angular.module('do.users', [])
                         'count') {
                         console.log("val: ", $scope.filters[i].val);
                         $scope.showErr = true;
-                        // $scope.isErr = 'error';
-                        // console.log("error class", $scope.isErr);
                     } else {
                         $scope.showErr = false;
-                        // $scope.isErr = '';
                     }
                 };
             }
@@ -638,18 +693,7 @@ angular.module('do.users', [])
         modelsQuery.getQueries(AppService.getCurrentApp()
             ._id, fillData);
 
-
-    }
-])
-
-.controller('TableCtrl', ['$scope', '$filter', 'ngTableParams', '$modal',
-    'UidService', '$moment', 'UserList', '$timeout',
-
-    function ($scope, $filter, ngTableParams, $modal, UidService, $moment,
-        UserList, $timeout) {
-
         $scope.title = "Write Message";
-        // $scope.content = "Hello Modal<br />This is a multiline message!";
 
         var popupModal = $modal({
             scope: $scope,
@@ -657,23 +701,52 @@ angular.module('do.users', [])
             show: false
         });
 
+        $scope.mail = [];
         $scope.openModal = function () {
             popupModal.show();
-            console.log(_.keys($scope.checkboxes.items));
-            UidService.set(_.keys($scope.checkboxes.items));
+            console.log("checkboxes items: ", $scope.checkboxes.items);
+            /*Object.keys(obj)
+                .forEach(function (key) {
+                    f(key, obj[key])
+                });*/
+            var prop, value;
+            var keys = Object.keys($scope.checkboxes.items);
+            for (var i = 0; i < Object.keys($scope.checkboxes.items)
+                .length; i++) {
+                prop = keys[i];
+                console.log("id: ", prop);
+                value = $scope.checkboxes.items[prop];
+                console.log("value: ", value);
+                if (value) {
+                    $scope.mail[i] = prop;
+                }
+            };
+            console.log("email objects: ", $scope.mail);
+            UidService.set($scope.mail);
 
         };
 
-        /*$scope.hideModal = function () {
-            popupModal.hide();
-        }*/
 
         var data = [];
         $scope.users = []
 
-        $scope.$watch(UserList.getUsers, function () {
+        $scope.checkboxes = {
+            'checked': false,
+            items: {}
+        };
 
-            console.log("userlist: ", UserList.getUsers());
+        console.log("checkboxes: ", $scope.checkboxes);
+
+        $scope.$watch('checkboxes.items', function (value) {
+            console.log("$watch checkboxes: ", $scope.checkboxes.items);
+        })
+
+        $scope.$watch(UserList.getUsers, function () {
+            $scope.users = [];
+            if (UserList.getUsers()
+                .length > 0) {
+                $scope.showUsers = true;
+            }
             for (var i = 0; i < UserList.getUsers()
                 .length; i++) {
                 $scope.users.push({
@@ -686,10 +759,6 @@ angular.module('do.users', [])
                 })
             };
 
-            // $scope.
-
-            // console.log("users: ", $scope.users);
-            // console.log("data: ", data);
             $scope.columns = [{
                 title: '',
                 field: 'checkbox',
@@ -712,24 +781,12 @@ angular.module('do.users', [])
                 visible: true
             }];
 
-            // var Api = data;
-            // console.log("Api: ", Api);
-            // var data = [];
-            // for (var i = 0; i < 30; i++) {
-            //     data.push({
-            //         datejoined: new Date,
-            //         email: 'sa@dfaf.co',
-            //         unsubscribed: false,
-            //         userkarma: '80'
-            //     })
-            // };
-            // console.log("data: ", data);
-            
-            /*
-            Reference: http://plnkr.co/edit/dtlKAHwy99jdnWVU0pc8?p=preview
+            /**
+             * Reference: http://plnkr.co/edit/dtlKAHwy99jdnWVU0pc8?p=preview
+             *
              */
+
             $scope.refreshTable = function () {
-                console.log('\n\n refreshing table')
                 $scope['tableParams'] = {
                     reload: function () {},
                     settings: function () {
@@ -755,15 +812,10 @@ angular.module('do.users', [])
                     filterSwitch: true,
                     total: $scope.users.length, // length of data
                     getData: function ($defer, params) {
-                        // var filteredData = params.filter() ? $filter(
-                        //     'filter')(data, params.filter()) :
-                        //     data;
-                        console.log(
-                            '\n\nngTable getData called now')
                         var orderedData = params.sorting() ?
                             $filter('orderBy')($scope.users,
                                 params.orderBy()) :
-                            data;
+                            $scope.users;
                         params.total(orderedData.length);
                         $defer.resolve(orderedData.slice((params.page() -
                                 1) * params.count(), params.page() *
@@ -771,149 +823,19 @@ angular.module('do.users', [])
                     }
                 });
             }
-
-            /*$scope.tableParams = new ngTableParams({
-                page: 1, 
-                    count: 10, // count per page
-                    filter: {
-                        name: 'M' // initial filter
-                    },
-                    sorting: {
-                        name: 'asc'
-                    }
-                }, {
-                    total: $scope.data.length, // length of data
-                    getData: function ($defer, params) {
-                        // use build-in angular filter
-                        var filteredData = params.filter() ?
-                            $filter('filter')($scope.data, params
-                                .filter()) :
-                            data;
-                        var orderedData = params.sorting() ?
-                            $filter('orderBy')($scope.data,
-                                params.orderBy()) :
-                            $scope.data;
-                        params.total(orderedData.length); // set total for recalc paginationemail
-
-                        $defer.resolve(orderedData.slice((
-                                params.page() -
-                                1) * params.count(),
-                            params.page() *
-                            params.count()));
-                    }
-                });*/
-
-            /*var requestParams = {
-                count: 10,
-                page: 1,
-                sorting: {
-                    name: "asc"
-                }
-            };
-            var params = new ngTableParams(requestParams);
-            data = params.filter() ? $filter('filter')(data, params.filter()) :
-                data;
-            data = params.sorting() ? $filter('orderBy')(data, params.orderBy()) :
-                data;
-
-            var total = data.length;
-            data = data.slice((params.page() - 1) * params.count(),
-                params.page() * params.count());
-
-            var Api = {
-                result: data,
-                total: total
-            };
-
-            console.log("APi: ", Api);
-            $scope.tableParams = new ngTableParams({
-                page: 1, // show first page
-                count: 10, // count per page
-                sorting: {
-                    name: 'asc' // initial sorting
-                }
-            }, {
-                total: 0, // length of data
-                getData: function ($defer, params) {
-                    // ajax request to api
-                    Api.get(params.url(), function (data) {
-                        $timeout(function () {
-                            // update table params
-                            params.total(data.total);
-                            // set new data
-                            $defer.resolve(data.result);
-                        }, 500);
-                    });
-                }
-            });*/
-
-
-
-
-            $scope.currentPage = 0;
-            $scope.pageSize = 20;
-
-
-            /*$scope.numberOfPages = function () {
-                return Math.ceil($scope.data.length / $scope.pageSize);
-            }*/
         })
 
-
-
-        $scope.checkboxes = {
-            'checked': false,
-            items: {}
-        };
-
-        console.log("checkboxes: ", $scope.checkboxes);
-
-        $scope.$watch('checkboxes.items', function (values) {
-            console.log("$watch checkboxes: ", $scope.checkboxes.items);
-        })
-
-        // watch for check all checkbox
-        /*$scope.$watch('checkboxes.checked', function (value) {
-            console.log("checkbox value: ", value)
-            angular.forEach($scope.data, function (item) {
-                if (angular.isDefined(item.id)) {
-                    $scope.checkboxes.items[item.id] = value;
-                }
-            });
-        });
-
-        $scope.$watch('checkboxes.items', function (values) {
-            if (!$scope.data) {
-                return;
-            }
-            var checked = 0,
-                unchecked = 0,
-                total = $scope.data.length;
-            angular.forEach($scope.data, function (item) {
-                checked += ($scope.checkboxes.items[item.id]) || 0;
-                unchecked += (!$scope.checkboxes.items[item.id]) ||
-                    0;
-            });
-            if ((unchecked == 0) || (checked == 0)) {
-                $scope.checkboxes.checked = (checked == total);
-            }
-            // grayed checkbox
-            angular.element(document.getElementById("select_all"))
-                .prop("indeterminate", (checked != 0 && unchecked != 0));
-        }, true);*/
-
-        $scope.tabledropdown = {
-
-        }
 
     }
 ])
+
+
 
 .controller('sendMessageCtrl', ['$scope', 'MsgService', '$modal', 'UidService',
     function ($scope, MsgService, $modal, UidService) {
         console.log("inside send message ctrl");
         $scope.sendManualMessage = function () {
-            MsgService.sendManualMessage($scope.sub, $scope.text,
+            MsgService.sendManualMessage($scope.sub, $scope.msgtext,
                 UidService.get());
         }
     }
@@ -1069,3 +991,149 @@ angular.module('do.users', [])
 
     }
 ])
+
+// .controller('TableCtrl', ['$scope', '$filter', 'ngTableParams', '$modal',
+//     'UidService', '$moment', 'UserList', '$timeout',
+
+//     function ($scope, $filter, ngTableParams, $modal, UidService, $moment,
+//         UserList, $timeout) {
+
+//         $scope.title = "Write Message";
+
+//         var popupModal = $modal({
+//             scope: $scope,
+//             template: '/templates/usersmodule/message.modal.html',
+//             show: false
+//         });
+
+//         $scope.mail = [];
+//         $scope.openModal = function () {
+//             popupModal.show();
+//             console.log("checkboxes items: ", $scope.checkboxes.items);
+//             /*Object.keys(obj)
+//                 .forEach(function (key) {
+//                     f(key, obj[key])
+//                 });*/
+//             var prop, value;
+//             var keys = Object.keys($scope.checkboxes.items);
+//             for (var i = 0; i < Object.keys($scope.checkboxes.items)
+//                 .length; i++) {
+//                 prop = keys[i];
+//                 console.log("id: ", prop);
+//                 value = $scope.checkboxes.items[prop];
+//                 console.log("value: ", value);
+//                 if (value) {
+//                     $scope.mail[i] = prop;
+//                 }
+//             };
+//             console.log("email objects: ", $scope.mail);
+//             UidService.set($scope.mail);
+
+//         };
+
+
+//         var data = [];
+//         $scope.users = []
+
+//         $scope.checkboxes = {
+//             'checked': false,
+//             items: {}
+//         };
+
+//         console.log("checkboxes: ", $scope.checkboxes);
+
+//         $scope.$watch('checkboxes.items', function (value) {
+//             console.log("$watch checkboxes: ", $scope.checkboxes.items);
+//         })
+
+//         $scope.$watch(UserList.getUsers, function () {
+//             if (UserList.getUsers().length > 0) {
+//                 $scope.showUsers = true;
+//             }
+//             for (var i = 0; i < UserList.getUsers()
+//                 .length; i++) {
+//                 $scope.users.push({
+//                     id: UserList.getUsers()[i]._id,
+//                     email: UserList.getUsers()[i].email,
+//                     userkarma: UserList.getUsers()[i].healthScore,
+//                     datejoined: moment(UserList.getUsers()[i].firstSessionAt)
+//                         .format("MMMM Do YYYY"),
+//                     unsubscribed: UserList.getUsers()[i].unsubscribed
+//                 })
+//             };
+
+//             $scope.columns = [{
+//                 title: '',
+//                 field: 'checkbox',
+//                 visible: true
+//             }, {
+//                 title: 'Email',
+//                 field: 'email',
+//                 visible: true
+//             }, {
+//                 title: 'User Karma',
+//                 field: 'userkarma',
+//                 visible: true
+//             }, {
+//                 title: 'Date Joined',
+//                 field: 'datejoined',
+//                 visible: true
+//             }, {
+//                 title: 'Unsubscribed',
+//                 field: 'unsubscribed',
+//                 visible: true
+//             }];
+
+//             /**
+//              * Reference: http://plnkr.co/edit/dtlKAHwy99jdnWVU0pc8?p=preview
+//              *
+//              */
+
+//             $scope.refreshTable = function () {
+//                 $scope['tableParams'] = {
+//                     reload: function () {},
+//                     settings: function () {
+//                         return {}
+//                     }
+//                 };
+//                 $timeout(setTable, 100)
+//             };
+//             $scope.refreshTable();
+
+//             function setTable(arguments) {
+
+//                 $scope.tableParams = new ngTableParams({
+//                     page: 1, // show first page
+//                     count: 10, // count per page
+//                     filter: {
+//                         name: '' // initial filter
+//                     },
+//                     sorting: {
+//                         name: 'asc'
+//                     }
+//                 }, {
+//                     filterSwitch: true,
+//                     total: $scope.users.length, // length of data
+//                     getData: function ($defer, params) {
+//                         var orderedData = params.sorting() ?
+//                             $filter('orderBy')($scope.users,
+//                                 params.orderBy()) :
+//                             $scope.users;
+//                         params.total(orderedData.length);
+//                         $defer.resolve(orderedData.slice((params.page() -
+//                                 1) * params.count(), params.page() *
+//                             params.count()));
+//                     }
+//                 });
+//             }
+//         })
+
+
+
+
+//         // $scope.tabledropdown = {
+
+//         // }
+
+//     }
+// ])

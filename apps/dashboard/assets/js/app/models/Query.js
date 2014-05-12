@@ -21,7 +21,7 @@ angular.module('models.Query', ['services'])
             $http.get(config.apiUrl + '/apps/' + appId + '/query/?' +
                 queryObj)
                 .success(function (data) {
-                    console.log("success in running query: ", data);
+                    console.log("data: ", data);
                     UserList.setUsers(data);
                 })
                 .error(function () {

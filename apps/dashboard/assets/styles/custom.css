@@ -625,4 +625,18 @@ hr {
     border: 1px solid #ddd;
     border-radius: 15px;
 }
+.popover.right>.arrow {
+    top: 50%;
+    left: -11px;
+    margin-top: -11px;
+    border-left-width: 0;
+    border-right-color: #999;
+    border-right-color: rgba(0, 0, 0, .25);
+}
+.popover.right {
+    margin-left: 10px;
+}
+.popover {
+    max-width: 350px;
+}
 }

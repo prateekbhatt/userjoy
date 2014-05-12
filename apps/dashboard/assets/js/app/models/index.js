@@ -10,4 +10,5 @@ angular.module('models', [
     'models.apps',
     'models.message',
     'models.Query',
+    'models.Segment',
 ]);
