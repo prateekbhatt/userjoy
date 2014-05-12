@@ -7,9 +7,10 @@ describe('Resource /apps/:aid/segments', function () {
 
   before(function (done) {
     setupTestDb(function (err) {
+      if (err) return done(err);
       aid = saved.apps.first._id;
       url = '/apps/' + aid + '/segments';
-      done(err);
+      done();
     });
   });
 
@@ -57,6 +58,7 @@ describe('Resource /apps/:aid/segments', function () {
         var newSegment = {
           aid: randomId,
           list: 'users',
+          name: 'New segment',
           op: 'and',
           filters: [
 
