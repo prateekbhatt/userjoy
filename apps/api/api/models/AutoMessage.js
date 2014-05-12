@@ -22,6 +22,12 @@ var Schema = mongoose.Schema;
 var AutoMessageSchema = new Schema({
 
 
+  active: {
+    type: Boolean,
+    default: false
+  },
+
+
   // app Id
   aid: {
     type: Schema.Types.ObjectId,

@@ -10,6 +10,7 @@ This app contains an expressjs api which exposes a rest interface for the db.
 | ----- | --------------------- |
 | accid | account id            |
 | aid   | app id                |
+| amId  | automessage id        |
 | br    | browser               |
 | brv   | browser version       |
 | ci    | city                  |
@@ -302,6 +303,7 @@ User          | companies, notes        | users of a specific app. create a new 
 
 ##### Columns:
 
+- active (boolean)
 - aid (required)
 - body (required)
 - clicked
