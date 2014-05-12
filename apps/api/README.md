@@ -270,6 +270,7 @@ User          | companies, notes        | users of a specific app. create a new 
  - ct
  - ut
  - list
+ - name
  - op
  - filters (embedded documents)
 

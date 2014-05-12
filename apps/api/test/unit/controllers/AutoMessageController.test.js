@@ -307,4 +307,97 @@ describe('Resource /apps/:aid/automessages', function () {
 
   });
 
+
+  describe('PUT /apps/:aid/automessages/:amId/active/:status', function () {
+
+    var savedAutoMessageId;
+    var testUrl;
+
+    before(function (done) {
+      logoutUser(function (err) {
+        savedAutoMessageId = saved.automessages.first._id;
+        testUrl = url + '/' + savedAutoMessageId + '/active';
+        done(err);
+      });
+    });
+
+
+    it('returns error if not logged in', function (done) {
+
+      var statusTestUrl = testUrl + '/false';
+      request
+        .put(statusTestUrl)
+        .expect('Content-Type', /json/)
+        .expect(401)
+        .end(done);
+    });
+
+
+    it('logging in user', function (done) {
+      loginUser(done);
+    });
+
+
+    it('should return error is active status is neither true nor false',
+      function (done) {
+
+        var statusTestUrl = testUrl + '/randomStatus';
+
+        request
+          .put(statusTestUrl)
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            "error": "Active status should be either true or false",
+            "status": 400
+          })
+          .end(done);
+
+      });
+
+    it('should return error is active status is not provided',
+      function (done) {
+
+        var statusTestUrl = testUrl;
+
+        request
+          .put(statusTestUrl)
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            "error": "Active status should be either true or false",
+            "status": 400
+          })
+          .end(done);
+
+      });
+
+    it('should update active status of automessage', function (done) {
+
+      expect(saved.automessages.first.active)
+        .to.be.false;
+
+      var statusTestUrl = testUrl + '/true';
+
+      request
+        .put(statusTestUrl)
+        .set('cookie', loginCookie)
+        .expect('Content-Type', /json/)
+        .expect(function (res) {
+
+          expect(res.body)
+            .to.be.an("object");
+
+          expect(res.body.active)
+            .to.be.true;
+        })
+        .expect(200)
+        .end(done);
+
+    });
+
+  });
+
 });

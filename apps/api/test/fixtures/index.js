@@ -121,6 +121,7 @@ var segments = {
     aid: null,
     creator: null,
     list: 'users',
+    name: 'First segment',
     op: 'and',
     filters: [
 
