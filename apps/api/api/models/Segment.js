@@ -128,6 +128,12 @@ var SegmentSchema = new Schema({
   },
 
 
+  name: {
+    type: String,
+    required:[true, 'Invalid segment name']
+  },
+
+
   // base operator
   op: {
     type: String,
