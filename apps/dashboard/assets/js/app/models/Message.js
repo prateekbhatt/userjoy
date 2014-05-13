@@ -1,8 +1,9 @@
 angular.module('models.message', ['services'])
 
 .service('MsgService', ['$http', 'config', 'AppService',
-    'InboxMessagesService', '$modal',
-    function ($http, config, AppService, InboxMessagesService, $modal) {
+    'InboxMsgService', '$modal', '$location', 'ThreadService',
+    function ($http, config, AppService, InboxMsgService, $modal,
+        $location, ThreadService) {
         this.sendManualMessage = function (sub, text, uid) {
             console.log("uid: ", uid)
             var data = {
@@ -10,7 +11,7 @@ angular.module('models.message', ['services'])
                 sub: sub,
                 text: text,
                 type: 'email',
-                uid: uid
+                uid: '536c9e5f2508e316447893c9'
             }
             console.log("message data: ", data);
             console.log("LIAS", AppService.getCurrentApp());
@@ -18,7 +19,7 @@ angular.module('models.message', ['services'])
                 ._id;
 
 
-            $http.post(config.apiUrl + '/apps/' + appId + '/messages',
+            $http.post(config.apiUrl + '/apps/' + appId + '/conversations',
                 data)
                 .success(function (data) {
                     console.log("success");
@@ -28,22 +29,95 @@ angular.module('models.message', ['services'])
                     console.log("error");
                 })
 
+        };
+
+        this.getManualMessage = function (appId, callback) {
+            console.log("going to fetch msgs");
+            $http.get(config.apiUrl + '/apps/' + appId + '/conversations')
+                .success(function (data) {
+                    console.log("success getting messages");
+                    InboxMsgService.setInboxMessage(data);
+                    console.log("setting msg: ", InboxMsgService.getInboxMessage());
+                    callback();
+                })
+                .error(callback);
+        };
+
+        this.getMessageThread = function (appId, coId, callback) {
+            $http.get(config.apiUrl + '/apps/' + appId + '/conversations/' +
+                coId)
+                .success(function (data) {
+                    console.log("success getting msg thread");
+                    console.log("msg thread: ", data);
+                    ThreadService.setThread(data);
+                    callback();
+                })
+                .error(callback);
         }
 
-        this.getManualMessage = function (appId) {
+        this.closeConversationRequest = function (appId, coId, callback) {
 
-            $http.get(config.apiUrl + '/apps/' + appId + '/messages')
+            $http.put(config.apiUrl + '/apps/' + appId + '/conversations/' +
+                coId + '/closed')
                 .success(function (data) {
-                    InboxMessagesService.setInboxMessage(data);
+                    console.log("success closing conversation: ", data);
+                    ThreadService.setThread(data);
+                    callback();
+                })
+                .error(callback);
+        }
+
+        this.getUnreadMessages = function (appId, callback) {
+            $http.get(config.apiUrl + '/apps/' + appId +
+                '/conversations?filter=unread')
+                .success(function (data) {
+                    console.log("success unread msgs");
+                    InboxMsgService.setUnreadMessage(data);
+                    callback();
+                })
+                .error(callback);
+        }
+
+        this.replyToMsg = function (appId, coId, reply, accid, callback) {
+
+            var data = {
+                text: reply
+            }
+
+            console.log("data replyToMsg: ", data);
+
+            $http.post(config.apiUrl + '/apps/' + appId +
+                '/conversations/' + coId, data)
+                .success(function (data) {
                     console.log("success");
-                    console.log(data);
+                    ThreadService.setReply(data);
+                    callback();
                 })
-                .error(function () {
-                    console.log("error");
+                .error(callback);
+
+        }
+
+        this.reopenConversation = function (appId, coId, callback) {
+            $http.put(config.apiUrl + '/apps/' + appId + '/conversations/' +
+                coId + '/reopened')
+                .success(function (data) {
+                    console.log("success reopening conversation: ",
+                        data);
+                    ThreadService.setThread(data);
+                    callback();
                 })
+                .error(callback);
+        }
 
-            return InboxMessagesService.getInboxMessage();
-
+        this.getClosedConversations = function (appId, callback) {
+            $http.get(config.apiUrl + '/apps/' + appId +
+                '/conversations?filter=closed')
+                .success(function (data) {
+                    console.log("closed conversations: ", data);
+                    InboxMsgService.setClosedMessage(data);
+                    callback();
+                })
+                .error(callback);
         }
     }
 ])

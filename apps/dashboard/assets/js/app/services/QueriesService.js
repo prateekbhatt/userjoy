@@ -1,4 +1,4 @@
-angular.module('services.segmentQueryService', [])
+angular.module('services.QueriesService', [])
 
 .service('segment', [
 
@@ -51,6 +51,40 @@ angular.module('services.segmentQueryService', [])
                 }
             }
         };
+    }
+])
+
+.service('eventNames', [
+    function () {
+
+        var allEvents = [];
+
+        this.setEvents = function (value) {
+            allEvents = value;
+        }
+
+        this.getEvents = function () {
+            return allEvents;
+        }
+
+        return this;
+
+    }
+])
+
+.service('userAttributes', [
+    function () {
+        var allAttributes = [];
+
+        this.setUserAttributes = function (value) {
+            allAttributes = value;
+        }
+
+        this.getUserAttributes = function (value) {
+            return allAttributes;
+        }
+
+        return this;
     }
 ])
 

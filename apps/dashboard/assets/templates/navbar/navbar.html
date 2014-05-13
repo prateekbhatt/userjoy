@@ -1,0 +1,100 @@
+<div ng-controller="NavbarCtrl" ng-class="class" ng-show="loggedIn" style= "padding-top: 70px;">
+    <nav role="navigation" style="background-color: #222; border-color: #080808" class="navbar navbar-inverse navbar-fixed-top" bs-navbar>
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" data-toggle="collapse" data-target=".navbar-ex1-collapse" class="navbar-toggle">
+                <span class="sr-only">
+                Toggle navigation
+                </span>
+                <span class="icon-bar">
+                </span>
+                <span class="icon-bar">
+                </span>
+                <span class="icon-bar">
+                </span>
+                </button>
+                <a href="/" style="font-size:19px;" class="navbar-brand">UserJoy
+                </a>
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="/feed">
+                        <i class="fa fa-sort-amount-asc">
+                        </i>
+                        Feed
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/users/list">
+                        <i class="fa fa-user">
+                        </i>
+                        Users
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/messages/inbox">
+                        <i class="fa fa-envelope-o">
+                        </i>
+                        Messages
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div role="navigation" class="collapse navbar-collapse navbar-right navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" ng-click="showDropdownApp()">
+                        <i class="fa fa-folder-open-o">
+                        </i>
+                        Apps
+                        <i class="fa fa-caret-down">
+                        </i>
+                        </a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" ng-show="visibleDropdownApp">
+                            <li role="presentation" ng-show="!apps">
+                                <a role="menuitem" tabindex="-1"  href="/onboarding">
+                                <span>No Apps are connected</span>
+                                <br>
+                                <span>Click here to connect an app</span></a>
+                            </li>
+                            <li role="presentation" ng-repeat="app in apps">
+                                <a role="menuitem" tabindex="-1" href="#" ng-show="apps">
+                                &nbsp;&nbsp;&nbsp;&nbsp;{{app.name}}
+                                </a>
+                                &nbsp;&nbsp;<a href="#" style="padding-top: 0px; color: #07c; background-color: #fff; font-size: 14px" ng-show="apps"><span class="glyphicon glyphicon-cog">&nbsp;Settings for {{app.name}}</span></a>
+                                <hr ng-show="!$last">
+                                <!-- <button class="gylphicon glyphicon"></button> -->
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" ng-click="showDropdown()">
+                        <i class="fa fa-cogs">
+                        </i>
+                        Account
+                        <i class="fa fa-caret-down">
+                        </i>
+                        </a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" ng-show="visibleDropdown">
+                            <li role="presentation">
+                                <a role="menuitem" tabindex="-1" href="/account/settings">
+                                <span class="glyphicon glyphicon-cog"></span>&nbsp;&nbsp;&nbsp;&nbsp;Settings
+                                </a>
+                            </li>
+                            <li role="presentation">
+                                <a role="menuitem" tabindex="-1" href="#">
+                                <i class="fa fa-book"></i>&nbsp;&nbsp;&nbsp;&nbsp;Docs
+                                </a>
+                            </li>
+                            <li role="presentation" class="divider"></li>
+                            <li role="presentation">
+                                <a role="menuitem" tabindex="-1" href="#" ng-click="logout()">
+                                <span class="glyphicon glyphicon-off"></span>&nbsp;&nbsp;&nbsp;&nbsp;Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>
