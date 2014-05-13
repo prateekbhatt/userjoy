@@ -1053,6 +1053,37 @@ describe('Lib query', function () {
       });
     });
 
+    it('should return all users if no filter is provided',
+      function (done) {
+        Query.prototype.attrFilters = [];
+        Query.prototype.countFilters = [];
+
+        User.count(function (err, count) {
+          expect(err)
+            .to.not.exist;
+
+          expect(count)
+            .to.exist;
+
+          Query.prototype.run(function (err, users) {
+
+            expect(err)
+              .to.not.exist;
+
+            expect(users)
+              .to.be.an("array");
+
+            expect(users)
+              .to.have.length(count);
+
+            done()
+          })
+
+        })
+
+
+      });
+
   });
 
 
