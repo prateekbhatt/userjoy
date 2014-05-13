@@ -28,17 +28,26 @@ angular.module('do.login', [])
 ])
 
 .controller('LoginCtrl', ['$scope', 'LoginService', 'AuthService', '$state',
-    '$log', 'ErrorMessageService',
+    '$log', 'ErrMsgService', 'login', '$location', '$rootScope',  
     function ($scope, LoginService, AuthService, $state, $log,
-        ErrorMessageService) {
+        ErrMsgService, login, $location, $rootScope) {
 
-        $log.info('LoginCtrl', LoginService.getUserAuthenticated());
+        console.log('LoginProvider:', login.getLoggedIn());
         $scope.errMsg = '';
         $scope.showError = false;
+        // login.setLoggedIn(true);
         // If user is logged in send them to home page
-        if (LoginService.getUserAuthenticated()) {
-            $state.transitionTo('users.list');
+        /*if (login.getLoggedIn()) {
+            $location.path('/users/list');
+        }*/
+        console.log("$rootScope loggedIn: ", $rootScope.loggedIn);
+        if($rootScope.loggedIn) {
+            $location.path('/users/list');
         }
+
+        // if(!login.getLoggedIn()) {
+        //     $state.transitionTo('login');
+        // }
 
         $scope.hideErrorAlert = function () {
             $scope.showError = false;
@@ -48,10 +57,10 @@ angular.module('do.login', [])
         $scope.attemptLogin = function () {
 
             AuthService.attemptLogin($scope.email, $scope.password);
-            $scope.$watch(ErrorMessageService.getErrorMessage, function () {
-                if (ErrorMessageService.getErrorMessage()) {
+            $scope.$watch(ErrMsgService.getErrorMessage, function () {
+                if (ErrMsgService.getErrorMessage()) {
                     $scope.showError = true;
-                    $scope.errMsg = ErrorMessageService.getErrorMessage();
+                    $scope.errMsg = ErrMsgService.getErrorMessage();
                 }
             })
 

@@ -2,9 +2,9 @@ angular.module('models.auth', ['services'])
 
 .service('AuthService', ['$http', 'utils', 'ipCookie', 'LoginService',
     '$log', 'config', '$state', '$location', 'AppService', 
-    'ErrorMessageService', 'authService',  
+    'ErrMsgService', 'authService', 'login', '$rootScope', 
     function ($http, utils, ipCookie, LoginService, $log, config, $state,
-        $location, AppService, ErrorMessageService, authService) {
+        $location, AppService, ErrMsgService, authService, login, $rootScope) {
 
         this.attemptLogin = function (email, password) {
 
@@ -25,7 +25,14 @@ angular.module('models.auth', ['services'])
                     });
 
                     LoginService.setUserAuthenticated(true);
-
+                    // login.setLoggedIn(true);
+                    login.setLoggedIn(true);
+                    $rootScope.loggedIn = true;
+                    console.log("$rootScope loggIn: ", $rootScope.loggedIn);
+                    console.log("loginProvider Auth js: ", login.getLoggedIn());
+                    /*if(login.getLoggedIn()) {
+                        $location.path('/users/list');
+                    }*/
                     $http.get(config.apiUrl + '/apps')
                         .success(function (data) {
                             console.log("loggedin Apps: ", data);
@@ -36,7 +43,7 @@ angular.module('models.auth', ['services'])
                             if (AppService.getLoggedInApps()
                                 .length) {
                                 console.log(AppService.getLoggedInApps());
-                                $state.go('users.list');
+                                $state.go('list');
                             } else {
                                 $state.go('onboarding');
                             }
@@ -51,7 +58,7 @@ angular.module('models.auth', ['services'])
                 .error(function (err) {
                     $log.error("error in signing in");
                     console.log(err.error);
-                    ErrorMessageService.setErrorMessage(err.error);
+                    ErrMsgService.setErrorMessage(err.error);
                 })
         };
 
@@ -63,6 +70,8 @@ angular.module('models.auth', ['services'])
                         path: '/'
                     });
                     LoginService.setUserAuthenticated(false);
+                    login.setLoggedIn(false);
+                    $rootScope.loggedIn = false;
                     $log.info(arguments);
                     $location.path('/login');
                 })

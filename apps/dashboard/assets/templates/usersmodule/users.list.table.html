@@ -1,4 +1,9 @@
-<div class="row">
+<div ng-show="!showUsers" class="col-md-push-2 col-md-8">
+    <br>
+    <br>
+    <h4 class="well text-center">There are no users to be displayed. Run a query!!</h4>
+</div>
+<div class="row"  ng-show="showUsers">
     <div class="col-md-2">
         <p style="font-size:20px">All Users</p>
     </div>
@@ -21,51 +26,46 @@
 </div>
 <br>
 <br>
-<div class="panel panel-default ">
+<div class="panel panel-default " ng-show="showUsers">
     <div class="container">
         <div class="row">
-            <table ng-table="tableParams" show-filter="true" class="table">
-                <thead>
-                    <tr>
-                        <th ng-repeat="column in columns" ng-show="column.visible"
-                            class="text-center" ng-class="{
-                            'sort-asc': tableParams.isSortBy(column.field, 'asc'),
-                            'sort-desc': tableParams.isSortBy(column.field, 'desc'),
-                            'sortable': !$first
-                            }"
-                            ng-click="tableParams.sorting(column.field, tableParams.isSortBy(column.field, 'asc') ? 'desc' : 'asc')">
-                            <div>{{column.title}}</div>
-                        </th>
+            <div>
+                <table ng-table="tableParams" show-filter="true" class="table">
+                    <thead>
+                        <tr>
+                            <th ng-repeat="column in columns" ng-show="column.visible"
+                                class="text-center" ng-class="{
+                                'sort-asc': tableParams.isSortBy(column.field, 'asc'),
+                                'sort-desc': tableParams.isSortBy(column.field, 'desc'),
+                                'sortable': !$first
+                                }"
+                                ng-click="tableParams.sorting(column.field, tableParams.isSortBy(column.field, 'asc') ? 'desc' : 'asc')">
+                                <div>{{column.title}}</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tr ng-repeat="user in $data">
+                        <td width="30" style="text-align: left">
+                            <input type="checkbox" ng-model="checkboxes.items[user.id]" />
+                        </td>
+                        <td data-title="'Email Id'" class="text-center" sortable="email" ng-show="columns[1].visible">
+                            <span>{{user.email}}</span>
+                        </td>
+                        <td data-title="'User Karma'" class="text-center" sortable="userkarma" ng-show="columns[2].visible">
+                            <span>{{user.userkarma}}</span>
+                        </td>
+                        <td data-title="'Date Joined'" class="text-center" sortable="datejoined" ng-show="columns[3].visible">
+                            <span>{{user.datejoined}}</span>
+                        </td>
+                        <td data-title="'Unsubscribed'" class="text-center" sortable="status" ng-show="columns[4].visible">
+                            <span>{{user.unsubscribed}}</span>
+                        </td>
                     </tr>
-                    <!-- <tr>
-                                                <input class="form-control" ng-model="searchText">
-                    </tr> -->
-                </thead>
-                <tr ng-repeat="user in $data | filter:searchText">
-                    <!-- <td ng-repeat="column in columns" ng-show="column.visible" sortable="column.field" class="text-center"></td> -->
-                    <td width="30" style="text-align: left">
-                        <input type="checkbox" ng-model="checkboxes.items[user.id]" />
-                    </td>
-                    <td data-title="'Name'" class="text-center" sortable="name" ng-show="columns[1].visible">
-                        <span>{{user.name}}</span>
-                    </td>
-                    <td data-title="'Email Id'" class="text-center" sortable="email" ng-show="columns[2].visible">
-                        <span>{{user.email}}</span>
-                    </td>
-                    <td data-title="'User Karma'" class="text-center" sortable="userkarma" ng-show="columns[3].visible">
-                        <span>{{user.userkarma}}</span>
-                    </td>
-                    <td data-title="'Date Joined'" class="text-center" sortable="datejoined" ng-show="columns[4].visible">
-                        <span>{{user.datejoined}}</span>
-                    </td>
-                    <td data-title="'Status'" class="text-center" sortable="status" ng-show="columns[5].visible">
-                        <span>{{user.status}}</span>
-                    </td>
-                </tr>
-            </table>
-            <script type="text/ng-template" id="ng-table/headers/checkbox.html">
-                            <input type="checkbox" ng-model="checkboxes.checked" id="select_all" name="filter-checkbox" value="" />
-            </script>
+                </table>
+            </div>
+            <!-- <script type="text/ng-template" id="ng-table/headers/checkbox.html">
+                                        <input type="checkbox" ng-model="checkboxes.checked" id="select_all" name="filter-checkbox" value="" />
+            </script> -->
         </div>
     </div>
 </div>

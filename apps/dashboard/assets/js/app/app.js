@@ -25,19 +25,70 @@ angular.module('dodatado', [
     'do.install',
     'do.settings',
     'do.feed',
-    'http-auth-interceptor'
+    'http-auth-interceptor',
+    'angular-momentjs',
+    'do.automate'
 ])
 
+.provider('login', [
+    function () {
+
+        var userIsAuthenticated = false;
+
+        this.$get = [
+            function () {
+                return {
+                    setLoggedIn: function (value) {
+                        userIsAuthenticated = value;
+                    },
+                    getLoggedIn: function () {
+                        return userIsAuthenticated;
+                    }
+                };
+            }
+        ];
+    }
+])
+
+.filter('startFrom', function() {
+    return function(input, start) {
+        start = +start; //parse to int
+        return input.slice(start);
+    }
+})
+
 .config(function ($stateProvider, $urlRouterProvider,
-    $locationProvider, $httpProvider, $provide) {
+    $locationProvider, $httpProvider, $provide, $momentProvider,
+    loginProvider) {
+
+    $momentProvider.asyncLoading(false)
+        .scriptUrl(
+            '//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js'
+    );
 
     $urlRouterProvider.otherwise('/404');
     $locationProvider.html5Mode(true);
-
+    console.log('\n\n setting authcredentials');
     // for making cross domain authentication requests
     $httpProvider.defaults.useXDomain = true;
     $httpProvider.defaults.withCredentials = true;
     delete $httpProvider.defaults.headers.common['X-Requested-With'];
+
+    $httpProvider.interceptors.push(function ($rootScope, $location, $q) {
+        return {
+            'responseError': function (rejection) {
+                // if we're not logged-in to the web service, redirect to login page
+                if (rejection.status === 401 && $location.path() !=
+                    '/login') {
+                    console.log("401 status logout");
+                    loginProvider.setLoggedIn = false;
+                    $rootScope.loggedIn = false;
+                    $location.path('/login');
+                }
+                return $q.reject(rejection);
+            }
+        };
+    });
 
     // adding custom tool to textAngular
     $provide.decorator('taOptions', ['taRegisterTool', '$delegate',
@@ -87,13 +138,23 @@ angular.module('dodatado', [
 
 })
 
-.run(['LoginService', 'ipCookie', '$log',
-    function (LoginService, ipCookie, $log) {
+/*.service('api', ['authService', '$rootScope', '$location',
+    function () {
+        $rootScope.$on('event: auth-loginRequired', function () {
+            $location.path('/login');
+        })
+    }
+])*/
+
+.run(['LoginService', 'ipCookie', '$log', 'login', '$rootScope',
+    function (LoginService, ipCookie, $log, login, $rootScope) {
 
         // check cookie to set if user is authenticated
         if (ipCookie('loggedin')) {
             // $log.info('app.run setUserAuthenticated');
             LoginService.setUserAuthenticated(true);
+            login.setLoggedIn(true);
+            $rootScope.loggedIn = true;
         }
     }
 ])
@@ -120,41 +181,56 @@ angular.module('dodatado', [
             }
             AppService.setLoggedInApps(apps);
             AppService.setCurrentApp(apps[0]);
+            console.log("default app:", AppService.getCurrentApp());
+            
         });
     }
 ])
-.run(['$state', 'LoginService', '$rootScope',
-    function ($state, LoginService, $rootScope) {
+    .run(['$state', 'LoginService', '$rootScope',
+        function ($state, LoginService, $rootScope) {
 
-        // check if user needs to be logged in to view a specific page
-        $rootScope.$on("$stateChangeStart", function (event,
-            toState,
-            toParams, fromState, fromParams) {
-            if (toState.authenticate && !LoginService.getUserAuthenticated()) {
-                // User isn’t authenticated
-                $state.go("login");
-                event.preventDefault();
-            }
-        });
+            // check if user needs to be logged in to view a specific page
+            $rootScope.$on("$stateChangeStart", function (event,
+                toState,
+                toParams, fromState, fromParams) {
+                if (toState.authenticate && !LoginService.getUserAuthenticated()) {
+                    // User isn’t authenticated
+                    $state.go("login");
+                    event.preventDefault();
+                }
+            });
+        }
+    ])
+
+/*.run(['ThreadService', 'MsgService',
+    function (ThreadService, MsgService) {
+        window.location.pathname
     }
-])
+])*/
 
 .run(['segment', 'queryMatching', 'countOfActions', 'hasNotDone',
-    'hasDoneActions',
+    'hasDoneActions', 'modelsQuery', 'AppService',
     function (segment, queryMatching, countOfActions, hasNotDone,
-        hasDoneActions) {
+        hasDoneActions, modelsQuery, AppService) {
 
         // FIXME : get data from backend
+        
+        
         var allSegments = [{
             _id: "0",
-            name: "Phone Users"
-        }, {
-            _id: "1",
-            name: "Android Users"
-        }, {
-            _id: "2",
-            name: "Paying Customers"
-        }];
+            name: "Users"
+        }
+        // , {
+        //     _id: "1",
+        //     name: "Phone Users"
+        // }, {
+        //     _id: "2",
+        //     name: "Android Users"
+        // }, {
+        //     _id: "3",
+        //     name: "Paying Customers"
+        // }
+        ];
 
         var allQueries = [{
             id: "0",
@@ -173,14 +249,16 @@ angular.module('dodatado', [
             name: "does not contain",
             key: 'ncn'
         }, {
-            id:"4",
+            id: "4",
             name: 'greater than',
             key: 'gt'
         }, {
-            id:"5",
+            id: "5",
             name: 'less than',
             key: 'lt'
         }];
+
+        
 
         var actions = [{
             name: 'Watched Intro Video'
