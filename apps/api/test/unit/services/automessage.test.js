@@ -45,7 +45,7 @@ describe('Service automessage', function () {
         .to.have.property("toEmail", toEmail);
 
       expect(locals)
-        .to.have.property("text", savedAutoMsg.body);
+        .to.have.property("body", savedAutoMsg.body);
 
       expect(locals)
         .to.have.property("subject", savedAutoMsg.sub);
