@@ -2,11 +2,11 @@
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="caption-full">
-            <div class="col-md-9" style="border-right: 2px solid; border-color: #ecf0f1; box-shadow: 8px 0px 2px -2px #bdc3c7;">
+            <div class="col-md-9">
                 <div class="row" style="padding-left: 40px; padding-top: 20px;">
                     <div class="col-md-12">
                         <label class="col-md-1 control-label" style="font-size: 20px; padding-left: 13px">List: </label>
-                        <div class="col-md-8" style="padding-left: 38px;">
+                        <div class="col-md-8">
                             <button type="button" class="btn btn-default" ng-model="selectedIcon" data-html="1" ng-options="segmenticon.value as segmenticon.label for segmenticon in segmenticons" bs-select style=".dropdown-menu > li > a:hover,.dropdown-menu > li > a:focus { background-color: #7b8a8b}">
                             Users <span class="caret"></span>
                             </button>
@@ -25,9 +25,9 @@
                             <div>
                                 <div class="col-md-11">
                                     <div class="row">
-                                        <div class="col-md-4">
+                                        <div class="col-md-4" style="padding-left: 24px;">
                                             <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.btntext}}</span>&nbsp;<span class="caret"></span></button>
-                                            <ul class="select dropdown-menu" role="select" style="left: 15px">
+                                            <ul class="select dropdown-menu" role="select" style="left: 23px;">
                                                 <li class="dropdown dropdown-submenu">
                                                     <a style="cursor: default">Has done</a>
                                                     <ul class="dropdown-menu">
@@ -95,7 +95,7 @@
                             <button class="btn btn-info fa fa-toggle-right" ng-click="runQuery()" style="font-size: 16px; padding: 11px 27px">
                             Run
                             </button>
-                            <button class="btn btn-info fa fa-save" ng-click="saveQuery()" style="font-size: 16px; padding: 11px 27px;">
+                            <button class="btn btn-info fa fa-save" ng-click="saveQuery()" style="font-size: 16px; padding: 11px 27px;" ng-show="showSaveButton">
                             Save
                             </button>
                             <div class="popover right" tabindex="-1" style="display: block; position: absolute; top: -73px; left: 236px;" ng-show="showPopover">
@@ -117,11 +117,24 @@
                     </div>
                 </div>
             </div>
+            <div class="col-md-3">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                        Segments</h3>
+                    </div>
+                    <div ng-show="!segmentsCreated">
+                        <p>No Segments Created.</p>
+                    </div>
+                    <ul class="list-group" ng-show="segmentsCreated">
+                        <a href="#" class="list-group-item" ng-repeat="segname in segmentsCreatedName" ng-click="showQuery(segname.id)">{{segname.name}}</a>
+                        
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-<br>
-<br>
 <div ng-show="!showUsers" class="col-md-push-2 col-md-8">
     <br>
     <br>
@@ -187,9 +200,7 @@
                     </tr>
                 </table>
             </div>
-            <!-- <script type="text/ng-template" id="ng-table/headers/checkbox.html">
-                                                                                                                                                    <input type="checkbox" ng-model="checkboxes.checked" id="select_all" name="filter-checkbox" value="" />
-            </script> -->
+            
         </div>
     </div>
 </div>

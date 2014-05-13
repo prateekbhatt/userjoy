@@ -17,16 +17,15 @@ angular.module('models.Query', ['services'])
                 .error(callback);
         };
 
-        this.runQueryAndGetUsers = function (appId, queryObj) {
+        this.runQueryAndGetUsers = function (appId, queryObj, callback) {
             $http.get(config.apiUrl + '/apps/' + appId + '/query/?' +
                 queryObj)
                 .success(function (data) {
                     console.log("data: ", data);
                     UserList.setUsers(data);
+                    callback();
                 })
-                .error(function () {
-                    console.log("error");
-                })
+                .error(callback);
         };
     }
 ])

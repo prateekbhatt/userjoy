@@ -272,11 +272,43 @@ angular.module('do.users', [])
     'AppService', 'segment', 'queryMatching', 'eventNames',
     'userAttributes', 'lodash', '$modal',
     'UidService', '$moment', 'UserList', '$timeout', 'modelsSegment',
+    'segmentService',
     function ($scope, $location, segment, queryMatching, $filter,
         countOfActions, hasNotDone, hasDoneActions,
         ngTableParams, login, modelsQuery, AppService, segment,
         queryMatching, eventNames, userAttributes, lodash, $modal,
-        UidService, $moment, UserList, $timeout, modelsSegment) {
+        UidService, $moment, UserList, $timeout, modelsSegment,
+        segmentService) {
+
+        $scope.showSaveButton = false;
+        $scope.segmentsCreatedName = [];
+        var checkSegments = function (err) {
+            if (err) {
+                return err;
+            }
+
+            if (segmentService.getSegments()
+                .length > 0) {
+                for (var i = 0; i < segmentService.getSegments()
+                    .length; i++) {
+                    $scope.segmentsCreatedName.push({
+                        id: segmentService.getSegments()[i]._id,
+                        name: segmentService.getSegments()[i].name
+                    })
+                    // $scope.segmentsCreatedName[i] = segmentService.getSegments()[i].name;
+                };
+                $scope.segmentsCreated = true;
+                console.log("$scope.segmentName: ", $scope.segmentsCreatedName);
+            } else {
+                $scope.segmentsCreated = false;
+            }
+        }
+
+        modelsSegment.getAllSegments(AppService.getCurrentApp()
+            ._id, checkSegments);
+
+
+
 
         var _ = lodash;
 
@@ -561,6 +593,9 @@ angular.module('do.users', [])
                     optext: 'equal',
                     val: ''
                 })
+                if ($scope.filters.length > 0) {
+                    $scope.showSaveButton = true;
+                }
             }
 
             $scope.removeFilter = function removeFilter(
@@ -568,12 +603,103 @@ angular.module('do.users', [])
                 var index = $scope.filters.indexOf(
                     filterToRemove);
                 $scope.filters.splice(index, 1);
+                if($scope.filters.length == 0) {
+                    $scope.showSaveButton = false;
+                }
             }
             $scope.switchAndOr = function switchAndOr() {
                 if ($scope.text === 'AND') {
                     $scope.text = 'OR'
                 } else {
                     $scope.text = 'AND'
+                }
+            }
+
+            var populateTable = function () {
+
+                if (err) {
+                    return err;
+                }
+                $scope.users = [];
+                if (UserList.getUsers()
+                    .length > 0) {
+                    $scope.showUsers = true;
+                }
+                for (var i = 0; i < UserList.getUsers()
+                    .length; i++) {
+                    $scope.users.push({
+                        id: UserList.getUsers()[i]._id,
+                        email: UserList.getUsers()[i].email,
+                        userkarma: UserList.getUsers()[i].healthScore,
+                        datejoined: moment(UserList.getUsers()[i].firstSessionAt)
+                            .format("MMMM Do YYYY"),
+                        unsubscribed: UserList.getUsers()[i].unsubscribed
+                    })
+                };
+
+                $scope.columns = [{
+                    title: '',
+                    field: 'checkbox',
+                    visible: true
+                }, {
+                    title: 'Email',
+                    field: 'email',
+                    visible: true
+                }, {
+                    title: 'User Karma',
+                    field: 'userkarma',
+                    visible: true
+                }, {
+                    title: 'Date Joined',
+                    field: 'datejoined',
+                    visible: true
+                }, {
+                    title: 'Unsubscribed',
+                    field: 'unsubscribed',
+                    visible: true
+                }];
+
+                /**
+                 * Reference: http://plnkr.co/edit/dtlKAHwy99jdnWVU0pc8?p=preview
+                 *
+                 */
+
+                $scope.refreshTable = function () {
+                    $scope['tableParams'] = {
+                        reload: function () {},
+                        settings: function () {
+                            return {}
+                        }
+                    };
+                    $timeout(setTable, 100)
+                };
+                $scope.refreshTable();
+
+                function setTable(arguments) {
+
+                    $scope.tableParams = new ngTableParams({
+                        page: 1, // show first page
+                        count: 10, // count per page
+                        filter: {
+                            name: '' // initial filter
+                        },
+                        sorting: {
+                            name: 'asc'
+                        }
+                    }, {
+                        filterSwitch: true,
+                        total: $scope.users.length, // length of data
+                        getData: function ($defer, params) {
+                            var orderedData = params.sorting() ?
+                                $filter('orderBy')($scope.users,
+                                    params.orderBy()) :
+                                $scope.users;
+                            params.total(orderedData.length);
+                            $defer.resolve(orderedData.slice((params.page() -
+                                    1) * params.count(), params.page() *
+                                params.count()));
+                        }
+                    });
                 }
             }
 
@@ -604,7 +730,7 @@ angular.module('do.users', [])
                 console.log('stringifiedQuery', stringifiedQuery);
 
                 modelsQuery.runQueryAndGetUsers(AppService.getCurrentApp()
-                    ._id, stringifiedQuery);
+                    ._id, stringifiedQuery, populateTable);
             }
 
             // var myPopover = $popover({
@@ -642,23 +768,88 @@ angular.module('do.users', [])
                 $scope.createSegmentObj.filters = $scope.filtersBackend;
                 console.log("createSegmentObj: ", $scope.createSegmentObj);
 
-                modelsSegment.createSegment(AppService.getCurrentApp()._id, $scope.createSegmentObj);
+                modelsSegment.createSegment(AppService.getCurrentApp()
+                    ._id, $scope.createSegmentObj);
 
 
             }
 
-            // $scope.popover = {
-            //     "title": "Title",
-            //     "content": "Hello Popover<br />This is a multiline message!"
-            // };
 
 
+            var populateFilterAndRunQuery = function () {
+                $scope.queryObject = {};
+                $scope.filtersFrontEnd = [];
+                var getFilters = [];
+                $scope.filters = [];
+                console.log("$scope.queries: ", $scope.queries);
+                getFilters = segmentService.getSingleSegment()
+                    .filters;
+                for (var i = 0; i < getFilters.length; i++) {
+                    var buttonText = '';
+                    var btnName = '';
+                    var chkMethod = false;
+                    var operationText = '';
+                    console.log("op text: ", getFilters[i].op);
+                    if (getFilters[i].op != '') {
+                        for (var j = 0; j < $scope.queries.length; j++) {
+                            console.log("$scope.queries[j]: ", $scope.queries[
+                                j]);
+                            if ($scope.queries[j].key == getFilters[i].op) {
+                                operationText = $scope.queries[j].name;
+                            }
+                        };
+                    }
+                    if (getFilters[i].method == 'hasdone') {
+                        buttonText = "Has Done";
+                        btnName = getFilters[i].name;
+                        chkMethod = false;
+                    }
+                    if (getFilters[i].method == 'hasnotdone') {
+                        buttonText = "Has not Done";
+                        btnName = getFilters[i].name;
+                        chkMethod = false;
+                    }
+                    if (getFilters[i].method == 'count') {
+                        buttonText = "Count of " + getFilters[i].name;
+                        btnName = getFilters[i].name;
+                        chkMethod = true;
+                    }
+                    if (getFilters[i].method == 'attr') {
+                        buttonText = getFilters[i].name;
+                        btnName = getFilters[i].name;
+                        chkMethod = true;
+                    }
+                    $scope.filters.push({
+                        method: getFilters[i].method,
+                        btntext: buttonText,
+                        checkMethod: chkMethod,
+                        name: btnName,
+                        op: getFilters[i].op,
+                        optext: operationText,
+                        val: getFilters[i].val
+                    })
 
-            /* $scope.popover = {
-                "title": "Title",
-                "content": "Hello Popover<br />This is a multiline message!",
-                "saved": true
-            };*/
+                };
+                $scope.queryObject.list = segmentService.getSingleSegment()
+                    .list;
+                $scope.queryObject.op = segmentService.getSingleSegment()
+                    .op;
+                $scope.queryObject.filters = $scope.getFilters;
+
+                var stringifiedQueryObject = stringify($scope.queryObject);
+                console.log('queryObj', $scope.queryObject);
+                console.log('stringifiedQuery', stringifiedQueryObject);
+
+                modelsQuery.runQueryAndGetUsers(AppService.getCurrentApp()
+                    ._id, stringifiedQueryObject, populateTable);
+
+
+            }
+
+            $scope.showQuery = function (segId) {
+                modelsSegment.getSegment(AppService.getCurrentApp()
+                    ._id, segId, populateFilterAndRunQuery);
+            }
 
             $scope.showErr = false;
             $scope.errMsg = 'Enter the outlined fields';
@@ -741,89 +932,10 @@ angular.module('do.users', [])
             console.log("$watch checkboxes: ", $scope.checkboxes.items);
         })
 
-        $scope.$watch(UserList.getUsers, function () {
-            $scope.users = [];
-            if (UserList.getUsers()
-                .length > 0) {
-                $scope.showUsers = true;
-            }
-            for (var i = 0; i < UserList.getUsers()
-                .length; i++) {
-                $scope.users.push({
-                    id: UserList.getUsers()[i]._id,
-                    email: UserList.getUsers()[i].email,
-                    userkarma: UserList.getUsers()[i].healthScore,
-                    datejoined: moment(UserList.getUsers()[i].firstSessionAt)
-                        .format("MMMM Do YYYY"),
-                    unsubscribed: UserList.getUsers()[i].unsubscribed
-                })
-            };
 
-            $scope.columns = [{
-                title: '',
-                field: 'checkbox',
-                visible: true
-            }, {
-                title: 'Email',
-                field: 'email',
-                visible: true
-            }, {
-                title: 'User Karma',
-                field: 'userkarma',
-                visible: true
-            }, {
-                title: 'Date Joined',
-                field: 'datejoined',
-                visible: true
-            }, {
-                title: 'Unsubscribed',
-                field: 'unsubscribed',
-                visible: true
-            }];
 
-            /**
-             * Reference: http://plnkr.co/edit/dtlKAHwy99jdnWVU0pc8?p=preview
-             *
-             */
-
-            $scope.refreshTable = function () {
-                $scope['tableParams'] = {
-                    reload: function () {},
-                    settings: function () {
-                        return {}
-                    }
-                };
-                $timeout(setTable, 100)
-            };
-            $scope.refreshTable();
-
-            function setTable(arguments) {
-
-                $scope.tableParams = new ngTableParams({
-                    page: 1, // show first page
-                    count: 10, // count per page
-                    filter: {
-                        name: '' // initial filter
-                    },
-                    sorting: {
-                        name: 'asc'
-                    }
-                }, {
-                    filterSwitch: true,
-                    total: $scope.users.length, // length of data
-                    getData: function ($defer, params) {
-                        var orderedData = params.sorting() ?
-                            $filter('orderBy')($scope.users,
-                                params.orderBy()) :
-                            $scope.users;
-                        params.total(orderedData.length);
-                        $defer.resolve(orderedData.slice((params.page() -
-                                1) * params.count(), params.page() *
-                            params.count()));
-                    }
-                });
-            }
-        })
+        // $scope.$watch(UserList.getUsers, function () {
+        // })
 
 
     }
