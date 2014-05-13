@@ -781,7 +781,7 @@ describe('Lib query', function () {
       {
         method: 'count',
         type: 'pageview',
-        name: 'Define Segment',
+        name: '/account/login',
         op: '$gt',
         val: 0
       },
@@ -918,7 +918,7 @@ describe('Lib query', function () {
       {
         method: 'count',
         type: 'pageview',
-        name: 'Define Segment',
+        name: '/account/login',
         op: '$gt',
         val: 0
       }
