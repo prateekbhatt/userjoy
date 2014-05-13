@@ -3,8 +3,6 @@
  */
 
 var async = require('async');
-var emailTemplates = require('email-templates');
-var ejs = require('ejs');
 var nodemailer = require('nodemailer');
 var path = require('path');
 
@@ -23,23 +21,36 @@ var UJ_SUPPORT_EMAIL = 'support@userjoy.co';
 var UJ_SUPPORT_NAME = 'UserJoy';
 
 
+/**
+ * Helpers
+ */
+
+var logger = require('../../helpers/logger');
+var render = require('../../helpers/render-message');
+
+
 //
 // USAGE:
 //
-// var locals = {
+// var options = {
+//   locals: {
+//     user: {
+//       name: 'Prateek'
+//     }
+//   },
 //   fromEmail: '532d6bf862d673ba7131812e@mail.userjoy.co',
 //   fromName: 'Prateek from UserJoy',
 //   metadata: {
 //     'mId': '535d131c67d02dc60b2b1764'
 //   },
-//   // replyToEmail: '532d6bf862d673ba7131812e+535d131c67d02dc60b2b1764@mail.userjoy.co',
-//   // replyToName: 'Reply to Prateek from UserJoy',
+//   replyToEmail: '532d6bf862d673ba7131812e+535d131c67d02dc60b2b1764@mail.userjoy.co',
+//   replyToName: 'Reply to Prateek from UserJoy',
 //   subject: 'Welcome to UserJoy',
 //   toEmail: 'prattbhatt@gmail.com',
 //   toName: 'Prateek Bhatt',
-//   text: 'This is what I want to send'
+//   body: 'This is what I wanted to send to {{= user.name || "you" }}'
 // };
-// mailer.sendToUser(locals);
+// mailer.sendToUser(options);
 //
 
 
@@ -47,21 +58,27 @@ var UJ_SUPPORT_NAME = 'UserJoy';
  * @constructor Mailer
  */
 
-function Mailer(locals) {
+function Mailer(opts) {
 
-  this.locals = locals;
-  this.subject = locals.subject;
+  this.locals = opts.locals;
+  this.subject = opts.subject;
+
+  // in case of automessages, the message body must be provided.
+  // the message body should be in ejs format,
+  // and will be rendered before sending the email
+  this.body = opts.body || null;
+
+  // if there is template file, then this should be defined
   this.template = null;
 
-  this.aid = locals.aid;
-  this.fromEmail = locals.fromEmail;
-  this.fromName = locals.fromName;
-  this.mId = locals.mId;
-  this.text = locals.text || null;
-  this.replyToEmail = locals.replyToEmail;
-  this.replyToName = locals.replyToName;
-  this.toEmail = locals.toEmail;
-  this.toName = locals.toName;
+  this.aid = opts.aid;
+  this.fromEmail = opts.fromEmail;
+  this.fromName = opts.fromName;
+  this.mId = opts.mId;
+  this.replyToEmail = opts.replyToEmail;
+  this.replyToName = opts.replyToName;
+  this.toEmail = opts.toEmail;
+  this.toName = opts.toName;
 
   this.html = null;
 
@@ -124,30 +141,6 @@ Mailer.prototype.options = function () {
 };
 
 
-Mailer.prototype.renderTemplateFile = function (cb) {
-
-  var self = this;
-
-  // get template
-  emailTemplates(templatesDir, function (err, template) {
-    if (err) return cb(err);
-
-    // render template
-    template(self.template, self.locals, cb);
-  });
-};
-
-
-Mailer.prototype.renderTemplateString = function (cb) {
-  var self = this;
-  var text = self.text;
-  var renderedText = ejs.render(text);
-
-  cb(null, renderedText);
-};
-
-
-
 /**
  * sends email with the proper template
  */
@@ -155,47 +148,32 @@ Mailer.prototype.renderTemplateString = function (cb) {
 Mailer.prototype.send = function (cb) {
 
   var self = this;
+  var opts = self.options();
 
-  async.waterfall(
-    [
+  self.transport.sendMail(opts, function (err, responseStatus) {
 
-      // render template
-      function (cb) {
+    logger.trace({
+      at: 'mailer',
+      err: err,
+      res: responseStatus,
+      opts: opts
+    });
 
-        var callback = function (err, html, text) {
-          self.html = html;
-          cb(err);
-        };
+    cb(err, responseStatus);
+  });
 
-        if (self.template) {
-          self.renderTemplateFile.call(self, callback);
-        } else {
-          self.renderTemplateString.call(self, callback);
-        }
+};
 
 
-      },
+Mailer.prototype.sendUJMail = function (cb) {
 
+  var self = this;
+  var templatePath = path.join(templatesDir, this.template);
 
-      // TODO: save html/text message to db here
-
-      // send email
-      function (cb) {
-
-        var opts = self.options();
-
-        self.transport.sendMail(opts, function (err, responseStatus) {
-          cb(err, responseStatus);
-        });
-
-      }
-
-    ],
-
-    function (err, responseStatus) {
-      cb(err, responseStatus);
-    }
-  )
+  render.file(templatePath, this.locals, function (err, html, text) {
+    self.html = html;
+    self.send.call(self, cb);
+  });
 
 };
 
@@ -203,27 +181,50 @@ Mailer.prototype.send = function (cb) {
 /**
  * Sends signup email
  *
- * @param  {object} locals contains the email and other local variables
+ * @param  {object} options contains the email and other local variables
  */
 
-exports.sendSignupMail = function (locals) {
-  var mailer = new Mailer(locals);
+exports.sendSignupMail = function (options, cb) {
+  var mailer = new Mailer(options);
   mailer.fromName = UJ_SUPPORT_NAME;
   mailer.fromEmail = UJ_SUPPORT_EMAIL;
   mailer.subject = 'Welcome to DoDataDo';
-  mailer.template = 'signup';
-  mailer.send();
+  mailer.template = 'signup/html.ejs';
+  mailer.sendUJMail(cb);
 };
 
 
 /**
- * Sends mail from an app to a user
+ * Sends auto mails from an app to a user
  *
- * @param {object} locals
+ * @param {object} options
  * @param {function} cb callback
  */
 
-exports.sendToUser = function (locals, cb) {
-  var mailer = new Mailer(locals);
+exports.sendAutoMessage = function (options, cb) {
+  var mailer = new Mailer(options);
+
+  // render body and subject
+  mailer.html = render.string(mailer.body, mailer.locals);
+  mailer.subject = render.string(mailer.subject, mailer.locals);
+
+  mailer.send(cb);
+};
+
+
+/**
+ * Sends mail to user from app, manually from dashboard
+ *
+ * @param {object} options
+ * @param {function} cb callback
+ */
+
+exports.sendManualMessage = function (options, cb) {
+  var mailer = new Mailer(options);
+
+  // since the body is already rendered in Conversation controller,
+  // we will use the body as the final html output for the mail
+  mailer.html = mailer.body;
+
   mailer.send(cb);
 };
