@@ -135,7 +135,15 @@ function Query(aid, query) {
   this.countFilterUserIds = [];
 
   // root level operator $and/$or
-  this.rootOperator = query.op;
+  this.rootOperator = null;
+
+  if (query.op === 'and') {
+    this.rootOperator = '$and';
+  } else if (query.op === 'or') {
+    this.rootOperator = '$or';
+  } else {
+    throw new Error('op must be one of and/or')
+  }
 
   var filters = query.filters;
 

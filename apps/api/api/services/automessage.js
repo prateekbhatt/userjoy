@@ -50,7 +50,7 @@ function getMailLocals(automessage, toName, toEmail) {
     replyToEmail: appEmail(amsg.aid),
 
     // TODO : body has to be rendered
-    text: amsg.body
+    body: amsg.body
   };
 
   locals.replyToName = 'Reply to ' + locals.fromName;
@@ -98,7 +98,7 @@ function sendAutoMessage(aid, amId, to, cb) {
           var toName = recipient.name || toEmail;
           var locals = getMailLocals(amsg, toName, toEmail);
 
-          mailer.sendToUser(locals, function (err, responseStatus) {
+          mailer.sendAutoMessage(locals, function (err, responseStatus) {
 
             if (err) {
 
