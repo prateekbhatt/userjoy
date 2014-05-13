@@ -2,6 +2,7 @@
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="caption-full">
+        <form name="usersListForm" novalidate>
             <div class="col-md-9">
                 <div class="row" style="padding-left: 40px; padding-top: 20px;">
                     <div class="col-md-12">
@@ -27,6 +28,7 @@
                                     <div class="row">
                                         <div class="col-md-4" style="padding-left: 24px;">
                                             <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.btntext}}</span>&nbsp;<span class="caret"></span></button>
+                                            <!-- <button type="button" ng-class="{'btn': true, 'btn-default': true, 'dropdown-toggle': true, 'form-control': true, 'selectwidthauto': true}" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.btntext}}</span>&nbsp;<span class="caret"></span></button> -->
                                             <ul class="select dropdown-menu" role="select" style="left: 23px;">
                                                 <li class="dropdown dropdown-submenu">
                                                     <a style="cursor: default">Has done</a>
@@ -70,7 +72,7 @@
                                             </ul>
                                         </div>
                                         <div class="col-md-3" ng-if="filter.checkMethod">
-                                            <input type="text" class="form-control" placeholder="Value" ng-model="filter.val">
+                                            <input type="text" placeholder="Value" ng-model="filter.val" ng-class="{'form-control': true, 'error': filter.val.length == 0 && usersListForm.$dirty}">
                                         </div>
                                         <div class="col-md-2">
                                             <a class="btn btn-default fa fa-times" ng-click="removeFilter(filter)"></a>
@@ -81,6 +83,14 @@
                         </div>
                     </div>
                     <br>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-push-1">
+                            <div ng-show="showErr" id="login-alert" class="alert alert-danger col-sm-12">
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="hideErrorAlert()">&times;</button>
+                                {{errMsg}}
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-md-4" style="margin-left: 20px">
                             <button class="btn btn-info" ng-click="addAnotherFilter()" ng-show="true">
@@ -118,20 +128,21 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="panel panel-info">
+                <div class="panel panel-info" style="min-height: 200px">
                     <div class="panel-heading">
                         <h3 class="panel-title">
                         Segments</h3>
                     </div>
                     <div ng-show="!segmentsCreated">
-                        <p>No Segments Created.</p>
+                        <p class="text-center" style="padding-top: 60px;">No Segments Created.</p>
                     </div>
                     <ul class="list-group" ng-show="segmentsCreated">
                         <a href="#" class="list-group-item" ng-repeat="segname in segmentsCreatedName" ng-click="showQuery(segname.id)">{{segname.name}}</a>
-                        
+
                     </ul>
                 </div>
             </div>
+        </form>
         </div>
     </div>
 </div>
@@ -200,7 +211,7 @@
                     </tr>
                 </table>
             </div>
-            
+
         </div>
     </div>
 </div>

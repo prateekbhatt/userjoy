@@ -12,4 +12,5 @@ angular.module('services', [
     'services.saveMsgService',
     'services.UserList',
     'services.segmentService',
+    'services.AutoMsgService',
 ]);

@@ -61,14 +61,27 @@ angular.module('do.automate', [])
 ])
 
 .controller('messageAutomateCtrl', ['$scope', '$location', 'segment',
-    'queryMatching', '$filter',
-    function ($scope, $location, segment, queryMatching, $filter) {
+    'queryMatching', '$filter', 'AutoMsgService', 'modelsAutomate',
+    'AppService',
+    function ($scope, $location, segment, queryMatching, $filter,
+        AutoMsgService, modelsAutomate, AppService) {
 
         console.log("inside automate ctrl");
 
-        $scope.automessages = ["In App welcmessageAutomateCtrlome message for start ups",
+        var populateAutoMsg = function (err) {
+            if (err) {
+                return err;
+            }
+            console.log("success");
+        }
+        modelsAutomate.getAllAutoMessages(AppService.getCurrentApp()
+            ._id, populateAutoMsg);
+
+        $scope.automessages = [
+            "In App welcmessageAutomateCtrlome message for start ups",
             "Discount for users from Uganda", "As above", "As above1"
         ];
+
 
 
         $scope.isActive = function (viewLocation) {
@@ -127,18 +140,45 @@ angular.module('do.automate', [])
 
 ])
 
-.controller('automateSegmentCtrl', ['$scope', 'segment',
-    function ($scope, segment) {
-        $scope.segments = segment.get.all();
-        $scope.segmenticons = [];
-        $scope.selectedIcon = $scope.segments[0].name;
+.controller('automateSegmentCtrl', ['$scope', 'segment', 'modelsSegment',
+    'AppService', 'segmentService',
+    function ($scope, segment, modelsSegment, AppService, segmentService) {
 
-        for (var i = $scope.segments.length - 1; i >= 0; i--) {
-            $scope.segmenticons.push({
-                value: $scope.segments[i].name,
-                label: $scope.segments[i].name
-            })
-        };
+        $scope.segments = [];
+        $scope.segmenticons = [];
+        $scope.selectedIcon = [];
+
+
+        var checkSegments = function (err) {
+            if (err) {
+                return err;
+            }
+            $scope.selectedIcon.id = segmentService.getSegments()[0]._id;
+            $scope.selectedIcon.name = segmentService.getSegments()[0].name;
+            if (segmentService.getSegments()
+                .length > 0) {
+                for (var i = 0; i < segmentService.getSegments()
+                    .length; i++) {
+                    $scope.segmenticons.push({
+                        value: segmentService.getSegments()[i].name,
+                        label: segmentService.getSegments()[i].name,
+                        id: segmentService.getSegments()[i]._id
+                    })
+                };
+            }
+        }
+
+        modelsSegment.getAllSegments(AppService.getCurrentApp()
+            ._id, checkSegments);
+        $scope.changeText = function (ind) {
+            $scope.selectedIcon.id = $scope.segmenticons[ind].id;
+            $scope.selectedIcon.name = $scope.segmenticons[ind].label;
+        }
+
+        $scope.storeSegment = function () {
+            segmentService.setSingleSegment($scope.selectedIcon);
+            console.log("single segment: ", segmentService.getSingleSegment());
+        }
     }
 ])
 
@@ -186,7 +226,8 @@ angular.module('do.automate', [])
         }
 
         $scope.saveMessage = function () {
-            if($scope.htmlVariable) {
+            if ($scope.htmlVariable) {
+
                 $location.path('/messages/automate/test');
                 saveMsgService.setMsg($scope.htmlVariable);
             }

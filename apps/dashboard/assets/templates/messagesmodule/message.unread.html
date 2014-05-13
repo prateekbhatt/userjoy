@@ -77,6 +77,7 @@
                                         </div>
                                     </li>
                                 </ul>
+                                </a>
                             </li>
                         </ul>
                         <!-- /#side-menu -->
@@ -94,23 +95,7 @@
                                 <div class="panel-heading">
                                     <i class="fa fa-comments"></i> Unread Messages
                                     <div class="pull-right">
-                                        <!-- <div class="btn-group">
-                                                                                            <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
-                                                                                            Actions
-                                                                                            <span class="caret"></span>
-                                                                                            </button>
-                                                                                            <ul class="dropdown-menu pull-right" role="menu">
-                                                                                                    <li><a href="#">Action</a>
-                                                                                                    </li>
-                                                                                                    <li><a href="#">Another action</a>
-                                                                                                    </li>
-                                                                                                    <li><a href="#">Something else here</a>
-                                                                                                    </li>
-                                                                                                    <li class="divider"></li>
-                                                                                                    <li><a href="#">Separated link</a>
-                                                                                                    </li>
-                                                                                            </ul>
-                                        </div> -->
+
                                     </div>
                                 </div>
                                 <!-- /.panel-heading -->
@@ -138,9 +123,7 @@
                                                     <br>
                                                     <br>
                                                     <tbody>
-                                                        <!-- <td ng-repeat="column in columnsSent" ng-show="column.visible" sortable="column.field" class="text-center">
-                                                                                                                            {{user[column.field]}}
-                                                        </td> -->
+                                                        <!-- <td ng-repeat="column in columnsSent" ng-show="column.visible" sortable="column.field" class="text-center"></td> -->
                                                         <tr ng-repeat="user in data | filter:searchText" >
                                                             <td data-title="'User'" style="text-align:center; cursor:pointer" ng-click="showSelectedMail(user.id)">
                                                                 <span>{{user.name}}</span>
