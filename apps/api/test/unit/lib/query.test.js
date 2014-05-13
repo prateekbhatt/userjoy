@@ -1,4 +1,4 @@
-describe.only('Lib query', function () {
+describe('Lib query', function () {
 
   /**
    * Lib
@@ -66,7 +66,6 @@ describe.only('Lib query', function () {
     beforeEach(function () {
       setIntoCountSpy = sinon.spy(Query.prototype, 'setIntoCount');
       newQuery = new Query(saved.apps.first._id, queryObj);
-      console.log('beforeeach', newQuery, queryObj);
     });
 
     afterEach(function () {
@@ -131,7 +130,6 @@ describe.only('Lib query', function () {
 
     it('should set countFilters', function () {
 
-console.log('newQuery', newQuery);
       expect(newQuery.countFilters)
         .to.be.an('array');
 
@@ -335,8 +333,7 @@ console.log('newQuery', newQuery);
       Query.prototype.aid = 'BlaBlaID';
       Query.prototype.countFilterUserIds = [];
 
-      var attrFilters = [
-        {
+      var attrFilters = [{
           method: 'attr',
           name: 'platform',
           op: '$eq',
@@ -777,6 +774,8 @@ console.log('newQuery', newQuery);
 
   describe('#runCountQuery', function () {
 
+    var aid, uids;
+
     var countFilters = [
 
       {
@@ -789,17 +788,20 @@ console.log('newQuery', newQuery);
 
       {
         method: 'count',
+        type: 'feature',
         name: 'Clicked logout btn',
         op: '$lt',
-        val: 1000000000
+        val: 10000
       },
 
     ];
 
     before(function (done) {
-      var aid = saved.apps.first._id;
-      var uid = randomId;
-      var uids = [uid];
+      var uid1 = saved.users.first._id;
+      var uid2 = saved.users.second._id;
+
+      aid = saved.apps.first._id;
+      uids = [uid1, uid2];
       createEventFixtures(aid, uids, 100, done);
     });
 
@@ -808,23 +810,6 @@ console.log('newQuery', newQuery);
       Query.prototype.aid = saved.apps.first._id;
       Query.prototype.countFilters = countFilters;
       Query.prototype.rootOperator = '$and';
-    });
-
-    it('should aggregate user ids', function (done) {
-      Query.prototype.runCountQuery(function (err, uids) {
-
-        expect(err)
-          .not.to.exist;
-
-        expect(uids)
-          .to.be.an('array');
-
-        expect(uids)
-          .to.have.length.above(0);
-
-        done();
-      });
-
     });
 
 
@@ -849,7 +834,6 @@ console.log('newQuery', newQuery);
 
       var spy = sinon.spy(Query.prototype, 'genCountMatchCond');
 
-
       Query.prototype.runCountQuery(function (err, uids) {
 
         expect(spy)
@@ -860,6 +844,70 @@ console.log('newQuery', newQuery);
       });
 
     });
+
+
+    it('should aggregate user ids', function (done) {
+      Query.prototype.runCountQuery(function (err, userIds) {
+
+        expect(err)
+          .not.to.exist;
+
+        expect(userIds)
+          .to.be.an('array');
+
+        expect(userIds)
+          .to.have.length(uids.length);
+
+        done();
+      });
+
+    });
+
+
+    it(
+      'should return empty error if query has hasdone and hasnotdone filters on the same event',
+      function (done) {
+
+        Query.prototype.countFilters = [
+
+          // hasdone
+          {
+            method: 'count',
+            type: 'feature',
+            name: 'Define Segment',
+            op: '$gt',
+            val: 0
+          },
+
+
+          // hasnotdone
+          {
+            method: 'count',
+            type: 'feature',
+            name: 'Define Segment',
+            op: '$eq',
+            val: 0
+          },
+
+        ];
+
+        Query.prototype.runCountQuery(function (err, userIds) {
+
+          expect(err)
+            .not.to.exist;
+
+          expect(userIds)
+            .to.be.an('array');
+
+          expect(userIds)
+            .to.be.empty;
+
+          done();
+        });
+
+      });
+
+
   });
 
 
@@ -1004,6 +1052,60 @@ console.log('newQuery', newQuery);
         done();
       });
     });
+
+  });
+
+
+  describe('#sanitize', function () {
+
+    var before = {
+      list: 'users',
+      op: 'and',
+      filters: [{
+        method: 'hasdone',
+        type: 'feature',
+        name: 'Define Segment',
+        op: '',
+        val: ''
+      }]
+    }
+
+
+
+    var after = {
+      list: 'users',
+      op: 'and',
+      filters: [{
+        method: 'hasdone',
+        type: 'feature',
+        name: 'Define Segment'
+      }]
+    };
+
+    it('should remove empty op/val values in hasdone/hasnotdone filters',
+      function () {
+
+        expect(before.filters[0])
+          .to.have.property("op");
+
+        expect(before.filters[0])
+          .to.have.property("val");
+
+        expect(before)
+          .to.not.eql(after);
+
+        Query.sanitize(before);
+
+        expect(before.filters[0])
+          .to.not.have.property("op");
+
+        expect(before.filters[0])
+          .to.not.have.property("val");
+
+        expect(before)
+          .to.eql(after);
+
+      });
 
   });
 

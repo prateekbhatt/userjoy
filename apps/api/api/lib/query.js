@@ -22,6 +22,27 @@ var Event = require('../models/Event');
 
 
 /**
+ * Helpers
+ */
+
+var logger = require('../../helpers/logger');
+
+
+/**
+ * Maps mongo db operators w.r.t. defined by UserJoy client
+ * @type {Object}
+ */
+
+var OP_MAP = {
+  and: '$and',
+  or: '$or',
+  eq: '$eq',
+  gt: '$gt',
+  lt: '$lt'
+};
+
+
+/**
  * Expose the Query constructor
  */
 
@@ -134,13 +155,10 @@ function Query(aid, query) {
 
   // set root level operator as $and/$or
   this.rootOperator = null;
-
-  if (query.op === 'and') {
-    this.rootOperator = '$and';
-  } else if (query.op === 'or') {
-    this.rootOperator = '$or';
+  if (_.contains(['and', 'or'], query.op)) {
+    this.rootOperator = OP_MAP[query.op];
   } else {
-    throw new Error('op must be one of and/or')
+    throw new Error('op must be one of and/or');
   }
 
 
@@ -296,12 +314,8 @@ Query.prototype.run = function (cb) {
 
         self.runCountQuery.call(self, function (err, uids) {
 
-          if (err) {
-            return cb(err);
-          }
-
+          if (err) return cb(err);
           self.countFilterUserIds = uids;
-
           return cb();
         });
 
@@ -310,13 +324,8 @@ Query.prototype.run = function (cb) {
       attrQuery: function (cb) {
 
         self.runAttrQuery.call(self, function (err, users) {
-
-          if (err) {
-            return cb(err);
-          }
-
+          if (err) return cb(err);
           self.filteredUsers = users;
-
           return cb();
         });
 
@@ -326,6 +335,12 @@ Query.prototype.run = function (cb) {
     function (err) {
 
       if (err) {
+
+        logger.crit({
+          at: 'query run',
+          err: err
+        });
+
         return cb(err);
       }
 
@@ -358,9 +373,7 @@ Query.prototype.runCountQuery = function (cb) {
     })
     .exec(function (err, result) {
 
-      if (err) {
-        return cb(err);
-      }
+      if (err) return cb(err);
       var uids = _.pluck(result, '_id');
 
       cb(null, uids);
@@ -534,4 +547,61 @@ Query.prototype.getCountFilterCond = function (filter) {
   }
 
   return cond;
+};
+
+
+
+/**
+ * Sanitizes the query object
+ *
+ * e.g.
+ *
+ * BEFORE:
+ *
+ * {
+ *   list: 'users',
+ *   op: 'and',
+ *   filters: [
+ *     {
+ *       method: 'hasdone',
+ *       type: 'feature',
+ *       name: 'Define Segment',
+ *       op: '',
+ *       val: ''
+ *     }
+ *   ]
+ * }
+ *
+ *
+ * AFTER:
+ *
+ * {
+ *   list: 'users',
+ *   op: 'and',
+ *   filters: [
+ *     {
+ *       method: 'hasdone',
+ *       type: 'feature',
+ *       name: 'Define Segment'
+ *     }
+ *   ]
+ * }
+ *
+ *
+ * @param {object} q the query object
+ * @return {object} sanitized query object
+ */
+
+module.exports.sanitize = function (q) {
+
+  _.each(q.filters, function (f) {
+
+    if (_.contains(['hasdone', 'hasnotdone'], f.method)) {
+      delete f.op;
+      delete f.val;
+    }
+
+  });
+
+  return q;
 };
