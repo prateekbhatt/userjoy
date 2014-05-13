@@ -1,6 +1,6 @@
 
 BROWSERS ?= 'chrome, safari, firefox'
-NAME= 'dodatado'
+NAME= 'userjoy'
 BINS= node_modules/.bin
 C= $(BINS)/component
 MINIFY = $(BINS)/uglifyjs

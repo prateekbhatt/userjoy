@@ -31,6 +31,14 @@ var logger = require('../../helpers/logger');
 
 
 /**
+ * Lib
+ */
+
+var sanitize = require('../lib/query')
+  .sanitize;
+
+
+/**
  * All routes on /apps
  * need to be authenticated
  */
@@ -67,7 +75,7 @@ router
       .find({
         aid: aid
       })
-      .exec(function(err, segments) {
+      .exec(function (err, segments) {
         if (err) return next(err);
         res
           .status(200)
@@ -92,7 +100,7 @@ router
 
     Segment
       .findById(sid)
-      .exec(function(err, segment) {
+      .exec(function (err, segment) {
         if (err) return next(err);
         res
           .status(200)
@@ -124,6 +132,8 @@ router
     // add current logged in account as the creator of the segment
     newSegment.creator = accid;
 
+    // sanitize the segment object
+    newSegment = sanitize(newSegment);
 
     Segment
       .create(newSegment, function (err, savedSegment) {

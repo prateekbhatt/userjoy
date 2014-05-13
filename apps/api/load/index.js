@@ -37,8 +37,8 @@ exports.start = function startServer(done) {
   loadMiddleware.common(app);
 
 
-  // collector routes which do not need session
-  loadRoutes.collector(app);
+  // track routes which do not need session
+  loadRoutes.track(app);
 
 
   // session middleware required for dashboard routes

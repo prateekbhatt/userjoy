@@ -5,7 +5,7 @@
   "private": "true",
   "description": "js lib to capture data and show notifications",
   "repository": "git://github.com/prateekbhatt/littlejohn.git",
-  "main": "dodatado.js",
+  "main": "userjoy.js",
   "dependencies": {},
   "devDependencies": {
     "component": "0.19.5",

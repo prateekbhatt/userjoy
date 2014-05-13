@@ -15,19 +15,19 @@ logger.trace(Object.keys(routes));
 
 
 /**
- * Defines data collector routes
+ * Defines data track routes
  * These routes collect data from the js snippet on users' browsers
  * @param  {Object} app
  */
-module.exports.collector = function loadCollectorRoutes(app) {
+module.exports.track = function loadTrackRoutes(app) {
 
   ////////////////////////////////////////////////////////
-  // Define data collector routes below
-  // app.use('/company', routes.CollectorController);
-  // app.use('/identify', routes.CollectorController);
+  // Define data track routes below
+  // app.use('/company', routes.TrackController);
+  // app.use('/identify', routes.TrackController);
   ////////////////////////////////////////////////////////
 
-  app.use('/track', routes.CollectorController);
+  app.use('/track', routes.TrackController);
 
 };
 

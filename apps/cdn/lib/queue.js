@@ -22,7 +22,7 @@ function Queue() {
 /**
  * Creates queue based on the tasks in the param array
  *
- * @param {Array} window.dodatado
+ * @param {Array} window.userjoy
  * @return {Queue}
  */
 
