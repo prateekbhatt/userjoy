@@ -1,8 +1,8 @@
 
 describe('store', function () {
 
-  var dodatado = window.dodatado;
-  var require = dodatado.require;
+  var userjoy = window.userjoy;
+  var require = userjoy.require;
   var assert = dev('assert');
   var equal = dev('equals');
   var store = require('./store');

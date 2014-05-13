@@ -1,5 +1,5 @@
 
-var debug = require('debug')('dodatado:user');
+var debug = require('debug')('userjoy:user');
 var Entity = require('./entity');
 var inherit = require('inherit');
 var bind = require('bind');
@@ -13,10 +13,10 @@ var cookie = require('./cookie');
 User.defaults = {
   persist: true,
   cookie: {
-    key: 'dodatado_user_id'
+    key: 'userjoy_user_id'
   },
   localStorage: {
-    key: 'dodatado_user_traits'
+    key: 'userjoy_user_traits'
   }
 };
 

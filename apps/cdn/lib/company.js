@@ -1,5 +1,5 @@
 
-var debug = require('debug')('dodatado:company');
+var debug = require('debug')('userjoy:company');
 var Entity = require('./entity');
 var inherit = require('inherit');
 var bind = require('bind');
@@ -12,10 +12,10 @@ var bind = require('bind');
 Company.defaults = {
   persist: true,
   cookie: {
-    key: 'dodatado_company_id'
+    key: 'userjoy_company_id'
   },
   localStorage: {
-    key: 'dodatado_company_properties'
+    key: 'userjoy_company_properties'
   }
 };
 

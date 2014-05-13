@@ -5,12 +5,12 @@
   <link rel="stylesheet" href="test/server/mocha.css">
   <script src="test/server/mocha.js"></script>
   <script>mocha.setup({ ui: 'bdd' })</script>
-  <script src="dodatado.js"></script>
+  <script src="userjoy.js"></script>
   <script src='test/build/build.js'></script>
   <script src="test/index.js"></script>
   <script src="test/company.js"></script>
   <script src="test/cookie.js"></script>
-  <script src="test/dodatado.js"></script>
+  <script src="test/userjoy.js"></script>
   <script src="test/queue.js"></script>
   <script src="test/store.js"></script>
   <script src="test/user.js"></script>
@@ -20,10 +20,10 @@
   <script>
     if (window.mochaPhantomJS) {
       mochaPhantomJS.run();
-      dodatado.require('debug').disable();
+      userjoy.require('debug').disable();
     } else {
       dev('gravy')(mocha.run());
-      dodatado.require('debug').enable('*');
+      userjoy.require('debug').enable('*');
     }
   </script>
 </body>

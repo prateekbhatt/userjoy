@@ -1,7 +1,7 @@
 describe('queue', function () {
 
-  var dodatado = window.dodatado;
-  var require = dodatado.require;
+  var userjoy = window.userjoy;
+  var require = userjoy.require;
   var assert = dev('assert');
   var _ = require('lodash');
   var queue = require('./queue');
