@@ -68,7 +68,7 @@ describe('Resource /query', function () {
     beforeEach(function () {
       obj = {
         list: 'users',
-        op: '$and',
+        op: 'and',
         filters: [
 
           {
