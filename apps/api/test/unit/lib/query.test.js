@@ -1,4 +1,4 @@
-describe('Lib query', function () {
+describe.only('Lib query', function () {
 
   /**
    * Lib
@@ -42,11 +42,21 @@ describe('Lib query', function () {
     var newQuery;
     var queryObj;
     var setIntoCountSpy;
-    var setFiltersSpy;
     var filters = [{
-      method: 'hasdone',
-      name: 'Create new object'
-    }];
+        method: 'count',
+        name: 'Clicked login btn',
+        op: '$eq',
+        val: 0
+      },
+
+      {
+        method: 'attr',
+        name: 'platform',
+        op: '$eq',
+        val: 'Android'
+      }
+
+    ];
 
     queryObj = {
       op: 'and',
@@ -55,13 +65,12 @@ describe('Lib query', function () {
 
     beforeEach(function () {
       setIntoCountSpy = sinon.spy(Query.prototype, 'setIntoCount');
-      setFiltersSpy = sinon.spy(Query.prototype, 'setFilters');
       newQuery = new Query(saved.apps.first._id, queryObj);
+      console.log('beforeeach', newQuery, queryObj);
     });
 
     afterEach(function () {
       Query.prototype.setIntoCount.restore();
-      Query.prototype.setFilters.restore();
     });
 
 
@@ -90,20 +99,6 @@ describe('Lib query', function () {
     });
 
 
-    it('should set default startDate', function () {
-
-      expect(newQuery.startDate)
-        .to.exist;
-    });
-
-
-    it('should set default endDate', function () {
-
-      expect(newQuery.endDate)
-        .to.exist;
-    });
-
-
     it('should set rootOperator', function () {
 
       expect(newQuery.rootOperator)
@@ -111,7 +106,7 @@ describe('Lib query', function () {
     });
 
 
-    it('should set default endDate', function () {
+    it('should set default countFilterUserIds', function () {
 
       expect(newQuery.countFilterUserIds)
         .to.exist;
@@ -134,13 +129,26 @@ describe('Lib query', function () {
     });
 
 
-    it('should call #setFilters', function () {
+    it('should set countFilters', function () {
 
-      expect(setFiltersSpy)
-        .to.have.been.calledOnce;
+console.log('newQuery', newQuery);
+      expect(newQuery.countFilters)
+        .to.be.an('array');
 
-      expect(setFiltersSpy)
-        .to.have.been.calledWithExactly(filters);
+      expect(newQuery.countFilters.length)
+        .to.eql(1);
+
+    });
+
+
+    it('should set attrFilters', function () {
+
+      expect(newQuery.attrFilters)
+        .to.be.an('array');
+
+      expect(newQuery.attrFilters.length)
+        .to.eql(1);
+
     });
 
   });
@@ -319,69 +327,6 @@ describe('Lib query', function () {
   });
 
 
-  describe('#setFilters', function () {
-
-
-    it('should set countFilters', function () {
-
-      var filters = [{
-          method: 'count',
-          name: 'Clicked login btn',
-          op: '$eq',
-          val: 0
-        },
-
-        {
-          method: 'attr',
-          name: 'platform',
-          op: '$eq',
-          val: 'Android'
-        }
-
-      ];
-
-      Query.prototype.setFilters(filters);
-
-      expect(Query.prototype.countFilters)
-        .to.be.an('array');
-
-      expect(Query.prototype.countFilters.length)
-        .to.eql(1);
-
-    });
-
-
-    it('should set attrFilters', function () {
-
-      var filters = [{
-          method: 'count',
-          name: 'Clicked login btn',
-          op: '$eq',
-          val: 0
-        },
-
-        {
-          method: 'attr',
-          name: 'platform',
-          op: '$eq',
-          val: 'Android'
-        }
-
-      ];
-
-      Query.prototype.setFilters(filters);
-
-      expect(Query.prototype.attrFilters)
-        .to.be.an('array');
-
-      expect(Query.prototype.attrFilters.length)
-        .to.eql(1);
-
-    });
-  });
-
-
-
   describe('#genAttrMatchCond', function () {
 
     var cond;
@@ -390,13 +335,7 @@ describe('Lib query', function () {
       Query.prototype.aid = 'BlaBlaID';
       Query.prototype.countFilterUserIds = [];
 
-      var filters = [{
-          method: 'count',
-          name: 'Clicked login btn',
-          op: '$eq',
-          val: 0
-        },
-
+      var attrFilters = [
         {
           method: 'attr',
           name: 'platform',
@@ -419,8 +358,7 @@ describe('Lib query', function () {
         }
       ];
 
-      Query.prototype.filters = filters;
-      Query.prototype.setFilters(filters);
+      Query.prototype.attrFilters = attrFilters;
       cond = Query.prototype.genAttrMatchCond();
     });
 

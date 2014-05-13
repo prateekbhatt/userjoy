@@ -9,7 +9,6 @@
 
 var _ = require('lodash');
 var async = require('async');
-var moment = require('moment');
 var ObjectId = require('mongoose')
   .Types.ObjectId;
 
@@ -72,7 +71,7 @@ module.exports = Query;
  *
  * {
  *   list: 'users',
- *   op: '$and',
+ *   op: 'and',
  *   filters: [
  *       {
  *         method: 'count',
@@ -129,12 +128,11 @@ function Query(aid, query) {
 
 
   this.aid = aid;
-
-  this.countFilters = [];
-  this.attrFilters = [];
   this.countFilterUserIds = [];
 
-  // root level operator $and/$or
+  var filters = query.filters;
+
+  // set root level operator as $and/$or
   this.rootOperator = null;
 
   if (query.op === 'and') {
@@ -145,24 +143,17 @@ function Query(aid, query) {
     throw new Error('op must be one of and/or')
   }
 
-  var filters = query.filters;
-
-  // all event queries will operate for events since the startDate and till
-  // endDate
-  //
-  // by default, the startDate will be 30 days prior, and endDate today
-  this.startDate = moment()
-    .subtract('days', 30)
-    .format();
-
-  this.endDate = moment()
-    .format();
-
 
   // separate Event count queries and User attribute queries
   this.setIntoCount(filters);
-  this.setFilters(filters);
 
+  this.countFilters = _.filter(filters, {
+    'method': 'count'
+  });
+
+  this.attrFilters = _.filter(filters, {
+    'method': 'attr'
+  });
 
   return this;
 
@@ -283,27 +274,6 @@ Query.prototype.setIntoCount = function (filters) {
       self.hasnotdoneIntoCount(q);
     }
 
-  });
-
-  return this;
-};
-
-
-/**
- * Sets this.countFilters and this.attrFilters
- *
- * @param {array} filters
- * @return {Query}
- */
-
-Query.prototype.setFilters = function (filters) {
-  var self = this;
-
-  this.countFilters = _.filter(filters, {
-    'method': 'count'
-  });
-  this.attrFilters = _.filter(filters, {
-    'method': 'attr'
   });
 
   return this;
