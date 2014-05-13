@@ -67,17 +67,17 @@ var user = require('./user');
 
 
 /**
- * Expose `DoDataDo`.
+ * Expose `UserJoy`.
  */
 
-module.exports = DoDataDo;
+module.exports = UserJoy;
 
 
 /**
- * Initialize a new `DoDataDo` instance.
+ * Initialize a new `UserJoy` instance.
  */
 
-function DoDataDo() {
+function UserJoy() {
   this._timeout = 300;
   this.api_url = '/track';
   this.jsonp_callback = 'foo';
@@ -90,10 +90,10 @@ function DoDataDo() {
  *
  * @param {Object} settings
  * @param {Object} options (optional)
- * @return {DoDataDo}
+ * @return {UserJoy}
  */
 
-DoDataDo.prototype.initialize = function (settings, options) {
+UserJoy.prototype.initialize = function (settings, options) {
   settings = settings || {};
   options = options || {};
 
@@ -105,7 +105,7 @@ DoDataDo.prototype.initialize = function (settings, options) {
 
   // set tasks which were queued before initialization
   queue
-    .create(window.dodatado)
+    .create(window.userjoy)
     .prioritize();
 
   // invoke queued tasks
@@ -121,10 +121,10 @@ DoDataDo.prototype.initialize = function (settings, options) {
 /**
  * Invoke tasks which have been queued
  *
- * @return {DoDataDo}
+ * @return {UserJoy}
  */
 
-DoDataDo.prototype._invokeQueue = function () {
+UserJoy.prototype._invokeQueue = function () {
 
   for (var i = queue.tasks.length - 1; i >= 0; i--) {
     this.push(queue.tasks.shift());
@@ -139,10 +139,10 @@ DoDataDo.prototype._invokeQueue = function () {
  * @param {String} id (optional)
  * @param {Object} traits (optional)
  * @param {Function} fn (optional)
- * @return {DoDataDo}
+ * @return {UserJoy}
  */
 
-DoDataDo.prototype.identify = function (id, traits, options, fn) {
+UserJoy.prototype.identify = function (id, traits, options, fn) {
   if (is.fn(options)) fn = options, options = null;
   if (is.fn(traits)) fn = traits, options = null, traits = null;
   if (is.object(id)) options = traits, traits = id, id = user.id();
@@ -164,7 +164,7 @@ DoDataDo.prototype.identify = function (id, traits, options, fn) {
  * @return {Object}
  */
 
-DoDataDo.prototype.user = function () {
+UserJoy.prototype.user = function () {
   return user;
 };
 
@@ -177,10 +177,10 @@ DoDataDo.prototype.user = function () {
  * @param {Object} traits (optional)
  * @param {Object} options (optional)
  * @param {Function} fn (optional)
- * @return {DoDataDo or Object}
+ * @return {UserJoy or Object}
  */
 
-DoDataDo.prototype.company = function (id, traits, options, fn) {
+UserJoy.prototype.company = function (id, traits, options, fn) {
   if (0 === arguments.length) return company;
   if (is.fn(options)) fn = options, options = null;
   if (is.fn(traits)) fn = traits, options = null, traits = null;
@@ -204,10 +204,10 @@ DoDataDo.prototype.company = function (id, traits, options, fn) {
  * @param {Object} properties (optional)
  * @param {Object} options (optional)
  * @param {Function} fn (optional)
- * @return {DoDataDo}
+ * @return {UserJoy}
  */
 
-DoDataDo.prototype.track = function (event, properties, options, fn) {
+UserJoy.prototype.track = function (event, properties, options, fn) {
   if (is.fn(options)) fn = options, options = null;
   if (is.fn(properties)) fn = properties, options = null, properties = null;
 
@@ -229,10 +229,10 @@ DoDataDo.prototype.track = function (event, properties, options, fn) {
  * @param {Element or Array} links
  * @param {String or Function} event
  * @param {Object or Function} properties (optional)
- * @return {DoDataDo}
+ * @return {UserJoy}
  */
 
-DoDataDo.prototype.trackLink = function (links, event, properties) {
+UserJoy.prototype.trackLink = function (links, event, properties) {
   if (!links) return this;
   if (is.element(links)) links = [links]; // always arrays, handles jquery
 
@@ -263,10 +263,10 @@ DoDataDo.prototype.trackLink = function (links, event, properties) {
  * @param {Element or Array} forms
  * @param {String or Function} event
  * @param {Object or Function} properties (optional)
- * @return {DoDataDo}
+ * @return {UserJoy}
  */
 
-DoDataDo.prototype.trackForm = function (forms, event, properties) {
+UserJoy.prototype.trackForm = function (forms, event, properties) {
   if (!forms) return this;
   if (is.element(forms)) forms = [forms]; // always arrays, handles jquery
 
@@ -308,10 +308,10 @@ DoDataDo.prototype.trackForm = function (forms, event, properties) {
  * @param {Object or String} properties (or path) (optional)
  * @param {Object} options (optional)
  * @param {Function} fn (optional)
- * @return {DoDataDo}
+ * @return {UserJoy}
  */
 
-DoDataDo.prototype.page = function (category, name, properties, options, fn) {
+UserJoy.prototype.page = function (category, name, properties, options, fn) {
 
   if (is.fn(options)) fn = options, options = null;
   if (is.fn(properties)) fn = properties, options = properties = null;
@@ -354,7 +354,7 @@ DoDataDo.prototype.page = function (category, name, properties, options, fn) {
  * @param {Number} timeout
  */
 
-DoDataDo.prototype.timeout = function (timeout) {
+UserJoy.prototype.timeout = function (timeout) {
   this._timeout = timeout;
 };
 
@@ -365,7 +365,7 @@ DoDataDo.prototype.timeout = function (timeout) {
  * @param {String or Boolean} str
  */
 
-DoDataDo.prototype.debug = function (str) {
+UserJoy.prototype.debug = function (str) {
   if (0 == arguments.length || str) {
     debug.enable('analytics:' + (str || '*'));
   } else {
@@ -378,11 +378,11 @@ DoDataDo.prototype.debug = function (str) {
  * Apply options.
  *
  * @param {Object} options
- * @return {DoDataDo}
+ * @return {UserJoy}
  * @api private
  */
 
-DoDataDo.prototype._options = function (options) {
+UserJoy.prototype._options = function (options) {
   options = options || {};
   cookie.options(options.cookie);
   store.options(options.localStorage);
@@ -396,11 +396,11 @@ DoDataDo.prototype._options = function (options) {
  * Callback a `fn` after our defined timeout period.
  *
  * @param {Function} fn
- * @return {DoDataDo}
+ * @return {UserJoy}
  * @api private
  */
 
-DoDataDo.prototype._callback = function (fn) {
+UserJoy.prototype._callback = function (fn) {
   callback.async(fn, this._timeout);
   return this;
 };
@@ -408,17 +408,17 @@ DoDataDo.prototype._callback = function (fn) {
 
 /**
  *
- * Send event data to DoDataDo API
+ * Send event data to UserJoy API
  *
  * @param {String} type of event
  * @param {Object} traits of event
- * @return {DoDataDo}
+ * @return {UserJoy}
  * @api private
  */
 
-DoDataDo.prototype._send = function (type, traits) {
+UserJoy.prototype._send = function (type, traits) {
 
-  // TODO: send data to dodatado api here
+  // TODO: send data to userjoy api here
 
   var data = {
     event: {
@@ -447,10 +447,10 @@ DoDataDo.prototype._send = function (type, traits) {
  * Send data to api using JSON-P
  *
  * @param {Object} data to be sent
- * @return {dodatado}
+ * @return {userjoy}
  */
 
-DoDataDo.prototype._jsonp = function (data) {
+UserJoy.prototype._jsonp = function (data) {
 
   function foo(data) {
     // do stuff with JSON
@@ -479,7 +479,7 @@ DoDataDo.prototype._jsonp = function (data) {
  * @api private
  */
 
-DoDataDo.prototype.push = function (args) {
+UserJoy.prototype.push = function (args) {
   var method = args.shift();
 
   if (!this[method]) return;

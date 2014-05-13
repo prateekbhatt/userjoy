@@ -1,8 +1,8 @@
-describe('DoDataDo', function () {
+describe('UserJoy', function () {
 
-  var dodatado = window.dodatado;
-  var require = dodatado.require;
-  var DoDataDo = require('./dodatado');
+  var userjoy = window.userjoy;
+  var require = userjoy.require;
+  var UserJoy = require('./userjoy');
   var assert = dev('assert');
   var bind = require('event')
     .bind;
@@ -17,7 +17,7 @@ describe('DoDataDo', function () {
   var trigger = dev('trigger-event');
   var user = require('./user');
 
-  var dodatado;
+  var userjoy;
   var Test;
   var settings = {
     Test: {
@@ -26,8 +26,8 @@ describe('DoDataDo', function () {
   };
 
   beforeEach(function () {
-    dodatado = new DoDataDo();
-    dodatado.timeout(0);
+    userjoy = new UserJoy();
+    userjoy.timeout(0);
   });
 
   afterEach(function () {
@@ -37,57 +37,57 @@ describe('DoDataDo', function () {
 
 
   it('should set a default timeout', function () {
-    dodatado = new DoDataDo();
-    assert(300 === dodatado._timeout);
+    userjoy = new UserJoy();
+    assert(300 === userjoy._timeout);
   });
 
   describe('#initialize', function () {
     beforeEach(function () {
       sinon.spy(user, 'load');
       sinon.spy(company, 'load');
-      sinon.spy(dodatado, '_invokeQueue');
-      sinon.spy(dodatado, 'page');
+      sinon.spy(userjoy, '_invokeQueue');
+      sinon.spy(userjoy, 'page');
     });
 
     afterEach(function () {
       user.load.restore();
       company.load.restore();
-      dodatado._invokeQueue.restore();
-      dodatado.page.restore();
+      userjoy._invokeQueue.restore();
+      userjoy.page.restore();
     });
 
     it('should not error without settings', function () {
-      dodatado.initialize();
+      userjoy.initialize();
     });
 
     it('should set options', function () {
-      dodatado._options = sinon.spy();
-      dodatado.initialize({}, {
+      userjoy._options = sinon.spy();
+      userjoy.initialize({}, {
         option: true
       });
-      assert(dodatado._options.calledWith({
+      assert(userjoy._options.calledWith({
         option: true
       }));
     });
 
     it('should call #_invokeQueue', function () {
-      dodatado.initialize();
-      assert(dodatado._invokeQueue.calledOnce);
+      userjoy.initialize();
+      assert(userjoy._invokeQueue.calledOnce);
     });
 
     it('should call #load on the user', function () {
-      dodatado.initialize();
+      userjoy.initialize();
       assert(user.load.called);
     });
 
     it('should call #load on the company', function () {
-      dodatado.initialize();
+      userjoy.initialize();
       assert(company.load.called);
     });
 
     it('should invoke #page', function () {
-      dodatado.initialize();
-      assert(dodatado.page.calledOnce);
+      userjoy.initialize();
+      assert(userjoy.page.calledOnce);
     });
 
   });
@@ -95,20 +95,20 @@ describe('DoDataDo', function () {
   describe('#_invokeQueue', function () {
 
     beforeEach(function () {
-      sinon.stub(dodatado, 'push');
+      sinon.stub(userjoy, 'push');
       queue.tasks = [
         ['identify', 'prateek'],
         ['track', 'page', '/about']
       ];
-      dodatado._invokeQueue();
+      userjoy._invokeQueue();
     });
 
     afterEach(function () {
-      dodatado.push.restore();
+      userjoy.push.restore();
     });
 
     it('should call #_push for each task', function () {
-      assert(dodatado.push.calledTwice);
+      assert(userjoy.push.calledTwice);
     });
 
     it('should remove invoked tasks from the queue', function () {
@@ -117,14 +117,14 @@ describe('DoDataDo', function () {
 
     it('should invoke tasks beginning from the start of the queue',
       function () {
-        assert(dodatado.push.firstCall.calledWith(['identify', 'prateek']));
+        assert(userjoy.push.firstCall.calledWith(['identify', 'prateek']));
       });
 
   });
 
   describe('#_send', function () {
     beforeEach(function (done) {
-      dodatado.initialize();
+      userjoy.initialize();
     });
 
   });
@@ -145,7 +145,7 @@ describe('DoDataDo', function () {
     });
 
     it('should set cookie options', function () {
-      dodatado._options({
+      userjoy._options({
         cookie: {
           option: true
         }
@@ -156,7 +156,7 @@ describe('DoDataDo', function () {
     });
 
     it('should set store options', function () {
-      dodatado._options({
+      userjoy._options({
         localStorage: {
           option: true
         }
@@ -167,7 +167,7 @@ describe('DoDataDo', function () {
     });
 
     it('should set user options', function () {
-      dodatado._options({
+      userjoy._options({
         user: {
           option: true
         }
@@ -178,7 +178,7 @@ describe('DoDataDo', function () {
     });
 
     it('should set company options', function () {
-      dodatado._options({
+      userjoy._options({
         company: {
           option: true
         }
@@ -191,15 +191,15 @@ describe('DoDataDo', function () {
 
   describe('#_timeout', function () {
     it('should set the timeout for callbacks', function () {
-      dodatado.timeout(500);
-      assert(500 === dodatado._timeout);
+      userjoy.timeout(500);
+      assert(500 === userjoy._timeout);
     });
   });
 
   describe('#_callback', function () {
     it('should callback after a timeout', function (done) {
       var spy = sinon.spy();
-      dodatado._callback(spy);
+      userjoy._callback(spy);
       assert(!spy.called);
       tick(function () {
         assert(spy.called);
@@ -219,17 +219,17 @@ describe('DoDataDo', function () {
         url: window.location.href,
         search: window.location.search
       };
-      sinon.spy(dodatado, '_send');
+      sinon.spy(userjoy, '_send');
     });
 
     // it('should call #_send', function () {
-    //   dodatado.page();
-    //   assert(dodatado._send.calledWith('page'));
+    //   userjoy.page();
+    //   assert(userjoy._send.calledWith('page'));
     // });
 
     it('should call #_send with type "page" and params', function () {
-      dodatado.page();
-      var page = dodatado._send.args[0];
+      userjoy.page();
+      var page = userjoy._send.args[0];
       assert(page[0] === 'page');
       assert(page[1] instanceof Object);
     })
@@ -238,8 +238,8 @@ describe('DoDataDo', function () {
       function (done) {
         defaults.category = 'category';
         defaults.name = 'name';
-        dodatado.page('category', 'name', {}, {}, function () {
-          var page = dodatado._send.args[0][1];
+        userjoy.page('category', 'name', {}, {}, function () {
+          var page = userjoy._send.args[0][1];
           assert('category' == page.category);
           assert('name' == page.name);
           assert('object' == typeof page.properties);
@@ -252,8 +252,8 @@ describe('DoDataDo', function () {
       done) {
       defaults.category = 'category';
       defaults.name = 'name';
-      dodatado.page('category', 'name', {}, function () {
-        var page = dodatado._send.args[0][1];
+      userjoy.page('category', 'name', {}, function () {
+        var page = userjoy._send.args[0][1];
         assert('category' == page.category);
         assert('name' == page.name);
         assert('object' == typeof page.properties);
@@ -264,8 +264,8 @@ describe('DoDataDo', function () {
     it('should accept (category, name, callback)', function (done) {
       defaults.category = 'category';
       defaults.name = 'name';
-      dodatado.page('category', 'name', function () {
-        var page = dodatado._send.args[0][1];
+      userjoy.page('category', 'name', function () {
+        var page = userjoy._send.args[0][1];
         assert('category' == page.category);
         assert('name' == page.name);
         done();
@@ -275,8 +275,8 @@ describe('DoDataDo', function () {
     it('should accept (name, properties, options, callback)', function (
       done) {
       defaults.name = 'name';
-      dodatado.page('name', {}, {}, function () {
-        var page = dodatado._send.args[0][1];
+      userjoy.page('name', {}, {}, function () {
+        var page = userjoy._send.args[0][1];
         assert('name' == page.name);
         assert('object' == typeof page.properties);
         assert('object' == typeof page.options);
@@ -286,8 +286,8 @@ describe('DoDataDo', function () {
 
     it('should accept (name, properties, callback)', function (done) {
       defaults.name = 'name';
-      dodatado.page('name', {}, function () {
-        var page = dodatado._send.args[0][1];
+      userjoy.page('name', {}, function () {
+        var page = userjoy._send.args[0][1];
         assert('name' == page.name);
         assert('object' == typeof page.properties);
         done();
@@ -296,16 +296,16 @@ describe('DoDataDo', function () {
 
     it('should accept (name, callback)', function (done) {
       defaults.name = 'name';
-      dodatado.page('name', function () {
-        var page = dodatado._send.args[0][1];
+      userjoy.page('name', function () {
+        var page = userjoy._send.args[0][1];
         assert('name' == page.name);
         done();
       });
     });
 
     it('should accept (properties, options, callback)', function (done) {
-      dodatado.page({}, {}, function () {
-        var page = dodatado._send.args[0][1];
+      userjoy.page({}, {}, function () {
+        var page = userjoy._send.args[0][1];
         assert(null == page.category);
         assert(null == page.name);
         assert('object' == typeof page.properties);
@@ -315,8 +315,8 @@ describe('DoDataDo', function () {
     });
 
     it('should accept (properties, callback)', function (done) {
-      dodatado.page({}, function () {
-        var page = dodatado._send.args[0][1];
+      userjoy.page({}, function () {
+        var page = userjoy._send.args[0][1];
         assert(null == page.category);
         assert(null == page.name);
         assert('object' == typeof page.options);
@@ -326,10 +326,10 @@ describe('DoDataDo', function () {
 
     it('should back properties with defaults', function () {
       defaults.property = true;
-      dodatado.page({
+      userjoy.page({
         property: true
       });
-      var page = dodatado._send.args[0][1];
+      var page = userjoy._send.args[0][1];
       assert.deepEqual(defaults, page.properties);
     });
 
@@ -347,7 +347,7 @@ describe('DoDataDo', function () {
     it('should accept (id, traits, options, callback)', function (
       done) {
       // NOTE: this test is not complete
-      dodatado.identify('id', {
+      userjoy.identify('id', {
         trait: true
       }, {}, function () {
         assert(user.identify.calledWith('id', {
@@ -358,7 +358,7 @@ describe('DoDataDo', function () {
     });
 
     it('should accept (id, traits, callback)', function (done) {
-      dodatado.identify('id', {
+      userjoy.identify('id', {
         trait: true
       }, function () {
         assert(user.identify.calledWith('id', {
@@ -369,7 +369,7 @@ describe('DoDataDo', function () {
     });
 
     it('should accept (id, callback)', function (done) {
-      dodatado.identify('id', function () {
+      userjoy.identify('id', function () {
         assert(user.identify.calledWith('id'));
         done();
       });
@@ -377,7 +377,7 @@ describe('DoDataDo', function () {
 
     it('should accept (traits, options, callback)', function (done) {
       // NOTE: this test is not complete
-      dodatado.identify({
+      userjoy.identify({
         trait: true
       }, {}, function () {
         assert(user.identify.calledWith(null, {
@@ -389,7 +389,7 @@ describe('DoDataDo', function () {
 
     it('should accept (traits, callback)', function (done) {
       // NOTE: this test is not complete
-      dodatado.identify({
+      userjoy.identify({
         trait: true
       }, function () {
         assert(user.identify.calledWith(null, {
@@ -400,7 +400,7 @@ describe('DoDataDo', function () {
     });
 
     it('should identify the user', function () {
-      dodatado.identify('id', {
+      userjoy.identify('id', {
         trait: true
       });
       assert(user.identify.calledWith('id', {
@@ -413,7 +413,7 @@ describe('DoDataDo', function () {
         one: 1
       });
       user.save();
-      dodatado.identify('id', {
+      userjoy.identify('id', {
         two: 2
       });
       assert(1 == user.traits()
@@ -425,8 +425,8 @@ describe('DoDataDo', function () {
     // it('should parse a created string into a date', function () {
     //   var date = new Date();
     //   var string = date.getTime().toString();
-    //   dodatado.identify({ created: string });
-    //   var created = dodatado._send.args[0][1].created();
+    //   userjoy.identify({ created: string });
+    //   var created = userjoy._send.args[0][1].created();
     //   assert(is.date(created));
     //   assert(created.getTime() === date.getTime());
     // });
@@ -434,8 +434,8 @@ describe('DoDataDo', function () {
     // it('should parse created milliseconds into a date', function () {
     //   var date = new Date();
     //   var milliseconds = date.getTime();
-    //   dodatado.identify({ created: milliseconds });
-    //   var created = dodatado._send.args[0][1].created();
+    //   userjoy.identify({ created: milliseconds });
+    //   var created = userjoy._send.args[0][1].created();
     //   assert(is.date(created));
     //   assert(created.getTime() === milliseconds);
     // });
@@ -443,8 +443,8 @@ describe('DoDataDo', function () {
     // it('should parse created seconds into a date', function () {
     //   var date = new Date();
     //   var seconds = Math.floor(date.getTime() / 1000);
-    //   dodatado.identify({ created: seconds });
-    //   var identify = dodatado._send.args[0][1];
+    //   userjoy.identify({ created: seconds });
+    //   var identify = userjoy._send.args[0][1];
     //   var created = identify.created();
     //   assert(is.date(created));
     //   assert(created.getTime() === seconds * 1000);
@@ -453,8 +453,8 @@ describe('DoDataDo', function () {
     // it('should parse a company created string into a date', function () {
     //   var date = new Date();
     //   var string = date.getTime() + '';
-    //   dodatado.identify({ company: { created: string }});
-    //   var identify = dodatado._send.args[0][1];
+    //   userjoy.identify({ company: { created: string }});
+    //   var identify = userjoy._send.args[0][1];
     //   var created = identify.companyCreated();
     //   assert(is.date(created));
     //   assert(created.getTime() === date.getTime());
@@ -463,8 +463,8 @@ describe('DoDataDo', function () {
     // it('should parse company created milliseconds into a date', function () {
     //   var date = new Date();
     //   var milliseconds = date.getTime();
-    //   dodatado.identify({ company: { created: milliseconds }});
-    //   var identify = dodatado._send.args[0][1];
+    //   userjoy.identify({ company: { created: milliseconds }});
+    //   var identify = userjoy._send.args[0][1];
     //   var created = identify.companyCreated();
     //   assert(is.date(created));
     //   assert(created.getTime() === milliseconds);
@@ -473,12 +473,12 @@ describe('DoDataDo', function () {
     // it('should parse company created seconds into a date', function () {
     //   var date = new Date();
     //   var seconds = Math.floor(date.getTime() / 1000);
-    //   dodatado.identify({
+    //   userjoy.identify({
     //     company: {
     //       created: seconds
     //     }
     //   });
-    //   var identify = dodatado._send.args[0][1];
+    //   var identify = userjoy._send.args[0][1];
     //   var created = identify.companyCreated();
     //   assert(is.date(created));
     //   assert(created.getTime() === seconds * 1000);
@@ -487,13 +487,13 @@ describe('DoDataDo', function () {
 
   describe('#user', function () {
     it('should return the user singleton', function () {
-      assert(dodatado.user() == user);
+      assert(userjoy.user() == user);
     });
   });
 
   describe('#company', function () {
     beforeEach(function () {
-      sinon.spy(dodatado, '_send');
+      sinon.spy(userjoy, '_send');
       sinon.spy(company, 'identify');
     });
 
@@ -502,12 +502,12 @@ describe('DoDataDo', function () {
     });
 
     it('should return the company singleton', function () {
-      assert(dodatado.company() == company);
+      assert(userjoy.company() == company);
     });
 
     it('should accept (id, properties, options, callback)', function (
       done) {
-      dodatado.company('id', {
+      userjoy.company('id', {
         trait: true
       }, {}, function () {
         company.identify.calledWith('id', {
@@ -518,7 +518,7 @@ describe('DoDataDo', function () {
     });
 
     it('should accept (id, properties, callback)', function (done) {
-      dodatado.company('id', {
+      userjoy.company('id', {
         trait: true
       }, function () {
         company.identify.calledWith('id', {
@@ -529,7 +529,7 @@ describe('DoDataDo', function () {
     });
 
     it('should accept (id, callback)', function (done) {
-      dodatado.company('id', function () {
+      userjoy.company('id', function () {
         company.identify.calledWith('id');
         done();
       });
@@ -537,7 +537,7 @@ describe('DoDataDo', function () {
 
     it('should accept (properties, options, callback)', function (
       done) {
-      dodatado.company({
+      userjoy.company({
         trait: true
       }, {}, function () {
         company.identify.calledWith(null, {
@@ -548,7 +548,7 @@ describe('DoDataDo', function () {
     });
 
     it('should accept (properties, callback)', function (done) {
-      dodatado.company({
+      userjoy.company({
         trait: true
       }, function () {
         company.identify.calledWith(null, {
@@ -559,7 +559,7 @@ describe('DoDataDo', function () {
     });
 
     it('should call #identify on the company', function () {
-      dodatado.company('id', {
+      userjoy.company('id', {
         property: true
       });
       assert(company.identify.calledWith('id', {
@@ -572,7 +572,7 @@ describe('DoDataDo', function () {
         one: 1
       });
       company.save();
-      dodatado.company('id', {
+      userjoy.company('id', {
         two: 2
       });
       assert('id' == company.id());
@@ -585,8 +585,8 @@ describe('DoDataDo', function () {
     // it('should parse a created string into a date', function () {
     //   var date = new Date();
     //   var string = date.getTime().toString();
-    //   dodatado.company({ created: string });
-    //   var g = dodatado._send.args[0][1];
+    //   userjoy.company({ created: string });
+    //   var g = userjoy._send.args[0][1];
     //   var created = g.created();
     //   assert(is.date(created));
     //   assert(created.getTime() === date.getTime());
@@ -595,8 +595,8 @@ describe('DoDataDo', function () {
     // it('should parse created milliseconds into a date', function () {
     //   var date = new Date();
     //   var milliseconds = date.getTime();
-    //   dodatado.company({ created: milliseconds });
-    //   var g = dodatado._send.args[0][1];
+    //   userjoy.company({ created: milliseconds });
+    //   var g = userjoy._send.args[0][1];
     //   var created = g.created();
     //   assert(is.date(created));
     //   assert(created.getTime() === milliseconds);
@@ -605,8 +605,8 @@ describe('DoDataDo', function () {
     // it('should parse created seconds into a date', function () {
     //   var date = new Date();
     //   var seconds = Math.floor(date.getTime() / 1000);
-    //   dodatado.company({ created: seconds });
-    //   var g = dodatado._send.args[0][1];
+    //   userjoy.company({ created: seconds });
+    //   var g = userjoy._send.args[0][1];
     //   var created = g.created();
     //   assert(is.date(created));
     //   assert(created.getTime() === seconds * 1000);
@@ -615,18 +615,18 @@ describe('DoDataDo', function () {
 
   describe('#track', function () {
     beforeEach(function () {
-      sinon.spy(dodatado, '_send');
+      sinon.spy(userjoy, '_send');
     });
 
     it('should call #_send', function () {
-      dodatado.track();
-      assert(dodatado._send.calledWith('track'));
+      userjoy.track();
+      assert(userjoy._send.calledWith('track'));
     });
 
     it('should accept (event, properties, options, callback)', function (
       done) {
-      dodatado.track('event', {}, {}, function () {
-        var track = dodatado._send.args[0][1];
+      userjoy.track('event', {}, {}, function () {
+        var track = userjoy._send.args[0][1];
         assert('event' == track.event);
         assert('object' == typeof track.properties);
         assert('object' == typeof track.options);
@@ -635,8 +635,8 @@ describe('DoDataDo', function () {
     });
 
     it('should accept (event, properties, callback)', function (done) {
-      dodatado.track('event', {}, function () {
-        var track = dodatado._send.args[0][1];
+      userjoy.track('event', {}, function () {
+        var track = userjoy._send.args[0][1];
         assert('event' == track.event);
         assert('object' == typeof track.properties);
         done();
@@ -644,8 +644,8 @@ describe('DoDataDo', function () {
     });
 
     it('should accept (event, callback)', function (done) {
-      dodatado.track('event', function () {
-        var track = dodatado._send.args[0][1];
+      userjoy.track('event', function () {
+        var track = userjoy._send.args[0][1];
         assert('event' == track.event);
         done();
       });
@@ -653,11 +653,11 @@ describe('DoDataDo', function () {
 
     // it('should safely convert ISO dates to date objects', function () {
     //   var date = new Date(Date.UTC(2013, 9, 5));
-    //   dodatado.track('event', {
+    //   userjoy.track('event', {
     //     date: '2013-10-05T00:00:00.000Z',
     //     nonDate: '2013'
     //   });
-    //   var track = dodatado._send.args[0][1];
+    //   var track = userjoy._send.args[0][1];
     //   assert(track.properties()
     //     .date.getTime() === date.getTime());
     //   assert(track.properties()
@@ -669,7 +669,7 @@ describe('DoDataDo', function () {
     var link;
 
     beforeEach(function () {
-      sinon.spy(dodatado, 'track');
+      sinon.spy(userjoy, 'track');
       link = document.createElement('a');
     });
 
@@ -678,24 +678,24 @@ describe('DoDataDo', function () {
     });
 
     it('should trigger a track on an element click', function () {
-      dodatado.trackLink(link);
+      userjoy.trackLink(link);
       trigger(link, 'click');
-      assert(dodatado.track.called);
+      assert(userjoy.track.called);
     });
 
     it('should accept a jquery object for an element', function () {
       var $link = jQuery(link);
-      dodatado.trackLink($link);
+      userjoy.trackLink($link);
       trigger(link, 'click');
-      assert(dodatado.track.called);
+      assert(userjoy.track.called);
     });
 
     it('should send an event and properties', function () {
-      dodatado.trackLink(link, 'event', {
+      userjoy.trackLink(link, 'event', {
         property: true
       });
       trigger(link, 'click');
-      assert(dodatado.track.calledWith('event', {
+      assert(userjoy.track.calledWith('event', {
         property: true
       }));
     });
@@ -704,9 +704,9 @@ describe('DoDataDo', function () {
       function event(el) {
         return el.nodeName;
       }
-      dodatado.trackLink(link, event);
+      userjoy.trackLink(link, event);
       trigger(link, 'click');
-      assert(dodatado.track.calledWith('A'));
+      assert(userjoy.track.calledWith('A'));
     });
 
     it('should accept a properties function', function () {
@@ -715,16 +715,16 @@ describe('DoDataDo', function () {
           type: el.nodeName
         };
       }
-      dodatado.trackLink(link, 'event', properties);
+      userjoy.trackLink(link, 'event', properties);
       trigger(link, 'click');
-      assert(dodatado.track.calledWith('event', {
+      assert(userjoy.track.calledWith('event', {
         type: 'A'
       }));
     });
 
     it('should load an href on click', function (done) {
       link.href = '#test';
-      dodatado.trackLink(link);
+      userjoy.trackLink(link);
       trigger(link, 'click');
       tick(function () {
         assert(window.location.hash == '#test');
@@ -736,7 +736,7 @@ describe('DoDataDo', function () {
       done) {
       link.href = '/test/server/mock.html';
       link.target = '_blank';
-      dodatado.trackLink(link);
+      userjoy.trackLink(link);
       trigger(link, 'click');
       tick(function () {
         assert(window.location.hash != '#test');
@@ -757,7 +757,7 @@ describe('DoDataDo', function () {
     });
 
     beforeEach(function () {
-      sinon.spy(dodatado, 'track');
+      sinon.spy(userjoy, 'track');
       form = document.createElement('form');
       form.action = '/test/server/mock.html';
       form.target = '_blank';
@@ -771,24 +771,24 @@ describe('DoDataDo', function () {
     });
 
     it('should trigger a track on a form submit', function () {
-      dodatado.trackForm(form);
+      userjoy.trackForm(form);
       trigger(submit, 'click');
-      assert(dodatado.track.called);
+      assert(userjoy.track.called);
     });
 
     it('should accept a jquery object for an element', function () {
       var $form = jQuery(form);
-      dodatado.trackForm(form);
+      userjoy.trackForm(form);
       trigger(submit, 'click');
-      assert(dodatado.track.called);
+      assert(userjoy.track.called);
     });
 
     it('should send an event and properties', function () {
-      dodatado.trackForm(form, 'event', {
+      userjoy.trackForm(form, 'event', {
         property: true
       });
       trigger(submit, 'click');
-      assert(dodatado.track.calledWith('event', {
+      assert(userjoy.track.calledWith('event', {
         property: true
       }));
     });
@@ -797,9 +797,9 @@ describe('DoDataDo', function () {
       function event(el) {
         return 'event';
       }
-      dodatado.trackForm(form, event);
+      userjoy.trackForm(form, event);
       trigger(submit, 'click');
-      assert(dodatado.track.calledWith('event'));
+      assert(userjoy.track.calledWith('event'));
     });
 
     it('should accept a properties function', function () {
@@ -808,16 +808,16 @@ describe('DoDataDo', function () {
           property: true
         };
       }
-      dodatado.trackForm(form, 'event', properties);
+      userjoy.trackForm(form, 'event', properties);
       trigger(submit, 'click');
-      assert(dodatado.track.calledWith('event', {
+      assert(userjoy.track.calledWith('event', {
         property: true
       }));
     });
 
     it('should call submit after a timeout', function (done) {
       var spy = sinon.spy(form, 'submit');
-      dodatado.trackForm(form);
+      userjoy.trackForm(form);
       trigger(submit, 'click');
       setTimeout(function () {
         assert(spy.called);
@@ -829,7 +829,7 @@ describe('DoDataDo', function () {
       bind(form, 'submit', function () {
         done();
       });
-      dodatado.trackForm(form);
+      userjoy.trackForm(form);
       trigger(submit, 'click');
     });
 
@@ -838,15 +838,15 @@ describe('DoDataDo', function () {
       $form.submit(function () {
         done();
       });
-      dodatado.trackForm(form);
+      userjoy.trackForm(form);
       trigger(submit, 'click');
     });
 
     it('should track on a form submitted via jquery', function () {
       var $form = jQuery(form);
-      dodatado.trackForm(form);
+      userjoy.trackForm(form);
       $form.submit();
-      assert(dodatado.track.called);
+      assert(userjoy.track.called);
     });
 
     it(
@@ -856,21 +856,21 @@ describe('DoDataDo', function () {
         $form.submit(function () {
           done();
         });
-        dodatado.trackForm(form);
+        userjoy.trackForm(form);
         $form.submit();
       });
   });
 
   describe('#push', function () {
     beforeEach(function () {
-      dodatado.track = sinon.spy();
+      userjoy.track = sinon.spy();
     })
 
     it('should call methods with args', function () {
-      dodatado.push(['track', 'event', {
+      userjoy.push(['track', 'event', {
         prop: true
       }]);
-      assert(dodatado.track.calledWith('event', {
+      assert(userjoy.track.calledWith('event', {
         prop: true
       }));
     })

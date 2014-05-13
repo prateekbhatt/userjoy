@@ -1,8 +1,8 @@
 
 describe('cookie', function () {
 
-  var dodatado = window.dodatado;
-  var require = dodatado.require;
+  var userjoy = window.userjoy;
+  var require = userjoy.require;
   var assert = dev('assert');
   var cookie = require('./cookie.js');
   var equal = dev('equals');
