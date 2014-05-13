@@ -119,8 +119,11 @@ router
     var accid = req.user._id;
     var aid = req.app._id;
 
+    newSegment.aid = aid;
+
     // add current logged in account as the creator of the segment
     newSegment.creator = accid;
+
 
     Segment
       .create(newSegment, function (err, savedSegment) {
