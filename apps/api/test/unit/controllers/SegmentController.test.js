@@ -56,7 +56,6 @@ describe('Resource /apps/:aid/segments', function () {
       function (done) {
 
         var newSegment = {
-          aid: randomId,
           list: 'users',
           name: 'New segment',
           op: 'and',
@@ -85,7 +84,7 @@ describe('Resource /apps/:aid/segments', function () {
               .to.have.property("creator", newSegment.creator);
 
             expect(savedMsg)
-              .to.have.property("aid", newSegment.aid.toString());
+              .to.have.property("aid", aid.toString());
 
           })
           .end(done);
