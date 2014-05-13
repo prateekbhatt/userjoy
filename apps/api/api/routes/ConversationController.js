@@ -38,6 +38,7 @@ var mailer = require('../services/mailer');
 
 var appEmail = require('../../helpers/app-email');
 var logger = require('../../helpers/logger');
+var render = require('../../helpers/render-message');
 
 
 /**
@@ -85,7 +86,7 @@ function sendMailToUser(msg, cb) {
       if (!usr) return cb(new Error('User Not Found'));
 
       var fromEmail = appEmail(msg.aid);
-      var locals = {
+      var options = {
         fromEmail: fromEmail,
         fromName: msg.sName,
         metadata: {
@@ -96,9 +97,9 @@ function sendMailToUser(msg, cb) {
         subject: msg.sub,
         toEmail: usr.email,
         toName: usr.name, // TODO : User Model should have a default name key
-        text: msg.text
+        body: msg.text
       };
-      mailer.sendToUser(locals, cb);
+      mailer.sendManualMessage(options, cb);
     });
 }
 
@@ -347,8 +348,7 @@ router
     async.waterfall(
       [
 
-        // create new conversation
-        function (cb) {
+        function createConversation(cb) {
 
           var newConversation = {
             accId: accid,
@@ -361,8 +361,17 @@ router
         },
 
 
-        // create new message
-        function (conversation, cb) {
+        function findUser(conversation, cb) {
+
+          User
+            .findById(uid)
+            .exec(function (err, usr) {
+              cb(err, conversation, usr)
+            });
+        },
+
+
+        function createMessage(conversation, user, cb) {
 
           // add from as 'account'
           newMessage.from = 'account';
@@ -370,20 +379,38 @@ router
           newMessage.aid = aid;
           newMessage.coId = conversation._id;
 
+          // locals to be passed for rendering the templates
+          var locals = {
+            user: user
+          };
+
+          // render body and subject
+          newMessage.text = render.string(newMessage.text, locals);
+          newMessage.sub = render.string(newMessage.sub, locals);
+
           Message.create(newMessage, cb);
 
         },
 
-        // send message through mandrill
-        function (msg, cb) {
-          sendMailToUser(msg, function (err) {
+        function sendMessage(msg, cb) {
+
+          // TODO: check if message is notification or email
+
+          if (msg.type === "email") {
+
+            sendMailToUser(msg, function (err) {
+              cb(err, msg);
+            });
+
+          } else {
             cb(err, msg);
-          });
+          }
+
         }
 
       ],
 
-      function (err, msg) {
+      function callback(err, msg) {
 
         if (err) return next(err);
         res.json(msg, 201);

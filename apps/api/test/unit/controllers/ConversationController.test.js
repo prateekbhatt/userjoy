@@ -469,8 +469,8 @@ describe('Resource /apps/:aid/conversations', function () {
         var uid = saved.users.first._id;
         var newMessage = {
           sName: 'Prateek Bhatt',
-          sub: 'Welcome to UserJoy!',
-          text: 'This is the message I want to send',
+          sub: 'Welcome to UserJoy, {{= user.email || "you"}}',
+          text: 'This is the message I want to send to {{= user.email || "YOU" }}',
           type: 'email',
           uid: uid,
         };
@@ -482,8 +482,14 @@ describe('Resource /apps/:aid/conversations', function () {
           .expect('Content-Type', /json/)
           .expect(201)
           .expect(function (res) {
+
+            expect(res.body.sub)
+              .to.eql('Welcome to UserJoy, prattbhatt@gmail.com');
+
             expect(res.body.text)
-              .to.eql(newMessage.text);
+              .to.eql(
+                'This is the message I want to send to prattbhatt@gmail.com'
+            );
           })
           .end(done);
 
