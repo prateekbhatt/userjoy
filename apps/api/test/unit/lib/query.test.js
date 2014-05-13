@@ -49,7 +49,7 @@ describe('Lib query', function () {
     }];
 
     queryObj = {
-      op: '$and',
+      op: 'and',
       filters: filters
     };
 
@@ -64,6 +64,23 @@ describe('Lib query', function () {
       Query.prototype.setFilters.restore();
     });
 
+
+    it('should throw error if op is not one of and/or', function () {
+
+      var newQueryObj = {
+        op: '$and',
+        filters: filters
+      };
+
+
+      expect(function () {
+        return new Query(saved.apps.first._id, newQueryObj)
+      })
+        .to.
+      throw ('op must be one of and/or');
+
+
+    });
 
 
     it('should set aid', function () {
