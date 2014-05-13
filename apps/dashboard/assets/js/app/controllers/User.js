@@ -473,12 +473,12 @@ angular.module('do.users', [])
                 $scope.filters[parentindex].val = '';
 
 
-                $scope.hasDoneOrHasNotDone = true;
-                $scope.textHasDoneNotHasDone = $scope.hasDoneItems[index].name;
-                $scope.hasDoneOrHasNotDoneClicked = true;
-                $scope.hasCountOfClicked = false;
-                $scope.selectFilterHasOrHasNotDone = 'Has done ';
-                console.log("index: ", index);
+                // $scope.hasDoneOrHasNotDone = true;
+                // $scope.textHasDoneNotHasDone = $scope.hasDoneItems[index].name;
+                // $scope.hasDoneOrHasNotDoneClicked = true;
+                // $scope.hasCountOfClicked = false;
+                // $scope.selectFilterHasOrHasNotDone = 'Has done ';
+                // console.log("index: ", index);
             }
 
             $scope.changeFilterHasNotDone = function (parentindex, index,
@@ -497,12 +497,12 @@ angular.module('do.users', [])
 
 
 
-                $scope.hasDoneOrHasNotDone = true;
-                $scope.textHasDoneNotHasDone = $scope.hasDoneItems[index].name;
-                $scope.hasDoneOrHasNotDoneClicked = true;
-                $scope.hasCountOfClicked = false;
-                $scope.selectFilterHasOrHasNotDone = 'Has not done';
-                console.log("index: ", index);
+                // $scope.hasDoneOrHasNotDone = true;
+                // $scope.textHasDoneNotHasDone = $scope.hasDoneItems[index].name;
+                // $scope.hasDoneOrHasNotDoneClicked = true;
+                // $scope.hasCountOfClicked = false;
+                // $scope.selectFilterHasOrHasNotDone = 'Has not done';
+                // console.log("index: ", index);
             }
 
 
@@ -521,15 +521,15 @@ angular.module('do.users', [])
 
 
 
-                $scope.hasDoneOrHasNotDone = false;
-                $scope.hasCountOfClicked = true;
-                $scope.hasDoneOrHasNotDoneClicked = false;
-                console.log("index: ", index);
+                // $scope.hasDoneOrHasNotDone = false;
+                // $scope.hasCountOfClicked = true;
+                // $scope.hasDoneOrHasNotDoneClicked = false;
+                // console.log("index: ", index);
             }
 
-            $scope.isActive = function (viewLocation) {
-                return viewLocation === $location.path();
-            };
+            // $scope.isActive = function (viewLocation) {
+            //     return viewLocation === $location.path();
+            // };
 
 
             var segments = segment.get.all();
@@ -603,7 +603,7 @@ angular.module('do.users', [])
                 var index = $scope.filters.indexOf(
                     filterToRemove);
                 $scope.filters.splice(index, 1);
-                if($scope.filters.length == 0) {
+                if ($scope.filters.length == 0) {
                     $scope.showSaveButton = false;
                 }
             }
@@ -706,8 +706,24 @@ angular.module('do.users', [])
 
             $scope.queryObj = {};
 
-
+            $scope.showErrorOnInput = true;
             $scope.runQuery = function () {
+                $scope.showErrorOnInput = true;
+                for (var i = 0; i < $scope.filters.length; i++) {
+                    console.log("val: ", $scope.filters[i].val);
+                    if ($scope.filters[i].val == '' && ($scope.filters[i].method ==
+                        'count' || $scope.filters[i].method == 'attr')) {
+                        console.log("val: ", $scope.filters[i].val);
+                        $scope.showErrorOnInput = true;
+                        $scope.showErr = true;
+                        return;
+                        // $scope.isErr = 'error';
+                        // console.log("error class", $scope.isErr);
+                    } else {
+                        $scope.showErr = false;
+                        // $scope.isErr = '';
+                    }
+                };
                 $scope.filtersBackend = [];
                 console.log("run Query: ", $scope.filters);
                 for (var i = 0; i < $scope.filters.length; i++) {
@@ -733,13 +749,21 @@ angular.module('do.users', [])
                     ._id, stringifiedQuery, populateTable);
             }
 
-            // var myPopover = $popover({
-            //     scope: $scope,
-            //     template: '/templates/usersmodule/save.segments.html',
-            //     show: false
-            // });
             $scope.saveQuery = function () {
-                // myPopover.show();
+                for (var i = 0; i < $scope.filters.length; i++) {
+                    console.log("val: ", $scope.filters[i].val);
+                    if ($scope.filters[i].val == '' && ($scope.filters[i].method ==
+                        'count' || $scope.filters[i].method == 'attr')) {
+                        console.log("val: ", $scope.filters[i].val);
+                        $scope.showErr = true;
+                        return;
+                        // $scope.isErr = 'error';
+                        // console.log("error class", $scope.isErr);
+                    } else {
+                        $scope.showErr = false;
+                        // $scope.isErr = '';
+                    }
+                };
                 $scope.showPopover = !$scope.showPopover;
             }
 
@@ -861,7 +885,7 @@ angular.module('do.users', [])
 
             $scope.isErr = 'error';
 
-            $scope.signupForm = function () {
+            $scope.popoverForm = function () {
                 console.log($scope.filters);
                 for (var i = 0; i < $scope.filters.length; i++) {
                     console.log("val: ", $scope.filters[i].val);
@@ -931,13 +955,6 @@ angular.module('do.users', [])
         $scope.$watch('checkboxes.items', function (value) {
             console.log("$watch checkboxes: ", $scope.checkboxes.items);
         })
-
-
-
-        // $scope.$watch(UserList.getUsers, function () {
-        // })
-
-
     }
 ])
 
