@@ -253,28 +253,37 @@ describe('Resource /query', function () {
     });
 
 
-    it('should fetch users matching given filters', function (done) {
+    it('should return userAttributes/events on which to query',
+      function (done) {
 
-      request
-        .get(url)
-        .set('cookie', loginCookie)
-        .expect('Content-Type', /json/)
-        .expect(200)
-        .expect(function (res) {
+        request
+          .get(url)
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .expect(function (res) {
 
-          if (_.isEmpty(res.body.eventNames)) {
-            return 'No eventNames found'
-          }
+            expect(res.body.events)
+              .to.be.an("array");
 
-          expect(res.body.userAttributes)
-            .to.contain("user_id");
+            expect(res.body.events)
+              .to.not.be.empty;
 
-          expect(res.body.userAttributes)
-            .to.contain("email");
-        })
-        .end(done);
+            expect(res.body.events[0])
+              .to.have.property('type');
 
-    });
+            expect(res.body.events[0])
+              .to.have.property('name');
+
+            expect(res.body.userAttributes)
+              .to.contain("user_id");
+
+            expect(res.body.userAttributes)
+              .to.contain("email");
+          })
+          .end(done);
+
+      });
 
 
   });
