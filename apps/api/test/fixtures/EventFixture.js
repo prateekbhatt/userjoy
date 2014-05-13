@@ -28,16 +28,30 @@ var eventTypes = ['pageview', 'feature'];
 
 
 /**
- * event names
+ * feature event names
  */
 
-var eventNames = [
+var featureEventNames = [
   'Complete Integration',
   'Define Segment',
   'List Users',
   'Create Message',
   'Create Notification',
   'Send Notification'
+];
+
+
+/**
+ * pageview event names
+ */
+
+var pageviewEventNames = [
+  '/account/login',
+  '/reports',
+  '/signup',
+  '/users',
+  '/messages/inbox',
+  '/messages/automate'
 ];
 
 
@@ -63,16 +77,22 @@ function randomFromArray(arr) {
 
 function createEvent(aid, uid, cb) {
 
-  var aFakeEvent = {
+  var fakeEvent = {
     aid: aid,
     cid: randomId,
-    uid: uid,
-    type: randomFromArray(eventTypes),
-    name: randomFromArray(eventNames),
-    feature: randomFromArray(featureNames)
+    uid: uid
   };
 
-  Event.create(aFakeEvent, cb);
+  fakeEvent.type = randomFromArray(eventTypes);
+
+  if (fakeEvent.type === 'feature') {
+    fakeEvent.name = randomFromArray(featureEventNames);
+    fakeEvent.feature = randomFromArray(featureNames);
+  } else {
+    fakeEvent.name = randomFromArray(pageviewEventNames);
+  }
+
+  Event.create(fakeEvent, cb);
 }
 
 

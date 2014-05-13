@@ -1,8 +1,8 @@
 
 describe('company', function () {
 
-  var dodatado = window.dodatado;
-  var require = dodatado.require;
+  var userjoy = window.userjoy;
+  var require = userjoy.require;
   var assert = dev('assert');
   var cookie = require('./cookie');
   var equal = dev('equals');
@@ -127,10 +127,10 @@ describe('company', function () {
         option: true,
         persist: true,
         cookie: {
-          key: 'dodatado_company_id'
+          key: 'userjoy_company_id'
         },
         localStorage: {
-          key: 'dodatado_company_properties'
+          key: 'userjoy_company_properties'
         }
       }));
     });

@@ -1,7 +1,7 @@
 describe('Resource /track', function () {
 
-  var CollectorController = require(
-    '../../../api/routes/CollectorController');
+  var TrackController = require(
+    '../../../api/routes/TrackController');
   var AppModel = require(
     '../../../api/models/App');
 
@@ -173,7 +173,7 @@ describe('Resource /track', function () {
       var appKey = 'randomAppKey';
       var url = 'randomUrl.com';
 
-      CollectorController._findAndVerifyApp(mode, appKey, url,
+      TrackController._findAndVerifyApp(mode, appKey, url,
         function (err, app) {
 
           expect(err)
@@ -205,7 +205,7 @@ describe('Resource /track', function () {
         var appKey = saved.apps.first.liveKey;
         var url = 'randomUrl.com';
 
-        CollectorController._findAndVerifyApp(mode, appKey, url,
+        TrackController._findAndVerifyApp(mode, appKey, url,
           function (err, app) {
 
             expect(err)
@@ -229,7 +229,7 @@ describe('Resource /track', function () {
       var appKey = saved.apps.first.liveKey;
       var url = saved.apps.first.url;
 
-      CollectorController._findAndVerifyApp(mode, appKey, url,
+      TrackController._findAndVerifyApp(mode, appKey, url,
         function (err, app) {
 
           expect(err)

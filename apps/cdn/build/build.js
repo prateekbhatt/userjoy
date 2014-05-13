@@ -1,4 +1,3 @@
-;(function(){
 
 /**
  * Require the given path.
@@ -9398,21 +9397,390 @@ require.register("lodash-lodash/dist/lodash.compat.js", function(exports, requir
 }.call(this));
 
 });
-require.register("dodatado/lib/index.js", function(exports, require, module){
-var DoDataDo = require('./dodatado');
+require.register("visionmedia-node-querystring/index.js", function(exports, require, module){
+/**
+ * Object#toString() ref for stringify().
+ */
+
+var toString = Object.prototype.toString;
+
+/**
+ * Object#hasOwnProperty ref
+ */
+
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+/**
+ * Array#indexOf shim.
+ */
+
+var indexOf = typeof Array.prototype.indexOf === 'function'
+  ? function(arr, el) { return arr.indexOf(el); }
+  : function(arr, el) {
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i] === el) return i;
+      }
+      return -1;
+    };
+
+/**
+ * Array.isArray shim.
+ */
+
+var isArray = Array.isArray || function(arr) {
+  return toString.call(arr) == '[object Array]';
+};
+
+/**
+ * Object.keys shim.
+ */
+
+var objectKeys = Object.keys || function(obj) {
+  var ret = [];
+  for (var key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      ret.push(key);
+    }
+  }
+  return ret;
+};
+
+/**
+ * Array#forEach shim.
+ */
+
+var forEach = typeof Array.prototype.forEach === 'function'
+  ? function(arr, fn) { return arr.forEach(fn); }
+  : function(arr, fn) {
+      for (var i = 0; i < arr.length; i++) fn(arr[i]);
+    };
+
+/**
+ * Array#reduce shim.
+ */
+
+var reduce = function(arr, fn, initial) {
+  if (typeof arr.reduce === 'function') return arr.reduce(fn, initial);
+  var res = initial;
+  for (var i = 0; i < arr.length; i++) res = fn(res, arr[i]);
+  return res;
+};
+
+/**
+ * Cache non-integer test regexp.
+ */
+
+var isint = /^[0-9]+$/;
+
+function promote(parent, key) {
+  if (parent[key].length == 0) return parent[key] = {}
+  var t = {};
+  for (var i in parent[key]) {
+    if (hasOwnProperty.call(parent[key], i)) {
+      t[i] = parent[key][i];
+    }
+  }
+  parent[key] = t;
+  return t;
+}
+
+function parse(parts, parent, key, val) {
+  var part = parts.shift();
+
+  // illegal
+  if (hasOwnProperty.call(Object.prototype, key)) return;
+
+  // end
+  if (!part) {
+    if (isArray(parent[key])) {
+      parent[key].push(val);
+    } else if ('object' == typeof parent[key]) {
+      parent[key] = val;
+    } else if ('undefined' == typeof parent[key]) {
+      parent[key] = val;
+    } else {
+      parent[key] = [parent[key], val];
+    }
+    // array
+  } else {
+    var obj = parent[key] = parent[key] || [];
+    if (']' == part) {
+      if (isArray(obj)) {
+        if ('' != val) obj.push(val);
+      } else if ('object' == typeof obj) {
+        obj[objectKeys(obj).length] = val;
+      } else {
+        obj = parent[key] = [parent[key], val];
+      }
+      // prop
+    } else if (~indexOf(part, ']')) {
+      part = part.substr(0, part.length - 1);
+      if (!isint.test(part) && isArray(obj)) obj = promote(parent, key);
+      parse(parts, obj, part, val);
+      // key
+    } else {
+      if (!isint.test(part) && isArray(obj)) obj = promote(parent, key);
+      parse(parts, obj, part, val);
+    }
+  }
+}
+
+/**
+ * Merge parent key/val pair.
+ */
+
+function merge(parent, key, val){
+  if (~indexOf(key, ']')) {
+    var parts = key.split('[')
+      , len = parts.length
+      , last = len - 1;
+    parse(parts, parent, 'base', val);
+    // optimize
+  } else {
+    if (!isint.test(key) && isArray(parent.base)) {
+      var t = {};
+      for (var k in parent.base) t[k] = parent.base[k];
+      parent.base = t;
+    }
+    set(parent.base, key, val);
+  }
+
+  return parent;
+}
+
+/**
+ * Compact sparse arrays.
+ */
+
+function compact(obj) {
+  if ('object' != typeof obj) return obj;
+
+  if (isArray(obj)) {
+    var ret = [];
+
+    for (var i in obj) {
+      if (hasOwnProperty.call(obj, i)) {
+        ret.push(obj[i]);
+      }
+    }
+
+    return ret;
+  }
+
+  for (var key in obj) {
+    obj[key] = compact(obj[key]);
+  }
+
+  return obj;
+}
+
+/**
+ * Parse the given obj.
+ */
+
+function parseObject(obj){
+  var ret = { base: {} };
+
+  forEach(objectKeys(obj), function(name){
+    merge(ret, name, obj[name]);
+  });
+
+  return compact(ret.base);
+}
+
+/**
+ * Parse the given str.
+ */
+
+function parseString(str){
+  var ret = reduce(String(str).split('&'), function(ret, pair){
+    var eql = indexOf(pair, '=')
+      , brace = lastBraceInKey(pair)
+      , key = pair.substr(0, brace || eql)
+      , val = pair.substr(brace || eql, pair.length)
+      , val = val.substr(indexOf(val, '=') + 1, val.length);
+
+    // ?foo
+    if ('' == key) key = pair, val = '';
+    if ('' == key) return ret;
+
+    return merge(ret, decode(key), decode(val));
+  }, { base: {} }).base;
+
+  return compact(ret);
+}
+
+/**
+ * Parse the given query `str` or `obj`, returning an object.
+ *
+ * @param {String} str | {Object} obj
+ * @return {Object}
+ * @api public
+ */
+
+exports.parse = function(str){
+  if (null == str || '' == str) return {};
+  return 'object' == typeof str
+    ? parseObject(str)
+    : parseString(str);
+};
+
+/**
+ * Turn the given `obj` into a query string
+ *
+ * @param {Object} obj
+ * @return {String}
+ * @api public
+ */
+
+var stringify = exports.stringify = function(obj, prefix) {
+  if (isArray(obj)) {
+    return stringifyArray(obj, prefix);
+  } else if ('[object Object]' == toString.call(obj)) {
+    return stringifyObject(obj, prefix);
+  } else if ('string' == typeof obj) {
+    return stringifyString(obj, prefix);
+  } else {
+    return prefix + '=' + encodeURIComponent(String(obj));
+  }
+};
+
+/**
+ * Stringify the given `str`.
+ *
+ * @param {String} str
+ * @param {String} prefix
+ * @return {String}
+ * @api private
+ */
+
+function stringifyString(str, prefix) {
+  if (!prefix) throw new TypeError('stringify expects an object');
+  return prefix + '=' + encodeURIComponent(str);
+}
+
+/**
+ * Stringify the given `arr`.
+ *
+ * @param {Array} arr
+ * @param {String} prefix
+ * @return {String}
+ * @api private
+ */
+
+function stringifyArray(arr, prefix) {
+  var ret = [];
+  if (!prefix) throw new TypeError('stringify expects an object');
+  for (var i = 0; i < arr.length; i++) {
+    ret.push(stringify(arr[i], prefix + '[' + i + ']'));
+  }
+  return ret.join('&');
+}
+
+/**
+ * Stringify the given `obj`.
+ *
+ * @param {Object} obj
+ * @param {String} prefix
+ * @return {String}
+ * @api private
+ */
+
+function stringifyObject(obj, prefix) {
+  var ret = []
+    , keys = objectKeys(obj)
+    , key;
+
+  for (var i = 0, len = keys.length; i < len; ++i) {
+    key = keys[i];
+    if ('' == key) continue;
+    if (null == obj[key]) {
+      ret.push(encodeURIComponent(key) + '=');
+    } else {
+      ret.push(stringify(obj[key], prefix
+        ? prefix + '[' + encodeURIComponent(key) + ']'
+        : encodeURIComponent(key)));
+    }
+  }
+
+  return ret.join('&');
+}
+
+/**
+ * Set `obj`'s `key` to `val` respecting
+ * the weird and wonderful syntax of a qs,
+ * where "foo=bar&foo=baz" becomes an array.
+ *
+ * @param {Object} obj
+ * @param {String} key
+ * @param {String} val
+ * @api private
+ */
+
+function set(obj, key, val) {
+  var v = obj[key];
+  if (hasOwnProperty.call(Object.prototype, key)) return;
+  if (undefined === v) {
+    obj[key] = val;
+  } else if (isArray(v)) {
+    v.push(val);
+  } else {
+    obj[key] = [v, val];
+  }
+}
+
+/**
+ * Locate last brace in `str` within the key.
+ *
+ * @param {String} str
+ * @return {Number}
+ * @api private
+ */
+
+function lastBraceInKey(str) {
+  var len = str.length
+    , brace
+    , c;
+  for (var i = 0; i < len; ++i) {
+    c = str[i];
+    if (']' == c) brace = false;
+    if ('[' == c) brace = true;
+    if ('=' == c && !brace) return i;
+  }
+}
+
+/**
+ * Decode `str`.
+ *
+ * @param {String} str
+ * @return {String}
+ * @api private
+ */
+
+function decode(str) {
+  try {
+    return decodeURIComponent(str.replace(/\+/g, ' '));
+  } catch (err) {
+    return str;
+  }
+}
+
+});
+require.register("userjoy/lib/index.js", function(exports, require, module){
+var UserJoy = require('./userjoy');
 
 
 /**
- * Expose the `dodatado` singleton.
+ * Expose the `userjoy` singleton.
  */
 
-var dodatado = module.exports = exports = new DoDataDo();
+var userjoy = module.exports = exports = new UserJoy();
 
 /**
  * Expose require
  */
 
-dodatado.require = require;
+userjoy.require = require;
 
 /**
  * Expose `VERSION`.
@@ -9424,12 +9792,12 @@ exports.VERSION = '1.0.0';
  * Initialize
  */
 
-dodatado.initialize();
+userjoy.initialize();
 
 });
-require.register("dodatado/lib/company.js", function(exports, require, module){
+require.register("userjoy/lib/company.js", function(exports, require, module){
 
-var debug = require('debug')('dodatado:company');
+var debug = require('debug')('userjoy:company');
 var Entity = require('./entity');
 var inherit = require('inherit');
 var bind = require('bind');
@@ -9442,10 +9810,10 @@ var bind = require('bind');
 Company.defaults = {
   persist: true,
   cookie: {
-    key: 'dodatado_company_id'
+    key: 'userjoy_company_id'
   },
   localStorage: {
-    key: 'dodatado_company_properties'
+    key: 'userjoy_company_properties'
   }
 };
 
@@ -9484,7 +9852,7 @@ module.exports = bind.all(new Company());
 module.exports.Company = Company;
 
 });
-require.register("dodatado/lib/cookie.js", function(exports, require, module){
+require.register("userjoy/lib/cookie.js", function(exports, require, module){
 
 var bind = require('bind');
 var cookie = require('cookie');
@@ -9602,523 +9970,7 @@ module.exports = bind.all(new Cookie());
 
 module.exports.Cookie = Cookie;
 });
-require.register("dodatado/lib/dodatado.js", function(exports, require, module){
-var after = require('after');
-var bind = require('bind');
-var callback = require('callback');
-var canonical = require('canonical');
-var clone = require('clone');
-var cookie = require('./cookie');
-var debug = require('debug');
-var defaults = require('defaults');
-var each = require('each');
-var company = require('./company');
-var is = require('is');
-var isEmail = require('is-email');
-var isMeta = require('is-meta');
-var json = require('json');
-var newDate = require('new-date');
-var on = require('event')
-  .bind;
-var prevent = require('prevent');
-var querystring = require('querystring');
-var queue = require('./queue');
-var size = require('object')
-  .length;
-var store = require('./store');
-var url = require('url');
-var user = require('./user');
-
-/**
- * TODO
- *
- * - ASSUME THERE IS ONLY ONE INTEGRATION AND THEN REMOVE UNNECESSARY
- * ABSTRACTION
- * - Remove all facade contructors
- * - In place of facade functions, use constructors in company and user modules
- * - Create new constructors for Alias, Track and Page in the root dir
- * - Update _invoke function to send data
- * - Remove Emitter
- * - Remove all integration related functions
- * - Remove all unused 'components'
- * - Update tests
- *
- *
- * ===================
- * PSEUDO-CODE
- * ===================
- *
- * In initialize, load user and company from storage
- *
- * In invokeQueue, check if identify user / company
- * functions are present in the queue. If yes, invoke these functions
- * before invoking other event-related functions
- *
- * In identify user / company, if unique id is not
- * equal to the id stored in cookie, then reset
- * user / company, and then set new id / traits
- * change entity.prototype.identify function to delete current id / traits
- *
- * Session: create separate session cookie with maxAge of 30 minutes.
- * Every time a new event happens, check if the session exists. If it does
- * not exist, create a new session and pass session related data to the new
- * session. Session should be an entity with its own traits. if there is a
- * valid session id, send it alongwith the request, else the server should
- * create a new session, and send back the session id in the jsonp callback
- *
- */
-
-
-
-
-/**
- * Expose `DoDataDo`.
- */
-
-module.exports = DoDataDo;
-
-
-/**
- * Initialize a new `DoDataDo` instance.
- */
-
-function DoDataDo() {
-  this._timeout = 300;
-  this.api_url = '/track';
-  this.jsonp_callback = 'foo';
-  bind.all(this);
-}
-
-
-/**
- * Initialize with the given `settings` and `options`.
- *
- * @param {Object} settings
- * @param {Object} options (optional)
- * @return {DoDataDo}
- */
-
-DoDataDo.prototype.initialize = function (settings, options) {
-  settings = settings || {};
-  options = options || {};
-
-  this._options(options);
-
-  // load user now that options are set
-  user.load();
-  company.load();
-
-  // set tasks which were queued before initialization
-  queue
-    .create(window.dodatado)
-    .prioritize();
-
-  // invoke queued tasks
-  this._invokeQueue();
-
-  // track page view
-  this.page();
-
-  return this;
-};
-
-
-/**
- * Invoke tasks which have been queued
- *
- * @return {DoDataDo}
- */
-
-DoDataDo.prototype._invokeQueue = function () {
-
-  for (var i = queue.tasks.length - 1; i >= 0; i--) {
-    this.push(queue.tasks.shift());
-  };
-
-  return this;
-};
-
-/**
- * Identify a user by optional `id` and `traits`.
- *
- * @param {String} id (optional)
- * @param {Object} traits (optional)
- * @param {Function} fn (optional)
- * @return {DoDataDo}
- */
-
-DoDataDo.prototype.identify = function (id, traits, options, fn) {
-  if (is.fn(options)) fn = options, options = null;
-  if (is.fn(traits)) fn = traits, options = null, traits = null;
-  if (is.object(id)) options = traits, traits = id, id = user.id();
-
-  // clone traits before we manipulate so we don't do anything uncouth, and take
-  // from `user` so that we carryover anonymous traits
-  user.identify(id, traits);
-  id = user.id();
-  traits = user.traits();
-
-  this._callback(fn);
-  return this;
-};
-
-
-/**
- * Return the current user.
- *
- * @return {Object}
- */
-
-DoDataDo.prototype.user = function () {
-  return user;
-};
-
-
-/**
- * Identify a company by optional `id` and `traits`. Or, if no arguments are
- * supplied, return the current company.
- *
- * @param {String} id (optional)
- * @param {Object} traits (optional)
- * @param {Object} options (optional)
- * @param {Function} fn (optional)
- * @return {DoDataDo or Object}
- */
-
-DoDataDo.prototype.company = function (id, traits, options, fn) {
-  if (0 === arguments.length) return company;
-  if (is.fn(options)) fn = options, options = null;
-  if (is.fn(traits)) fn = traits, options = null, traits = null;
-  if (is.object(id)) options = traits, traits = id, id = company.id();
-
-
-  // grab from company again to make sure we're taking from the source
-  company.identify(id, traits);
-  id = company.id();
-  traits = company.traits();
-
-  this._callback(fn);
-  return this;
-};
-
-
-/**
- * Track an `event` that a user has triggered with optional `properties`.
- *
- * @param {String} event
- * @param {Object} properties (optional)
- * @param {Object} options (optional)
- * @param {Function} fn (optional)
- * @return {DoDataDo}
- */
-
-DoDataDo.prototype.track = function (event, properties, options, fn) {
-  if (is.fn(options)) fn = options, options = null;
-  if (is.fn(properties)) fn = properties, options = null, properties = null;
-
-  this._send('track', {
-    properties: properties,
-    options: options,
-    event: event
-  });
-
-  this._callback(fn);
-  return this;
-};
-
-
-/**
- * Helper method to track an outbound link that would normally navigate away
- * from the page before the analytics calls were sent.
- *
- * @param {Element or Array} links
- * @param {String or Function} event
- * @param {Object or Function} properties (optional)
- * @return {DoDataDo}
- */
-
-DoDataDo.prototype.trackLink = function (links, event, properties) {
-  if (!links) return this;
-  if (is.element(links)) links = [links]; // always arrays, handles jquery
-
-  var self = this;
-  each(links, function (el) {
-    on(el, 'click', function (e) {
-      var ev = is.fn(event) ? event(el) : event;
-      var props = is.fn(properties) ? properties(el) : properties;
-      self.track(ev, props);
-
-      if (el.href && el.target !== '_blank' && !isMeta(e)) {
-        prevent(e);
-        self._callback(function () {
-          window.location.href = el.href;
-        });
-      }
-    });
-  });
-
-  return this;
-};
-
-
-/**
- * Helper method to track an outbound form that would normally navigate away
- * from the page before the analytics calls were sent.
- *
- * @param {Element or Array} forms
- * @param {String or Function} event
- * @param {Object or Function} properties (optional)
- * @return {DoDataDo}
- */
-
-DoDataDo.prototype.trackForm = function (forms, event, properties) {
-  if (!forms) return this;
-  if (is.element(forms)) forms = [forms]; // always arrays, handles jquery
-
-  var self = this;
-  each(forms, function (el) {
-    function handler(e) {
-      prevent(e);
-
-      var ev = is.fn(event) ? event(el) : event;
-      var props = is.fn(properties) ? properties(el) : properties;
-      self.track(ev, props);
-
-      self._callback(function () {
-        el.submit();
-      });
-    }
-
-    // support the events happening through jQuery or Zepto instead of through
-    // the normal DOM API, since `el.submit` doesn't bubble up events...
-    var $ = window.jQuery || window.Zepto;
-    if ($) {
-      $(el)
-        .submit(handler);
-    } else {
-      on(el, 'submit', handler);
-    }
-  });
-
-  return this;
-};
-
-
-/**
- * Trigger a pageview, labeling the current page with an optional `category`,
- * `name` and `properties`.
- *
- * @param {String} category (optional)
- * @param {String} name (optional)
- * @param {Object or String} properties (or path) (optional)
- * @param {Object} options (optional)
- * @param {Function} fn (optional)
- * @return {DoDataDo}
- */
-
-DoDataDo.prototype.page = function (category, name, properties, options, fn) {
-
-  if (is.fn(options)) fn = options, options = null;
-  if (is.fn(properties)) fn = properties, options = properties = null;
-  if (is.fn(name)) fn = name, options = properties = name = null;
-  if (is.object(category)) options = name, properties = category, name =
-    category = null;
-  if (is.object(name)) options = properties, properties = name, name = null;
-  if (is.string(category) && !is.string(name)) name = category, category =
-    null;
-
-  var defs = {
-    path: canonicalPath(),
-    referrer: document.referrer,
-    title: document.title,
-    url: canonicalUrl(),
-    search: location.search
-  };
-
-  if (name) defs.name = name;
-  if (category) defs.category = category;
-
-  properties = clone(properties) || {};
-  defaults(properties, defs);
-
-  this._send('page', {
-    properties: properties,
-    category: category,
-    options: options,
-    name: name
-  });
-
-  this._callback(fn);
-  return this;
-};
-
-
-/**
- * Set the `timeout` (in milliseconds) used for callbacks.
- *
- * @param {Number} timeout
- */
-
-DoDataDo.prototype.timeout = function (timeout) {
-  this._timeout = timeout;
-};
-
-
-/**
- * Enable or disable debug.
- *
- * @param {String or Boolean} str
- */
-
-DoDataDo.prototype.debug = function (str) {
-  if (0 == arguments.length || str) {
-    debug.enable('analytics:' + (str || '*'));
-  } else {
-    debug.disable();
-  }
-};
-
-
-/**
- * Apply options.
- *
- * @param {Object} options
- * @return {DoDataDo}
- * @api private
- */
-
-DoDataDo.prototype._options = function (options) {
-  options = options || {};
-  cookie.options(options.cookie);
-  store.options(options.localStorage);
-  user.options(options.user);
-  company.options(options.company);
-  return this;
-};
-
-
-/**
- * Callback a `fn` after our defined timeout period.
- *
- * @param {Function} fn
- * @return {DoDataDo}
- * @api private
- */
-
-DoDataDo.prototype._callback = function (fn) {
-  callback.async(fn, this._timeout);
-  return this;
-};
-
-
-/**
- *
- * Send event data to DoDataDo API
- *
- * @param {String} type of event
- * @param {Object} traits of event
- * @return {DoDataDo}
- * @api private
- */
-
-DoDataDo.prototype._send = function (type, traits) {
-
-  // TODO: send data to dodatado api here
-
-  var data = {
-    event: {
-      type: type,
-      traits: traits
-    },
-    user: {
-      id: user.id(),
-      traits: user.traits()
-    }
-  };
-
-  if (company.id()) {
-    data.company = {
-      id: company.id(),
-      traits: company.traits()
-    };
-  }
-
-  this._jsonp(data);
-  return this;
-};
-
-
-/**
- * Send data to api using JSON-P
- *
- * @param {Object} data to be sent
- * @return {dodatado}
- */
-
-DoDataDo.prototype._jsonp = function (data) {
-
-  function foo(data) {
-    // do stuff with JSON
-    console.log('recieved foo data', data);
-  }
-
-  data.callback = foo;
-
-  data = json.stringify(data);
-
-  // var script = document.createElement('script');
-
-  // script.src = this.api_url +
-  //   '?data=' +
-  //   data;
-
-  // document.getElementsByTagName('head')[0].appendChild(script);
-  return this;
-};
-
-
-/**
- * Push `args`.
- *
- * @param {Array} args
- * @api private
- */
-
-DoDataDo.prototype.push = function (args) {
-  var method = args.shift();
-
-  if (!this[method]) return;
-  this[method].apply(this, args);
-};
-
-/**
- * Return the canonical path for the page.
- *
- * @return {String}
- */
-
-function canonicalPath() {
-  var canon = canonical();
-  if (!canon) return window.location.pathname;
-  var parsed = url.parse(canon);
-  return parsed.pathname;
-}
-
-/**
- * Return the canonical URL for the page, without the hash.
- *
- * @return {String}
- */
-
-function canonicalUrl() {
-  var canon = canonical();
-  if (canon) return canon;
-  var url = window.location.href;
-  var i = url.indexOf('#');
-  return -1 == i ? url : url.slice(0, i);
-}
-});
-require.register("dodatado/lib/entity.js", function(exports, require, module){
+require.register("userjoy/lib/entity.js", function(exports, require, module){
 
 var traverse = require('isodate-traverse');
 var defaults = require('defaults');
@@ -10320,7 +10172,7 @@ Entity.prototype.load = function () {
 
 
 });
-require.register("dodatado/lib/queue.js", function(exports, require, module){
+require.register("userjoy/lib/queue.js", function(exports, require, module){
 var _ = require('lodash');
 var bind = require('bind');
 var is = require('is');
@@ -10345,7 +10197,7 @@ function Queue() {
 /**
  * Creates queue based on the tasks in the param array
  *
- * @param {Array} window.dodatado
+ * @param {Array} window.userjoy
  * @return {Queue}
  */
 
@@ -10400,7 +10252,7 @@ Queue.prototype._pullIdentify = function () {
 };
 
 });
-require.register("dodatado/lib/store.js", function(exports, require, module){
+require.register("userjoy/lib/store.js", function(exports, require, module){
 
 var bind = require('bind');
 var defaults = require('defaults');
@@ -10487,9 +10339,9 @@ module.exports = bind.all(new Store());
 
 module.exports.Store = Store;
 });
-require.register("dodatado/lib/user.js", function(exports, require, module){
+require.register("userjoy/lib/user.js", function(exports, require, module){
 
-var debug = require('debug')('dodatado:user');
+var debug = require('debug')('userjoy:user');
 var Entity = require('./entity');
 var inherit = require('inherit');
 var bind = require('bind');
@@ -10503,10 +10355,10 @@ var cookie = require('./cookie');
 User.defaults = {
   persist: true,
   cookie: {
-    key: 'dodatado_user_id'
+    key: 'userjoy_user_id'
   },
   localStorage: {
-    key: 'dodatado_user_traits'
+    key: 'userjoy_user_traits'
   }
 };
 
@@ -10552,6 +10404,523 @@ module.exports = bind.all(new User());
  */
 
 module.exports.User = User;
+
+});
+require.register("userjoy/lib/userjoy.js", function(exports, require, module){
+var after = require('after');
+var bind = require('bind');
+var callback = require('callback');
+var canonical = require('canonical');
+var clone = require('clone');
+var cookie = require('./cookie');
+var debug = require('debug');
+var defaults = require('defaults');
+var each = require('each');
+var company = require('./company');
+var is = require('is');
+var isEmail = require('is-email');
+var isMeta = require('is-meta');
+var json = require('json');
+var newDate = require('new-date');
+var on = require('event')
+  .bind;
+var prevent = require('prevent');
+var querystring = require('querystring');
+var queue = require('./queue');
+var size = require('object')
+  .length;
+var store = require('./store');
+var url = require('url');
+var user = require('./user');
+
+/**
+ * TODO
+ *
+ * - ASSUME THERE IS ONLY ONE INTEGRATION AND THEN REMOVE UNNECESSARY
+ * ABSTRACTION
+ * - Remove all facade contructors
+ * - In place of facade functions, use constructors in company and user modules
+ * - Create new constructors for Alias, Track and Page in the root dir
+ * - Update _invoke function to send data
+ * - Remove Emitter
+ * - Remove all integration related functions
+ * - Remove all unused 'components'
+ * - Update tests
+ *
+ *
+ * ===================
+ * PSEUDO-CODE
+ * ===================
+ *
+ * In initialize, load user and company from storage
+ *
+ * In invokeQueue, check if identify user / company
+ * functions are present in the queue. If yes, invoke these functions
+ * before invoking other event-related functions
+ *
+ * In identify user / company, if unique id is not
+ * equal to the id stored in cookie, then reset
+ * user / company, and then set new id / traits
+ * change entity.prototype.identify function to delete current id / traits
+ *
+ * Session: create separate session cookie with maxAge of 30 minutes.
+ * Every time a new event happens, check if the session exists. If it does
+ * not exist, create a new session and pass session related data to the new
+ * session. Session should be an entity with its own traits. if there is a
+ * valid session id, send it alongwith the request, else the server should
+ * create a new session, and send back the session id in the jsonp callback
+ *
+ */
+
+
+
+
+/**
+ * Expose `UserJoy`.
+ */
+
+module.exports = UserJoy;
+
+
+/**
+ * Initialize a new `UserJoy` instance.
+ */
+
+function UserJoy() {
+  this._timeout = 300;
+  this.api_url = '/track';
+  this.jsonp_callback = 'foo';
+  bind.all(this);
+}
+
+
+/**
+ * Initialize with the given `settings` and `options`.
+ *
+ * @param {Object} settings
+ * @param {Object} options (optional)
+ * @return {UserJoy}
+ */
+
+UserJoy.prototype.initialize = function (settings, options) {
+  settings = settings || {};
+  options = options || {};
+
+  this._options(options);
+
+  // load user now that options are set
+  user.load();
+  company.load();
+
+  // set tasks which were queued before initialization
+  queue
+    .create(window.userjoy)
+    .prioritize();
+
+  // invoke queued tasks
+  this._invokeQueue();
+
+  // track page view
+  this.page();
+
+  return this;
+};
+
+
+/**
+ * Invoke tasks which have been queued
+ *
+ * @return {UserJoy}
+ */
+
+UserJoy.prototype._invokeQueue = function () {
+
+  for (var i = queue.tasks.length - 1; i >= 0; i--) {
+    this.push(queue.tasks.shift());
+  };
+
+  return this;
+};
+
+/**
+ * Identify a user by optional `id` and `traits`.
+ *
+ * @param {String} id (optional)
+ * @param {Object} traits (optional)
+ * @param {Function} fn (optional)
+ * @return {UserJoy}
+ */
+
+UserJoy.prototype.identify = function (id, traits, options, fn) {
+  if (is.fn(options)) fn = options, options = null;
+  if (is.fn(traits)) fn = traits, options = null, traits = null;
+  if (is.object(id)) options = traits, traits = id, id = user.id();
+
+  // clone traits before we manipulate so we don't do anything uncouth, and take
+  // from `user` so that we carryover anonymous traits
+  user.identify(id, traits);
+  id = user.id();
+  traits = user.traits();
+
+  this._callback(fn);
+  return this;
+};
+
+
+/**
+ * Return the current user.
+ *
+ * @return {Object}
+ */
+
+UserJoy.prototype.user = function () {
+  return user;
+};
+
+
+/**
+ * Identify a company by optional `id` and `traits`. Or, if no arguments are
+ * supplied, return the current company.
+ *
+ * @param {String} id (optional)
+ * @param {Object} traits (optional)
+ * @param {Object} options (optional)
+ * @param {Function} fn (optional)
+ * @return {UserJoy or Object}
+ */
+
+UserJoy.prototype.company = function (id, traits, options, fn) {
+  if (0 === arguments.length) return company;
+  if (is.fn(options)) fn = options, options = null;
+  if (is.fn(traits)) fn = traits, options = null, traits = null;
+  if (is.object(id)) options = traits, traits = id, id = company.id();
+
+
+  // grab from company again to make sure we're taking from the source
+  company.identify(id, traits);
+  id = company.id();
+  traits = company.traits();
+
+  this._callback(fn);
+  return this;
+};
+
+
+/**
+ * Track an `event` that a user has triggered with optional `properties`.
+ *
+ * @param {String} event
+ * @param {Object} properties (optional)
+ * @param {Object} options (optional)
+ * @param {Function} fn (optional)
+ * @return {UserJoy}
+ */
+
+UserJoy.prototype.track = function (event, properties, options, fn) {
+  if (is.fn(options)) fn = options, options = null;
+  if (is.fn(properties)) fn = properties, options = null, properties = null;
+
+  this._send('track', {
+    properties: properties,
+    options: options,
+    event: event
+  });
+
+  this._callback(fn);
+  return this;
+};
+
+
+/**
+ * Helper method to track an outbound link that would normally navigate away
+ * from the page before the analytics calls were sent.
+ *
+ * @param {Element or Array} links
+ * @param {String or Function} event
+ * @param {Object or Function} properties (optional)
+ * @return {UserJoy}
+ */
+
+UserJoy.prototype.trackLink = function (links, event, properties) {
+  if (!links) return this;
+  if (is.element(links)) links = [links]; // always arrays, handles jquery
+
+  var self = this;
+  each(links, function (el) {
+    on(el, 'click', function (e) {
+      var ev = is.fn(event) ? event(el) : event;
+      var props = is.fn(properties) ? properties(el) : properties;
+      self.track(ev, props);
+
+      if (el.href && el.target !== '_blank' && !isMeta(e)) {
+        prevent(e);
+        self._callback(function () {
+          window.location.href = el.href;
+        });
+      }
+    });
+  });
+
+  return this;
+};
+
+
+/**
+ * Helper method to track an outbound form that would normally navigate away
+ * from the page before the analytics calls were sent.
+ *
+ * @param {Element or Array} forms
+ * @param {String or Function} event
+ * @param {Object or Function} properties (optional)
+ * @return {UserJoy}
+ */
+
+UserJoy.prototype.trackForm = function (forms, event, properties) {
+  if (!forms) return this;
+  if (is.element(forms)) forms = [forms]; // always arrays, handles jquery
+
+  var self = this;
+  each(forms, function (el) {
+    function handler(e) {
+      prevent(e);
+
+      var ev = is.fn(event) ? event(el) : event;
+      var props = is.fn(properties) ? properties(el) : properties;
+      self.track(ev, props);
+
+      self._callback(function () {
+        el.submit();
+      });
+    }
+
+    // support the events happening through jQuery or Zepto instead of through
+    // the normal DOM API, since `el.submit` doesn't bubble up events...
+    var $ = window.jQuery || window.Zepto;
+    if ($) {
+      $(el)
+        .submit(handler);
+    } else {
+      on(el, 'submit', handler);
+    }
+  });
+
+  return this;
+};
+
+
+/**
+ * Trigger a pageview, labeling the current page with an optional `category`,
+ * `name` and `properties`.
+ *
+ * @param {String} category (optional)
+ * @param {String} name (optional)
+ * @param {Object or String} properties (or path) (optional)
+ * @param {Object} options (optional)
+ * @param {Function} fn (optional)
+ * @return {UserJoy}
+ */
+
+UserJoy.prototype.page = function (category, name, properties, options, fn) {
+
+  if (is.fn(options)) fn = options, options = null;
+  if (is.fn(properties)) fn = properties, options = properties = null;
+  if (is.fn(name)) fn = name, options = properties = name = null;
+  if (is.object(category)) options = name, properties = category, name =
+    category = null;
+  if (is.object(name)) options = properties, properties = name, name = null;
+  if (is.string(category) && !is.string(name)) name = category, category =
+    null;
+
+  var defs = {
+    path: canonicalPath(),
+    referrer: document.referrer,
+    title: document.title,
+    url: canonicalUrl(),
+    search: location.search
+  };
+
+  if (name) defs.name = name;
+  if (category) defs.category = category;
+
+  properties = clone(properties) || {};
+  defaults(properties, defs);
+
+  this._send('page', {
+    properties: properties,
+    category: category,
+    options: options,
+    name: name
+  });
+
+  this._callback(fn);
+  return this;
+};
+
+
+/**
+ * Set the `timeout` (in milliseconds) used for callbacks.
+ *
+ * @param {Number} timeout
+ */
+
+UserJoy.prototype.timeout = function (timeout) {
+  this._timeout = timeout;
+};
+
+
+/**
+ * Enable or disable debug.
+ *
+ * @param {String or Boolean} str
+ */
+
+UserJoy.prototype.debug = function (str) {
+  if (0 == arguments.length || str) {
+    debug.enable('analytics:' + (str || '*'));
+  } else {
+    debug.disable();
+  }
+};
+
+
+/**
+ * Apply options.
+ *
+ * @param {Object} options
+ * @return {UserJoy}
+ * @api private
+ */
+
+UserJoy.prototype._options = function (options) {
+  options = options || {};
+  cookie.options(options.cookie);
+  store.options(options.localStorage);
+  user.options(options.user);
+  company.options(options.company);
+  return this;
+};
+
+
+/**
+ * Callback a `fn` after our defined timeout period.
+ *
+ * @param {Function} fn
+ * @return {UserJoy}
+ * @api private
+ */
+
+UserJoy.prototype._callback = function (fn) {
+  callback.async(fn, this._timeout);
+  return this;
+};
+
+
+/**
+ *
+ * Send event data to UserJoy API
+ *
+ * @param {String} type of event
+ * @param {Object} traits of event
+ * @return {UserJoy}
+ * @api private
+ */
+
+UserJoy.prototype._send = function (type, traits) {
+
+  // TODO: send data to userjoy api here
+
+  var data = {
+    event: {
+      type: type,
+      traits: traits
+    },
+    user: {
+      id: user.id(),
+      traits: user.traits()
+    }
+  };
+
+  if (company.id()) {
+    data.company = {
+      id: company.id(),
+      traits: company.traits()
+    };
+  }
+
+  this._jsonp(data);
+  return this;
+};
+
+
+/**
+ * Send data to api using JSON-P
+ *
+ * @param {Object} data to be sent
+ * @return {userjoy}
+ */
+
+UserJoy.prototype._jsonp = function (data) {
+
+  function foo(data) {
+    // do stuff with JSON
+    console.log('recieved foo data', data);
+  }
+
+  data.callback = foo;
+
+  data = json.stringify(data);
+
+  // var script = document.createElement('script');
+
+  // script.src = this.api_url +
+  //   '?data=' +
+  //   data;
+
+  // document.getElementsByTagName('head')[0].appendChild(script);
+  return this;
+};
+
+
+/**
+ * Push `args`.
+ *
+ * @param {Array} args
+ * @api private
+ */
+
+UserJoy.prototype.push = function (args) {
+  var method = args.shift();
+
+  if (!this[method]) return;
+  this[method].apply(this, args);
+};
+
+/**
+ * Return the canonical path for the page.
+ *
+ * @return {String}
+ */
+
+function canonicalPath() {
+  var canon = canonical();
+  if (!canon) return window.location.pathname;
+  var parsed = url.parse(canon);
+  return parsed.pathname;
+}
+
+/**
+ * Return the canonical URL for the page, without the hash.
+ *
+ * @return {String}
+ */
+
+function canonicalUrl() {
+  var canon = canonical();
+  if (canon) return canon;
+  var url = window.location.href;
+  var i = url.indexOf('#');
+  return -1 == i ? url : url.slice(0, i);
+}
 
 });
 
@@ -10606,37 +10975,39 @@ module.exports.User = User;
 
 
 
-require.alias("avetisk-defaults/index.js", "dodatado/deps/defaults/index.js");
+
+
+require.alias("avetisk-defaults/index.js", "userjoy/deps/defaults/index.js");
 require.alias("avetisk-defaults/index.js", "defaults/index.js");
 
-require.alias("component-clone/index.js", "dodatado/deps/clone/index.js");
+require.alias("component-clone/index.js", "userjoy/deps/clone/index.js");
 require.alias("component-clone/index.js", "clone/index.js");
 require.alias("component-type/index.js", "component-clone/deps/type/index.js");
 
-require.alias("component-cookie/index.js", "dodatado/deps/cookie/index.js");
+require.alias("component-cookie/index.js", "userjoy/deps/cookie/index.js");
 require.alias("component-cookie/index.js", "cookie/index.js");
 
-require.alias("component-each/index.js", "dodatado/deps/each/index.js");
+require.alias("component-each/index.js", "userjoy/deps/each/index.js");
 require.alias("component-each/index.js", "each/index.js");
 require.alias("component-type/index.js", "component-each/deps/type/index.js");
 
-require.alias("component-event/index.js", "dodatado/deps/event/index.js");
+require.alias("component-event/index.js", "userjoy/deps/event/index.js");
 require.alias("component-event/index.js", "event/index.js");
 
-require.alias("component-inherit/index.js", "dodatado/deps/inherit/index.js");
+require.alias("component-inherit/index.js", "userjoy/deps/inherit/index.js");
 require.alias("component-inherit/index.js", "inherit/index.js");
 
-require.alias("component-object/index.js", "dodatado/deps/object/index.js");
+require.alias("component-object/index.js", "userjoy/deps/object/index.js");
 require.alias("component-object/index.js", "object/index.js");
 
-require.alias("component-querystring/index.js", "dodatado/deps/querystring/index.js");
+require.alias("component-querystring/index.js", "userjoy/deps/querystring/index.js");
 require.alias("component-querystring/index.js", "querystring/index.js");
 require.alias("component-trim/index.js", "component-querystring/deps/trim/index.js");
 
-require.alias("component-url/index.js", "dodatado/deps/url/index.js");
+require.alias("component-url/index.js", "userjoy/deps/url/index.js");
 require.alias("component-url/index.js", "url/index.js");
 
-require.alias("ianstormtaylor-bind/index.js", "dodatado/deps/bind/index.js");
+require.alias("ianstormtaylor-bind/index.js", "userjoy/deps/bind/index.js");
 require.alias("ianstormtaylor-bind/index.js", "bind/index.js");
 require.alias("component-bind/index.js", "ianstormtaylor-bind/deps/bind/index.js");
 
@@ -10645,32 +11016,32 @@ require.alias("component-bind/index.js", "segmentio-bind-all/deps/bind/index.js"
 
 require.alias("component-type/index.js", "segmentio-bind-all/deps/type/index.js");
 
-require.alias("ianstormtaylor-callback/index.js", "dodatado/deps/callback/index.js");
+require.alias("ianstormtaylor-callback/index.js", "userjoy/deps/callback/index.js");
 require.alias("ianstormtaylor-callback/index.js", "callback/index.js");
 require.alias("timoxley-next-tick/index.js", "ianstormtaylor-callback/deps/next-tick/index.js");
 
-require.alias("ianstormtaylor-is/index.js", "dodatado/deps/is/index.js");
+require.alias("ianstormtaylor-is/index.js", "userjoy/deps/is/index.js");
 require.alias("ianstormtaylor-is/index.js", "is/index.js");
 require.alias("component-type/index.js", "ianstormtaylor-is/deps/type/index.js");
 
 require.alias("ianstormtaylor-is-empty/index.js", "ianstormtaylor-is/deps/is-empty/index.js");
 
-require.alias("segmentio-after/index.js", "dodatado/deps/after/index.js");
+require.alias("segmentio-after/index.js", "userjoy/deps/after/index.js");
 require.alias("segmentio-after/index.js", "after/index.js");
 
-require.alias("segmentio-canonical/index.js", "dodatado/deps/canonical/index.js");
+require.alias("segmentio-canonical/index.js", "userjoy/deps/canonical/index.js");
 require.alias("segmentio-canonical/index.js", "canonical/index.js");
 
-require.alias("segmentio-extend/index.js", "dodatado/deps/extend/index.js");
+require.alias("segmentio-extend/index.js", "userjoy/deps/extend/index.js");
 require.alias("segmentio-extend/index.js", "extend/index.js");
 
-require.alias("segmentio-is-email/index.js", "dodatado/deps/is-email/index.js");
+require.alias("segmentio-is-email/index.js", "userjoy/deps/is-email/index.js");
 require.alias("segmentio-is-email/index.js", "is-email/index.js");
 
-require.alias("segmentio-is-meta/index.js", "dodatado/deps/is-meta/index.js");
+require.alias("segmentio-is-meta/index.js", "userjoy/deps/is-meta/index.js");
 require.alias("segmentio-is-meta/index.js", "is-meta/index.js");
 
-require.alias("segmentio-isodate-traverse/index.js", "dodatado/deps/isodate-traverse/index.js");
+require.alias("segmentio-isodate-traverse/index.js", "userjoy/deps/isodate-traverse/index.js");
 require.alias("segmentio-isodate-traverse/index.js", "isodate-traverse/index.js");
 require.alias("component-each/index.js", "segmentio-isodate-traverse/deps/each/index.js");
 require.alias("component-type/index.js", "component-each/deps/type/index.js");
@@ -10682,14 +11053,14 @@ require.alias("ianstormtaylor-is-empty/index.js", "ianstormtaylor-is/deps/is-emp
 
 require.alias("segmentio-isodate/index.js", "segmentio-isodate-traverse/deps/isodate/index.js");
 
-require.alias("segmentio-json/index.js", "dodatado/deps/json/index.js");
+require.alias("segmentio-json/index.js", "userjoy/deps/json/index.js");
 require.alias("segmentio-json/index.js", "json/index.js");
 require.alias("component-json-fallback/index.js", "segmentio-json/deps/json-fallback/index.js");
 
-require.alias("segmentio-new-date/lib/index.js", "dodatado/deps/new-date/lib/index.js");
-require.alias("segmentio-new-date/lib/milliseconds.js", "dodatado/deps/new-date/lib/milliseconds.js");
-require.alias("segmentio-new-date/lib/seconds.js", "dodatado/deps/new-date/lib/seconds.js");
-require.alias("segmentio-new-date/lib/index.js", "dodatado/deps/new-date/index.js");
+require.alias("segmentio-new-date/lib/index.js", "userjoy/deps/new-date/lib/index.js");
+require.alias("segmentio-new-date/lib/milliseconds.js", "userjoy/deps/new-date/lib/milliseconds.js");
+require.alias("segmentio-new-date/lib/seconds.js", "userjoy/deps/new-date/lib/seconds.js");
+require.alias("segmentio-new-date/lib/index.js", "userjoy/deps/new-date/index.js");
 require.alias("segmentio-new-date/lib/index.js", "new-date/index.js");
 require.alias("ianstormtaylor-is/index.js", "segmentio-new-date/deps/is/index.js");
 require.alias("component-type/index.js", "ianstormtaylor-is/deps/type/index.js");
@@ -10699,31 +11070,28 @@ require.alias("ianstormtaylor-is-empty/index.js", "ianstormtaylor-is/deps/is-emp
 require.alias("segmentio-isodate/index.js", "segmentio-new-date/deps/isodate/index.js");
 
 require.alias("segmentio-new-date/lib/index.js", "segmentio-new-date/index.js");
-require.alias("segmentio-store.js/store.js", "dodatado/deps/store/store.js");
-require.alias("segmentio-store.js/store.js", "dodatado/deps/store/index.js");
+require.alias("segmentio-store.js/store.js", "userjoy/deps/store/store.js");
+require.alias("segmentio-store.js/store.js", "userjoy/deps/store/index.js");
 require.alias("segmentio-store.js/store.js", "store/index.js");
 require.alias("segmentio-store.js/store.js", "segmentio-store.js/index.js");
-require.alias("segmentio-top-domain/index.js", "dodatado/deps/top-domain/index.js");
-require.alias("segmentio-top-domain/index.js", "dodatado/deps/top-domain/index.js");
+require.alias("segmentio-top-domain/index.js", "userjoy/deps/top-domain/index.js");
+require.alias("segmentio-top-domain/index.js", "userjoy/deps/top-domain/index.js");
 require.alias("segmentio-top-domain/index.js", "top-domain/index.js");
 require.alias("component-url/index.js", "segmentio-top-domain/deps/url/index.js");
 
 require.alias("segmentio-top-domain/index.js", "segmentio-top-domain/index.js");
-require.alias("visionmedia-debug/index.js", "dodatado/deps/debug/index.js");
-require.alias("visionmedia-debug/debug.js", "dodatado/deps/debug/debug.js");
+require.alias("visionmedia-debug/index.js", "userjoy/deps/debug/index.js");
+require.alias("visionmedia-debug/debug.js", "userjoy/deps/debug/debug.js");
 require.alias("visionmedia-debug/index.js", "debug/index.js");
 
-require.alias("yields-prevent/index.js", "dodatado/deps/prevent/index.js");
+require.alias("yields-prevent/index.js", "userjoy/deps/prevent/index.js");
 require.alias("yields-prevent/index.js", "prevent/index.js");
 
-require.alias("lodash-lodash/index.js", "dodatado/deps/lodash/index.js");
-require.alias("lodash-lodash/dist/lodash.compat.js", "dodatado/deps/lodash/dist/lodash.compat.js");
+require.alias("lodash-lodash/index.js", "userjoy/deps/lodash/index.js");
+require.alias("lodash-lodash/dist/lodash.compat.js", "userjoy/deps/lodash/dist/lodash.compat.js");
 require.alias("lodash-lodash/index.js", "lodash/index.js");
 
-require.alias("dodatado/lib/index.js", "dodatado/index.js");if (typeof exports == "object") {
-  module.exports = require("dodatado");
-} else if (typeof define == "function" && define.amd) {
-  define([], function(){ return require("dodatado"); });
-} else {
-  this["dodatado"] = require("dodatado");
-}})();
+require.alias("visionmedia-node-querystring/index.js", "userjoy/deps/querystring/index.js");
+require.alias("visionmedia-node-querystring/index.js", "querystring/index.js");
+
+require.alias("userjoy/lib/index.js", "userjoy/index.js");

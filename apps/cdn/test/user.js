@@ -1,8 +1,8 @@
 
 describe('user', function () {
 
-  var dodatado = window.dodatado;
-  var require = dodatado.require;
+  var userjoy = window.userjoy;
+  var require = userjoy.require;
   var assert = dev('assert');
   var cookie = require('./cookie');
   var equal = dev('equals');
@@ -127,10 +127,10 @@ describe('user', function () {
         option: true,
         persist: true,
         cookie: {
-          key: 'dodatado_user_id'
+          key: 'userjoy_user_id'
         },
         localStorage: {
-          key: 'dodatado_user_traits'
+          key: 'userjoy_user_traits'
         }
       }));
     });

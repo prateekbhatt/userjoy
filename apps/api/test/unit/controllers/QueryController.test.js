@@ -24,6 +24,13 @@ describe('Resource /query', function () {
   var userIds = [];
 
 
+  /**
+   * models
+   */
+
+  var User = require('../../../api/models/User');
+
+
   before(function (done) {
 
 
@@ -120,14 +127,68 @@ describe('Resource /query', function () {
         .expect(200)
         .expect(function (res) {
 
-          if (!res.body.length) {
-            return 'No user found'
-          }
+          expect(res.body)
+            .to.be.an("array");
+
+          expect(res.body)
+            .to.not.be.empty;
+
         })
         .end(done);
 
     });
 
+
+    it(
+      'should return empty error if query has hasdone and hasnotdone filters on the same event',
+
+      function (done) {
+
+        var newObj = {
+          list: 'users',
+          op: 'and',
+          filters: [
+
+            {
+              method: 'hasdone',
+              type: 'feature',
+              name: 'Define Segment'
+            },
+
+            {
+              method: 'hasnotdone',
+              type: 'feature',
+              name: 'Define Segment'
+            }
+          ]
+        };
+
+        var newUrl = '/apps/' + aid + '/query?' + qs.stringify(obj);
+
+        request
+          .get(newUrl)
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .expect(function (res) {
+            console.log('query random val', res.body);
+
+            expect(res.body)
+              .to.be.an("array");
+
+            expect(res.body)
+              .to.not.be.empty;
+
+          })
+          .end(function (err, res) {
+            User.count(function (err, count) {
+              console.log('USER count', arguments);
+              done(err);
+            })
+
+          });
+
+      });
 
     it('should return empty array if not users matched', function (done) {
 
@@ -149,12 +210,11 @@ describe('Resource /query', function () {
         .expect(200)
         .expect(function (res) {
 
-          if (!(res.body instanceof Array)) {
-            return 'should return an array';
-          }
-          if (res.body.length) {
-            return 'should not match any users';
-          }
+          expect(res.body)
+            .to.be.an("array");
+
+          expect(res.body)
+            .to.be.empty;
         })
         .end(done);
 
@@ -193,28 +253,37 @@ describe('Resource /query', function () {
     });
 
 
-    it('should fetch users matching given filters', function (done) {
+    it('should return userAttributes/events on which to query',
+      function (done) {
 
-      request
-        .get(url)
-        .set('cookie', loginCookie)
-        .expect('Content-Type', /json/)
-        .expect(200)
-        .expect(function (res) {
+        request
+          .get(url)
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .expect(function (res) {
 
-          if (_.isEmpty(res.body.eventNames)) {
-            return 'No eventNames found'
-          }
+            expect(res.body.events)
+              .to.be.an("array");
 
-          expect(res.body.userAttributes)
-            .to.contain("user_id");
+            expect(res.body.events)
+              .to.not.be.empty;
 
-          expect(res.body.userAttributes)
-            .to.contain("email");
-        })
-        .end(done);
+            expect(res.body.events[0])
+              .to.have.property('type');
 
-    });
+            expect(res.body.events[0])
+              .to.have.property('name');
+
+            expect(res.body.userAttributes)
+              .to.contain("user_id");
+
+            expect(res.body.userAttributes)
+              .to.contain("email");
+          })
+          .end(done);
+
+      });
 
 
   });

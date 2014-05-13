@@ -97,22 +97,51 @@ router
     async.waterfall(
       [
 
-        function getEventNames(cb) {
+        function getFeatureNames(cb) {
           Event
-            .distinct('name')
-            .exec(function (err, eventNames) {
-              cb(err, eventNames);
+            .distinct('name', {
+              type: 'feature'
+            })
+            .exec(function (err, featureNames) {
+
+              var features = _.map(featureNames, function (name) {
+                var f = {
+                  type: 'feature',
+                  name: name
+                };
+                return f;
+              });
+
+              cb(err, features);
+            });
+        },
+
+        function getPageviewNames(features, cb) {
+          Event
+            .distinct('name', {
+              type: 'pageview'
+            })
+            .exec(function (err, pvNames) {
+              var pvs = _.map(pvNames, function (name) {
+                var f = {
+                  type: 'pageview',
+                  name: name
+                };
+                return f;
+              });
+
+              cb(err, features, pvs);
             });
         }
 
       ],
 
-      function (err, eventNames) {
+      function callback(err, features, pageviews) {
         if (err) return next(err);
 
         var attributes = {
           userAttributes: userAttributes,
-          eventNames: eventNames
+          events: features.concat(pageviews)
         };
 
         res

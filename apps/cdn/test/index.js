@@ -1,11 +1,11 @@
 
-describe('dodatado', function () {
+describe('userjoy', function () {
 
-  var dodatado = window.dodatado;
+  var userjoy = window.userjoy;
   var assert = dev('assert');
 
   it('should expose a .VERSION', function () {
-    assert(dodatado.VERSION);
+    assert(userjoy.VERSION);
   });
 
 });
