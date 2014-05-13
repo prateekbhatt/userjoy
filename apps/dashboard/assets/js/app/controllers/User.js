@@ -596,7 +596,7 @@ angular.module('do.users', [])
                 };
 
                 $scope.queryObj.list = $scope.selectedIcon.toLowerCase();
-                $scope.queryObj.op = '$' + $scope.text.toLowerCase();
+                $scope.queryObj.op = $scope.text.toLowerCase();
                 $scope.queryObj.filters = $scope.filtersBackend;
 
                 var stringifiedQuery = stringify($scope.queryObj);
@@ -617,12 +617,12 @@ angular.module('do.users', [])
                 $scope.showPopover = !$scope.showPopover;
             }
 
-            $scope.closePopover = function () {
+            $scope.closePopover = function (event) {
+                event.preventDefault();
                 $scope.showPopover = false;
             }
 
             $scope.createSegmentObj = {};
-console.log("segment Name: ", $scope.segmentName);
             $scope.createSegment = function () {
                 $scope.filtersBackend = [];
                 console.log("create segment: ", $scope.filters);
