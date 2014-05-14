@@ -443,7 +443,7 @@ describe('Resource /apps/:aid/conversations', function () {
         loginUser(done);
       });
 
-    it('should return error if uid/sub/text/type is not provided',
+    it('should return error if uids/sub/text/type is not provided',
 
       function (done) {
 
@@ -457,7 +457,7 @@ describe('Resource /apps/:aid/conversations', function () {
           .expect(400)
           .expect({
             status: 400,
-            error: 'Missing uid/sub/text/type'
+            error: 'Missing uids/sub/text/type'
           })
           .end(done);
 
@@ -466,13 +466,13 @@ describe('Resource /apps/:aid/conversations', function () {
     it('should create new message',
 
       function (done) {
-        var uid = saved.users.first._id;
+        var uids = [saved.users.first._id];
         var newMessage = {
           sName: 'Prateek Bhatt',
           sub: 'Welcome to UserJoy, {{= user.email || "you"}}',
           text: 'This is the message I want to send to {{= user.email || "YOU" }}',
           type: 'email',
-          uid: uid,
+          uids: uids,
         };
 
         request
@@ -483,10 +483,14 @@ describe('Resource /apps/:aid/conversations', function () {
           .expect(201)
           .expect(function (res) {
 
-            expect(res.body.sub)
+            expect(res.body).to.be.an("array");
+
+            expect(res.body).to.have.length(1);
+
+            expect(res.body[0].sub)
               .to.eql('Welcome to UserJoy, prattbhatt@gmail.com');
 
-            expect(res.body.text)
+            expect(res.body[0].text)
               .to.eql(
                 'This is the message I want to send to prattbhatt@gmail.com'
             );
