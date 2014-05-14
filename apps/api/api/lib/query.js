@@ -148,10 +148,11 @@ module.exports = Query;
 function Query(aid, query) {
 
 
+  // sanitize the query object
+  query = sanitize(query);
+
   this.aid = aid;
   this.countFilterUserIds = [];
-
-  var filters = query.filters;
 
   // set root level operator as $and/$or
   this.rootOperator = null;
@@ -161,6 +162,17 @@ function Query(aid, query) {
     throw new Error('op must be one of and/or');
   }
 
+  var filters = query.filters;
+
+  _.each(filters, function (f) {
+    if (f.op) {
+      if (OP_MAP[f.op]) {
+        f.op = OP_MAP[f.op];
+      } else {
+        throw new Error('Invalid filter op: ' + f.op);
+      }
+    }
+  });
 
   // separate Event count queries and User attribute queries
   this.setIntoCount(filters);
@@ -432,7 +444,13 @@ Query.prototype.genAttrMatchCond = function () {
 
   });
 
-  if (this.countFilterUserIds.length) {
+
+  // if there are countFilters, then the countFilter query must have been run.
+  // in that case, the uids output by the countQuery must be taken into account
+  //
+  // However, if there are no countFilters defined, then the output of the countQuery
+  // does not matter
+  if (this.countFilters && this.countFilters.length) {
     cond['_id'] = {
       '$in': this.countFilterUserIds
     };
@@ -592,7 +610,7 @@ Query.prototype.getCountFilterCond = function (filter) {
  * @return {object} sanitized query object
  */
 
-module.exports.sanitize = function (q) {
+function sanitize(q) {
 
   _.each(q.filters, function (f) {
 
@@ -601,7 +619,13 @@ module.exports.sanitize = function (q) {
       delete f.val;
     }
 
+    if (f.val && f.method === 'count') {
+      f.val = parseInt(f.val, 10);
+    }
+
   });
 
   return q;
 };
+
+module.exports.sanitize = sanitize;

@@ -42,28 +42,29 @@ describe('Lib query', function () {
     var newQuery;
     var queryObj;
     var setIntoCountSpy;
-    var filters = [{
-        method: 'count',
-        name: 'Clicked login btn',
-        op: '$eq',
-        val: 0
-      },
-
-      {
-        method: 'attr',
-        name: 'platform',
-        op: '$eq',
-        val: 'Android'
-      }
-
-    ];
-
-    queryObj = {
-      op: 'and',
-      filters: filters
-    };
+    var filters;
 
     beforeEach(function () {
+      filters = [{
+          method: 'count',
+          name: 'Clicked login btn',
+          op: 'eq',
+          val: 0
+        },
+
+        {
+          method: 'attr',
+          name: 'platform',
+          op: 'eq',
+          val: 'Android'
+        }
+
+      ];
+
+      queryObj = {
+        op: 'and',
+        filters: filters
+      };
       setIntoCountSpy = sinon.spy(Query.prototype, 'setIntoCount');
       newQuery = new Query(saved.apps.first._id, queryObj);
     });
@@ -77,7 +78,12 @@ describe('Lib query', function () {
 
       var newQueryObj = {
         op: '$and',
-        filters: filters
+        filters: [{
+          method: 'count',
+          name: 'Clicked login btn',
+          op: 'eq',
+          val: 0
+        }]
       };
 
 
@@ -183,7 +189,7 @@ describe('Lib query', function () {
           method: 'count',
           name: 'Create new chat',
           feature: 'Group',
-          op: '$gt',
+          op: 'gt',
           val: 15
         }];
 
@@ -199,7 +205,7 @@ describe('Lib query', function () {
         method: 'count',
         name: 'Add member',
         feature: 'Group',
-        op: '$gt',
+        op: 'gt',
         val: 15
       }, {
         method: 'hasdone',
@@ -224,7 +230,7 @@ describe('Lib query', function () {
           method: 'count',
           name: 'Create new chat',
           feature: 'Group',
-          op: '$gt',
+          op: 'gt',
           val: 15
         }];
 
@@ -241,7 +247,7 @@ describe('Lib query', function () {
           method: 'count',
           name: 'Add member',
           feature: 'Group',
-          op: '$gt',
+          op: 'gt',
           val: 15
         }, {
           method: 'hasdone',
@@ -330,33 +336,35 @@ describe('Lib query', function () {
     var cond;
 
     beforeEach(function () {
-      Query.prototype.aid = 'BlaBlaID';
-      Query.prototype.countFilterUserIds = [];
+      var queryObj = {
+        aid: 'BlaBlaID',
+        list: 'users',
+        op: 'and',
+        filters: [{
+            method: 'attr',
+            name: 'platform',
+            op: 'eq',
+            val: 'Android'
+          },
 
-      var attrFilters = [{
-          method: 'attr',
-          name: 'platform',
-          op: '$eq',
-          val: 'Android'
-        },
+          {
+            method: 'attr',
+            name: 'amount',
+            op: 'lt',
+            val: 100
+          },
 
-        {
-          method: 'attr',
-          name: 'amount',
-          op: '$lt',
-          val: 100
-        },
+          {
+            method: 'attr',
+            name: 'totalEvents',
+            op: 'gt',
+            val: 999
+          }
+        ]
+      }
 
-        {
-          method: 'attr',
-          name: 'totalEvents',
-          op: '$gt',
-          val: 999
-        }
-      ];
-
-      Query.prototype.attrFilters = attrFilters;
-      cond = Query.prototype.genAttrMatchCond();
+      var query = new Query(queryObj.aid, queryObj);
+      cond = query.genAttrMatchCond();
     });
 
 
@@ -391,13 +399,19 @@ describe('Lib query', function () {
         });
     });
 
-    it('should set $in filter on _id if countFilterUserIds is valid',
+    it('should set $in filter on _id if there are countFilters',
       function () {
+        var countFilters = [{
+          method: 'count',
+          type: 'pageview',
+          name: '/login'
+        }];
         var countFilterUserIds = [
           randomId,
           '5313123131'
         ];
 
+        Query.prototype.countFilters = countFilters;
         Query.prototype.countFilterUserIds = countFilterUserIds;
 
         cond = Query.prototype.genAttrMatchCond();
@@ -421,6 +435,7 @@ describe('Lib query', function () {
     it('should fetch users', function (done) {
 
       Query.prototype.aid = saved.apps.first._id;
+      Query.prototype.countFilters = [];
       Query.prototype.countFilterUserIds = [];
       Query.prototype.attrFilters = [];
 
@@ -495,14 +510,14 @@ describe('Lib query', function () {
       {
         method: 'count',
         name: 'Clicked login btn',
-        op: '$gt',
+        op: 'gt',
         val: 10
       },
 
       {
         method: 'count',
         name: 'Clicked logout btn',
-        op: '$eq',
+        op: 'eq',
         val: 0
       },
 
@@ -632,7 +647,7 @@ describe('Lib query', function () {
           method: 'count',
           type: 'feature',
           name: 'Clicked login btn',
-          op: '$gt',
+          op: 'gt',
           val: 10
         };
 
@@ -653,7 +668,7 @@ describe('Lib query', function () {
           type: 'feature',
           feature: 'Authentication',
           name: 'Clicked login btn',
-          op: '$gt',
+          op: 'gt',
           val: 10
         };
 
@@ -875,17 +890,17 @@ describe('Lib query', function () {
             method: 'count',
             type: 'feature',
             name: 'Define Segment',
-            op: '$gt',
+            op: 'gt',
             val: 0
           },
 
-
+          // TODO: fix this test, it means shit
           // hasnotdone
           {
             method: 'count',
             type: 'feature',
             name: 'Define Segment',
-            op: '$eq',
+            op: 'eq',
             val: 0
           },
 
@@ -1089,32 +1104,33 @@ describe('Lib query', function () {
 
   describe('#sanitize', function () {
 
-    var before = {
-      list: 'users',
-      op: 'and',
-      filters: [{
-        method: 'hasdone',
-        type: 'feature',
-        name: 'Define Segment',
-        op: '',
-        val: ''
-      }]
-    }
-
-
-
-    var after = {
-      list: 'users',
-      op: 'and',
-      filters: [{
-        method: 'hasdone',
-        type: 'feature',
-        name: 'Define Segment'
-      }]
-    };
 
     it('should remove empty op/val values in hasdone/hasnotdone filters',
       function () {
+
+        var before = {
+          list: 'users',
+          op: 'and',
+          filters: [{
+            method: 'hasdone',
+            type: 'feature',
+            name: 'Define Segment',
+            op: '',
+            val: ''
+          }]
+        }
+
+
+
+        var after = {
+          list: 'users',
+          op: 'and',
+          filters: [{
+            method: 'hasdone',
+            type: 'feature',
+            name: 'Define Segment'
+          }]
+        };
 
         expect(before.filters[0])
           .to.have.property("op");
@@ -1137,6 +1153,50 @@ describe('Lib query', function () {
           .to.eql(after);
 
       });
+
+    it('should parseInt val in filters with count method', function () {
+
+      var before = {
+        list: 'users',
+        op: 'and',
+        filters: [{
+          method: 'count',
+          type: 'feature',
+          name: 'Define Segment',
+          op: 'gt',
+          val: '10'
+        }]
+      }
+
+      var after = {
+        list: 'users',
+        op: 'and',
+        filters: [{
+          method: 'count',
+          type: 'feature',
+          name: 'Define Segment',
+          op: 'gt',
+          val: 10
+        }]
+      };
+
+      expect(before.filters[0])
+        .to.have.property("method", "count");
+
+      expect(before.filters[0].val)
+        .to.be.a("string");
+
+      expect(before)
+        .to.not.eql(after);
+
+      Query.sanitize(before);
+
+      expect(before.filters[0].val)
+        .to.be.a("number");
+
+      expect(before)
+        .to.eql(after);
+    });
 
   });
 

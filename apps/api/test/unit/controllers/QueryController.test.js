@@ -56,7 +56,7 @@ describe('Resource /query', function () {
             ));
           }
 
-          EventFixture(aid, userIds, 10, cb);
+          EventFixture(aid, userIds, 1000, cb);
         }
 
       },
@@ -79,18 +79,16 @@ describe('Resource /query', function () {
         filters: [
 
           {
-            method: 'count',
-            type: 'pageview',
-            name: 'Define Segment',
-            op: '$gt',
-            val: 1
+            method: 'hasdone',
+            type: 'feature',
+            name: 'Create Message'
           },
 
           {
             method: 'attr',
             name: 'healthScore',
-            op: '$lt',
-            val: 30
+            op: 'gt',
+            val: 10
           }
         ]
       };
@@ -140,7 +138,7 @@ describe('Resource /query', function () {
 
 
     it(
-      'should return empty error if query has hasdone and hasnotdone filters on the same event',
+      'should return empty array if query has hasdone and hasnotdone filters on the same event',
 
       function (done) {
 
@@ -163,26 +161,24 @@ describe('Resource /query', function () {
           ]
         };
 
-        var newUrl = '/apps/' + aid + '/query?' + qs.stringify(obj);
+        var newUrl = '/apps/' + aid + '/query?' + qs.stringify(newObj);
 
         request
           .get(newUrl)
           .set('cookie', loginCookie)
           .expect('Content-Type', /json/)
           .expect(200)
-          .expect(function (res) {
-            console.log('query random val', res.body);
+          .end(function (err, res) {
 
             expect(res.body)
               .to.be.an("array");
 
             expect(res.body)
-              .to.not.be.empty;
+              .to.be.empty;
 
-          })
-          .end(function (err, res) {
             User.count(function (err, count) {
-              console.log('USER count', arguments);
+              expect(count)
+                .to.be.above(0);
               done(err);
             })
 
@@ -190,13 +186,53 @@ describe('Resource /query', function () {
 
       });
 
-    it('should return empty array if not users matched', function (done) {
+    it('should run count query',
+
+      function (done) {
+
+        var newObj = {
+          list: 'users',
+          op: 'and',
+          filters: [
+
+            {
+              method: 'count',
+              type: 'feature',
+              name: 'Define Segment',
+              op: 'gt',
+              val: 0
+            }
+          ]
+        };
+
+        var newUrl = '/apps/' + aid + '/query?' + qs.stringify(newObj);
+
+        request
+          .get(newUrl)
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function (err, res) {
+
+            expect(res.body)
+              .to.be.an("array");
+
+            expect(res.body)
+              .to.not.be.empty;
+
+            done(err);
+
+          });
+
+      });
+
+    it('should return empty array if no users matched', function (done) {
 
       // push a filter with random attr
       obj.filters.push({
         method: 'attr',
         name: 'randomAttrWhichDoesnotExist',
-        op: '$eq',
+        op: 'eq',
         val: 'randomValHere'
       })
 
