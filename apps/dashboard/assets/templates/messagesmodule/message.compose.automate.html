@@ -124,14 +124,17 @@
                                                             <td class="text-center">{{automessage.clicked}}</td>
                                                             <td class="text-center">
                                                                 <a style="cursor: pointer" ng-click="changeMsgStatus(automessage.id, automessage.message, $index)">{{automessage.message}}</a>
-                                                                <!-- <a ng-if="automessage.active" style="cursor: pointer" ng-click="deactivateAutoMsg(automessage.id)">Deactivate</a>
-                                                                <a ng-if="!automessage.active" style="cursor: pointer" ng-click="activateAutoMsg(automessage.id)">Activate</a> -->
                                                             </td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
                                             </div>
                                             <!-- /.table-responsive -->
+                                        </div>
+                                        <div class="text-center" style="padding-top: 20px;">
+                                            <div class="col-md-push-4 col-md-4">
+                                                <button class="btn btn-info btn-block" ui-sref="automateSegment">Create New Auto Message</button>
+                                            </div>
                                         </div>
                                     </div>
                                     <br>
@@ -142,11 +145,6 @@
                             <!-- /.panel -->
                             <!-- /.panel -->
                             <div class="row" style="padding-top:50px">
-                                <div class="text-center">
-                                    <div class="col-md-push-4 col-md-4">
-                                        <button class="btn btn-info btn-block" ui-sref="automateSegment">Create New Auto Message</button>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                         <!-- /.col-lg-8 -->
