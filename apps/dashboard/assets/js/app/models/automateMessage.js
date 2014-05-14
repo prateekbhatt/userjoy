@@ -53,5 +53,15 @@ angular.module('models.automate', ['services'])
                     console.log("error in making message live");
                 })
         }
+
+        this.deActivateMsg = function (appId, autoMsgId) {
+            $http.put(config.apiUrl + '/apps/' + appId + '/automessages/' + autoMsgId + '/active/false')
+                .success(function(data){
+                    console.log("message is deactive");
+                })
+                .error(function(){
+                    console.log("error in making message deactive");
+                })
+        }
     }
 ])
