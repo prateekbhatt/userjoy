@@ -1,8 +1,16 @@
 /**
+ * npm dependencies
+ */
+
+var _ = require('lodash');
+var async = require('async');
+
+
+/**
  * Helpers
  */
 
-var appEmail = require('../../helpers/app-email');
+var getMailerLocals = require('../../helpers/get-mailer-locals');
 var logger = require('../../helpers/logger');
 
 
@@ -20,46 +28,43 @@ var AutoMessage = require('../models/AutoMessage');
 var mailer = require('../services/mailer');
 
 
-/**
- * Creates locals for nodemailer
- *
- * @param {object} automessage
- * @param {string} toName
- * @param {string} toEmail
- *
- * @return {object} locals-object
- */
+var sendMails = function (type, msg, toArray, cb) {
 
-function getMailLocals(automessage, toName, toEmail) {
+  var iterator = function (recipient, cb) {
 
-  var amsg = automessage;
+    var toEmail = recipient.email;
+    var toName = recipient.name || toEmail;
+    var locals = getMailerLocals(type, msg, toName, toEmail);
 
-  var locals = {
+    var sendFunction = (type === 'auto') ? mailer.sendAutoMessage : mailer.sendManualMessage;
 
-    fromEmail: amsg.creator.email,
-    fromName: amsg.creator.name || amsg.creator.email,
-    metadata: {
-      amId: amsg._id
-    },
+    sendFunction(locals, function (err, responseStatus) {
 
-    // TODO : subject has to be rendered
-    subject: amsg.sub,
+      if (err) {
 
-    toEmail: toEmail,
-    toName: toName,
-    replyToEmail: appEmail(amsg.aid),
+        logger.crit({
+          at: 'automessage service send',
+          type: type,
+          toEmail: toEmail,
+          err: err,
+          res: responseStatus
+        });
+      } else {
+        logger.debug({
+          at: 'automessage service send',
+          type: type,
+          toEmail: toEmail,
+          res: responseStatus
+        });
+      }
 
-    // TODO : body has to be rendered
-    body: amsg.body
+      cb(err);
+    });
+
   };
 
-  locals.replyToName = 'Reply to ' + locals.fromName;
-
-
-  // TODO : if not test mode, set reply-to email and name
-
-  return locals;
-}
+  async.each(toArray, iterator, cb);
+};
 
 
 /**
@@ -71,7 +76,7 @@ function getMailLocals(automessage, toName, toEmail) {
  * @param {function} cb callback
  */
 
-function sendAutoMessage(aid, amId, to, cb) {
+module.exports = function sendAutoMessage(aid, amId, to, callback) {
 
   async.waterfall([
 
@@ -91,50 +96,10 @@ function sendAutoMessage(aid, amId, to, cb) {
 
 
       function sendMail(amsg, cb) {
-
-        var iterator = function (recipient, cb) {
-
-          var toEmail = recipient.email;
-          var toName = recipient.name || toEmail;
-          var locals = getMailLocals(amsg, toName, toEmail);
-
-          mailer.sendAutoMessage(locals, function (err, responseStatus) {
-
-            if (err) {
-
-              logger.crit({
-                at: 'AutoMessageController send',
-                toEmail: toEmail,
-                err: err,
-                res: responseStatus
-              });
-            } else {
-              logger.debug({
-                at: 'AutoMessageController send',
-                toEmail: toEmail,
-                res: responseStatus
-              });
-            }
-
-            cb(err);
-          });
-
-        };
-
-        async.each(to, iterator, cb);
+        sendMails('auto', amsg, to, cb);
       }
     ],
 
-    cb
+    callback
   );
 }
-
-
-module.exports = sendAutoMessage;
-
-
-/**
- * Expose methods for testing
- */
-
-module.exports._getMailLocals = getMailLocals;

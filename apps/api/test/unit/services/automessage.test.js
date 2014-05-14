@@ -10,70 +10,13 @@ describe('Service automessage', function () {
     setupTestDb(done);
   });
 
-  describe('#getMailLocals', function () {
+
+  describe('#auto', function () {
 
     var creator;
     var locals;
     var savedAutoMsg;
-
-    beforeEach(function () {
-
-      savedAutoMsg = saved.automessages.first.toJSON();
-
-      // mongoose populate is run to populate the creator account
-      creator = saved.accounts.first;
-      savedAutoMsg.creator = creator;
-
-      locals = automessageService._getMailLocals(savedAutoMsg, toName,
-        toEmail);
-
-    });
-
-
-    it('should create locals object', function () {
-
-      expect(locals)
-        .to.have.property("fromEmail", creator.email);
-
-      expect(locals)
-        .to.have.property("fromName", creator.name);
-
-      expect(locals)
-        .to.have.property("toName", toName);
-
-      expect(locals)
-        .to.have.property("toEmail", toEmail);
-
-      expect(locals)
-        .to.have.property("body", savedAutoMsg.body);
-
-      expect(locals)
-        .to.have.property("subject", savedAutoMsg.sub);
-
-      expect(locals)
-        .to.have.property("replyToEmail", savedAutoMsg.aid + '@mail.userjoy.co');
-
-      expect(locals)
-        .to.have.property("replyToName", 'Reply to ' + creator.name);
-
-    });
-
-
-    it('should automessage-id in metadata', function () {
-
-      expect(locals.metadata)
-        .to.have.property("amId", savedAutoMsg._id);
-
-    });
-
-  });
-
-
-  describe('()', function () {
-
-    var creator;
-    var locals;
-    var savedAutoMsg;
+    var savedManualMsg;
     var to = [{
       name: toName,
       email: toEmail
@@ -82,6 +25,7 @@ describe('Service automessage', function () {
     beforeEach(function () {
 
       savedAutoMsg = saved.automessages.first.toJSON();
+      savedManualMsg = saved.messages.first.toJSON();
 
     });
 
@@ -100,4 +44,5 @@ describe('Service automessage', function () {
     });
 
   });
+
 });
