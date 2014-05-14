@@ -68,21 +68,64 @@ angular.module('do.automate', [])
 
         console.log("inside automate ctrl");
 
+        $scope.showTable = false;
+
+        $scope.activeMsg = '';
+
+
         var populateAutoMsg = function (err) {
+            $scope.automessages = [];
             if (err) {
                 return err;
             }
-            console.log("success");
+
+            for (var i = 0; i < AutoMsgService.getAllAutoMsg()
+                .length; i++) {
+                var activeMessage = '';
+                if(AutoMsgService.getAllAutoMsg()[i].active) {
+                    activeMessage = 'Deactivate';
+                } else {
+                    activeMessage = 'Activate';
+                }
+                $scope.automessages.push({
+                    title: AutoMsgService.getAllAutoMsg()[i].title,
+                    type: AutoMsgService.getAllAutoMsg()[i].type[0].toUpperCase() +
+                        AutoMsgService.getAllAutoMsg()[i].type.substring(
+                            1),
+                    replied: AutoMsgService.getAllAutoMsg()[i].replied,
+                    sent: AutoMsgService.getAllAutoMsg()[i].sent,
+                    seen: AutoMsgService.getAllAutoMsg()[i].seen,
+                    clicked: AutoMsgService.getAllAutoMsg()[i].clicked,
+                    active: AutoMsgService.getAllAutoMsg()[i].active,
+                    id: AutoMsgService.getAllAutoMsg()[i]._id,
+                    message: activeMessage
+                })
+
+            };
+            console.log($scope.automessages);
+            if($scope.automessages.length > 0) {
+                $scope.showTable = true;
+            }
+
         }
         modelsAutomate.getAllAutoMessages(AppService.getCurrentApp()
             ._id, populateAutoMsg);
 
-        $scope.automessages = [
-            "In App welcmessageAutomateCtrlome message for start ups",
-            "Discount for users from Uganda", "As above", "As above1"
-        ];
+        $scope.changeMsgStatus = function (id, text, index) {
+            if(text == 'Activate') {
+                modelsAutomate.makeMsgLive(AppService.getCurrentApp()
+            ._id, id);
+                // FIXME: The message should be changed to Deactivate when its a success. Have a callback for this.
+                $scope.automessages[index].message = 'Deactivate';
+            }
 
-
+            if(text == 'Deactivate') {
+                // FIXME: The message should be changed to Activate when its a success. Have a callback for this.
+                modelsAutomate.deActivateMsg(AppService.getCurrentApp()
+            ._id, id);
+                $scope.automessages[index].message = 'Activate';
+            }
+        }
 
         $scope.isActive = function (viewLocation) {
             return viewLocation === $location.path();
@@ -182,8 +225,10 @@ angular.module('do.automate', [])
     }
 ])
 
-.controller('textAngularCtrl', ['$scope', 'saveMsgService', '$location', 'modelsAutomate', 'AppService', 'segmentService',
-    function ($scope, saveMsgService, $location, modelsAutomate, AppService, segmentService) {
+.controller('textAngularCtrl', ['$scope', 'saveMsgService', '$location',
+    'modelsAutomate', 'AppService', 'segmentService',
+    function ($scope, saveMsgService, $location, modelsAutomate,
+        AppService, segmentService) {
         console.log("inside text Angular Ctrl");
         console.log("sid: ", segmentService.getSingleSegment());
         $scope.showNotification = true;
@@ -246,11 +291,13 @@ angular.module('do.automate', [])
                 sub: saveMsgService.getSub(),
                 title: saveMsgService.getTitle(),
                 type: $scope.selectedMessageType.value.toLowerCase(),
-                sid: segmentService.getSingleSegment().id
+                sid: segmentService.getSingleSegment()
+                    .id
             }
 
             console.log("data: ", data);
-            modelsAutomate.saveAutoMsg(AppService.getCurrentApp()._id, data);
+            modelsAutomate.saveAutoMsg(AppService.getCurrentApp()
+                ._id, data);
         }
 
         $scope.showText = function (htmlVariable) {
@@ -261,21 +308,29 @@ angular.module('do.automate', [])
     }
 ])
 
-.controller('testEmailCtrl', ['$scope', 'saveMsgService', 'modelsAutomate', 'AppService', 'AutoMsgService',
-    function ($scope, saveMsgService, modelsAutomate, AppService, AutoMsgService) {
+.controller('testEmailCtrl', ['$scope', 'saveMsgService', 'modelsAutomate',
+    'AppService', 'AutoMsgService',
+    function ($scope, saveMsgService, modelsAutomate, AppService,
+        AutoMsgService) {
         $scope.previewText = saveMsgService.getMsg();
         console.log(saveMsgService.getMsg());
         $scope.sendTestEmail = function () {
-            modelsAutomate.sendTestEmail(AppService.getCurrentApp()._id, AutoMsgService.getSingleAutoMsg()._id);
+            modelsAutomate.sendTestEmail(AppService.getCurrentApp()
+                ._id, AutoMsgService.getSingleAutoMsg()
+                ._id);
         }
     }
 ])
 
-.controller('liveEmailCtrl', ['$scope', 'saveMsgService', 'modelsAutomate', 'AppService', 'AutoMsgService',
-    function ($scope, saveMsgService, modelsAutomate, AppService, AutoMsgService) {
+.controller('liveEmailCtrl', ['$scope', 'saveMsgService', 'modelsAutomate',
+    'AppService', 'AutoMsgService',
+    function ($scope, saveMsgService, modelsAutomate, AppService,
+        AutoMsgService) {
         $scope.preview = saveMsgService.getMsg();
         $scope.makeMsgLive = function () {
-            modelsAutomate.makeMsgLive(AppService.getCurrentApp()._id, AutoMsgService.getSingleAutoMsg()._id);
+            modelsAutomate.makeMsgLive(AppService.getCurrentApp()
+                ._id, AutoMsgService.getSingleAutoMsg()
+                ._id);
         }
     }
 ])

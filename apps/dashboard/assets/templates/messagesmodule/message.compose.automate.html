@@ -90,23 +90,43 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <br>
-                            <div class="panel panel-default">
+                            <div class="panel panel-default" >
                                 <div class="panel-heading">
                                     <i class="fa fa-inbox"></i> Messages
                                 </div>
                                 <!-- /.panel-heading -->
                                 <div class="panel-body">
                                     <div class="row">
-                                        <div class="col-lg-12">
+                                        <div class="text-center" ng-show="!showTable">There are no Automatic Messages!! Create one</div>
+                                        <div class="col-lg-12" ng-if="showTable">
                                             <div class="table-responsive">
                                                 <table class="table table-bordered">
+                                                    <thead>
+                                                        <th class="text-center">Title</th>
+                                                        <th class="text-center">Type</th>
+                                                        <th class="text-center">Replied</th>
+                                                        <th class="text-center">Sent</th>
+                                                        <th class="text-center">Seen</th>
+                                                        <th class="text-center">Clicked</th>
+                                                        <th></th>
+                                                    </thead>
                                                     <tbody>
                                                         <tr ng-repeat="automessage in automessages">
-                                                            <td class="text-center"> Draft </td>
+                                                            <td class="text-center"> {{automessage.title}} </td>
                                                             <td class="text-center">
-                                                                <span class="label label-success">Automatic </span>
+                                                                {{automessage.type}}
                                                             </td>
-                                                            <td>{{automessage}}</td>
+                                                            <td class="text-center">{{automessage.replied}}</td>
+                                                            <td class="text-center">
+                                                                {{automessage.sent}}
+                                                            </td>
+                                                            <td class="text-center">{{automessage.seen}}</td>
+                                                            <td class="text-center">{{automessage.clicked}}</td>
+                                                            <td class="text-center">
+                                                                <a style="cursor: pointer" ng-click="changeMsgStatus(automessage.id, automessage.message, $index)">{{automessage.message}}</a>
+                                                                <!-- <a ng-if="automessage.active" style="cursor: pointer" ng-click="deactivateAutoMsg(automessage.id)">Deactivate</a>
+                                                                <a ng-if="!automessage.active" style="cursor: pointer" ng-click="activateAutoMsg(automessage.id)">Activate</a> -->
+                                                            </td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
