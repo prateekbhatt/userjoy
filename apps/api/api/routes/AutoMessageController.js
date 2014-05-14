@@ -153,7 +153,6 @@ router
 
     var aid = req.params.aid;
     var amId = req.params.amId;
-    var isTest = req.body.test || false;
     var toEmail = req.user.email;
     var toName = req.user.name || toEmail;
 
