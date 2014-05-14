@@ -31,11 +31,13 @@ angular.module('dodatado', [
 ])
 
 .provider('login', [
+
     function () {
 
         var userIsAuthenticated = false;
 
         this.$get = [
+
             function () {
                 return {
                     setLoggedIn: function (value) {
@@ -50,8 +52,8 @@ angular.module('dodatado', [
     }
 ])
 
-.filter('startFrom', function() {
-    return function(input, start) {
+.filter('startFrom', function () {
+    return function (input, start) {
         start = +start; //parse to int
         return input.slice(start);
     }
@@ -109,11 +111,13 @@ angular.module('dodatado', [
                 },
                 // TODO: Get data from backend
                 options: [{
+                    name: 'Email',
+                    value: '{{= email || "there"}}'
+                }
+                // ,
+                /*{
                     name: 'App Name',
                     value: '{{app_name}}'
-                }, {
-                    name: 'First Name',
-                    value: '{{first_name}}'
                 }, {
                     name: 'Last Name',
                     value: '{{last_name}}'
@@ -126,7 +130,8 @@ angular.module('dodatado', [
                 }, {
                     name: 'status',
                     value: '{{status}}'
-                }]
+                }*/
+                ]
             });
 
             // add the button to the default toolbar definition
@@ -176,7 +181,7 @@ angular.module('dodatado', [
             AppService.setLoggedInApps(apps);
             AppService.setCurrentApp(apps[0]);
             console.log("default app:", AppService.getCurrentApp());
-            
+
         });
     }
 ])
@@ -208,22 +213,22 @@ angular.module('dodatado', [
         hasDoneActions, modelsQuery, AppService) {
 
         // FIXME : get data from backend
-        
-        
+
+
         var allSegments = [{
-            _id: "0",
-            name: "Users"
-        }
-        // , {
-        //     _id: "1",
-        //     name: "Phone Users"
-        // }, {
-        //     _id: "2",
-        //     name: "Android Users"
-        // }, {
-        //     _id: "3",
-        //     name: "Paying Customers"
-        // }
+                _id: "0",
+                name: "Users"
+            }
+            // , {
+            //     _id: "1",
+            //     name: "Phone Users"
+            // }, {
+            //     _id: "2",
+            //     name: "Android Users"
+            // }, {
+            //     _id: "3",
+            //     name: "Paying Customers"
+            // }
         ];
 
         var allQueries = [{
@@ -252,7 +257,7 @@ angular.module('dodatado', [
             key: 'lt'
         }];
 
-        
+
 
         var actions = [{
             name: 'Watched Intro Video'
