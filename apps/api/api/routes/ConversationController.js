@@ -37,82 +37,9 @@ var mailer = require('../services/mailer');
  */
 
 var appEmail = require('../../helpers/app-email');
+var getMailerLocals = require('../../helpers/get-mailer-locals');
 var logger = require('../../helpers/logger');
 var render = require('../../helpers/render-message');
-
-
-/**
- * e.g. '532d6bf862d673ba7131812e+535d131c67d02dc60b2b1764@mail.userjoy.co'
- */
-
-function replyToEmail(fromEmail, conversationId) {
-  var emailSplit = fromEmail.split('@');
-  var emailLocal = emailSplit[0];
-  var emailDomain = emailSplit[1];
-  var email = emailLocal + '+' + conversationId + '@' + emailDomain;
-  return email;
-}
-
-
-/**
- * if name is 'Prateek',
- * replyTo name is 'Reply to Prateek'
- *
- * @param {string} fromName name of the sender
- * @return {string} reply-to name
- */
-
-function replyToName(fromName) {
-  var prepend = 'Reply to';
-  var name = prepend + ' ' + fromName;
-  return name;
-}
-
-
-/**
- * This sends email from an app admin to one of its users
- *
- * @param {object} msg the message object
- * @param {function} cb callback
- */
-
-function sendMailToUser(msg, cb) {
-
-  User
-    .findById(msg.uid)
-    .exec(function (err, usr) {
-
-      if (err) return cb(err);
-      if (!usr) return cb(new Error('User Not Found'));
-
-      var fromEmail = appEmail(msg.aid);
-      var options = {
-        fromEmail: fromEmail,
-        fromName: msg.sName,
-        metadata: {
-          'mId': msg._id
-        },
-        replyToEmail: replyToEmail(fromEmail, msg.coId),
-        replyToName: replyToName(msg.sName),
-        subject: msg.sub,
-        toEmail: usr.email,
-        toName: usr.name, // TODO : User Model should have a default name key
-        body: msg.text
-      };
-      mailer.sendManualMessage(options, cb);
-    });
-}
-
-
-// /**
-//  * Add a delimiter on top of the function
-//  * Used to extract out the text of the current message
-//  */
-
-// function addDelimiter(text) {
-//   var delimiter = '## Please reply above to send message ##';
-//   return delimiter
-// }
 
 
 /**
@@ -331,89 +258,136 @@ router
   .route('/:aid/conversations')
   .post(function (req, res, next) {
 
-    var newMessage = req.body;
+    var newMsg = req.body;
     var accid = req.user._id;
     var aid = req.app._id;
-    var sub = newMessage.sub;
-    var uid = newMessage.uid;
+    var sub = newMsg.sub;
+    var uids = newMsg.uids;
     var fromEmail = appEmail(aid);
 
     // since this is a multi-query request (transaction), we need to make all
     // input validations upfront
-    // uid, subject, text, type
-    if (!(uid && aid && sub && newMessage.text && newMessage.type)) {
-      return res.badRequest('Missing uid/sub/text/type');
+    // uids, subject, text, type
+    if (!(uids && aid && sub && newMsg.text && newMsg.type)) {
+      return res.badRequest('Missing uids/sub/text/type');
     }
+
+
+    if (!_.isArray(uids) || _.isEmpty(uids)) {
+      return res.badRequest('Provide atleast on user id in the uids array');
+    };
+
 
     async.waterfall(
       [
 
-        function createConversation(cb) {
 
-          var newConversation = {
-            accId: accid,
-            aid: aid,
-            sub: sub,
-            uid: uid
-          };
-
-          Conversation.create(newConversation, cb);
-        },
-
-
-        function findUser(conversation, cb) {
+        function findUsers(cb) {
 
           User
-            .findById(uid)
-            .exec(function (err, usr) {
-              cb(err, conversation, usr)
-            });
+            .find({
+              _id: {
+                $in: uids
+              }
+            })
+            .select({
+              name: 1,
+              email: 1
+            })
+            .exec(cb);
         },
 
 
-        function createMessage(conversation, user, cb) {
+        function createMessages(users, cb) {
 
-          // add from as 'account'
-          newMessage.from = 'account';
-          newMessage.accid = accid;
-          newMessage.aid = aid;
-          newMessage.coId = conversation._id;
+          var iterator = function (user, iteratorCB) {
 
-          // locals to be passed for rendering the templates
-          var locals = {
-            user: user
+            async.waterfall(
+
+              [
+
+                function createConversation(cb) {
+                  var newConversation = {
+                    accId: accid,
+                    aid: aid,
+                    sub: sub,
+                    uid: user._id
+                  };
+
+                  Conversation.create(newConversation, cb);
+                },
+
+
+                function createMessage(conversation, cb) {
+
+                  newMsg.accid = accid;
+                  newMsg.aid = aid;
+                  newMsg.coId = conversation._id;
+                  // add from as 'account'
+                  newMsg.from = 'account';
+                  newMsg.uid = user._id;
+
+                  // locals to be passed for rendering the templates
+                  var locals = {
+                    user: user
+                  };
+
+                  // render body and subject
+                  newMsg.text = render.string(newMsg.text, locals);
+                  newMsg.sub = render.string(newMsg.sub, locals);
+
+                  Message.create(newMsg, function (err, msg) {
+
+                    if (err) return cb(err);
+
+                    msg = msg.toJSON();
+
+                    // NOTE: adding the toEmail and toNames to messages to make
+                    // it simpler while mailing them
+
+                    msg.toEmail = user.email;
+                    msg.toName = user.name;
+                    cb(null, msg);
+                  });
+
+                }
+              ],
+
+              iteratorCB
+
+            );
+
           };
 
-          // render body and subject
-          newMessage.text = render.string(newMessage.text, locals);
-          newMessage.sub = render.string(newMessage.sub, locals);
-
-          Message.create(newMessage, cb);
-
+          async.map(users, iterator, cb);
         },
 
-        function sendMessage(msg, cb) {
+
+        function sendMessages(messages, cb) {
 
           // TODO: check if message is notification or email
 
-          if (msg.type === "email") {
+          if (newMsg.type !== "email") return cb(err, messages);
 
-            sendMailToUser(msg, function (err) {
+          var iterator = function (msg, cb) {
+            var toEmail = msg.toEmail;
+            var toName = msg.toName;
+            var locals = getMailerLocals('manual', msg, toName, toEmail);
+            mailer.sendManualMessage(locals, function (err) {
               cb(err, msg);
             });
+          };
 
-          } else {
-            cb(err, msg);
-          }
+          async.map(messages, iterator, cb);
 
         }
 
       ],
 
-      function callback(err, msg) {
+      function callback(err, msgs) {
 
         if (err) return next(err);
-        res.json(msg, 201);
+        res.json(msgs, 201);
       }
     );
 
@@ -451,6 +425,7 @@ router
         function findConversation(cb) {
           Conversation
             .findById(coId)
+            .populate('uid', 'name email')
             .exec(cb);
         },
 
@@ -466,17 +441,26 @@ router
           reply.sName = sName;
 
           reply.sub = conv.sub;
-          reply.uid = conv.uid;
+
+          // since uid has been populated in the findConversation query above,
+          // we need to access the user's id from conv.uid._id
+          reply.uid = conv.uid._id;
 
           // reply type is always email
           reply.type = 'email';
 
-          Message.create(reply, cb);
+          Message.create(reply, function (err, savedMsg) {
+            cb(err, conv, savedMsg);
+          });
 
         },
 
-        function sendEmail(msg, cb) {
-          sendMailToUser(msg, function (err) {
+        function sendEmail(conv, msg, cb) {
+
+          var toEmail = conv.uid.email;
+          var toName = conv.uid.name;
+          var locals = getMailerLocals('manual', msg, toName, toEmail);
+          mailer.sendManualMessage(locals, function (err) {
             cb(err, msg);
           });
         }
