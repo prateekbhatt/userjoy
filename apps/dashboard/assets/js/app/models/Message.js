@@ -11,7 +11,7 @@ angular.module('models.message', ['services'])
                 sub: sub,
                 text: text,
                 type: 'email',
-                uid: '536c9e5f2508e316447893c9'
+                uid: '53734370ffa81f297dbc8e9d'
             }
             console.log("message data: ", data);
             console.log("LIAS", AppService.getCurrentApp());

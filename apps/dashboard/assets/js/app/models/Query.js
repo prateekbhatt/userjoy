@@ -10,7 +10,8 @@ angular.module('models.Query', ['services'])
             $http.get(url)
                 .success(function (data) {
                     console.log("attributes: ", data);
-                    eventNames.setEvents(data.eventNames);
+                    eventNames.setEvents(data.events);
+                    console.log("events: ", eventNames.getEvents());
                     userAttributes.setUserAttributes(data.userAttributes);
                     callback();
                 })

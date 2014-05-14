@@ -13,7 +13,7 @@
     <div class="row" style="padding-top: 50px;">
         <div class="col-md-6">
             <label class="col-md-2 col-md-offset-2 control-label" style="font-size: 20px; padding-left: 0px">Type: </label>
-            <div class="col-md-6 col-md-offset-1">
+            <div class="col-md-6">
                 <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users" class="{{selectedMessageType.icon}}">&nbsp;{{selectedMessageType.value}}</span>&nbsp;<span class="caret"></span></button>
                 <ul class="select dropdown-menu" role="select" style="left: 15px; top:100%;">
                     <li ng-repeat="icon in icons">
@@ -23,10 +23,20 @@
                 </ul>
             </div>
         </div>
+    </div>
+    <div class="row" style="padding-top: 20px;">
         <div class="col-md-6">
             <label class="col-md-2 col-md-offset-2 control-label" style="font-size: 20px; padding-left: 0px">From: </label>
-            <div class="col-md-8">
+            <div class="col-md-6">
                 <input class="form-control disabled" ng-model="email">
+            </div>
+        </div>
+    </div>
+    <div class="row" style="padding-top: 20px;">
+        <div class="col-md-6">
+            <label style="font-size: 20px; padding-left: 0px;" class="col-md-2 col-md-offset-2 control-label">Title: </label>
+            <div class="col-md-6">
+                <input class="form-control disabled" ng-model="title" placeholder="Title">
             </div>
         </div>
     </div>
@@ -38,10 +48,17 @@
             <div class="text-center">
                 <p style="font-size: 20px;"><strong>Write Message: </strong></p>
             </div>
-            <div text-angular ta-toolbar="[['h1','h2','h3','p'], ['bold','italics','ul', 'ol'],['html', 'insertImage', 'insertLink', 'dropdown']]" ng-model="htmlVariable" ng-change="showText(htmlVariable)"></div>
-            <text-angular-toolbar name="toolbar" ta-toolbar="[['h1','h2','h3','p'], ['bold','italics','ul', 'ol'],['html', 'insertImage', 'insertLink', 'dropdown']]"></text-angular-toolbar>
-            <text-angular name="subject" ng-model="subject" ta-target-toolbars='toolbar'></text-angular>
-            <text-angular name="htmlVariable" ng-model="htmlVariable" ta-target-toolbars='toolbar' ng-change="showText(htmlVariable)"></text-angular>
+            <div ng-show="showNotification">
+                <text-angular-toolbar name="toolbar" ta-toolbar="[['h1','h2','h3','p', 'pre'], ['bold','italics','ul', 'ol'],['html', 'insertImage', 'insertLink', 'dropdown']]"></text-angular-toolbar>
+                <text-angular name="notificationBody" ng-model="notificationBody" ta-target-toolbars='toolbar' ng-change="showText(notificationBody)"></text-angular>
+            </div>
+            <!-- <div text-angular ta-toolbar="[['h1','h2','h3','p'], ['bold','italics','ul', 'ol'],['html', 'insertImage', 'insertLink', 'dropdown']]" ng-model="htmlVariable" ng-change="showText(htmlVariable)" ng-show="showNotification" style="height: 300px;"></div> -->
+            <div ng-show="showEmail">
+                <text-angular-toolbar name="toolbar1" ta-toolbar="[['h1','h2','h3','p', 'pre'], ['bold','italics','ul', 'ol'],['html', 'insertImage', 'insertLink', 'dropdown']]"></text-angular-toolbar>
+                <text-angular name="subject" ng-model="subject" ta-target-toolbars='toolbar1' class="subject"></text-angular>
+                <br>
+                <text-angular name="emailBody" ng-model="emailBody" ta-target-toolbars='toolbar1' ng-change="showText(emailBody)"></text-angular>
+            </div>
             <br>
             <br>
         </div>
@@ -50,10 +67,10 @@
                 <p style="font-size: 20px;"><strong>Preview: </strong></p>
             </div>
             <!-- TODO: Replace template color with the color entered by the user -->
-            <div style="padding-top: 47px;">
+            <div style="padding-top: 55px;">
                 <div class="col-md-8 col-md-offset-2" ng-show="showNotification">
                     <div class="message-template message-template-danger" style="max-height: 200px; min-height: 200px; overflow: auto;">
-                        <p ng-bind-html="htmlVariable"></p>
+                        <p ng-bind-html="notificationBody"></p>
                     </div>
                     <div class="panel-footer" style="margin-top: -21px;">
                         <div class="input-group">
@@ -68,8 +85,9 @@
                 </div>
                 <!-- TODO: Replace template color with the color entered by the user -->
                 <div class="col-md-10 col-md-offset-1" ng-show="showEmail">
+                    <label style="font-size: 18px;">Subject: </label>&nbsp;<p ng-bind-html="subject"></p>
                     <div class="message-template message-email-success" style="min-height: 300px; overflow: auto; max-height: 300px;">
-                        <p ng-bind-html="htmlVariable"></p>
+                        <p ng-bind-html="emailBody"></p>
                     </div>
                 </div>
             </div>

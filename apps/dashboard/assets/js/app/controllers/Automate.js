@@ -182,9 +182,10 @@ angular.module('do.automate', [])
     }
 ])
 
-.controller('textAngularCtrl', ['$scope', 'saveMsgService', '$location',
-    function ($scope, saveMsgService, $location) {
-        console.log("inside text Angular Ctrl")
+.controller('textAngularCtrl', ['$scope', 'saveMsgService', '$location', 'modelsAutomate', 'AppService', 'segmentService',
+    function ($scope, saveMsgService, $location, modelsAutomate, AppService, segmentService) {
+        console.log("inside text Angular Ctrl");
+        console.log("sid: ", segmentService.getSingleSegment());
         $scope.showNotification = true;
         $scope.showEmail = false;
         $scope.email = "savinay@dodatado.com";
@@ -226,14 +227,32 @@ angular.module('do.automate', [])
         }
 
         $scope.saveMessage = function () {
-            if ($scope.htmlVariable) {
-
-                $location.path('/messages/automate/test');
-                saveMsgService.setMsg($scope.htmlVariable);
+            if ($scope.showNotification) {
+                saveMsgService.setMsg($scope.notificationBody);
+                saveMsgService.setTitle($scope.title);
             }
-            console.log("htmlVariable: ", $scope.htmlVariable);
+
+            if ($scope.showEmail) {
+                saveMsgService.setMsg($scope.emailBody);
+                saveMsgService.setSub($scope.subject);
+                saveMsgService.setTitle($scope.title);
+                console.log("email body: ", saveMsgService.getMsg());
+                console.log("email subject: ", saveMsgService.getSub());
+                // console.log("msg: ",saveMsgService)
+            }
+
+            var data = {
+                body: saveMsgService.getMsg(),
+                sub: saveMsgService.getSub(),
+                title: saveMsgService.getTitle(),
+                type: $scope.selectedMessageType.value.toLowerCase(),
+                sid: segmentService.getSingleSegment().id
+            }
+
+            console.log("data: ", data);
+            modelsAutomate.saveAutoMsg(AppService.getCurrentApp()._id, data);
         }
-        // $scope.text = $scope.htmlVariable.text;
+
         $scope.showText = function (htmlVariable) {
             console.log($scope.htmlVariable);
         }
@@ -242,15 +261,21 @@ angular.module('do.automate', [])
     }
 ])
 
-.controller('testEmailCtrl', ['$scope', 'saveMsgService',
-    function ($scope, saveMsgService) {
+.controller('testEmailCtrl', ['$scope', 'saveMsgService', 'modelsAutomate', 'AppService', 'AutoMsgService',
+    function ($scope, saveMsgService, modelsAutomate, AppService, AutoMsgService) {
         $scope.previewText = saveMsgService.getMsg();
         console.log(saveMsgService.getMsg());
+        $scope.sendTestEmail = function () {
+            modelsAutomate.sendTestEmail(AppService.getCurrentApp()._id, AutoMsgService.getSingleAutoMsg()._id);
+        }
     }
 ])
 
-.controller('liveEmailCtrl', ['$scope', 'saveMsgService',
-    function ($scope, saveMsgService) {
+.controller('liveEmailCtrl', ['$scope', 'saveMsgService', 'modelsAutomate', 'AppService', 'AutoMsgService',
+    function ($scope, saveMsgService, modelsAutomate, AppService, AutoMsgService) {
         $scope.preview = saveMsgService.getMsg();
+        $scope.makeMsgLive = function () {
+            modelsAutomate.makeMsgLive(AppService.getCurrentApp()._id, AutoMsgService.getSingleAutoMsg()._id);
+        }
     }
 ])
