@@ -124,7 +124,10 @@ router
 
     var newAutoMessage = req.body;
     var accid = req.user._id;
-    var aid = req.app._id;
+    var aid = req.params.aid;
+
+    newAutoMessage.aid = aid;
+    newAutoMessage.creator = accid;
 
 
     AutoMessage
