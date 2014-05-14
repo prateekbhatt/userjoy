@@ -48,7 +48,7 @@ describe('Resource /apps/:aid/automessages', function () {
       });
 
     it(
-      'should return error if aid/body/creator/sid/title/type is not present',
+      'should return error if body/sid/title/type is not present',
       function (done) {
 
         request
@@ -62,9 +62,7 @@ describe('Resource /apps/:aid/automessages', function () {
               "type is required",
               "title is required",
               "sid is required",
-              "creator is required",
               "body is required",
-              "aid is required"
             ],
             "status": 400
           })
@@ -78,9 +76,7 @@ describe('Resource /apps/:aid/automessages', function () {
       function (done) {
 
         var newAutoMsg = {
-          aid: randomId,
           body: 'Hey, Welkom to CabanaLand!',
-          creator: randomId,
           sid: randomId,
           sub: 'Welkom!',
           title: 'Welcome Message',
@@ -97,13 +93,13 @@ describe('Resource /apps/:aid/automessages', function () {
             savedMsg = res.body;
 
             expect(savedMsg)
-              .to.have.property("creator", newAutoMsg.creator);
+              .to.have.property("creator", saved.accounts.first._id.toString());
 
             expect(savedMsg)
               .to.have.property("type", newAutoMsg.email);
 
             expect(savedMsg)
-              .to.have.property("aid", newAutoMsg.aid.toString());
+              .to.have.property("aid", aid.toString());
 
           })
           .end(done);
