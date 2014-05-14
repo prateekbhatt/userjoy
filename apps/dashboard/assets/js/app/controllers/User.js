@@ -399,7 +399,8 @@ angular.module('do.users', [])
             for (var i = 0; i < eventNames.getEvents()
                 .length; i++) {
                 allActions.push({
-                    name: eventNames.getEvents()[i]
+                    name: eventNames.getEvents()[i].name,
+                    type: eventNames.getEvents()[i].type
                 })
             };
 
@@ -458,6 +459,7 @@ angular.module('do.users', [])
                 $scope.filters[parentindex].method = 'attr';
                 $scope.filters[parentindex].name = $scope.attributes[
                     index].name;
+                $scope.filters[parentindex].type = '';
             }
 
             $scope.changeFilterHasDone = function (parentindex, index, evt) {
@@ -471,6 +473,7 @@ angular.module('do.users', [])
                 $scope.filters[parentindex].op = '';
                 $scope.filters[parentindex].optext = '';
                 $scope.filters[parentindex].val = '';
+                $scope.filters[parentindex].type = $scope.hasDoneItems[index].type;
 
 
                 // $scope.hasDoneOrHasNotDone = true;
@@ -493,6 +496,7 @@ angular.module('do.users', [])
                 $scope.filters[parentindex].op = '';
                 $scope.filters[parentindex].optext = '';
                 $scope.filters[parentindex].val = '';
+                $scope.filters[parentindex].type = $scope.hasNotDoneItems[index].type;
                 console.log($scope.filters);
 
 
@@ -518,6 +522,7 @@ angular.module('do.users', [])
                 $scope.filters[parentindex].name = $scope
                     .countOfItems[
                         index].name;
+                $scope.filters[parentindex].type = $scope.countOfItems[index].type;                
 
 
 
@@ -591,7 +596,8 @@ angular.module('do.users', [])
                     name: '',
                     op: 'eq',
                     optext: 'equal',
-                    val: ''
+                    val: '',
+                    type: ''
                 })
                 if ($scope.filters.length > 0) {
                     $scope.showSaveButton = true;
@@ -732,7 +738,8 @@ angular.module('do.users', [])
                         type: 'feature',
                         name: $scope.filters[i].name,
                         op: $scope.filters[i].op,
-                        val: $scope.filters[i].val
+                        val: $scope.filters[i].val,
+                        type: $scope.filters[i].type
 
                     })
                 };

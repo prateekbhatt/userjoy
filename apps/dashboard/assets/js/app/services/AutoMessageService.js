@@ -5,6 +5,7 @@ angular.module('services.AutoMsgService', [])
     function ($log) {
 
         var allAutoMsg = [];
+        var singleAutoMsg = [];
 
         this.setAllAutoMsg = function (value) {
             allAutoMsg = value;
@@ -13,6 +14,14 @@ angular.module('services.AutoMsgService', [])
         this.getAllAutoMsg = function () {
             return allAutoMsg;
         };
+
+        this.setSingleAutoMsg = function (value) {
+            singleAutoMsg = value;
+        }
+
+        this.getSingleAutoMsg = function () {
+            return singleAutoMsg;
+        }
 
         return this;
 

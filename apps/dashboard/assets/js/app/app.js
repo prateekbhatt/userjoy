@@ -97,7 +97,7 @@ angular.module('dodatado', [
             // register the tool with textAngular
             taRegisterTool('dropdown', {
                 display: "<span class='dropdown'>" +
-                    "<button class='btn btn-default dropdown-toggle' type='button' ng-disabled='showHtml()'><i class='fa fa-caret-down'></i></button>" +
+                    "<button class='btn btn-sm btn-default dropdown-toggle' type='button' ng-disabled='showHtml()'><i class='fa fa-caret-down'></i></button>" +
                     "<ul class='dropdown-menu'><li ng-repeat='o in options' ng-model='o.value' ng-click='action(o.value)'>{{o.name}}</li></ul>" +
                     "</span>",
                 action: function (size) {
@@ -138,13 +138,7 @@ angular.module('dodatado', [
 
 })
 
-/*.service('api', ['authService', '$rootScope', '$location',
-    function () {
-        $rootScope.$on('event: auth-loginRequired', function () {
-            $location.path('/login');
-        })
-    }
-])*/
+
 
 .run(['LoginService', 'ipCookie', '$log', 'login', '$rootScope',
     function (LoginService, ipCookie, $log, login, $rootScope) {
