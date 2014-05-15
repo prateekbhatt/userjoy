@@ -105,13 +105,13 @@ angular.module('do.message', [])
 ])
 
 .controller('InboxCtrl', ['$scope', '$filter', 'ngTableParams', '$log',
-    'MsgService', '$location', 'AppService', 'InboxMsgService', '$moment', 'login', 
+    'MsgService', '$location', 'AppService', 'InboxMsgService', '$moment',
+    'login', '$timeout',
     function ($scope, $filter, ngTableParams, $log, MsgService, $location,
-        AppService, InboxMsgService, $moment, login) {
+        AppService, InboxMsgService, $moment, login, $timeout) {
 
         console.log("loginProvider MsgCtrl:", login.getLoggedIn());
         $scope.showOpenConversations = true;
-        $scope.data = [];
         console.log("entering inboxctrl");
 
         $scope.replytext = 'hello world';
@@ -130,13 +130,14 @@ angular.module('do.message', [])
         var msg = [];
 
         function showManualMsg() {
+            $scope.openmsg = [];
             msg = InboxMsgService.getInboxMessage();
             if (!msg.length) {
                 $scope.showOpenConversations = false;
             }
             console.log("msg show Manual Msg: ", msg);
             for (var i = 0; i < msg.length; i++) {
-                $scope.data.push({
+                $scope.openmsg.push({
                     id: msg[i]._id,
                     name: msg[i].sName,
                     subject: msg[i].sub,
@@ -147,7 +148,7 @@ angular.module('do.message', [])
                     coid: msg[i].coId
                 })
             }
-            console.log("$scope.data: ", $scope.data);
+            console.log("$scope.data: ", $scope.openmsg);
             $scope.columnsInbox = [{
                 title: 'User',
                 field: 'name',
@@ -173,11 +174,49 @@ angular.module('do.message', [])
                 visible: true
             }];
 
+            // $scope.refreshTable = function () {
+            //     $scope['tableParams'] = {
+            //         reload: function () {},
+            //         settings: function () {
+            //             return {}
+            //         }
+            //     };
+            //     $timeout(setTable, 100)
+            // };
+            // $scope.refreshTable();
+
+            // function setTable(arguments) {
+
+            //     $scope.tableParamsInbox = new ngTableParams({
+            //         page: 1, // show first page
+            //         count: 10, // count per page
+            //         filter: {
+            //             name: '' // initial filter
+            //         },
+            //         sorting: {
+            //             name: 'asc'
+            //         }
+            //     }, {
+            //         filterSwitch: true,
+            //         total: $scope.openmsg.length, // length of data
+            //         getData: function ($defer, params) {
+            //             var orderedData = params.sorting() ?
+            //                 $filter('orderBy')($scope.openmsg,
+            //                     params.orderBy()) :
+            //                 $scope.openmsg;
+            //             params.total(orderedData.length);
+            //             $defer.resolve(orderedData.slice((params.page() -
+            //                     1) * params.count(), params.page() *
+            //                 params.count()));
+            //         }
+            //     });
+            // }
+
             $scope.tableParamsInbox = new ngTableParams({
                 page: 1, // show first page
                 count: 10 // count per page
             }, {
-                total: $scope.data.length, // length of data
+                total: $scope.openmsg.length, // length of data
                 getData: function ($defer, params) {
                     // use build-in angular filter
                     // var filteredData = params.filter() ?
@@ -190,7 +229,7 @@ angular.module('do.message', [])
                     //     $scope.data;
                     // params.total(orderedData.length); // set total for recalc paginationemail
 
-                    $defer.resolve($scope.data.slice((
+                    $defer.resolve($scope.openmsg.slice((
                             params.page() -
                             1) * params.count(),
                         params.page() *
@@ -208,7 +247,7 @@ angular.module('do.message', [])
 
         MsgService.getManualMessage(AppService.getCurrentApp()
             ._id, showMsgCallback);
-        console.log("msg: ", $scope.data);
+        console.log("msg: ", $scope.openmsg);
 
 
         $scope.showMessageThread = function (index) {
@@ -219,12 +258,15 @@ angular.module('do.message', [])
         $scope.closeConversation = function (coId, user, index) {
             MsgService.closeConversationRequest(AppService.getCurrentApp()
                 ._id, coId, function (err, user) {
+                    console.log("coid: ", coId, $scope.openmsg);
                     if (err) {
                         console.log("error");
                         return;
                     }
                     // var index = $scope.data.indexOf(coId);
-                    $scope.data.splice(index, 1);
+                    console.log("index: ", index);
+                    $scope.openmsg.splice(index, 1);
+                    $scope.tableParamsInbox.reload();
                     console.log("closing open conversation: ",
                         InboxMsgService.getInboxMessage()
                         .length);
@@ -258,16 +300,16 @@ angular.module('do.message', [])
 ])
 
 .controller('UnreadCtrl', ['$scope', '$filter', 'ngTableParams', 'AppService',
-    '$moment', 'MsgService', 'InboxMsgService', '$location',
+    '$moment', 'MsgService', 'InboxMsgService', '$location', '$timeout',
     function ($scope, $filter, ngTableParams, AppService, $moment,
-        MsgService, InboxMsgService, $location) {
+        MsgService, InboxMsgService, $location, $timeout) {
         // TODO: Get data from backend
         // TODO: Replace ng-table with normal table
 
         $scope.showUnreadMsgs = true;
 
         console.log("inside UnreadCtrl");
-        $scope.data = [];
+        $scope.unreadmsg = [];
         var msg = [];
         var populateUnreadMsg = function () {
             msg = InboxMsgService.getUnreadMessage();
@@ -277,7 +319,7 @@ angular.module('do.message', [])
             }
 
             for (var i = 0; i < msg.length; i++) {
-                $scope.data.push({
+                $scope.unreadmsg.push({
                     id: msg[i]._id,
                     name: msg[i].sName,
                     subject: msg[i].sub,
@@ -314,36 +356,43 @@ angular.module('do.message', [])
                 visible: 'true'
             }];
 
-            $scope.tableParamsSent = new ngTableParams({
-                page: 1, // show first page
-                count: 10, // count per page
-                filter: {
-                    name: 'M' // initial filter
-                },
-                sorting: {
-                    name: 'asc'
-                }
-            }, {
-                total: $scope.data.length, // length of data
-                getData: function ($defer, params) {
-                    // use build-in angular filter
-                    var filteredData = params.filter() ?
-                        $filter('filter')($scope.data, params
-                            .filter()) :
-                        $scope.data;
-                    var ordereddata = params.sorting() ?
-                        $filter('orderBy')($scope.data,
-                            params.orderBy()) :
-                        $scope.data;
-                    params.total(ordereddata.length); // set total for recalc paginationemail
+            $scope.refreshTable = function () {
+                $scope['tableParams'] = {
+                    reload: function () {},
+                    settings: function () {
+                        return {}
+                    }
+                };
+                $timeout(setTable, 100)
+            };
+            $scope.refreshTable();
 
-                    $defer.resolve(ordereddata.slice((
-                            params.page() -
-                            1) * params.count(),
-                        params.page() *
-                        params.count()));
-                }
-            });
+            function setTable(arguments) {
+
+                $scope.tableParamsSent = new ngTableParams({
+                    page: 1, // show first page
+                    count: 10, // count per page
+                    filter: {
+                        name: '' // initial filter
+                    },
+                    sorting: {
+                        name: 'asc'
+                    }
+                }, {
+                    filterSwitch: true,
+                    total: $scope.unreadmsg.length, // length of data
+                    getData: function ($defer, params) {
+                        var orderedData = params.sorting() ?
+                            $filter('orderBy')($scope.unreadmsg,
+                                params.orderBy()) :
+                            $scope.unreadmsg;
+                        params.total(orderedData.length);
+                        $defer.resolve(orderedData.slice((params.page() -
+                                1) * params.count(), params.page() *
+                            params.count()));
+                    }
+                });
+            }
 
         }
 
@@ -778,24 +827,24 @@ angular.module('do.message', [])
     'AppService',
     'InboxMsgService', '$moment', '$filter', 'ngTableParams',
     '$log',
-    '$location',
+    '$location', '$timeout',
     function ($scope, MsgService, AppService, InboxMsgService,
         $moment,
-        $filter, ngTableParams, $log, $location) {
+        $filter, ngTableParams, $log, $location, $timeout) {
         console.log("inside closedConversationCtrl");
 
         $scope.showClosedConversations = true;
-        $scope.data = [];
         var msg = [];
 
         function showClosedMsg() {
+            $scope.closedmsg = [];
             msg = InboxMsgService.getClosedMessage();
             if (!msg.length) {
                 $scope.showClosedConversations = false;
             }
             console.log("msg show Closed Msg -> -> ", msg);
             for (var i = 0; i < msg.length; i++) {
-                $scope.data.push({
+                $scope.closedmsg.push({
                     id: msg[i]._id,
                     name: msg[i].sName,
                     subject: msg[i].sub,
@@ -803,7 +852,7 @@ angular.module('do.message', [])
                         .fromNow()
                 })
             }
-            console.log("$scope.data: ", $scope.data);
+            console.log("$scope.data: ", $scope.closedmsg);
             $scope.columnsClosed = [{
                 title: 'User',
                 field: 'name',
@@ -821,36 +870,43 @@ angular.module('do.message', [])
                 visible: true
             }];
 
-            $scope.tableParamsClosed = new ngTableParams({
-                page: 1, // show first page
-                count: 10, // count per page
-                filter: {
-                    name: 'M' // initial filter
-                },
-                sorting: {
-                    name: 'asc'
-                }
-            }, {
-                total: $scope.data.length, // length of data
-                getData: function ($defer, params) {
-                    // use build-in angular filter
-                    var filteredData = params.filter() ?
-                        $filter('filter')($scope.data, params
-                            .filter()) :
-                        $scope.data;
-                    var orderedData = params.sorting() ?
-                        $filter('orderBy')($scope.data,
-                            params.orderBy()) :
-                        $scope.data;
-                    params.total(orderedData.length); // set total for recalc paginationemail
+            $scope.refreshTable = function () {
+                $scope['tableParams'] = {
+                    reload: function () {},
+                    settings: function () {
+                        return {}
+                    }
+                };
+                $timeout(setTable, 100)
+            };
+            $scope.refreshTable();
 
-                    $defer.resolve(orderedData.slice((
-                            params.page() -
-                            1) * params.count(),
-                        params.page() *
-                        params.count()));
-                }
-            });
+            function setTable(arguments) {
+
+                $scope.tableParamsClosed = new ngTableParams({
+                    page: 1, // show first page
+                    count: 10, // count per page
+                    filter: {
+                        name: '' // initial filter
+                    },
+                    sorting: {
+                        name: 'asc'
+                    }
+                }, {
+                    filterSwitch: true,
+                    total: $scope.closedmsg.length, // length of data
+                    getData: function ($defer, params) {
+                        var orderedData = params.sorting() ?
+                            $filter('orderBy')($scope.closedmsg,
+                                params.orderBy()) :
+                            $scope.closedmsg;
+                        params.total(orderedData.length);
+                        $defer.resolve(orderedData.slice((params.page() -
+                                1) * params.count(), params.page() *
+                            params.count()));
+                    }
+                });
+            }
         }
 
         var showClosedMsgCallback = function (err) {
