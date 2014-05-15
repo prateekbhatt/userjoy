@@ -118,7 +118,7 @@
                                                         <br>
                                                         <br>
                                                         <tbody>
-                                                            <tr ng-repeat="user in data | filter:searchText" >
+                                                            <tr ng-repeat="user in $data" >
                                                                 <td data-title="'User'" style="text-align:center; cursor:pointer" ng-click="showClosedConversations(user.id)">
                                                                     <span>{{user.name}}</span>
                                                                 </td>
