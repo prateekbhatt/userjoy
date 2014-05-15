@@ -303,9 +303,11 @@ angular.module('do.users', [])
                 $scope.segmentsCreated = false;
             }
         }
-
-        modelsSegment.getAllSegments(AppService.getCurrentApp()
-            ._id, checkSegments);
+        if (AppService.getCurrentApp()
+            ._id != null) {
+            modelsSegment.getAllSegments(AppService.getCurrentApp()
+                ._id, checkSegments);
+        }
 
 
 
@@ -473,7 +475,8 @@ angular.module('do.users', [])
                 $scope.filters[parentindex].op = '';
                 $scope.filters[parentindex].optext = '';
                 $scope.filters[parentindex].val = '';
-                $scope.filters[parentindex].type = $scope.hasDoneItems[index].type;
+                $scope.filters[parentindex].type = $scope.hasDoneItems[
+                    index].type;
 
 
                 // $scope.hasDoneOrHasNotDone = true;
@@ -496,7 +499,8 @@ angular.module('do.users', [])
                 $scope.filters[parentindex].op = '';
                 $scope.filters[parentindex].optext = '';
                 $scope.filters[parentindex].val = '';
-                $scope.filters[parentindex].type = $scope.hasNotDoneItems[index].type;
+                $scope.filters[parentindex].type = $scope.hasNotDoneItems[
+                    index].type;
                 console.log($scope.filters);
 
 
@@ -522,7 +526,8 @@ angular.module('do.users', [])
                 $scope.filters[parentindex].name = $scope
                     .countOfItems[
                         index].name;
-                $scope.filters[parentindex].type = $scope.countOfItems[index].type;                
+                $scope.filters[parentindex].type = $scope.countOfItems[
+                    index].type;
 
 
 
@@ -752,8 +757,11 @@ angular.module('do.users', [])
                 console.log('queryObj', $scope.queryObj);
                 console.log('stringifiedQuery', stringifiedQuery);
 
-                modelsQuery.runQueryAndGetUsers(AppService.getCurrentApp()
-                    ._id, stringifiedQuery, populateTable);
+                if (AppService.getCurrentApp()
+                    ._id != null) {
+                    modelsQuery.runQueryAndGetUsers(AppService.getCurrentApp()
+                        ._id, stringifiedQuery, populateTable);
+                }
             }
 
             $scope.saveQuery = function () {
@@ -912,8 +920,11 @@ angular.module('do.users', [])
         console.log("App Id: ", AppService.getCurrentApp()
             ._id);
 
-        modelsQuery.getQueries(AppService.getCurrentApp()
-            ._id, fillData);
+        if (AppService.getCurrentApp()
+            ._id != null) {
+            modelsQuery.getQueries(AppService.getCurrentApp()
+                ._id, fillData);
+        }
 
         $scope.title = "Write Message";
 
