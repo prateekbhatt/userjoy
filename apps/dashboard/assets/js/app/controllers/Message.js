@@ -245,8 +245,11 @@ angular.module('do.message', [])
             showManualMsg();
         }
 
-        MsgService.getManualMessage(AppService.getCurrentApp()
-            ._id, showMsgCallback);
+        if (AppService.getCurrentApp()
+            ._id != null) {
+            MsgService.getManualMessage(AppService.getCurrentApp()
+                ._id, showMsgCallback);
+        }
         console.log("msg: ", $scope.openmsg);
 
 
@@ -403,9 +406,11 @@ angular.module('do.message', [])
             populateUnreadMsg();
         }
 
-        MsgService.getUnreadMessages(AppService.getCurrentApp()
-            ._id, showUnreadMsgCallBack);
-
+        if (AppService.getCurrentApp()
+            ._id != null) {
+            MsgService.getUnreadMessages(AppService.getCurrentApp()
+                ._id, showUnreadMsgCallBack);
+        }
 
         $scope.closeConversation = function (coId) {
             MsgService.closeConversationRequest(AppService.getCurrentApp()
@@ -918,9 +923,11 @@ angular.module('do.message', [])
 
 
 
-
-        MsgService.getClosedConversations(AppService.getCurrentApp()
-            ._id, showClosedMsgCallback);
+        if (AppService.getCurrentApp()
+            ._id) {
+            MsgService.getClosedConversations(AppService.getCurrentApp()
+                ._id, showClosedMsgCallback);
+        }
 
         $scope.showClosedConversations = function (id) {
             $location.path('/messages/' + AppService.getCurrentApp()

@@ -178,7 +178,9 @@ angular.module('dodatado', [
                 console.log("err apps: ", err);
                 return;
             }
+            console.log("apps: ", apps)
             AppService.setLoggedInApps(apps);
+            console.log("apps[0]: ", apps[0]);
             AppService.setCurrentApp(apps[0]);
             console.log("default app:", AppService.getCurrentApp());
 
