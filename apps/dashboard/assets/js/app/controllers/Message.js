@@ -106,323 +106,330 @@ angular.module('do.message', [])
 
 .controller('InboxCtrl', ['$scope', '$filter', 'ngTableParams', '$log',
     'MsgService', '$location', 'AppService', 'InboxMsgService', '$moment',
-    'login', '$timeout',
+    'login', '$timeout', '$rootScope', 'CurrentAppService',
     function ($scope, $filter, ngTableParams, $log, MsgService, $location,
-        AppService, InboxMsgService, $moment, login, $timeout) {
+        AppService, InboxMsgService, $moment, login, $timeout, $rootScope,
+        CurrentAppService) {
+        // console.log('Promise is now resolved: ' + CurrentAppService.getCurrentApp());
 
-        console.log("loginProvider MsgCtrl:", login.getLoggedIn());
-        $scope.showOpenConversations = true;
-        console.log("entering inboxctrl");
+        CurrentAppService.getCurrentApp()
+            .then(function (currentApp) {
+                console.log("Promise Resolved: ", currentApp);
+                console.log("loginProvider MsgCtrl:", login.getLoggedIn());
+                $scope.showOpenConversations = true;
+                console.log("entering inboxctrl");
 
-        $scope.replytext = 'hello world';
+                $scope.replytext = 'hello world';
 
-        console.log('inside inboxctrl and showtable is true');
-        $scope.showTable = true;
+                console.log('inside inboxctrl and showtable is true');
+                $scope.showTable = true;
 
-        $scope.showTableInbox = function () {
-            console.log("inside showTableInbox");
-            $scope.showTable = true;
-        }
-
-        // Get Data from backend TODO
-        console.log(AppService.getCurrentApp()
-            ._id);
-        var msg = [];
-
-        function showManualMsg() {
-            $scope.openmsg = [];
-            msg = InboxMsgService.getInboxMessage();
-            if (!msg.length) {
-                $scope.showOpenConversations = false;
-            }
-            console.log("msg show Manual Msg: ", msg);
-            for (var i = 0; i < msg.length; i++) {
-                $scope.openmsg.push({
-                    id: msg[i]._id,
-                    name: msg[i].sName,
-                    subject: msg[i].sub,
-                    time: $moment(msg[i].ct)
-                        .fromNow(),
-                    close: 'Close',
-                    assign: 'Assign',
-                    coid: msg[i].coId
-                })
-            }
-            console.log("$scope.data: ", $scope.openmsg);
-            $scope.columnsInbox = [{
-                title: 'User',
-                field: 'name',
-                visible: true,
-                filter: {
-                    'name': 'text'
+                $scope.showTableInbox = function () {
+                    console.log("inside showTableInbox");
+                    $scope.showTable = true;
                 }
-            }, {
-                title: 'Subject',
-                field: 'subject',
-                visible: true
-            }, {
-                title: 'When',
-                field: 'time',
-                visible: true
-            }, {
-                title: '',
-                field: 'close',
-                visible: true
-            }, {
-                title: '',
-                field: 'assign',
-                visible: true
-            }];
 
-            // $scope.refreshTable = function () {
-            //     $scope['tableParams'] = {
-            //         reload: function () {},
-            //         settings: function () {
-            //             return {}
-            //         }
-            //     };
-            //     $timeout(setTable, 100)
-            // };
-            // $scope.refreshTable();
+                // Get Data from backend TODO
+                console.log(AppService.getCurrentApp()
+                    ._id);
+                var msg = [];
 
-            // function setTable(arguments) {
-
-            //     $scope.tableParamsInbox = new ngTableParams({
-            //         page: 1, // show first page
-            //         count: 10, // count per page
-            //         filter: {
-            //             name: '' // initial filter
-            //         },
-            //         sorting: {
-            //             name: 'asc'
-            //         }
-            //     }, {
-            //         filterSwitch: true,
-            //         total: $scope.openmsg.length, // length of data
-            //         getData: function ($defer, params) {
-            //             var orderedData = params.sorting() ?
-            //                 $filter('orderBy')($scope.openmsg,
-            //                     params.orderBy()) :
-            //                 $scope.openmsg;
-            //             params.total(orderedData.length);
-            //             $defer.resolve(orderedData.slice((params.page() -
-            //                     1) * params.count(), params.page() *
-            //                 params.count()));
-            //         }
-            //     });
-            // }
-
-            $scope.tableParamsInbox = new ngTableParams({
-                page: 1, // show first page
-                count: 10 // count per page
-            }, {
-                total: $scope.openmsg.length, // length of data
-                getData: function ($defer, params) {
-                    // use build-in angular filter
-                    // var filteredData = params.filter() ?
-                    //     $filter('filter')($scope.data, params
-                    //         .filter()) :
-                    //     $scope.data;
-                    // var orderedData = params.sorting() ?
-                    //     $filter('orderBy')($scope.data,
-                    //         params.orderBy()) :
-                    //     $scope.data;
-                    // params.total(orderedData.length); // set total for recalc paginationemail
-
-                    $defer.resolve($scope.openmsg.slice((
-                            params.page() -
-                            1) * params.count(),
-                        params.page() *
-                        params.count()));
-                }
-            });
-        }
-
-        var showMsgCallback = function (err) {
-            if (err) {
-                return;
-            }
-            showManualMsg();
-        }
-
-        if (AppService.getCurrentApp()
-            ._id != null) {
-            MsgService.getManualMessage(AppService.getCurrentApp()
-                ._id, showMsgCallback);
-        }
-        console.log("msg: ", $scope.openmsg);
-
-
-        $scope.showMessageThread = function (index) {
-            console.log("index: ", index);
-            console.log(InboxMsgService.getInboxMessage());
-        }
-
-        $scope.closeConversation = function (coId, user, index) {
-            MsgService.closeConversationRequest(AppService.getCurrentApp()
-                ._id, coId, function (err, user) {
-                    console.log("coid: ", coId, $scope.openmsg);
-                    if (err) {
-                        console.log("error");
-                        return;
-                    }
-                    // var index = $scope.data.indexOf(coId);
-                    console.log("index: ", index);
-                    $scope.openmsg.splice(index, 1);
-                    $scope.tableParamsInbox.reload();
-                    console.log("closing open conversation: ",
-                        InboxMsgService.getInboxMessage()
-                        .length);
-                    if (InboxMsgService.getInboxMessage()
-                        .length == 1) {
+                function showManualMsg() {
+                    $scope.openmsg = [];
+                    msg = InboxMsgService.getInboxMessage();
+                    if (!msg.length) {
                         $scope.showOpenConversations = false;
                     }
-                });
-        }
+                    console.log("msg show Manual Msg: ", msg);
+                    for (var i = 0; i < msg.length; i++) {
+                        $scope.openmsg.push({
+                            id: msg[i]._id,
+                            name: msg[i].sName,
+                            subject: msg[i].sub,
+                            time: $moment(msg[i].ct)
+                                .fromNow(),
+                            close: 'Close',
+                            assign: 'Assign',
+                            coid: msg[i].coId
+                        })
+                    }
+                    console.log("$scope.data: ", $scope.openmsg);
+                    $scope.columnsInbox = [{
+                        title: 'User',
+                        field: 'name',
+                        visible: true,
+                        filter: {
+                            'name': 'text'
+                        }
+                    }, {
+                        title: 'Subject',
+                        field: 'subject',
+                        visible: true
+                    }, {
+                        title: 'When',
+                        field: 'time',
+                        visible: true
+                    }, {
+                        title: '',
+                        field: 'close',
+                        visible: true
+                    }, {
+                        title: '',
+                        field: 'assign',
+                        visible: true
+                    }];
+
+                    // $scope.refreshTable = function () {
+                    //     $scope['tableParams'] = {
+                    //         reload: function () {},
+                    //         settings: function () {
+                    //             return {}
+                    //         }
+                    //     };
+                    //     $timeout(setTable, 100)
+                    // };
+                    // $scope.refreshTable();
+
+                    // function setTable(arguments) {
+
+                    //     $scope.tableParamsInbox = new ngTableParams({
+                    //         page: 1, // show first page
+                    //         count: 10, // count per page
+                    //         filter: {
+                    //             name: '' // initial filter
+                    //         },
+                    //         sorting: {
+                    //             name: 'asc'
+                    //         }
+                    //     }, {
+                    //         filterSwitch: true,
+                    //         total: $scope.openmsg.length, // length of data
+                    //         getData: function ($defer, params) {
+                    //             var orderedData = params.sorting() ?
+                    //                 $filter('orderBy')($scope.openmsg,
+                    //                     params.orderBy()) :
+                    //                 $scope.openmsg;
+                    //             params.total(orderedData.length);
+                    //             $defer.resolve(orderedData.slice((params.page() -
+                    //                     1) * params.count(), params.page() *
+                    //                 params.count()));
+                    //         }
+                    //     });
+                    // }
+
+                    $scope.tableParamsInbox = new ngTableParams({
+                        page: 1, // show first page
+                        count: 10 // count per page
+                    }, {
+                        total: $scope.openmsg.length, // length of data
+                        getData: function ($defer, params) {
+                            // use build-in angular filter
+                            // var filteredData = params.filter() ?
+                            //     $filter('filter')($scope.data, params
+                            //         .filter()) :
+                            //     $scope.data;
+                            // var orderedData = params.sorting() ?
+                            //     $filter('orderBy')($scope.data,
+                            //         params.orderBy()) :
+                            //     $scope.data;
+                            // params.total(orderedData.length); // set total for recalc paginationemail
+
+                            $defer.resolve($scope.openmsg.slice((
+                                    params.page() -
+                                    1) * params.count(),
+                                params.page() *
+                                params.count()));
+                        }
+                    });
+                }
+
+                var showMsgCallback = function (err) {
+                    if (err) {
+                        return;
+                    }
+                    showManualMsg();
+                }
+                var currentAppId = AppService.getCurrentApp()
+                    ._id;
+                MsgService.getManualMessage(currentApp._id,
+                    showMsgCallback);
+
+                console.log("msg: ", $scope.openmsg);
 
 
-        // Get Data from backend TODO
+                $scope.showMessageThread = function (index) {
+                    console.log("index: ", index);
+                    console.log(InboxMsgService.getInboxMessage());
+                }
 
-        $scope.messagebody =
-            'Hi, Thanks for such an offer. I really appreciate it. Loerm Ipsum .......';
+                $scope.closeConversation = function (coId, user, index) {
+                    MsgService.closeConversationRequest(AppService.getCurrentApp()
+                        ._id, coId, function (err, user) {
+                            console.log("coid: ", coId, $scope.openmsg);
+                            if (err) {
+                                console.log("error");
+                                return;
+                            }
+                            console.log("index: ", index);
+                            $scope.openmsg.splice(index, 1);
+                            $scope.tableParamsInbox.reload();
+                            console.log("closing open conversation: ",
+                                InboxMsgService.getInboxMessage()
+                                .length);
+                            if (InboxMsgService.getInboxMessage()
+                                .length == 1) {
+                                $scope.showOpenConversations = false;
+                            }
+                        });
+                }
+
+
+                // Get Data from backend TODO
+
+                $scope.messagebody =
+                    'Hi, Thanks for such an offer. I really appreciate it. Loerm Ipsum .......';
 
 
 
-        $scope.showSelectedMail = function (id) {
-            // console.log("inside selected mail");
-            // $scope.showTable = false;
-            $location.path('/messages/' + AppService.getCurrentApp()
-                ._id + '/conversations/' + id);
+                $scope.showSelectedMail = function (id) {
+                    $location.path('/messages/' + AppService.getCurrentApp()
+                        ._id + '/conversations/' + id);
 
 
-        }
+                }
 
+            })
 
+        // 
 
     }
 ])
 
 .controller('UnreadCtrl', ['$scope', '$filter', 'ngTableParams', 'AppService',
     '$moment', 'MsgService', 'InboxMsgService', '$location', '$timeout',
+    'CurrentAppService',
     function ($scope, $filter, ngTableParams, AppService, $moment,
-        MsgService, InboxMsgService, $location, $timeout) {
-        // TODO: Get data from backend
-        // TODO: Replace ng-table with normal table
+        MsgService, InboxMsgService, $location, $timeout,
+        CurrentAppService) {
 
-        $scope.showUnreadMsgs = true;
+        CurrentAppService.getCurrentApp()
+            .then(function (currentApp) {
+                console.log("Promise Resolved: ", currentApp);
+                $scope.showUnreadMsgs = true;
 
-        console.log("inside UnreadCtrl");
-        $scope.unreadmsg = [];
-        var msg = [];
-        var populateUnreadMsg = function () {
-            msg = InboxMsgService.getUnreadMessage();
-            console.log("unread msgs ---> ", msg);
-            if (!msg.length) {
-                $scope.showUnreadMsgs = false;
-            }
+                console.log("inside UnreadCtrl");
+                $scope.unreadmsg = [];
+                var msg = [];
+                var populateUnreadMsg = function () {
+                    msg = InboxMsgService.getUnreadMessage();
+                    console.log("unread msgs ---> ", msg);
+                    if (!msg.length) {
+                        $scope.showUnreadMsgs = false;
+                    }
 
-            for (var i = 0; i < msg.length; i++) {
-                $scope.unreadmsg.push({
-                    id: msg[i]._id,
-                    name: msg[i].sName,
-                    subject: msg[i].sub,
-                    time: $moment(msg[i].ct)
-                        .fromNow(),
-                    close: 'Close',
-                    assign: 'Assign',
-                    coid: msg[i].coId
-                })
-            };
+                    for (var i = 0; i < msg.length; i++) {
+                        $scope.unreadmsg.push({
+                            id: msg[i]._id,
+                            name: msg[i].sName,
+                            subject: msg[i].sub,
+                            time: $moment(msg[i].ct)
+                                .fromNow(),
+                            close: 'Close',
+                            assign: 'Assign',
+                            coid: msg[i].coId
+                        })
+                    };
 
-            $scope.columnsSent = [{
-                title: 'User',
-                field: 'name',
-                visible: true,
-                filter: {
-                    'name': 'text'
+                    $scope.columnsSent = [{
+                        title: 'User',
+                        field: 'name',
+                        visible: true,
+                        filter: {
+                            'name': 'text'
+                        }
+                    }, {
+                        title: 'Text',
+                        field: 'subject',
+                        visible: true
+                    }, {
+                        title: 'When',
+                        field: 'time',
+                        visible: true
+                    }, {
+                        title: '',
+                        field: 'close',
+                        visible: 'true'
+                    }, {
+                        title: '',
+                        field: 'assign',
+                        visible: 'true'
+                    }];
+
+                    $scope.refreshTable = function () {
+                        $scope['tableParams'] = {
+                            reload: function () {},
+                            settings: function () {
+                                return {}
+                            }
+                        };
+                        $timeout(setTable, 100)
+                    };
+                    $scope.refreshTable();
+
+                    function setTable(arguments) {
+
+                        $scope.tableParamsSent = new ngTableParams({
+                            page: 1, // show first page
+                            count: 10, // count per page
+                            filter: {
+                                name: '' // initial filter
+                            },
+                            sorting: {
+                                name: 'asc'
+                            }
+                        }, {
+                            filterSwitch: true,
+                            total: $scope.unreadmsg.length, // length of data
+                            getData: function ($defer, params) {
+                                var orderedData = params.sorting() ?
+                                    $filter('orderBy')($scope.unreadmsg,
+                                        params.orderBy()) :
+                                    $scope.unreadmsg;
+                                params.total(orderedData.length);
+                                $defer.resolve(orderedData.slice((
+                                        params.page() -
+                                        1) * params.count(),
+                                    params.page() *
+                                    params.count()));
+                            }
+                        });
+                    }
+
                 }
-            }, {
-                title: 'Text',
-                field: 'subject',
-                visible: true
-            }, {
-                title: 'When',
-                field: 'time',
-                visible: true
-            }, {
-                title: '',
-                field: 'close',
-                visible: 'true'
-            }, {
-                title: '',
-                field: 'assign',
-                visible: 'true'
-            }];
 
-            $scope.refreshTable = function () {
-                $scope['tableParams'] = {
-                    reload: function () {},
-                    settings: function () {
-                        return {}
+                var showUnreadMsgCallBack = function (err) {
+                    if (err) {
+                        return err;
                     }
-                };
-                $timeout(setTable, 100)
-            };
-            $scope.refreshTable();
+                    populateUnreadMsg();
+                }
 
-            function setTable(arguments) {
 
-                $scope.tableParamsSent = new ngTableParams({
-                    page: 1, // show first page
-                    count: 10, // count per page
-                    filter: {
-                        name: '' // initial filter
-                    },
-                    sorting: {
-                        name: 'asc'
-                    }
-                }, {
-                    filterSwitch: true,
-                    total: $scope.unreadmsg.length, // length of data
-                    getData: function ($defer, params) {
-                        var orderedData = params.sorting() ?
-                            $filter('orderBy')($scope.unreadmsg,
-                                params.orderBy()) :
-                            $scope.unreadmsg;
-                        params.total(orderedData.length);
-                        $defer.resolve(orderedData.slice((params.page() -
-                                1) * params.count(), params.page() *
-                            params.count()));
-                    }
-                });
-            }
 
-        }
+                MsgService.getUnreadMessages(currentApp._id,
+                    showUnreadMsgCallBack);
 
-        var showUnreadMsgCallBack = function (err) {
-            if (err) {
-                return err;
-            }
-            populateUnreadMsg();
-        }
+                $scope.closeConversation = function (coId) {
+                    MsgService.closeConversationRequest(AppService.getCurrentApp()
+                        ._id, coId);
+                }
 
-        if (AppService.getCurrentApp()
-            ._id != null) {
-            MsgService.getUnreadMessages(AppService.getCurrentApp()
-                ._id, showUnreadMsgCallBack);
-        }
+                $scope.showSelectedMail = function (id) {
+                    $location.path('/messages/' + AppService.getCurrentApp()
+                        ._id + '/conversations/' + id);
+                }
 
-        $scope.closeConversation = function (coId) {
-            MsgService.closeConversationRequest(AppService.getCurrentApp()
-                ._id, coId);
-        }
-
-        $scope.showSelectedMail = function (id) {
-            // console.log("inside selected mail");
-            // $scope.showTable = false;
-            $location.path('/messages/' + AppService.getCurrentApp()
-                ._id + '/conversations/' + id);
-        }
+            })
 
     }
 ])
@@ -832,108 +839,112 @@ angular.module('do.message', [])
     'AppService',
     'InboxMsgService', '$moment', '$filter', 'ngTableParams',
     '$log',
-    '$location', '$timeout',
+    '$location', '$timeout', 'CurrentAppService',
     function ($scope, MsgService, AppService, InboxMsgService,
         $moment,
-        $filter, ngTableParams, $log, $location, $timeout) {
+        $filter, ngTableParams, $log, $location, $timeout,
+        CurrentAppService) {
         console.log("inside closedConversationCtrl");
 
-        $scope.showClosedConversations = true;
-        var msg = [];
+        CurrentAppService.getCurrentApp()
+            .then(function (currentApp) {
+                console.log("Promise Resolved: ", currentApp);
 
-        function showClosedMsg() {
-            $scope.closedmsg = [];
-            msg = InboxMsgService.getClosedMessage();
-            if (!msg.length) {
-                $scope.showClosedConversations = false;
-            }
-            console.log("msg show Closed Msg -> -> ", msg);
-            for (var i = 0; i < msg.length; i++) {
-                $scope.closedmsg.push({
-                    id: msg[i]._id,
-                    name: msg[i].sName,
-                    subject: msg[i].sub,
-                    time: $moment(msg[i].ct)
-                        .fromNow()
-                })
-            }
-            console.log("$scope.data: ", $scope.closedmsg);
-            $scope.columnsClosed = [{
-                title: 'User',
-                field: 'name',
-                visible: true,
-                filter: {
-                    'name': 'text'
+                $scope.showClosedConversations = true;
+                var msg = [];
+
+                function showClosedMsg() {
+                    $scope.closedmsg = [];
+                    msg = InboxMsgService.getClosedMessage();
+                    if (!msg.length) {
+                        $scope.showClosedConversations = false;
+                    }
+                    console.log("msg show Closed Msg -> -> ", msg);
+                    for (var i = 0; i < msg.length; i++) {
+                        $scope.closedmsg.push({
+                            id: msg[i]._id,
+                            name: msg[i].sName,
+                            subject: msg[i].sub,
+                            time: $moment(msg[i].ct)
+                                .fromNow()
+                        })
+                    }
+                    console.log("$scope.data: ", $scope.closedmsg);
+                    $scope.columnsClosed = [{
+                        title: 'User',
+                        field: 'name',
+                        visible: true,
+                        filter: {
+                            'name': 'text'
+                        }
+                    }, {
+                        title: 'Subject',
+                        field: 'subject',
+                        visible: true
+                    }, {
+                        title: 'When',
+                        field: 'time',
+                        visible: true
+                    }];
+
+                    $scope.refreshTable = function () {
+                        $scope['tableParams'] = {
+                            reload: function () {},
+                            settings: function () {
+                                return {}
+                            }
+                        };
+                        $timeout(setTable, 100)
+                    };
+                    $scope.refreshTable();
+
+                    function setTable(arguments) {
+
+                        $scope.tableParamsClosed = new ngTableParams({
+                            page: 1, // show first page
+                            count: 10, // count per page
+                            filter: {
+                                name: '' // initial filter
+                            },
+                            sorting: {
+                                name: 'asc'
+                            }
+                        }, {
+                            filterSwitch: true,
+                            total: $scope.closedmsg.length, // length of data
+                            getData: function ($defer, params) {
+                                var orderedData = params.sorting() ?
+                                    $filter('orderBy')($scope.closedmsg,
+                                        params.orderBy()) :
+                                    $scope.closedmsg;
+                                params.total(orderedData.length);
+                                $defer.resolve(orderedData.slice((
+                                        params.page() -
+                                        1) * params.count(),
+                                    params.page() *
+                                    params.count()));
+                            }
+                        });
+                    }
                 }
-            }, {
-                title: 'Subject',
-                field: 'subject',
-                visible: true
-            }, {
-                title: 'When',
-                field: 'time',
-                visible: true
-            }];
 
-            $scope.refreshTable = function () {
-                $scope['tableParams'] = {
-                    reload: function () {},
-                    settings: function () {
-                        return {}
+                var showClosedMsgCallback = function (err) {
+                    if (err) {
+                        return;
                     }
-                };
-                $timeout(setTable, 100)
-            };
-            $scope.refreshTable();
+                    showClosedMsg();
+                }
 
-            function setTable(arguments) {
+                MsgService.getClosedConversations(currentApp._id,
+                    showClosedMsgCallback);
 
-                $scope.tableParamsClosed = new ngTableParams({
-                    page: 1, // show first page
-                    count: 10, // count per page
-                    filter: {
-                        name: '' // initial filter
-                    },
-                    sorting: {
-                        name: 'asc'
-                    }
-                }, {
-                    filterSwitch: true,
-                    total: $scope.closedmsg.length, // length of data
-                    getData: function ($defer, params) {
-                        var orderedData = params.sorting() ?
-                            $filter('orderBy')($scope.closedmsg,
-                                params.orderBy()) :
-                            $scope.closedmsg;
-                        params.total(orderedData.length);
-                        $defer.resolve(orderedData.slice((params.page() -
-                                1) * params.count(), params.page() *
-                            params.count()));
-                    }
-                });
-            }
-        }
-
-        var showClosedMsgCallback = function (err) {
-            if (err) {
-                return;
-            }
-            showClosedMsg();
-        }
+                $scope.showClosedConversations = function (id) {
+                    $location.path('/messages/' + AppService.getCurrentApp()
+                        ._id + '/conversations/' + id);
 
 
+                }
 
-        if (AppService.getCurrentApp()
-            ._id) {
-            MsgService.getClosedConversations(AppService.getCurrentApp()
-                ._id, showClosedMsgCallback);
-        }
-
-        $scope.showClosedConversations = function (id) {
-            $location.path('/messages/' + AppService.getCurrentApp()
-                ._id + '/conversations/' + id);
-
-
-        }
+            })
     }
 ]);

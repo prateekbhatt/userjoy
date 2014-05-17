@@ -1,4 +1,4 @@
-angular.module('dodatado', [
+var app = angular.module('dodatado', [
     'ui.bootstrap',
     'ui.router',
     // 'ngSails',
@@ -28,6 +28,28 @@ angular.module('dodatado', [
     'http-auth-interceptor',
     'angular-momentjs',
     'do.automate'
+])
+
+.provider('appIdProvider', [
+
+    function () {
+
+        var appId = '';
+
+        this.$get = [
+
+            function () {
+                return {
+                    setAppId: function (value) {
+                        appId = value;
+                    },
+                    getAppId: function () {
+                        return appId;
+                    }
+                };
+            }
+        ];
+    }
 ])
 
 .provider('login', [
@@ -111,11 +133,11 @@ angular.module('dodatado', [
                 },
                 // TODO: Get data from backend
                 options: [{
-                    name: 'Email',
-                    value: '{{= email || "there"}}'
-                }
-                // ,
-                /*{
+                        name: 'Email',
+                        value: '{{= email || "there"}}'
+                    }
+                    // ,
+                    /*{
                     name: 'App Name',
                     value: '{{app_name}}'
                 }, {
@@ -170,8 +192,8 @@ angular.module('dodatado', [
     }
 ])
 
-.run(['AppService', 'AppModel', '$log',
-    function (AppService, AppModel, $log) {
+.run(['AppService', 'AppModel', '$log', 'appIdProvider',
+    function (AppService, AppModel, $log, appIdProvider) {
         AppModel.get(function (err, apps) {
             console.log("apps log", err, apps);
             if (err) {
@@ -182,6 +204,8 @@ angular.module('dodatado', [
             AppService.setLoggedInApps(apps);
             console.log("apps[0]: ", apps[0]);
             AppService.setCurrentApp(apps[0]);
+            appIdProvider.setAppId(apps[0]._id);
+            console.log("AppIdProvider: ", appIdProvider.getAppId());
             console.log("default app:", AppService.getCurrentApp());
 
         });
@@ -343,7 +367,8 @@ angular.module('dodatado', [
     }
 ])
 
+angular.element(document)
+    .ready(function () {
+        angular.bootstrap(document, ['dodatado']);
+    });
 
-.controller('AppCtrl', function AppCtrl($scope) {
-
-});
