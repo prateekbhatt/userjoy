@@ -1,4 +1,3 @@
-
 /**
  * npm dependencies
  */
@@ -103,7 +102,7 @@ function findAutoMessages(cb) {
     })
     .exec(cb);
 
-};
+}
 
 
 /**
@@ -117,15 +116,22 @@ function queue(msgs, cb) {
   logger.trace('Queuing automessage cron job');
 
   var iterator = function (m) {
+
+    // post the automessage id in the body
     var body = m._id;
+
+    // post automessage id to queue
     q.post(body, function (err, res) {
-      cb(err, res);
+      if (err) return cb(err);
+
+      // update the lastQueued timestamp for the AutoMessage
+      AutoMessage.updateLastQueued(body, cb);
     });
   };
 
   async.each(msgs, iterator, cb);
 
-};
+}
 
 
 /**
