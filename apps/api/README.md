@@ -103,6 +103,7 @@ Event         | meta (metadata)         | events belonging to a user
 Health        |                         | the healthscore of a user for a specific company
 Invite        |                         | tokens of team members that have been invited to use an app
 Message       |                         | messages between users and accounts
+Notification  |                         | notifications to be shown to the user
 Segment       | filters                 | all the segments defined for an app
 Trigger       |                         | triggers for sending auto emails / notifications
 User          | companies, notes        | users of a specific app. create a new user for every new unique identifier for an app
@@ -343,6 +344,20 @@ User          | companies, notes        | users of a specific app. create a new 
 ##### Notes:
 
 - accid is required only when the message is created by an account. If a user has sent the message, then it is not required for the message to have an accid
+
+### Notification
+
+##### Columns:
+
+- accid
+- aid
+- body
+- ct
+- seen (boolean)
+- sender
+- title
+- uid
+- ut
 
 ### Conversation
 
