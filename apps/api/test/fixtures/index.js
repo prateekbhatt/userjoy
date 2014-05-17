@@ -123,6 +123,7 @@ var notifications = {
   first: {
     accid: null,
     aid: null,
+    amId: null,
     sender: 'Prateek Bhatt',
     title: 'New Title for Notification',
     body: 'Hello World',
@@ -212,10 +213,11 @@ function createMessage(accid, aid, coId, uid, message, fn) {
 }
 
 
-function createNotification(accid, aid, uid, notf, fn) {
+function createNotification(accid, aid, amId, uid, notf, fn) {
 
   notf.accid = accid;
   notf.aid = aid;
+  notf.amId = amId;
   notf.uid = uid;
   Notification.create(notf, fn);
 
@@ -365,22 +367,6 @@ module.exports = function loadFixtures(callback) {
     },
 
 
-    createFirstNotification: function (cb) {
-
-      var aid = apps.first._id;
-      var accid = accounts.first._id;
-      var uid = users.first._id;
-      var notification = notifications.first;
-
-      createNotification(accid, aid, uid, notification, function (err, notf) {
-        if (err) return cb(err);
-        notifications.first = notf;
-        cb();
-      });
-
-    },
-
-
     createFirstSegment: function (cb) {
 
       var aid = apps.first._id;
@@ -406,6 +392,23 @@ module.exports = function loadFixtures(callback) {
       createAutoMessage(accid, aid, sid, automessage, function (err, amsg) {
         if (err) return cb(err);
         automessages.first = amsg;
+        cb();
+      });
+
+    },
+
+
+    createFirstNotification: function (cb) {
+
+      var aid = apps.first._id;
+      var amId = automessages.first._id;
+      var accid = accounts.first._id;
+      var uid = users.first._id;
+      var notification = notifications.first;
+
+      createNotification(accid, aid, amId, uid, notification, function (err, notf) {
+        if (err) return cb(err);
+        notifications.first = notf;
         cb();
       });
 

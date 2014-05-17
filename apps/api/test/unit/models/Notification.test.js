@@ -42,13 +42,16 @@ describe('Model Notification', function () {
 
           expect(Object.keys(err.errors)
             .length)
-            .to.eql(5);
+            .to.eql(6);
 
           expect(err.errors.accid.message)
             .to.eql('Invalid account id');
 
           expect(err.errors.aid.message)
             .to.eql('Invalid aid');
+
+          expect(err.errors.amId.message)
+            .to.eql('Invalid automessage id');
 
           expect(err.errors.body.message)
             .to.eql('Provide notification body');
@@ -73,6 +76,7 @@ describe('Model Notification', function () {
       var newNotification = {
         accid: ObjectId(),
         aid: ObjectId(),
+        amId: ObjectId(),
         body: 'Hello World',
         sender: 'Prateek Bhatt',
         title: 'Subject I Am',
