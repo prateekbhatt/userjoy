@@ -16,6 +16,13 @@ var Schema = mongoose.Schema;
 
 
 /**
+ * helpers
+ */
+
+var logger = require('../../helpers/logger');
+
+
+/**
  * Define automessage schema
  */
 
@@ -60,6 +67,12 @@ var AutoMessageSchema = new Schema({
   ct: {
     type: Date,
     default: Date.now
+  },
+
+
+  // timestamp of when the automessage was last queued to be run
+  lastQueued: {
+    type: Date
   },
 
 
@@ -127,6 +140,26 @@ AutoMessageSchema.pre('save', function (next) {
   this.ut = new Date;
   next();
 });
+
+
+/**
+ * Updates the lastQueued property of the AutoMessage
+ *
+ * @param {string} automessageId
+ * @param {function} cb callback
+ */
+
+AutoMessageSchema.statics.updateLastQueued = function (automessageId, cb) {
+
+  logger.trace('models/AutoMessage updateLastQueued');
+
+  var update = {
+    lastQueued: Date.now()
+  };
+
+  AutoMessage.findByIdAndUpdate(automessageId, update, cb);
+}
+
 
 
 var AutoMessage = mongoose.model('AutoMessage', AutoMessageSchema);

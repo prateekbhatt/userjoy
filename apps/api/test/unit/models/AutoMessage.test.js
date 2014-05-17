@@ -16,6 +16,11 @@ describe('Model AutoMessage', function () {
   var savedAutoMessage;
 
 
+  before(function (done) {
+    setupTestDb(done);
+  });
+
+
   describe('#create', function () {
 
     it(
@@ -140,6 +145,38 @@ describe('Model AutoMessage', function () {
 
       expect(savedAutoMessage.sent)
         .to.eql(0);
+
+    });
+
+  });
+
+
+  describe('#updateLastQueued', function () {
+
+    it('should should update lastQueued to current time', function (done) {
+
+      var savedAutoMessage = saved.automessages.first;
+
+      expect(savedAutoMessage)
+        .to.not.have.property('lastQueued');
+
+      AutoMessage.updateLastQueued(savedAutoMessage._id,
+        function (err, msg) {
+
+          expect(err)
+            .to.not.exist;
+
+          expect(msg)
+            .to.be.an('object');
+
+          expect(msg)
+            .to.have.property("lastQueued");
+
+          expect(msg.lastQueued)
+            .to.be.a("date");
+
+          done();
+        });
 
     });
 
