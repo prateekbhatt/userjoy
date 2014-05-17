@@ -1,5 +1,8 @@
 /**
  * Model for notifications belonging to an app
+ *
+ * NOTE: This contains only auto notifications. Notifications that are manually
+ * created by the admin are stored in the Message collection.
  */
 
 
@@ -34,6 +37,14 @@ var NotificationSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'App',
     required: [true, 'Invalid aid']
+  },
+
+
+  // automessage Id
+  amId: {
+    type: Schema.Types.ObjectId,
+    ref: 'AutoMessage',
+    required: [true, 'Invalid automessage id']
   },
 
 

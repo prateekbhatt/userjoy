@@ -103,7 +103,7 @@ Event         | meta (metadata)         | events belonging to a user
 Health        |                         | the healthscore of a user for a specific company
 Invite        |                         | tokens of team members that have been invited to use an app
 Message       |                         | messages between users and accounts
-Notification  |                         | notifications to be shown to the user
+Notification  |                         | notifications to be shown to the user (only auto)
 Segment       | filters                 | all the segments defined for an app
 Trigger       |                         | triggers for sending auto emails / notifications
 User          | companies, notes        | users of a specific app. create a new user for every new unique identifier for an app
@@ -351,6 +351,7 @@ User          | companies, notes        | users of a specific app. create a new 
 
 - accid
 - aid
+- amId
 - body
 - ct
 - seen (boolean)
@@ -358,6 +359,11 @@ User          | companies, notes        | users of a specific app. create a new 
 - title
 - uid
 - ut
+
+##### Notes:
+
+- Only auto notifications are stored in this. The manually created notifications are stored in the Message collection
+- A notification would be deleted once it has been seen by the user
 
 ### Conversation
 
