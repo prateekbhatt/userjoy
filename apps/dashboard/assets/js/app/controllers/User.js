@@ -272,707 +272,722 @@ angular.module('do.users', [])
     'AppService', 'segment', 'queryMatching', 'eventNames',
     'userAttributes', 'lodash', '$modal',
     'UidService', '$moment', 'UserList', '$timeout', 'modelsSegment',
-    'segmentService',
+    'segmentService', 'CurrentAppService',
     function ($scope, $location, segment, queryMatching, $filter,
         countOfActions, hasNotDone, hasDoneActions,
         ngTableParams, login, modelsQuery, AppService, segment,
         queryMatching, eventNames, userAttributes, lodash, $modal,
         UidService, $moment, UserList, $timeout, modelsSegment,
-        segmentService) {
+        segmentService, CurrentAppService) {
 
-        $scope.showSaveButton = false;
-        $scope.segmentsCreatedName = [];
-        var checkSegments = function (err) {
-            if (err) {
-                return err;
-            }
+        CurrentAppService.getCurrentApp()
+            .then(function (currentApp) {
+                console.log("Promise Resolved: ", currentApp);
 
-            if (segmentService.getSegments()
-                .length > 0) {
-                for (var i = 0; i < segmentService.getSegments()
-                    .length; i++) {
-                    $scope.segmentsCreatedName.push({
-                        id: segmentService.getSegments()[i]._id,
-                        name: segmentService.getSegments()[i].name
-                    })
-                    // $scope.segmentsCreatedName[i] = segmentService.getSegments()[i].name;
+                $scope.showSaveButton = false;
+                $scope.segmentsCreatedName = [];
+                var checkSegments = function (err) {
+                    if (err) {
+                        return err;
+                    }
+
+                    if (segmentService.getSegments()
+                        .length > 0) {
+                        for (var i = 0; i < segmentService.getSegments()
+                            .length; i++) {
+                            $scope.segmentsCreatedName.push({
+                                id: segmentService.getSegments()[i]
+                                    ._id,
+                                name: segmentService.getSegments()[
+                                    i].name
+                            })
+                        };
+                        $scope.segmentsCreated = true;
+                        console.log("$scope.segmentName: ", $scope.segmentsCreatedName);
+                    } else {
+                        $scope.segmentsCreated = false;
+                    }
+                }
+
+                modelsSegment.getAllSegments(currentApp._id,
+                    checkSegments);
+
+
+
+
+                var _ = lodash;
+
+                var stringify = function (obj, prefix) {
+                    if (_.isArray(obj)) {
+                        return stringifyArray(obj, prefix);
+                    } else if ('[object Object]' == Object.prototype.toString
+                        .call(
+                            obj)) {
+                        return stringifyObject(obj, prefix);
+                    } else if ('string' == typeof obj) {
+                        return stringifyString(obj, prefix);
+                    } else {
+                        return prefix + '=' + encodeURIComponent(
+                            String(obj));
+                    }
                 };
-                $scope.segmentsCreated = true;
-                console.log("$scope.segmentName: ", $scope.segmentsCreatedName);
-            } else {
-                $scope.segmentsCreated = false;
-            }
-        }
-        if (AppService.getCurrentApp()
-            ._id != null) {
-            modelsSegment.getAllSegments(AppService.getCurrentApp()
-                ._id, checkSegments);
-        }
-
-
-
-
-        var _ = lodash;
-
-        var stringify = function (obj, prefix) {
-            if (_.isArray(obj)) {
-                return stringifyArray(obj, prefix);
-            } else if ('[object Object]' == Object.prototype.toString.call(
-                obj)) {
-                return stringifyObject(obj, prefix);
-            } else if ('string' == typeof obj) {
-                return stringifyString(obj, prefix);
-            } else {
-                return prefix + '=' + encodeURIComponent(String(obj));
-            }
-        };
-
-        /**
-         * Stringify the given `str`.
-         *
-         * @param {String} str
-         * @param {String} prefix
-         * @return {String}
-         * @api private
-         */
-
-        function stringifyString(str, prefix) {
-            if (!prefix) throw new TypeError('stringify expects an object');
-            return prefix + '=' + encodeURIComponent(str);
-        }
-
-        /**
-         * Stringify the given `arr`.
-         *
-         * @param {Array} arr
-         * @param {String} prefix
-         * @return {String}
-         * @api private
-         */
-
-        function stringifyArray(arr, prefix) {
-            var ret = [];
-            if (!prefix) throw new TypeError('stringify expects an object');
-            for (var i = 0; i < arr.length; i++) {
-                ret.push(stringify(arr[i], prefix + '[' + i + ']'));
-            }
-            return ret.join('&');
-        }
-
-        /**
-         * Stringify the given `obj`.
-         *
-         * @param {Object} obj
-         * @param {String} prefix
-         * @return {String}
-         * @api private
-         */
-
-        function stringifyObject(obj, prefix) {
-            var ret = [],
-                keys = _.keys(obj),
-                key;
-
-            for (var i = 0, len = keys.length; i < len; ++i) {
-                key = keys[i];
-                if ('' == key) continue;
-                if (null == obj[key]) {
-                    ret.push(encodeURIComponent(key) + '=');
-                } else {
-                    ret.push(stringify(obj[key], prefix ? prefix + '[' +
-                        encodeURIComponent(
-                            key) + ']' : encodeURIComponent(key)));
-                }
-            }
-
-            return ret.join('&');
-        }
-
-        var allActions = [];
-
-        var attributes = [];
-
-        var fillData = function (err) {
-
-            if (err) {
-                return;
-            }
-
-            for (var i = 0; i < eventNames.getEvents()
-                .length; i++) {
-                allActions.push({
-                    name: eventNames.getEvents()[i].name,
-                    type: eventNames.getEvents()[i].type
-                })
-            };
-
-            for (var i = 0; i < userAttributes.getUserAttributes()
-                .length; i++) {
-                attributes.push({
-                    name: userAttributes.getUserAttributes()[i]
-                })
-            };
-
-
-
-            console.log("allActions: ", allActions)
-
-
-            console.log("inside UserListCtrl loginProvider: ", login.getLoggedIn());
-            $scope.state = 'form-control';
-            $scope.isErr = '';
-            $scope.method = 'count';
-            $scope.checkMethod = true;
-            $scope.rootOperator = 'and';
-            $scope.newFilterArray = [{
-                    method: 'hasdone',
-                    name: 'Create new chat',
-                    op: '',
-                    val: ''
-                },
-
-                {
-                    method: 'count',
-                    name: 'Logged In',
-                    op: 'gt',
-                    val: 20
-                }
-            ]
-
-
-            $scope.selectFilter = 'Users';
-            $scope.hasNotDoneItems = [];
-            $scope.hasNotDoneItems = allActions;
-            $scope.hasDoneItems = [];
-            $scope.hasDoneItems = allActions;
-            $scope.countOfItems = [];
-            $scope.countOfItems = allActions;
-            $scope.hasDoneOrHasNotDoneClicked = false;
-            $scope.hasCountOfClicked = true;
-
-            $scope.attributes = [];
-            $scope.attributes = attributes;
-
-            $scope.changeFilterAttribute = function (parentindex, index,
-                evt) {
-                $scope.filters[parentindex].checkMethod = true;
-                $scope.filters[parentindex].btntext = $scope.attributes[
-                    index].name;
-                $scope.filters[parentindex].method = 'attr';
-                $scope.filters[parentindex].name = $scope.attributes[
-                    index].name;
-                $scope.filters[parentindex].type = '';
-            }
-
-            $scope.changeFilterHasDone = function (parentindex, index, evt) {
-                $scope.method = 'hasdone';
-                $scope.filters[parentindex].checkMethod = false;
-                console.log("has done: ", parentindex);
-                $scope.filters[parentindex].btntext = 'Has Done';
-                $scope.filters[parentindex].method = 'hasdone';
-                $scope.filters[parentindex].name = $scope.hasDoneItems[
-                    index].name;
-                $scope.filters[parentindex].op = '';
-                $scope.filters[parentindex].optext = '';
-                $scope.filters[parentindex].val = '';
-                $scope.filters[parentindex].type = $scope.hasDoneItems[
-                    index].type;
-
-
-                // $scope.hasDoneOrHasNotDone = true;
-                // $scope.textHasDoneNotHasDone = $scope.hasDoneItems[index].name;
-                // $scope.hasDoneOrHasNotDoneClicked = true;
-                // $scope.hasCountOfClicked = false;
-                // $scope.selectFilterHasOrHasNotDone = 'Has done ';
-                // console.log("index: ", index);
-            }
-
-            $scope.changeFilterHasNotDone = function (parentindex, index,
-                evt) {
-                $scope.method = 'hasnotdone';
-                $scope.filters[parentindex].checkMethod = false;
-                console.log("has not done: ", parentindex);
-                $scope.filters[parentindex].method = 'hasnotdone';
-                $scope.filters[parentindex].btntext = 'Has Not Done ';
-                $scope.filters[parentindex].name = $scope.hasNotDoneItems[
-                    index].name;
-                $scope.filters[parentindex].op = '';
-                $scope.filters[parentindex].optext = '';
-                $scope.filters[parentindex].val = '';
-                $scope.filters[parentindex].type = $scope.hasNotDoneItems[
-                    index].type;
-                console.log($scope.filters);
-
-
-
-                // $scope.hasDoneOrHasNotDone = true;
-                // $scope.textHasDoneNotHasDone = $scope.hasDoneItems[index].name;
-                // $scope.hasDoneOrHasNotDoneClicked = true;
-                // $scope.hasCountOfClicked = false;
-                // $scope.selectFilterHasOrHasNotDone = 'Has not done';
-                // console.log("index: ", index);
-            }
-
-
-
-            $scope.changeFilterCountOf = function (parentindex, index, evt) {
-                $scope.method = 'count';
-                $scope.filters[parentindex].checkMethod = true;
-                console.log("count: ", parentindex);
-                $scope.filters[parentindex].method = 'count';
-                $scope.filters[parentindex].btntext = 'Count Of ' + $scope
-                    .countOfItems[
-                        index].name;
-                $scope.filters[parentindex].name = $scope
-                    .countOfItems[
-                        index].name;
-                $scope.filters[parentindex].type = $scope.countOfItems[
-                    index].type;
-
-
-
-                // $scope.hasDoneOrHasNotDone = false;
-                // $scope.hasCountOfClicked = true;
-                // $scope.hasDoneOrHasNotDoneClicked = false;
-                // console.log("index: ", index);
-            }
-
-            // $scope.isActive = function (viewLocation) {
-            //     return viewLocation === $location.path();
-            // };
-
-
-            var segments = segment.get.all();
-            $scope.dropdown = [];
-            for (var i = segments.length - 1; i >= 0; i--) {
-                $scope.dropdown.push({
-                    text: segments[i].name
-                });
-            };
-
-
-            $scope.segments = segment.get.all();
-            $scope.segmenticons = [];
-            $scope.selectedIcon = $scope.segments[0].name;
-
-            for (var i = $scope.segments.length - 1; i >= 0; i--) {
-                $scope.segmenticons.push({
-                    value: $scope.segments[i].name,
-                    label: $scope.segments[i].name
-                })
-            };
-
-
-            $scope.queries = queryMatching.get.all();
-            $scope.query = [];
-            $scope.queryDisplayed = $scope.queries[0].name;
-            $scope.selectedQuery = queryMatching.get.selected();
-            $scope.selectedqueries = [];
-            for (var i = 0; i <= $scope.queries.length - 1; i++) {
-                $scope.selectedqueries.push({
-                    value: $scope.queries[i].name,
-                    label: $scope.queries[i].name
-                })
-            };
-
-
-            $scope.chngquery = function (parentindex, index) {
-                console.log("parentindex: ", parentindex);
-                $scope.filters[parentindex].optext = $scope.queries[index]
-                    .name;
-                $scope.filters[parentindex].op = $scope.queries[index].key;
-                console.log($scope.filters[parentindex].op);
-                console.log($scope.filters);
-            }
-
-
-            console.log("queryDisplayed: ", $scope.queryDisplayed);
-
-            $scope.text = 'AND';
-            $scope.segmentFilterCtrl = segment.get.selected();
-            $scope.queryFilterCtrl = queryMatching.get.selected();
-            $scope.filters = [];
-            $scope.addAnotherFilter = function addAnotherFilter() {
-                $scope.checkMethod = true;
-                $scope.filters.push({
-                    method: 'count',
-                    btntext: 'Choose',
-                    checkMethod: 'true',
-                    name: '',
-                    op: 'eq',
-                    optext: 'equal',
-                    val: '',
-                    type: ''
-                })
-                if ($scope.filters.length > 0) {
-                    $scope.showSaveButton = true;
-                }
-            }
-
-            $scope.removeFilter = function removeFilter(
-                filterToRemove) {
-                var index = $scope.filters.indexOf(
-                    filterToRemove);
-                $scope.filters.splice(index, 1);
-                if ($scope.filters.length == 0) {
-                    $scope.showSaveButton = false;
-                }
-            }
-            $scope.switchAndOr = function switchAndOr() {
-                if ($scope.text === 'AND') {
-                    $scope.text = 'OR'
-                } else {
-                    $scope.text = 'AND'
-                }
-            }
-
-            var populateTable = function () {
-
-                if (err) {
-                    return err;
-                }
-                $scope.users = [];
-                if (UserList.getUsers()
-                    .length > 0) {
-                    $scope.showUsers = true;
-                }
-                for (var i = 0; i < UserList.getUsers()
-                    .length; i++) {
-                    $scope.users.push({
-                        id: UserList.getUsers()[i]._id,
-                        email: UserList.getUsers()[i].email,
-                        userkarma: UserList.getUsers()[i].healthScore,
-                        datejoined: moment(UserList.getUsers()[i].firstSessionAt)
-                            .format("MMMM Do YYYY"),
-                        unsubscribed: UserList.getUsers()[i].unsubscribed
-                    })
-                };
-
-                $scope.columns = [{
-                    title: '',
-                    field: 'checkbox',
-                    visible: true
-                }, {
-                    title: 'Email',
-                    field: 'email',
-                    visible: true
-                }, {
-                    title: 'User Karma',
-                    field: 'userkarma',
-                    visible: true
-                }, {
-                    title: 'Date Joined',
-                    field: 'datejoined',
-                    visible: true
-                }, {
-                    title: 'Unsubscribed',
-                    field: 'unsubscribed',
-                    visible: true
-                }];
 
                 /**
-                 * Reference: http://plnkr.co/edit/dtlKAHwy99jdnWVU0pc8?p=preview
+                 * Stringify the given `str`.
                  *
+                 * @param {String} str
+                 * @param {String} prefix
+                 * @return {String}
+                 * @api private
                  */
 
-                $scope.refreshTable = function () {
-                    $scope['tableParams'] = {
-                        reload: function () {},
-                        settings: function () {
-                            return {}
+                function stringifyString(str, prefix) {
+                    if (!prefix) throw new TypeError(
+                        'stringify expects an object');
+                    return prefix + '=' + encodeURIComponent(str);
+                }
+
+                /**
+                 * Stringify the given `arr`.
+                 *
+                 * @param {Array} arr
+                 * @param {String} prefix
+                 * @return {String}
+                 * @api private
+                 */
+
+                function stringifyArray(arr, prefix) {
+                    var ret = [];
+                    if (!prefix) throw new TypeError(
+                        'stringify expects an object');
+                    for (var i = 0; i < arr.length; i++) {
+                        ret.push(stringify(arr[i], prefix + '[' + i +
+                            ']'));
+                    }
+                    return ret.join('&');
+                }
+
+                /**
+                 * Stringify the given `obj`.
+                 *
+                 * @param {Object} obj
+                 * @param {String} prefix
+                 * @return {String}
+                 * @api private
+                 */
+
+                function stringifyObject(obj, prefix) {
+                    var ret = [],
+                        keys = _.keys(obj),
+                        key;
+
+                    for (var i = 0, len = keys.length; i < len; ++i) {
+                        key = keys[i];
+                        if ('' == key) continue;
+                        if (null == obj[key]) {
+                            ret.push(encodeURIComponent(key) + '=');
+                        } else {
+                            ret.push(stringify(obj[key], prefix ?
+                                prefix + '[' +
+                                encodeURIComponent(
+                                    key) + ']' :
+                                encodeURIComponent(key)));
                         }
+                    }
+
+                    return ret.join('&');
+                }
+
+                var allActions = [];
+
+                var attributes = [];
+
+                var fillData = function (err) {
+
+                    if (err) {
+                        return;
+                    }
+
+                    for (var i = 0; i < eventNames.getEvents()
+                        .length; i++) {
+                        allActions.push({
+                            name: eventNames.getEvents()[i].name,
+                            type: eventNames.getEvents()[i].type
+                        })
                     };
-                    $timeout(setTable, 100)
-                };
-                $scope.refreshTable();
 
-                function setTable(arguments) {
+                    for (var i = 0; i < userAttributes.getUserAttributes()
+                        .length; i++) {
+                        attributes.push({
+                            name: userAttributes.getUserAttributes()[
+                                i]
+                        })
+                    };
 
-                    $scope.tableParams = new ngTableParams({
-                        page: 1, // show first page
-                        count: 10, // count per page
-                        filter: {
-                            name: '' // initial filter
+
+
+                    console.log("allActions: ", allActions)
+
+
+                    console.log("inside UserListCtrl loginProvider: ",
+                        login.getLoggedIn());
+                    $scope.state = 'form-control';
+                    $scope.isErr = '';
+                    $scope.method = 'count';
+                    $scope.checkMethod = true;
+                    $scope.rootOperator = 'and';
+                    $scope.newFilterArray = [{
+                            method: 'hasdone',
+                            name: 'Create new chat',
+                            op: '',
+                            val: ''
                         },
-                        sorting: {
-                            name: 'asc'
+
+                        {
+                            method: 'count',
+                            name: 'Logged In',
+                            op: 'gt',
+                            val: 20
                         }
-                    }, {
-                        filterSwitch: true,
-                        total: $scope.users.length, // length of data
-                        getData: function ($defer, params) {
-                            var orderedData = params.sorting() ?
-                                $filter('orderBy')($scope.users,
-                                    params.orderBy()) :
-                                $scope.users;
-                            params.total(orderedData.length);
-                            $defer.resolve(orderedData.slice((params.page() -
-                                    1) * params.count(), params.page() *
-                                params.count()));
+                    ]
+
+
+                    $scope.selectFilter = 'Users';
+                    $scope.hasNotDoneItems = [];
+                    $scope.hasNotDoneItems = allActions;
+                    $scope.hasDoneItems = [];
+                    $scope.hasDoneItems = allActions;
+                    $scope.countOfItems = [];
+                    $scope.countOfItems = allActions;
+                    $scope.hasDoneOrHasNotDoneClicked = false;
+                    $scope.hasCountOfClicked = true;
+
+                    $scope.attributes = [];
+                    $scope.attributes = attributes;
+
+                    $scope.changeFilterAttribute = function (
+                        parentindex, index,
+                        evt) {
+                        $scope.filters[parentindex].checkMethod = true;
+                        $scope.filters[parentindex].btntext = $scope.attributes[
+                            index].name;
+                        $scope.filters[parentindex].method = 'attr';
+                        $scope.filters[parentindex].name = $scope.attributes[
+                            index].name;
+                        $scope.filters[parentindex].type = '';
+                    }
+
+                    $scope.changeFilterHasDone = function (parentindex,
+                        index, evt) {
+                        $scope.method = 'hasdone';
+                        $scope.filters[parentindex].checkMethod =
+                            false;
+                        console.log("has done: ", parentindex);
+                        $scope.filters[parentindex].btntext =
+                            'Has Done';
+                        $scope.filters[parentindex].method = 'hasdone';
+                        $scope.filters[parentindex].name = $scope.hasDoneItems[
+                            index].name;
+                        $scope.filters[parentindex].op = '';
+                        $scope.filters[parentindex].optext = '';
+                        $scope.filters[parentindex].val = '';
+                        $scope.filters[parentindex].type = $scope.hasDoneItems[
+                            index].type;
+                    }
+
+                    $scope.changeFilterHasNotDone = function (
+                        parentindex, index,
+                        evt) {
+                        $scope.method = 'hasnotdone';
+                        $scope.filters[parentindex].checkMethod =
+                            false;
+                        console.log("has not done: ", parentindex);
+                        $scope.filters[parentindex].method =
+                            'hasnotdone';
+                        $scope.filters[parentindex].btntext =
+                            'Has Not Done ';
+                        $scope.filters[parentindex].name = $scope.hasNotDoneItems[
+                            index].name;
+                        $scope.filters[parentindex].op = '';
+                        $scope.filters[parentindex].optext = '';
+                        $scope.filters[parentindex].val = '';
+                        $scope.filters[parentindex].type = $scope.hasNotDoneItems[
+                            index].type;
+                        console.log($scope.filters);
+                    }
+
+
+
+                    $scope.changeFilterCountOf = function (parentindex,
+                        index, evt) {
+                        $scope.method = 'count';
+                        $scope.filters[parentindex].checkMethod = true;
+                        console.log("count: ", parentindex);
+                        $scope.filters[parentindex].method = 'count';
+                        $scope.filters[parentindex].btntext =
+                            'Count Of ' + $scope
+                            .countOfItems[
+                                index].name;
+                        $scope.filters[parentindex].name = $scope
+                            .countOfItems[
+                                index].name;
+                        $scope.filters[parentindex].type = $scope.countOfItems[
+                            index].type;
+                    }
+
+                    var segments = segment.get.all();
+                    $scope.dropdown = [];
+                    for (var i = segments.length - 1; i >= 0; i--) {
+                        $scope.dropdown.push({
+                            text: segments[i].name
+                        });
+                    };
+
+
+                    $scope.segments = segment.get.all();
+                    $scope.segmenticons = [];
+                    $scope.selectedIcon = $scope.segments[0].name;
+
+                    for (var i = $scope.segments.length - 1; i >= 0; i--) {
+                        $scope.segmenticons.push({
+                            value: $scope.segments[i].name,
+                            label: $scope.segments[i].name
+                        })
+                    };
+
+
+                    $scope.queries = queryMatching.get.all();
+                    $scope.query = [];
+                    $scope.queryDisplayed = $scope.queries[0].name;
+                    $scope.selectedQuery = queryMatching.get.selected();
+                    $scope.selectedqueries = [];
+                    for (var i = 0; i <= $scope.queries.length - 1; i++) {
+                        $scope.selectedqueries.push({
+                            value: $scope.queries[i].name,
+                            label: $scope.queries[i].name
+                        })
+                    };
+
+
+                    $scope.chngquery = function (parentindex, index) {
+                        console.log("parentindex: ", parentindex);
+                        $scope.filters[parentindex].optext = $scope.queries[
+                            index]
+                            .name;
+                        $scope.filters[parentindex].op = $scope.queries[
+                            index].key;
+                        console.log($scope.filters[parentindex].op);
+                        console.log($scope.filters);
+                    }
+
+
+                    console.log("queryDisplayed: ", $scope.queryDisplayed);
+
+                    $scope.text = 'AND';
+                    $scope.segmentFilterCtrl = segment.get.selected();
+                    $scope.queryFilterCtrl = queryMatching.get.selected();
+                    $scope.filters = [];
+                    $scope.addAnotherFilter = function addAnotherFilter() {
+                        $scope.checkMethod = true;
+                        $scope.filters.push({
+                            method: 'count',
+                            btntext: 'Choose',
+                            checkMethod: 'true',
+                            name: '',
+                            op: 'eq',
+                            optext: 'equal',
+                            val: '',
+                            type: ''
+                        })
+                        if ($scope.filters.length > 0) {
+                            $scope.showSaveButton = true;
                         }
-                    });
-                }
-            }
+                    }
+
+                    $scope.removeFilter = function removeFilter(
+                        filterToRemove) {
+                        var index = $scope.filters.indexOf(
+                            filterToRemove);
+                        $scope.filters.splice(index, 1);
+                        if ($scope.filters.length == 0) {
+                            $scope.showSaveButton = false;
+                        }
+                    }
+                    $scope.switchAndOr = function switchAndOr() {
+                        if ($scope.text === 'AND') {
+                            $scope.text = 'OR'
+                        } else {
+                            $scope.text = 'AND'
+                        }
+                    }
+
+                    var populateTable = function () {
+
+                        if (err) {
+                            return err;
+                        }
+                        $scope.users = [];
+                        if (UserList.getUsers()
+                            .length > 0) {
+                            $scope.showUsers = true;
+                        }
+                        for (var i = 0; i < UserList.getUsers()
+                            .length; i++) {
+                            $scope.users.push({
+                                id: UserList.getUsers()[i]._id,
+                                email: UserList.getUsers()[i].email,
+                                userkarma: UserList.getUsers()[i].healthScore,
+                                datejoined: moment(UserList.getUsers()[
+                                    i].firstSessionAt)
+                                    .format("MMMM Do YYYY"),
+                                unsubscribed: UserList.getUsers()[
+                                    i].unsubscribed
+                            })
+                        };
+
+                        $scope.columns = [{
+                            title: '',
+                            field: 'checkbox',
+                            visible: true
+                        }, {
+                            title: 'Email',
+                            field: 'email',
+                            visible: true
+                        }, {
+                            title: 'User Karma',
+                            field: 'userkarma',
+                            visible: true
+                        }, {
+                            title: 'Date Joined',
+                            field: 'datejoined',
+                            visible: true
+                        }, {
+                            title: 'Unsubscribed',
+                            field: 'unsubscribed',
+                            visible: true
+                        }];
+
+                        /**
+                         * Reference: http://plnkr.co/edit/dtlKAHwy99jdnWVU0pc8?p=preview
+                         *
+                         */
+
+                        $scope.refreshTable = function () {
+                            $scope['tableParams'] = {
+                                reload: function () {},
+                                settings: function () {
+                                    return {}
+                                }
+                            };
+                            $timeout(setTable, 100)
+                        };
+                        $scope.refreshTable();
+
+                        function setTable(arguments) {
+
+                            $scope.tableParams = new ngTableParams({
+                                page: 1, // show first page
+                                count: 10, // count per page
+                                filter: {
+                                    name: '' // initial filter
+                                },
+                                sorting: {
+                                    name: 'asc'
+                                }
+                            }, {
+                                filterSwitch: true,
+                                total: $scope.users.length, // length of data
+                                getData: function ($defer, params) {
+                                    var orderedData = params.sorting() ?
+                                        $filter('orderBy')($scope.users,
+                                            params.orderBy()) :
+                                        $scope.users;
+                                    params.total(orderedData.length);
+                                    $defer.resolve(orderedData.slice(
+                                        (params.page() -
+                                            1) * params.count(),
+                                        params.page() *
+                                        params.count()));
+                                }
+                            });
+                        }
+                    }
 
 
-            $scope.queryObj = {};
+                    $scope.queryObj = {};
 
-            $scope.showErrorOnInput = true;
-            $scope.runQuery = function () {
-                $scope.showErrorOnInput = true;
-                for (var i = 0; i < $scope.filters.length; i++) {
-                    console.log("val: ", $scope.filters[i].val);
-                    if ($scope.filters[i].val == '' && ($scope.filters[i].method ==
-                        'count' || $scope.filters[i].method == 'attr')) {
-                        console.log("val: ", $scope.filters[i].val);
+                    $scope.showErrorOnInput = true;
+                    $scope.runQuery = function () {
                         $scope.showErrorOnInput = true;
-                        $scope.showErr = true;
-                        return;
-                        // $scope.isErr = 'error';
-                        // console.log("error class", $scope.isErr);
-                    } else {
-                        $scope.showErr = false;
-                        // $scope.isErr = '';
+                        for (var i = 0; i < $scope.filters.length; i++) {
+                            console.log("val: ", $scope.filters[i].val);
+                            if ($scope.filters[i].val == '' && ($scope
+                                .filters[i].method ==
+                                'count' || $scope.filters[i].method ==
+                                'attr')) {
+                                console.log("val: ", $scope.filters[i]
+                                    .val);
+                                $scope.showErrorOnInput = true;
+                                $scope.showErr = true;
+                                return;
+                                // $scope.isErr = 'error';
+                                // console.log("error class", $scope.isErr);
+                            } else {
+                                $scope.showErr = false;
+                                // $scope.isErr = '';
+                            }
+                        };
+                        $scope.filtersBackend = [];
+                        console.log("run Query: ", $scope.filters);
+                        for (var i = 0; i < $scope.filters.length; i++) {
+                            $scope.filtersBackend.push({
+                                method: $scope.filters[i].method,
+                                type: 'feature',
+                                name: $scope.filters[i].name,
+                                op: $scope.filters[i].op,
+                                val: $scope.filters[i].val,
+                                type: $scope.filters[i].type
+
+                            })
+                        };
+
+                        $scope.queryObj.list = $scope.selectedIcon.toLowerCase();
+                        $scope.queryObj.op = $scope.text.toLowerCase();
+                        $scope.queryObj.filters = $scope.filtersBackend;
+
+                        var stringifiedQuery = stringify($scope.queryObj);
+                        console.log('queryObj', $scope.queryObj);
+                        console.log('stringifiedQuery',
+                            stringifiedQuery);
+
+
+                        modelsQuery.runQueryAndGetUsers(currentApp
+                            ._id, stringifiedQuery, populateTable);
+
                     }
-                };
-                $scope.filtersBackend = [];
-                console.log("run Query: ", $scope.filters);
-                for (var i = 0; i < $scope.filters.length; i++) {
-                    $scope.filtersBackend.push({
-                        method: $scope.filters[i].method,
-                        type: 'feature',
-                        name: $scope.filters[i].name,
-                        op: $scope.filters[i].op,
-                        val: $scope.filters[i].val,
-                        type: $scope.filters[i].type
 
-                    })
-                };
-
-                $scope.queryObj.list = $scope.selectedIcon.toLowerCase();
-                $scope.queryObj.op = $scope.text.toLowerCase();
-                $scope.queryObj.filters = $scope.filtersBackend;
-
-                var stringifiedQuery = stringify($scope.queryObj);
-                console.log('queryObj', $scope.queryObj);
-                console.log('stringifiedQuery', stringifiedQuery);
-
-                if (AppService.getCurrentApp()
-                    ._id != null) {
-                    modelsQuery.runQueryAndGetUsers(AppService.getCurrentApp()
-                        ._id, stringifiedQuery, populateTable);
-                }
-            }
-
-            $scope.saveQuery = function () {
-                for (var i = 0; i < $scope.filters.length; i++) {
-                    console.log("val: ", $scope.filters[i].val);
-                    if ($scope.filters[i].val == '' && ($scope.filters[i].method ==
-                        'count' || $scope.filters[i].method == 'attr')) {
-                        console.log("val: ", $scope.filters[i].val);
-                        $scope.showErr = true;
-                        return;
-                        // $scope.isErr = 'error';
-                        // console.log("error class", $scope.isErr);
-                    } else {
-                        $scope.showErr = false;
-                        // $scope.isErr = '';
+                    $scope.saveQuery = function () {
+                        for (var i = 0; i < $scope.filters.length; i++) {
+                            console.log("val: ", $scope.filters[i].val);
+                            if ($scope.filters[i].val == '' && ($scope
+                                .filters[i].method ==
+                                'count' || $scope.filters[i].method ==
+                                'attr')) {
+                                console.log("val: ", $scope.filters[i]
+                                    .val);
+                                $scope.showErr = true;
+                                return;
+                                // $scope.isErr = 'error';
+                                // console.log("error class", $scope.isErr);
+                            } else {
+                                $scope.showErr = false;
+                                // $scope.isErr = '';
+                            }
+                        };
+                        $scope.showPopover = !$scope.showPopover;
                     }
-                };
-                $scope.showPopover = !$scope.showPopover;
-            }
 
-            $scope.closePopover = function (event) {
-                event.preventDefault();
-                $scope.showPopover = false;
-            }
+                    $scope.closePopover = function (event) {
+                        event.preventDefault();
+                        $scope.showPopover = false;
+                    }
 
-            $scope.createSegmentObj = {};
-            $scope.createSegment = function () {
-                $scope.filtersBackend = [];
-                console.log("create segment: ", $scope.filters);
-                for (var i = 0; i < $scope.filters.length; i++) {
-                    $scope.filtersBackend.push({
-                        method: $scope.filters[i].method,
-                        type: 'feature',
-                        name: $scope.filters[i].name,
-                        op: $scope.filters[i].op,
-                        val: $scope.filters[i].val
+                    $scope.createSegmentObj = {};
+                    $scope.createSegment = function () {
+                        $scope.filtersBackend = [];
+                        console.log("create segment: ", $scope.filters);
+                        for (var i = 0; i < $scope.filters.length; i++) {
+                            $scope.filtersBackend.push({
+                                method: $scope.filters[i].method,
+                                type: 'feature',
+                                name: $scope.filters[i].name,
+                                op: $scope.filters[i].op,
+                                val: $scope.filters[i].val
 
-                    })
-                };
-                $scope.createSegmentObj.list = $scope.selectedIcon.toLowerCase();
-                $scope.createSegmentObj.name = $scope.segmentName;
-                $scope.createSegmentObj.op = $scope.text.toLowerCase();
-                $scope.createSegmentObj.filters = $scope.filtersBackend;
-                console.log("createSegmentObj: ", $scope.createSegmentObj);
+                            })
+                        };
+                        $scope.createSegmentObj.list = $scope.selectedIcon
+                            .toLowerCase();
+                        $scope.createSegmentObj.name = $scope.segmentName;
+                        $scope.createSegmentObj.op = $scope.text.toLowerCase();
+                        $scope.createSegmentObj.filters = $scope.filtersBackend;
+                        console.log("createSegmentObj: ", $scope.createSegmentObj);
 
-                modelsSegment.createSegment(AppService.getCurrentApp()
-                    ._id, $scope.createSegmentObj);
+                        modelsSegment.createSegment(currentApp._id,
+                            $scope.createSegmentObj);
 
 
-            }
+                    }
 
 
 
-            var populateFilterAndRunQuery = function () {
-                $scope.queryObject = {};
-                $scope.filtersFrontEnd = [];
-                var getFilters = [];
-                $scope.filters = [];
-                console.log("$scope.queries: ", $scope.queries);
-                getFilters = segmentService.getSingleSegment()
-                    .filters;
-                for (var i = 0; i < getFilters.length; i++) {
-                    var buttonText = '';
-                    var btnName = '';
-                    var chkMethod = false;
-                    var operationText = '';
-                    console.log("op text: ", getFilters[i].op);
-                    if (getFilters[i].op != '') {
-                        for (var j = 0; j < $scope.queries.length; j++) {
-                            console.log("$scope.queries[j]: ", $scope.queries[
-                                j]);
-                            if ($scope.queries[j].key == getFilters[i].op) {
-                                operationText = $scope.queries[j].name;
+                    var populateFilterAndRunQuery = function () {
+                        $scope.queryObject = {};
+                        $scope.filtersFrontEnd = [];
+                        var getFilters = [];
+                        $scope.filters = [];
+                        console.log("$scope.queries: ", $scope.queries);
+                        getFilters = segmentService.getSingleSegment()
+                            .filters;
+                        for (var i = 0; i < getFilters.length; i++) {
+                            var buttonText = '';
+                            var btnName = '';
+                            var chkMethod = false;
+                            var operationText = '';
+                            console.log("op text: ", getFilters[i].op);
+                            if (getFilters[i].op != '') {
+                                for (var j = 0; j < $scope.queries.length; j++) {
+                                    console.log("$scope.queries[j]: ",
+                                        $scope.queries[
+                                            j]);
+                                    if ($scope.queries[j].key ==
+                                        getFilters[i].op) {
+                                        operationText = $scope.queries[
+                                            j].name;
+                                    }
+                                };
+                            }
+                            if (getFilters[i].method == 'hasdone') {
+                                buttonText = "Has Done";
+                                btnName = getFilters[i].name;
+                                chkMethod = false;
+                            }
+                            if (getFilters[i].method == 'hasnotdone') {
+                                buttonText = "Has not Done";
+                                btnName = getFilters[i].name;
+                                chkMethod = false;
+                            }
+                            if (getFilters[i].method == 'count') {
+                                buttonText = "Count of " + getFilters[
+                                    i].name;
+                                btnName = getFilters[i].name;
+                                chkMethod = true;
+                            }
+                            if (getFilters[i].method == 'attr') {
+                                buttonText = getFilters[i].name;
+                                btnName = getFilters[i].name;
+                                chkMethod = true;
+                            }
+                            $scope.filters.push({
+                                method: getFilters[i].method,
+                                btntext: buttonText,
+                                checkMethod: chkMethod,
+                                name: btnName,
+                                op: getFilters[i].op,
+                                optext: operationText,
+                                val: getFilters[i].val
+                            })
+
+                        };
+                        $scope.queryObject.list = segmentService.getSingleSegment()
+                            .list;
+                        $scope.queryObject.op = segmentService.getSingleSegment()
+                            .op;
+                        $scope.queryObject.filters = $scope.getFilters;
+
+                        var stringifiedQueryObject = stringify($scope.queryObject);
+                        console.log('queryObj', $scope.queryObject);
+                        console.log('stringifiedQuery',
+                            stringifiedQueryObject);
+
+                        modelsQuery.runQueryAndGetUsers(currentApp._id,
+                            stringifiedQueryObject,
+                            populateTable);
+
+
+                    }
+
+                    $scope.showQuery = function (segId) {
+                        modelsSegment.getSegment(currentApp._id, segId,
+                            populateFilterAndRunQuery);
+                    }
+
+                    $scope.showErr = false;
+                    $scope.errMsg = 'Enter the outlined fields';
+                    $scope.errorclass = '';
+
+                    $scope.hideErrorAlert = function () {
+                        $scope.showErr = false;
+                    }
+
+                    $scope.isErr = 'error';
+
+                    $scope.popoverForm = function () {
+                        console.log($scope.filters);
+                        for (var i = 0; i < $scope.filters.length; i++) {
+                            console.log("val: ", $scope.filters[i].val);
+                            if ($scope.filters[i].val == '' && $scope.filters[
+                                    i].method ==
+                                'count') {
+                                console.log("val: ", $scope.filters[i]
+                                    .val);
+                                $scope.showErr = true;
+                            } else {
+                                $scope.showErr = false;
                             }
                         };
                     }
-                    if (getFilters[i].method == 'hasdone') {
-                        buttonText = "Has Done";
-                        btnName = getFilters[i].name;
-                        chkMethod = false;
-                    }
-                    if (getFilters[i].method == 'hasnotdone') {
-                        buttonText = "Has not Done";
-                        btnName = getFilters[i].name;
-                        chkMethod = false;
-                    }
-                    if (getFilters[i].method == 'count') {
-                        buttonText = "Count of " + getFilters[i].name;
-                        btnName = getFilters[i].name;
-                        chkMethod = true;
-                    }
-                    if (getFilters[i].method == 'attr') {
-                        buttonText = getFilters[i].name;
-                        btnName = getFilters[i].name;
-                        chkMethod = true;
-                    }
-                    $scope.filters.push({
-                        method: getFilters[i].method,
-                        btntext: buttonText,
-                        checkMethod: chkMethod,
-                        name: btnName,
-                        op: getFilters[i].op,
-                        optext: operationText,
-                        val: getFilters[i].val
-                    })
 
-                };
-                $scope.queryObject.list = segmentService.getSingleSegment()
-                    .list;
-                $scope.queryObject.op = segmentService.getSingleSegment()
-                    .op;
-                $scope.queryObject.filters = $scope.getFilters;
-
-                var stringifiedQueryObject = stringify($scope.queryObject);
-                console.log('queryObj', $scope.queryObject);
-                console.log('stringifiedQuery', stringifiedQueryObject);
-
-                modelsQuery.runQueryAndGetUsers(AppService.getCurrentApp()
-                    ._id, stringifiedQueryObject, populateTable);
+                }
 
 
-            }
-
-            $scope.showQuery = function (segId) {
-                modelsSegment.getSegment(AppService.getCurrentApp()
-                    ._id, segId, populateFilterAndRunQuery);
-            }
-
-            $scope.showErr = false;
-            $scope.errMsg = 'Enter the outlined fields';
-            $scope.errorclass = '';
-
-            $scope.hideErrorAlert = function () {
-                $scope.showErr = false;
-            }
-
-            $scope.isErr = 'error';
-
-            $scope.popoverForm = function () {
-                console.log($scope.filters);
-                for (var i = 0; i < $scope.filters.length; i++) {
-                    console.log("val: ", $scope.filters[i].val);
-                    if ($scope.filters[i].val == '' && $scope.filters[i].method ==
-                        'count') {
-                        console.log("val: ", $scope.filters[i].val);
-                        $scope.showErr = true;
-                    } else {
-                        $scope.showErr = false;
-                    }
-                };
-            }
-
-        }
+                console.log("App Id: ", currentApp._id);
 
 
-        console.log("App Id: ", AppService.getCurrentApp()
-            ._id);
+                modelsQuery.getQueries(currentApp._id, fillData);
 
-        if (AppService.getCurrentApp()
-            ._id != null) {
-            modelsQuery.getQueries(AppService.getCurrentApp()
-                ._id, fillData);
-        }
 
-        $scope.title = "Write Message";
+                $scope.title = "Write Message";
 
-        var popupModal = $modal({
-            scope: $scope,
-            template: '/templates/usersmodule/message.modal.html',
-            show: false
-        });
+                var popupModal = $modal({
+                    scope: $scope,
+                    template: '/templates/usersmodule/message.modal.html',
+                    show: false
+                });
 
-        $scope.mail = [];
-        $scope.openModal = function () {
-            popupModal.show();
-            console.log("checkboxes items: ", $scope.checkboxes.items);
-            /*Object.keys(obj)
+                $scope.mail = [];
+                $scope.openModal = function () {
+                    popupModal.show();
+                    console.log("checkboxes items: ", $scope.checkboxes
+                        .items);
+                    /*Object.keys(obj)
                 .forEach(function (key) {
                     f(key, obj[key])
                 });*/
-            var prop, value;
-            var keys = Object.keys($scope.checkboxes.items);
-            for (var i = 0; i < Object.keys($scope.checkboxes.items)
-                .length; i++) {
-                prop = keys[i];
-                console.log("id: ", prop);
-                value = $scope.checkboxes.items[prop];
-                console.log("value: ", value);
-                if (value) {
-                    $scope.mail[i] = prop;
-                }
-            };
-            console.log("email objects: ", $scope.mail);
-            UidService.set($scope.mail);
+                    var prop, value;
+                    var keys = Object.keys($scope.checkboxes.items);
+                    for (var i = 0; i < Object.keys($scope.checkboxes.items)
+                        .length; i++) {
+                        prop = keys[i];
+                        console.log("id: ", prop);
+                        value = $scope.checkboxes.items[prop];
+                        console.log("value: ", value);
+                        if (value) {
+                            $scope.mail[i] = prop;
+                        }
+                    };
+                    console.log("email objects: ", $scope.mail);
+                    UidService.set($scope.mail);
 
-        };
+                };
 
 
-        var data = [];
-        $scope.users = []
+                var data = [];
+                $scope.users = []
 
-        $scope.checkboxes = {
-            'checked': false,
-            items: {}
-        };
+                $scope.checkboxes = {
+                    'checked': false,
+                    items: {}
+                };
 
-        console.log("checkboxes: ", $scope.checkboxes);
+                console.log("checkboxes: ", $scope.checkboxes);
 
-        $scope.$watch('checkboxes.items', function (value) {
-            console.log("$watch checkboxes: ", $scope.checkboxes.items);
-        })
+                $scope.$watch('checkboxes.items', function (value) {
+                    console.log("$watch checkboxes: ", $scope.checkboxes
+                        .items);
+                })
+
+            })
     }
 ])
 

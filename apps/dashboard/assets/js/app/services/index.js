@@ -13,4 +13,5 @@ angular.module('services', [
     'services.UserList',
     'services.segmentService',
     'services.AutoMsgService',
+    'services.CurrentAppService',
 ]);
