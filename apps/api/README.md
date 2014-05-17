@@ -310,6 +310,7 @@ User          | companies, notes        | users of a specific app. create a new 
 - clicked
 - creator (account id) (required)
 - ct
+- lastQueued (timestamp)
 - replied
 - seen
 - sent
