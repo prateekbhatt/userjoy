@@ -349,16 +349,12 @@ User          | companies, notes        | users of a specific app. create a new 
 
 ##### Columns:
 
-- accid
-- aid
 - amId
 - body
 - ct
 - seen (boolean)
 - sender
-- title
 - uid
-- ut
 
 ##### Notes:
 

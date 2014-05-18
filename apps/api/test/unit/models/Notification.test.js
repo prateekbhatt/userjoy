@@ -30,7 +30,7 @@ describe('Model Notification', function () {
 
   describe('#create', function () {
 
-    it('should return error if accid/aid/body/title/uid is not provided',
+    it('should return error if amId/body/uid is not provided',
       function (done) {
 
         var newNotf = {};
@@ -42,22 +42,13 @@ describe('Model Notification', function () {
 
           expect(Object.keys(err.errors)
             .length)
-            .to.eql(6);
-
-          expect(err.errors.accid.message)
-            .to.eql('Invalid account id');
-
-          expect(err.errors.aid.message)
-            .to.eql('Invalid aid');
+            .to.eql(3);
 
           expect(err.errors.amId.message)
             .to.eql('Invalid automessage id');
 
           expect(err.errors.body.message)
             .to.eql('Provide notification body');
-
-          expect(err.errors.title.message)
-            .to.eql('Provide notification title');
 
           expect(err.errors.uid.message)
             .to.eql('Invalid uid');
@@ -74,12 +65,9 @@ describe('Model Notification', function () {
     it('should create notification', function (done) {
 
       var newNotification = {
-        accid: ObjectId(),
-        aid: ObjectId(),
         amId: ObjectId(),
         body: 'Hello World',
         sender: 'Prateek Bhatt',
-        title: 'Subject I Am',
         uid: ObjectId(),
       };
 
@@ -93,17 +81,14 @@ describe('Model Notification', function () {
 
         savedNotification = notf;
 
-        expect(notf.aid.toString())
-          .to.eql(newNotification.aid.toString());
+        expect(notf.amId.toString())
+          .to.eql(newNotification.amId.toString());
 
-        expect(notf.body)
-          .to.eql(newNotification.body);
+        expect(notf)
+          .to.have.property('body', newNotification.body);
 
-        expect(notf.title)
-          .to.eql(newNotification.title);
-
-        expect(notf.sub)
-          .to.eql(newNotification.sub);
+        expect(notf)
+          .to.have.property('sender', newNotification.sender);
 
         expect(notf.uid.toString())
           .to.eql(newNotification.uid.toString());
@@ -114,25 +99,24 @@ describe('Model Notification', function () {
     });
 
     it('should add ct (created) timestamp', function () {
-
       expect(savedNotification)
         .to.have.property('ct');
 
     });
 
 
-    it('should add ut (updated) timestamp', function () {
-
+    it('should not add ut (updated) timestamp', function () {
+      // ut timestamp is not required in auto notifications
       expect(savedNotification)
-        .to.have.property('ut');
+        .to.not.have.property('ut');
 
     });
 
 
-    it('should add seen values as false', function () {
+    it('should add seen status as false', function () {
 
-      expect(savedNotification.seen)
-        .to.eql(false);
+      expect(savedNotification)
+        .to.have.property('seen', false);
 
     });
 
