@@ -1,10 +1,17 @@
 describe('Resource /apps', function () {
 
+  /**
+   * npm dependencies
+   */
+
+  var mongoose = require('mongoose');
+
+
   var newApp = {
     name: 'My New App'
-  },
+  };
 
-    randomId = '532d6bf862d673ba7131812a';
+  var randomId = mongoose.Types.ObjectId;
 
 
   before(function (done) {
@@ -198,7 +205,7 @@ describe('Resource /apps', function () {
       function (done) {
 
         request
-          .get('/apps/' + randomId)
+          .get('/apps/' + randomId())
           .expect('Content-Type', /json/)
           .expect(401)
           .end(done);
@@ -236,10 +243,8 @@ describe('Resource /apps', function () {
 
       function (done) {
 
-        var randomId = '5303570d9c554e7356000017';
-
         request
-          .get('/apps/' + randomId)
+          .get('/apps/' + randomId())
           .set('cookie', loginCookie)
           .expect('Content-Type', /json/)
           .expect(404)
@@ -316,6 +321,68 @@ describe('Resource /apps', function () {
             }
           })
           .end(done);
+
+      });
+
+  });
+
+
+  describe('POST /apps/:aid/invite', function () {
+
+    var testUrl;
+
+    before(function (done) {
+      testUrl = '/apps/' + saved.apps.first._id + '/invite';
+      logoutUser(done);
+    });
+
+    it('should return error if not logged in',
+
+      function (done) {
+
+        request
+          .post(testUrl)
+          .send({})
+          .expect('Content-Type', /json/)
+          .expect(401)
+          .end(done);
+
+      });
+
+
+    it('logging in user', function (done) {
+      loginUser(done);
+    });
+
+
+    it('should create and send new invite',
+
+      function (done) {
+
+        var newInvite = {
+          name: 'Prats',
+          email: 'prattbhatt@gmail.com'
+        };
+
+        request
+          .post(testUrl)
+          .send(newInvite)
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(201)
+          .end(function (err, res) {
+
+            expect(res.body)
+              .to.be.an("object");
+
+            expect(res.body)
+              .to.have.property("toEmail", newInvite.email);
+
+            expect(res.body)
+              .to.have.property("toName", newInvite.name);
+
+            done(err);
+          });
 
       });
 
