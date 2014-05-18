@@ -22,6 +22,7 @@ var App = require('../../api/models/App');
 var AutoMessage = require('../../api/models/AutoMessage');
 var Conversation = require('../../api/models/Conversation');
 var Message = require('../../api/models/Message');
+var Notification = require('../../api/models/Notification');
 var Segment = require('../../api/models/Segment');
 var User = require('../../api/models/User');
 
@@ -116,6 +117,21 @@ var accounts = {
     }
   };
 
+
+var notifications = {
+
+  first: {
+    accid: null,
+    aid: null,
+    amId: null,
+    sender: 'Prateek Bhatt',
+    title: 'New Title for Notification',
+    body: 'Hello World',
+    uid: null,
+  }
+};
+
+
 var segments = {
   first: {
     aid: null,
@@ -195,6 +211,18 @@ function createMessage(accid, aid, coId, uid, message, fn) {
   Message.create(message, fn);
 
 }
+
+
+function createNotification(accid, aid, amId, uid, notf, fn) {
+
+  notf.accid = accid;
+  notf.aid = aid;
+  notf.amId = amId;
+  notf.uid = uid;
+  Notification.create(notf, fn);
+
+}
+
 
 
 function createAutoMessage(accid, aid, sid, automessage, fn) {
@@ -369,6 +397,23 @@ module.exports = function loadFixtures(callback) {
 
     },
 
+
+    createFirstNotification: function (cb) {
+
+      var aid = apps.first._id;
+      var amId = automessages.first._id;
+      var accid = accounts.first._id;
+      var uid = users.first._id;
+      var notification = notifications.first;
+
+      createNotification(accid, aid, amId, uid, notification, function (err, notf) {
+        if (err) return cb(err);
+        notifications.first = notf;
+        cb();
+      });
+
+    },
+
   }, function (err) {
 
     var savedObj = {
@@ -377,6 +422,7 @@ module.exports = function loadFixtures(callback) {
       automessages: automessages,
       conversations: conversations,
       messages: messages,
+      notifications: notifications,
       segments: segments,
       users: users
     };

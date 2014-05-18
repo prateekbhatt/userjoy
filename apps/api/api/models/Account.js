@@ -176,7 +176,18 @@ AccountSchema.statics.verify = function (accountId, token, cb) {
       account.save(cb);
 
     });
-}
+};
+
+
+AccountSchema.methods.createVerifyToken = function (cb) {
+  var self = this;
+  self.verifyToken = mongoose.Types.ObjectId();
+  self.save(function (err, acc) {
+    if (err) return cb(err);
+    var verifyToken = self.verifyToken;
+    cb(null, acc, verifyToken);
+  });
+};
 
 
 /**

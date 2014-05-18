@@ -2,9 +2,10 @@
  * Module dependencies
  */
 
+var async = require('async');
+var path = require('path');
 var router = require('express')
-  .Router(),
-  async = require('async');
+  .Router();
 
 
 /**
@@ -12,15 +13,22 @@ var router = require('express')
  */
 
 var App = require('../models/App');
+var Invite = require('../models/Invite');
 
 
 /**
  * Policies
  */
 
-var isAuthenticated = require('../policies/isAuthenticated'),
-  hasAccess = require('../policies/hasAccess');
+var isAuthenticated = require('../policies/isAuthenticated');
+var hasAccess = require('../policies/hasAccess');
 
+
+/**
+ * Services
+ */
+
+var mailer = require('../services/mailer');
 
 
 /**
@@ -148,6 +156,93 @@ router
 
     })
   });
+
+
+// TODO:
+// add routes to:
+// 1. invite a new email to team member
+// 2. confirm invitation:
+//  - check if account already exists
+//    - if exists, add to team members
+//    - else create account, and then add to team members
+// 3. switch team members from among admin
+
+
+/**
+ * POST /apps/:aid/invite
+ *
+ * Sends invite to add a new team member
+ */
+
+router
+  .route('/:aid/invite')
+  .post(function (req, res, next) {
+
+    /**
+     * Apps Config
+     */
+
+    var config = require('../../../config')('api');
+
+    var aid = req.params.aid;
+    var email = req.body.email;
+    var name = req.body.name;
+    var uid = req.user._id;
+
+
+    async.waterfall(
+
+      [
+
+        function createInvite(cb) {
+
+          var newInvite = {
+            aid: aid,
+            from: uid,
+            toEmail: email,
+            toName: name
+          };
+
+          Invite.create(newInvite, cb);
+        },
+
+
+        function sendInviteEmail(invite, cb) {
+
+          var inviteId = invite._id.toString();
+
+          var inviteUrl = path.join(config.baseUrl, 'apps', aid, 'invite',
+            inviteId);
+
+          var mailOptions = {
+            locals: {
+              inviteUrl: inviteUrl,
+              userName: invite.toName,
+              appName: req.app.name
+            },
+            toEmail: invite.toEmail,
+            toName: invite.toName
+          };
+
+          mailer.sendInvite(mailOptions, function (err) {
+            cb(err, invite);
+          });
+        }
+
+      ],
+
+
+      function callback(err, invite) {
+        if (err) return next(err);
+
+        res
+          .status(201)
+          .json(invite);
+
+      }
+    );
+  });
+
 
 
 module.exports = router;

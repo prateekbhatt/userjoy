@@ -179,17 +179,17 @@ Mailer.prototype.sendUJMail = function (cb) {
 
 
 /**
- * Sends signup email
+ * Sends email confirmation email
  *
  * @param  {object} options contains the email and other local variables
  */
 
-exports.sendSignupMail = function (options, cb) {
+exports.sendConfirmation = function (options, cb) {
   var mailer = new Mailer(options);
   mailer.fromName = UJ_SUPPORT_NAME;
   mailer.fromEmail = UJ_SUPPORT_EMAIL;
-  mailer.subject = 'Welcome to DoDataDo';
-  mailer.template = 'signup/html.ejs';
+  mailer.subject = 'Welcome to UserJoy';
+  mailer.template = 'email-confirmation.ejs';
   mailer.sendUJMail(cb);
 };
 
@@ -227,4 +227,23 @@ exports.sendManualMessage = function (options, cb) {
   mailer.html = mailer.body;
 
   mailer.send(cb);
+};
+
+
+/**
+ * Sends invite to a new email, to join as a team member
+ *
+ * @param {object} options
+ * @param {function} cb callback
+ */
+
+exports.sendInvite = function (options, cb) {
+  var mailer = new Mailer(options);
+
+  mailer.fromName = UJ_SUPPORT_NAME;
+  mailer.fromEmail = UJ_SUPPORT_EMAIL;
+  mailer.subject = 'Invite to join UserJoy';
+  mailer.template = 'invite.ejs';
+
+  mailer.sendUJMail(cb);
 };

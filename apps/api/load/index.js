@@ -1,13 +1,29 @@
 /**
- * Module dependencies
+ * npm dependencies
  */
 
-var express = require('express'),
-  path = require('path'),
-  loadMiddleware = require('./middleware'),
-  loadRoutes = require('../config/routes'),
-  db = require('./db'),
-  async = require('async');
+var async = require('async');
+var express = require('express');
+var path = require('path');
+
+
+var db = require('./db');
+var loadMiddleware = require('./middleware');
+var loadRoutes = require('../config/routes');
+
+
+/**
+ * Jobs
+ */
+
+var automessageCron = require('../jobs/automessage');
+
+
+/**
+ * Helpers
+ */
+
+var logger = require('../helpers/logger');
 
 
 /**
@@ -58,35 +74,49 @@ exports.start = function startServer(done) {
   loadRoutes.error(app);
 
 
-  async.waterfall([
+  async.waterfall(
 
-    function (cb) {
+    [
 
-      db.connect(function (err, db) {
-        cb(err, db);
-      });
+      function connectDB(cb) {
 
-    },
+        db.connect(function (err, db) {
+          cb(err, db);
+        });
 
-    function (db, cb) {
+      },
 
-      var server = app.listen(app.get('port'), function () {
-        cb(null, db, app, server);
-      });
+      function startServer(db, cb) {
 
-    }
+        var server = app.listen(app.get('port'), function () {
+          cb(null, db, server);
+        });
 
-  ], function (err, db, app, server) {
+      },
 
-    if (err) {
-      return done(err);
-    }
+      function startCronJobs(db, server, cb) {
+        automessageCron();
+        cb(null, db, server);
+      }
 
-    printMessage(db, app);
+    ],
 
-    done && done(null, db, app);
+    function callback(err, db, server) {
 
-  });
+      if (err) {
+
+        logger.crit({
+          at: 'load/index',
+          err: err
+        });
+
+        return (done && done(err));
+      };
+
+      printMessage(db, app);
+      done && done(null, db, app);
+
+    });
 
 
 }
