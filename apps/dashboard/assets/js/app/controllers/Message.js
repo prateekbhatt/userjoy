@@ -14,7 +14,7 @@ angular.module('do.message', [])
                 authenticate: true
             })
             .state('inbox', {
-                url: '/messages/inbox',
+                url: '/messages/open/:id',
                 views: {
                     "main": {
                         templateUrl: '/templates/messagesmodule/message.inbox.html',
@@ -34,7 +34,7 @@ angular.module('do.message', [])
                 authenticate: true
             })
             .state('unread', {
-                url: '/messages/unread',
+                url: '/messages/unread/:id',
                 views: {
                     "main": {
                         templateUrl: '/templates/messagesmodule/message.unread.html',
@@ -77,7 +77,7 @@ angular.module('do.message', [])
 
             })
             .state('closed', {
-                url: '/messages/closed',
+                url: '/messages/closed/:id',
                 views: {
                     "main": {
                         templateUrl: '/templates/messagesmodule/message.filter.closed.conversations.html',
@@ -114,6 +114,8 @@ angular.module('do.message', [])
 
         CurrentAppService.getCurrentApp()
             .then(function (currentApp) {
+
+                $scope.currApp = currentApp._id
                 console.log("Promise Resolved: ", currentApp);
                 console.log("loginProvider MsgCtrl:", login.getLoggedIn());
                 $scope.showOpenConversations = true;
@@ -130,8 +132,8 @@ angular.module('do.message', [])
                 }
 
                 // Get Data from backend TODO
-                console.log(AppService.getCurrentApp()
-                    ._id);
+                // console.log(AppService.getCurrentApp()
+                //     ._id);
                 var msg = [];
 
                 function showManualMsg() {
@@ -314,6 +316,7 @@ angular.module('do.message', [])
 
         CurrentAppService.getCurrentApp()
             .then(function (currentApp) {
+                $scope.currApp = currentApp._id
                 console.log("Promise Resolved: ", currentApp);
                 $scope.showUnreadMsgs = true;
 
@@ -844,12 +847,12 @@ angular.module('do.message', [])
         $moment,
         $filter, ngTableParams, $log, $location, $timeout,
         CurrentAppService) {
-        console.log("inside closedConversationCtrl");
 
         CurrentAppService.getCurrentApp()
             .then(function (currentApp) {
                 console.log("Promise Resolved: ", currentApp);
-
+                $scope.currApp = currentApp._id;
+                console.log("inside closedConversationCtrl");
                 $scope.showClosedConversations = true;
                 var msg = [];
 

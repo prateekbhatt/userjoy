@@ -62,123 +62,137 @@ angular.module('do.automate', [])
 
 .controller('messageAutomateCtrl', ['$scope', '$location', 'segment',
     'queryMatching', '$filter', 'AutoMsgService', 'modelsAutomate',
-    'AppService',
+    'AppService', 'CurrentAppService',
     function ($scope, $location, segment, queryMatching, $filter,
-        AutoMsgService, modelsAutomate, AppService) {
+        AutoMsgService, modelsAutomate, AppService, CurrentAppService) {
 
-        console.log("inside automate ctrl");
+        CurrentAppService.getCurrentApp()
+            .then(function (currentApp) {
+                console.log("Promise resolved: ", currentApp);
+                console.log("inside automate ctrl");
 
-        $scope.showTable = false;
+                $scope.showTable = false;
 
-        $scope.activeMsg = '';
+                $scope.activeMsg = '';
 
 
-        var populateAutoMsg = function (err) {
-            $scope.automessages = [];
-            if (err) {
-                return err;
-            }
+                var populateAutoMsg = function (err) {
+                    $scope.automessages = [];
+                    if (err) {
+                        return err;
+                    }
 
-            for (var i = 0; i < AutoMsgService.getAllAutoMsg()
-                .length; i++) {
-                var activeMessage = '';
-                if(AutoMsgService.getAllAutoMsg()[i].active) {
-                    activeMessage = 'Deactivate';
-                } else {
-                    activeMessage = 'Activate';
+                    for (var i = 0; i < AutoMsgService.getAllAutoMsg()
+                        .length; i++) {
+                        var activeMessage = '';
+                        if (AutoMsgService.getAllAutoMsg()[i].active) {
+                            activeMessage = 'Deactivate';
+                        } else {
+                            activeMessage = 'Activate';
+                        }
+                        $scope.automessages.push({
+                            title: AutoMsgService.getAllAutoMsg()[
+                                i].title,
+                            type: AutoMsgService.getAllAutoMsg()[i]
+                                .type[0].toUpperCase() +
+                                AutoMsgService.getAllAutoMsg()[i].type
+                                .substring(
+                                    1),
+                            replied: AutoMsgService.getAllAutoMsg()[
+                                i].replied,
+                            sent: AutoMsgService.getAllAutoMsg()[i]
+                                .sent,
+                            seen: AutoMsgService.getAllAutoMsg()[i]
+                                .seen,
+                            clicked: AutoMsgService.getAllAutoMsg()[
+                                i].clicked,
+                            active: AutoMsgService.getAllAutoMsg()[
+                                i].active,
+                            id: AutoMsgService.getAllAutoMsg()[i]._id,
+                            message: activeMessage
+                        })
+
+                    };
+                    console.log($scope.automessages);
+                    if ($scope.automessages.length > 0) {
+                        $scope.showTable = true;
+                    }
+
                 }
-                $scope.automessages.push({
-                    title: AutoMsgService.getAllAutoMsg()[i].title,
-                    type: AutoMsgService.getAllAutoMsg()[i].type[0].toUpperCase() +
-                        AutoMsgService.getAllAutoMsg()[i].type.substring(
-                            1),
-                    replied: AutoMsgService.getAllAutoMsg()[i].replied,
-                    sent: AutoMsgService.getAllAutoMsg()[i].sent,
-                    seen: AutoMsgService.getAllAutoMsg()[i].seen,
-                    clicked: AutoMsgService.getAllAutoMsg()[i].clicked,
-                    active: AutoMsgService.getAllAutoMsg()[i].active,
-                    id: AutoMsgService.getAllAutoMsg()[i]._id,
-                    message: activeMessage
-                })
+                modelsAutomate.getAllAutoMessages(currentApp._id, populateAutoMsg);
 
-            };
-            console.log($scope.automessages);
-            if($scope.automessages.length > 0) {
-                $scope.showTable = true;
-            }
+                $scope.changeMsgStatus = function (id, text, index) {
+                    if (text == 'Activate') {
+                        modelsAutomate.makeMsgLive(AppService.getCurrentApp()
+                            ._id, id);
+                        // FIXME: The message should be changed to Deactivate when its a success. Have a callback for this.
+                        $scope.automessages[index].message =
+                            'Deactivate';
+                    }
 
-        }
-        modelsAutomate.getAllAutoMessages(AppService.getCurrentApp()
-            ._id, populateAutoMsg);
+                    if (text == 'Deactivate') {
+                        // FIXME: The message should be changed to Activate when its a success. Have a callback for this.
+                        modelsAutomate.deActivateMsg(AppService.getCurrentApp()
+                            ._id, id);
+                        $scope.automessages[index].message =
+                            'Activate';
+                    }
+                }
 
-        $scope.changeMsgStatus = function (id, text, index) {
-            if(text == 'Activate') {
-                modelsAutomate.makeMsgLive(AppService.getCurrentApp()
-            ._id, id);
-                // FIXME: The message should be changed to Deactivate when its a success. Have a callback for this.
-                $scope.automessages[index].message = 'Deactivate';
-            }
-
-            if(text == 'Deactivate') {
-                // FIXME: The message should be changed to Activate when its a success. Have a callback for this.
-                modelsAutomate.deActivateMsg(AppService.getCurrentApp()
-            ._id, id);
-                $scope.automessages[index].message = 'Activate';
-            }
-        }
-
-        $scope.isActive = function (viewLocation) {
-            return viewLocation === $location.path();
-        };
+                $scope.isActive = function (viewLocation) {
+                    return viewLocation === $location.path();
+                };
 
 
-        var segments = segment.get.all();
-        $scope.dropdown = [];
-        for (var i = segments.length - 1; i >= 0; i--) {
-            $scope.dropdown.push({
-                text: segments[i].name
-            });
-        };
+                var segments = segment.get.all();
+                $scope.dropdown = [];
+                for (var i = segments.length - 1; i >= 0; i--) {
+                    $scope.dropdown.push({
+                        text: segments[i].name
+                    });
+                };
 
 
-        $scope.segments = segment.get.all();
-        $scope.selectedSegment = segment.get.selected();
+                $scope.segments = segment.get.all();
+                $scope.selectedSegment = segment.get.selected();
 
 
 
-        $scope.queries = queryMatching.get.all();
-        $scope.query = [];
-        $scope.selectedQuery = queryMatching.get.selected();
-        for (var i = $scope.queries.length - 1; i >= 0; i--) {
-            $scope.query.push({
-                text: $scope.queries[i]['name']
+                $scope.queries = queryMatching.get.all();
+                $scope.query = [];
+                $scope.selectedQuery = queryMatching.get.selected();
+                for (var i = $scope.queries.length - 1; i >= 0; i--) {
+                    $scope.query.push({
+                        text: $scope.queries[i]['name']
+                    })
+                };
+
+
+                $scope.text = 'AND';
+                $scope.segmentFilterCtrl = segment.get.selected();
+                $scope.queryFilterCtrl = queryMatching.get.selected();
+                $scope.filters = [];
+                $scope.addAnotherFilter = function addAnotherFilter() {
+                    $scope.filters.push({
+                        segment: $scope.segmentFilterCtrl,
+                        type: $scope.queryFilterCtrl
+                    })
+                }
+                $scope.removeFilter = function removeFilter(
+                    filterToRemove) {
+                    var index = $scope.filters.indexOf(
+                        filterToRemove);
+                    $scope.filters.splice(index, 1);
+                }
+                $scope.switchAndOr = function switchAndOr() {
+                    if ($scope.text === 'AND') {
+                        $scope.text = 'OR'
+                    } else {
+                        $scope.text = 'AND'
+                    }
+                }
+
             })
-        };
-
-
-        $scope.text = 'AND';
-        $scope.segmentFilterCtrl = segment.get.selected();
-        $scope.queryFilterCtrl = queryMatching.get.selected();
-        $scope.filters = [];
-        $scope.addAnotherFilter = function addAnotherFilter() {
-            $scope.filters.push({
-                segment: $scope.segmentFilterCtrl,
-                type: $scope.queryFilterCtrl
-            })
-        }
-        $scope.removeFilter = function removeFilter(
-            filterToRemove) {
-            var index = $scope.filters.indexOf(
-                filterToRemove);
-            $scope.filters.splice(index, 1);
-        }
-        $scope.switchAndOr = function switchAndOr() {
-            if ($scope.text === 'AND') {
-                $scope.text = 'OR'
-            } else {
-                $scope.text = 'AND'
-            }
-        }
     }
 
 ])
@@ -226,23 +240,19 @@ angular.module('do.automate', [])
 ])
 
 .controller('textAngularCtrl', ['$scope', 'saveMsgService', '$location',
-    'modelsAutomate', 'AppService', 'segmentService',
+    'modelsAutomate', 'AppService', 'segmentService', 'ErrMsgService',
     function ($scope, saveMsgService, $location, modelsAutomate,
-        AppService, segmentService) {
+        AppService, segmentService, ErrMsgService) {
         console.log("inside text Angular Ctrl");
         console.log("sid: ", segmentService.getSingleSegment());
         $scope.showNotification = true;
         $scope.showEmail = false;
+        $scope.showAutoMsgError = false;
         $scope.email = "savinay@dodatado.com";
         $scope.selectedMessageType = {
             icon: "fa fa-bell",
             value: "Notification"
         };
-        /*$scope.text = '';
-        $scope.htmlVariable = {
-            text: 'Hello World'
-        };*/
-        // $scope.selectedMessageType = "Notification";
         console.log("selectedIcon: ", $scope.selectedMessageType);
         $scope.icons = [{
             value: "Notification",
@@ -251,8 +261,6 @@ angular.module('do.automate', [])
             value: "Email",
             label: 'fa fa-envelope'
         }];
-
-        // $scope.htmlVariable = 'HelloWorld';
 
         $scope.changeBtnText = function (index) {
             $scope.selectedMessageType.value = $scope.icons[
@@ -298,10 +306,20 @@ angular.module('do.automate', [])
             console.log("data: ", data);
             modelsAutomate.saveAutoMsg(AppService.getCurrentApp()
                 ._id, data);
+            $scope.$watch(ErrMsgService.getErrorMessage, function () {
+                if (ErrMsgService.getErrorMessage()) {
+                    $scope.showAutoMsgError = true;
+                    $scope.errMsg = ErrMsgService.getErrorMessage();
+                }
+            })
         }
 
         $scope.showText = function (htmlVariable) {
             console.log($scope.htmlVariable);
+        }
+
+        $scope.hideErrorAlert = function () {
+            $scope.showAutoMsgError = false;
         }
 
 

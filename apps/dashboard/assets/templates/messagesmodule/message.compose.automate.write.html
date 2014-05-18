@@ -43,6 +43,12 @@
     <div class="row text-center" style="padding-top: 40px;">
         <button class="btn btn-info" ng-click="saveMessage()">Save Message</button>
     </div>
+    <div class="row text-center" style="padding-top: 40px;">
+        <div ng-show="showAutoMsgError" id="login-alert" class="alert alert-danger col-md-4 col-md-push-4">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="hideErrorAlert()">&times;</button>
+            {{errMsg}}
+        </div>
+    </div>
     <div class="row" style="padding-top:70px">
         <div class="col-md-6">
             <div class="text-center">

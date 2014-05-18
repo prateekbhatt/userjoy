@@ -180,35 +180,39 @@ var app = angular.module('dodatado', [
     }
 ])
 
-.run(['AccountService', 'AccountModel', '$log',
-    function (AccountService, AccountModel, $log) {
-        AccountModel.get(function (err, acc) {
-            if (err) {
-                return;
-            }
-            console.log("accounts", acc);
-            AccountService.set(acc);
-        });
+.run(['AccountService', 'AccountModel', '$log', '$rootScope',
+    function (AccountService, AccountModel, $log, $rootScope) {
+        if ($rootScope.loggedIn) {
+            AccountModel.get(function (err, acc) {
+                if (err) {
+                    return;
+                }
+                console.log("accounts", acc);
+                AccountService.set(acc);
+            });
+        }
     }
 ])
 
-.run(['AppService', 'AppModel', '$log', 'appIdProvider',
-    function (AppService, AppModel, $log, appIdProvider) {
-        AppModel.get(function (err, apps) {
-            console.log("apps log", err, apps);
-            if (err) {
-                console.log("err apps: ", err);
-                return;
-            }
-            console.log("apps: ", apps)
-            AppService.setLoggedInApps(apps);
-            console.log("apps[0]: ", apps[0]);
-            AppService.setCurrentApp(apps[0]);
-            appIdProvider.setAppId(apps[0]._id);
-            console.log("AppIdProvider: ", appIdProvider.getAppId());
-            console.log("default app:", AppService.getCurrentApp());
+.run(['AppService', 'AppModel', '$log', 'appIdProvider', '$rootScope',
+    function (AppService, AppModel, $log, appIdProvider, $rootScope) {
+        if ($rootScope.loggedIn) {
+            AppModel.get(function (err, apps) {
+                console.log("apps log", err, apps);
+                if (err) {
+                    console.log("err apps: ", err);
+                    return;
+                }
+                console.log("apps: ", apps)
+                AppService.setLoggedInApps(apps);
+                // console.log("apps[0]: ", apps[0]);
+                AppService.setCurrentApp(apps[0]);
+                appIdProvider.setAppId(apps[0]._id);
+                // console.log("AppIdProvider: ", appIdProvider.getAppId());
+                // console.log("default app:", AppService.getCurrentApp());
 
-        });
+            });
+        }
     }
 ])
     .run(['$state', 'LoginService', '$rootScope',
@@ -348,11 +352,11 @@ var app = angular.module('dodatado', [
         countOfActions.setCountOfActions(allCountOfActions);
 
         hasNotDone.setAllHasNotDoneActions(allHasNotDoneActions);
-        console.log("not has done: ", hasNotDone.getAllHasNotDoneActions());
+        // console.log("not has done: ", hasNotDone.getAllHasNotDoneActions());
 
         hasDoneActions.setAllHasDoneActions(allHasDoneActions);
-        console.log("has done: ", hasDoneActions.getAllHasDoneActions());
-        console.log("count of: ", countOfActions.getCountOfActions());
+        // console.log("has done: ", hasDoneActions.getAllHasDoneActions());
+        // console.log("count of: ", countOfActions.getCountOfActions());
 
         /**
          * Set the first segmentation as the default selected segmentation
@@ -371,4 +375,3 @@ angular.element(document)
     .ready(function () {
         angular.bootstrap(document, ['dodatado']);
     });
-

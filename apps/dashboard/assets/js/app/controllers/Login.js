@@ -35,19 +35,10 @@ angular.module('do.login', [])
         console.log('LoginProvider:', login.getLoggedIn());
         $scope.errMsg = '';
         $scope.showError = false;
-        // login.setLoggedIn(true);
-        // If user is logged in send them to home page
-        /*if (login.getLoggedIn()) {
-            $location.path('/users/list');
-        }*/
         console.log("$rootScope loggedIn: ", $rootScope.loggedIn);
         if($rootScope.loggedIn) {
             $location.path('/users/list');
         }
-
-        // if(!login.getLoggedIn()) {
-        //     $state.transitionTo('login');
-        // }
 
         $scope.hideErrorAlert = function () {
             $scope.showError = false;
@@ -59,6 +50,7 @@ angular.module('do.login', [])
             AuthService.attemptLogin($scope.email, $scope.password);
             $scope.$watch(ErrMsgService.getErrorMessage, function () {
                 if (ErrMsgService.getErrorMessage()) {
+                    console.log("err msg: ", ErrMsgService.getErrorMessage());
                     $scope.showError = true;
                     $scope.errMsg = ErrMsgService.getErrorMessage();
                 }
