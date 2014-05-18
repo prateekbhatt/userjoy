@@ -292,6 +292,7 @@ User          | companies, notes        | users of a specific app. create a new 
 ### Event
 
 - aid (required)
+- amId (only required for an 'automessage' event)
 - cid
 - ct
 - feature

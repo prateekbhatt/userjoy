@@ -65,6 +65,13 @@ var EventSchema = new Schema({
   },
 
 
+  // automessage Id (only required for 'automessage' events)
+  amId: {
+    type: Schema.Types.ObjectId,
+    ref: 'AutoMessage'
+  },
+
+
   // company Id
   cid: {
     type: Schema.Types.ObjectId,
@@ -164,6 +171,31 @@ EventSchema.statics.pageview = function (ids, path, cb) {
     type: 'pageview',
     uid: ids.uid
   };
+
+  Event.create(newEvent, cb);
+};
+
+
+/**
+ * Create a new 'automessage' event
+ *
+ * This helps in identifying which users have already been sent an automessage
+ *
+ * @param {object} ids contains the aid, amId, uid
+ * @param {string} title the title of the automessage
+ * @param {function} cb callback
+ */
+
+EventSchema.statics.automessage = function (ids, title, cb) {
+
+  var newEvent = {
+    aid: ids.aid,
+    amId: ids.amId,
+    name: title,
+    type: 'automessage',
+    uid: ids.uid
+  };
+
 
   Event.create(newEvent, cb);
 };

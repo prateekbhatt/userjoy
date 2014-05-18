@@ -1,4 +1,11 @@
-describe('Model Event', function () {
+describe.only('Model Event', function () {
+
+
+  /**
+   * npm dependencies
+   */
+
+  var mongoose = require('mongoose');
 
 
   /**
@@ -12,7 +19,7 @@ describe('Model Event', function () {
    * Test variables
    */
 
-  var randomId = '532d6bf862d673ba7131812a';
+  var randomId = mongoose.Types.ObjectId;
 
 
 
@@ -56,10 +63,10 @@ describe('Model Event', function () {
       function (done) {
 
         var newEvent = {
-          aid: randomId,
+          aid: randomId(),
           name: 'Create App',
           type: 'randomType',
-          uid: randomId
+          uid: randomId()
         };
 
         Event.create(newEvent, function (err, evn) {
@@ -68,7 +75,7 @@ describe('Model Event', function () {
             .to.not.exist;
 
           expect(err.errors.type.message)
-            .to.eql("Event type must be one of 'pageview' or 'feature'");
+            .to.eql("Event type must be one of 'pageview/feature/automessage'");
 
           done();
         });
@@ -80,10 +87,10 @@ describe('Model Event', function () {
       function (done) {
 
         var newEvent = {
-          aid: randomId,
+          aid: randomId(),
           name: 'Create Action',
           type: 'feature',
-          uid: randomId,
+          uid: randomId(),
           meta: [{
             k: 'status',
             v: 'paying'
@@ -140,8 +147,8 @@ describe('Model Event', function () {
     it('should create a new feature event', function (done) {
 
       var ids = {
-        uid: randomId,
-        aid: randomId
+        uid: randomId(),
+        aid: randomId()
       };
 
       var name = 'Open chat';
@@ -191,8 +198,8 @@ describe('Model Event', function () {
     it('should create a new pageview event', function (done) {
 
       var ids = {
-        uid: randomId,
-        aid: randomId
+        uid: randomId(),
+        aid: randomId()
       };
 
       var name = '/login';
@@ -212,6 +219,41 @@ describe('Model Event', function () {
 
         expect(evn)
           .to.have.property("name", "/login");
+
+        done();
+      });
+    });
+
+  });
+
+
+  describe('#automessage', function () {
+
+    it('should create a new automessage event', function (done) {
+
+      var ids = {
+        uid: randomId(),
+        aid: randomId(),
+        amId: randomId()
+      };
+
+      var title = 'In App Welcome Message';
+
+      Event.automessage(ids, title, function (err, evn) {
+
+        evn = evn.toJSON();
+
+        expect(err)
+          .to.not.exist;
+
+        expect(evn)
+          .to.have.property("type", "automessage");
+
+        expect(evn)
+          .to.have.property("name", "In App Welcome Message");
+
+        expect(evn.amId)
+          .to.eql(ids.amId);
 
         done();
       });
