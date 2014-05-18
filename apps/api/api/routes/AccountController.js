@@ -2,9 +2,11 @@
  * Module dependencies
  */
 
+var _ = require('lodash');
+var async = require('async');
+var path = require('path');
 var router = require('express')
-  .Router(),
-  async = require('async');
+  .Router();
 
 
 /**
@@ -12,6 +14,8 @@ var router = require('express')
  */
 
 var Account = require('../models/Account');
+var App = require('../models/App');
+var Invite = require('../models/Invite');
 
 
 /**
@@ -20,6 +24,12 @@ var Account = require('../models/Account');
 
 var isAuthenticated = require('../policies/isAuthenticated');
 
+
+/**
+ * Services
+ */
+
+var mailer = require('../services/mailer');
 
 
 /**
@@ -43,30 +53,109 @@ router
   });
 
 
-
 /**
  * POST /account
+ *
  * Create a new account
+ *
+ * Check if invited:
+ * - if invited, add as team member to app
+ * - else, send email confirmation mail (TODO)
  */
 
 router
   .route('/')
   .post(function (req, res, next) {
 
+    /**
+     * Apps config
+     */
+
+    var config = require('../../../config')('api');
+
     var newAccount = req.body;
+    var inviteId = req.body.inviteId;
 
-    Account
-      .create(newAccount, function (err, acc) {
+    // should the email confirmation mail be sent?
+    // if the account was invited, then no
+    var shouldSendMail = true;
 
-        if (err) {
-          return next(err);
-        }
+    async.waterfall(
 
-        // TODO : Send Verification Email Here
+      [
 
-        res.json(acc, 201);
-      });
+        function createAccount(cb) {
+          Account.create(newAccount, cb);
+        },
 
+
+        function invited(acc, cb) {
+
+          // if not invited, move on
+          if (!inviteId) return cb(null, acc);
+
+          Invite
+            .findById(inviteId)
+            .exec(function (err, inv) {
+              if (err) return cb(err);
+
+              // if invite not found, then move on, and send confirmation email
+              // to user
+              if (!inv) return cb(null, acc);
+
+              // add as a team member to the app the user was invited to
+              App.addMember(inv.aid, acc._id, function (err, app) {
+                if (err) return cb(err);
+
+                // now the email confirmation mail should not be sent
+                shouldSendMail = false;
+
+                // delete invite
+                Invite.findByIdAndRemove(inv._id, function (err) {
+                  cb(err, acc);
+                });
+
+              });
+
+            });
+        },
+
+        function sendConfirmationMail(acc, cb) {
+          if (!shouldSendMail) return cb(null, acc);
+
+          acc.createVerifyToken(function (err, acc, verifyToken) {
+
+            var confirmUrl = path.join(config.baseUrl, 'account',
+              acc._id.toString(), 'verify-email', verifyToken);
+
+            var mailOptions = {
+              locals: {
+                confirmUrl: confirmUrl,
+                name: acc.name
+              },
+              toEmail: acc.email,
+              toName: acc.name
+            };
+
+            // send Verification Email
+            mailer.sendConfirmation(mailOptions, function (err) {
+              cb(err, acc);
+            });
+
+          });
+
+        },
+
+      ],
+
+      function callback(err, acc) {
+        if (err) return next(err);
+        res
+          .status(201)
+          .json(acc);
+      }
+
+    );
   });
 
 
