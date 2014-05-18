@@ -30,14 +30,6 @@ var InviteSchema = new Schema({
   },
 
 
-  // account Id
-  accid: {
-    type: Schema.Types.ObjectId,
-    ref: 'Account',
-    required: [true, 'Invalid account id']
-  },
-
-
   // created at timestamp
   ct: {
     type: Date,

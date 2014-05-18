@@ -25,7 +25,7 @@ describe('Model Invite', function () {
   describe('#create', function () {
 
     it(
-      'should return error if accid/aid/from/toEmail/toName is not provided',
+      'should return error if aid/from/toEmail/toName is not provided',
       function (done) {
 
         var newInv = {};
@@ -37,10 +37,7 @@ describe('Model Invite', function () {
 
           expect(Object.keys(err.errors)
             .length)
-            .to.eql(5);
-
-          expect(err.errors.accid.message)
-            .to.eql('Invalid account id');
+            .to.eql(4);
 
           expect(err.errors.aid.message)
             .to.eql('Invalid aid');
@@ -66,7 +63,6 @@ describe('Model Invite', function () {
     it('should create invite', function (done) {
 
       var newInvite = {
-        accid: randomId(),
         aid: randomId(),
         from: randomId(),
         toEmail: 'prattbhatt@gmail.com',
