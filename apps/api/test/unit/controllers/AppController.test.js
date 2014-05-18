@@ -388,4 +388,48 @@ describe('Resource /apps', function () {
 
   });
 
+
+  describe('GET /apps/:aid/invite/:inviteId', function () {
+
+    var testUrl;
+    var testInvite;
+
+    before(function (done) {
+      testInvite = saved.invites.first;
+      testUrl = '/apps/' + saved.apps.first._id + '/invite/' +
+        testInvite._id;
+      logoutUser(done);
+    });
+
+
+    // NOTE: the saved invite has been created using the saved account.
+    // Hence, it would not through the 'Create Account' error.
+    it('should confirm invitation',
+
+      function (done) {
+        request
+          .get(testUrl)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function (err, res) {
+
+            expect(res.body)
+              .to.be.an("object");
+
+            expect(res.body)
+              .to.have.property("message", 'Redirect to login');
+
+            expect(res.body)
+              .to.have.property("success", true);
+
+            done(err);
+          });
+
+      });
+
+    // FIXME: add test to check that it throws an error when the user is already
+    // in the team
+
+  });
+
 });

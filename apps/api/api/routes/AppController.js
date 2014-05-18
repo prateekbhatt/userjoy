@@ -12,6 +12,7 @@ var router = require('express')
  * Models
  */
 
+var Account = require('../models/Account');
 var App = require('../models/App');
 var Invite = require('../models/Invite');
 
@@ -32,8 +33,116 @@ var mailer = require('../services/mailer');
 
 
 /**
- * All routes on /apps
- * need to be authenticated
+ * Helpers
+ */
+
+var logger = require('../../helpers/logger');
+
+
+/**
+ * GET /apps/:aid/invite/:inviteId
+ *
+ * Confirm invitation on clicking the link in the Invite email:
+ * - check if account already exists
+ * - if exists, add to team members
+ * - else the user should be redirected to the signup page
+ *
+ * ALERT:
+ *
+ * 1. This route does not need authentication. Hence it is above the
+ * isAuthenticated and hasAccess policies.
+ * 2. The param to accept the application-id is 'appId' and not 'aid'. This is
+ * because router.param('aid', hasAccess) always invokes the hasAccess
+ * middleware, even though the route is defined above.
+ *
+ */
+
+router
+  .route('/:appId/invite/:inviteId')
+  .get(function (req, res, next) {
+
+    var aid = req.params.appId;
+    var inviteId = req.params.inviteId;
+    var inviteObj;
+
+    async.waterfall(
+
+      [
+
+        function checkInvite(cb) {
+
+          Invite
+            .findOne({
+              _id: inviteId,
+              aid: aid
+            })
+            .exec(function (err, invite) {
+              if (err) return cb(err);
+              if (!invite) return cb(new Error('Invite not found'));
+              inviteObj = invite;
+              cb(null, invite);
+            });
+
+        },
+
+
+        function checkAccount(invite, cb) {
+
+          Account
+            .findOne({
+              email: invite.toEmail
+            })
+            .exec(function (err, acc) {
+              if (err) return cb(err);
+              if (!acc) return cb(new Error('Create Account'));
+              cb(null, acc);
+            })
+
+        },
+
+        function addToTeam(account, cb) {
+          App.addMember(aid, account._id, cb);
+        }
+
+      ],
+
+
+      function callback(err, app) {
+
+        logger.trace({
+          at: 'invite:confirm',
+          inviteObj: inviteObj
+        });
+
+        if (err) {
+
+          if (err.message === 'Create Account') {
+            return res.status(200).json({
+              success: false,
+              name: inviteObj.toName,
+              message: 'Redirect to signup',
+              email: inviteObj.toEmail
+            });
+          }
+
+          return next(err);
+        }
+
+        res
+          .status(200)
+          .json({
+            success: true,
+            message: 'Redirect to login',
+            email: inviteObj.toEmail
+          });
+
+      }
+    );
+  });
+
+
+/**
+ * All routes below need to be authenticated
  */
 
 router.use(isAuthenticated);
@@ -242,6 +351,8 @@ router
       }
     );
   });
+
+
 
 
 
