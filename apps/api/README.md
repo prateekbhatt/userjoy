@@ -399,7 +399,6 @@ User          | companies, notes        | users of a specific app. create a new 
 ##### Columns:
 
 - aid (required)
-- accid (required)
 - ct
 - from (accountId) (required)
 - status (pending / cancelled / joined)
