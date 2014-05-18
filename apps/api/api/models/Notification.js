@@ -25,21 +25,6 @@ var Schema = mongoose.Schema;
 var NotificationSchema = new Schema({
 
 
-  accid: {
-    type: Schema.Types.ObjectId,
-    ref: 'Account',
-    required: [true, 'Invalid account id']
-  },
-
-
-  // app Id
-  aid: {
-    type: Schema.Types.ObjectId,
-    ref: 'App',
-    required: [true, 'Invalid aid']
-  },
-
-
   // automessage Id
   amId: {
     type: Schema.Types.ObjectId,
@@ -62,13 +47,6 @@ var NotificationSchema = new Schema({
   },
 
 
-  // notification title (this will appear on the admin dashboard)
-  title: {
-    type: String,
-    required: [true, 'Provide notification title']
-  },
-
-
   // has the notification been seen by the user
   seen: {
     type: Boolean,
@@ -87,26 +65,8 @@ var NotificationSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: [true, 'Invalid uid']
-  },
-
-
-  // updated at timestamp
-  ut: {
-    type: Date,
-    default: Date.now
   }
 
-});
-
-
-/**
- * Adds updated (ut) timestamps
- * Created timestamp (ct) is added by default
- */
-
-NotificationSchema.pre('save', function (next) {
-  this.ut = new Date;
-  next();
 });
 
 
