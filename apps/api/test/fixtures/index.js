@@ -21,6 +21,7 @@ var Account = require('../../api/models/Account');
 var App = require('../../api/models/App');
 var AutoMessage = require('../../api/models/AutoMessage');
 var Conversation = require('../../api/models/Conversation');
+var Invite = require('../../api/models/Invite');
 var Message = require('../../api/models/Message');
 var Notification = require('../../api/models/Notification');
 var Segment = require('../../api/models/Segment');
@@ -37,7 +38,7 @@ var accounts = {
 
   second: {
     name: 'Savinay',
-    email: 'savinay@example.com',
+    email: 'prateek@dodatado.com',
     password: 'newapptest'
   },
 },
@@ -116,6 +117,16 @@ var accounts = {
       uid: ObjectId(),
     }
   };
+
+var invites = {
+
+  first: {
+    aid: null,
+    from: null,
+    toEmail: accounts.second.email,
+    toName: 'Prats'
+  }
+};
 
 
 var notifications = {
@@ -243,6 +254,13 @@ function createSegment(accid, aid, segment, fn) {
   Segment.create(segment, fn);
 }
 
+
+function createInvite(accid, aid, invite, cb) {
+
+  invite.from = accid;
+  invite.aid = aid;
+  Invite.create(invite, cb);
+}
 
 module.exports = function loadFixtures(callback) {
 
@@ -414,6 +432,20 @@ module.exports = function loadFixtures(callback) {
 
     },
 
+    createFirstInvite: function (cb) {
+
+      var aid = apps.first._id;
+      var accid = accounts.first._id;
+      var invite = invites.first;
+
+      createInvite(accid, aid, invite, function (err, inv) {
+        if (err) return cb(err);
+        invites.first = inv;
+        cb();
+      });
+
+    },
+
   }, function (err) {
 
     var savedObj = {
@@ -421,6 +453,7 @@ module.exports = function loadFixtures(callback) {
       apps: apps,
       automessages: automessages,
       conversations: conversations,
+      invites: invites,
       messages: messages,
       notifications: notifications,
       segments: segments,
