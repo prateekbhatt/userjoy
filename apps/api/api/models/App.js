@@ -2,13 +2,15 @@
  * Module dependencies
  */
 
-var mongoose = require('mongoose'),
-  Schema = mongoose.Schema,
-  troop = require('mongoose-troop'),
-  async = require('async'),
-  _ = require('lodash'),
-  validate = require('mongoose-validator')
-    .validate;
+var _ = require('lodash');
+var async = require('async');
+var mongoose = require('mongoose');
+var troop = require('mongoose-troop');
+var validate = require('mongoose-validator')
+  .validate;
+
+var Schema = mongoose.Schema;
+
 
 /**
  * Helpers
@@ -70,9 +72,6 @@ var AppSchema = new Schema({
     default: false
   },
 
-  // TODO : Allow to add team members
-  //
-  // other members added by the admin
   team: [TeamMemberSchema]
 
 });
@@ -139,6 +138,56 @@ AppSchema.statics.findByKey = function (mode, key, cb) {
   App
     .findOne(query)
     .exec(cb);
+};
+
+
+/**
+ * Adds a team member to an app
+ * - should not already be part of the team
+ *
+ * @param {string} aid app-id
+ * @param {string} accid team-member account id
+ * @param {function} cb callback
+ */
+
+AppSchema.statics.addMember = function (aid, accid, cb) {
+
+  async.waterfall(
+    [
+
+      function findApp(cb) {
+        App
+          .findById(aid)
+          .exec(cb);
+      },
+
+      function checkIfInTeam(app, cb) {
+
+        var isTeamMember = _.chain(app.team)
+          .map(function (m) {
+            return m.accid.toString();
+          })
+          .contains(accid.toString())
+          .value();
+
+        if (isTeamMember) return cb(new Error('Is Team Member'));
+
+        cb(null, app);
+
+      },
+
+      function addMember(app, cb) {
+        app.team.push({
+          accid: accid
+        });
+
+        app.save(cb)
+      }
+
+    ],
+
+    cb
+  );
 };
 
 

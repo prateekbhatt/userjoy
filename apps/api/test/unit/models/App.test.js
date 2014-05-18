@@ -1,8 +1,21 @@
 describe('Model App', function () {
 
+
+  /**
+   * npm dependencies
+   */
+
+  var mongoose = require('mongoose');
+
+
+  /**
+   * models
+   */
+
   var App = require('../../../api/models/App');
 
-  var randomId = '532d6bf862d673ba7131812a';
+  var randomId = mongoose.Types.ObjectId;
+
 
   before(function (done) {
     setupTestDb(done);
@@ -103,5 +116,62 @@ describe('Model App', function () {
       expect(fetchedApp.checkUrl(saved.apps.first.url))
         .to.be.true;
     });
+  });
+
+
+  describe('#addMember', function () {
+
+    it('should add account to team', function (done) {
+
+      var aid = saved.apps.first._id;
+      var newMemberId = randomId();
+
+      App.addMember(aid, newMemberId, function (err, app) {
+
+        expect(err)
+          .to.be.null;
+
+        expect(app)
+          .to.be.an("object");
+
+        expect(app._id.toString())
+          .to.eql(saved.apps.first._id.toString());
+
+
+        var teamIds = _.pluck(app.team, 'accid');
+
+        expect(teamIds)
+          .to.not.be.empty;
+
+        expect(teamIds)
+          .to.contain(newMemberId);
+
+        done();
+      });
+    });
+
+
+    it('should return error if account is already a team member',
+      function (done) {
+
+        var aid = saved.apps.first._id;
+        var adminId = saved.apps.first.team[0].accid;
+
+        App.addMember(aid, adminId, function (err, app) {
+
+          expect(err)
+            .to.exist;
+
+          expect(err.message)
+            .to.eql('Is Team Member');
+
+          expect(app)
+            .to.not.exist;
+
+        });
+
+        done()
+      });
+
   });
 });
