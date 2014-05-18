@@ -1,6 +1,13 @@
 describe('Resource /account', function () {
 
   /**
+   * npm dependencies
+   */
+
+  var mongoose = require('mongoose');
+
+
+  /**
    * models
    */
 
@@ -11,14 +18,14 @@ describe('Resource /account', function () {
    * Test variables
    */
 
-  var randomObjectId = '5303570d9c554e7356000017',
+  var randomId = mongoose.Types.ObjectId,
 
     randomEmail = 'randomEmail@example.com',
 
     newAccount = {
 
-      name: 'Savinay',
-      email: 'savinay@dodatado.com',
+      name: 'Prats',
+      email: 'prattbhatt@gmail.com',
       password: 'testingtesting'
 
     },
@@ -185,7 +192,7 @@ describe('Resource /account', function () {
     it('returns error for wrong accountId', function (done) {
 
       var url = '/account/' +
-        randomObjectId +
+        randomId() +
         '/verify-email/' +
         saved.accounts.first.verifyToken;
 

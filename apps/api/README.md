@@ -103,6 +103,7 @@ Event         | meta (metadata)         | events belonging to a user
 Health        |                         | the healthscore of a user for a specific company
 Invite        |                         | tokens of team members that have been invited to use an app
 Message       |                         | messages between users and accounts
+Notification  |                         | notifications to be shown to the user (only auto)
 Segment       | filters                 | all the segments defined for an app
 Trigger       |                         | triggers for sending auto emails / notifications
 User          | companies, notes        | users of a specific app. create a new user for every new unique identifier for an app
@@ -291,6 +292,7 @@ User          | companies, notes        | users of a specific app. create a new 
 ### Event
 
 - aid (required)
+- amId (only required for an 'automessage' event)
 - cid
 - ct
 - feature
@@ -310,6 +312,7 @@ User          | companies, notes        | users of a specific app. create a new 
 - clicked
 - creator (account id) (required)
 - ct
+- lastQueued (timestamp)
 - replied
 - seen
 - sent
@@ -342,6 +345,22 @@ User          | companies, notes        | users of a specific app. create a new 
 ##### Notes:
 
 - accid is required only when the message is created by an account. If a user has sent the message, then it is not required for the message to have an accid
+
+### Notification
+
+##### Columns:
+
+- amId
+- body
+- ct
+- seen (boolean)
+- sender
+- uid
+
+##### Notes:
+
+- Only auto notifications are stored in this. The manually created notifications are stored in the Message collection
+- A notification would be deleted once it has been seen by the user
 
 ### Conversation
 
@@ -379,11 +398,12 @@ User          | companies, notes        | users of a specific app. create a new 
 
 ##### Columns:
 
-- aid
+- aid (required)
 - ct
-- from (accountId)
+- from (accountId) (required)
 - status (pending / cancelled / joined)
-- to (email)
+- toEmail (required)
+- toName (required)
 - ut
 
 ##### Notes:

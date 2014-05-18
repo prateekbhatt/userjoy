@@ -52,10 +52,17 @@ var InviteSchema = new Schema({
   },
 
 
-  // invite is sent to this email
-  to: {
+  // email of the invitee
+  toEmail: {
     type: String,
-    required: [true, 'Provide email']
+    required: [true, 'Provide invitee email']
+  },
+
+
+  // name of the invitee
+  toName: {
+    type: String,
+    required: [true, 'Provide invitee name']
   },
 
 

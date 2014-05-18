@@ -1,5 +1,11 @@
 describe('Model Invite', function () {
 
+  /**
+   * npm dependencies
+   */
+
+  var mongoose = require('mongoose');
+
 
   /**
    * Models
@@ -12,14 +18,14 @@ describe('Model Invite', function () {
    * Test variables
    */
 
-  var randomId = '532d6bf862d673ba7131812a';
+  var randomId = mongoose.Types.ObjectId;
   var savedInvite;
 
 
   describe('#create', function () {
 
     it(
-      'should return error if aid/from/to is not provided',
+      'should return error if aid/from/toEmail/toName is not provided',
       function (done) {
 
         var newInv = {};
@@ -31,7 +37,7 @@ describe('Model Invite', function () {
 
           expect(Object.keys(err.errors)
             .length)
-            .to.eql(3);
+            .to.eql(4);
 
           expect(err.errors.aid.message)
             .to.eql('Invalid aid');
@@ -39,8 +45,11 @@ describe('Model Invite', function () {
           expect(err.errors.from.message)
             .to.eql('Invalid from-account id');
 
-          expect(err.errors.to.message)
-            .to.eql('Provide email');
+          expect(err.errors.toEmail.message)
+            .to.eql('Provide invitee email');
+
+          expect(err.errors.toName.message)
+            .to.eql('Provide invitee name');
 
           expect(inv)
             .to.not.exist;
@@ -54,9 +63,10 @@ describe('Model Invite', function () {
     it('should create invite', function (done) {
 
       var newInvite = {
-        aid: randomId,
-        from: randomId,
-        to: 'randomId@random.com'
+        aid: randomId(),
+        from: randomId(),
+        toEmail: 'prattbhatt@gmail.com',
+        toName: 'Prateek Invite Mail Test'
       };
 
       Invite.create(newInvite, function (err, inv) {
@@ -69,14 +79,17 @@ describe('Model Invite', function () {
 
         savedInvite = inv;
 
-        expect(inv.aid.toString())
-          .to.eql(newInvite.aid);
+        expect(inv)
+          .to.have.property('aid', newInvite.aid);
 
-        expect(inv.from.toString())
-          .to.eql(newInvite.from);
+        expect(inv)
+          .to.have.property('from', newInvite.from);
 
-        expect(inv.to)
-          .to.eql(newInvite.to);
+        expect(inv)
+          .to.have.property('toEmail', newInvite.toEmail);
+
+        expect(inv)
+          .to.have.property('toName', newInvite.toName);
 
         done();
       });
