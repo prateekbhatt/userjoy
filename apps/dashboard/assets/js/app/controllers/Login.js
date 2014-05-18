@@ -23,12 +23,22 @@ angular.module('do.login', [])
                 },
                 authenticate: false
             })
+            // .state('signup', {
+            //     url: '/signup',
+            //     views: {
+            //         "main": {
+            //             templateUrl: '/templates/LoginSignup/signup.html',
+            //             controller: 'signupCtrl',
+            //         }
+            //     },
+            //     authenticate: false
+            // })
 
     }
 ])
 
 .controller('LoginCtrl', ['$scope', 'LoginService', 'AuthService', '$state',
-    '$log', 'ErrMsgService', 'login', '$location', '$rootScope',  
+    '$log', 'ErrMsgService', 'login', '$location', '$rootScope',
     function ($scope, LoginService, AuthService, $state, $log,
         ErrMsgService, login, $location, $rootScope) {
 
@@ -36,7 +46,7 @@ angular.module('do.login', [])
         $scope.errMsg = '';
         $scope.showError = false;
         console.log("$rootScope loggedIn: ", $rootScope.loggedIn);
-        if($rootScope.loggedIn) {
+        if ($rootScope.loggedIn) {
             $location.path('/users/list');
         }
 
@@ -59,8 +69,15 @@ angular.module('do.login', [])
         };
     }
 ])
-    .controller('forgotPasswordCtrl', ['$scope',
-        function ($scope) {
 
-        }
-    ]);
+.controller('forgotPasswordCtrl', ['$scope',
+    function ($scope) {
+
+    }
+]);
+
+// .controller('signupCtrl', ['$scope',
+//     function ($scope) {
+
+//     }
+// ]);

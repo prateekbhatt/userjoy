@@ -42,5 +42,17 @@ angular
                             savedApp);
                     })
             }
+
+            this.addNewMember = function (data, appId) {
+                $http.post(config.apiUrl + '/apps/' + appId + '/invite',
+                    data)
+                    .success(function (data) {
+                        console.log("success");
+                    })
+                    .error(function () {
+                        console.log("error");
+                    })
+
+            }
         }
     ])
