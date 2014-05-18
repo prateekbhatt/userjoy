@@ -30,6 +30,14 @@ var InviteSchema = new Schema({
   },
 
 
+  // account Id
+  accid: {
+    type: Schema.Types.ObjectId,
+    ref: 'Account',
+    required: [true, 'Invalid account id']
+  },
+
+
   // created at timestamp
   ct: {
     type: Date,
@@ -52,10 +60,17 @@ var InviteSchema = new Schema({
   },
 
 
-  // invite is sent to this email
-  to: {
+  // email of the invitee
+  toEmail: {
     type: String,
-    required: [true, 'Provide email']
+    required: [true, 'Provide invitee email']
+  },
+
+
+  // name of the invitee
+  toName: {
+    type: String,
+    required: [true, 'Provide invitee name']
   },
 
 

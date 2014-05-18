@@ -398,11 +398,13 @@ User          | companies, notes        | users of a specific app. create a new 
 
 ##### Columns:
 
-- aid
+- aid (required)
+- accid (required)
 - ct
-- from (accountId)
+- from (accountId) (required)
 - status (pending / cancelled / joined)
-- to (email)
+- toEmail (required)
+- toName (required)
 - ut
 
 ##### Notes:
