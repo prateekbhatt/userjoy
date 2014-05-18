@@ -228,3 +228,22 @@ exports.sendManualMessage = function (options, cb) {
 
   mailer.send(cb);
 };
+
+
+/**
+ * Sends invite to a new email, to join as a team member
+ *
+ * @param {object} options
+ * @param {function} cb callback
+ */
+
+exports.sendInvite = function (options, cb) {
+  var mailer = new Mailer(options);
+
+  mailer.fromName = UJ_SUPPORT_NAME;
+  mailer.fromEmail = UJ_SUPPORT_EMAIL;
+  mailer.subject = 'Invite to join UserJoy';
+  mailer.template = 'invite.ejs';
+
+  mailer.sendUJMail(cb);
+};
