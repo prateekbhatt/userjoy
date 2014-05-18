@@ -47,6 +47,8 @@ angular.module('do.navbar', [])
             $location.path('/login');
         };
 
+        $scope.appId = AppService.getCurrentApp()._id;
+
         $scope.$watch(LoginService.getUserAuthenticated, function () {
             $log.info("Navbar watch", arguments);
             $scope.loggedIn = LoginService.getUserAuthenticated();

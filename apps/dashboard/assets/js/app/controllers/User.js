@@ -945,15 +945,22 @@ angular.module('do.users', [])
                     show: false
                 });
 
-                $scope.mail = [];
+                $scope.showErr = false;
+
+                $scope.hideMaxMsgErrorAlert = function () {
+                    $scope.showMaxMsgErr = false;
+                }
+
                 $scope.openModal = function () {
-                    popupModal.show();
+                    $scope.mail = [];
+                    console.log("items ticked: ", Object.keys($scope.checkboxes.items)
+                        .length);
+                    if(Object.keys($scope.checkboxes.items)
+                        .length <= 50) {
+                        popupModal.show();
+                    }
                     console.log("checkboxes items: ", $scope.checkboxes
                         .items);
-                    /*Object.keys(obj)
-                .forEach(function (key) {
-                    f(key, obj[key])
-                });*/
                     var prop, value;
                     var keys = Object.keys($scope.checkboxes.items);
                     for (var i = 0; i < Object.keys($scope.checkboxes.items)
@@ -962,13 +969,19 @@ angular.module('do.users', [])
                         console.log("id: ", prop);
                         value = $scope.checkboxes.items[prop];
                         console.log("value: ", value);
-                        if (value) {
-                            $scope.mail[i] = prop;
+                        if (value == true) {
+                            $scope.mail.push(prop);
                         }
                     };
                     console.log("email objects: ", $scope.mail);
-                    UidService.set($scope.mail);
+                    if ($scope.mail.length > 50) {
+                        $scope.showMaxMsgErr = true;
+                        $scope.maxMsgErr =
+                            "Maximum Messages that can be sent at once is 50";
 
+                    } else {
+                        UidService.set($scope.mail);
+                    }
                 };
 
 
@@ -981,6 +994,15 @@ angular.module('do.users', [])
                 };
 
                 console.log("checkboxes: ", $scope.checkboxes);
+
+                $scope.$watch('checkboxes.all', function (value) {
+                    angular.forEach($scope.users, function (item) {
+                        if (angular.isDefined(item.id)) {
+                            $scope.checkboxes.items[item.id] =
+                                value;
+                        }
+                    });
+                });
 
                 $scope.$watch('checkboxes.items', function (value) {
                     console.log("$watch checkboxes: ", $scope.checkboxes

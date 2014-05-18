@@ -12,11 +12,12 @@ angular.module('services.AppService', [])
         };
 
         this.setLoggedInApps = function (value) {
-            if (value instanceof Array) {
-                angular.forEach(value, function (app) {
-                    apps.push(app);
-                });
-            }
+            // if (value instanceof Array) {
+            //     angular.forEach(value, function (app) {
+            //         apps.push(app);
+            //     });
+            // }
+            apps = value;
         };
 
         this.getLoggedInApps = function () {
