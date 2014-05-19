@@ -1,7 +1,7 @@
 angular
     .module('models.apps', ['services'])
-    .service('AppModel', ['$http', 'config', '$state', 'AppService',
-        function ($http, config, $state, AppService) {
+    .service('AppModel', ['$http', 'config', '$state', 'AppService', '$location',
+        function ($http, config, $state, AppService, $location) {
 
             this.get = function (cb) {
 
@@ -53,6 +53,23 @@ angular
                         console.log("error");
                     })
 
+            }
+
+            this.redirectUser = function (appId, inviteId) {
+                $http.get(config.apiUrl + '/apps/' + appId + '/invite/' + inviteId)
+                    .success(function(data) {
+                        console.log("data: ", data);
+                        if(data.message == 'Redirect to signup') {
+                            $location.path('/signup');
+                        }
+
+                        if(data.message == 'Redirect to login') {
+                            $location.path('/login');
+                        }
+                    })
+                    .error(function(){
+                        console.log("error");
+                    })
             }
         }
     ])

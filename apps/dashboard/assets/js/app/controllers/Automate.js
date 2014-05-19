@@ -119,7 +119,8 @@ angular.module('do.automate', [])
                     }
 
                 }
-                modelsAutomate.getAllAutoMessages(currentApp._id, populateAutoMsg);
+                modelsAutomate.getAllAutoMessages(currentApp._id,
+                    populateAutoMsg);
 
                 $scope.changeMsgStatus = function (id, text, index) {
                     if (text == 'Activate') {
@@ -198,44 +199,55 @@ angular.module('do.automate', [])
 ])
 
 .controller('automateSegmentCtrl', ['$scope', 'segment', 'modelsSegment',
-    'AppService', 'segmentService',
-    function ($scope, segment, modelsSegment, AppService, segmentService) {
+    'AppService', 'segmentService', 'CurrentAppService',
+    function ($scope, segment, modelsSegment, AppService, segmentService,
+        CurrentAppService) {
 
-        $scope.segments = [];
-        $scope.segmenticons = [];
-        $scope.selectedIcon = [];
+        CurrentAppService.getCurrentApp()
+            .then(function (currentApp) {
+                $scope.segments = [];
+                $scope.segmenticons = [];
+                $scope.selectedIcon = [];
 
 
-        var checkSegments = function (err) {
-            if (err) {
-                return err;
-            }
-            $scope.selectedIcon.id = segmentService.getSegments()[0]._id;
-            $scope.selectedIcon.name = segmentService.getSegments()[0].name;
-            if (segmentService.getSegments()
-                .length > 0) {
-                for (var i = 0; i < segmentService.getSegments()
-                    .length; i++) {
-                    $scope.segmenticons.push({
-                        value: segmentService.getSegments()[i].name,
-                        label: segmentService.getSegments()[i].name,
-                        id: segmentService.getSegments()[i]._id
-                    })
-                };
-            }
-        }
+                var checkSegments = function (err) {
+                    if (err) {
+                        return err;
+                    }
+                    $scope.selectedIcon.id = segmentService.getSegments()[
+                        0]._id;
+                    $scope.selectedIcon.name = segmentService.getSegments()[
+                        0].name;
+                    if (segmentService.getSegments()
+                        .length > 0) {
+                        for (var i = 0; i < segmentService.getSegments()
+                            .length; i++) {
+                            $scope.segmenticons.push({
+                                value: segmentService.getSegments()[
+                                    i].name,
+                                label: segmentService.getSegments()[
+                                    i].name,
+                                id: segmentService.getSegments()[i]
+                                    ._id
+                            })
+                        };
+                    }
+                }
 
-        modelsSegment.getAllSegments(AppService.getCurrentApp()
-            ._id, checkSegments);
-        $scope.changeText = function (ind) {
-            $scope.selectedIcon.id = $scope.segmenticons[ind].id;
-            $scope.selectedIcon.name = $scope.segmenticons[ind].label;
-        }
+                modelsSegment.getAllSegments(currentApp._id, checkSegments);
+                $scope.changeText = function (ind) {
+                    $scope.selectedIcon.id = $scope.segmenticons[ind].id;
+                    $scope.selectedIcon.name = $scope.segmenticons[ind]
+                        .label;
+                }
 
-        $scope.storeSegment = function () {
-            segmentService.setSingleSegment($scope.selectedIcon);
-            console.log("single segment: ", segmentService.getSingleSegment());
-        }
+                $scope.storeSegment = function () {
+                    segmentService.setSingleSegment($scope.selectedIcon);
+                    console.log("single segment: ", segmentService.getSingleSegment());
+                }
+
+            })
+
     }
 ])
 
