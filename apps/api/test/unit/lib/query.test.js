@@ -1198,6 +1198,55 @@ describe('Lib query', function () {
         .to.eql(after);
     });
 
+
+    it(
+      'should sanitize the "op" which sometimes gets parsed as an array ["and", ""]',
+      function () {
+
+        var before = {
+          list: 'users',
+          op: ['and', ''],
+          filters: [{
+            method: 'hasdone',
+            type: 'feature',
+            name: 'Define Segment'
+          }]
+        }
+
+
+
+        var after = {
+          list: 'users',
+          op: 'and',
+          filters: [{
+            method: 'hasdone',
+            type: 'feature',
+            name: 'Define Segment'
+          }]
+        };
+
+        expect(before.op)
+          .to.be.an('array');
+
+        expect(before.op[0])
+          .to.eql("and");
+
+        expect(before)
+          .to.not.eql(after);
+
+        Query.sanitize(before);
+
+        expect(before.op)
+          .to.be.an('string');
+
+        expect(before.op)
+          .to.eql("and");
+
+        expect(before)
+          .to.eql(after);
+
+      });
+
   });
 
 });

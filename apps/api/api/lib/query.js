@@ -625,6 +625,26 @@ function sanitize(q) {
 
   });
 
+
+  // sometimes the parsed query object contains the 'op' in the form of an
+  // array. This situation needs to be taken care of. e.g.
+  //
+  // BEFORE:
+  // op: [ 'and', '' ]
+  //
+  // AFTER:
+  // op: 'and'
+
+  if (_.isArray(q.op)) {
+    q.op = q.op[0];
+  }
+
+  logger.trace({
+    at: 'lib/query sanitized',
+    q: q,
+    f: q.filters
+  });
+
   return q;
 };
 
