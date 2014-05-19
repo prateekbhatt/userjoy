@@ -1,4 +1,4 @@
-describe.only('Resource /apps', function () {
+describe('Resource /apps', function () {
 
   /**
    * npm dependencies
@@ -434,6 +434,23 @@ describe.only('Resource /apps', function () {
           });
 
       });
+
+
+    // NOTE: the following test must be below the previous test, because we are checking
+    // if the invite fixture has been deleted from the db after the confirmation
+    // in the previous test
+    it('should delete invite confirmed', function (done) {
+      Invite.findById(testInvite._id, function (err, inv) {
+
+        expect(err)
+          .to.not.exist;
+
+        expect(inv)
+          .to.not.exist;
+
+        done();
+      })
+    });
 
 
     it('should return error if the account is already in the team',
