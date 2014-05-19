@@ -102,7 +102,21 @@ router
 
         function addToTeam(account, cb) {
           App.addMember(aid, account._id, function (err, app) {
-            cb(err, app);
+
+            // if 'is team member' error, delete invite and send response
+
+            if (err && (err.message === 'Is Team Member')) {
+
+              Invite.findByIdAndRemove(inviteObj._id, function (removeErr) {
+                removeErr = removeErr || err;
+                cb(removeErr, app);
+              });
+
+            } else {
+
+              cb(err, app);
+            }
+
           });
         },
 
