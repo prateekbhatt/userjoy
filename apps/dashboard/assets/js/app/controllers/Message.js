@@ -265,8 +265,8 @@ angular.module('do.message', [])
                 }
 
                 $scope.closeConversation = function (coId, user, index) {
-                    MsgService.closeConversationRequest(AppService.getCurrentApp()
-                        ._id, coId, function (err, user) {
+                    MsgService.closeConversationRequest(currentApp._id,
+                        coId, function (err, user) {
                             console.log("coid: ", coId, $scope.openmsg);
                             if (err) {
                                 console.log("error");

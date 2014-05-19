@@ -14,4 +14,5 @@ angular.module('services', [
     'services.segmentService',
     'services.AutoMsgService',
     'services.CurrentAppService',
+    'services.InviteIdService',
 ]);

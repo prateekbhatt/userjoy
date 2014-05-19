@@ -371,11 +371,27 @@ angular.module('do.settings', [])
     }
 ])
 
-.controller('appSettingsInviteCtrl', ['$scope', '$rootScope', 'AppModel',
-    function ($scope, $rootScope, AppModel) {
+.controller('appSettingsInviteCtrl', ['$scope', '$rootScope', 'AppModel', 'InviteIdService',
+    function ($scope, $rootScope, AppModel, InviteIdService) {
+        $scope.noError = true;
+        $scope.error = false;
         var url = window.location.href;
         var appId = url.split("/")[4];
         var inviteId = url.split("/")[6];
-        AppModel.redirectUser(appId, inviteId);
+        InviteIdService.setInviteId(inviteId);
+        var showMsg = function (err) {
+            if(err) {
+                $scope.noError = false;
+                $scope.error = true;
+                return;
+            }
+            else {
+                $scope.noError = true;
+                $scope.error = false;
+            }
+        }
+
+        AppModel.redirectUser(appId, inviteId, showMsg);
+
     }
 ])

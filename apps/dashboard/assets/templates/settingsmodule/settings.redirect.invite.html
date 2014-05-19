@@ -1,1 +1,6 @@
-<h1 class="text-center">Redirecting...</h1>
+<h1 class="text-center" ng-show="noError">Redirecting...</h1>
+<div class="panel-body" style="padding-top: 238px;">
+    <div class="text-center alert alert-danger col-md-push-2 col-md-8" ng-show="error">
+        <h3>Invalid token! Please ask your admin to send an invite again!!</h3>
+    </div>
+</div>
