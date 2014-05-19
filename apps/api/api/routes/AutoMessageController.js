@@ -28,13 +28,14 @@ var isAuthenticated = require('../policies/isAuthenticated');
  */
 
 var logger = require('../../helpers/logger');
+var getMailerLocals = require('../../helpers/get-mailer-locals');
 
 
 /**
  * Services
  */
 
-var automessage = require('../services/automessage');
+var mailer = require('../services/mailer');
 
 
 /**
@@ -162,25 +163,74 @@ router
       email: toEmail
     });
 
-    automessage(aid, amId, to, function (err, responseStatus) {
 
-      if (err) {
+    async.waterfall(
 
-        if (err.message === 'Message not found') {
-          return res.notFound(err.message);
+      [
+
+        function findAutoMessage(cb) {
+          AutoMessage
+            .findOne({
+              aid: aid,
+              _id: amId
+            })
+            .populate('creator')
+            .exec(function (err, amsg) {
+              if (err) return cb(err);
+              if (!amsg) return cb(new Error('AutoMessage not found'));
+              cb(null, amsg);
+            });
+        },
+
+
+        function sendMail(amsg, cb) {
+
+          var locals = getMailerLocals('auto', amsg, toName, toEmail);
+
+          mailer.sendAutoMessage(locals, function (err, responseStatus) {
+
+            if (err) {
+
+              logger.crit({
+                at: 'automessage:send-test',
+                toEmail: toEmail,
+                err: err,
+                res: responseStatus
+              });
+            } else {
+              logger.debug({
+                at: 'automessage:send-test',
+                toEmail: toEmail,
+                res: responseStatus
+              });
+            }
+
+            cb(err);
+          });
+
+        }
+      ],
+
+
+      function callback(err, responseStatus) {
+
+        if (err) {
+
+          if (err.message === 'AutoMessage not found') {
+            return res.notFound(err.message);
+          }
+
+          return next(err);
         }
 
-        return next(err);
-      }
-
-      res
-        .status(200)
-        .json({
-          message: 'Message is queued'
-        });
+        res
+          .status(200)
+          .json({
+            message: 'Message is queued'
+          });
 
 
-    });
+      })
   })
 
 
