@@ -101,7 +101,16 @@ router
         },
 
         function addToTeam(account, cb) {
-          App.addMember(aid, account._id, cb);
+          App.addMember(aid, account._id, function (err, app) {
+            cb(err, app);
+          });
+        },
+
+
+        function deleteInviteToken(app, cb) {
+          Invite.findByIdAndRemove(inviteObj._id, function (err) {
+            cb(err, app);
+          });
         }
 
       ],
