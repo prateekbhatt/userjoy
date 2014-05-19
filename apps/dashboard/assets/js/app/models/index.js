@@ -12,4 +12,5 @@ angular.module('models', [
     'models.Query',
     'models.Segment',
     'models.automate',
+    'models.Invite',
 ]);
