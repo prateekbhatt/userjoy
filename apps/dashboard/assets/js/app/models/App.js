@@ -61,6 +61,7 @@ angular
                     inviteId)
                     .success(function (data) {
                         console.log("data: ", data);
+                        AppService.setEmail(data.email);
                         if (data.message == 'REDIRECT_TO_SIGNUP') {
                             $location.path('/signup');
                         }
