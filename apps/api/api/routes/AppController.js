@@ -117,12 +117,32 @@ router
         if (err) {
 
           if (err.message === 'Create Account') {
-            return res.status(200).json({
-              success: false,
-              name: inviteObj.toName,
-              message: 'Redirect to signup',
-              email: inviteObj.toEmail
-            });
+            return res.status(200)
+              .json({
+                success: false,
+                name: inviteObj.toName,
+                message: 'REDIRECT_TO_SIGNUP',
+                email: inviteObj.toEmail
+              });
+          }
+
+          if (err.message === 'Is Team Member') {
+            return res.status(200)
+              .json({
+                success: false,
+                name: inviteObj.toName,
+                message: 'IS_TEAM_MEMBER',
+                email: inviteObj.toEmail
+              });
+          }
+
+
+          if (err.message === 'Invite not found') {
+            return res.status(404)
+              .json({
+                success: false,
+                message: 'INVITE_NOT_FOUND',
+              });
           }
 
           return next(err);
@@ -132,7 +152,7 @@ router
           .status(200)
           .json({
             success: true,
-            message: 'Redirect to login',
+            message: 'REDIRECT_TO_LOGIN',
             email: inviteObj.toEmail
           });
 
@@ -320,7 +340,8 @@ router
 
           var inviteId = invite._id.toString();
 
-          var inviteUrl = path.join(config.hosts.dashboard, 'apps', aid, 'invite',
+          var inviteUrl = path.join(config.hosts.dashboard, 'apps', aid,
+            'invite',
             inviteId);
 
           var mailOptions = {

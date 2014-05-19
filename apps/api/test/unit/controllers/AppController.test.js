@@ -1,10 +1,18 @@
-describe('Resource /apps', function () {
+describe.only('Resource /apps', function () {
 
   /**
    * npm dependencies
    */
 
   var mongoose = require('mongoose');
+
+
+  /**
+   * Models
+   */
+
+  var Invite = require('../../../api/models/Invite');
+
 
 
   var newApp = {
@@ -417,7 +425,7 @@ describe('Resource /apps', function () {
               .to.be.an("object");
 
             expect(res.body)
-              .to.have.property("message", 'Redirect to login');
+              .to.have.property("message", 'REDIRECT_TO_LOGIN');
 
             expect(res.body)
               .to.have.property("success", true);
@@ -427,8 +435,80 @@ describe('Resource /apps', function () {
 
       });
 
-    // FIXME: add test to check that it throws an error when the user is already
-    // in the team
+
+    it('should return error if the account is already in the team',
+
+      function (done) {
+
+        var inviteId;
+
+        var testUrl = '/apps/' + saved.apps.first._id + '/invite/';
+
+        Invite.create(
+
+          {
+            aid: saved.apps.first._id,
+            from: saved.accounts.second._id,
+            toEmail: saved.accounts.first.email,
+            toName: 'Random Name'
+          },
+
+          function (err, inv) {
+
+            if (err) return done(err);
+            inviteId = inv._id;
+            testUrl = testUrl + inviteId;
+
+            request
+              .get(testUrl)
+              .expect('Content-Type', /json/)
+              .expect(200)
+              .end(function (err, res) {
+
+                expect(res.body)
+                  .to.be.an("object");
+
+                expect(res.body)
+                  .to.have.property("message", 'IS_TEAM_MEMBER');
+
+                expect(res.body)
+                  .to.have.property("success", false);
+
+                done(err);
+              });
+
+          });
+
+
+      });
+
+
+    it('should return error if invite not found',
+      function (done) {
+
+        var testUrl = '/apps/' + saved.apps.first._id + '/invite/' +
+          randomId();
+
+        request
+          .get(testUrl)
+          .expect('Content-Type', /json/)
+          .expect(404)
+          .end(function (err, res) {
+
+            expect(res.body)
+              .to.be.an("object");
+
+            expect(res.body)
+              .to.have.property("message", 'INVITE_NOT_FOUND');
+
+            expect(res.body)
+              .to.have.property("success", false);
+
+            done(err);
+          });
+
+      });
+
 
   });
 
