@@ -23,31 +23,32 @@ angular.module('do.login', [])
                 },
                 authenticate: false
             })
+            // .state('signup', {
+            //     url: '/signup',
+            //     views: {
+            //         "main": {
+            //             templateUrl: '/templates/LoginSignup/signup.html',
+            //             controller: 'signupCtrl',
+            //         }
+            //     },
+            //     authenticate: false
+            // })
 
     }
 ])
 
 .controller('LoginCtrl', ['$scope', 'LoginService', 'AuthService', '$state',
-    '$log', 'ErrMsgService', 'login', '$location', '$rootScope',  
+    '$log', 'ErrMsgService', 'login', '$location', '$rootScope',
     function ($scope, LoginService, AuthService, $state, $log,
         ErrMsgService, login, $location, $rootScope) {
 
         console.log('LoginProvider:', login.getLoggedIn());
         $scope.errMsg = '';
         $scope.showError = false;
-        // login.setLoggedIn(true);
-        // If user is logged in send them to home page
-        /*if (login.getLoggedIn()) {
-            $location.path('/users/list');
-        }*/
         console.log("$rootScope loggedIn: ", $rootScope.loggedIn);
-        if($rootScope.loggedIn) {
+        if ($rootScope.loggedIn) {
             $location.path('/users/list');
         }
-
-        // if(!login.getLoggedIn()) {
-        //     $state.transitionTo('login');
-        // }
 
         $scope.hideErrorAlert = function () {
             $scope.showError = false;
@@ -59,6 +60,7 @@ angular.module('do.login', [])
             AuthService.attemptLogin($scope.email, $scope.password);
             $scope.$watch(ErrMsgService.getErrorMessage, function () {
                 if (ErrMsgService.getErrorMessage()) {
+                    console.log("err msg: ", ErrMsgService.getErrorMessage());
                     $scope.showError = true;
                     $scope.errMsg = ErrMsgService.getErrorMessage();
                 }
@@ -67,8 +69,15 @@ angular.module('do.login', [])
         };
     }
 ])
-    .controller('forgotPasswordCtrl', ['$scope',
-        function ($scope) {
 
-        }
-    ]);
+.controller('forgotPasswordCtrl', ['$scope',
+    function ($scope) {
+
+    }
+]);
+
+// .controller('signupCtrl', ['$scope',
+//     function ($scope) {
+
+//     }
+// ]);

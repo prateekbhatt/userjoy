@@ -5,6 +5,8 @@ angular.module('services.saveMsgService', [])
     function ($log) {
 
         var savedMsg = '';
+        var sub = '';
+        var title = '';
 
         this.setMsg = function (value) {
             savedMsg = value;
@@ -13,6 +15,22 @@ angular.module('services.saveMsgService', [])
         this.getMsg = function () {
             return savedMsg;
         };
+
+        this.setSub = function (value) {
+            sub = value;
+        }
+
+        this.getSub = function () {
+            return sub
+        }
+
+        this.setTitle = function (value) {
+            title = value;
+        }
+
+        this.getTitle = function () {
+            return title;
+        }
 
         return this;
 

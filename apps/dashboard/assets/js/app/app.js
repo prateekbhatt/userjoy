@@ -1,4 +1,4 @@
-angular.module('dodatado', [
+var app = angular.module('dodatado', [
     'ui.bootstrap',
     'ui.router',
     // 'ngSails',
@@ -30,12 +30,36 @@ angular.module('dodatado', [
     'do.automate'
 ])
 
+.provider('appIdProvider', [
+
+    function () {
+
+        var appId = '';
+
+        this.$get = [
+
+            function () {
+                return {
+                    setAppId: function (value) {
+                        appId = value;
+                    },
+                    getAppId: function () {
+                        return appId;
+                    }
+                };
+            }
+        ];
+    }
+])
+
 .provider('login', [
+
     function () {
 
         var userIsAuthenticated = false;
 
         this.$get = [
+
             function () {
                 return {
                     setLoggedIn: function (value) {
@@ -50,8 +74,8 @@ angular.module('dodatado', [
     }
 ])
 
-.filter('startFrom', function() {
-    return function(input, start) {
+.filter('startFrom', function () {
+    return function (input, start) {
         start = +start; //parse to int
         return input.slice(start);
     }
@@ -97,7 +121,7 @@ angular.module('dodatado', [
             // register the tool with textAngular
             taRegisterTool('dropdown', {
                 display: "<span class='dropdown'>" +
-                    "<button class='btn btn-default dropdown-toggle' type='button' ng-disabled='showHtml()'><i class='fa fa-caret-down'></i></button>" +
+                    "<button class='btn btn-sm btn-default dropdown-toggle' type='button' ng-disabled='showHtml()'><i class='fa fa-caret-down'></i></button>" +
                     "<ul class='dropdown-menu'><li ng-repeat='o in options' ng-model='o.value' ng-click='action(o.value)'>{{o.name}}</li></ul>" +
                     "</span>",
                 action: function (size) {
@@ -109,11 +133,13 @@ angular.module('dodatado', [
                 },
                 // TODO: Get data from backend
                 options: [{
+                        name: 'Email',
+                        value: '{{= email || "there"}}'
+                    }
+                    // ,
+                    /*{
                     name: 'App Name',
                     value: '{{app_name}}'
-                }, {
-                    name: 'First Name',
-                    value: '{{first_name}}'
                 }, {
                     name: 'Last Name',
                     value: '{{last_name}}'
@@ -126,7 +152,8 @@ angular.module('dodatado', [
                 }, {
                     name: 'status',
                     value: '{{status}}'
-                }]
+                }*/
+                ]
             });
 
             // add the button to the default toolbar definition
@@ -138,13 +165,7 @@ angular.module('dodatado', [
 
 })
 
-/*.service('api', ['authService', '$rootScope', '$location',
-    function () {
-        $rootScope.$on('event: auth-loginRequired', function () {
-            $location.path('/login');
-        })
-    }
-])*/
+
 
 .run(['LoginService', 'ipCookie', '$log', 'login', '$rootScope',
     function (LoginService, ipCookie, $log, login, $rootScope) {
@@ -159,31 +180,39 @@ angular.module('dodatado', [
     }
 ])
 
-.run(['AccountService', 'AccountModel', '$log',
-    function (AccountService, AccountModel, $log) {
-        AccountModel.get(function (err, acc) {
-            if (err) {
-                return;
-            }
-            console.log("accounts", acc);
-            AccountService.set(acc);
-        });
+.run(['AccountService', 'AccountModel', '$log', '$rootScope',
+    function (AccountService, AccountModel, $log, $rootScope) {
+        if ($rootScope.loggedIn) {
+            AccountModel.get(function (err, acc) {
+                if (err) {
+                    return;
+                }
+                console.log("accounts", acc);
+                AccountService.set(acc);
+            });
+        }
     }
 ])
 
-.run(['AppService', 'AppModel', '$log',
-    function (AppService, AppModel, $log) {
-        AppModel.get(function (err, apps) {
-            console.log("apps log", err, apps);
-            if (err) {
-                console.log("err apps: ", err);
-                return;
-            }
-            AppService.setLoggedInApps(apps);
-            AppService.setCurrentApp(apps[0]);
-            console.log("default app:", AppService.getCurrentApp());
-            
-        });
+.run(['AppService', 'AppModel', '$log', 'appIdProvider', '$rootScope',
+    function (AppService, AppModel, $log, appIdProvider, $rootScope) {
+        if ($rootScope.loggedIn) {
+            AppModel.get(function (err, apps) {
+                console.log("apps log", err, apps);
+                if (err) {
+                    console.log("err apps: ", err);
+                    return;
+                }
+                console.log("apps: ", apps)
+                AppService.setLoggedInApps(apps);
+                // console.log("apps[0]: ", apps[0]);
+                AppService.setCurrentApp(apps[0]);
+                appIdProvider.setAppId(apps[0]._id);
+                // console.log("AppIdProvider: ", appIdProvider.getAppId());
+                // console.log("default app:", AppService.getCurrentApp());
+
+            });
+        }
     }
 ])
     .run(['$state', 'LoginService', '$rootScope',
@@ -214,22 +243,22 @@ angular.module('dodatado', [
         hasDoneActions, modelsQuery, AppService) {
 
         // FIXME : get data from backend
-        
-        
+
+
         var allSegments = [{
-            _id: "0",
-            name: "Users"
-        }
-        // , {
-        //     _id: "1",
-        //     name: "Phone Users"
-        // }, {
-        //     _id: "2",
-        //     name: "Android Users"
-        // }, {
-        //     _id: "3",
-        //     name: "Paying Customers"
-        // }
+                _id: "0",
+                name: "Users"
+            }
+            // , {
+            //     _id: "1",
+            //     name: "Phone Users"
+            // }, {
+            //     _id: "2",
+            //     name: "Android Users"
+            // }, {
+            //     _id: "3",
+            //     name: "Paying Customers"
+            // }
         ];
 
         var allQueries = [{
@@ -258,7 +287,7 @@ angular.module('dodatado', [
             key: 'lt'
         }];
 
-        
+
 
         var actions = [{
             name: 'Watched Intro Video'
@@ -323,11 +352,11 @@ angular.module('dodatado', [
         countOfActions.setCountOfActions(allCountOfActions);
 
         hasNotDone.setAllHasNotDoneActions(allHasNotDoneActions);
-        console.log("not has done: ", hasNotDone.getAllHasNotDoneActions());
+        // console.log("not has done: ", hasNotDone.getAllHasNotDoneActions());
 
         hasDoneActions.setAllHasDoneActions(allHasDoneActions);
-        console.log("has done: ", hasDoneActions.getAllHasDoneActions());
-        console.log("count of: ", countOfActions.getCountOfActions());
+        // console.log("has done: ", hasDoneActions.getAllHasDoneActions());
+        // console.log("count of: ", countOfActions.getCountOfActions());
 
         /**
          * Set the first segmentation as the default selected segmentation
@@ -342,7 +371,7 @@ angular.module('dodatado', [
     }
 ])
 
-
-.controller('AppCtrl', function AppCtrl($scope) {
-
-});
+angular.element(document)
+    .ready(function () {
+        angular.bootstrap(document, ['dodatado']);
+    });

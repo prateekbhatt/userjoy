@@ -19,15 +19,18 @@
             <br>
             <label class="col-md-3 control-label" style="font-size: 20px; padding-top: 5px;">Segments</label>
             <div class="col-md-9">
-                <button type="button" class="btn btn-default" ng-model="selectedIcon" data-html="1" ng-options="segmenticon.value as segmenticon.label for segmenticon in segmenticons" bs-select style=".dropdown-menu > li > a:hover,.dropdown-menu > li > a:focus { background-color: #7b8a8b}">
-                Users <span class="caret"></span>
-                </button>
+                <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{selectedIcon.name}}</span>&nbsp;<span class="caret"></span></button>
+                <ul class="select dropdown-menu" role="select" style="left: 15px;">
+                    <li class="dropdown" ng-repeat="segment in segmenticons">
+                        <a style="cursor: default;" ng-click="changeText($index)">{{segment.label}}</a>
+                    </li>
+                </ul>
             </div>
             <br>
             <br>
             <div class="btn-toolbar" style="padding-top: 45px;">
-                <button class="btn btn-info pull-right" ui-sref="automateWrite">Next</button>&nbsp;&nbsp;&nbsp;
-                <button class="btn btn-info pull-right" ui-sref="users.list">Create Another Segment</button>
+                <button class="btn btn-info pull-right" ui-sref="automateWrite" ng-click="storeSegment()">Next</button>&nbsp;&nbsp;&nbsp;
+                <button class="btn btn-info pull-right" ui-sref="list">Create Another Segment</button>
             </div>
         </div>
     </div>

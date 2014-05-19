@@ -113,6 +113,15 @@ angular.module('do.settings', [])
                 },
                 authenticate: true
             })
+            .state('redirect', {
+                url: '/apps/:aid/invite/:id',
+                views: {
+                    "main": {
+                        templateUrl: '/templates/settingsmodule/settings.redirect.invite.html',
+                        controller: 'appSettingsInviteCtrl',
+                    }
+                }
+            })
 
     }
 ])
@@ -240,25 +249,42 @@ angular.module('do.settings', [])
 ])
 
 .controller('appSettingsTeamCtrl', ['$scope', '$log', '$state',
-    function ($scope, $log, $state) {
+    'CurrentAppService', 'AppModel',
+    function ($scope, $log, $state, CurrentAppService, AppModel) {
 
         // TODO: Get data from backend
-        $scope.team = [{
-            name: 'Savinay Narendra',
-            email: 'savinay.90@gmail.com',
-            incomingEmail: 'savinay.90@gmail.mail.dodatado.io'
-        }, {
-            name: 'Savinay Narendra',
-            email: 'savinay.90@gmail.com',
-            incomingEmail: 'savinay.90@gmail.mail.dodatado.io'
-        }]
+        CurrentAppService.getCurrentApp()
+            .then(function (currentApp) {
 
-        $scope.removeTeamMember = function (teamMember) {
-            // TODO: Add code to remove team member
-            $log.info("team member removed function called");
-            var index = $scope.team.indexOf(teamMember);
-            $scope.team.splice(index,1);
-        }
+                // $scope.team = currentApp.team;
+
+                $scope.team = [{
+                    name: 'Savinay Narendra',
+                    email: 'savinay.90@gmail.com',
+                    incomingEmail: 'savinay.90@gmail.mail.dodatado.io'
+                }, {
+                    name: 'Savinay Narendra',
+                    email: 'savinay.90@gmail.com',
+                    incomingEmail: 'savinay.90@gmail.mail.dodatado.io'
+                }]
+
+                $scope.removeTeamMember = function (teamMember) {
+                    // TODO: Add code to remove team member
+                    $log.info("team member removed function called");
+                    var index = $scope.team.indexOf(teamMember);
+                    $scope.team.splice(index, 1);
+                }
+
+                $scope.addTeamMember = function () {
+                    var data = {
+                        email: $scope.teamMember,
+                        name: $scope.nameMember
+                    };
+                    console.log("data: ", data);
+
+                    AppModel.addNewMember(data, currentApp._id);
+                }
+            })
     }
 ])
 
@@ -342,5 +368,14 @@ angular.module('do.settings', [])
 .controller('appSettingsInstallationCtrl', ['$scope', '$log', '$state',
     function ($scope, $log, $state) {
 
+    }
+])
+
+.controller('appSettingsInviteCtrl', ['$scope', '$rootScope', 'AppModel',
+    function ($scope, $rootScope, AppModel) {
+        var url = window.location.href;
+        var appId = url.split("/")[4];
+        var inviteId = url.split("/")[6];
+        AppModel.redirectUser(appId, inviteId);
     }
 ])

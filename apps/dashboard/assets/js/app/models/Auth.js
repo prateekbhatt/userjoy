@@ -1,10 +1,11 @@
 angular.module('models.auth', ['services'])
 
 .service('AuthService', ['$http', 'utils', 'ipCookie', 'LoginService',
-    '$log', 'config', '$state', '$location', 'AppService', 
-    'ErrMsgService', 'authService', 'login', '$rootScope', 
+    '$log', 'config', '$state', '$location', 'AppService',
+    'ErrMsgService', 'authService', 'login', '$rootScope',
     function ($http, utils, ipCookie, LoginService, $log, config, $state,
-        $location, AppService, ErrMsgService, authService, login, $rootScope) {
+        $location, AppService, ErrMsgService, authService, login,
+        $rootScope) {
 
         this.attemptLogin = function (email, password) {
 
@@ -25,30 +26,25 @@ angular.module('models.auth', ['services'])
                     });
 
                     LoginService.setUserAuthenticated(true);
-                    // login.setLoggedIn(true);
                     login.setLoggedIn(true);
                     $rootScope.loggedIn = true;
                     console.log("$rootScope loggIn: ", $rootScope.loggedIn);
                     console.log("loginProvider Auth js: ", login.getLoggedIn());
-                    /*if(login.getLoggedIn()) {
-                        $location.path('/users/list');
-                    }*/
                     $http.get(config.apiUrl + '/apps')
                         .success(function (data) {
                             console.log("loggedin Apps: ", data);
-
                             AppService.setLoggedInApps(
                                 data);
 
                             if (AppService.getLoggedInApps()
                                 .length) {
-                                console.log(AppService.getLoggedInApps());
+                                console.log(
+                                    "AppService data Auth.js",
+                                    AppService.getLoggedInApps());
                                 $state.go('list');
                             } else {
                                 $state.go('onboarding');
                             }
-                            // window.location.reload();
-
                         })
                         .error(function () {
                             $log.error("error in fetching /apps");
@@ -56,7 +52,7 @@ angular.module('models.auth', ['services'])
                         })
                 })
                 .error(function (err) {
-                    $log.error("error in signing in");
+                    console.log("error in signing in");
                     console.log(err.error);
                     ErrMsgService.setErrorMessage(err.error);
                 })
@@ -77,7 +73,7 @@ angular.module('models.auth', ['services'])
                 })
         }
 
-        return this;
+        // return this;
 
     }
 ]);

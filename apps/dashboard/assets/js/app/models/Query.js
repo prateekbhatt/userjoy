@@ -10,23 +10,23 @@ angular.module('models.Query', ['services'])
             $http.get(url)
                 .success(function (data) {
                     console.log("attributes: ", data);
-                    eventNames.setEvents(data.eventNames);
+                    eventNames.setEvents(data.events);
+                    console.log("events: ", eventNames.getEvents());
                     userAttributes.setUserAttributes(data.userAttributes);
                     callback();
                 })
                 .error(callback);
         };
 
-        this.runQueryAndGetUsers = function (appId, queryObj) {
+        this.runQueryAndGetUsers = function (appId, queryObj, callback) {
             $http.get(config.apiUrl + '/apps/' + appId + '/query/?' +
                 queryObj)
                 .success(function (data) {
                     console.log("data: ", data);
                     UserList.setUsers(data);
+                    callback();
                 })
-                .error(function () {
-                    console.log("error");
-                })
+                .error(callback);
         };
     }
 ])
