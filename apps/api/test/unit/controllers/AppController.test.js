@@ -453,7 +453,8 @@ describe('Resource /apps', function () {
     });
 
 
-    it('should return error if the account is already in the team',
+    it(
+      'should return error and delete invite, if the account is already in the team',
 
       function (done) {
 
@@ -491,7 +492,17 @@ describe('Resource /apps', function () {
                 expect(res.body)
                   .to.have.property("success", false);
 
-                done(err);
+                Invite.findById(inviteId, function (err, deletedInv) {
+
+                  expect(err)
+                    .to.not.exist;
+
+                  expect(deletedInv)
+                    .to.not.exist;
+
+                  done();
+                });
+
               });
 
           });
