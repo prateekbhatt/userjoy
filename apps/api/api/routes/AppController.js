@@ -320,7 +320,7 @@ router
 
           var inviteId = invite._id.toString();
 
-          var inviteUrl = path.join(config.baseUrl, 'apps', aid, 'invite',
+          var inviteUrl = path.join(config.hosts.dashboard, 'apps', aid, 'invite',
             inviteId);
 
           var mailOptions = {
