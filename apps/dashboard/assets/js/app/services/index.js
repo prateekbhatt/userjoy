@@ -11,4 +11,7 @@ angular.module('services', [
     'services.ThreadService',
     'services.saveMsgService',
     'services.UserList',
+    'services.segmentService',
+    'services.AutoMsgService',
+    'services.CurrentAppService',
 ]);

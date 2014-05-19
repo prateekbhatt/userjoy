@@ -11,4 +11,5 @@ angular.module('models', [
     'models.message',
     'models.Query',
     'models.Segment',
+    'models.automate',
 ]);

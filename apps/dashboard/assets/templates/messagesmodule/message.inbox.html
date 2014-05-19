@@ -8,10 +8,10 @@
                     <div id="sidebar-wrapper-settings">
                         <ul class="sidebar-nav">
                             <li>
-                                <a ui-sref="inbox" ng-click="showTableInbox()"><i class="fa fa-inbox"></i> Open Conversations <span class="badge">12</span></a>
+                                <a href="/messages/open/{{currApp}}" ng-click="showTableInbox()"><i class="fa fa-inbox"></i> Open Conversations <span class="badge">12</span></a>
                             </li>
                             <li>
-                                <a ui-sref="unread"><i class="fa fa-exclamation"></i>&nbsp; Unread Conversations <span class="badge">26</span></a>
+                                <a href="/messages/unread/{{currApp}}"><i class="fa fa-exclamation"></i>&nbsp; Unread Conversations <span class="badge">26</span></a>
                             </li>
                             <li>
                                 <a ui-sref="automate"><i class="fa fa-edit"></i> Automate Messages </a>
@@ -20,7 +20,7 @@
                                 <a ui-sref="message.template"><span class="glyphicon glyphicon-list-alt"></span> Choose Templates</a>
                             </li>
                             <li>
-                                <a ui-sref="#" style="cursor: pointer"><i class="fa fa-paperclip"></i> Smart Filters</a>
+                                <a ui-sref="#" style="cursor: pointer"><i class="fa fa-paperclip"></i> Smart Filters
                                 <ul style="list-style: none;">
                                     <li>
                                         <div class="progress" style="margin-left: 30px;">
@@ -53,14 +53,14 @@
                                         <div class="progress" style="margin-left: 30px;">
                                             <a ui-sref="#goodhealth" style="cursor: pointer">
                                             <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #f0ad4e;">
-                                                <span class="progress-type pull-left"><strong>Unassigned</strong></span>
+                                                <span class="progress-type pull-left"><strong>Open Conversations</strong></span>
                                             </div>
                                             </a>
                                         </div>
                                     </li>
                                     <li>
                                         <div class="progress" style="margin-left: 30px;">
-                                            <a ui-sref="closed" style="cursor: pointer">
+                                            <a href="/messages/closed/{{currApp}}" style="cursor: pointer">
                                             <div class="progress-bar progress-bar-default" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #999;">
                                                 <span class="progress-type pull-left"><strong>Closed Conversations</strong></span>
                                             </div>
@@ -77,6 +77,7 @@
                                         </div>
                                     </li>
                                 </ul>
+                                </a>
                             </li>
                         </ul>
                         <!-- /#side-menu -->
@@ -116,7 +117,7 @@
                                                     <br>
                                                     <br>
                                                     <tbody>
-                                                        <tr ng-repeat="user in data | filter:searchText" >
+                                                        <tr ng-repeat="user in $data">
                                                             <td data-title="'User'" style="text-align:center; cursor:pointer" ng-click="showSelectedMail(user.id)">
                                                                 <span>{{user.name}}</span>
                                                             </td>
