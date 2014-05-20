@@ -1,39 +1,29 @@
 angular.module('models.user', ['services'])
 
-.service('UserModel', function ($q, $http, utils) {
-    this.getAll = function () {
-        var deferred = $q.defer();
-        var url = utils.prepareUrl('user');
+.service('UserModel', ['$http', 'config', '$location', 'InboxMsgService', 'UserList',
+    function ($http, config, $location, InboxMsgService, UserList) {
 
-        $sails.get(url, function (models) {
-            return deferred.resolve(models);
-        });
+        this.getUserProfile = function (id, appId) {
+            $http.get(config.apiUrl + '/apps/' + appId + '/users/' + id)
+                .success(function (data) {
+                    console.log("success: ", data);
+                    UserList.setUserEmail(data.email);
+                    $location.path('/users/profile/' + id);
+                })
+                .error(function (data) {
+                    console.log("error: ", data);
+                })
+        }
 
-        return deferred.promise;
-    };
-
-    this.getOne = function (id) {
-        var deferred = $q.defer();
-        var url = utils.prepareUrl('user/' + id);
-
-        $sails.get(url, function (model) {
-            return deferred.resolve(model);
-        });
-
-        return deferred.promise;
-    };
-
-    this.create = function (newModel) {
-
-        console.log('UserModel create', newModel);
-
-        var deferred = $q.defer();
-        var url = utils.prepareUrl('user');
-
-        $http.post(url, newModel, function (model) {
-            return deferred.resolve(model);
-        });
-
-        return deferred.promise;
-    };
-});
+        this.getLatestConversations = function (appId, uid, cb) {
+            $http.get(config.apiUrl + '/apps/' + appId + '/users/' + uid +
+                '/conversations')
+                .success(function (data) {
+                    console.log("msg: ", data);
+                    InboxMsgService.setLatestConversations(data);
+                    cb();
+                })
+                .error(cb);
+        }
+    }
+]);
