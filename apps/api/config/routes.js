@@ -71,6 +71,9 @@ module.exports.dashboard = function loadDashboardRoutes(app) {
   // "/apps/:aid/users/"
   app.use('/apps', routes.UserController);
 
+  // "/apps/:aid/users/:uid/notes"
+  app.use('/apps', routes.UserNoteController);
+
   app.use('/auth', routes.AuthController);
   app.use('/mandrill', routes.MandrillController);
 
