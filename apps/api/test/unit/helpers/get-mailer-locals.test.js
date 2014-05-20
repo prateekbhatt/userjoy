@@ -85,7 +85,7 @@ describe('Helper get-mailer-locals', function () {
       expect(locals)
         .to.have.property("toEmail", toEmail);
       expect(locals)
-        .to.have.property("body", savedManualMsg.text);
+        .to.have.property("body", savedManualMsg.body);
 
       expect(locals)
         .to.have.property("subject", savedManualMsg.sub);

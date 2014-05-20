@@ -51,7 +51,7 @@ var getLocals = function (type, msg, toName, toEmail) {
 
   } else if (type === 'manual') {
 
-    body = msg.text;
+    body = msg.body;
     meta.mId = msg._id;
     fromName = msg.sName;
     replyToEmail = replyToEmailManual(fromEmail, msg.coId);
