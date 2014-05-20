@@ -106,7 +106,8 @@ Message       |                         | messages between users and accounts
 Notification  |                         | notifications to be shown to the user (only auto)
 Segment       | filters                 | all the segments defined for an app
 Trigger       |                         | triggers for sending auto emails / notifications
-User          | companies, notes        | users of a specific app. create a new user for every new unique identifier for an app
+User          | companies               | users of a specific app. create a new user for every new unique identifier for an app
+UserNote      |                         | notes created by team members about a specific user
 
 
 
@@ -207,14 +208,17 @@ User          | companies, notes        | users of a specific app. create a new 
 
 ##### Embedded Documents:
 
-> ### Note
->
-> Columns:
->
-> - note
-> - createdBy (accountId)
-> - ct
-> - ut
+
+### UserNote
+
+##### Columns:
+
+- aid
+- creator (accountId)
+- ct
+- note
+- uid (user id)
+- ut
 
 
 ### Health

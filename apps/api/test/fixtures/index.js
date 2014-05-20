@@ -26,6 +26,7 @@ var Message = require('../../api/models/Message');
 var Notification = require('../../api/models/Notification');
 var Segment = require('../../api/models/Segment');
 var User = require('../../api/models/User');
+var UserNote = require('../../api/models/UserNote');
 
 
 /**
@@ -173,6 +174,25 @@ var segments = {
   }
 };
 
+var usernotes = {
+
+  first: {
+    aid: null,
+    creator: null,
+    note: 'This user sucks ! :(',
+    uid: null,
+  },
+
+
+  second: {
+    aid: null,
+    creator: null,
+    note: 'He needs onboarding assistance',
+    uid: null
+  }
+
+};
+
 var automessages = {
 
   first: {
@@ -272,6 +292,16 @@ function createInvite(accid, aid, invite, cb) {
   invite.aid = aid;
   Invite.create(invite, cb);
 }
+
+
+function createUserNote(accid, aid, uid, note, cb) {
+
+  note.aid = aid;
+  note.creator = accid;
+  note.uid = uid;
+  UserNote.create(note, cb);
+}
+
 
 module.exports = function loadFixtures(callback) {
 
@@ -435,7 +465,8 @@ module.exports = function loadFixtures(callback) {
       var uid = users.first._id;
       var notification = notifications.first;
 
-      createNotification(accid, aid, amId, uid, notification, function (err, notf) {
+      createNotification(accid, aid, amId, uid, notification, function (err,
+        notf) {
         if (err) return cb(err);
         notifications.first = notf;
         cb();
@@ -452,6 +483,39 @@ module.exports = function loadFixtures(callback) {
       createInvite(accid, aid, invite, function (err, inv) {
         if (err) return cb(err);
         invites.first = inv;
+        cb();
+      });
+
+    },
+
+    createFirstUserNote: function (cb) {
+
+      var aid = apps.first._id;
+      var accid = accounts.first._id;
+      var uid = users.first._id;
+      var usernote = usernotes.first;
+
+      createUserNote(accid, aid, uid, usernote, function (err, note) {
+        if (err) return cb(err);
+        usernotes.first = note;
+        cb();
+      });
+
+    },
+
+
+
+
+    createSecondUserNote: function (cb) {
+
+      var aid = apps.first._id;
+      var accid = accounts.first._id;
+      var uid = users.first._id;
+      var usernote = usernotes.second;
+
+      createUserNote(accid, aid, uid, usernote, function (err, note) {
+        if (err) return cb(err);
+        usernotes.second = note;
         cb();
       });
 
@@ -475,7 +539,8 @@ module.exports = function loadFixtures(callback) {
       messages: messages,
       notifications: notifications,
       segments: segments,
-      users: users
+      users: users,
+      usernotes: usernotes
     };
 
     callback(err, savedObj);
