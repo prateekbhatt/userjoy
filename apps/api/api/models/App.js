@@ -118,6 +118,7 @@ AppSchema.statics.findByAccountId = function (accountId, cb) {
     .find({
       'team.accid': accountId
     })
+    .populate('team.accid', 'name email')
     .exec(cb);
 
 };
