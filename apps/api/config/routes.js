@@ -46,11 +46,28 @@ module.exports.dashboard = function loadDashboardRoutes(app) {
   /////////////////////////////////////////////////////////
 
   app.use('/account', routes.AccountController);
+
+  // "/apps/:aid/invites/"
+  //
+  // NOTE:
+  // GET "/apps/:aid/invites/:inviteId" must not required authentication
+  // Hence, InviteController route must be at the top
+  app.use('/apps', routes.InviteController);
+
   app.use('/apps', routes.AppController);
+
+  // "/apps/:aid/conversations/"
   app.use('/apps', routes.ConversationController);
+
+  // "/apps/:aid/automessages/"
   app.use('/apps', routes.AutoMessageController);
+
+  // "/apps/:aid/query/"
   app.use('/apps', routes.QueryController);
+
+  // "/apps/:aid/segments/"
   app.use('/apps', routes.SegmentController);
+
   app.use('/auth', routes.AuthController);
   app.use('/mandrill', routes.MandrillController);
 
