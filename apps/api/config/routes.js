@@ -68,6 +68,9 @@ module.exports.dashboard = function loadDashboardRoutes(app) {
   // "/apps/:aid/segments/"
   app.use('/apps', routes.SegmentController);
 
+  // "/apps/:aid/users/"
+  app.use('/apps', routes.UserController);
+
   app.use('/auth', routes.AuthController);
   app.use('/mandrill', routes.MandrillController);
 
