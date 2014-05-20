@@ -179,13 +179,34 @@ describe('Resource /apps', function () {
           .get('/apps')
           .set('cookie', loginCookie)
           .expect('Content-Type', /json/)
-          .expect(function (res) {
-            if (!Array.isArray(res.body)) {
-              return 'Should return an array';
-            }
-          })
           .expect(200)
-          .end(done);
+          .end(function (err, res) {
+
+            if (err) return done(err);
+
+            expect(res.body)
+              .to.be.an("array");
+
+            expect(res.body[0].team)
+              .to.be.an("array");
+
+            expect(res.body[0].team[0])
+              .to.have.property("admin", true);
+
+            expect(res.body[0].team[0].accid)
+              .to.be.an("object");
+
+            expect(res.body[0].team[0].accid)
+              .to.have.property("_id");
+
+            expect(res.body[0].team[0].accid)
+              .to.have.property("name");
+
+            expect(res.body[0].team[0].accid)
+              .to.have.property("email");
+
+            done();
+          });
 
       });
 

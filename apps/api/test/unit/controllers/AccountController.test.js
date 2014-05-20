@@ -25,7 +25,7 @@ describe('Resource /account', function () {
     newAccount = {
 
       name: 'Prats',
-      email: 'prattbhatt@gmail.com',
+      email: 'prattbhatt+1@gmail.com',
       password: 'testingtesting'
 
     },
