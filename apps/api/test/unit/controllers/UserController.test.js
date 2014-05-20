@@ -89,4 +89,66 @@ describe('Resource /apps/:aid/users', function () {
   });
 
 
+  describe('GET /apps/:aid/users/:uid/conversations', function () {
+
+    var aid, uid, testUrl;
+
+    before(function (done) {
+      aid = saved.apps.first._id;
+      uid = saved.users.first._id;
+      testUrl = '/apps/' + aid + '/users/' + uid + '/conversations';
+      logoutUser(done);
+    });
+
+
+    it('should return error if not logged in', function (done) {
+
+      request
+        .get(testUrl)
+        .expect('Content-Type', /json/)
+        .expect(401)
+        .end(done);
+    });
+
+
+    it('logging in user', function (done) {
+      loginUser(done);
+    });
+
+
+    it('should return upto latest 10 conversations of user', function (
+      done) {
+
+      request
+        .get(testUrl)
+        .set('cookie', loginCookie)
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function (err, res) {
+
+          if (err) return done(err);
+
+          expect(res.body)
+            .to.be.an("array")
+            .and.to.have.length.above(0);
+
+          expect(res.body)
+            .to.have.length.of.at.most(10);
+
+          expect(res.body[0])
+            .to.have.property('sub');
+
+          expect(res.body[0])
+            .to.have.property('toRead');
+
+          expect(res.body[0])
+            .to.have.property('closed');
+
+          done();
+        });
+
+    });
+
+  });
+
 });
