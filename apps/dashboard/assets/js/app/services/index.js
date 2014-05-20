@@ -15,4 +15,5 @@ angular.module('services', [
     'services.AutoMsgService',
     'services.CurrentAppService',
     'services.InviteIdService',
+    'services.NotesService',
 ]);
