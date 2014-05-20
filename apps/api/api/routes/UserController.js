@@ -10,6 +10,7 @@ var router = require('express')
  * Models
  */
 
+var Conversation = require('../models/Conversation');
 var User = require('../models/User');
 
 
@@ -76,6 +77,43 @@ router
         res
           .status(200)
           .json(user);
+
+      });
+
+  });
+
+
+/**
+ * GET /apps/:aid/users/:uid/conversations
+ *
+ * Returns 10 latest conversations of the user
+ */
+
+router
+  .route('/:aid/users/:uid/conversations')
+  .get(function (req, res, next) {
+
+    logger.trace({
+      at: 'UserController:getMessages',
+      params: req.params
+    });
+
+    Conversation
+      .find({
+        uid: req.params.uid,
+        aid: req.params.aid
+      })
+      .sort({
+        ct: -1
+      })
+      .limit(10)
+      .exec(function (err, conversations) {
+
+        if (err) return next(err);
+
+        res
+          .status(200)
+          .json(conversations);
 
       });
 
