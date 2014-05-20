@@ -249,24 +249,46 @@ angular.module('do.settings', [])
 ])
 
 .controller('appSettingsTeamCtrl', ['$scope', '$log', '$state',
-    'CurrentAppService', 'AppModel',
-    function ($scope, $log, $state, CurrentAppService, AppModel) {
+    'CurrentAppService', 'AppModel', 'InviteModel', 'InviteIdService',
+    function ($scope, $log, $state, CurrentAppService, AppModel,
+        InviteModel, InviteIdService) {
 
         // TODO: Get data from backend
         CurrentAppService.getCurrentApp()
             .then(function (currentApp) {
-
+                $scope.invTeamMember = false;
+                $scope.team = [];
+                $scope.invitedTeam = [];
+                var populateInvitedMembers = function () {
+                    $scope.invitedTeam = InviteIdService.getInvitedMembers();
+                }
+                InviteModel.getPendingInvites(currentApp._id, populateInvitedMembers);
                 // $scope.team = currentApp.team;
 
-                $scope.team = [{
-                    name: 'Savinay Narendra',
-                    email: 'savinay.90@gmail.com',
-                    incomingEmail: 'savinay.90@gmail.mail.dodatado.io'
-                }, {
-                    name: 'Savinay Narendra',
-                    email: 'savinay.90@gmail.com',
-                    incomingEmail: 'savinay.90@gmail.mail.dodatado.io'
-                }]
+                var length = InviteIdService.getInvitedMembers().length;
+                $scope.$watch('length', function (){
+                    $scope.invTeamMember = true;
+                })
+
+                for (var i = 0; i < currentApp.team.length; i++) {
+                    $scope.team.push({
+                        name: currentApp.team[i].accid.name,
+                        email: currentApp.team[i].accid.email
+                    })
+                };
+
+                // $scope.team.push({
+                //     name: 
+                // })
+                // $scope.team = [{
+                //     name: 'Savinay Narendra',
+                //     email: 'savinay.90@gmail.com',
+                //     incomingEmail: 'savinay.90@gmail.mail.dodatado.io'
+                // }, {
+                //     name: 'Savinay Narendra',
+                //     email: 'savinay.90@gmail.com',
+                //     incomingEmail: 'savinay.90@gmail.mail.dodatado.io'
+                // }]
 
                 $scope.removeTeamMember = function (teamMember) {
                     // TODO: Add code to remove team member
@@ -371,7 +393,8 @@ angular.module('do.settings', [])
     }
 ])
 
-.controller('appSettingsInviteCtrl', ['$scope', '$rootScope', 'AppModel', 'InviteIdService',
+.controller('appSettingsInviteCtrl', ['$scope', '$rootScope', 'AppModel',
+    'InviteIdService',
     function ($scope, $rootScope, AppModel, InviteIdService) {
         $scope.noError = true;
         $scope.error = false;
@@ -380,12 +403,11 @@ angular.module('do.settings', [])
         var inviteId = url.split("/")[6];
         InviteIdService.setInviteId(inviteId);
         var showMsg = function (err) {
-            if(err) {
+            if (err) {
                 $scope.noError = false;
                 $scope.error = true;
                 return;
-            }
-            else {
+            } else {
                 $scope.noError = true;
                 $scope.error = false;
             }

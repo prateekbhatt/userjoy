@@ -45,7 +45,7 @@ angular
             }
 
             this.addNewMember = function (data, appId) {
-                $http.post(config.apiUrl + '/apps/' + appId + '/invite',
+                $http.post(config.apiUrl + '/apps/' + appId + '/invites',
                     data)
                     .success(function (data) {
                         console.log("success");
@@ -57,7 +57,7 @@ angular
             }
 
             this.redirectUser = function (appId, inviteId, cb) {
-                $http.get(config.apiUrl + '/apps/' + appId + '/invite/' +
+                $http.get(config.apiUrl + '/apps/' + appId + '/invites/' +
                     inviteId)
                     .success(function (data) {
                         console.log("data: ", data);
