@@ -20,7 +20,7 @@
                     <br>
                     <div class="btn-group">
                         <button type="button" class="btn btn-info">Message</button>
-                        <button type="button" class="btn btn-info">Note</button>
+                        <button type="button" class="btn btn-info" ng-click="openNoteModal()">Note</button>
                         <button type="button" class="btn btn-info">Tag</button>
                     </div>
                 </div>
@@ -112,15 +112,15 @@
                                                 <thead>
                                                     <tr>
                                                         <th class="text-center">Text</th>
-                                                        <th class="text-center">Date</th>
+                                                        <th class="text-center">When</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr>
-                                                        <td>Savinay is very happy with...</td>
-                                                        <td>6 Jun</td>
+                                                    <tr ng-repeat="note in notes">
+                                                        <td>{{note.text}}</td>
+                                                        <td>{{note.when}}</td>
                                                     </tr>
-                                                    <tr>
+                                                    <!-- <tr>
                                                         <td>Savinay is an evangelist</td>
                                                         <td>5 Jun</td>
                                                     </tr>
@@ -131,7 +131,7 @@
                                                     <tr>
                                                         <td>Savinay started using our service in March</td>
                                                         <td>2 Jun</td>
-                                                    </tr>
+                                                    </tr> -->
                                                 </tbody>
                                             </table>
                                         </div>

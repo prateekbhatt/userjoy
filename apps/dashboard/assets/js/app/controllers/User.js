@@ -436,20 +436,6 @@ angular.module('do.users', [])
                     $scope.method = 'count';
                     $scope.checkMethod = true;
                     $scope.rootOperator = 'and';
-                    // $scope.newFilterArray = [{
-                    //         method: 'hasdone',
-                    //         name: 'Create new chat',
-                    //         op: '',
-                    //         val: ''
-                    //     },
-
-                    //     {
-                    //         method: 'count',
-                    //         name: 'Logged In',
-                    //         op: 'gt',
-                    //         val: 20
-                    //     }
-                    // ]
 
 
                     $scope.selectFilter = 'Users';
@@ -1033,9 +1019,9 @@ angular.module('do.users', [])
 ])
 
 .controller('ProfileCtrl', ['$scope', 'UserModel', 'CurrentAppService',
-    'InboxMsgService', '$moment', 'UserList',
+    'InboxMsgService', '$moment', 'UserList', '$modal', 'NotesService',
     function ($scope, UserModel, CurrentAppService, InboxMsgService,
-        $moment, UserList) {
+        $moment, UserList, $modal, NotesService) {
 
         // TODO: Get data from backend
 
@@ -1046,7 +1032,7 @@ angular.module('do.users', [])
                 $scope.useremail = UserList.getUserEmail();
                 var populateMsgList = function (err) {
                     $scope.msgs = [];
-                    if(err) {
+                    if (err) {
                         return err;
                     }
                     for (var i = 0; i < InboxMsgService.getLatestConversations()
@@ -1064,8 +1050,36 @@ angular.module('do.users', [])
                     };
                 }
 
+                var populateNotes = function (err) {
+                    $scope.notes = [];
+                    if(err) {
+                        return err;
+                    }
+
+                    for (var i = 0; i < NotesService.getNotes().length; i++) {
+                        $scope.notes.push({
+                            text: NotesService.getNotes()[i].note,
+                            when: $moment(NotesService.getNotes()[i].ct).fromNow()
+                        })
+                    };
+                }
+
+                UserModel.getNotes(currentApp._id, uid, populateNotes);
+
                 UserModel.getLatestConversations(currentApp._id, uid,
                     populateMsgList);
+
+                var noteModal = $modal({
+                    scope: $scope,
+                    template: '/templates/usersmodule/note.modal.html',
+                    show: false
+                });
+
+                $scope.openNoteModal = function () {
+                    noteModal.show();
+                }
+
+                $scope.title = "Create Note";
 
                 $scope.healthScore = '50';
                 $scope.plan = 'Basic';
@@ -1210,6 +1224,24 @@ angular.module('do.users', [])
 
                 }
             })
+    }
+])
+
+.controller('notesCtrl', ['$scope', 'UserModel', 'CurrentAppService',
+    function ($scope, UserModel, CurrentAppService) {
+
+        CurrentAppService.getCurrentApp()
+            .then(function (currentApp) {
+                var url = window.location.href;
+                var uid = url.split("/")[5];
+                $scope.createNote = function () {
+                    var data = {
+                        note: $scope.notetext
+                    };
+                    UserModel.createNote(currentApp._id, uid, data);
+                }
+            })
+
     }
 ])
 
