@@ -90,6 +90,38 @@ describe('Model App', function () {
 
   });
 
+  describe('#findByAccountId', function () {
+
+    it('should return all apps belonging to an account', function (done) {
+      App.findByAccountId(saved.accounts.first._id, function (err, apps) {
+        console.log(err, apps[0].team[0].accid);
+
+        expect(err)
+          .to.not.exist;
+
+        expect(apps)
+          .to.be.an("array")
+          .and.to.not.be.empty;
+
+        expect(apps[0].team)
+          .to.be.an('array')
+          .and.to.not.be.empty;
+
+        expect(apps[0].team[0].accid)
+          .to.have.property('_id');
+
+        expect(apps[0].team[0].accid)
+          .to.have.property('name');
+
+        expect(apps[0].team[0].accid)
+          .to.have.property('email');
+
+        done();
+      });
+    });
+
+  });
+
   describe('#checkUrl', function () {
 
     var fetchedApp;
