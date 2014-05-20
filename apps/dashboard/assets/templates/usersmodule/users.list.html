@@ -233,16 +233,16 @@
                         <td width="30" style="text-align: left">
                             <input type="checkbox" ng-model="checkboxes.items[user.id]" />
                         </td>
-                        <td data-title="'Email Id'" class="text-center" sortable="email" ng-show="columns[1].visible">
+                        <td data-title="'Email Id'" class="text-center" sortable="email" ng-show="columns[1].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
                             <span>{{user.email}}</span>
                         </td>
-                        <td data-title="'User Karma'" class="text-center" sortable="userkarma" ng-show="columns[2].visible">
+                        <td data-title="'User Karma'" class="text-center" sortable="userkarma" ng-show="columns[2].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
                             <span>{{user.userkarma}}</span>
                         </td>
-                        <td data-title="'Date Joined'" class="text-center" sortable="datejoined" ng-show="columns[3].visible">
+                        <td data-title="'Date Joined'" class="text-center" sortable="datejoined" ng-show="columns[3].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
                             <span>{{user.datejoined}}</span>
                         </td>
-                        <td data-title="'Unsubscribed'" class="text-center" sortable="status" ng-show="columns[4].visible">
+                        <td data-title="'Unsubscribed'" class="text-center" sortable="status" ng-show="columns[4].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
                             <span>{{user.unsubscribed}}</span>
                         </td>
                     </tr>
