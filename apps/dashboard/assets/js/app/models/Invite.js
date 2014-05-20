@@ -1,7 +1,7 @@
 angular
     .module('models.Invite', ['services'])
-    .service('InviteModel', ['$http', 'config', '$location', 'AuthService',
-        function ($http, config, $location, AuthService) {
+    .service('InviteModel', ['$http', 'config', '$location', 'AuthService', 'InviteIdService',
+        function ($http, config, $location, AuthService, InviteIdService) {
             this.registerInvitedMember = function (email, password,
                 inviteId) {
                 var data = {
@@ -23,6 +23,16 @@ angular
                             "error in creating invited member account"
                         );
                     })
+            }
+
+            this.getPendingInvites = function (appId, cb) {
+                $http.get(config.apiUrl + '/apps/' + appId + '/invites')
+                    .success(function(data){
+                        console.log("success: ", data);
+                        InviteIdService.setInvitedMembers(data);
+                        cb()
+                    })
+                    .error (cb);
             }
 
             return this;

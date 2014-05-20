@@ -436,20 +436,20 @@ angular.module('do.users', [])
                     $scope.method = 'count';
                     $scope.checkMethod = true;
                     $scope.rootOperator = 'and';
-                    $scope.newFilterArray = [{
-                            method: 'hasdone',
-                            name: 'Create new chat',
-                            op: '',
-                            val: ''
-                        },
+                    // $scope.newFilterArray = [{
+                    //         method: 'hasdone',
+                    //         name: 'Create new chat',
+                    //         op: '',
+                    //         val: ''
+                    //     },
 
-                        {
-                            method: 'count',
-                            name: 'Logged In',
-                            op: 'gt',
-                            val: 20
-                        }
-                    ]
+                    //     {
+                    //         method: 'count',
+                    //         name: 'Logged In',
+                    //         op: 'gt',
+                    //         val: 20
+                    //     }
+                    // ]
 
 
                     $scope.selectFilter = 'Users';
@@ -742,7 +742,7 @@ angular.module('do.users', [])
                         for (var i = 0; i < $scope.filters.length; i++) {
                             $scope.filtersBackend.push({
                                 method: $scope.filters[i].method,
-                                type: 'feature',
+                                type: $scope.filters[i].type,
                                 name: $scope.filters[i].name,
                                 op: $scope.filters[i].op,
                                 val: $scope.filters[i].val,
@@ -799,7 +799,7 @@ angular.module('do.users', [])
                         for (var i = 0; i < $scope.filters.length; i++) {
                             $scope.filtersBackend.push({
                                 method: $scope.filters[i].method,
-                                type: 'feature',
+                                type: $scope.filters[i].type,
                                 name: $scope.filters[i].name,
                                 op: $scope.filters[i].op,
                                 val: $scope.filters[i].val
@@ -829,6 +829,7 @@ angular.module('do.users', [])
                         console.log("$scope.queries: ", $scope.queries);
                         getFilters = segmentService.getSingleSegment()
                             .filters;
+                        console.log("getFilers: ", getFilters);
                         for (var i = 0; i < getFilters.length; i++) {
                             var buttonText = '';
                             var btnName = '';
@@ -875,7 +876,8 @@ angular.module('do.users', [])
                                 name: btnName,
                                 op: getFilters[i].op,
                                 optext: operationText,
-                                val: getFilters[i].val
+                                val: getFilters[i].val,
+                                type: getFilters[i].type
                             })
 
                         };
@@ -883,7 +885,8 @@ angular.module('do.users', [])
                             .list;
                         $scope.queryObject.op = segmentService.getSingleSegment()
                             .op;
-                        $scope.queryObject.filters = $scope.getFilters;
+                        $scope.queryObject.filters = getFilters;
+                        console.log("queryobject: ", $scope.queryObject);
 
                         var stringifiedQueryObject = stringify($scope.queryObject);
                         console.log('queryObj', $scope.queryObject);

@@ -9,7 +9,7 @@ angular.module('models.message', ['services'])
             var data = {
                 sName: 'Savinay',
                 sub: sub,
-                text: text,
+                body: text,
                 type: 'email',
                 uids: uid
             }
@@ -81,7 +81,7 @@ angular.module('models.message', ['services'])
         this.replyToMsg = function (appId, coId, reply, accid, callback) {
 
             var data = {
-                text: reply
+                body: reply
             }
 
             console.log("data replyToMsg: ", data);
