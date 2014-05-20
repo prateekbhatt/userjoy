@@ -293,6 +293,28 @@ router
 
 
 
+/**
+ * GET /apps/:aid/invites
+ *
+ * Gets all pending invites
+ */
+
+router
+  .route('/:aid/invites')
+  .get(function (req, res, next) {
+
+    Invite
+      .find({
+        aid: req.params.aid
+      })
+      .exec(function (err, invites) {
+        if (err) return next(err);
+        res
+          .status(200)
+          .json(invites);
+      });
+
+  });
 
 
 module.exports = router;

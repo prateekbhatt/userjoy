@@ -21,6 +21,72 @@ describe('Resource /apps/:aid/invites', function () {
   });
 
 
+  describe('GET /apps/:aid/invites', function () {
+
+    var testUrl;
+    var testInvite;
+
+    before(function (done) {
+      testInvite = saved.invites.first;
+      testUrl = '/apps/' + saved.apps.first._id + '/invites/';
+      logoutUser(done);
+    });
+
+    it('should return error if not logged in',
+
+      function (done) {
+
+        request
+          .get(testUrl)
+          .expect('Content-Type', /json/)
+          .expect(401)
+          .end(done);
+
+      });
+
+
+    it('logging in user', function (done) {
+      loginUser(done);
+    });
+
+
+    it('should return all invites belonging to an app', function (done) {
+
+      request
+        .get(testUrl)
+        .set('cookie', loginCookie)
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function (err, res) {
+          console.log(res.body);
+
+          expect(res.body)
+            .to.be.an("array");
+
+          expect(res.body)
+            .to.not.be.empty;
+
+          expect(res.body[0])
+            .to.have.property("toName");
+
+          expect(res.body[0])
+            .to.have.property("toEmail");
+
+          expect(res.body[0])
+            .to.have.property("from");
+
+          expect(res.body[0])
+            .to.have.property("aid");
+
+          done(err);
+        });
+
+    });
+
+
+  });
+
+
   describe('POST /apps/:aid/invites', function () {
 
     var testUrl;
@@ -225,5 +291,8 @@ describe('Resource /apps/:aid/invites', function () {
 
 
   });
+
+
+
 
 });
