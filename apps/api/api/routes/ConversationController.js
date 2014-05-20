@@ -267,9 +267,9 @@ router
 
     // since this is a multi-query request (transaction), we need to make all
     // input validations upfront
-    // uids, subject, text, type
-    if (!(uids && aid && sub && newMsg.text && newMsg.type)) {
-      return res.badRequest('Missing uids/sub/text/type');
+    // uids, body, subject, type
+    if (!(uids && aid && sub && newMsg.body && newMsg.type)) {
+      return res.badRequest('Missing body/sub/type/uids');
     }
 
 
@@ -333,7 +333,7 @@ router
                   };
 
                   // render body and subject
-                  newMsg.text = render.string(newMsg.text, locals);
+                  newMsg.body = render.string(newMsg.body, locals);
                   newMsg.sub = render.string(newMsg.sub, locals);
 
                   Message.create(newMsg, function (err, msg) {
@@ -414,9 +414,9 @@ router
 
     // since this is a multi-query request (transaction), we need to make all
     // input validations upfront
-    // text
-    if (!(reply.text)) {
-      return res.badRequest('Missing text');
+    // body
+    if (!(reply.body)) {
+      return res.badRequest('Missing body');
     }
 
     async.waterfall(

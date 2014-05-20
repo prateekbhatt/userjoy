@@ -36,7 +36,7 @@ describe('Model Message', function () {
   describe('#create', function () {
 
     it(
-      'should return error if aid/coId/from/sub/text/type/uid is not provided',
+      'should return error if aid/body/coId/from/sub/type/uid is not provided',
       function (done) {
 
         var newCon = {};
@@ -53,6 +53,9 @@ describe('Model Message', function () {
           expect(err.errors.aid.message)
             .to.eql('Invalid aid');
 
+          expect(err.errors.body.message)
+            .to.eql('Provide message body');
+
           expect(err.errors.coId.message)
             .to.eql('Invalid conversation id');
 
@@ -61,9 +64,6 @@ describe('Model Message', function () {
 
           expect(err.errors.sub.message)
             .to.eql('Provide subject');
-
-          expect(err.errors.text.message)
-            .to.eql('Provide message text');
 
           expect(err.errors.type.message)
             .to.eql('Provide message type');
@@ -85,9 +85,9 @@ describe('Model Message', function () {
       var newMessage = {
         accid: randomId,
         aid: randomId,
+        body: 'Hello World',
         coId: randomId,
         from: 'user',
-        text: 'Hello World',
         type: 'email',
         sName: 'Prateek Bhatt',
         sub: 'Subject I Am',
@@ -107,8 +107,8 @@ describe('Model Message', function () {
         expect(msg.aid.toString())
           .to.eql(newMessage.aid);
 
-        expect(msg.text)
-          .to.eql(newMessage.text);
+        expect(msg.body)
+          .to.eql(newMessage.body);
 
         expect(msg.sub)
           .to.eql(newMessage.sub);
@@ -264,11 +264,11 @@ describe('Model Message', function () {
       var adminReply = {
         accid: savedMsg.accid,
         aid: savedMsg.aid,
+        body: 'This is a new reply',
         coId: savedMsg.coId,
         from: 'account',
         sName: 'Prateek Sender',
         sub: savedMsg.sub,
-        text: 'This is a new reply',
         type: 'email',
         uid: savedMsg.uid
       };

@@ -247,7 +247,7 @@ describe('Resource /mandrill', function () {
       expect(event.aid)
         .to.eql(aid.toString());
 
-      expect(event.text)
+      expect(event.body)
         .to.eql(replyEvent.msg.text);
 
     });
@@ -286,7 +286,7 @@ describe('Resource /mandrill', function () {
         expect(savedReply.sent)
           .to.eql(true);
 
-        expect(savedReply.text)
+        expect(savedReply.body)
           .to.eql(replyEvent.msg.text);
 
         done();
@@ -350,7 +350,7 @@ describe('Resource /mandrill', function () {
           .to.have.property("sent", true);
 
         expect(savedMessage)
-          .to.have.property("text", newMessageEvent.msg.text);
+          .to.have.property("body", newMessageEvent.msg.text);
 
         done();
       })

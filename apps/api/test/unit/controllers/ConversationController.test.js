@@ -443,7 +443,7 @@ describe('Resource /apps/:aid/conversations', function () {
         loginUser(done);
       });
 
-    it('should return error if uids/sub/text/type is not provided',
+    it('should return error if body/sub/type/uids is not provided',
 
       function (done) {
 
@@ -457,7 +457,7 @@ describe('Resource /apps/:aid/conversations', function () {
           .expect(400)
           .expect({
             status: 400,
-            error: 'Missing uids/sub/text/type'
+            error: 'Missing body/sub/type/uids'
           })
           .end(done);
 
@@ -468,9 +468,9 @@ describe('Resource /apps/:aid/conversations', function () {
       function (done) {
         var uids = [saved.users.first._id];
         var newMessage = {
+          body: 'This is the message I want to send to {{= user.email || "YOU" }}',
           sName: 'Prateek Bhatt',
           sub: 'Welcome to UserJoy, {{= user.email || "you"}}',
-          text: 'This is the message I want to send to {{= user.email || "YOU" }}',
           type: 'email',
           uids: uids,
         };
@@ -487,13 +487,14 @@ describe('Resource /apps/:aid/conversations', function () {
 
             expect(res.body).to.have.length(1);
 
-            expect(res.body[0].sub)
-              .to.eql('Welcome to UserJoy, prattbhatt@gmail.com');
-
-            expect(res.body[0].text)
+            expect(res.body[0].body)
               .to.eql(
                 'This is the message I want to send to prattbhatt@gmail.com'
             );
+
+            expect(res.body[0].sub)
+              .to.eql('Welcome to UserJoy, prattbhatt@gmail.com');
+
           })
           .end(done);
 
@@ -537,7 +538,7 @@ describe('Resource /apps/:aid/conversations', function () {
         loginUser(done);
       });
 
-    it('should return error if text is not provided',
+    it('should return error if body is not provided',
 
       function (done) {
 
@@ -551,7 +552,7 @@ describe('Resource /apps/:aid/conversations', function () {
           .expect(400)
           .expect({
             status: 400,
-            error: 'Missing text'
+            error: 'Missing body'
           })
           .end(done);
 
@@ -562,7 +563,7 @@ describe('Resource /apps/:aid/conversations', function () {
       function (done) {
 
         var newMessage = {
-          text: 'This is the message I want to reply'
+          body: 'This is the message I want to reply'
         };
 
         request
@@ -572,8 +573,8 @@ describe('Resource /apps/:aid/conversations', function () {
           .expect('Content-Type', /json/)
           .expect(201)
           .expect(function (res) {
-            expect(res.body.text)
-              .to.eql(newMessage.text);
+            expect(res.body.body)
+              .to.eql(newMessage.body);
             expect(res.body.sName)
               .to.exist;
           })

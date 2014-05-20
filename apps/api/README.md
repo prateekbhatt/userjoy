@@ -329,6 +329,7 @@ User          | companies, notes        | users of a specific app. create a new 
 
 - accid
 - aid
+- body
 - clicked (boolean)
 - coId
 - ct
@@ -337,7 +338,6 @@ User          | companies, notes        | users of a specific app. create a new 
 - sent (boolean)
 - sName
 - sub
-- text
 - type (email / notification)
 - uid
 - ut
@@ -431,7 +431,7 @@ User          | companies, notes        | users of a specific app. create a new 
 {
   sName: 'Prateek Bhatt',
   sub: 'Welcome to UserJoy!',
-  text: 'This is the message you want to send',
+  body: 'This is the message you want to send',
   type: 'email',
   uid: '535e5aafddda18934d1a2c6f'
 }
@@ -443,7 +443,7 @@ User          | companies, notes        | users of a specific app. create a new 
 {
   sName: 'Prateek Bhatt',
   sub: 'Welcome to UserJoy!',
-  text: 'This is the message I want to send',
+  body: 'This is the message I want to send',
   type: 'email',
   uid: '535e5aafddda18934d1a2c6f',
   from: 'account',
@@ -467,7 +467,7 @@ User          | companies, notes        | users of a specific app. create a new 
 ```js
 {
   sName: 'John Sender',
-  text: 'This is the message I want to send'
+  body: 'This is the message I want to send'
 }
 ```
 
@@ -476,7 +476,7 @@ User          | companies, notes        | users of a specific app. create a new 
 ```js
 {
   __v: 0,
-  text: 'This is the message I want to send',
+  body: 'This is the message I want to send',
   type: 'email',
   accid: '535e67a2455135db1815b072',
   aid: '535e67a2455135db1815b074',

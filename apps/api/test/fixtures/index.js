@@ -28,11 +28,22 @@ var Segment = require('../../api/models/Segment');
 var User = require('../../api/models/User');
 
 
+/**
+ * Helpers
+ */
+
+var logger = require('../../helpers/logger');
+
+
+/**
+ * Fixtures
+ */
+
 var accounts = {
 
   first: {
     name: 'Prateek',
-    email: 'test@userjoy.co',
+    email: 'prattbhatt@gmail.com',
     password: 'testtest'
   },
 
@@ -96,11 +107,11 @@ var accounts = {
     first: {
       accid: null,
       aid: null,
+      body: 'Hello World',
       coId: null,
       from: 'user',
       sName: 'Prateek Bhatt',
       sub: 'New Subject',
-      text: 'Hello World',
       type: 'email',
       uid: ObjectId(),
     },
@@ -108,11 +119,11 @@ var accounts = {
     second: {
       accid: null,
       aid: null,
+      body: 'Hello World',
       coId: null,
       from: 'user',
       sName: 'Prateek Bhatt',
       sub: 'New Subject',
-      text: 'Hello World',
       type: 'email',
       uid: ObjectId(),
     }
@@ -447,6 +458,13 @@ module.exports = function loadFixtures(callback) {
     },
 
   }, function (err) {
+
+    if (err) {
+      logger.crit({
+        at: 'test/fixtures/index.js',
+        err: err
+      });
+    }
 
     var savedObj = {
       accounts: accounts,

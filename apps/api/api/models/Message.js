@@ -36,6 +36,13 @@ var MessageSchema = new Schema({
   },
 
 
+  // message body
+  body: {
+    type: String,
+    required: [true, 'Provide message body']
+  },
+
+
   clicked: {
     type: Boolean,
     default: false
@@ -63,11 +70,6 @@ var MessageSchema = new Schema({
     enum: ['user', 'account']
   },
 
-  // message text
-  text: {
-    type: String,
-    required: [true, 'Provide message text']
-  },
 
   type: {
     type: String,
