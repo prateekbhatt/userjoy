@@ -41,6 +41,17 @@ var eventTypeValidator = [validate({
 )];
 
 
+
+/**
+ * The filter schema embedded objects should not have a default object id
+ * associated with them
+ */
+
+var filterSchemaOptions = {
+  _id: false
+};
+
+
 /**
  * Define filter schema
  * Filters are embedded documents inside segments
@@ -49,42 +60,46 @@ var eventTypeValidator = [validate({
 var SegmentFilterSchema = new Schema({
 
 
-  method: {
-    type: 'String',
-    required: [true, 'Filter method is required'],
-    validate: methodValidator
+    method: {
+      type: 'String',
+      required: [true, 'Filter method is required'],
+      validate: methodValidator
+    },
+
+
+    // event type
+    type: {
+      type: String,
+      validate: eventTypeValidator
+    },
+
+
+    name: {
+      type: String,
+      required: [true, 'Name is required in segment filter']
+    },
+
+
+    feature: {
+      type: String
+    },
+
+
+    op: {
+      type: String
+    },
+
+
+    val: {
+      type: String
+    }
+
+
   },
 
 
-  // event type
-  type: {
-    type: String,
-    validate: eventTypeValidator
-  },
-
-
-  name: {
-    type: String,
-    required: [true, 'Name is required in segment filter']
-  },
-
-
-  feature: {
-    type: String
-  },
-
-
-  op: {
-    type: String
-  },
-
-
-  val: {
-    type: String
-  }
-
-
-});
+  filterSchemaOptions
+);
 
 
 /**
@@ -123,14 +138,14 @@ var SegmentSchema = new Schema({
   // list upon segment
   list: {
     type: String,
-    required:[true, 'Invalid list'],
+    required: [true, 'Invalid list'],
     enum: LIST_TYPES
   },
 
 
   name: {
     type: String,
-    required:[true, 'Invalid segment name']
+    required: [true, 'Invalid segment name']
   },
 
 
