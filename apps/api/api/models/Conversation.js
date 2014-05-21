@@ -177,12 +177,19 @@ ConversationSchema.statics.toBeRead = function (coId, cb) {
 /**
  * Assigns account to conversation
  *
+ * @param {string} aid app-id
  * @param {string} accId account-id
  * @param {string} coId conversation-id
  * @param {function} cb callback
  */
 
-ConversationSchema.statics.assign = function (coId, accId, cb) {
+ConversationSchema.statics.assign = function (aid, coId, accId, cb) {
+
+  var conditions = {
+    _id: coId,
+    aid: aid
+  };
+
   var update = {
     $set: {
       accId: accId,
@@ -190,7 +197,7 @@ ConversationSchema.statics.assign = function (coId, accId, cb) {
     }
   };
 
-  Conversation.findByIdAndUpdate(coId, update, cb);
+  Conversation.findOneAndUpdate(conditions, update, cb);
 };
 
 
