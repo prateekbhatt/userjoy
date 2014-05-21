@@ -121,7 +121,7 @@ router
   .route('/:aid/segments')
   .post(function (req, res, next) {
 
-    logger.debug('creating new segment');
+    logger.trace('creating new segment');
 
     var newSegment = req.body;
     var accid = req.user._id;
@@ -142,6 +142,61 @@ router
           .status(201)
           .json(savedSegment);
       });
+
+  });
+
+
+/**
+ * PUT /apps/:aid/segments/:sid
+ *
+ * Updates segment
+ */
+
+router
+  .route('/:aid/segments/:sid')
+  .post(function (req, res, next) {
+
+    logger.trace({
+      at: 'segment:update',
+      params: req.params
+    });
+
+    // sanitize the segment object
+    var santizedSeg = sanitize(req.body);
+
+
+    async.waterfall(
+
+      [
+
+        function findSegment(cb) {
+          Segment
+            .findById(req.params.sid)
+            .exec(cb);
+        },
+
+
+        function updateSegment(seg, cb) {
+
+          // only allow to update filters/name/op
+          seg.filters = santizedSeg.filters;
+          seg.name = santizedSeg.name;
+          seg.op = santizedSeg.op;
+
+          seg.save(cb);
+
+        }
+
+      ],
+
+      function callback(err, updatedSegment) {
+
+        if (err) return next(err);
+        res
+          .status(201)
+          .json(updatedSegment)
+      }
+    );
 
   });
 
