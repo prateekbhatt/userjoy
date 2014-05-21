@@ -271,9 +271,10 @@ describe('Model Conversation', function () {
       var savedCon = saved.conversations.first;
       var assignee = randomId();
       var coId = savedCon._id;
+      var aid = savedCon.aid;
 
 
-      Conversation.assign(coId, assignee, function (err, con) {
+      Conversation.assign(aid, coId, assignee, function (err, con) {
 
         expect(err)
           .to.not.exist;
@@ -281,6 +282,12 @@ describe('Model Conversation', function () {
         expect(con.accId.toString())
           .to.eql(assignee.toString())
           .to.not.eql(savedCon.accId.toString());
+
+        expect(con.aid.toString())
+          .to.eql(aid.toString());
+
+        expect(con._id.toString())
+          .to.eql(coId.toString());
 
         done();
 
