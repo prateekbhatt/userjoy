@@ -242,4 +242,98 @@ describe('Resource /apps/:aid/segments', function () {
   });
 
 
+  describe('PUT /apps/:aid/segments/:sid', function () {
+
+    var aid, sid;
+    var testSeg;
+    var testUrl;
+
+    before(function (done) {
+      testSeg = saved.segments.first;
+      sid = testSeg._id;
+      aid = testSeg.aid;
+      testUrl = '/apps/' + aid + '/segments/' + sid;
+      logoutUser(done);
+    });
+
+
+    it('should return error if not logged in', function (done) {
+
+      request
+        .put(testUrl)
+        .send({})
+        .expect('Content-Type', /json/)
+        .expect(401)
+        .expect({
+          status: 401,
+          error: 'Unauthorized'
+        })
+        .end(done);
+
+    });
+
+
+    it('logging in user', function (done) {
+      loginUser(done);
+    });
+
+
+    it('should update segment', function (done) {
+
+
+      var updatedFilters = [
+
+        {
+          method: 'hasdone',
+          name: 'Add User',
+          type: 'feature'
+        }
+
+      ];
+
+      var updateSegment = {
+        list: 'users',
+        name: 'Updated Name',
+        filters: updatedFilters,
+        op: 'or',
+      };
+
+      request
+        .post(testUrl)
+        .set('cookie', loginCookie)
+        .send(updateSegment)
+        .expect('Content-Type', /json/)
+        .expect(201)
+        .expect(function (res) {
+
+          expect(res.body)
+            .to.be.an('object')
+            .and.to.not.be.empty;
+
+          expect(res.body)
+            .to.have.property("filters")
+            .that.is.an("array")
+            .that.deep.equals(updatedFilters)
+            .that.not.deep.equals(testSeg.filters);
+
+          expect(res.body)
+            .to.have.property("op")
+            .that.is.an("string")
+            .that.equals(updateSegment.op)
+            .that.not.equals(testSeg.op);
+
+          expect(res.body)
+            .to.have.property("name")
+            .that.is.an("string")
+            .that.equals(updateSegment.name)
+            .that.not.equals(testSeg.name);
+
+
+        })
+        .end(done);
+
+    });
+
+  });
+
 });

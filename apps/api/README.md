@@ -26,7 +26,6 @@ This app contains an expressjs api which exposes a rest interface for the db.
 | op    | operator (and / or)   |
 | p     | path (event url)      |
 | pl    | platform              |
-| seId  | segment id            |
 | sid   | segment id            |
 | sname | sender name (message) |
 | sub   | email subject         |
@@ -393,7 +392,7 @@ UserNote      |                         | notes created by team members about a 
 - aid
 - creator (accid)
 - ct
-- seId
+- sid
 - tId
 - ut
 

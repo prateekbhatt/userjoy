@@ -2,6 +2,7 @@
  * npm dependencies
  */
 
+var _ = require('lodash');
 var async = require('async');
 var nodemailer = require('nodemailer');
 var path = require('path');
@@ -15,7 +16,8 @@ var templatesDir = path.resolve(__dirname, '../..', 'email_templates');
 
 
 var MANDRILL_USER = 'prateek@dodatado.com';
-var MANDRILL_PASS = 'yhR70QpRFKF76wmlM7wNRg';
+var MANDRILL_PRODUCTION_KEY = 'yhR70QpRFKF76wmlM7wNRg';
+var MANDRILL_TEST_KEY = 'H2mkRaMDFP07M02p0MFhCg';
 var INBOUND_MAIL_DOMAIN = 'mail.userjoy.co';
 var UJ_SUPPORT_EMAIL = 'support@userjoy.co';
 var UJ_SUPPORT_NAME = 'UserJoy';
@@ -27,6 +29,18 @@ var UJ_SUPPORT_NAME = 'UserJoy';
 
 var logger = require('../../helpers/logger');
 var render = require('../../helpers/render-message');
+
+
+var MANDRILL_PASS = MANDRILL_PRODUCTION_KEY;
+
+// TODO: This should be handled in the apps/config
+if (!_.contains(['production', 'development'], process.env.NODE_ENV)) {
+  MANDRILL_PASS = MANDRILL_TEST_KEY;
+  logger.trace({
+    at: 'mailer',
+    key: 'Using Mandrill Test Key'
+  });
+}
 
 
 //

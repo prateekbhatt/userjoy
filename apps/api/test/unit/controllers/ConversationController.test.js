@@ -4,8 +4,7 @@ describe('Resource /apps/:aid/conversations', function () {
    * npm dependencies
    */
 
-  var ObjectId = require('mongoose')
-    .Types.ObjectId;
+  var mongoose = require('mongoose');
 
 
   /**
@@ -23,15 +22,16 @@ describe('Resource /apps/:aid/conversations', function () {
   var Message = require('../../../api/models/Message');
 
 
+  /**
+   * Test variables
+   */
+
   var newConversation = {
     name: 'My New Conversation'
-  },
+  };
 
-    randocoId = '532d6bf862d673ba7131812a',
-
-    aid,
-
-    basePath;
+  var randomId = mongoose.Types.ObjectId;
+  var aid, basePath;
 
 
   before(function (done) {
@@ -56,7 +56,7 @@ describe('Resource /apps/:aid/conversations', function () {
     });
 
 
-    it('returns error if not logged in',
+    it('should return error if not logged in',
 
       function (done) {
 
@@ -113,7 +113,7 @@ describe('Resource /apps/:aid/conversations', function () {
     });
 
 
-    it('returns error if not logged in',
+    it('should return error if not logged in',
 
       function (done) {
 
@@ -419,7 +419,7 @@ describe('Resource /apps/:aid/conversations', function () {
     });
 
 
-    it('returns error if not logged in',
+    it('should return error if not logged in',
 
       function (done) {
 
@@ -483,9 +483,11 @@ describe('Resource /apps/:aid/conversations', function () {
           .expect(201)
           .expect(function (res) {
 
-            expect(res.body).to.be.an("array");
+            expect(res.body)
+              .to.be.an("array");
 
-            expect(res.body).to.have.length(1);
+            expect(res.body)
+              .to.have.length(1);
 
             expect(res.body[0].body)
               .to.eql(
@@ -514,7 +516,7 @@ describe('Resource /apps/:aid/conversations', function () {
     });
 
 
-    it('returns error if not logged in',
+    it('should return error if not logged in',
 
       function (done) {
 
@@ -581,6 +583,81 @@ describe('Resource /apps/:aid/conversations', function () {
           .end(done);
 
       });
+
+  });
+
+
+  describe('PUT /apps/:aid/conversations/:coId/assign', function () {
+
+    var savedCon;
+    var testUrl;
+
+    before(function (done) {
+      savedCon = saved.conversations.first;
+      testUrl = basePath + '/' + savedCon._id + '/assign';
+      logoutUser(done);
+    });
+
+
+    it('should return error if not logged in', function (done) {
+
+      request
+        .put(testUrl)
+        .send({})
+        .expect('Content-Type', /json/)
+        .expect(401)
+        .expect({
+          status: 401,
+          error: 'Unauthorized'
+        })
+        .end(done);
+
+    });
+
+
+    it('logging in user', function (done) {
+      loginUser(done);
+    });
+
+    it('should return error if accId is not provided', function (done) {
+
+      request
+        .put(testUrl)
+        .set('cookie', loginCookie)
+        .send({})
+        .expect('Content-Type', /json/)
+        .expect(400)
+        .expect({
+          status: 400,
+          error: 'Provide valid account id (accId)'
+        })
+        .end(done);
+
+    });
+
+    it('should assign conversation', function (done) {
+
+      var assignee = randomId();
+
+      request
+        .put(testUrl)
+        .set('cookie', loginCookie)
+        .send({
+          accId: assignee
+        })
+        .expect('Content-Type', /json/)
+        .expect(201)
+        .expect(function (res) {
+
+          expect(res.body)
+            .to.have.property('accId')
+            .that.eqls(assignee.toString())
+            .that.not.eqls(savedCon.accId.toString());
+
+        })
+        .end(done);
+
+    });
 
   });
 

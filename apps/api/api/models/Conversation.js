@@ -107,7 +107,10 @@ ConversationSchema.pre('save', function (next) {
 
 ConversationSchema.statics.closed = function (coId, cb) {
   var update = {
-    closed: true
+    $set: {
+      closed: true,
+      ut: Date.now()
+    }
   };
 
   Conversation.findByIdAndUpdate(coId, update, cb);
@@ -123,7 +126,10 @@ ConversationSchema.statics.closed = function (coId, cb) {
 
 ConversationSchema.statics.reopened = function (coId, cb) {
   var update = {
-    closed: false
+    $set: {
+      closed: false,
+      ut: Date.now()
+    }
   };
 
   Conversation.findByIdAndUpdate(coId, update, cb);
@@ -139,7 +145,10 @@ ConversationSchema.statics.reopened = function (coId, cb) {
 
 ConversationSchema.statics.isRead = function (coId, cb) {
   var update = {
-    toRead: false
+    $set: {
+      toRead: false,
+      ut: Date.now()
+    }
   };
 
   Conversation.findByIdAndUpdate(coId, update, cb);
@@ -155,11 +164,42 @@ ConversationSchema.statics.isRead = function (coId, cb) {
 
 ConversationSchema.statics.toBeRead = function (coId, cb) {
   var update = {
-    toRead: true
+    $set: {
+      toRead: true,
+      ut: Date.now()
+    }
   };
 
   Conversation.findByIdAndUpdate(coId, update, cb);
 };
+
+
+/**
+ * Assigns account to conversation
+ *
+ * @param {string} aid app-id
+ * @param {string} accId account-id
+ * @param {string} coId conversation-id
+ * @param {function} cb callback
+ */
+
+ConversationSchema.statics.assign = function (aid, coId, accId, cb) {
+
+  var conditions = {
+    _id: coId,
+    aid: aid
+  };
+
+  var update = {
+    $set: {
+      accId: accId,
+      ut: Date.now()
+    }
+  };
+
+  Conversation.findOneAndUpdate(conditions, update, cb);
+};
+
 
 
 var Conversation = mongoose.model('Conversation', ConversationSchema);
