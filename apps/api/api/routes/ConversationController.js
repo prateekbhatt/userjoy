@@ -482,4 +482,32 @@ router
   });
 
 
+/**
+ * PUT /apps/:aid/conversations/:coId/assign
+ *
+ * Assigns team member to conversation
+ */
+
+router
+  .route('/:aid/conversations/:coId/assign')
+  .put(function (req, res, next) {
+
+    var accId = req.body.accId;
+    var aid = req.params.aid;
+    var coId = req.params.coId;
+
+    if (!accId) return res.badRequest('Provide valid account id (accId)')
+
+    Conversation.assign(aid, coId, accId, function (err, con) {
+
+      if (err) return next(err);
+      if (!con) return res.notFound('Conversation not found');
+
+      res
+        .status(201)
+        .json(con);
+    });
+  });
+
+
 module.exports = router;

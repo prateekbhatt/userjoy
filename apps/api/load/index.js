@@ -16,7 +16,7 @@ var loadRoutes = require('../config/routes');
  * Jobs
  */
 
-var automessageCron = require('../jobs/automessage');
+var automessagePublisher = require('../workers/automessagePublisher');
 
 
 /**
@@ -95,7 +95,7 @@ exports.start = function startServer(done) {
       },
 
       function startCronJobs(db, server, cb) {
-        automessageCron();
+        automessagePublisher();
         cb(null, db, server);
       }
 
