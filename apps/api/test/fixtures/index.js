@@ -203,6 +203,16 @@ var automessages = {
     sub: 'Welkom!',
     title: 'Welcome Message',
     type: 'email'
+  },
+
+  second: {
+    aid: null,
+    body: 'Hey, Welkom to Second CabanaLand!',
+    creator: null,
+    sid: null,
+    sub: 'Welkom Boss!',
+    title: 'Welcome Message',
+    type: 'email'
   }
 };
 
@@ -451,6 +461,22 @@ module.exports = function loadFixtures(callback) {
       createAutoMessage(accid, aid, sid, automessage, function (err, amsg) {
         if (err) return cb(err);
         automessages.first = amsg;
+        cb();
+      });
+
+    },
+
+
+    createSecondAutoMessage: function (cb) {
+
+      var aid = apps.first._id;
+      var accid = accounts.first._id;
+      var sid = segments.first._id;
+      var automessage = automessages.second;
+
+      createAutoMessage(accid, aid, sid, automessage, function (err, amsg) {
+        if (err) return cb(err);
+        automessages.second = amsg;
         cb();
       });
 
