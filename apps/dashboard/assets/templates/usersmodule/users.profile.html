@@ -11,7 +11,7 @@
                     <br>
                     <blockquote>
                         <p>Savinay Narendra</p> <small><cite title="Source Title">Ahmedabad, India  <i class="glyphicon glyphicon-map-marker"></i></cite></small>
-                        <small><cite title="Source Title">savinay@dodatado.com  <i class="glyphicon glyphicon-envelope"></i></cite></small>
+                        <small><cite title="Source Title">{{useremail}} <i class="glyphicon glyphicon-envelope"></i></cite></small>
                     </blockquote>
                     <br>
                     <br>
@@ -81,13 +81,13 @@
                                                 </thead>
                                                 <tbody>
                                                     <tr class="text-center" ng-repeat="msg in msgs">
-                                                        <td>{{msg.sub}}</td>
-                                                        <td>{{msg.when}}</td>
-                                                        <td>
+                                                        <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer;">{{msg.sub}}</td>
+                                                        <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer;">{{msg.when}}</td>
+                                                        <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer;">
                                                             <span class="glyphicon glyphicon-ok" ng-show="{{msg.opened}}"></span>
                                                             <span class="glyphicon glyphicon-remove" ng-show="{{!msg.opened}}"></span>
                                                         </td>
-                                                        <td>
+                                                        <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer;">
                                                             <span class="glyphicon glyphicon-ok" ng-show="{{msg.replied}}"></span>
                                                             <span class="glyphicon glyphicon-remove" ng-show="{{!msg.replied}}"></span>
                                                         </td>
@@ -117,21 +117,9 @@
                                                 </thead>
                                                 <tbody>
                                                     <tr ng-repeat="note in notes">
-                                                        <td>{{note.text}}</td>
-                                                        <td>{{note.when}}</td>
+                                                        <td class="text-center">{{note.text}}</td>
+                                                        <td class="text-center">{{note.when}}</td>
                                                     </tr>
-                                                    <!-- <tr>
-                                                        <td>Savinay is an evangelist</td>
-                                                        <td>5 Jun</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Savinay got a discount of 10%</td>
-                                                        <td>3 Jun</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Savinay started using our service in March</td>
-                                                        <td>2 Jun</td>
-                                                    </tr> -->
                                                 </tbody>
                                             </table>
                                         </div>

@@ -8,7 +8,7 @@ var app = angular.module('dodatado', [
     'services',
     'models',
     'ngTable',
-    'mgcrea.ngStrap',
+    // 'mgcrea.ngStrap',
     // 'templates-dev',
 
     'do.navbar',
@@ -198,12 +198,10 @@ var app = angular.module('dodatado', [
     function (AppService, AppModel, $log, appIdProvider, $rootScope) {
         if ($rootScope.loggedIn) {
             AppModel.get(function (err, apps) {
-                console.log("apps log", err, apps);
+                console.log("Run App", err, apps);
                 if (err) {
-                    console.log("err apps: ", err);
                     return;
                 }
-                console.log("apps: ", apps)
                 AppService.setLoggedInApps(apps);
                 // console.log("apps[0]: ", apps[0]);
                 AppService.setCurrentApp(apps[0]);
