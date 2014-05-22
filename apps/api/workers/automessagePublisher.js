@@ -80,7 +80,7 @@ var q = imq.queue("automessage");
  */
 
 function findAutoMessages(cb) {
-  logger.trace('Finding automessage cron job');
+  logger.trace('workers/automessagePublisher findAutoMessages');
 
 
   // TODO: check if this is working
@@ -93,7 +93,7 @@ function findAutoMessages(cb) {
   AutoMessage
     .find({
       active: true,
-      lastRan: {
+      lastQueued: {
         $lt: sixHoursAgo
       }
     })
@@ -113,23 +113,25 @@ function findAutoMessages(cb) {
  */
 
 function queue(msgs, cb) {
-  logger.trace('Queuing automessage cron job');
+  logger.trace('workers/automessagePublisher queue');
 
-  var iterator = function (m) {
+  var iterator = function (m, cb) {
 
     // post the automessage id in the body
-    var body = m._id;
+    var amId = m._id;
 
     // post automessage id to queue
-    q.post(body, function (err, res) {
+    q.post(m, function (err, res) {
       if (err) return cb(err);
 
       // update the lastQueued timestamp for the AutoMessage
-      AutoMessage.updateLastQueued(body, cb);
+      AutoMessage.updateLastQueued(amId, function (err) {
+        cb(err, res);
+      });
     });
   };
 
-  async.each(msgs, iterator, cb);
+  async.map(msgs, iterator, cb);
 
 }
 
@@ -140,11 +142,11 @@ function queue(msgs, cb) {
 
 function cronFunc() {
 
-  logger.trace('Started automessage cron job');
+  logger.trace('workers/automessagePublisher cronFunc');
 
   var finalCallback = function (err, res) {
 
-    logger.trace('Finished automessage cron job');
+    logger.trace('workers/automessagePublisher Completed');
 
     if (err) {
       logger.crit({
@@ -166,3 +168,11 @@ function cronFunc() {
 module.exports = function () {
   return new cronJob(SCHEDULE, cronFunc, null, true, "");
 };
+
+
+/**
+ * Expose functions for the test cases
+ */
+
+module.exports._findAutoMessages = findAutoMessages;
+module.exports._queue = queue;
