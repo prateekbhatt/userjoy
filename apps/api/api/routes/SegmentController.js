@@ -154,7 +154,7 @@ router
 
 router
   .route('/:aid/segments/:sid')
-  .post(function (req, res, next) {
+  .put(function (req, res, next) {
 
     logger.trace({
       at: 'segment:update',
