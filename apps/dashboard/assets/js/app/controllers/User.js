@@ -272,7 +272,8 @@ angular.module('do.users', [])
     'AppService', 'segment', 'queryMatching', 'eventNames',
     'userAttributes', 'lodash', '$modal',
     'UidService', '$moment', 'UserList', '$timeout', 'modelsSegment',
-    'segmentService', 'CurrentAppService', 'UserModel', '$log', 'MsgService',
+    'segmentService', 'CurrentAppService', 'UserModel', '$log',
+    'MsgService',
     function ($scope, $location, segment, queryMatching, $filter,
         countOfActions, hasNotDone, hasDoneActions,
         ngTableParams, login, modelsQuery, AppService, segment,
@@ -1048,13 +1049,19 @@ angular.module('do.users', [])
                         }
                     })
 
+                    var populateMsgOnCreation = function (err, lastNote) {
+                        if(err) {
+                            return;
+                        }
+                    }
+
                     modalInstance.result.then(function (mail) {
                         console.log("mail: ", mail)
                         console.log("subject : ", mail.sub);
                         console.log("msgtext: ", mail.msgtext);
                         console.log("uid : ", UidService.get());
                         MsgService.sendManualMessage(mail.sub,
-                            mail.msgtext, UidService.get());
+                            mail.msgtext, UidService.get(), populateMsgOnCreation);
                     }, function () {
                         $log.info('Modal dismissed at: ' + new Date());
                     });
@@ -1074,19 +1081,10 @@ angular.module('do.users', [])
             sub: '',
             msgtext: ''
         }
-        // $scope.sub = '';
-        // $scope.msgtext = '';
         $scope.sendManualMessage = function () {
             $modalInstance.close($scope.mail);
-            console.log("sub: ", $scope.sub);
-            console.log("msg: ", msgtext);
-            // MsgService.sendManualMessage($scope.sub, $scope.msgtext,
-            //     UidService.get());
-            // $scope.note = {
-            //     text: ''
-            // };
-            // $scope.sendM = function () {
-            // };
+            console.log("sub: ", $scope.mail.sub);
+            console.log("msg: ", $scope.mail.msgtext);
         }
     }
 ])
@@ -1094,11 +1092,11 @@ angular.module('do.users', [])
 .controller('ProfileCtrl', ['$scope', 'UserModel', 'CurrentAppService',
     'InboxMsgService', '$moment', 'UserList', '$modal', 'NotesService',
     '$location', '$timeout', '$state', '$stateParams', '$rootScope',
-    '$log', 'AppService',
+    '$log', 'AppService', 'MsgService',
 
     function ($scope, UserModel, CurrentAppService, InboxMsgService,
         $moment, UserList, $modal, NotesService, $location, $timeout,
-        $state, $stateParams, $rootScope, $log, AppService) {
+        $state, $stateParams, $rootScope, $log, AppService, MsgService) {
 
         $scope.notes = [];
         $scope.msgs = [];
@@ -1121,11 +1119,17 @@ angular.module('do.users', [])
             _id: $stateParams.id
         };
 
+        /**
+         * Populating the newly created note in the notes table
+         */
+
         $scope.populateNotesOnCreation = function (err, lastNote) {
 
             if (err) {
                 return err;
             }
+
+            console.log("lastNote: ", lastNote);
 
             $scope.notes.unshift({
                 text: lastNote.note,
@@ -1133,6 +1137,23 @@ angular.module('do.users', [])
                     .fromNow()
             });
         };
+
+        $scope.populateMsgOnCreation = function (err, lastMsg) {
+                if(err) {
+                    return err;
+                }
+                console.log("lastMsg: ", lastMsg[0]);
+                console.log("subject created msg: ", lastMsg[0].sub, lastMsg[0].sName, lastMsg[0].ct, lastMsg[0].toRead);
+
+                $scope.msgs.unshift({
+                    id: lastMsg[0]._id,
+                    sub: lastMsg[0].sub,
+                    when: $moment(lastMsg[0].ct)
+                        .fromNow(),
+                    opened: lastMsg[0].toRead,
+                    replied: false // TODO: get status from backend when ready
+                })
+            }
 
 
         var populateMsgList = function (err) {
@@ -1170,6 +1191,35 @@ angular.module('do.users', [])
                         .fromNow()
                 })
             };
+        };
+
+        $scope.openMessageModal = function () {
+
+            var modalInstance = $modal.open({
+                templateUrl: '/templates/usersmodule/message.modal.id.html',
+                controller: 'sendMessageCtrl',
+                size: 'lg'
+            });
+
+            modalInstance.opened.then(function () {
+                $log.info(
+                    'message modal template downloaded');
+            })
+
+            
+
+            modalInstance.result.then(function (mail) {
+                console.log("mail: ", mail)
+                console.log("subject : ", mail.sub);
+                console.log("msgtext: ", mail.msgtext);
+                var emailId = [];
+                emailId.push($stateParams.id);
+                console.log("uid : ", emailId);
+                MsgService.sendManualMessage(mail.sub,
+                    mail.msgtext, emailId, $scope.populateMsgOnCreation);
+            }, function () {
+                $log.info('Modal dismissed at: ' + new Date());
+            });
         };
 
 

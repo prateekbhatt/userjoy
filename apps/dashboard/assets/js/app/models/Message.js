@@ -4,7 +4,7 @@ angular.module('models.message', ['services'])
     'InboxMsgService', '$modal', '$location', 'ThreadService',
     function ($http, config, AppService, InboxMsgService, $modal,
         $location, ThreadService) {
-        this.sendManualMessage = function (sub, text, uid) {
+        this.sendManualMessage = function (sub, text, uid, cb) {
             console.log("uid: ", uid)
             var data = {
                 sName: 'Savinay',
@@ -22,12 +22,11 @@ angular.module('models.message', ['services'])
             $http.post(config.apiUrl + '/apps/' + appId + '/conversations',
                 data)
                 .success(function (data) {
-                    console.log("success");
+                    console.log("success: ", data);
+                    cb(null, data);
 
                 })
-                .error(function () {
-                    console.log("error");
-                })
+                .error(cb);
 
         };
 
