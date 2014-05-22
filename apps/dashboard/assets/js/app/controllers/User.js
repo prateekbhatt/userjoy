@@ -272,13 +272,13 @@ angular.module('do.users', [])
     'AppService', 'segment', 'queryMatching', 'eventNames',
     'userAttributes', 'lodash', '$modal',
     'UidService', '$moment', 'UserList', '$timeout', 'modelsSegment',
-    'segmentService', 'CurrentAppService', 'UserModel',
+    'segmentService', 'CurrentAppService', 'UserModel', '$log', 'MsgService',
     function ($scope, $location, segment, queryMatching, $filter,
         countOfActions, hasNotDone, hasDoneActions,
         ngTableParams, login, modelsQuery, AppService, segment,
         queryMatching, eventNames, userAttributes, lodash, $modal,
         UidService, $moment, UserList, $timeout, modelsSegment,
-        segmentService, CurrentAppService, UserModel) {
+        segmentService, CurrentAppService, UserModel, $log, MsgService) {
 
         CurrentAppService.getCurrentApp()
             .then(function (currentApp) {
@@ -929,13 +929,13 @@ angular.module('do.users', [])
                 modelsQuery.getQueries(currentApp._id, fillData);
 
 
-                $scope.title = "Write Message";
+                // $scope.title = "Write Message";
 
-                var popupModal = $modal({
-                    scope: $scope,
-                    template: '/templates/usersmodule/message.modal.html',
-                    show: false
-                });
+                // var popupModal = $modal({
+                //     scope: $scope,
+                //     template: '/templates/usersmodule/message.modal.html',
+                //     show: false
+                // });
 
                 $scope.showErr = false;
 
@@ -943,39 +943,39 @@ angular.module('do.users', [])
                     $scope.showMaxMsgErr = false;
                 }
 
-                $scope.openModal = function () {
-                    $scope.mail = [];
-                    console.log("items ticked: ", Object.keys($scope.checkboxes
-                            .items)
-                        .length);
-                    if (Object.keys($scope.checkboxes.items)
-                        .length <= 50) {
-                        popupModal.show();
-                    }
-                    console.log("checkboxes items: ", $scope.checkboxes
-                        .items);
-                    var prop, value;
-                    var keys = Object.keys($scope.checkboxes.items);
-                    for (var i = 0; i < Object.keys($scope.checkboxes.items)
-                        .length; i++) {
-                        prop = keys[i];
-                        console.log("id: ", prop);
-                        value = $scope.checkboxes.items[prop];
-                        console.log("value: ", value);
-                        if (value == true) {
-                            $scope.mail.push(prop);
-                        }
-                    };
-                    console.log("email objects: ", $scope.mail);
-                    if ($scope.mail.length > 50) {
-                        $scope.showMaxMsgErr = true;
-                        $scope.maxMsgErr =
-                            "Maximum Messages that can be sent at once is 50";
+                // $scope.openModal = function () {
+                //     $scope.mail = [];
+                //     console.log("items ticked: ", Object.keys($scope.checkboxes
+                //             .items)
+                //         .length);
+                //     if (Object.keys($scope.checkboxes.items)
+                //         .length <= 50) {
+                //         popupModal.show();
+                //     }
+                //     console.log("checkboxes items: ", $scope.checkboxes
+                //         .items);
+                //     var prop, value;
+                //     var keys = Object.keys($scope.checkboxes.items);
+                //     for (var i = 0; i < Object.keys($scope.checkboxes.items)
+                //         .length; i++) {
+                //         prop = keys[i];
+                //         console.log("id: ", prop);
+                //         value = $scope.checkboxes.items[prop];
+                //         console.log("value: ", value);
+                //         if (value == true) {
+                //             $scope.mail.push(prop);
+                //         }
+                //     };
+                //     console.log("email objects: ", $scope.mail);
+                //     if ($scope.mail.length > 50) {
+                //         $scope.showMaxMsgErr = true;
+                //         $scope.maxMsgErr =
+                //             "Maximum Messages that can be sent at once is 50";
 
-                    } else {
-                        UidService.set($scope.mail);
-                    }
-                };
+                //     } else {
+                //         UidService.set($scope.mail);
+                //     }
+                // };
 
 
                 var data = [];
@@ -1002,6 +1002,64 @@ angular.module('do.users', [])
                         .items);
                 })
 
+                $scope.openModal = function () {
+
+                    var modalInstance = $modal.open({
+                        templateUrl: '/templates/usersmodule/message.modal.html',
+                        controller: 'sendMessageCtrl',
+                        size: 'lg'
+                    });
+
+                    modalInstance.opened.then(function () {
+                        $log.info(
+                            'message modal template downloaded');
+                        $scope.mail = [];
+                        console.log("items ticked: ", Object.keys(
+                                $scope.checkboxes
+                                .items)
+                            .length);
+                        // if (Object.keys($scope.checkboxes.items)
+                        //     .length <= 50) {
+                        //     popupModal.show();
+                        // }
+                        console.log("checkboxes items: ", $scope.checkboxes
+                            .items);
+                        var prop, value;
+                        var keys = Object.keys($scope.checkboxes.items);
+                        for (var i = 0; i < Object.keys($scope.checkboxes
+                                .items)
+                            .length; i++) {
+                            prop = keys[i];
+                            console.log("id: ", prop);
+                            value = $scope.checkboxes.items[prop];
+                            console.log("value: ", value);
+                            if (value == true) {
+                                $scope.mail.push(prop);
+                            }
+                        };
+                        console.log("email objects: ", $scope.mail);
+                        if ($scope.mail.length > 50) {
+                            $scope.showMaxMsgErr = true;
+                            $scope.maxMsgErr =
+                                "Maximum Messages that can be sent at once is 50";
+
+                        } else {
+                            UidService.set($scope.mail);
+                        }
+                    })
+
+                    modalInstance.result.then(function (mail) {
+                        console.log("mail: ", mail)
+                        console.log("subject : ", mail.sub);
+                        console.log("msgtext: ", mail.msgtext);
+                        console.log("uid : ", UidService.get());
+                        MsgService.sendManualMessage(mail.sub,
+                            mail.msgtext, UidService.get());
+                    }, function () {
+                        $log.info('Modal dismissed at: ' + new Date());
+                    });
+                };
+
             })
     }
 ])
@@ -1009,241 +1067,335 @@ angular.module('do.users', [])
 
 
 .controller('sendMessageCtrl', ['$scope', 'MsgService', '$modal', 'UidService',
-    function ($scope, MsgService, $modal, UidService) {
+    '$modalInstance',
+    function ($scope, MsgService, $modal, UidService, $modalInstance) {
         console.log("inside send message ctrl");
+        $scope.mail = {
+            sub: '',
+            msgtext: ''
+        }
+        // $scope.sub = '';
+        // $scope.msgtext = '';
         $scope.sendManualMessage = function () {
-            MsgService.sendManualMessage($scope.sub, $scope.msgtext,
-                UidService.get());
+            $modalInstance.close($scope.mail);
+            console.log("sub: ", $scope.sub);
+            console.log("msg: ", msgtext);
+            // MsgService.sendManualMessage($scope.sub, $scope.msgtext,
+            //     UidService.get());
+            // $scope.note = {
+            //     text: ''
+            // };
+            // $scope.sendM = function () {
+            // };
         }
     }
 ])
 
 .controller('ProfileCtrl', ['$scope', 'UserModel', 'CurrentAppService',
     'InboxMsgService', '$moment', 'UserList', '$modal', 'NotesService',
+    '$location', '$timeout', '$state', '$stateParams', '$rootScope',
+    '$log', 'AppService',
+
     function ($scope, UserModel, CurrentAppService, InboxMsgService,
-        $moment, UserList, $modal, NotesService) {
+        $moment, UserList, $modal, NotesService, $location, $timeout,
+        $state, $stateParams, $rootScope, $log, AppService) {
+
+        $scope.notes = [];
+        $scope.msgs = [];
+        $scope.currentApp = {};
+        $scope.useremail = null;
+
+        $scope.title = "Create Note";
+
+        $scope.healthScore = '50';
+        $scope.plan = 'Basic';
+        $scope.planValue = '$25';
+        $scope.renewal = '25 Mar 2014';
+        $scope.firstSeen = '3 months ago';
+        $scope.lastSession = '2 months ago';
+        $scope.country = 'India';
+        $scope.os = 'Ubuntu';
+        $scope.browser = 'Mozilla Firefox';
+
+        $scope.user = {
+            _id: $stateParams.id
+        };
+
+        $scope.populateNotesOnCreation = function (err, lastNote) {
+
+            if (err) {
+                return err;
+            }
+
+            $scope.notes.unshift({
+                text: lastNote.note,
+                when: $moment(lastNote.ct)
+                    .fromNow()
+            });
+        };
+
+
+        var populateMsgList = function (err) {
+            if (err) {
+                return err;
+            }
+            for (var i = 0; i < InboxMsgService.getLatestConversations()
+                .length; i++) {
+                $scope.msgs.push({
+                    id: InboxMsgService.getLatestConversations()[
+                        i]._id,
+                    sub: InboxMsgService.getLatestConversations()[
+                        i].sub,
+                    when: $moment(InboxMsgService.getLatestConversations()[
+                        i].ct)
+                        .fromNow(),
+                    opened: InboxMsgService.getLatestConversations()[
+                        i].toRead,
+                    replied: false // TODO: get status from backend when ready
+                })
+            };
+        }
+
+        var populateNotes = function (err) {
+            if (err) {
+                return err;
+            }
+
+            var notes = NotesService.getNotes();
+            var length = notes.length;
+            for (var i = 0; i < length; i++) {
+                $scope.notes.push({
+                    text: notes[i].note,
+                    when: $moment(notes[i].ct)
+                        .fromNow()
+                })
+            };
+        };
+
+
+        $scope.openNoteModal = function () {
+
+            var modalInstance = $modal.open({
+                templateUrl: '/templates/usersmodule/note.modal.html',
+                controller: 'NoteModalCtrl',
+                size: 'sm'
+            });
+
+            modalInstance.opened.then(function () {
+                $log.info('modal template downloaded')
+            })
+
+            modalInstance.result.then(function (note) {
+                var data = {
+                    note: note
+                };
+                UserModel.createNote($scope.currentApp._id, $scope.user
+                    ._id,
+                    data,
+                    $scope.populateNotesOnCreation);
+
+            }, function () {
+                $log.info('Modal dismissed at: ' + new Date());
+            });
+        };
+
+        $scope.redirectToConversation = function (id) {
+            console.log("redirecting to conversation: ", id);
+            $location.path('/messages/' + $scope.currentApp._id +
+                '/conversations/' + id);
+        };
+
+
+        $scope.exampleData = [{
+            "key": "Series 1",
+            "values": [
+                [1025409600000, 0],
+                [1028088000000, -6.3382185140371],
+                [1030766400000, -5.9507873460847],
+                [1033358400000, -11.569146943813],
+                [1036040400000, -5.4767332317425],
+                [1038632400000, 0.50794682203014],
+                [1041310800000, -5.5310285460542],
+                [1043989200000, -5.7838296963382],
+                [1046408400000, -7.3249341615649],
+                [1049086800000, -6.7078630712489],
+                [1051675200000, 0.44227126150934],
+                [1054353600000, 7.2481659343222],
+                [1056945600000, 9.2512381306992],
+                [1059624000000, 11.341210982529],
+                [1062302400000, 14.734820409020],
+                [1064894400000, 12.387148007542],
+                [1067576400000, 18.436471461827],
+                [1070168400000, 19.830742266977],
+                [1072846800000, 22.643205829887],
+                [1075525200000, 26.743156781239],
+                [1078030800000, 29.597478802228],
+                [1080709200000, 30.831697585341],
+                [1083297600000, 28.054068024708],
+                [1085976000000, 29.294079423832],
+                [1088568000000, 30.269264061274],
+                [1091246400000, 24.934526898906],
+                [1093924800000, 24.265982759406],
+                [1096516800000, 27.217794897473],
+                [1099195200000, 30.802601992077],
+                [1101790800000, 36.331003758254],
+                [1104469200000, 43.142498700060],
+                [1107147600000, 40.558263931958],
+                [1109566800000, 42.543622385800],
+                [1112245200000, 41.683584710331],
+                [1114833600000, 36.375367302328],
+                [1117512000000, 40.719688980730],
+                [1120104000000, 43.897963036919],
+                [1122782400000, 49.797033975368],
+                [1125460800000, 47.085993935989],
+                [1128052800000, 46.601972859745],
+                [1130734800000, 41.567784572762],
+                [1133326800000, 47.296923737245],
+                [1136005200000, 47.642969612080],
+                [1138683600000, 50.781515820954],
+                [1141102800000, 52.600229204305],
+                [1143781200000, 55.599684490628],
+                [1146369600000, 57.920388436633],
+                [1149048000000, 53.503593218971],
+                [1151640000000, 53.522973979964],
+                [1154318400000, 49.846822298548],
+                [1156996800000, 54.721341614650],
+                [1159588800000, 58.186236223191],
+                [1162270800000, 63.908065540997],
+                [1164862800000, 69.767285129367],
+                [1167541200000, 72.534013373592],
+                [1170219600000, 77.991819436573],
+                [1172638800000, 78.143584404990],
+                [1175313600000, 83.702398665233],
+                [1177905600000, 91.140859312418],
+                [1180584000000, 98.590960607028],
+                [1183176000000, 96.245634754228],
+                [1185854400000, 92.326364432615],
+                [1188532800000, 97.068765332230],
+                [1191124800000, 105.81025556260],
+                [1193803200000, 114.38348777791],
+                [1196398800000, 103.59604949810],
+                [1199077200000, 101.72488429307],
+                [1201755600000, 89.840147735028],
+                [1204261200000, 86.963597532664],
+                [1206936000000, 84.075505208491],
+                [1209528000000, 93.170105645831],
+                [1212206400000, 103.62838083121],
+                [1214798400000, 87.458241365091],
+                [1217476800000, 85.808374141319],
+                [1220155200000, 93.158054469193],
+                [1222747200000, 65.973252382360],
+                [1225425600000, 44.580686638224],
+                [1228021200000, 36.418977140128],
+                [1230699600000, 38.727678144761],
+                [1233378000000, 36.692674173387],
+                [1235797200000, 30.033022809480],
+                [1238472000000, 36.707532162718],
+                [1241064000000, 52.191457688389],
+                [1243742400000, 56.357883979735],
+                [1246334400000, 57.629002180305],
+                [1249012800000, 66.650985790166],
+                [1251691200000, 70.839243432186],
+                [1254283200000, 78.731998491499],
+                [1256961600000, 72.375528540349],
+                [1259557200000, 81.738387881630],
+                [1262235600000, 87.539792394232],
+                [1264914000000, 84.320762662273],
+                [1267333200000, 90.621278391889],
+                [1270008000000, 102.47144881651],
+                [1272600000000, 102.79320353429],
+                [1275278400000, 90.529736050479],
+                [1277870400000, 76.580859994531],
+                [1280548800000, 86.548979376972],
+                [1283227200000, 81.879653334089],
+                [1285819200000, 101.72550015956],
+                [1288497600000, 107.97964852260],
+                [1291093200000, 106.16240630785],
+                [1293771600000, 114.84268599533],
+                [1296450000000, 121.60793322282],
+                [1298869200000, 133.41437346605],
+                [1301544000000, 125.46646042904],
+                [1304136000000, 129.76784954301],
+                [1306814400000, 128.15798861044],
+                [1309406400000, 121.92388706072],
+                [1312084800000, 116.70036100870],
+                [1314763200000, 88.367701837033],
+                [1317355200000, 59.159665765725],
+                [1320033600000, 79.793568139753],
+                [1322629200000, 75.903834028417],
+                [1325307600000, 72.704218209157],
+                [1327986000000, 84.936990804097],
+                [1330491600000, 93.388148670744]
+            ]
+        }];
+
+        $scope.xAxisTickFormatFunction = function () {
+
+            return function (d) {
+
+                return d3.time.format('%x')(new Date(d)); //uncomment for date format
+
+            }
+
+        }
 
         // TODO: Get data from backend
 
-        CurrentAppService.getCurrentApp()
-            .then(function (currentApp) {
-                var url = window.location.href;
-                var uid = url.split("/")[5];
-                $scope.useremail = UserList.getUserEmail();
-                var populateMsgList = function (err) {
-                    $scope.msgs = [];
-                    if (err) {
-                        return err;
-                    }
-                    for (var i = 0; i < InboxMsgService.getLatestConversations()
-                        .length; i++) {
-                        $scope.msgs.push({
-                            sub: InboxMsgService.getLatestConversations()[
-                                i].sub,
-                            when: $moment(InboxMsgService.getLatestConversations()[
-                                i].ct)
-                                .fromNow(),
-                            opened: InboxMsgService.getLatestConversations()[
-                                i].toRead,
-                            replied: false // TODO: get status from backend when ready
-                        })
-                    };
-                }
+        $scope.init = function () {
 
-                var populateNotes = function (err) {
-                    $scope.notes = [];
-                    if(err) {
-                        return err;
-                    }
+            CurrentAppService
+                .getCurrentApp()
+                .then(function (currentApp) {
 
-                    for (var i = 0; i < NotesService.getNotes().length; i++) {
-                        $scope.notes.push({
-                            text: NotesService.getNotes()[i].note,
-                            when: $moment(NotesService.getNotes()[i].ct).fromNow()
-                        })
-                    };
-                }
+                    $scope.currentApp = currentApp;
+                    $scope.useremail = UserList.getUserEmail();
 
-                UserModel.getNotes(currentApp._id, uid, populateNotes);
+                    UserModel.getNotes(currentApp._id, $scope.user._id,
+                        populateNotes);
 
-                UserModel.getLatestConversations(currentApp._id, uid,
-                    populateMsgList);
+                    UserModel.getLatestConversations(currentApp._id,
+                        $scope.user._id,
+                        populateMsgList);
 
-                var noteModal = $modal({
-                    scope: $scope,
-                    template: '/templates/usersmodule/note.modal.html',
-                    show: false
-                });
+                })
+        };
 
-                $scope.openNoteModal = function () {
-                    noteModal.show();
-                }
-
-                $scope.title = "Create Note";
-
-                $scope.healthScore = '50';
-                $scope.plan = 'Basic';
-                $scope.planValue = '$25';
-                $scope.renewal = '25 Mar 2014';
-                $scope.firstSeen = '3 months ago';
-                $scope.lastSession = '2 months ago';
-                $scope.country = 'India';
-                $scope.os = 'Ubuntu';
-                $scope.browser = 'Mozilla Firefox';
-
-                $scope.exampleData = [{
-                    "key": "Series 1",
-                    "values": [
-                        [1025409600000, 0],
-                        [1028088000000, -6.3382185140371],
-                        [1030766400000, -5.9507873460847],
-                        [1033358400000, -11.569146943813],
-                        [1036040400000, -5.4767332317425],
-                        [1038632400000, 0.50794682203014],
-                        [1041310800000, -5.5310285460542],
-                        [1043989200000, -5.7838296963382],
-                        [1046408400000, -7.3249341615649],
-                        [1049086800000, -6.7078630712489],
-                        [1051675200000, 0.44227126150934],
-                        [1054353600000, 7.2481659343222],
-                        [1056945600000, 9.2512381306992],
-                        [1059624000000, 11.341210982529],
-                        [1062302400000, 14.734820409020],
-                        [1064894400000, 12.387148007542],
-                        [1067576400000, 18.436471461827],
-                        [1070168400000, 19.830742266977],
-                        [1072846800000, 22.643205829887],
-                        [1075525200000, 26.743156781239],
-                        [1078030800000, 29.597478802228],
-                        [1080709200000, 30.831697585341],
-                        [1083297600000, 28.054068024708],
-                        [1085976000000, 29.294079423832],
-                        [1088568000000, 30.269264061274],
-                        [1091246400000, 24.934526898906],
-                        [1093924800000, 24.265982759406],
-                        [1096516800000, 27.217794897473],
-                        [1099195200000, 30.802601992077],
-                        [1101790800000, 36.331003758254],
-                        [1104469200000, 43.142498700060],
-                        [1107147600000, 40.558263931958],
-                        [1109566800000, 42.543622385800],
-                        [1112245200000, 41.683584710331],
-                        [1114833600000, 36.375367302328],
-                        [1117512000000, 40.719688980730],
-                        [1120104000000, 43.897963036919],
-                        [1122782400000, 49.797033975368],
-                        [1125460800000, 47.085993935989],
-                        [1128052800000, 46.601972859745],
-                        [1130734800000, 41.567784572762],
-                        [1133326800000, 47.296923737245],
-                        [1136005200000, 47.642969612080],
-                        [1138683600000, 50.781515820954],
-                        [1141102800000, 52.600229204305],
-                        [1143781200000, 55.599684490628],
-                        [1146369600000, 57.920388436633],
-                        [1149048000000, 53.503593218971],
-                        [1151640000000, 53.522973979964],
-                        [1154318400000, 49.846822298548],
-                        [1156996800000, 54.721341614650],
-                        [1159588800000, 58.186236223191],
-                        [1162270800000, 63.908065540997],
-                        [1164862800000, 69.767285129367],
-                        [1167541200000, 72.534013373592],
-                        [1170219600000, 77.991819436573],
-                        [1172638800000, 78.143584404990],
-                        [1175313600000, 83.702398665233],
-                        [1177905600000, 91.140859312418],
-                        [1180584000000, 98.590960607028],
-                        [1183176000000, 96.245634754228],
-                        [1185854400000, 92.326364432615],
-                        [1188532800000, 97.068765332230],
-                        [1191124800000, 105.81025556260],
-                        [1193803200000, 114.38348777791],
-                        [1196398800000, 103.59604949810],
-                        [1199077200000, 101.72488429307],
-                        [1201755600000, 89.840147735028],
-                        [1204261200000, 86.963597532664],
-                        [1206936000000, 84.075505208491],
-                        [1209528000000, 93.170105645831],
-                        [1212206400000, 103.62838083121],
-                        [1214798400000, 87.458241365091],
-                        [1217476800000, 85.808374141319],
-                        [1220155200000, 93.158054469193],
-                        [1222747200000, 65.973252382360],
-                        [1225425600000, 44.580686638224],
-                        [1228021200000, 36.418977140128],
-                        [1230699600000, 38.727678144761],
-                        [1233378000000, 36.692674173387],
-                        [1235797200000, 30.033022809480],
-                        [1238472000000, 36.707532162718],
-                        [1241064000000, 52.191457688389],
-                        [1243742400000, 56.357883979735],
-                        [1246334400000, 57.629002180305],
-                        [1249012800000, 66.650985790166],
-                        [1251691200000, 70.839243432186],
-                        [1254283200000, 78.731998491499],
-                        [1256961600000, 72.375528540349],
-                        [1259557200000, 81.738387881630],
-                        [1262235600000, 87.539792394232],
-                        [1264914000000, 84.320762662273],
-                        [1267333200000, 90.621278391889],
-                        [1270008000000, 102.47144881651],
-                        [1272600000000, 102.79320353429],
-                        [1275278400000, 90.529736050479],
-                        [1277870400000, 76.580859994531],
-                        [1280548800000, 86.548979376972],
-                        [1283227200000, 81.879653334089],
-                        [1285819200000, 101.72550015956],
-                        [1288497600000, 107.97964852260],
-                        [1291093200000, 106.16240630785],
-                        [1293771600000, 114.84268599533],
-                        [1296450000000, 121.60793322282],
-                        [1298869200000, 133.41437346605],
-                        [1301544000000, 125.46646042904],
-                        [1304136000000, 129.76784954301],
-                        [1306814400000, 128.15798861044],
-                        [1309406400000, 121.92388706072],
-                        [1312084800000, 116.70036100870],
-                        [1314763200000, 88.367701837033],
-                        [1317355200000, 59.159665765725],
-                        [1320033600000, 79.793568139753],
-                        [1322629200000, 75.903834028417],
-                        [1325307600000, 72.704218209157],
-                        [1327986000000, 84.936990804097],
-                        [1330491600000, 93.388148670744]
-                    ]
-                }];
-
-                $scope.xAxisTickFormatFunction = function () {
-
-                    return function (d) {
-
-                        return d3.time.format('%x')(new Date(d)); //uncomment for date format
-
-                    }
-
-                }
-            })
-    }
-])
-
-.controller('notesCtrl', ['$scope', 'UserModel', 'CurrentAppService',
-    function ($scope, UserModel, CurrentAppService) {
-
-        CurrentAppService.getCurrentApp()
-            .then(function (currentApp) {
-                var url = window.location.href;
-                var uid = url.split("/")[5];
-                $scope.createNote = function () {
-                    var data = {
-                        note: $scope.notetext
-                    };
-                    UserModel.createNote(currentApp._id, uid, data);
-                }
-            })
+        $scope.init();
 
     }
 ])
+
+.controller('NoteModalCtrl', ['$scope', '$modalInstance',
+    function ($scope, $modalInstance) {
+
+        $scope.note = {
+            text: ''
+        };
+        $scope.createNote = function () {
+            $modalInstance.close($scope.note.text);
+        };
+
+
+    }
+])
+
+// .controller('notesCtrl', ['$scope', 'UserModel', 'CurrentAppService',
+//     function ($scope, UserModel, CurrentAppService) {
+
+//         CurrentAppService.getCurrentApp()
+//             .then(function (currentApp) {
+//                 var url = window.location.href;
+//                 var uid = url.split("/")[5];
+//                 $scope.createNote = function () {
+//                     var data = {
+//                         note: $scope.notetext
+//                     };
+//                     UserModel.createNote(currentApp._id, uid, data);
+//                 }
+//             })
+
+//     }
+// ])
 
 // .controller('TableCtrl', ['$scope', '$filter', 'ngTableParams', '$modal',
 //     'UidService', '$moment', 'UserList', '$timeout',

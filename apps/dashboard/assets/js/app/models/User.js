@@ -2,7 +2,8 @@ angular.module('models.user', ['services'])
 
 .service('UserModel', ['$http', 'config', '$location', 'InboxMsgService',
     'UserList', 'NotesService',
-    function ($http, config, $location, InboxMsgService, UserList, NotesService) {
+    function ($http, config, $location, InboxMsgService, UserList,
+        NotesService) {
 
         this.getUserProfile = function (id, appId) {
             $http.get(config.apiUrl + '/apps/' + appId + '/users/' + id)
@@ -27,20 +28,24 @@ angular.module('models.user', ['services'])
                 .error(cb);
         }
 
-        this.createNote = function (appId, uid, data) {
+        this.createNote = function (appId, uid, data, cb) {
             $http.post(config.apiUrl + '/apps/' + appId + '/users/' + uid +
                 '/notes', data)
                 .success(function (data) {
                     console.log("success");
+                    var notes = NotesService.getNotes();
+                    notes.push(data);
+                    NotesService.setNotes(notes);
+                    console.log("allnotes: ", NotesService.getNotes());
+                    cb(null, data);
                 })
-                .error(function () {
-                    console.log("error");
-                })
+                .error(cb);
         }
 
         this.getNotes = function (appId, uid, cb) {
-            $http.get(config.apiUrl + '/apps/' + appId + '/users/' + uid + '/notes')
-                .success(function(data){
+            $http.get(config.apiUrl + '/apps/' + appId + '/users/' + uid +
+                '/notes')
+                .success(function (data) {
                     console.log("notes: ", data);
                     NotesService.setNotes(data);
                     cb();
