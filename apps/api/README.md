@@ -294,8 +294,9 @@ UserNote      |                         | notes created by team members about a 
 
 ### Event
 
+##### Columns:
+
 - aid (required)
-- amId (only required for an 'automessage' event)
 - cid
 - ct
 - feature
@@ -303,6 +304,11 @@ UserNote      |                         | notes created by team members about a 
 - name (required)
 - type (required)
 - uid (required)
+
+##### Notes:
+
+- 'amId' and 'state' must be required for 'automessage' events (they are stored
+as meta properties)
 
 
 ### AutoMessage
