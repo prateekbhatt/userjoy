@@ -33,13 +33,20 @@ var AccountSchema = new Schema({
   },
 
   name: {
-    type: String
+    type: String,
+    required: [true, 'name is required'],
+    validate: validate({
+      message: "Name should be longer than 2 characters",
+    }, 'len', 2)
   },
 
   password: {
     type: String,
     required: [true, 'Password is required'],
-    select: false
+    select: false,
+    validate: validate({
+      message: "Password should be longer than 8 characters",
+    }, 'len', 8)
   },
 
   // email verification token

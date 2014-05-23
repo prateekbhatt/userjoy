@@ -114,9 +114,9 @@ UserNote      |                         | notes created by team members about a 
 
 ##### Columns:
 
-- email
-- name
-- password
+- email (required)
+- name (required)
+- password (required)
 - verifyToken
 - emailVerified (boolean)
 - passwordResetToken
