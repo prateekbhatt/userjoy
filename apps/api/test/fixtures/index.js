@@ -87,14 +87,14 @@ var accounts = {
   conversations = {
 
     first: {
-      accId: null,
+      assignee: null,
       aid: null,
       sub: 'First Conversation!',
       uid: ObjectId()
     },
 
     second: {
-      accId: null,
+      assignee: null,
       aid: null,
       closed: true,
       sub: 'First Conversation!',
@@ -203,6 +203,16 @@ var automessages = {
     sub: 'Welkom!',
     title: 'Welcome Message',
     type: 'email'
+  },
+
+  second: {
+    aid: null,
+    body: 'Hey, Welkom to Second CabanaLand!',
+    creator: null,
+    sid: null,
+    sub: 'Welkom Boss!',
+    title: 'Welcome Message',
+    type: 'email'
   }
 };
 
@@ -238,8 +248,8 @@ function createUser(aid, user, fn) {
 
 
 function createConversation(accid, aid, uid, con, fn) {
-  con.accId = accid;
   con.aid = aid;
+  con.assignee = accid;
   con.uid = uid;
   Conversation.create(con, fn);
 }
@@ -451,6 +461,22 @@ module.exports = function loadFixtures(callback) {
       createAutoMessage(accid, aid, sid, automessage, function (err, amsg) {
         if (err) return cb(err);
         automessages.first = amsg;
+        cb();
+      });
+
+    },
+
+
+    createSecondAutoMessage: function (cb) {
+
+      var aid = apps.first._id;
+      var accid = accounts.first._id;
+      var sid = segments.first._id;
+      var automessage = automessages.second;
+
+      createAutoMessage(accid, aid, sid, automessage, function (err, amsg) {
+        if (err) return cb(err);
+        automessages.second = amsg;
         cb();
       });
 

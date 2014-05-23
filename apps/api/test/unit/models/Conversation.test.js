@@ -64,7 +64,7 @@ describe('Model Conversation', function () {
 
       var newConversation = {
         aid: randomId(),
-        accId: randomId(),
+        assignee: randomId(),
         sub: 'My new subject',
         uid: randomId()
       };
@@ -83,7 +83,7 @@ describe('Model Conversation', function () {
           .to.have.property("aid", newConversation.aid);
 
         expect(con)
-          .to.have.property("accId", newConversation.accId);
+          .to.have.property("assignee", newConversation.assignee);
 
         expect(con)
           .to.have.property("sub", newConversation.sub);
@@ -279,9 +279,9 @@ describe('Model Conversation', function () {
         expect(err)
           .to.not.exist;
 
-        expect(con.accId.toString())
+        expect(con.assignee.toString())
           .to.eql(assignee.toString())
-          .to.not.eql(savedCon.accId.toString());
+          .to.not.eql(savedCon.assignee.toString());
 
         expect(con.aid.toString())
           .to.eql(aid.toString());
