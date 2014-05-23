@@ -44,15 +44,14 @@ angular
                     })
             }
 
-            this.addNewMember = function (data, appId) {
+            this.addNewMember = function (data, appId, cb) {
                 $http.post(config.apiUrl + '/apps/' + appId + '/invites',
                     data)
                     .success(function (data) {
                         console.log("success");
+                        cb();
                     })
-                    .error(function () {
-                        console.log("error");
-                    })
+                    .error(cb);
 
             }
 

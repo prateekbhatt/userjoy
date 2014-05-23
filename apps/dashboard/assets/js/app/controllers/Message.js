@@ -144,16 +144,31 @@ angular.module('do.message', [])
                     }
                     console.log("msg show Manual Msg: ", msg);
                     for (var i = 0; i < msg.length; i++) {
-                        $scope.openmsg.push({
-                            id: msg[i]._id,
-                            name: msg[i].sName,
-                            subject: msg[i].sub,
-                            time: $moment(msg[i].ct)
-                                .fromNow(),
-                            close: 'Close',
-                            assign: 'Assign',
-                            coid: msg[i].coId
-                        })
+                        if (msg[i].assignee.name) {
+                            $scope.openmsg.push({
+                                id: msg[i]._id,
+                                name: msg[i].sName,
+                                subject: msg[i].sub,
+                                time: $moment(msg[i].ct)
+                                    .fromNow(),
+                                close: 'Close',
+                                assign: 'Assigned to ' + msg[i].assignee
+                                    .name,
+                                coid: msg[i].coId
+                            })
+                        } else {
+                            $scope.openmsg.push({
+                                id: msg[i]._id,
+                                name: msg[i].sName,
+                                subject: msg[i].sub,
+                                time: $moment(msg[i].ct)
+                                    .fromNow(),
+                                close: 'Close',
+                                assign: 'Assigned to ' + msg[i].assignee
+                                    .email,
+                                coid: msg[i].coId
+                            })
+                        }
                     }
                     console.log("$scope.data: ", $scope.openmsg);
                     $scope.columnsInbox = [{
@@ -236,7 +251,8 @@ angular.module('do.message', [])
                             //     $scope.data;
                             // params.total(orderedData.length); // set total for recalc paginationemail
 
-                            $defer.resolve($scope.openmsg.slice((
+                            $defer.resolve($scope.openmsg.slice(
+                                (
                                     params.page() -
                                     1) * params.count(),
                                 params.page() *
@@ -264,8 +280,10 @@ angular.module('do.message', [])
                     console.log(InboxMsgService.getInboxMessage());
                 }
 
-                $scope.closeConversation = function (coId, user, index) {
-                    MsgService.closeConversationRequest(currentApp._id,
+                $scope.closeConversation = function (coId, user,
+                    index) {
+                    MsgService.closeConversationRequest(currentApp
+                        ._id,
                         coId, function (err, user) {
                             console.log("coid: ", coId, $scope.openmsg);
                             if (err) {
@@ -275,21 +293,57 @@ angular.module('do.message', [])
                             console.log("index: ", index);
                             $scope.openmsg.splice(index, 1);
                             $scope.tableParamsInbox.reload();
-                            console.log("closing open conversation: ",
+                            console.log(
+                                "closing open conversation: ",
                                 InboxMsgService.getInboxMessage()
                                 .length);
                             if (InboxMsgService.getInboxMessage()
                                 .length == 1) {
-                                $scope.showOpenConversations = false;
+                                $scope.showOpenConversations =
+                                    false;
                             }
                         });
+                }
+
+                // $scope.hasbeenAssigned = false;
+                // $scope.notAssigned = true;
+                // $scope.assignedToEmail = '';
+                // $scope.
+                // $scope.assignText = 'Assign';
+                $scope.assignTo = function (id) {
+                    $scope.assignSelect = true;
+                }
+
+                $scope.team = currentApp.team;
+                var assignedTo = function (err, email, index) {
+                    if (err) {
+                        return err;
+                    }
+                    console.log("$scope.openmsg -->", $scope.openmsg);
+                    $scope.openmsg[index].assign = 'Assigned to ' +
+                        email;
+                    // $scope.hasbeenAssigned = true;
+                    // $scope.notAssigned = false;
+                }
+
+                $scope.assignToMember = function (accId, coId,
+                    email,
+                    index) {
+                    console.log("index: email: ", index, email);
+                    var data = {
+                        assignee: accId
+                    };
+                    // $scope.assignedToEmail = email;
+                    // $scope.assignindex = index;
+                    MsgService.assignTo(currentApp._id, coId, data,
+                        index, email, assignedTo);
                 }
 
 
                 // Get Data from backend TODO
 
-                $scope.messagebody =
-                    'Hi, Thanks for such an offer. I really appreciate it. Loerm Ipsum .......';
+                // $scope.messagebody =
+                //     'Hi, Thanks for such an offer. I really appreciate it. Loerm Ipsum .......';
 
 
 
@@ -307,8 +361,10 @@ angular.module('do.message', [])
     }
 ])
 
-.controller('UnreadCtrl', ['$scope', '$filter', 'ngTableParams', 'AppService',
-    '$moment', 'MsgService', 'InboxMsgService', '$location', '$timeout',
+.controller('UnreadCtrl', ['$scope', '$filter', 'ngTableParams',
+    'AppService',
+    '$moment', 'MsgService', 'InboxMsgService', '$location',
+    '$timeout',
     'CurrentAppService',
     function ($scope, $filter, ngTableParams, AppService, $moment,
         MsgService, InboxMsgService, $location, $timeout,
@@ -399,7 +455,8 @@ angular.module('do.message', [])
                                         params.orderBy()) :
                                     $scope.unreadmsg;
                                 params.total(orderedData.length);
-                                $defer.resolve(orderedData.slice((
+                                $defer.resolve(orderedData.slice(
+                                    (
                                         params.page() -
                                         1) * params.count(),
                                     params.page() *
@@ -423,7 +480,8 @@ angular.module('do.message', [])
                     showUnreadMsgCallBack);
 
                 $scope.closeConversation = function (coId) {
-                    MsgService.closeConversationRequest(AppService.getCurrentApp()
+                    MsgService.closeConversationRequest(AppService
+                        .getCurrentApp()
                         ._id, coId);
                 }
 
@@ -545,12 +603,13 @@ angular.module('do.message', [])
             console.log("msg thread: -> ->", msgThread);
             for (var i = 0; i < msgThread.messages.length; i++) {
                 var isSeen = false;
-                if (msgThread.messages[i].seen && msgThread.messages[i].from ==
+                if (msgThread.messages[i].seen && msgThread.messages[i]
+                    .from ==
                     'account') {
                     isSeen = true;
                 }
                 $scope.messages.push({
-                    messagebody: msgThread.messages[i].text,
+                    messagebody: msgThread.messages[i].body,
                     createdby: msgThread.messages[i].sName,
                     createdat: $moment(msgThread.messages[i].ut)
                         .fromNow(),
@@ -573,7 +632,8 @@ angular.module('do.message', [])
                 for (var j = 0; j < i; j++) {
                     console.log("i: ", i);
                     // TODO : Get data from backend and match it based on uid
-                    if ($scope.messages[j].createdby == $scope.messages[i]
+                    if ($scope.messages[j].createdby == $scope.messages[
+                            i]
                         .createdby) {
                         count++;
                         storedimgsrc = $scope.messagesWithSrc[j].src;
@@ -606,7 +666,8 @@ angular.module('do.message', [])
                         seen: $scope.messages[i].seen
                     })
                 }
-                console.log("src generated: ", $scope.messagesWithSrc[i].src);
+                console.log("src generated: ", $scope.messagesWithSrc[
+                    i].src);
                 console.log("with src: ", $scope.messagesWithSrc);
             };
 
@@ -674,7 +735,8 @@ angular.module('do.message', [])
                 break;
             } else {
                 var colorReply = getRandomColor();
-                $scope.custsrc = 'http://placehold.it/60/' + colorReply +
+                $scope.custsrc = 'http://placehold.it/60/' +
+                    colorReply +
                     '/FFF&text=' + $scope.user.charAt(0);
             }
         };
@@ -749,7 +811,8 @@ angular.module('do.message', [])
                                 console.log("error");
                                 return;
                             }
-                            console.log("changing button text to reopen");
+                            console.log(
+                                "changing button text to reopen");
                             $scope.buttontext = 'Reopen';
                         });
                 } else {
@@ -797,7 +860,8 @@ angular.module('do.message', [])
                     $scope.replyButtonClicked = true;
                     $scope.replytextInDiv = $scope.replytext;
                     MsgService.replyToMsg(AppService.getCurrentApp()
-                        ._id, coId, $scope.replytextInDiv, AccountService.get()
+                        ._id, coId, $scope.replytextInDiv,
+                        AccountService.get()
                         ._id, closeOrReopenReplyCallBack);
                 } else {
                     MsgService.closeConversationRequest(AppService.getCurrentApp()
@@ -806,7 +870,8 @@ angular.module('do.message', [])
                                 console.log("error");
                                 return;
                             }
-                            console.log("changing button text to reopen");
+                            console.log(
+                                "changing button text to reopen");
                             $scope.buttontext = 'Reopen';
                         });
                 }
@@ -921,7 +986,8 @@ angular.module('do.message', [])
                                         params.orderBy()) :
                                     $scope.closedmsg;
                                 params.total(orderedData.length);
-                                $defer.resolve(orderedData.slice((
+                                $defer.resolve(orderedData.slice(
+                                    (
                                         params.page() -
                                         1) * params.count(),
                                     params.page() *

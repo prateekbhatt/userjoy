@@ -39,7 +39,8 @@
     "angular-http-auth": "~1.2.1",
     "angular-momentjs": "~0.1.8",
     "angular-bootstrap": "0.10.0",
-    "textAngular": "1.2.1-pre6"
+    "textAngular": "1.2.1-pre6",
+    "angular-flash": "~0.1.13"
   },
   "resolutions": {
     "angular": "~1.2.15",
