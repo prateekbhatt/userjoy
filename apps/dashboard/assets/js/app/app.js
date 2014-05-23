@@ -28,8 +28,6 @@ var app = angular.module('dodatado', [
     'http-auth-interceptor',
     'angular-momentjs',
     'do.automate',
-    'angular-flash.service',
-    'angular-flash.flash-alert-directive'
 ])
 
 .provider('appIdProvider', [
