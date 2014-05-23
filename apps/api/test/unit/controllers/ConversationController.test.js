@@ -199,11 +199,15 @@ describe('Resource /apps/:aid/conversations', function () {
           .set('cookie', loginCookie)
           .expect('Content-Type', /json/)
           .expect(function (res) {
-            expect(res.body)
-              .to.be.an("array");
 
             expect(res.body)
-              .to.not.be.empty;
+              .to.be.an("array")
+              .that.is.not.empty;
+
+            expect(res.body[0])
+              .to.have.property('assignee')
+              .that.is.an('object')
+              .that.has.keys(['_id', 'name', 'email']);
 
             _.each(res.body, function (m) {
               expect(m.closed)
@@ -343,11 +347,15 @@ describe('Resource /apps/:aid/conversations', function () {
             expect(res.body)
               .to.be.an("object");
 
-            expect(res.body.messages)
-              .to.be.an("array");
+            expect(res.body)
+              .to.have.property('assignee')
+              .that.is.an('object')
+              .that.has.keys(['name', 'email', '_id']);
 
-            expect(res.body.messages)
-              .to.have.length.above(0);
+            expect(res.body)
+              .to.have.property('messages')
+              .to.be.an("array")
+              .that.has.length.above(0);
 
             done();
           });
@@ -619,40 +627,42 @@ describe('Resource /apps/:aid/conversations', function () {
       loginUser(done);
     });
 
-    it('should return error if accId is not provided', function (done) {
+    it('should return error if assignee account id is not provided',
+      function (done) {
 
-      request
-        .put(testUrl)
-        .set('cookie', loginCookie)
-        .send({})
-        .expect('Content-Type', /json/)
-        .expect(400)
-        .expect({
-          status: 400,
-          error: 'Provide valid account id (accId)'
-        })
-        .end(done);
+        request
+          .put(testUrl)
+          .set('cookie', loginCookie)
+          .send({})
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            status: 400,
+            error: 'Provide valid account id (assignee)'
+          })
+          .end(done);
 
-    });
+      });
 
     it('should assign conversation', function (done) {
 
-      var assignee = randomId();
+      var assignee = saved.accounts.second._id;
 
       request
         .put(testUrl)
         .set('cookie', loginCookie)
         .send({
-          accId: assignee
+          assignee: assignee
         })
         .expect('Content-Type', /json/)
         .expect(201)
         .expect(function (res) {
 
           expect(res.body)
-            .to.have.property('accId')
-            .that.eqls(assignee.toString())
-            .that.not.eqls(savedCon.accId.toString());
+            .to.have.property('assignee')
+            .that.is.an('object')
+            .that.has.keys(['name', 'email', '_id'])
+            .that.has.deep.property('_id', assignee.toString());
 
         })
         .end(done);
