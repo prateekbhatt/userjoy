@@ -87,14 +87,14 @@ var accounts = {
   conversations = {
 
     first: {
-      accId: null,
+      assignee: null,
       aid: null,
       sub: 'First Conversation!',
       uid: ObjectId()
     },
 
     second: {
-      accId: null,
+      assignee: null,
       aid: null,
       closed: true,
       sub: 'First Conversation!',
@@ -248,8 +248,8 @@ function createUser(aid, user, fn) {
 
 
 function createConversation(accid, aid, uid, con, fn) {
-  con.accId = accid;
   con.aid = aid;
+  con.assignee = accid;
   con.uid = uid;
   Conversation.create(con, fn);
 }

@@ -22,18 +22,18 @@ var Schema = mongoose.Schema;
 var ConversationSchema = new Schema({
 
 
-  // assignee
-  accId: {
-    type: Schema.Types.ObjectId,
-    ref: 'Account'
-  },
-
-
   // app Id
   aid: {
     type: Schema.Types.ObjectId,
     ref: 'App',
     required: [true, 'Invalid aid']
+  },
+
+
+  // team member who is assigned
+  assignee: {
+    type: Schema.Types.ObjectId,
+    ref: 'Account'
   },
 
 
@@ -178,12 +178,12 @@ ConversationSchema.statics.toBeRead = function (coId, cb) {
  * Assigns account to conversation
  *
  * @param {string} aid app-id
- * @param {string} accId account-id
+ * @param {string} assignee account-id
  * @param {string} coId conversation-id
  * @param {function} cb callback
  */
 
-ConversationSchema.statics.assign = function (aid, coId, accId, cb) {
+ConversationSchema.statics.assign = function (aid, coId, assignee, cb) {
 
   var conditions = {
     _id: coId,
@@ -192,7 +192,7 @@ ConversationSchema.statics.assign = function (aid, coId, accId, cb) {
 
   var update = {
     $set: {
-      accId: accId,
+      assignee: assignee,
       ut: Date.now()
     }
   };
