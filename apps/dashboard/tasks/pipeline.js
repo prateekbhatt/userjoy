@@ -65,7 +65,7 @@ var jsFilesToInject = [
   'bower_components/colorpicker.js',
   'bower_components/angular-http-auth/src/http-auth-interceptor.js',
   'bower_components/angular-momentjs/angular-momentjs.js',
-  'bower_components/angular-flash/dist/angular-flash.min.js',
+  // 'bower_components/angular-flash/dist/angular-flash.min.js',
   // 'bower_components/lodash/dist/lodash.js',
   // 'bower_components/textAngular/textAngular-sanitize.js',
   // 'js/app/textAng.js',

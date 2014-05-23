@@ -40,10 +40,10 @@
     "angular-momentjs": "~0.1.8",
     "angular-bootstrap": "0.10.0",
     "textAngular": "1.2.1-pre6",
-    "angular-flash": "~0.1.13"
+    "spin.js": "~2.0.1"
   },
   "resolutions": {
-    "angular": "~1.2.15",
+    "angular": ">=1",
     "d3": "~3.4.4",
     "nvd3": "~1.1.15-beta"
   }
