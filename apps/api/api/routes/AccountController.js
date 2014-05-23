@@ -32,6 +32,107 @@ var isAuthenticated = require('../policies/isAuthenticated');
 var mailer = require('../services/mailer');
 
 
+function signupWithInvite(account, inviteId, cb) {
+
+  async.waterfall(
+
+    [
+
+      function findInvite(cb) {
+
+        Invite
+          .findById(inviteId)
+          .exec(function (err, invite) {
+            if (err) return cb(err);
+            if (!invite) return cb(new Error('Invite not found'));
+            cb(null, invite);
+          });
+      },
+
+      function createAccount(invite, cb) {
+
+        // set emailVerified as true
+        account.emailVerified = true;
+
+        Account.create(account, function (err, acc) {
+          cb(err, acc, invite);
+        });
+      },
+
+      function addMember(acc, invite, cb) {
+
+        // add as a team member to the app the user was invited to
+        App.addMember(invite.aid, acc._id, function (err, app) {
+          cb(err, acc, invite);
+        });
+      },
+
+      function deleteInvite(acc, invite, cb) {
+        // delete invite
+        Invite.findByIdAndRemove(inv._id, function (err) {
+          cb(err, acc);
+        });
+
+      }
+    ],
+
+    cb
+  );
+}
+
+
+function signupWithoutInvite(account, cb) {
+
+  /**
+   * Apps config
+   */
+
+  var config = require('../../../config')('api');
+
+  async.waterfall(
+
+    [
+
+      function createAccount(cb) {
+        account.emailVerified = false;
+        Account.create(account, cb);
+      },
+
+      function createVerifyToken(acc, cb) {
+        acc.createVerifyToken(function (err, acc, verifyToken) {
+          cb(err, acc, verifyToken);
+        });
+      },
+
+      function sendConfirmationMail(acc, verifyToken, cb) {
+
+        var confirmUrl = path.join(config.baseUrl, 'account',
+          acc._id.toString(), 'verify-email', verifyToken);
+
+        var mailOptions = {
+          locals: {
+            confirmUrl: confirmUrl,
+            name: acc.name
+          },
+          toEmail: acc.email,
+          toName: acc.name
+        };
+
+        mailer.sendConfirmation(mailOptions, function (err) {
+          cb(err, acc);
+        });
+
+      },
+
+    ],
+
+    cb
+
+  );
+}
+
+
+
 /**
  * GET /account/
  *
@@ -73,89 +174,27 @@ router
 
     var config = require('../../../config')('api');
 
-    var newAccount = req.body;
+    var account = req.body;
     var inviteId = req.body.inviteId;
 
-    // should the email confirmation mail be sent?
-    // if the account was invited, then no
-    var shouldSendMail = true;
+    var respond = function (err, acc) {
+      if (err) return next(err);
+      res
+        .status(201)
+        .json(acc);
+    }
 
-    async.waterfall(
+    if (!inviteId) return signupWithoutInvite(account, respond);
 
-      [
+    signupWithInvite(account, inviteId, function (err, acc) {
 
-        function createAccount(cb) {
-          Account.create(newAccount, cb);
-        },
-
-
-        function invited(acc, cb) {
-
-          // if not invited, move on
-          if (!inviteId) return cb(null, acc);
-
-          Invite
-            .findById(inviteId)
-            .exec(function (err, inv) {
-              if (err) return cb(err);
-
-              // if invite not found, then move on, and send confirmation email
-              // to user
-              if (!inv) return cb(null, acc);
-
-              // add as a team member to the app the user was invited to
-              App.addMember(inv.aid, acc._id, function (err, app) {
-                if (err) return cb(err);
-
-                // now the email confirmation mail should not be sent
-                shouldSendMail = false;
-
-                // delete invite
-                Invite.findByIdAndRemove(inv._id, function (err) {
-                  cb(err, acc);
-                });
-
-              });
-
-            });
-        },
-
-        function sendConfirmationMail(acc, cb) {
-          if (!shouldSendMail) return cb(null, acc);
-
-          acc.createVerifyToken(function (err, acc, verifyToken) {
-
-            var confirmUrl = path.join(config.baseUrl, 'account',
-              acc._id.toString(), 'verify-email', verifyToken);
-
-            var mailOptions = {
-              locals: {
-                confirmUrl: confirmUrl,
-                name: acc.name
-              },
-              toEmail: acc.email,
-              toName: acc.name
-            };
-
-            // send Verification Email
-            mailer.sendConfirmation(mailOptions, function (err) {
-              cb(err, acc);
-            });
-
-          });
-
-        },
-
-      ],
-
-      function callback(err, acc) {
-        if (err) return next(err);
-        res
-          .status(201)
-          .json(acc);
+      if (err && err.message === 'Invite not found') {
+        return signupWithoutInvite(account, respond);
       }
 
-    );
+      respond(err, acc);
+    });
+
   });
 
 

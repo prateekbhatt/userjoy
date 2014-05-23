@@ -370,7 +370,7 @@ UserNote      |                         | notes created by team members about a 
 ##### Columns:
 
 - aid
-- accid
+- assignee (account id)
 - closed (boolean)
 - ct
 - sub
@@ -381,7 +381,7 @@ UserNote      |                         | notes created by team members about a 
 
 ##### Notes:
 
-- accId should not be required. It is possible that the conversation is a new one and is not assigned to any team member. In this case we will send emails to all team members/ only admin (?)
+- assignee should not be required. It is possible that the conversation is a new one and is not assigned to any team member. In this case we will send emails to all team members/ only admin (?)
 
 
 ### Triggers

@@ -169,6 +169,7 @@ router
 
     Conversation
       .find(condition)
+      .populate('assignee', 'name email')
       .sort({
         ct: -1
       })
@@ -199,6 +200,7 @@ router
         function findConversation(cb) {
           Conversation
             .findById(coId)
+            .populate('assignee', 'name email')
             .exec(cb);
         },
 
@@ -259,7 +261,7 @@ router
   .post(function (req, res, next) {
 
     var newMsg = req.body;
-    var accid = req.user._id;
+    var assignee = req.user._id;
     var aid = req.app._id;
     var sub = newMsg.sub;
     var uids = newMsg.uids;
@@ -308,8 +310,8 @@ router
 
                 function createConversation(cb) {
                   var newConversation = {
-                    accId: accid,
                     aid: aid,
+                    assignee: assignee,
                     sub: sub,
                     uid: user._id
                   };
@@ -320,7 +322,7 @@ router
 
                 function createMessage(conversation, cb) {
 
-                  newMsg.accid = accid;
+                  newMsg.accid = assignee;
                   newMsg.aid = aid;
                   newMsg.coId = conversation._id;
                   // add from as 'account'
@@ -387,7 +389,9 @@ router
       function callback(err, msgs) {
 
         if (err) return next(err);
-        res.json(msgs, 201);
+        res
+          .status(201)
+          .json(msgs);
       }
     );
 
@@ -475,7 +479,9 @@ router
         });
 
         if (err) return next(err);
-        res.json(msg, 201);
+        res
+          .status(201)
+          .json(msg);
       }
     );
 
@@ -492,20 +498,32 @@ router
   .route('/:aid/conversations/:coId/assign')
   .put(function (req, res, next) {
 
-    var accId = req.body.accId;
+    var assignee = req.body.assignee;
     var aid = req.params.aid;
     var coId = req.params.coId;
 
-    if (!accId) return res.badRequest('Provide valid account id (accId)')
+    if (!assignee) return res.badRequest(
+      'Provide valid account id (assignee)')
 
-    Conversation.assign(aid, coId, accId, function (err, con) {
+    Conversation.assign(aid, coId, assignee, function (err, con) {
 
       if (err) return next(err);
       if (!con) return res.notFound('Conversation not found');
 
-      res
-        .status(201)
-        .json(con);
+
+      var populate = {
+        path: 'assignee',
+        select: 'name email'
+      };
+
+      con.populate(populate, function (err, conversation) {
+        if (err) return next(err);
+
+        res
+          .status(201)
+          .json(conversation);
+      })
+
     });
   });
 

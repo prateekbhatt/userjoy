@@ -80,7 +80,7 @@ var q = imq.queue("automessage");
  */
 
 function findAutoMessages(cb) {
-  logger.trace('Finding automessage cron job');
+  logger.trace('workers/automessagePublisher findAutoMessages');
 
 
   // TODO: check if this is working
@@ -93,7 +93,7 @@ function findAutoMessages(cb) {
   AutoMessage
     .find({
       active: true,
-      lastRan: {
+      lastQueued: {
         $lt: sixHoursAgo
       }
     })
@@ -106,56 +106,94 @@ function findAutoMessages(cb) {
 
 
 /**
- * Iterate over all messages and queue them to ironmq
+ * updates the 'lastQueued' timestamp for all given automessages
  *
- * @param {array} msgs all-found-automessages
+ * @param {array} ids automessage ids
  * @param {function} cb callback
  */
 
-function queue(msgs, cb) {
-  logger.trace('Queuing automessage cron job');
+function updateLastQueued(ids, cb) {
 
-  var iterator = function (m) {
-
-    // post the automessage id in the body
-    var body = m._id;
-
-    // post automessage id to queue
-    q.post(body, function (err, res) {
-      if (err) return cb(err);
-
-      // update the lastQueued timestamp for the AutoMessage
-      AutoMessage.updateLastQueued(body, cb);
-    });
+  var query = {
+    _id: {
+      $in: ids
+    }
   };
 
-  async.each(msgs, iterator, cb);
+  var update = {
+    $set: {
+      lastQueued: Date.now()
+    }
+  };
 
+  var options = {
+    multi: true
+  };
+
+
+  AutoMessage
+    .update(query, update, options, function (err, numberAffected) {
+      cb(err, numberAffected);
+    });
 }
 
 
 /**
  * Cron function to find all valid automessages and put them into queue
+ *
+ * @param {function} cb optional callback function (used for testing)
  */
 
-function cronFunc() {
+function cronFunc(cb) {
 
-  logger.trace('Started automessage cron job');
+  logger.trace('workers/automessagePublisher cronFunc');
 
-  var finalCallback = function (err, res) {
+  async.waterfall([
 
-    logger.trace('Finished automessage cron job');
+      function find(cb) {
+        findAutoMessages(cb);
+      },
 
-    if (err) {
-      logger.crit({
-        at: 'jobs/automessage',
-        err: err,
-        ts: Date.now()
-      });
-    }
-  };
+      function queue(msgs, cb) {
 
-  async.waterfall([findAutoMessages, queue], finalCallback);
+        var ids = _.chain(msgs)
+          .pluck('_id')
+          .map(function (id) {
+            return id.toString();
+          })
+          .value();
+
+        q.post(ids, function (err, queueIds) {
+          cb(err, queueIds, ids);
+        });
+      },
+
+      function updateTime(queueIds, ids) {
+        updateLastQueued(ids, function (err, numberAffected) {
+          cb(err, queueIds, ids, numberAffected);
+        });
+      }
+
+
+    ],
+
+    function finalCallback(err, queueIds, ids, numberAffected) {
+
+      logger.trace('workers/automessagePublisher Completed');
+
+      if (err) {
+        logger.crit({
+          at: 'jobs/automessage',
+          err: err,
+          ts: Date.now()
+        });
+      }
+
+      if (cb) {
+        return cb(err, queueIds, ids, numberAffected);
+      }
+
+    });
 }
 
 
@@ -166,3 +204,12 @@ function cronFunc() {
 module.exports = function () {
   return new cronJob(SCHEDULE, cronFunc, null, true, "");
 };
+
+
+/**
+ * Expose functions for the test cases
+ */
+
+module.exports._cronFunc = cronFunc;
+module.exports._findAutoMessages = findAutoMessages;
+module.exports._updateLastQueued = updateLastQueued;
