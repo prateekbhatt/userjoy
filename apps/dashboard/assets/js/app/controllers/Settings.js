@@ -257,10 +257,16 @@ angular.module('do.settings', [])
         CurrentAppService.getCurrentApp()
             .then(function (currentApp) {
                 $scope.invTeamMember = false;
+                $scope.showMsgSuccess = false;
                 $scope.team = [];
                 $scope.invitedTeam = [];
+                $scope.hideMsgSuccessAlert = function () {
+                    $scope.showMsgSuccess = false;
+                }
+
                 var populateInvitedMembers = function () {
                     $scope.invitedTeam = InviteIdService.getInvitedMembers();
+                    // $scope.showMsgSuccess = true;
                 }
                 InviteModel.getPendingInvites(currentApp._id, populateInvitedMembers);
                 // $scope.team = currentApp.team;
@@ -297,6 +303,14 @@ angular.module('do.settings', [])
                     $scope.team.splice(index, 1);
                 }
 
+                var showSuccessMsg = function() {
+                    $scope.showMsgSuccess = true;
+                    $scope.invitedTeam.push({
+                        toName: $scope.nameMember,
+                        toEmail: $scope.teamMember
+                    })
+                }
+
                 $scope.addTeamMember = function () {
                     var data = {
                         email: $scope.teamMember,
@@ -304,7 +318,7 @@ angular.module('do.settings', [])
                     };
                     console.log("data: ", data);
 
-                    AppModel.addNewMember(data, currentApp._id);
+                    AppModel.addNewMember(data, currentApp._id, showSuccessMsg);
                 }
             })
     }

@@ -118,5 +118,15 @@ angular.module('models.message', ['services'])
                 })
                 .error(callback);
         }
+
+        this.assignTo = function (appId, coId, data, index, email, cb) {
+            $http.put(config.apiUrl + '/apps/' + appId + '/conversations/' + coId +
+                '/assign', data)
+                .success(function (data) {
+                    console.log("success in assigning: ");
+                    cb(null, email, index);
+                })
+                .error(cb)
+        }
     }
 ])
