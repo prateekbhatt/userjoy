@@ -179,10 +179,24 @@ EventSchema.statics.pageview = function (ids, path, cb) {
         var query = {
           type: 'automessage',
           meta: {
-            $all: [{
-              k: 'amId',
-              v: ids.amId
-            }]
+            $all: [
+
+              {
+                $elemMatch: {
+                  k: 'amId',
+                  v: ids.amId
+                }
+              },
+
+
+              {
+                $elemMatch: {
+                  k: 'state',
+                  v: 'sent'
+                }
+              }
+
+            ]
           }
         };
 
