@@ -54,10 +54,12 @@ angular.module('do.navbar', [])
 
                 $scope.appId = AppService.getCurrentApp()
                     ._id;
-                if($scope.appId == null) {
+                if ($scope.appId == null && currentApp[0] != null) {
                     $scope.appId = currentApp[0]._id;
                 }
-                console.log("current App Id ------>>>>>>>..", $scope.appId, AppService.getCurrentApp()._id);
+                console.log("current App Id ------>>>>>>>..", $scope.appId,
+                    AppService.getCurrentApp()
+                    ._id);
 
 
                 $scope.$watch(LoginService.getUserAuthenticated,
@@ -73,7 +75,8 @@ angular.module('do.navbar', [])
                     $scope.apps = [];
                     for (var i = 0; i < AppService.getLoggedInApps()
                         .length; i++) {
-                        $scope.apps.push(AppService.getLoggedInApps()[i]);
+                        $scope.apps.push(AppService.getLoggedInApps()[
+                            i]);
                     };
                     console.log("navbar apps: ---->>>>> ", $scope.apps,
                         AppService.getLoggedInApps());
@@ -105,5 +108,19 @@ angular.module('do.navbar', [])
             })
 
         // 
+    }
+])
+
+.controller('navbarInstallationCtrl', ['$scope', 'AuthService', '$location',
+    function ($scope, AuthService, $location) {
+        $scope.showDropdown = function () {
+            $scope.visibleDropdown = true;
+        }
+
+        $scope.logout = function () {
+            AuthService.logout();
+            // $scope.apps = [];
+            // $location.path('/login');
+        };
     }
 ]);

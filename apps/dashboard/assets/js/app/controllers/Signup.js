@@ -17,13 +17,14 @@ angular.module('do.signup', [])
     }
 ])
 
-.controller('SignupCtrl', ['$scope', 'InviteIdService', 'InviteModel', 'AppService',
+.controller('SignupCtrl', ['$scope', 'InviteIdService', 'InviteModel',
+    'AppService',
     function ($scope, InviteIdService, InviteModel, AppService) {
         console.log("Invite id: ", InviteIdService.getInviteId());
         $scope.email = AppService.getEmail();
         $scope.createAccount = function () {
             InviteModel.registerInvitedMember($scope.email, $scope.password,
-                InviteIdService.getInviteId());
+                $scope.name, InviteIdService.getInviteId());
         }
     }
 ]);
