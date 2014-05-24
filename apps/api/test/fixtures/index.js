@@ -212,7 +212,7 @@ var automessages = {
     sid: null,
     sub: 'Welkom Boss!',
     title: 'Welcome Message',
-    type: 'email'
+    type: 'notification'
   }
 };
 
