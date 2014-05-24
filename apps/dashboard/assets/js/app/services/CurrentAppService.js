@@ -10,7 +10,7 @@ angular.module('services.CurrentAppService', [])
                 $http.get(config.apiUrl + '/apps')
                     .success(function (data) {
                         defer.resolve(data);
-                        // AppService.setCurrentApp()
+                        AppService.setLoggedInApps(data);
                     })
                 return defer.promise;
             }

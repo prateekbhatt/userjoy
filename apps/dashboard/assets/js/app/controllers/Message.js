@@ -126,15 +126,16 @@ angular.module('do.message', [])
                 console.log('inside inboxctrl and showtable is true');
                 $scope.showTable = true;
 
+                if($scope.currApp == null) {
+                    $scope.currApp = currentApp[0]._id
+                }
+
                 var populatePage = function () {
                     $scope.showTableInbox = function () {
                         console.log("inside showTableInbox");
                         $scope.showTable = true;
                     }
 
-                    // Get Data from backend TODO
-                    // console.log(AppService.getCurrentApp()
-                    //     ._id);
                     var msg = [];
 
                     function showManualMsg() {
@@ -199,61 +200,12 @@ angular.module('do.message', [])
                             visible: true
                         }];
 
-                        // $scope.refreshTable = function () {
-                        //     $scope['tableParams'] = {
-                        //         reload: function () {},
-                        //         settings: function () {
-                        //             return {}
-                        //         }
-                        //     };
-                        //     $timeout(setTable, 100)
-                        // };
-                        // $scope.refreshTable();
-
-                        // function setTable(arguments) {
-
-                        //     $scope.tableParamsInbox = new ngTableParams({
-                        //         page: 1, // show first page
-                        //         count: 10, // count per page
-                        //         filter: {
-                        //             name: '' // initial filter
-                        //         },
-                        //         sorting: {
-                        //             name: 'asc'
-                        //         }
-                        //     }, {
-                        //         filterSwitch: true,
-                        //         total: $scope.openmsg.length, // length of data
-                        //         getData: function ($defer, params) {
-                        //             var orderedData = params.sorting() ?
-                        //                 $filter('orderBy')($scope.openmsg,
-                        //                     params.orderBy()) :
-                        //                 $scope.openmsg;
-                        //             params.total(orderedData.length);
-                        //             $defer.resolve(orderedData.slice((params.page() -
-                        //                     1) * params.count(), params.page() *
-                        //                 params.count()));
-                        //         }
-                        //     });
-                        // }
-
                         $scope.tableParamsInbox = new ngTableParams({
                             page: 1, // show first page
                             count: 10 // count per page
                         }, {
                             total: $scope.openmsg.length, // length of data
                             getData: function ($defer, params) {
-                                // use build-in angular filter
-                                // var filteredData = params.filter() ?
-                                //     $filter('filter')($scope.data, params
-                                //         .filter()) :
-                                //     $scope.data;
-                                // var orderedData = params.sorting() ?
-                                //     $filter('orderBy')($scope.data,
-                                //         params.orderBy()) :
-                                //     $scope.data;
-                                // params.total(orderedData.length); // set total for recalc paginationemail
-
                                 $defer.resolve($scope.openmsg.slice(
                                     (
                                         params.page() -
@@ -307,11 +259,6 @@ angular.module('do.message', [])
                             });
                     }
 
-                    // $scope.hasbeenAssigned = false;
-                    // $scope.notAssigned = true;
-                    // $scope.assignedToEmail = '';
-                    // $scope.
-                    // $scope.assignText = 'Assign';
                     $scope.assignTo = function (id) {
                         $scope.assignSelect = true;
                     }
@@ -324,8 +271,6 @@ angular.module('do.message', [])
                         console.log("$scope.openmsg -->", $scope.openmsg);
                         $scope.openmsg[index].assign = 'Assigned to ' +
                             email;
-                        // $scope.hasbeenAssigned = true;
-                        // $scope.notAssigned = false;
                     }
 
                     $scope.assignToMember = function (accId, coId,
@@ -335,19 +280,9 @@ angular.module('do.message', [])
                         var data = {
                             assignee: accId
                         };
-                        // $scope.assignedToEmail = email;
-                        // $scope.assignindex = index;
                         MsgService.assignTo($scope.currApp, coId, data,
                             index, email, assignedTo);
                     }
-
-
-                    // Get Data from backend TODO
-
-                    // $scope.messagebody =
-                    //     'Hi, Thanks for such an offer. I really appreciate it. Loerm Ipsum .......';
-
-
 
                     $scope.showSelectedMail = function (id) {
                         $location.path('/apps/' + $scope.currApp +
@@ -357,11 +292,8 @@ angular.module('do.message', [])
                     }
 
                 }
+
                 AppModel.getSingleApp($scope.currApp, populatePage);
-
-
-
-
             })
 
         // 
