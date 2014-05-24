@@ -1,11 +1,13 @@
 angular
     .module('models.Invite', ['services'])
-    .service('InviteModel', ['$http', 'config', '$location', 'AuthService', 'InviteIdService',
+    .service('InviteModel', ['$http', 'config', '$location', 'AuthService',
+        'InviteIdService',
         function ($http, config, $location, AuthService, InviteIdService) {
-            this.registerInvitedMember = function (email, password,
+            this.registerInvitedMember = function (email, password, name,
                 inviteId) {
                 var data = {
                     email: email,
+                    name: name,
                     password: password,
                     inviteId: inviteId
                 }
@@ -27,12 +29,12 @@ angular
 
             this.getPendingInvites = function (appId, cb) {
                 $http.get(config.apiUrl + '/apps/' + appId + '/invites')
-                    .success(function(data){
+                    .success(function (data) {
                         console.log("success: ", data);
                         InviteIdService.setInvitedMembers(data);
                         cb()
                     })
-                    .error (cb);
+                    .error(cb);
             }
 
             return this;
