@@ -237,7 +237,12 @@ EventSchema.statics.automessage = function (ids, state, title, cb) {
 
     {
       k: 'amId',
-      v: ids.amId
+
+      // we need to convert it from BSON to String type, since the val field is
+      // of Mixed schema type
+      //
+      // Otherwise querying back the data with a stringified id does not work
+      v: ids.amId.toString()
     },
 
     {
