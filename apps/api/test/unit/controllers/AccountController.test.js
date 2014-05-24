@@ -166,6 +166,72 @@ describe('Resource /account', function () {
 
     });
 
+    it('should return error if password is shorter than 8 characters',
+      function (done) {
+
+        var acc = {
+          name: 'Pratt',
+          email: 'prateek@example.com',
+          password: '1234567'
+        };
+
+        request
+          .post('/account')
+          .send(acc)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            "error": ["Password should be longer than 8 characters"],
+            "status": 400
+          })
+          .end(done);
+
+      });
+
+
+    it('should return error if name is not provided',
+      function (done) {
+
+        var acc = {
+          email: 'prateek@example.com',
+          password: '12345678'
+        };
+
+        request
+          .post('/account')
+          .send(acc)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            "error": ['name is required'],
+            "status": 400
+          })
+          .end(done);
+
+      });
+
+    it('should return error if name is shorter than 2 characters',
+      function (done) {
+
+        var acc = {
+          name: 'N',
+          email: 'prateek@example.com',
+          password: '12345678'
+        };
+
+        request
+          .post('/account')
+          .send(acc)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            "error": ['Name should be longer than 2 characters'],
+            "status": 400
+          })
+          .end(done);
+
+      });
+
   });
 
   describe('GET /account/:id/verify-email/:token', function () {
