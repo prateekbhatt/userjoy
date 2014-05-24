@@ -65,13 +65,6 @@ var EventSchema = new Schema({
   },
 
 
-  // automessage Id (only required for 'automessage' events)
-  amId: {
-    type: Schema.Types.ObjectId,
-    ref: 'AutoMessage'
-  },
-
-
   // company Id
   cid: {
     type: Schema.Types.ObjectId,
@@ -181,21 +174,77 @@ EventSchema.statics.pageview = function (ids, path, cb) {
  *
  * This helps in identifying which users have already been sent an automessage
  *
+ * To query for an automessage:
+
+        var query = {
+          type: 'automessage',
+          meta: {
+            $all: [
+
+              {
+                $elemMatch: {
+                  k: 'amId',
+                  v: ids.amId
+                }
+              },
+
+
+              {
+                $elemMatch: {
+                  k: 'state',
+                  v: 'sent'
+                }
+              }
+
+            ]
+          }
+        };
+
+        Event.find(query, function (err, amsg) {
+          console.log('did we get the damn event?', amsg);
+          cb();
+        });
+ *
+ *
  * @param {object} ids contains the aid, amId, uid
+ * @param {string} state sent/opened/clicked/replied
  * @param {string} title the title of the automessage
  * @param {function} cb callback
  */
 
-EventSchema.statics.automessage = function (ids, title, cb) {
+EventSchema.statics.automessage = function (ids, state, title, cb) {
+
+  if (!ids.aid || !ids.uid || !ids.amId) {
+    return cb(new Error('aid/uid/amId are required for automessage events'));
+  }
+
+
+  if (!_.contains(['sent', 'opened', 'clicked', 'replied'], state)) {
+    return cb(new Error(
+      'automessage state must be one of sent/opened/clicked/replied'));
+  }
+
 
   var newEvent = {
     aid: ids.aid,
-    amId: ids.amId,
     name: title,
     type: 'automessage',
     uid: ids.uid
   };
 
+
+  newEvent.meta = [
+
+    {
+      k: 'amId',
+      v: ids.amId
+    },
+
+    {
+      k: 'state',
+      v: state
+    }
+  ];
 
   Event.create(newEvent, cb);
 };

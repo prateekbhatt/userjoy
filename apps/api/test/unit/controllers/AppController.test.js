@@ -248,10 +248,13 @@ describe('Resource /apps', function () {
           .set('cookie', loginCookie)
           .expect('Content-Type', /json/)
           .expect(function (res) {
-            if (res.body.team[0].accid.toString() !== saved.accounts.first
-              ._id.toString()) {
-              return 'Could not fetch saved app';
-            }
+
+            expect(res.body.team[0])
+              .to.have.property("accid")
+              .that.is.an("object")
+              .and.has.keys(['_id', 'name', 'email'])
+              .and.has.property('_id', saved.accounts.first._id.toString());
+
           })
           .expect(200)
           .end(done);

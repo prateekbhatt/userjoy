@@ -75,7 +75,9 @@ describe('Model Event', function () {
             .to.not.exist;
 
           expect(err.errors.type.message)
-            .to.eql("Event type must be one of 'pageview/feature/automessage'");
+            .to.eql(
+              "Event type must be one of 'pageview/feature/automessage'"
+          );
 
           done();
         });
@@ -238,13 +240,13 @@ describe('Model Event', function () {
       };
 
       var title = 'In App Welcome Message';
-
-      Event.automessage(ids, title, function (err, evn) {
-
-        evn = evn.toJSON();
+      var state = 'sent';
+      Event.automessage(ids, state, title, function (err, evn) {
 
         expect(err)
           .to.not.exist;
+
+        evn = evn.toJSON();
 
         expect(evn)
           .to.have.property("type", "automessage");
@@ -252,12 +254,71 @@ describe('Model Event', function () {
         expect(evn)
           .to.have.property("name", "In App Welcome Message");
 
-        expect(evn.amId)
-          .to.eql(ids.amId);
+        expect(evn.meta[0])
+          .to.eql({
+            k: 'amId',
+            v: ids.amId
+          });
 
         done();
+
       });
     });
+
+
+    it(
+      'should return error if automessage state is not in sent/clicked/opened/replied',
+      function (done) {
+
+        var ids = {
+          uid: randomId(),
+          aid: randomId(),
+          amId: randomId()
+        };
+
+        var title = 'In App Welcome Message';
+        var state = 'randomState';
+
+        Event.automessage(ids, state, title, function (err, evn) {
+
+          expect(err)
+            .to.exist;
+
+          expect(err.message)
+            .to.eql(
+              'automessage state must be one of sent/opened/clicked/replied'
+          );
+
+          done();
+
+        });
+      });
+
+
+    it(
+      'should return error if aid/uid/amId not provided',
+      function (done) {
+
+        var ids = {
+          uid: randomId(),
+          aid: randomId(),
+        };
+
+        var title = 'In App Welcome Message';
+        var state = 'sent';
+
+        Event.automessage(ids, state, title, function (err, evn) {
+
+          expect(err)
+            .to.exist;
+
+          expect(err.message)
+            .to.eql('aid/uid/amId are required for automessage events');
+
+          done();
+
+        });
+      });
 
   });
 

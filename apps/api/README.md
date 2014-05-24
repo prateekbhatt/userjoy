@@ -114,9 +114,9 @@ UserNote      |                         | notes created by team members about a 
 
 ##### Columns:
 
-- email
-- name
-- password
+- email (required)
+- name (required)
+- password (required)
 - verifyToken
 - emailVerified (boolean)
 - passwordResetToken
@@ -289,13 +289,14 @@ UserNote      |                         | notes created by team members about a 
 > - name
 > - feature
 > - op
-> - val
+> - val (Schema.Types.Mixed - to allow integer/string etc types)
 
 
 ### Event
 
+##### Columns:
+
 - aid (required)
-- amId (only required for an 'automessage' event)
 - cid
 - ct
 - feature
@@ -303,6 +304,11 @@ UserNote      |                         | notes created by team members about a 
 - name (required)
 - type (required)
 - uid (required)
+
+##### Notes:
+
+- 'amId' and 'state' must be required for 'automessage' events (they are stored
+as meta properties)
 
 
 ### AutoMessage

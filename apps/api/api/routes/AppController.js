@@ -125,7 +125,21 @@ router
 router
   .route('/:aid')
   .get(function (req, res, next) {
-    res.json(req.app);
+
+    var populate = {
+      path: 'team.accid',
+      select: 'name email'
+    };
+
+    req.app.populate(populate, function (err, app) {
+
+      if (err) return next(err);
+
+      res
+        .status(200)
+        .json(req.app);
+    });
+
   });
 
 
