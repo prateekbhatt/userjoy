@@ -34,7 +34,7 @@ angular.module('do.settings', [])
                 authenticate: true
             })
             .state('appsettings', {
-                url: '/app/settings',
+                url: '/apps/:id/settings',
                 views: {
                     "main": {
                         templateUrl: '/templates/settingsmodule/settings.app.html',
@@ -250,76 +250,81 @@ angular.module('do.settings', [])
 
 .controller('appSettingsTeamCtrl', ['$scope', '$log', '$state',
     'CurrentAppService', 'AppModel', 'InviteModel', 'InviteIdService',
+    'AppService', '$stateParams',
     function ($scope, $log, $state, CurrentAppService, AppModel,
-        InviteModel, InviteIdService) {
+        InviteModel, InviteIdService, AppService, $stateParams) {
 
         // TODO: Get data from backend
         CurrentAppService.getCurrentApp()
             .then(function (currentApp) {
+
+                $scope.currApp = $stateParams.id;
                 $scope.invTeamMember = false;
                 $scope.showMsgSuccess = false;
                 $scope.team = [];
                 $scope.invitedTeam = [];
-                $scope.hideMsgSuccessAlert = function () {
-                    $scope.showMsgSuccess = false;
-                }
 
-                var populateInvitedMembers = function () {
-                    $scope.invitedTeam = InviteIdService.getInvitedMembers();
-                    // $scope.showMsgSuccess = true;
-                }
-                InviteModel.getPendingInvites(currentApp._id, populateInvitedMembers);
-                // $scope.team = currentApp.team;
+                var populatePage = function () {
 
-                var length = InviteIdService.getInvitedMembers().length;
-                $scope.$watch('length', function (){
-                    $scope.invTeamMember = true;
-                })
+                    $scope.hideMsgSuccessAlert = function () {
+                        $scope.showMsgSuccess = false;
+                    }
 
-                for (var i = 0; i < currentApp.team.length; i++) {
-                    $scope.team.push({
-                        name: currentApp.team[i].accid.name,
-                        email: currentApp.team[i].accid.email
+
+
+                    var populateInvitedMembers = function () {
+                        $scope.invitedTeam = InviteIdService.getInvitedMembers();
+                        // $scope.showMsgSuccess = true;
+                    }
+                    InviteModel.getPendingInvites($scope.currApp,
+                        populateInvitedMembers);
+                    // $scope.team = currentApp.team;
+
+                    var length = InviteIdService.getInvitedMembers()
+                        .length;
+                    $scope.$watch('length', function () {
+                        $scope.invTeamMember = true;
                     })
-                };
 
-                // $scope.team.push({
-                //     name: 
-                // })
-                // $scope.team = [{
-                //     name: 'Savinay Narendra',
-                //     email: 'savinay.90@gmail.com',
-                //     incomingEmail: 'savinay.90@gmail.mail.dodatado.io'
-                // }, {
-                //     name: 'Savinay Narendra',
-                //     email: 'savinay.90@gmail.com',
-                //     incomingEmail: 'savinay.90@gmail.mail.dodatado.io'
-                // }]
-
-                $scope.removeTeamMember = function (teamMember) {
-                    // TODO: Add code to remove team member
-                    $log.info("team member removed function called");
-                    var index = $scope.team.indexOf(teamMember);
-                    $scope.team.splice(index, 1);
-                }
-
-                var showSuccessMsg = function() {
-                    $scope.showMsgSuccess = true;
-                    $scope.invitedTeam.push({
-                        toName: $scope.nameMember,
-                        toEmail: $scope.teamMember
-                    })
-                }
-
-                $scope.addTeamMember = function () {
-                    var data = {
-                        email: $scope.teamMember,
-                        name: $scope.nameMember
+                    for (var i = 0; i < AppService.getCurrentApp()
+                        .team.length; i++) {
+                        $scope.team.push({
+                            name: AppService.getCurrentApp()
+                                .team[i].accid.name,
+                            email: AppService.getCurrentApp()
+                                .team[i].accid.email
+                        })
                     };
-                    console.log("data: ", data);
 
-                    AppModel.addNewMember(data, currentApp._id, showSuccessMsg);
+                    $scope.removeTeamMember = function (teamMember) {
+                        // TODO: Add code to remove team member
+                        $log.info(
+                            "team member removed function called");
+                        var index = $scope.team.indexOf(teamMember);
+                        $scope.team.splice(index, 1);
+                    }
+
+                    var showSuccessMsg = function () {
+                        $scope.showMsgSuccess = true;
+                        $scope.invitedTeam.push({
+                            toName: $scope.nameMember,
+                            toEmail: $scope.teamMember
+                        })
+                    }
+
+                    $scope.addTeamMember = function () {
+                        var data = {
+                            email: $scope.teamMember,
+                            name: $scope.nameMember
+                        };
+                        console.log("data: ", data);
+
+                        AppModel.addNewMember(data, currentApp._id,
+                            showSuccessMsg);
+                    }
                 }
+
+                AppModel.getSingleApp($scope.currApp, populatePage);
             })
     }
 ])
