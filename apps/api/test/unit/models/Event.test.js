@@ -240,7 +240,7 @@ describe('Model Event', function () {
       };
 
       var title = 'In App Welcome Message';
-      var state = 'sent';
+      var state = 'queued';
       Event.automessage(ids, state, title, function (err, evn) {
 
         expect(err)
@@ -260,6 +260,12 @@ describe('Model Event', function () {
             v: ids.amId
           });
 
+        expect(evn.meta[1])
+          .to.eql({
+            k: 'state',
+            v: state
+          });
+
         done();
 
       });
@@ -267,7 +273,7 @@ describe('Model Event', function () {
 
 
     it(
-      'should return error if automessage state is not in sent/clicked/opened/replied',
+      'should return error if automessage state is not in queued/sent/clicked/opened/replied',
       function (done) {
 
         var ids = {
@@ -286,7 +292,7 @@ describe('Model Event', function () {
 
           expect(err.message)
             .to.eql(
-              'automessage state must be one of sent/opened/clicked/replied'
+              'automessage state must be one of queued/sent/opened/clicked/replied'
           );
 
           done();
