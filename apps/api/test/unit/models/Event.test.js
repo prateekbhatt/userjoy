@@ -257,7 +257,7 @@ describe('Model Event', function () {
         expect(evn.meta[0])
           .to.eql({
             k: 'amId',
-            v: ids.amId
+            v: ids.amId.toString()
           });
 
         expect(evn.meta[1])
