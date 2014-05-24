@@ -49,6 +49,7 @@ angular
                     .success(function (savedApp) {
                         $state.transitionTo('addcode');
                         AppService.new(savedApp);
+                        AppService.setCurrentApp(savedApp);
                         console.log("apps created: ", AppService.getLoggedInApps(),
                             savedApp);
                     })

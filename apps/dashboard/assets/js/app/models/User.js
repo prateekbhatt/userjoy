@@ -10,7 +10,7 @@ angular.module('models.user', ['services'])
                 .success(function (data) {
                     console.log("success: ", data);
                     UserList.setUserEmail(data.email);
-                    $location.path('/users/profile/' + id);
+                    $location.path('/apps/' + appId + '/users/profile/' + id);
                 })
                 .error(function (data) {
                     console.log("error: ", data);
