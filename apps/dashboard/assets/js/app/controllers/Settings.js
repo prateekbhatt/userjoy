@@ -304,7 +304,11 @@ angular.module('do.settings', [])
                         $scope.team.splice(index, 1);
                     }
 
-                    var showSuccessMsg = function () {
+                    var showSuccessMsg = function (err) {
+                        if(err) {
+                            return err;
+                        }
+
                         $scope.showMsgSuccess = true;
                         $scope.invitedTeam.push({
                             toName: $scope.nameMember,
@@ -319,7 +323,7 @@ angular.module('do.settings', [])
                         };
                         console.log("data: ", data);
 
-                        AppModel.addNewMember(data, currentApp._id,
+                        AppModel.addNewMember(data, $scope.currApp,
                             showSuccessMsg);
                     }
                 }

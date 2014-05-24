@@ -194,25 +194,25 @@ var app = angular.module('dodatado', [
     }
 ])
 
-.run(['AppService', 'AppModel', '$log', 'appIdProvider', '$rootScope',
-    function (AppService, AppModel, $log, appIdProvider, $rootScope) {
-        if ($rootScope.loggedIn) {
-            AppModel.get(function (err, apps) {
-                console.log("Run App", err, apps);
-                if (err) {
-                    return;
-                }
-                AppService.setLoggedInApps(apps);
-                // console.log("apps[0]: ", apps[0]);
-                AppService.setCurrentApp(apps[0]);
-                appIdProvider.setAppId(apps[0]._id);
-                // console.log("AppIdProvider: ", appIdProvider.getAppId());
-                // console.log("default app:", AppService.getCurrentApp());
+// .run(['AppService', 'AppModel', '$log', 'appIdProvider', '$rootScope',
+//     function (AppService, AppModel, $log, appIdProvider, $rootScope) {
+//         if ($rootScope.loggedIn) {
+//             AppModel.get(function (err, apps) {
+//                 console.log("Run App", err, apps);
+//                 if (err) {
+//                     return;
+//                 }
+//                 AppService.setLoggedInApps(apps);
+//                 // console.log("apps[0]: ", apps[0]);
+//                 AppService.setCurrentApp(apps[0]);
+//                 appIdProvider.setAppId(apps[0]._id);
+//                 // console.log("AppIdProvider: ", appIdProvider.getAppId());
+//                 // console.log("default app:", AppService.getCurrentApp());
 
-            });
-        }
-    }
-])
+//             });
+//         }
+//     }
+// ])
     .run(['$state', 'LoginService', '$rootScope',
         function ($state, LoginService, $rootScope) {
 

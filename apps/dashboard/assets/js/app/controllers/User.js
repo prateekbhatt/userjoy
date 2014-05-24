@@ -279,14 +279,19 @@ angular.module('do.users', [])
         ngTableParams, login, modelsQuery, AppService, segment,
         queryMatching, eventNames, userAttributes, lodash, $modal,
         UidService, $moment, UserList, $timeout, modelsSegment,
-        segmentService, CurrentAppService, UserModel, $log, MsgService, $stateParams) {
+        segmentService, CurrentAppService, UserModel, $log, MsgService,
+        $stateParams) {
 
         CurrentAppService.getCurrentApp()
             .then(function (currentApp) {
                 console.log("Promise Resolved: ", currentApp);
-console.log("current App from service -->: ", AppService.getCurrentApp());
-var currentAppId = $stateParams.id;
-console.log("currentAppId--> ", currentAppId);
+                console.log("current App from service -->: ",
+                    AppService.getCurrentApp());
+                var currentAppId = $stateParams.id;
+                console.log("currentAppId--> ", currentAppId);
+                if (currentAppId == null) {
+                    currentAppId = currentApp[0]._id;
+                }
                 $scope.showSaveButton = false;
                 $scope.showUpdateButton = false;
                 $scope.segmentClicked = false;
@@ -776,7 +781,8 @@ console.log("currentAppId--> ", currentAppId);
                             stringifiedQuery);
 
 
-                        modelsQuery.runQueryAndGetUsers(currentAppId, stringifiedQuery, populateTable);
+                        modelsQuery.runQueryAndGetUsers(currentAppId,
+                            stringifiedQuery, populateTable);
 
                     }
 
@@ -1173,8 +1179,8 @@ console.log("currentAppId--> ", currentAppId);
     function ($scope, UserModel, CurrentAppService, InboxMsgService,
         $moment, UserList, $modal, NotesService, $location, $timeout,
         $state, $stateParams, $rootScope, $log, AppService, MsgService) {
-var currentAppId = $stateParams.aid;
-console.log("currentAppId: ", currentAppId);
+        var currentAppId = $stateParams.aid;
+        console.log("currentAppId: ", currentAppId);
         $scope.notes = [];
         $scope.msgs = [];
         $scope.currentApp = {};

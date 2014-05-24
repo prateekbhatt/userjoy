@@ -54,6 +54,11 @@ angular.module('do.navbar', [])
 
                 $scope.appId = AppService.getCurrentApp()
                     ._id;
+                if($scope.appId == null) {
+                    $scope.appId = currentApp[0]._id;
+                }
+                console.log("current App Id ------>>>>>>>..", $scope.appId, AppService.getCurrentApp()._id);
+
 
                 $scope.$watch(LoginService.getUserAuthenticated,
                     function () {
