@@ -107,9 +107,6 @@
                                                 <table ng-table="tableParamsSent" show-filter="true" class="table table-bordered table-hover table-striped">
                                                     <thead>
                                                         <tr>
-                                                            <input class="form-control" ng-model="searchText" placeholder="Search Messages">
-                                                        </tr>
-                                                        <tr>
                                                             <th ng-repeat="column in columnsSent" ng-show="column.visible"
                                                                 class="text-center" ng-class="{
                                                                 'sort-asc': tableParams.isSortBy(column.field, 'asc'),
