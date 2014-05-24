@@ -289,7 +289,7 @@ UserNote      |                         | notes created by team members about a 
 > - name
 > - feature
 > - op
-> - val
+> - val (Schema.Types.Mixed - to allow integer/string etc types)
 
 
 ### Event

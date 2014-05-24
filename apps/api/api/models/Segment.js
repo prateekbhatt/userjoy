@@ -91,7 +91,7 @@ var SegmentFilterSchema = new Schema({
 
 
     val: {
-      type: String
+      type: Schema.Types.Mixed
     }
 
 
