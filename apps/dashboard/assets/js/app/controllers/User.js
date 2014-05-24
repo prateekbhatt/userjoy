@@ -23,7 +23,7 @@ angular.module('do.users', [])
                 authenticate: true
             })
             .state('list', {
-                url: '/users/list',
+                url: '/apps/:id/users/list',
                 views: {
                     "main": {
                         templateUrl: '/templates/usersmodule/users.list.html',
@@ -38,7 +38,7 @@ angular.module('do.users', [])
 
             })
             .state('profile', {
-                url: '/users/profile/:id',
+                url: '/apps/:aid/users/profile/:id',
                 views: {
                     "main": {
                         templateUrl: '/templates/usersmodule/users.profile.html',
@@ -273,18 +273,20 @@ angular.module('do.users', [])
     'userAttributes', 'lodash', '$modal',
     'UidService', '$moment', 'UserList', '$timeout', 'modelsSegment',
     'segmentService', 'CurrentAppService', 'UserModel', '$log',
-    'MsgService',
+    'MsgService', '$stateParams',
     function ($scope, $location, segment, queryMatching, $filter,
         countOfActions, hasNotDone, hasDoneActions,
         ngTableParams, login, modelsQuery, AppService, segment,
         queryMatching, eventNames, userAttributes, lodash, $modal,
         UidService, $moment, UserList, $timeout, modelsSegment,
-        segmentService, CurrentAppService, UserModel, $log, MsgService) {
+        segmentService, CurrentAppService, UserModel, $log, MsgService, $stateParams) {
 
         CurrentAppService.getCurrentApp()
             .then(function (currentApp) {
                 console.log("Promise Resolved: ", currentApp);
-
+console.log("current App from service -->: ", AppService.getCurrentApp());
+var currentAppId = $stateParams.id;
+console.log("currentAppId--> ", currentAppId);
                 $scope.showSaveButton = false;
                 $scope.showUpdateButton = false;
                 $scope.segmentClicked = false;
@@ -314,7 +316,7 @@ angular.module('do.users', [])
                     }
                 }
 
-                modelsSegment.getAllSegments(currentApp._id,
+                modelsSegment.getAllSegments(currentAppId,
                     checkSegments);
 
 
@@ -774,8 +776,7 @@ angular.module('do.users', [])
                             stringifiedQuery);
 
 
-                        modelsQuery.runQueryAndGetUsers(currentApp
-                            ._id, stringifiedQuery, populateTable);
+                        modelsQuery.runQueryAndGetUsers(currentAppId, stringifiedQuery, populateTable);
 
                     }
 
@@ -835,7 +836,7 @@ angular.module('do.users', [])
                         $scope.updateSegmentObj.filters = $scope.filtersBackend;
                         console.log("updateSegmentObj: ", $scope.updateSegmentObj);
 
-                        modelsSegment.updateSegment(currentApp._id,
+                        modelsSegment.updateSegment(currentAppId,
                             segmentService.getSegmentId(), $scope.updateSegmentObj
                         );
                         $scope.showUpdatePopover = false;
@@ -862,7 +863,7 @@ angular.module('do.users', [])
                         $scope.createSegmentObj.filters = $scope.filtersBackend;
                         console.log("createSegmentObj: ", $scope.createSegmentObj);
 
-                        modelsSegment.createSegment(currentApp._id,
+                        modelsSegment.createSegment(currentAppId,
                             $scope.createSegmentObj);
                         $scope.showPopover = false;
 
@@ -944,7 +945,7 @@ angular.module('do.users', [])
                         console.log('stringifiedQuery',
                             stringifiedQueryObject);
 
-                        modelsQuery.runQueryAndGetUsers(currentApp._id,
+                        modelsQuery.runQueryAndGetUsers(currentAppId,
                             stringifiedQueryObject,
                             populateTable);
 
@@ -956,7 +957,7 @@ angular.module('do.users', [])
                         $scope.showSaveButton = false;
                         segmentService.setSegmentId(segId);
                         console.log("segmentId: ", segmentService.getSegmentId());
-                        modelsSegment.getSegment(currentApp._id, segId,
+                        modelsSegment.getSegment(currentAppId, segId,
                             populateFilterAndRunQuery);
                     }
 
@@ -989,13 +990,13 @@ angular.module('do.users', [])
                 }
 
                 $scope.showUserProfile = function (id) {
-                    UserModel.getUserProfile(id, currentApp._id);
+                    UserModel.getUserProfile(id, currentAppId);
                 }
 
-                console.log("App Id: ", currentApp._id);
+                console.log("App Id: ", currentAppId);
 
 
-                modelsQuery.getQueries(currentApp._id, fillData);
+                modelsQuery.getQueries(currentAppId, fillData);
 
 
                 // $scope.title = "Write Message";
@@ -1072,69 +1073,74 @@ angular.module('do.users', [])
                 })
 
                 $scope.openModal = function () {
+                    $scope.mail = [];
+                    console.log("items ticked: ", Object.keys(
+                            $scope.checkboxes
+                            .items)
+                        .length);
+                    console.log("checkboxes items: ",
+                        $scope.checkboxes
+                        .items);
 
-                    var modalInstance = $modal.open({
-                        templateUrl: '/templates/usersmodule/message.modal.html',
-                        controller: 'sendMessageCtrl',
-                        size: 'lg'
-                    });
+                    console.log("email objects: ", $scope.mail);
+                    var prop, value;
+                    var keys = Object.keys($scope.checkboxes
+                        .items);
+                    for (var i = 0; i < Object.keys($scope
+                            .checkboxes
+                            .items)
+                        .length; i++) {
+                        prop = keys[i];
+                        console.log("id: ", prop);
+                        value = $scope.checkboxes.items[
+                            prop];
+                        console.log("value: ", value);
+                        if (value == true) {
+                            $scope.mail.push(prop);
+                        }
+                    };
+                    UidService.set($scope.mail);
 
-                    modalInstance.opened.then(function () {
-                        $log.info(
-                            'message modal template downloaded');
-                        $scope.mail = [];
-                        console.log("items ticked: ", Object.keys(
-                                $scope.checkboxes
-                                .items)
-                            .length);
-                        // if (Object.keys($scope.checkboxes.items)
-                        //     .length <= 50) {
-                        //     popupModal.show();
-                        // }
-                        console.log("checkboxes items: ", $scope.checkboxes
-                            .items);
-                        var prop, value;
-                        var keys = Object.keys($scope.checkboxes.items);
-                        for (var i = 0; i < Object.keys($scope.checkboxes
-                                .items)
-                            .length; i++) {
-                            prop = keys[i];
-                            console.log("id: ", prop);
-                            value = $scope.checkboxes.items[prop];
-                            console.log("value: ", value);
-                            if (value == true) {
-                                $scope.mail.push(prop);
+
+                    if ($scope.mail.length > 50) {
+                        $scope.showMaxMsgErr = true;
+                        $scope.maxMsgErr =
+                            "Maximum Messages that can be sent at once is 50";
+
+                    } else {
+
+                        var modalInstance = $modal.open({
+                            templateUrl: '/templates/usersmodule/message.modal.html',
+                            controller: 'sendMessageCtrl',
+                            size: 'lg'
+                        });
+
+                        modalInstance.opened.then(function () {
+                            $log.info(
+                                'message modal template downloaded'
+                            );
+                        })
+
+                        var populateMsgOnCreation = function (err,
+                            lastNote) {
+                            if (err) {
+                                return;
                             }
-                        };
-                        console.log("email objects: ", $scope.mail);
-                        if ($scope.mail.length > 50) {
-                            $scope.showMaxMsgErr = true;
-                            $scope.maxMsgErr =
-                                "Maximum Messages that can be sent at once is 50";
-
-                        } else {
-                            UidService.set($scope.mail);
                         }
-                    })
 
-                    var populateMsgOnCreation = function (err,
-                        lastNote) {
-                        if (err) {
-                            return;
-                        }
+                        modalInstance.result.then(function (mail) {
+                            console.log("mail: ", mail)
+                            console.log("subject : ", mail.sub);
+                            console.log("msgtext: ", mail.msgtext);
+                            console.log("uid : ", UidService.get());
+                            MsgService.sendManualMessage(mail.sub,
+                                mail.msgtext, UidService.get(),
+                                populateMsgOnCreation);
+                        }, function () {
+                            $log.info('Modal dismissed at: ' + new Date());
+                        });
                     }
 
-                    modalInstance.result.then(function (mail) {
-                        console.log("mail: ", mail)
-                        console.log("subject : ", mail.sub);
-                        console.log("msgtext: ", mail.msgtext);
-                        console.log("uid : ", UidService.get());
-                        MsgService.sendManualMessage(mail.sub,
-                            mail.msgtext, UidService.get(),
-                            populateMsgOnCreation);
-                    }, function () {
-                        $log.info('Modal dismissed at: ' + new Date());
-                    });
                 };
 
             })
@@ -1167,7 +1173,8 @@ angular.module('do.users', [])
     function ($scope, UserModel, CurrentAppService, InboxMsgService,
         $moment, UserList, $modal, NotesService, $location, $timeout,
         $state, $stateParams, $rootScope, $log, AppService, MsgService) {
-
+var currentAppId = $stateParams.aid;
+console.log("currentAppId: ", currentAppId);
         $scope.notes = [];
         $scope.msgs = [];
         $scope.currentApp = {};
@@ -1469,13 +1476,13 @@ angular.module('do.users', [])
                 .getCurrentApp()
                 .then(function (currentApp) {
 
-                    $scope.currentApp = currentApp;
+                    $scope.currentApp = currentAppId;
                     $scope.useremail = UserList.getUserEmail();
 
-                    UserModel.getNotes(currentApp._id, $scope.user._id,
+                    UserModel.getNotes(currentAppId, $scope.user._id,
                         populateNotes);
 
-                    UserModel.getLatestConversations(currentApp._id,
+                    UserModel.getLatestConversations(currentAppId,
                         $scope.user._id,
                         populateMsgList);
 

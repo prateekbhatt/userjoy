@@ -15,6 +15,16 @@ angular
 
             };
 
+            this.getSingleApp = function (appId, cb) {
+                $http.get(config.apiUrl + '/apps/' + appId)
+                    .success(function(data) {
+                        console.log("current App: --> from App Model: ", data);
+                        AppService.setCurrentApp(data);
+                        cb();
+                    })
+                    .error(cb);
+            }
+
 
             this.updateName = function (name, appId, cb) {
 

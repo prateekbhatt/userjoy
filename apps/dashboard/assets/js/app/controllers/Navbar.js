@@ -17,61 +17,88 @@ angular.module('do.navbar', [])
 
 .controller('NavbarCtrl', ['$scope', 'AuthService', 'LoginService',
     '$location', '$log', 'AppService', '$http', 'config',
+    'CurrentAppService',
     function ($scope, AuthService, LoginService, $location, $log,
-        AppService, $http, config) {
-        $scope.loggedIn = false;
+        AppService, $http, config, CurrentAppService) {
 
-        $scope.showDropdown = function () {
-            $scope.visibleDropdown = true;
-        };
+        CurrentAppService.getCurrentApp()
+            .then(function (currentApp) {
 
-        $scope.showDropdownApp = function () {
-            $scope.visibleDropdownApp = true;
-        }
+                $scope.loggedIn = false;
 
-        var appsconnected;
-        $scope.apps = [];
+                $scope.showDropdown = function () {
+                    $scope.visibleDropdown = true;
+                };
 
-        /*$scope.apps = AppService.getLoggedInApps();
-        console.log("navbar apps: ", $scope.apps);*/
+                $scope.showDropdownApp = function () {
+                    $scope.visibleDropdownApp = true;
+                }
 
+                var appsconnected;
+                $scope.apps = [];
 
-
-        /*var loggedInapps = AppService.getLoggedInApps();
-        console.log(loggedInapps);*/
-        console.log("apps length: ", $scope.apps.length);
-
-        $scope.logout = function () {
-            AuthService.logout();
-            $scope.apps = [];
-            $location.path('/login');
-        };
-
-        $scope.appId = AppService.getCurrentApp()._id;
-
-        $scope.$watch(LoginService.getUserAuthenticated, function () {
-            $log.info("Navbar watch", arguments);
-            $scope.loggedIn = LoginService.getUserAuthenticated();
-        });
+                /*$scope.apps = AppService.getLoggedInApps();
+            console.log("navbar apps: ", $scope.apps);*/
 
 
-        $scope.$watch(AppService.getLoggedInApps, function () {
-            $log.info("Navbar watch AppService", arguments);
-            $scope.apps = AppService.getLoggedInApps();
-            console.log("navbar apps: ", $scope.apps, AppService.getLoggedInApps());
-            if (AppService.getLoggedInApps()
-                .length) {
-                $scope.connectedapps = true;
-            } else {
-                $scope.connectedapps = false;
-            }
-            console.log("connectedapps: ", $scope.connectedapps);
-        });
 
+                /*var loggedInapps = AppService.getLoggedInApps();
+            console.log(loggedInapps);*/
+                console.log("apps length: ", $scope.apps.length);
 
-        $scope.changeUrl = function () {
-            $log.info("inside settings changeUrl");
-            $location.path('/settings/profile');
-        }
+                $scope.logout = function () {
+                    AuthService.logout();
+                    $scope.apps = [];
+                    $location.path('/login');
+                };
+
+                $scope.appId = AppService.getCurrentApp()
+                    ._id;
+
+                $scope.$watch(LoginService.getUserAuthenticated,
+                    function () {
+                        $log.info("Navbar watch", arguments);
+                        $scope.loggedIn = LoginService.getUserAuthenticated();
+                    });
+
+                $scope.apps = AppService.getLoggedInApps();
+
+                $scope.$watch(AppService.getLoggedInApps, function () {
+                    $log.info("Navbar watch AppService", arguments);
+                    $scope.apps = [];
+                    for (var i = 0; i < AppService.getLoggedInApps()
+                        .length; i++) {
+                        $scope.apps.push(AppService.getLoggedInApps()[i]);
+                    };
+                    console.log("navbar apps: ---->>>>> ", $scope.apps,
+                        AppService.getLoggedInApps());
+                    if (AppService.getLoggedInApps()
+                        .length) {
+                        $scope.connectedapps = true;
+                    } else {
+                        $scope.connectedapps = false;
+                    }
+                    console.log("connectedapps: ", $scope.connectedapps);
+                });
+
+                $scope.changeApp = function (app) {
+                    AppService.setCurrentApp(app);
+                    $location.path('/apps/' + AppService.getCurrentApp()
+                        ._id + '/users/list');
+                }
+
+                $scope.goToSettings = function (app) {
+                    AppService.setCurrentApp(app);
+                    $location.path('/apps/' + AppService.getCurrentApp()
+                        ._id + '/settings/general');
+                }
+
+                $scope.changeUrl = function () {
+                    $log.info("inside settings changeUrl");
+                    $location.path('/settings/profile');
+                }
+            })
+
+        // 
     }
 ]);

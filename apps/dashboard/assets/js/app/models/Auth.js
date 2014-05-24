@@ -37,11 +37,13 @@ angular.module('models.auth', ['services'])
                                 data);
 
                             if (AppService.getLoggedInApps()
-                                .length) {
+                                .length > 0) {
                                 console.log(
                                     "AppService data Auth.js",
                                     AppService.getLoggedInApps());
-                                $state.go('list');
+                                // $state.go('list');
+                                $location.path('/apps/' + AppService.getLoggedInApps()[0]._id + '/users/list');
+                                AppService.setCurrentApp(AppService.getLoggedInApps()[0]);
                             } else {
                                 $state.go('onboarding');
                             }

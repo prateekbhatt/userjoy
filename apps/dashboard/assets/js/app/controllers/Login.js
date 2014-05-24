@@ -38,16 +38,16 @@ angular.module('do.login', [])
 ])
 
 .controller('LoginCtrl', ['$scope', 'LoginService', 'AuthService', '$state',
-    '$log', 'ErrMsgService', 'login', '$location', '$rootScope',
+    '$log', 'ErrMsgService', 'login', '$location', '$rootScope', 'AppService',
     function ($scope, LoginService, AuthService, $state, $log,
-        ErrMsgService, login, $location, $rootScope) {
+        ErrMsgService, login, $location, $rootScope, AppService) {
 
         console.log('LoginProvider:', login.getLoggedIn());
         $scope.errMsg = '';
         $scope.showError = false;
         console.log("$rootScope loggedIn: ", $rootScope.loggedIn);
         if ($rootScope.loggedIn) {
-            $location.path('/users/list');
+            $location.path('/apps/' + AppService.getCurrentApp()._id + '/users/list');
         }
 
         $scope.hideErrorAlert = function () {
