@@ -42,23 +42,31 @@ $(function () {
     $("#signup_form")
         .validate({
             rules: {
+                name: {
+                    required: true,
+                    minlength: 2
+                },
                 email: {
                     required: true,
                     email: true
                 },
                 password: {
                     required: true,
-                    minlength: 5
+                    minlength: 8
                 }
             },
 
             messages: {
+                name: {
+                    required: "Please provide your name",
+                    minlength: "Your name must be atleast 2 characters long"
+                },
                 email: {
                     required: "Please enter your email"
                 },
                 password: {
                     required: "Please provide a password",
-                    minlength: "Your password must be atleast 5 characters long"
+                    minlength: "Your password must be atleast 8 characters long"
                 }
             },
 
