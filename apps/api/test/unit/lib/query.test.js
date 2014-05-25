@@ -1,6 +1,13 @@
 describe('Lib query', function () {
 
   /**
+   * npm dependencies
+   */
+
+  var mongoose = require('mongoose');
+
+
+  /**
    * Lib
    */
 
@@ -12,6 +19,7 @@ describe('Lib query', function () {
    */
 
   var App = require('../../../api/models/App');
+  var Event = require('../../../api/models/Event');
   var User = require('../../../api/models/User');
 
 
@@ -27,7 +35,7 @@ describe('Lib query', function () {
    * Test variables
    */
 
-  var randomId = '532d6bf862d673ba7131812a';
+  var randomId = mongoose.Types.ObjectId;
 
 
 
@@ -407,7 +415,7 @@ describe('Lib query', function () {
           name: '/login'
         }];
         var countFilterUserIds = [
-          randomId,
+          randomId(),
           '5313123131'
         ];
 
@@ -460,7 +468,7 @@ describe('Lib query', function () {
   describe('#reset', function () {
 
     before(function () {
-      Query.prototype.aid = 'randomId';
+      Query.prototype.aid = 'randomId()';
       Query.prototype.query = {
         $and: [{
           key: 'val'
@@ -928,6 +936,8 @@ describe('Lib query', function () {
 
   describe('#run', function () {
 
+    var email = 'p@userjoy.co';
+
     var countFilters = [
 
       {
@@ -944,7 +954,7 @@ describe('Lib query', function () {
 
       {
         method: 'attr',
-        type: 'email',
+        name: 'email',
         op: '$eq',
         val: email
       }
@@ -953,24 +963,37 @@ describe('Lib query', function () {
 
     var aid;
     var uid;
-    var email = 'p@userjoy.co'
 
     before(function (done) {
 
       aid = saved.apps.first._id;
-      uid = randomId;
-      var uids = [uid];
-      createEventFixtures(aid, uids, 100, function (err) {
 
-        // TODO: user id should not be hardcoded here like this
-        // It would break if the uid the changed in fixtureEvent.js
+      async.series({
 
-        User.create({
-          _id: '532d6bf862d673ba7131812a',
-          aid: aid,
-          email: email
-        }, done);
-      });
+        createUser: function (cb) {
+
+          User.create({
+              aid: aid,
+              email: email
+            },
+
+            function (err, usr) {
+
+              if (err) return cb(err);
+              uid = usr._id;
+              cb();
+            });
+
+        },
+
+
+        createEvent: function (cb) {
+          var uids = [uid];
+          createEventFixtures(aid, uids, 100, cb);
+
+        }
+
+      }, done)
     });
 
     beforeEach(function () {
@@ -1070,6 +1093,7 @@ describe('Lib query', function () {
 
     it('should return all users if no filter is provided',
       function (done) {
+
         Query.prototype.attrFilters = [];
         Query.prototype.countFilters = [];
 
@@ -1086,10 +1110,14 @@ describe('Lib query', function () {
               .to.not.exist;
 
             expect(users)
-              .to.be.an("array");
+              .to.be.an("array")
+              .that.has.length(count);
 
-            expect(users)
-              .to.have.length(count);
+            _.each(users, function (u) {
+              expect(u)
+                .to.have.property('meta')
+                .that.is.an('object');
+            });
 
             done()
           })

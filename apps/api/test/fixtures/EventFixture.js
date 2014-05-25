@@ -4,6 +4,7 @@
 
 var async = require('async');
 var faker = require('Faker');
+var mongoose = require('mongoose');
 
 
 /**
@@ -17,7 +18,7 @@ var Event = require('../../api/models/Event');
  * random object ids
  */
 
-var randomId = '532d6bf862d673ba7131812a';
+var randomId = mongoose.Types.ObjectId;
 
 
 /**
@@ -79,7 +80,7 @@ function createEvent(aid, uid, cb) {
 
   var fakeEvent = {
     aid: aid,
-    cid: randomId,
+    cid: randomId(),
     uid: uid
   };
 

@@ -26,6 +26,7 @@ var Event = require('../models/Event');
  */
 
 var logger = require('../../helpers/logger');
+var metadata = require('../../helpers/metadata');
 
 
 /**
@@ -341,6 +342,21 @@ Query.prototype.run = function (cb) {
           return cb();
         });
 
+      },
+
+      metadataToObject: function (cb) {
+
+        if (!self.filteredUsers.length) return cb();
+
+        var users = _.map(self.filteredUsers, function (u) {
+          u = u.toJSON();
+          u.meta = metadata.toObject(u.meta);
+          return u;
+        });
+
+        self.filteredUsers = users;
+
+        cb();
       }
     },
 
