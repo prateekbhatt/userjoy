@@ -325,8 +325,13 @@ router
                   newMsg.accid = assignee;
                   newMsg.aid = aid;
                   newMsg.coId = conversation._id;
+
                   // add from as 'account'
                   newMsg.from = 'account';
+
+                  // add sender name 'sName' as account name
+                  newMsg.sName = req.user.name || req.user.email;
+
                   newMsg.uid = user._id;
 
                   // locals to be passed for rendering the templates
