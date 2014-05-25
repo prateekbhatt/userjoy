@@ -145,7 +145,7 @@ EventSchema.statics.feature = function (ids, name, feature, meta, cb) {
     aid: ids.aid,
     cid: ids.cid,
     feature: feature,
-    meta: metadata.format(meta),
+    meta: metadata.toArray(meta),
     name: name,
     type: 'feature',
     uid: ids.uid
