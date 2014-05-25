@@ -241,7 +241,7 @@ describe('Worker automessageConsumer', function () {
             amId: amId
           })
           .exec(function (err, notf) {
-            console.log(err, notf);
+
             expect(err)
               .to.not.exist;
 
@@ -251,6 +251,9 @@ describe('Worker automessageConsumer', function () {
 
             expect(notf[0].amId.toString())
               .to.equal(amId.toString());
+
+            expect(notf[0].body)
+              .to.equal('Hey Prat, Welkom to Second CabanaLand!');
 
             done();
           });

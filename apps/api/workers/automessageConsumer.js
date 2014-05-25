@@ -49,6 +49,14 @@ var mailer = require('../api/services/mailer');
 
 
 /**
+ * Helpers
+ */
+
+var render = require('../helpers/render-message');
+var getRenderData = require('../helpers/get-render-data');
+
+
+/**
  * Config settings
  *
  * TODO: move these to central config settings file
@@ -110,11 +118,15 @@ function saveNotifications(users, amsg, cb) {
 
     var uid = u._id;
 
-    // FIXME: render body
+    // get locals (user metadata, emails, user_id) for rendering the message body
+    var renderLocals = getRenderData(u);
+
+    // render the body of the automessage before saving it as a notification
+    var renderedBody = render.string(body, renderLocals);
 
     var n = {
       amId: amId,
-      body: body,
+      body: renderedBody,
       sender: sender,
       uid: uid
     };
