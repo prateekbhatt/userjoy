@@ -136,7 +136,7 @@
                                                                     <!-- <a href="#" ng-click="assignTo()" class="dropdown-toggle" ng-show="hasbeenAssigned(user.id)">Assigned to {{assignedToEmail}}</a> -->
                                                                     <ul ng-show="assignSelect" class="dropdown-menu" role="menu" style="left:auto; right: 0">
                                                                         <li role="presentation">
-                                                                            <a style="cursor: pointer" ng-repeat="member in team" ng-click="assignToMember(member.accid._id, user.id, member.accid.email, $parent.$index)">{{member.accid.email}}</a>
+                                                                            <a style="cursor: pointer" ng-repeat="member in team" ng-click="assignToMember(member.accid._id, user.id, member.accid.name, $parent.$index)">{{member.accid.name}}</a>
                                                                         </li>
                                                                         <!-- <li role="presentation">
                                                                             <a href="">prateek@dodatado.com</a>

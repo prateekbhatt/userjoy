@@ -119,12 +119,12 @@ angular.module('models.message', ['services'])
                 .error(callback);
         }
 
-        this.assignTo = function (appId, coId, data, index, email, cb) {
+        this.assignTo = function (appId, coId, data, index, name, cb) {
             $http.put(config.apiUrl + '/apps/' + appId + '/conversations/' + coId +
                 '/assign', data)
                 .success(function (data) {
-                    console.log("success in assigning: ");
-                    cb(null, email, index);
+                    console.log("success in assigning: ", data);
+                    cb(null, name, index);
                 })
                 .error(cb)
         }
