@@ -299,7 +299,7 @@ describe('Resource /apps/:aid/segments', function () {
       };
 
       request
-        .post(testUrl)
+        .put(testUrl)
         .set('cookie', loginCookie)
         .send(updateSegment)
         .expect('Content-Type', /json/)

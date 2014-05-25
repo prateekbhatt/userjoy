@@ -1,39 +1,56 @@
 angular.module('models.user', ['services'])
 
-.service('UserModel', function ($q, $http, utils) {
-    this.getAll = function () {
-        var deferred = $q.defer();
-        var url = utils.prepareUrl('user');
+.service('UserModel', ['$http', 'config', '$location', 'InboxMsgService',
+    'UserList', 'NotesService',
+    function ($http, config, $location, InboxMsgService, UserList,
+        NotesService) {
 
-        $sails.get(url, function (models) {
-            return deferred.resolve(models);
-        });
+        this.getUserProfile = function (id, appId) {
+            $http.get(config.apiUrl + '/apps/' + appId + '/users/' + id)
+                .success(function (data) {
+                    console.log("success: ", data);
+                    UserList.setUserEmail(data.email);
+                    $location.path('/apps/' + appId + '/users/profile/' + id);
+                })
+                .error(function (data) {
+                    console.log("error: ", data);
+                })
+        }
 
-        return deferred.promise;
-    };
+        this.getLatestConversations = function (appId, uid, cb) {
+            $http.get(config.apiUrl + '/apps/' + appId + '/users/' + uid +
+                '/conversations')
+                .success(function (data) {
+                    console.log("msg: ", data);
+                    InboxMsgService.setLatestConversations(data);
+                    cb();
+                })
+                .error(cb);
+        }
 
-    this.getOne = function (id) {
-        var deferred = $q.defer();
-        var url = utils.prepareUrl('user/' + id);
+        this.createNote = function (appId, uid, data, cb) {
+            $http.post(config.apiUrl + '/apps/' + appId + '/users/' + uid +
+                '/notes', data)
+                .success(function (data) {
+                    console.log("success");
+                    var notes = NotesService.getNotes();
+                    notes.push(data);
+                    NotesService.setNotes(notes);
+                    console.log("allnotes: ", NotesService.getNotes());
+                    cb(null, data);
+                })
+                .error(cb);
+        }
 
-        $sails.get(url, function (model) {
-            return deferred.resolve(model);
-        });
-
-        return deferred.promise;
-    };
-
-    this.create = function (newModel) {
-
-        console.log('UserModel create', newModel);
-
-        var deferred = $q.defer();
-        var url = utils.prepareUrl('user');
-
-        $http.post(url, newModel, function (model) {
-            return deferred.resolve(model);
-        });
-
-        return deferred.promise;
-    };
-});
+        this.getNotes = function (appId, uid, cb) {
+            $http.get(config.apiUrl + '/apps/' + appId + '/users/' + uid +
+                '/notes')
+                .success(function (data) {
+                    console.log("notes: ", data);
+                    NotesService.setNotes(data);
+                    cb();
+                })
+                .error(cb);
+        }
+    }
+]);

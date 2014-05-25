@@ -1,6 +1,7 @@
 angular
     .module('models.apps', ['services'])
-    .service('AppModel', ['$http', 'config', '$state', 'AppService', '$location',
+    .service('AppModel', ['$http', 'config', '$state', 'AppService',
+        '$location',
         function ($http, config, $state, AppService, $location) {
 
             this.get = function (cb) {
@@ -13,6 +14,16 @@ angular
                     .error(cb);
 
             };
+
+            this.getSingleApp = function (appId, cb) {
+                $http.get(config.apiUrl + '/apps/' + appId)
+                    .success(function(data) {
+                        console.log("current App: --> from App Model: ", data);
+                        AppService.setCurrentApp(data);
+                        cb();
+                    })
+                    .error(cb);
+            }
 
 
             this.updateName = function (name, appId, cb) {
@@ -38,38 +49,43 @@ angular
                     .success(function (savedApp) {
                         $state.transitionTo('addcode');
                         AppService.new(savedApp);
+                        AppService.setCurrentApp(savedApp);
                         console.log("apps created: ", AppService.getLoggedInApps(),
                             savedApp);
                     })
             }
 
-            this.addNewMember = function (data, appId) {
-                $http.post(config.apiUrl + '/apps/' + appId + '/invite',
+            this.addNewMember = function (data, appId, cb) {
+                $http.post(config.apiUrl + '/apps/' + appId + '/invites',
                     data)
                     .success(function (data) {
                         console.log("success");
+                        cb();
                     })
-                    .error(function () {
-                        console.log("error");
-                    })
+                    .error(cb);
 
             }
 
-            this.redirectUser = function (appId, inviteId) {
-                $http.get(config.apiUrl + '/apps/' + appId + '/invite/' + inviteId)
-                    .success(function(data) {
+            this.redirectUser = function (appId, inviteId, cb) {
+                $http.get(config.apiUrl + '/apps/' + appId + '/invites/' +
+                    inviteId)
+                    .success(function (data) {
                         console.log("data: ", data);
-                        if(data.message == 'Redirect to signup') {
+                        AppService.setEmail(data.email);
+                        if (data.message == 'REDIRECT_TO_SIGNUP') {
                             $location.path('/signup');
                         }
 
-                        if(data.message == 'Redirect to login') {
+                        if (data.message == 'IS_TEAM_MEMBER') {
                             $location.path('/login');
                         }
+
+                        if (data.message == 'REDIRECT_TO_LOGIN') {
+                            $location.path('/login');
+                        }
+                        cb();
                     })
-                    .error(function(){
-                        console.log("error");
-                    })
+                    .error(cb);
             }
         }
     ])

@@ -5,6 +5,7 @@ angular.module('services.UserList', [])
     function ($log) {
 
         var allUsers = [];
+        var useremail = '';
 
         this.setUsers = function (value) {
             allUsers = value;
@@ -14,6 +15,14 @@ angular.module('services.UserList', [])
             return allUsers;
         };
 
+        this.setUserEmail = function (value) {
+            useremail = value;
+        }
+
+        this.getUserEmail = function () {
+            return useremail;
+        }
+ 
         return this;
 
     }

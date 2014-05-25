@@ -4,12 +4,12 @@ angular.module('models.message', ['services'])
     'InboxMsgService', '$modal', '$location', 'ThreadService',
     function ($http, config, AppService, InboxMsgService, $modal,
         $location, ThreadService) {
-        this.sendManualMessage = function (sub, text, uid) {
+        this.sendManualMessage = function (sub, text, uid, cb) {
             console.log("uid: ", uid)
             var data = {
                 sName: 'Savinay',
                 sub: sub,
-                text: text,
+                body: text,
                 type: 'email',
                 uids: uid
             }
@@ -22,12 +22,11 @@ angular.module('models.message', ['services'])
             $http.post(config.apiUrl + '/apps/' + appId + '/conversations',
                 data)
                 .success(function (data) {
-                    console.log("success");
+                    console.log("success: ", data);
+                    cb(null, data);
 
                 })
-                .error(function () {
-                    console.log("error");
-                })
+                .error(cb);
 
         };
 
@@ -81,7 +80,7 @@ angular.module('models.message', ['services'])
         this.replyToMsg = function (appId, coId, reply, accid, callback) {
 
             var data = {
-                text: reply
+                body: reply
             }
 
             console.log("data replyToMsg: ", data);
@@ -118,6 +117,16 @@ angular.module('models.message', ['services'])
                     callback();
                 })
                 .error(callback);
+        }
+
+        this.assignTo = function (appId, coId, data, index, name, cb) {
+            $http.put(config.apiUrl + '/apps/' + appId + '/conversations/' + coId +
+                '/assign', data)
+                .success(function (data) {
+                    console.log("success in assigning: ", data);
+                    cb(null, name, index);
+                })
+                .error(cb)
         }
     }
 ])

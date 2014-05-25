@@ -123,6 +123,26 @@
                                         </form>
                                     </div>
                                 </div>
+                                <button class="btn btn-info fa fa-save" ng-click="updateQuery()" style="font-size: 16px; padding: 11px 27px;" ng-show="showUpdateButton">
+                                Update
+                                </button>
+                                <img src="/images/spiffygif_30x30.gif" ng-show="showSpinner">
+                                <div class="popover right" tabindex="-1" style="display: block; position: absolute; top: -73px; left: 255px;" ng-show="showUpdatePopover">
+                                    <div class="arrow"></div>
+                                    <h3 class="popover-title"> Update segment
+                                    </h3>
+                                    <div class="popover-content">
+                                        <form name="popoverForm" ng-submit="updateSegment()" novalidate>
+                                            <div class="row" style="padding: 10px;">
+                                                <input id="segmentName" type="text" class="form-control" name="updatedSegmentName" placeholder="Segment" ng-model="updatedSegmentName" required >
+                                                <br>
+                                                <button type="submit" class="btn btn-info" ng-click="updateSegment()">Update</button>
+                                                <button class="btn btn-info" ng-click="closeUpdatePopover($event)">Close</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <!-- <span us-spinner></span> -->
                             </div>
                         </div>
                     </div>
@@ -184,13 +204,13 @@
                     <thead>
                         <tr>
                             <!-- <th ng-repeat="column in columns" ng-show="column.visible"
-                                class="text-center" ng-class="{
-                                'sort-asc': tableParams.isSortBy(column.field, 'asc'),
-                                'sort-desc': tableParams.isSortBy(column.field, 'desc'),
-                                'sortable': !$first
-                                }"
-                                ng-click="tableParams.sorting(column.field, tableParams.isSortBy(column.field, 'asc') ? 'desc' : 'asc')">
-                                <div>{{column.title}}</div>
+                                                                class="text-center" ng-class="{
+                                                                'sort-asc': tableParams.isSortBy(column.field, 'asc'),
+                                                                'sort-desc': tableParams.isSortBy(column.field, 'desc'),
+                                                                'sortable': !$first
+                                                                }"
+                                                                ng-click="tableParams.sorting(column.field, tableParams.isSortBy(column.field, 'asc') ? 'desc' : 'asc')">
+                                                                <div>{{column.title}}</div>
                             </th> -->
                             <th class="text-center">
                                 <div><input type="checkbox" ng-model="checkboxes.all"></div>
@@ -233,16 +253,16 @@
                         <td width="30" style="text-align: left">
                             <input type="checkbox" ng-model="checkboxes.items[user.id]" />
                         </td>
-                        <td data-title="'Email Id'" class="text-center" sortable="email" ng-show="columns[1].visible">
+                        <td data-title="'Email Id'" class="text-center" sortable="email" ng-show="columns[1].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
                             <span>{{user.email}}</span>
                         </td>
-                        <td data-title="'User Karma'" class="text-center" sortable="userkarma" ng-show="columns[2].visible">
+                        <td data-title="'User Karma'" class="text-center" sortable="userkarma" ng-show="columns[2].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
                             <span>{{user.userkarma}}</span>
                         </td>
-                        <td data-title="'Date Joined'" class="text-center" sortable="datejoined" ng-show="columns[3].visible">
+                        <td data-title="'Date Joined'" class="text-center" sortable="datejoined" ng-show="columns[3].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
                             <span>{{user.datejoined}}</span>
                         </td>
-                        <td data-title="'Unsubscribed'" class="text-center" sortable="status" ng-show="columns[4].visible">
+                        <td data-title="'Unsubscribed'" class="text-center" sortable="status" ng-show="columns[4].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
                             <span>{{user.unsubscribed}}</span>
                         </td>
                     </tr>

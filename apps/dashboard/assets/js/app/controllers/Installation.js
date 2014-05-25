@@ -52,8 +52,23 @@ angular.module('do.install', [])
     }
 ])
 
-.controller('installAddcodeAppCtrl', ['$scope', '$http',
-    function ($scope, $http) {
+.controller('installAddcodeAppCtrl', ['$scope', '$http', 'AppService',
+    '$location', 'CurrentAppService',
+    function ($scope, $http, AppService, $location, CurrentAppService) {
+        CurrentAppService.getCurrentApp()
+            .then(function (currentApp) {
+                if(AppService.getCurrentApp()._id != null) {
+                    $scope.appId = AppService.getCurrentApp()
+                        ._id;
+                    
+                } else {
+                    $scope.appId = currentApp[0]._id;
+                }
+                console.log("$scope.appId ---->>>>>", $scope.appId);
+                $scope.startTracking = function () {
+                    $location.path('/apps/' + $scope.appId + '/users/list');
+                }
 
+            })
     }
 ])
