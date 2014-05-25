@@ -73,6 +73,10 @@ var accounts = {
     first: {
       aid: null,
       email: 'prattbhatt@gmail.com',
+      meta: [{
+        k: 'name',
+        v: 'Prat'
+      }]
     },
 
 
@@ -207,7 +211,7 @@ var automessages = {
 
   second: {
     aid: null,
-    body: 'Hey, Welkom to Second CabanaLand!',
+    body: 'Hey {{= user.name || "there" }}, Welkom to Second CabanaLand!',
     creator: null,
     sid: null,
     sub: 'Welkom Boss!',
