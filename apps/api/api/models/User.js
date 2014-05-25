@@ -7,13 +7,21 @@
  * Module dependencies
  */
 
-var mongoose = require('mongoose'),
-  Schema = mongoose.Schema,
-  troop = require('mongoose-troop'),
-  async = require('async'),
-  _ = require('lodash'),
-  validate = require('mongoose-validator')
+var _ = require('lodash');
+var async = require('async');
+var mongoose = require('mongoose');
+var troop = require('mongoose-troop');
+var validate = require('mongoose-validator')
     .validate;
+
+var Schema = mongoose.Schema;
+
+
+/**
+ * Helpers
+ */
+
+var metadata = require('../../helpers/metadata');
 
 
 /**
@@ -21,6 +29,31 @@ var mongoose = require('mongoose'),
  */
 
 var billingStatusValidator = require('../../helpers/billing-status-validator');
+
+
+/**
+ * Define metadata schema (embedded document)
+ */
+
+var MetaDataSchema = new Schema({
+
+    // key
+    k: {
+      type: Schema.Types.Mixed,
+      required: true
+    },
+
+    // value
+    v: {
+      type: Schema.Types.Mixed,
+      required: true
+    }
+
+  },
+
+  {
+    _id: false
+  });
 
 
 /**
@@ -54,13 +87,52 @@ var UserSchema = new Schema({
     required: true
   },
 
-  user_id: {
-    type: String
+
+  companies: [UserCompanySchema],
+
+
+  ct: {
+    type: Date
   },
+
 
   email: {
     type: String
   },
+
+
+  healthScore: {
+    type: Number
+  },
+
+
+  lastContactedAt: {
+    type: Date
+  },
+
+
+  lastHeardAt: {
+    type: Date
+  },
+
+
+  lastSessionAt: {
+    type: Date
+  },
+
+
+  meta: [MetaDataSchema],
+
+
+  totalSessions: {
+    type: Number,
+    default: 1
+  },
+
+
+  // tags [all tags this user belongs to]
+  // notes
+  // status (Free, Paying, Cancelled)
 
   unsubscribed: {
     type: Boolean,
@@ -80,30 +152,12 @@ var UserSchema = new Schema({
     }
   },
 
-  lastContactedAt: {
-    type: Date
+
+  user_id: {
+    type: String
   },
 
-  totalSessions: {
-    type: Number,
-    default: 1
-  },
 
-  ct: {
-    type: Date
-  },
-
-  lastSessionAt: {
-    type: Date
-  },
-
-  lastHeardAt: {
-    type: Date
-  },
-
-  healthScore: {
-    type: Number
-  },
 
   // billing data is stored in both company and user models
   billing: {
@@ -136,13 +190,6 @@ var UserSchema = new Schema({
       type: String
     }
   },
-
-  companies: [UserCompanySchema]
-
-  // tags [all tags this user belongs to]
-  // notes
-  // status (Free, Paying, Cancelled)
-  // companies [{cid, companyName}]
 
 });
 
@@ -178,6 +225,9 @@ UserSchema.statics.getOrCreate = function (aid, user, cb) {
 
   // add aid to user
   user.aid = aid;
+
+  // format metadata to array
+  user.meta = metadata.toArray(user.meta);
 
   // aid to query
   query.aid = aid;

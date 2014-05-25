@@ -1,5 +1,13 @@
 describe('Model User', function () {
 
+
+  /**
+   * npm dependencies
+   */
+
+  var mongoose = require('mongoose');
+
+
   /**
    * Models
    */
@@ -11,7 +19,7 @@ describe('Model User', function () {
    * Test variables
    */
 
-  var randomId = '532d6bf862d673ba7131812a';
+  var randomId = mongoose.Types.ObjectId;
   var savedUser;
 
 
@@ -23,7 +31,7 @@ describe('Model User', function () {
         email: 'savinay@dodatado.com'
       };
 
-      User.getOrCreate(randomId, newUser, function (err, usr) {
+      User.getOrCreate(randomId(), newUser, function (err, usr) {
         expect(err)
           .to.not.exist;
         expect(usr)
@@ -67,7 +75,7 @@ describe('Model User', function () {
 
         var testUser = {
           email: 'care@dodatado.com',
-          aid: randomId
+          aid: randomId()
         };
 
         var billing = {
@@ -132,9 +140,9 @@ describe('Model User', function () {
     it('should store company data if exists', function (done) {
       var testUser = {
         email: 'care@dodatado.com',
-        aid: randomId,
+        aid: randomId(),
         companies: [{
-          cid: randomId,
+          cid: randomId(),
           name: 'helloworld'
         }]
       };
@@ -163,7 +171,7 @@ describe('Model User', function () {
       function (done) {
         var testUser = {
           email: 'care@dodatado.com',
-          aid: randomId,
+          aid: randomId(),
           companies: [{
             name: 'helloworld'
           }]
@@ -190,12 +198,12 @@ describe('Model User', function () {
     };
 
     before(function (done) {
-      newUser.aid = randomId;
+      newUser.aid = randomId();
       User.create(newUser, done);
     });
 
     it('should return user if user exists', function (done) {
-      User.getOrCreate(randomId, newUser, function (err, usr) {
+      User.getOrCreate(randomId(), newUser, function (err, usr) {
         expect(err)
           .to.not.exist;
         expect(usr)
@@ -209,19 +217,36 @@ describe('Model User', function () {
     it('should create user if user does not exist', function (done) {
 
       var newUser = {
-        email: 'savinay@dodatado.com'
+        email: randomId() + '@dodatado.com',
+        meta: {
+          plan: 'Free Tier',
+          amount: 40
+        }
       };
 
-      User.getOrCreate(randomId, newUser, function (err, usr) {
+      User.getOrCreate(randomId(), newUser, function (err, usr) {
+
         expect(err)
           .to.not.exist;
-        expect(usr)
-          .to.be.an('object');
+
+        expect(usr.toJSON())
+          .to.be.an('object')
+          .and.to.have.property("meta")
+          .that.is.an("array")
+          .that.has.length(2)
+          .that.deep.equals([{
+            k: 'plan',
+            v: 'Free Tier'
+          }, {
+            k: 'amount',
+            v: 40
+          }]);
 
         savedUser = usr;
 
         expect(usr.email)
           .to.eql(newUser.email);
+
         done();
       });
 
@@ -246,7 +271,7 @@ describe('Model User', function () {
           name: 'PrateekDoDataDo'
         };
 
-        User.getOrCreate(randomId, testUser, function (err, usr) {
+        User.getOrCreate(randomId(), testUser, function (err, usr) {
           expect(err)
             .to.exist;
           expect(err.message)
