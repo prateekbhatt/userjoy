@@ -23,7 +23,7 @@ angular.module('do.users', [])
                 authenticate: true
             })
             .state('list', {
-                url: '/users/list',
+                url: '/apps/:id/users/list',
                 views: {
                     "main": {
                         templateUrl: '/templates/usersmodule/users.list.html',
@@ -38,7 +38,7 @@ angular.module('do.users', [])
 
             })
             .state('profile', {
-                url: '/users/profile/id',
+                url: '/apps/:aid/users/profile/:id',
                 views: {
                     "main": {
                         templateUrl: '/templates/usersmodule/users.profile.html',
@@ -52,219 +52,219 @@ angular.module('do.users', [])
     }
 ])
 
-.controller('UserSegmentCtrl', ['$scope', '$location', 'segment',
-    'queryMatching', '$filter', 'countOfActions', 'hasNotDone',
-    'hasDoneActions', 'ngTableParams',
-    function ($scope, $location, segment, queryMatching, $filter,
-        countOfActions, hasNotDone, hasDoneActions,
-        ngTableParams) {
+// .controller('UserSegmentCtrl', ['$scope', '$location', 'segment',
+//     'queryMatching', '$filter', 'countOfActions', 'hasNotDone',
+//     'hasDoneActions', 'ngTableParams',
+//     function ($scope, $location, segment, queryMatching, $filter,
+//         countOfActions, hasNotDone, hasDoneActions,
+//         ngTableParams) {
 
 
-        $scope.state = 'form-control';
-        $scope.isErr = '';
-        $scope.method = 'count';
-        $scope.checkMethod = true;
-        $scope.rootOperator = 'and';
-        $scope.newFilterArray = [{
-                method: 'hasdone',
-                name: 'Create new chat',
-                op: '',
-                val: ''
-            },
+//         $scope.state = 'form-control';
+//         $scope.isErr = '';
+//         $scope.method = 'count';
+//         $scope.checkMethod = true;
+//         $scope.rootOperator = 'and';
+//         $scope.newFilterArray = [{
+//                 method: 'hasdone',
+//                 name: 'Create new chat',
+//                 op: '',
+//                 val: ''
+//             },
 
-            {
-                method: 'count',
-                name: 'Logged In',
-                op: 'gt',
-                val: 20
-            }
-        ]
-
-
-        $scope.selectFilter = 'Users';
-        $scope.hasNotDoneItems = [];
-        $scope.hasNotDoneItems = hasNotDone.getAllHasNotDoneActions();
-        $scope.hasDoneItems = [];
-        $scope.hasDoneItems = hasDoneActions.getAllHasDoneActions();
-        $scope.countOfItems = [];
-        $scope.countOfItems = countOfActions.getCountOfActions();
-        $scope.hasDoneOrHasNotDoneClicked = false;
-        $scope.hasCountOfClicked = true;
-
-        $scope.changeFilterHasDone = function (parentindex, index, evt) {
-            $scope.method = 'hasdone';
-            $scope.filters[parentindex].checkMethod = false;
-            console.log("has done: ", parentindex);
-            $scope.filters[parentindex].btntext = 'Has Done';
-            $scope.filters[parentindex].method = 'hasdone';
-            $scope.filters[parentindex].name = $scope.hasDoneItems[index].name;
-            $scope.filters[parentindex].op = '';
-            $scope.filters[parentindex].optext = '';
-            $scope.filters[parentindex].val = '';
+//             {
+//                 method: 'count',
+//                 name: 'Logged In',
+//                 op: 'gt',
+//                 val: 20
+//             }
+//         ]
 
 
-            $scope.hasDoneOrHasNotDone = true;
-            $scope.textHasDoneNotHasDone = $scope.hasDoneItems[index].name;
-            $scope.hasDoneOrHasNotDoneClicked = true;
-            $scope.hasCountOfClicked = false;
-            $scope.selectFilterHasOrHasNotDone = 'Has done ';
-            console.log("index: ", index);
-        }
+//         $scope.selectFilter = 'Users';
+//         $scope.hasNotDoneItems = [];
+//         $scope.hasNotDoneItems = hasNotDone.getAllHasNotDoneActions();
+//         $scope.hasDoneItems = [];
+//         $scope.hasDoneItems = hasDoneActions.getAllHasDoneActions();
+//         $scope.countOfItems = [];
+//         $scope.countOfItems = countOfActions.getCountOfActions();
+//         $scope.hasDoneOrHasNotDoneClicked = false;
+//         $scope.hasCountOfClicked = true;
 
-        $scope.changeFilterHasNotDone = function (parentindex, index, evt) {
-            $scope.method = 'hasnotdone';
-            $scope.filters[parentindex].checkMethod = false;
-            console.log("has not done: ", parentindex);
-            $scope.filters[parentindex].method = 'hasnotdone';
-            $scope.filters[parentindex].btntext = 'Has Not Done ';
-            $scope.filters[parentindex].name = $scope.hasNotDoneItems[
-                index].name;
-            $scope.filters[parentindex].op = '';
-            $scope.filters[parentindex].optext = '';
-            $scope.filters[parentindex].val = '';
-            console.log($scope.filters);
+//         $scope.changeFilterHasDone = function (parentindex, index, evt) {
+//             $scope.method = 'hasdone';
+//             $scope.filters[parentindex].checkMethod = false;
+//             console.log("has done: ", parentindex);
+//             $scope.filters[parentindex].btntext = 'Has Done';
+//             $scope.filters[parentindex].method = 'hasdone';
+//             $scope.filters[parentindex].name = $scope.hasDoneItems[index].name;
+//             $scope.filters[parentindex].op = '';
+//             $scope.filters[parentindex].optext = '';
+//             $scope.filters[parentindex].val = '';
 
 
+//             $scope.hasDoneOrHasNotDone = true;
+//             $scope.textHasDoneNotHasDone = $scope.hasDoneItems[index].name;
+//             $scope.hasDoneOrHasNotDoneClicked = true;
+//             $scope.hasCountOfClicked = false;
+//             $scope.selectFilterHasOrHasNotDone = 'Has done ';
+//             console.log("index: ", index);
+//         }
 
-            $scope.hasDoneOrHasNotDone = true;
-            $scope.textHasDoneNotHasDone = $scope.hasDoneItems[index].name;
-            $scope.hasDoneOrHasNotDoneClicked = true;
-            $scope.hasCountOfClicked = false;
-            $scope.selectFilterHasOrHasNotDone = 'Has not done';
-            console.log("index: ", index);
-        }
+//         $scope.changeFilterHasNotDone = function (parentindex, index, evt) {
+//             $scope.method = 'hasnotdone';
+//             $scope.filters[parentindex].checkMethod = false;
+//             console.log("has not done: ", parentindex);
+//             $scope.filters[parentindex].method = 'hasnotdone';
+//             $scope.filters[parentindex].btntext = 'Has Not Done ';
+//             $scope.filters[parentindex].name = $scope.hasNotDoneItems[
+//                 index].name;
+//             $scope.filters[parentindex].op = '';
+//             $scope.filters[parentindex].optext = '';
+//             $scope.filters[parentindex].val = '';
+//             console.log($scope.filters);
 
 
 
-        $scope.changeFilterCountOf = function (parentindex, index, evt) {
-            $scope.method = 'count';
-            $scope.filters[parentindex].checkMethod = true;
-            console.log("count: ", parentindex);
-            $scope.filters[parentindex].method = 'count';
-            $scope.filters[parentindex].btntext = 'Count Of ' + $scope.countOfItems[
-                index].name;
+//             $scope.hasDoneOrHasNotDone = true;
+//             $scope.textHasDoneNotHasDone = $scope.hasDoneItems[index].name;
+//             $scope.hasDoneOrHasNotDoneClicked = true;
+//             $scope.hasCountOfClicked = false;
+//             $scope.selectFilterHasOrHasNotDone = 'Has not done';
+//             console.log("index: ", index);
+//         }
+
+
+
+//         $scope.changeFilterCountOf = function (parentindex, index, evt) {
+//             $scope.method = 'count';
+//             $scope.filters[parentindex].checkMethod = true;
+//             console.log("count: ", parentindex);
+//             $scope.filters[parentindex].method = 'count';
+//             $scope.filters[parentindex].btntext = 'Count Of ' + $scope.countOfItems[
+//                 index].name;
 
 
 
 
-            $scope.hasDoneOrHasNotDone = false;
-            $scope.hasCountOfClicked = true;
-            $scope.hasDoneOrHasNotDoneClicked = false;
-            console.log("index: ", index);
-        }
+//             $scope.hasDoneOrHasNotDone = false;
+//             $scope.hasCountOfClicked = true;
+//             $scope.hasDoneOrHasNotDoneClicked = false;
+//             console.log("index: ", index);
+//         }
 
-        $scope.isActive = function (viewLocation) {
-            return viewLocation === $location.path();
-        };
-
-
-        var segments = segment.get.all();
-        $scope.dropdown = [];
-        for (var i = segments.length - 1; i >= 0; i--) {
-            $scope.dropdown.push({
-                text: segments[i].name
-            });
-        };
+//         $scope.isActive = function (viewLocation) {
+//             return viewLocation === $location.path();
+//         };
 
 
-        $scope.segments = segment.get.all();
-        $scope.segmenticons = [];
-        $scope.selectedIcon = $scope.segments[0].name;
-
-        for (var i = $scope.segments.length - 1; i >= 0; i--) {
-            $scope.segmenticons.push({
-                value: $scope.segments[i].name,
-                label: $scope.segments[i].name
-            })
-        };
+//         var segments = segment.get.all();
+//         $scope.dropdown = [];
+//         for (var i = segments.length - 1; i >= 0; i--) {
+//             $scope.dropdown.push({
+//                 text: segments[i].name
+//             });
+//         };
 
 
-        $scope.queries = queryMatching.get.all();
-        $scope.query = [];
-        $scope.queryDisplayed = $scope.queries[0].name;
-        $scope.selectedQuery = queryMatching.get.selected();
-        $scope.selectedqueries = [];
-        for (var i = 0; i <= $scope.queries.length - 1; i++) {
-            $scope.selectedqueries.push({
-                value: $scope.queries[i].name,
-                label: $scope.queries[i].name
-            })
-        };
+//         $scope.segments = segment.get.all();
+//         $scope.segmenticons = [];
+//         $scope.selectedIcon = $scope.segments[0].name;
+
+//         for (var i = $scope.segments.length - 1; i >= 0; i--) {
+//             $scope.segmenticons.push({
+//                 value: $scope.segments[i].name,
+//                 label: $scope.segments[i].name
+//             })
+//         };
 
 
-        $scope.chngquery = function (parentindex, index) {
-            console.log("parentindex: ", parentindex);
-            $scope.filters[parentindex].optext = $scope.queries[index].name;
-            $scope.filters[parentindex].op = $scope.queries[index].key;
-            console.log($scope.filters[parentindex].op);
-            console.log($scope.filters);
-        }
+//         $scope.queries = queryMatching.get.all();
+//         $scope.query = [];
+//         $scope.queryDisplayed = $scope.queries[0].name;
+//         $scope.selectedQuery = queryMatching.get.selected();
+//         $scope.selectedqueries = [];
+//         for (var i = 0; i <= $scope.queries.length - 1; i++) {
+//             $scope.selectedqueries.push({
+//                 value: $scope.queries[i].name,
+//                 label: $scope.queries[i].name
+//             })
+//         };
 
-        $scope.runQuery = function () {
-            console.log("run Query: ", $scope.filters);
-        }
 
-        console.log("queryDisplayed: ", $scope.queryDisplayed);
+//         $scope.chngquery = function (parentindex, index) {
+//             console.log("parentindex: ", parentindex);
+//             $scope.filters[parentindex].optext = $scope.queries[index].name;
+//             $scope.filters[parentindex].op = $scope.queries[index].key;
+//             console.log($scope.filters[parentindex].op);
+//             console.log($scope.filters);
+//         }
 
-        $scope.text = 'AND';
-        $scope.segmentFilterCtrl = segment.get.selected();
-        $scope.queryFilterCtrl = queryMatching.get.selected();
-        $scope.filters = [];
-        $scope.addAnotherFilter = function addAnotherFilter() {
-            $scope.checkMethod = true;
-            $scope.filters.push({
-                method: 'count',
-                btntext: 'Choose',
-                checkMethod: 'true',
-                name: '',
-                op: 'eq',
-                optext: 'equal',
-                val: ''
-            })
-        }
+//         $scope.runQuery = function () {
+//             console.log("run Query: ", $scope.filters);
+//         }
 
-        $scope.removeFilter = function removeFilter(
-            filterToRemove) {
-            var index = $scope.filters.indexOf(
-                filterToRemove);
-            $scope.filters.splice(index, 1);
-        }
-        $scope.switchAndOr = function switchAndOr() {
-            if ($scope.text === 'AND') {
-                $scope.text = 'OR'
-            } else {
-                $scope.text = 'AND'
-            }
-        }
+//         console.log("queryDisplayed: ", $scope.queryDisplayed);
 
-        $scope.showErr = false;
-        $scope.errMsg = 'Enter the outlined fields';
-        $scope.errorclass = '';
+//         $scope.text = 'AND';
+//         $scope.segmentFilterCtrl = segment.get.selected();
+//         $scope.queryFilterCtrl = queryMatching.get.selected();
+//         $scope.filters = [];
+//         $scope.addAnotherFilter = function addAnotherFilter() {
+//             $scope.checkMethod = true;
+//             $scope.filters.push({
+//                 method: 'count',
+//                 btntext: 'Choose',
+//                 checkMethod: 'true',
+//                 name: '',
+//                 op: 'eq',
+//                 optext: 'equal',
+//                 val: ''
+//             })
+//         }
 
-        $scope.hideErrorAlert = function () {
-            $scope.showErr = false;
-        }
+//         $scope.removeFilter = function removeFilter(
+//             filterToRemove) {
+//             var index = $scope.filters.indexOf(
+//                 filterToRemove);
+//             $scope.filters.splice(index, 1);
+//         }
+//         $scope.switchAndOr = function switchAndOr() {
+//             if ($scope.text === 'AND') {
+//                 $scope.text = 'OR'
+//             } else {
+//                 $scope.text = 'AND'
+//             }
+//         }
 
-        $scope.isErr = 'error';
+//         $scope.showErr = false;
+//         $scope.errMsg = 'Enter the outlined fields';
+//         $scope.errorclass = '';
 
-        $scope.signupForm = function () {
-            console.log($scope.filters);
-            for (var i = 0; i < $scope.filters.length; i++) {
-                console.log("val: ", $scope.filters[i].val);
-                if ($scope.filters[i].val == '' && $scope.filters[i].method ==
-                    'count') {
-                    console.log("val: ", $scope.filters[i].val);
-                    $scope.showErr = true;
-                    // $scope.isErr = 'error';
-                    // console.log("error class", $scope.isErr);
-                } else {
-                    $scope.showErr = false;
-                    // $scope.isErr = '';
-                }
-            };
-        }
-    }
-])
+//         $scope.hideErrorAlert = function () {
+//             $scope.showErr = false;
+//         }
+
+//         $scope.isErr = 'error';
+
+//         $scope.signupForm = function () {
+//             console.log($scope.filters);
+//             for (var i = 0; i < $scope.filters.length; i++) {
+//                 console.log("val: ", $scope.filters[i].val);
+//                 if ($scope.filters[i].val == '' && $scope.filters[i].method ==
+//                     'count') {
+//                     console.log("val: ", $scope.filters[i].val);
+//                     $scope.showErr = true;
+//                     // $scope.isErr = 'error';
+//                     // console.log("error class", $scope.isErr);
+//                 } else {
+//                     $scope.showErr = false;
+//                     // $scope.isErr = '';
+//                 }
+//             };
+//         }
+//     }
+// ])
 
 .controller('UserListCtrl', ['$scope', '$location', 'segment',
     'queryMatching', '$filter', 'countOfActions', 'hasNotDone',
@@ -272,25 +272,37 @@ angular.module('do.users', [])
     'AppService', 'segment', 'queryMatching', 'eventNames',
     'userAttributes', 'lodash', '$modal',
     'UidService', '$moment', 'UserList', '$timeout', 'modelsSegment',
-    'segmentService', 'CurrentAppService',
+    'segmentService', 'CurrentAppService', 'UserModel', '$log',
+    'MsgService', '$stateParams',
     function ($scope, $location, segment, queryMatching, $filter,
         countOfActions, hasNotDone, hasDoneActions,
         ngTableParams, login, modelsQuery, AppService, segment,
         queryMatching, eventNames, userAttributes, lodash, $modal,
         UidService, $moment, UserList, $timeout, modelsSegment,
-        segmentService, CurrentAppService) {
+        segmentService, CurrentAppService, UserModel, $log, MsgService,
+        $stateParams) {
 
         CurrentAppService.getCurrentApp()
             .then(function (currentApp) {
                 console.log("Promise Resolved: ", currentApp);
-
+                console.log("current App from service -->: ",
+                    AppService.getCurrentApp());
+                var currentAppId = $stateParams.id;
+                console.log("currentAppId--> ", currentAppId);
+                if (currentAppId == null) {
+                    currentAppId = currentApp[0]._id;
+                }
                 $scope.showSaveButton = false;
+                $scope.showUpdateButton = false;
+                $scope.segmentClicked = false;
                 $scope.segmentsCreatedName = [];
+                $scope.showUpdatePopover = false;
+                $scope.showSpinner = false;
                 var checkSegments = function (err) {
                     if (err) {
                         return err;
                     }
-
+                    console.log("segment: ", segmentService.getSegments());
                     if (segmentService.getSegments()
                         .length > 0) {
                         for (var i = 0; i < segmentService.getSegments()
@@ -309,7 +321,7 @@ angular.module('do.users', [])
                     }
                 }
 
-                modelsSegment.getAllSegments(currentApp._id,
+                modelsSegment.getAllSegments(currentAppId,
                     checkSegments);
 
 
@@ -436,20 +448,6 @@ angular.module('do.users', [])
                     $scope.method = 'count';
                     $scope.checkMethod = true;
                     $scope.rootOperator = 'and';
-                    $scope.newFilterArray = [{
-                            method: 'hasdone',
-                            name: 'Create new chat',
-                            op: '',
-                            val: ''
-                        },
-
-                        {
-                            method: 'count',
-                            name: 'Logged In',
-                            op: 'gt',
-                            val: 20
-                        }
-                    ]
 
 
                     $scope.selectFilter = 'Users';
@@ -599,8 +597,16 @@ angular.module('do.users', [])
                             val: '',
                             type: ''
                         })
-                        if ($scope.filters.length > 0) {
+                        if ($scope.filters.length > 0 && $scope.segmentClicked ==
+                            false) {
                             $scope.showSaveButton = true;
+                            $scope.showUpdateButton = false;
+                        }
+
+                        if ($scope.filters.length > $scope.segmentLength &&
+                            $scope.segmentClicked == true) {
+                            $scope.showSaveButton = false;
+                            $scope.showUpdateButton = true;
                         }
                     }
 
@@ -609,10 +615,21 @@ angular.module('do.users', [])
                         var index = $scope.filters.indexOf(
                             filterToRemove);
                         $scope.filters.splice(index, 1);
+                        if ($scope.filters.length < $scope.segmentLength &&
+                            $scope.segmentClicked == true) {
+                            $scope.showUpdateButton = true;
+                        }
+
                         if ($scope.filters.length == 0) {
                             $scope.showSaveButton = false;
+                            $scope.showUpdateButton = false;
+                            $scope.segmentClicked = false;
+                            $scope.showUpdatePopover = false;
+                            $scope.showPopover = false;
+                            $scope.showUsers = false;
                         }
                     }
+
                     $scope.switchAndOr = function switchAndOr() {
                         if ($scope.text === 'AND') {
                             $scope.text = 'OR'
@@ -622,10 +639,12 @@ angular.module('do.users', [])
                     }
 
                     var populateTable = function () {
+                        $scope.showSpinner = false;
 
                         if (err) {
                             return err;
                         }
+
                         $scope.users = [];
                         if (UserList.getUsers()
                             .length > 0) {
@@ -718,6 +737,7 @@ angular.module('do.users', [])
 
                     $scope.showErrorOnInput = true;
                     $scope.runQuery = function () {
+                        $scope.showSpinner = true;
                         $scope.showErrorOnInput = true;
                         for (var i = 0; i < $scope.filters.length; i++) {
                             console.log("val: ", $scope.filters[i].val);
@@ -742,7 +762,7 @@ angular.module('do.users', [])
                         for (var i = 0; i < $scope.filters.length; i++) {
                             $scope.filtersBackend.push({
                                 method: $scope.filters[i].method,
-                                type: 'feature',
+                                type: $scope.filters[i].type,
                                 name: $scope.filters[i].name,
                                 op: $scope.filters[i].op,
                                 val: $scope.filters[i].val,
@@ -761,8 +781,8 @@ angular.module('do.users', [])
                             stringifiedQuery);
 
 
-                        modelsQuery.runQueryAndGetUsers(currentApp
-                            ._id, stringifiedQuery, populateTable);
+                        modelsQuery.runQueryAndGetUsers(currentAppId,
+                            stringifiedQuery, populateTable);
 
                     }
 
@@ -792,6 +812,42 @@ angular.module('do.users', [])
                         $scope.showPopover = false;
                     }
 
+                    $scope.closeUpdatePopover = function (event) {
+                        event.preventDefault();
+                        $scope.showUpdatePopover = false;
+                    }
+
+                    $scope.updateQuery = function () {
+                        $scope.showUpdatePopover = !$scope.showUpdatePopover;
+                    }
+
+                    $scope.updateSegment = function () {
+                        $scope.updateSegmentObj = {};
+                        $scope.filtersBackend = [];
+                        console.log("update segment: ", $scope.filters);
+                        for (var i = 0; i < $scope.filters.length; i++) {
+                            $scope.filtersBackend.push({
+                                method: $scope.filters[i].method,
+                                type: $scope.filters[i].type,
+                                name: $scope.filters[i].name,
+                                op: $scope.filters[i].op,
+                                val: $scope.filters[i].val
+
+                            })
+                        };
+                        $scope.updateSegmentObj.list = $scope.selectedIcon
+                            .toLowerCase();
+                        $scope.updateSegmentObj.name = $scope.updatedSegmentName;
+                        $scope.updateSegmentObj.op = $scope.text.toLowerCase();
+                        $scope.updateSegmentObj.filters = $scope.filtersBackend;
+                        console.log("updateSegmentObj: ", $scope.updateSegmentObj);
+
+                        modelsSegment.updateSegment(currentAppId,
+                            segmentService.getSegmentId(), $scope.updateSegmentObj
+                        );
+                        $scope.showUpdatePopover = false;
+                    }
+
                     $scope.createSegmentObj = {};
                     $scope.createSegment = function () {
                         $scope.filtersBackend = [];
@@ -799,7 +855,7 @@ angular.module('do.users', [])
                         for (var i = 0; i < $scope.filters.length; i++) {
                             $scope.filtersBackend.push({
                                 method: $scope.filters[i].method,
-                                type: 'feature',
+                                type: $scope.filters[i].type,
                                 name: $scope.filters[i].name,
                                 op: $scope.filters[i].op,
                                 val: $scope.filters[i].val
@@ -813,15 +869,16 @@ angular.module('do.users', [])
                         $scope.createSegmentObj.filters = $scope.filtersBackend;
                         console.log("createSegmentObj: ", $scope.createSegmentObj);
 
-                        modelsSegment.createSegment(currentApp._id,
+                        modelsSegment.createSegment(currentAppId,
                             $scope.createSegmentObj);
-
+                        $scope.showPopover = false;
 
                     }
 
 
 
                     var populateFilterAndRunQuery = function () {
+                        $scope.segmentLength = '';
                         $scope.queryObject = {};
                         $scope.filtersFrontEnd = [];
                         var getFilters = [];
@@ -829,6 +886,8 @@ angular.module('do.users', [])
                         console.log("$scope.queries: ", $scope.queries);
                         getFilters = segmentService.getSingleSegment()
                             .filters;
+                        $scope.segmentLength = getFilters.length;
+                        console.log("getFilters: ", getFilters);
                         for (var i = 0; i < getFilters.length; i++) {
                             var buttonText = '';
                             var btnName = '';
@@ -875,7 +934,8 @@ angular.module('do.users', [])
                                 name: btnName,
                                 op: getFilters[i].op,
                                 optext: operationText,
-                                val: getFilters[i].val
+                                val: getFilters[i].val,
+                                type: getFilters[i].type
                             })
 
                         };
@@ -883,14 +943,15 @@ angular.module('do.users', [])
                             .list;
                         $scope.queryObject.op = segmentService.getSingleSegment()
                             .op;
-                        $scope.queryObject.filters = $scope.getFilters;
+                        $scope.queryObject.filters = getFilters;
+                        console.log("queryobject: ", $scope.queryObject);
 
                         var stringifiedQueryObject = stringify($scope.queryObject);
                         console.log('queryObj', $scope.queryObject);
                         console.log('stringifiedQuery',
                             stringifiedQueryObject);
 
-                        modelsQuery.runQueryAndGetUsers(currentApp._id,
+                        modelsQuery.runQueryAndGetUsers(currentAppId,
                             stringifiedQueryObject,
                             populateTable);
 
@@ -898,7 +959,11 @@ angular.module('do.users', [])
                     }
 
                     $scope.showQuery = function (segId) {
-                        modelsSegment.getSegment(currentApp._id, segId,
+                        $scope.segmentClicked = true;
+                        $scope.showSaveButton = false;
+                        segmentService.setSegmentId(segId);
+                        console.log("segmentId: ", segmentService.getSegmentId());
+                        modelsSegment.getSegment(currentAppId, segId,
                             populateFilterAndRunQuery);
                     }
 
@@ -930,20 +995,23 @@ angular.module('do.users', [])
 
                 }
 
+                $scope.showUserProfile = function (id) {
+                    UserModel.getUserProfile(id, currentAppId);
+                }
 
-                console.log("App Id: ", currentApp._id);
+                console.log("App Id: ", currentAppId);
 
 
-                modelsQuery.getQueries(currentApp._id, fillData);
+                modelsQuery.getQueries(currentAppId, fillData);
 
 
-                $scope.title = "Write Message";
+                // $scope.title = "Write Message";
 
-                var popupModal = $modal({
-                    scope: $scope,
-                    template: '/templates/usersmodule/message.modal.html',
-                    show: false
-                });
+                // var popupModal = $modal({
+                //     scope: $scope,
+                //     template: '/templates/usersmodule/message.modal.html',
+                //     show: false
+                // });
 
                 $scope.showErr = false;
 
@@ -951,38 +1019,39 @@ angular.module('do.users', [])
                     $scope.showMaxMsgErr = false;
                 }
 
-                $scope.openModal = function () {
-                    $scope.mail = [];
-                    console.log("items ticked: ", Object.keys($scope.checkboxes.items)
-                        .length);
-                    if(Object.keys($scope.checkboxes.items)
-                        .length <= 50) {
-                        popupModal.show();
-                    }
-                    console.log("checkboxes items: ", $scope.checkboxes
-                        .items);
-                    var prop, value;
-                    var keys = Object.keys($scope.checkboxes.items);
-                    for (var i = 0; i < Object.keys($scope.checkboxes.items)
-                        .length; i++) {
-                        prop = keys[i];
-                        console.log("id: ", prop);
-                        value = $scope.checkboxes.items[prop];
-                        console.log("value: ", value);
-                        if (value == true) {
-                            $scope.mail.push(prop);
-                        }
-                    };
-                    console.log("email objects: ", $scope.mail);
-                    if ($scope.mail.length > 50) {
-                        $scope.showMaxMsgErr = true;
-                        $scope.maxMsgErr =
-                            "Maximum Messages that can be sent at once is 50";
+                // $scope.openModal = function () {
+                //     $scope.mail = [];
+                //     console.log("items ticked: ", Object.keys($scope.checkboxes
+                //             .items)
+                //         .length);
+                //     if (Object.keys($scope.checkboxes.items)
+                //         .length <= 50) {
+                //         popupModal.show();
+                //     }
+                //     console.log("checkboxes items: ", $scope.checkboxes
+                //         .items);
+                //     var prop, value;
+                //     var keys = Object.keys($scope.checkboxes.items);
+                //     for (var i = 0; i < Object.keys($scope.checkboxes.items)
+                //         .length; i++) {
+                //         prop = keys[i];
+                //         console.log("id: ", prop);
+                //         value = $scope.checkboxes.items[prop];
+                //         console.log("value: ", value);
+                //         if (value == true) {
+                //             $scope.mail.push(prop);
+                //         }
+                //     };
+                //     console.log("email objects: ", $scope.mail);
+                //     if ($scope.mail.length > 50) {
+                //         $scope.showMaxMsgErr = true;
+                //         $scope.maxMsgErr =
+                //             "Maximum Messages that can be sent at once is 50";
 
-                    } else {
-                        UidService.set($scope.mail);
-                    }
-                };
+                //     } else {
+                //         UidService.set($scope.mail);
+                //     }
+                // };
 
 
                 var data = [];
@@ -1009,6 +1078,77 @@ angular.module('do.users', [])
                         .items);
                 })
 
+                $scope.openModal = function () {
+                    $scope.mail = [];
+                    console.log("items ticked: ", Object.keys(
+                            $scope.checkboxes
+                            .items)
+                        .length);
+                    console.log("checkboxes items: ",
+                        $scope.checkboxes
+                        .items);
+
+                    console.log("email objects: ", $scope.mail);
+                    var prop, value;
+                    var keys = Object.keys($scope.checkboxes
+                        .items);
+                    for (var i = 0; i < Object.keys($scope
+                            .checkboxes
+                            .items)
+                        .length; i++) {
+                        prop = keys[i];
+                        console.log("id: ", prop);
+                        value = $scope.checkboxes.items[
+                            prop];
+                        console.log("value: ", value);
+                        if (value == true) {
+                            $scope.mail.push(prop);
+                        }
+                    };
+                    UidService.set($scope.mail);
+
+
+                    if ($scope.mail.length > 50) {
+                        $scope.showMaxMsgErr = true;
+                        $scope.maxMsgErr =
+                            "Maximum Messages that can be sent at once is 50";
+
+                    } else {
+
+                        var modalInstance = $modal.open({
+                            templateUrl: '/templates/usersmodule/message.modal.html',
+                            controller: 'sendMessageCtrl',
+                            size: 'lg'
+                        });
+
+                        modalInstance.opened.then(function () {
+                            $log.info(
+                                'message modal template downloaded'
+                            );
+                        })
+
+                        var populateMsgOnCreation = function (err,
+                            lastNote) {
+                            if (err) {
+                                return;
+                            }
+                        }
+
+                        modalInstance.result.then(function (mail) {
+                            console.log("mail: ", mail)
+                            console.log("subject : ", mail.sub);
+                            console.log("msgtext: ", mail.msgtext);
+                            console.log("uid : ", UidService.get());
+                            MsgService.sendManualMessage(mail.sub,
+                                mail.msgtext, UidService.get(),
+                                populateMsgOnCreation);
+                        }, function () {
+                            $log.info('Modal dismissed at: ' + new Date());
+                        });
+                    }
+
+                };
+
             })
     }
 ])
@@ -1016,19 +1156,37 @@ angular.module('do.users', [])
 
 
 .controller('sendMessageCtrl', ['$scope', 'MsgService', '$modal', 'UidService',
-    function ($scope, MsgService, $modal, UidService) {
+    '$modalInstance',
+    function ($scope, MsgService, $modal, UidService, $modalInstance) {
         console.log("inside send message ctrl");
+        $scope.mail = {
+            sub: '',
+            msgtext: ''
+        }
         $scope.sendManualMessage = function () {
-            MsgService.sendManualMessage($scope.sub, $scope.msgtext,
-                UidService.get());
+            $modalInstance.close($scope.mail);
+            console.log("sub: ", $scope.mail.sub);
+            console.log("msg: ", $scope.mail.msgtext);
         }
     }
 ])
 
-.controller('ProfileCtrl', ['$scope',
-    function ($scope) {
+.controller('ProfileCtrl', ['$scope', 'UserModel', 'CurrentAppService',
+    'InboxMsgService', '$moment', 'UserList', '$modal', 'NotesService',
+    '$location', '$timeout', '$state', '$stateParams', '$rootScope',
+    '$log', 'AppService', 'MsgService',
 
-        // Get data from backend
+    function ($scope, UserModel, CurrentAppService, InboxMsgService,
+        $moment, UserList, $modal, NotesService, $location, $timeout,
+        $state, $stateParams, $rootScope, $log, AppService, MsgService) {
+        var currentAppId = $stateParams.aid;
+        console.log("currentAppId: ", currentAppId);
+        $scope.notes = [];
+        $scope.msgs = [];
+        $scope.currentApp = {};
+        $scope.useremail = null;
+
+        $scope.title = "Create Note";
 
         $scope.healthScore = '50';
         $scope.plan = 'Basic';
@@ -1039,6 +1197,149 @@ angular.module('do.users', [])
         $scope.country = 'India';
         $scope.os = 'Ubuntu';
         $scope.browser = 'Mozilla Firefox';
+
+        $scope.user = {
+            _id: $stateParams.id
+        };
+
+        /**
+         * Populating the newly created note in the notes table
+         */
+
+        $scope.populateNotesOnCreation = function (err, lastNote) {
+
+            if (err) {
+                return err;
+            }
+
+            console.log("lastNote: ", lastNote);
+
+            $scope.notes.unshift({
+                text: lastNote.note,
+                when: $moment(lastNote.ct)
+                    .fromNow()
+            });
+        };
+
+        $scope.populateMsgOnCreation = function (err, lastMsg) {
+            if (err) {
+                return err;
+            }
+            console.log("lastMsg: ", lastMsg[0]);
+            console.log("subject created msg: ", lastMsg[0].sub, lastMsg[0]
+                .sName, lastMsg[0].ct, lastMsg[0].toRead);
+
+            $scope.msgs.unshift({
+                id: lastMsg[0]._id,
+                sub: lastMsg[0].sub,
+                when: $moment(lastMsg[0].ct)
+                    .fromNow(),
+                opened: lastMsg[0].toRead,
+                replied: false // TODO: get status from backend when ready
+            })
+        }
+
+
+        var populateMsgList = function (err) {
+            if (err) {
+                return err;
+            }
+            for (var i = 0; i < InboxMsgService.getLatestConversations()
+                .length; i++) {
+                $scope.msgs.push({
+                    id: InboxMsgService.getLatestConversations()[
+                        i]._id,
+                    sub: InboxMsgService.getLatestConversations()[
+                        i].sub,
+                    when: $moment(InboxMsgService.getLatestConversations()[
+                        i].ct)
+                        .fromNow(),
+                    opened: InboxMsgService.getLatestConversations()[
+                        i].toRead,
+                    replied: false // TODO: get status from backend when ready
+                })
+            };
+        }
+
+        var populateNotes = function (err) {
+            if (err) {
+                return err;
+            }
+
+            var notes = NotesService.getNotes();
+            var length = notes.length;
+            for (var i = 0; i < length; i++) {
+                $scope.notes.push({
+                    text: notes[i].note,
+                    when: $moment(notes[i].ct)
+                        .fromNow()
+                })
+            };
+        };
+
+        $scope.openMessageModal = function () {
+
+            var modalInstance = $modal.open({
+                templateUrl: '/templates/usersmodule/message.modal.id.html',
+                controller: 'sendMessageCtrl',
+                size: 'lg'
+            });
+
+            modalInstance.opened.then(function () {
+                $log.info(
+                    'message modal template downloaded');
+            })
+
+
+
+            modalInstance.result.then(function (mail) {
+                console.log("mail: ", mail)
+                console.log("subject : ", mail.sub);
+                console.log("msgtext: ", mail.msgtext);
+                var emailId = [];
+                emailId.push($stateParams.id);
+                console.log("uid : ", emailId);
+                MsgService.sendManualMessage(mail.sub,
+                    mail.msgtext, emailId, $scope.populateMsgOnCreation
+                );
+            }, function () {
+                $log.info('Modal dismissed at: ' + new Date());
+            });
+        };
+
+
+        $scope.openNoteModal = function () {
+
+            var modalInstance = $modal.open({
+                templateUrl: '/templates/usersmodule/note.modal.html',
+                controller: 'NoteModalCtrl',
+                size: 'sm'
+            });
+
+            modalInstance.opened.then(function () {
+                $log.info('modal template downloaded')
+            })
+
+            modalInstance.result.then(function (note) {
+                var data = {
+                    note: note
+                };
+                UserModel.createNote($scope.currentApp._id, $scope.user
+                    ._id,
+                    data,
+                    $scope.populateNotesOnCreation);
+
+            }, function () {
+                $log.info('Modal dismissed at: ' + new Date());
+            });
+        };
+
+        $scope.redirectToConversation = function (id) {
+            console.log("redirecting to conversation: ", id);
+            $location.path('/messages/' + $scope.currentApp._id +
+                '/conversations/' + id);
+        };
+
 
         $scope.exampleData = [{
             "key": "Series 1",
@@ -1173,8 +1474,63 @@ angular.module('do.users', [])
 
         }
 
+        // TODO: Get data from backend
+
+        $scope.init = function () {
+
+            CurrentAppService
+                .getCurrentApp()
+                .then(function (currentApp) {
+
+                    $scope.currentApp = currentAppId;
+                    $scope.useremail = UserList.getUserEmail();
+
+                    UserModel.getNotes(currentAppId, $scope.user._id,
+                        populateNotes);
+
+                    UserModel.getLatestConversations(currentAppId,
+                        $scope.user._id,
+                        populateMsgList);
+
+                })
+        };
+
+        $scope.init();
+
     }
 ])
+
+.controller('NoteModalCtrl', ['$scope', '$modalInstance',
+    function ($scope, $modalInstance) {
+
+        $scope.note = {
+            text: ''
+        };
+        $scope.createNote = function () {
+            $modalInstance.close($scope.note.text);
+        };
+
+
+    }
+])
+
+// .controller('notesCtrl', ['$scope', 'UserModel', 'CurrentAppService',
+//     function ($scope, UserModel, CurrentAppService) {
+
+//         CurrentAppService.getCurrentApp()
+//             .then(function (currentApp) {
+//                 var url = window.location.href;
+//                 var uid = url.split("/")[5];
+//                 $scope.createNote = function () {
+//                     var data = {
+//                         note: $scope.notetext
+//                     };
+//                     UserModel.createNote(currentApp._id, uid, data);
+//                 }
+//             })
+
+//     }
+// ])
 
 // .controller('TableCtrl', ['$scope', '$filter', 'ngTableParams', '$modal',
 //     'UidService', '$moment', 'UserList', '$timeout',

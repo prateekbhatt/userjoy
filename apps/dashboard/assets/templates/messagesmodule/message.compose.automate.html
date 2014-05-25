@@ -8,13 +8,13 @@
                     <div id="sidebar-wrapper-settings">
                         <ul class="sidebar-nav">
                             <li>
-                                <a href="/messages/open/{{currApp}}" ng-click="showTableInbox()"><i class="fa fa-inbox"></i> Open Conversations <span class="badge">12</span></a>
+                                <a href="/apps/{{currApp}}/messages/open" ng-click="showTableInbox()"><i class="fa fa-inbox"></i> Open Conversations <span class="badge">12</span></a>
                             </li>
                             <li>
-                                <a href="/messages/unread/{{currApp}}"><i class="fa fa-exclamation"></i>&nbsp; Unread Conversations <span class="badge">26</span></a>
+                                <a href="/apps/{{currApp}}/messages/unread"><i class="fa fa-exclamation"></i>&nbsp; Unread Conversations <span class="badge">26</span></a>
                             </li>
                             <li>
-                                <a ui-sref="automate"><i class="fa fa-edit"></i> Automate Messages </a>
+                                <a href="/apps/{{currApp}}/messages/automate"><i class="fa fa-edit"></i> Automate Messages </a>
                             </li>
                             <li>
                                 <a ui-sref="message.template"><span class="glyphicon glyphicon-list-alt"></span> Choose Templates</a>
@@ -60,7 +60,7 @@
                                     </li>
                                     <li>
                                         <div class="progress" style="margin-left: 30px;">
-                                            <a href="/messages/closed/{{currApp}}" style="cursor: pointer">
+                                            <a href="/apps/{{currApp}}/messages/closed" style="cursor: pointer">
                                             <div class="progress-bar progress-bar-default" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #999;">
                                                 <span class="progress-type pull-left"><strong>Closed Conversations</strong></span>
                                             </div>
@@ -134,7 +134,7 @@
                                         </div>
                                         <div class="text-center" style="padding-top: 20px;">
                                             <div class="col-md-push-4 col-md-4">
-                                                <button class="btn btn-info btn-block" ui-sref="automateSegment">Create New Auto Message</button>
+                                                <a class="btn btn-info btn-block" href="/apps/{{currApp}}/messages/automate/segment">Create New Auto Message</a>
                                             </div>
                                         </div>
                                     </div>

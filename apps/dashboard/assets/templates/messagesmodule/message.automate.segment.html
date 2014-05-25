@@ -29,8 +29,8 @@
             <br>
             <br>
             <div class="btn-toolbar" style="padding-top: 45px;">
-                <button class="btn btn-info pull-right" ui-sref="automateWrite" ng-click="storeSegment()">Next</button>&nbsp;&nbsp;&nbsp;
-                <button class="btn btn-info pull-right" ui-sref="list">Create Another Segment</button>
+                <a class="btn btn-info pull-right" href="/apps/{{currApp}}/messages/automate/write" ng-click="storeSegment()">Next</a>&nbsp;&nbsp;&nbsp;
+                <a class="btn btn-default pull-right" ui-sref="/apps/{{currApp}}/users/list">Create Another Segment</a>
             </div>
         </div>
     </div>

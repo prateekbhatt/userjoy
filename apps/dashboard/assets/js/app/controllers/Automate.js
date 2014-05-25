@@ -4,7 +4,7 @@ angular.module('do.automate', [])
     function ($stateProvider) {
         $stateProvider
             .state('automate', {
-                url: '/messages/automate',
+                url: '/apps/:id/messages/automate',
                 views: {
                     "main": {
                         templateUrl: '/templates/messagesmodule/message.compose.automate.html',
@@ -15,7 +15,7 @@ angular.module('do.automate', [])
 
             })
             .state('automateSegment', {
-                url: '/messages/automate/segment',
+                url: '/apps/:id/messages/automate/segment',
                 views: {
                     "main": {
                         templateUrl: '/templates/messagesmodule/message.automate.segment.html',
@@ -26,7 +26,7 @@ angular.module('do.automate', [])
 
             })
             .state('automateWrite', {
-                url: '/messages/automate/write',
+                url: '/apps/:id/messages/automate/write',
                 views: {
                     "main": {
                         templateUrl: '/templates/messagesmodule/message.compose.automate.write.html'
@@ -36,7 +36,7 @@ angular.module('do.automate', [])
 
             })
             .state('automateTest', {
-                url: '/messages/automate/test',
+                url: '/apps/:id/messages/automate/test',
                 views: {
                     "main": {
                         templateUrl: '/templates/messagesmodule/message.automate.test.email.html',
@@ -47,7 +47,7 @@ angular.module('do.automate', [])
 
             })
             .state('automateLive', {
-                url: '/messages/automate/live',
+                url: '/apps/:id/messages/automate/live',
                 views: {
                     "main": {
                         templateUrl: '/templates/messagesmodule/message.automate.live.html',
@@ -62,12 +62,14 @@ angular.module('do.automate', [])
 
 .controller('messageAutomateCtrl', ['$scope', '$location', 'segment',
     'queryMatching', '$filter', 'AutoMsgService', 'modelsAutomate',
-    'AppService', 'CurrentAppService',
+    'AppService', 'CurrentAppService', '$stateParams',
     function ($scope, $location, segment, queryMatching, $filter,
-        AutoMsgService, modelsAutomate, AppService, CurrentAppService) {
+        AutoMsgService, modelsAutomate, AppService, CurrentAppService,
+        $stateParams) {
 
         CurrentAppService.getCurrentApp()
             .then(function (currentApp) {
+                $scope.currApp = $stateParams.id;
                 console.log("Promise resolved: ", currentApp);
                 console.log("inside automate ctrl");
 
@@ -119,13 +121,12 @@ angular.module('do.automate', [])
                     }
 
                 }
-                modelsAutomate.getAllAutoMessages(currentApp._id,
+                modelsAutomate.getAllAutoMessages($scope.currApp,
                     populateAutoMsg);
 
                 $scope.changeMsgStatus = function (id, text, index) {
                     if (text == 'Activate') {
-                        modelsAutomate.makeMsgLive(AppService.getCurrentApp()
-                            ._id, id);
+                        modelsAutomate.makeMsgLive($scope.currApp, id);
                         // FIXME: The message should be changed to Deactivate when its a success. Have a callback for this.
                         $scope.automessages[index].message =
                             'Deactivate';
@@ -133,8 +134,8 @@ angular.module('do.automate', [])
 
                     if (text == 'Deactivate') {
                         // FIXME: The message should be changed to Activate when its a success. Have a callback for this.
-                        modelsAutomate.deActivateMsg(AppService.getCurrentApp()
-                            ._id, id);
+                        modelsAutomate.deActivateMsg($scope.currApp,
+                            id);
                         $scope.automessages[index].message =
                             'Activate';
                     }
@@ -199,12 +200,13 @@ angular.module('do.automate', [])
 ])
 
 .controller('automateSegmentCtrl', ['$scope', 'segment', 'modelsSegment',
-    'AppService', 'segmentService', 'CurrentAppService',
+    'AppService', 'segmentService', 'CurrentAppService', '$stateParams',
     function ($scope, segment, modelsSegment, AppService, segmentService,
-        CurrentAppService) {
+        CurrentAppService, $stateParams) {
 
         CurrentAppService.getCurrentApp()
             .then(function (currentApp) {
+                $scope.currApp = $stateParams.id;
                 $scope.segments = [];
                 $scope.segmenticons = [];
                 $scope.selectedIcon = [];
@@ -234,7 +236,8 @@ angular.module('do.automate', [])
                     }
                 }
 
-                modelsSegment.getAllSegments(currentApp._id, checkSegments);
+                modelsSegment.getAllSegments($scope.currApp,
+                    checkSegments);
                 $scope.changeText = function (ind) {
                     $scope.selectedIcon.id = $scope.segmenticons[ind].id;
                     $scope.selectedIcon.name = $scope.segmenticons[ind]
@@ -253,10 +256,12 @@ angular.module('do.automate', [])
 
 .controller('textAngularCtrl', ['$scope', 'saveMsgService', '$location',
     'modelsAutomate', 'AppService', 'segmentService', 'ErrMsgService',
+    '$stateParams',
     function ($scope, saveMsgService, $location, modelsAutomate,
-        AppService, segmentService, ErrMsgService) {
+        AppService, segmentService, ErrMsgService, $stateParams) {
         console.log("inside text Angular Ctrl");
         console.log("sid: ", segmentService.getSingleSegment());
+        $scope.currApp = $stateParams.id;
         $scope.showNotification = true;
         $scope.showEmail = false;
         $scope.showAutoMsgError = false;
@@ -316,8 +321,7 @@ angular.module('do.automate', [])
             }
 
             console.log("data: ", data);
-            modelsAutomate.saveAutoMsg(AppService.getCurrentApp()
-                ._id, data);
+            modelsAutomate.saveAutoMsg($scope.currApp, data);
             $scope.$watch(ErrMsgService.getErrorMessage, function () {
                 if (ErrMsgService.getErrorMessage()) {
                     $scope.showAutoMsgError = true;
@@ -339,14 +343,14 @@ angular.module('do.automate', [])
 ])
 
 .controller('testEmailCtrl', ['$scope', 'saveMsgService', 'modelsAutomate',
-    'AppService', 'AutoMsgService',
+    'AppService', 'AutoMsgService', '$stateParams',
     function ($scope, saveMsgService, modelsAutomate, AppService,
-        AutoMsgService) {
+        AutoMsgService, $stateParams) {
+        $scope.currApp = $stateParams.id;
         $scope.previewText = saveMsgService.getMsg();
         console.log(saveMsgService.getMsg());
         $scope.sendTestEmail = function () {
-            modelsAutomate.sendTestEmail(AppService.getCurrentApp()
-                ._id, AutoMsgService.getSingleAutoMsg()
+            modelsAutomate.sendTestEmail($scope.currApp, AutoMsgService.getSingleAutoMsg()
                 ._id);
         }
     }
@@ -356,10 +360,10 @@ angular.module('do.automate', [])
     'AppService', 'AutoMsgService',
     function ($scope, saveMsgService, modelsAutomate, AppService,
         AutoMsgService) {
+        $scope.currApp = $stateParams.id;
         $scope.preview = saveMsgService.getMsg();
         $scope.makeMsgLive = function () {
-            modelsAutomate.makeMsgLive(AppService.getCurrentApp()
-                ._id, AutoMsgService.getSingleAutoMsg()
+            modelsAutomate.makeMsgLive($scope.currapp, AutoMsgService.getSingleAutoMsg()
                 ._id);
         }
     }

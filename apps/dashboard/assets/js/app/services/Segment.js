@@ -6,6 +6,7 @@ angular.module('services.segmentService', [])
 
         var allSegments = [];
         var singleSegment = [];
+        var segmentId = '';
 
         this.setSegments = function (value) {
             allSegments = value;
@@ -21,6 +22,14 @@ angular.module('services.segmentService', [])
 
         this.getSingleSegment = function () {
             return singleSegment;
+        }
+
+        this.setSegmentId = function (value) {
+            segmentId = value;
+        }
+
+        this.getSegmentId = function () {
+            return segmentId;
         }
 
         return this;

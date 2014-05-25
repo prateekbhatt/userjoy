@@ -1,3 +1,8 @@
+<div class="container" style="padding-top:70px">
+    <div class="row">
+        <p class="text-center" style="font-size: 35px"><strong>UserJoy</strong></p>
+    </div>
+</div>
 <div class="container">
     <div id="signupbox" style="margin-top: 50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
         <div class="panel panel-info" style="border-color: #bce8f1">
@@ -6,39 +11,33 @@
                 <div style="float:right; font-size: 85%; position: relative; top:-10px"><a id="signinlink" ui-sref="login">Sign In</a></div>
             </div>
             <div class="panel-body">
-                <form id="signupform" class="form-horizontal" role="form">
+                <form id="signupform" class="form-horizontal" role="form" ng-submit="createAccount()">
                     <div id="signupalert" style="display:none" class="alert alert-danger">
                         <p>Error:</p>
                         <span></span>
                     </div>
                     <div class="form-group">
+                        <label for="name" class="col-md-3 control-label">Name</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" name="name" placeholder="Your Name" required ng-model="name">
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label for="email" class="col-md-3 control-label">Email</label>
                         <div class="col-md-9">
-                            <input type="text" class="form-control" name="email" placeholder="Email Address" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="firstname" class="col-md-3 control-label">First Name</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" name="firstname" placeholder="First Name" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="lastname" class="col-md-3 control-label">Last Name</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" name="lastname" placeholder="Last Name">
+                            <input type="email" class="form-control" name="email" placeholder="Email Address" required ng-model="email" disabled>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="password" class="col-md-3 control-label">Password</label>
                         <div class="col-md-9">
-                            <input type="password" class="form-control" name="passwd" placeholder="Password">
+                            <input type="password" class="form-control" name="passwd" placeholder="Password" ng-model="password">
                         </div>
                     </div>
                     <div class="form-group">
                         <!-- Button -->
                         <div class="col-md-offset-3 col-md-9">
-                            <button id="btn-signup" type="button" class="btn btn-info"><i class="icon-hand-right"></i> &nbsp; Sign Up</button>
+                            <button id="btn-signup" type="submit" class="btn btn-info" ng-disabled="!(email.length && password.length > 7 && name.length > 1)"><i class="icon-hand-right"></i> &nbsp; Sign Up</button>
                         </div>
                     </div>
                 </form>

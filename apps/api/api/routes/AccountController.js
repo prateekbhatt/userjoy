@@ -69,7 +69,7 @@ function signupWithInvite(account, inviteId, cb) {
 
       function deleteInvite(acc, invite, cb) {
         // delete invite
-        Invite.findByIdAndRemove(inv._id, function (err) {
+        Invite.findByIdAndRemove(invite._id, function (err) {
           cb(err, acc);
         });
 
