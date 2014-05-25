@@ -4,6 +4,7 @@
 
 var async = require('async');
 var faker = require('Faker');
+var mongoose = require('mongoose');
 
 
 /**
@@ -17,7 +18,7 @@ var User = require('../../api/models/User');
  * random object ids
  */
 
-var randomId = '532d6bf862d673ba7131812a';
+var randomId = mongoose.Types.ObjectId;
 
 
 /**
@@ -51,7 +52,7 @@ function randomFromArray(arr) {
 
 function genFakeCompany() {
   var aFakeCompany = {
-    cid: randomId,
+    cid: randomId(),
     name: faker.Company.companyName()
   };
   return aFakeCompany;
@@ -89,7 +90,14 @@ function genFakeUser(aid) {
       amount: faker.Helpers.randomNumber(1000)
     },
 
-    companies: []
+    companies: [],
+
+    meta: [
+      {
+        k: 'name',
+        v: faker.Name.firstName() + ' ' + faker.Name.lastName()
+      }
+    ]
 
   };
 
