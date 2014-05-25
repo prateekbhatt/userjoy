@@ -154,6 +154,60 @@ function saveNotifications(users, amsg, cb) {
 }
 
 
+/**
+ * After the query is run, we get a set of all the users that match the segment
+ * filters. But, out of all of these users, many might have already been sent the
+ * automessage before. In this step we are filtering out those users, to avoid
+ * sending the same message to twice to an user.
+ *
+ * @param {array} users array of all users that match the segment filter
+ * @param {string} amId automessage-id
+ * @param {function} cb callback
+ */
+
+function removeUsersAlreadySent(users, amId, cb) {
+  Event
+    .find({
+      type: 'automessage',
+      meta: {
+        $elemMatch: {
+          k: 'amId',
+          v: amId.toString()
+        }
+      }
+    })
+    .select({
+      uid: 1,
+      '_id': -1
+    })
+    .exec(function (err, uids) {
+
+      if (err) return cb(err);
+
+      // extract all uids into an array
+      uids = _.map(uids, function (u) {
+        return u.uid.toString();
+      });
+
+      // filter out all users who have already been sent the automessage
+      var newUsers = _.filter(users, function (u) {
+        return !_.contains(uids, u._id.toString());
+      });
+
+
+      logger.trace({
+        at: 'workers/amConsumer removeUsersAlreadySent',
+        found: users.length,
+        sent: uids.length,
+        new: newUsers.length
+      });
+
+      cb(null, newUsers);
+    });
+
+}
+
+
 function amConsumer(cb) {
 
   // the iron mq message id (required to delete the message from the queue)
@@ -260,12 +314,19 @@ function amConsumer(cb) {
       // else if type is notification, create notifications to be shown later
       //
       //
-      // FIXME: Need to store which users are being sent the mails / notifications
-      // in order to prevent double-sending mails etc.
-      //
       // This can be achieved by creating a new type of event in the Event
       // collection which will identify the user and automessage alongwith the
       // action (sent, seen, clicked, replied)
+
+
+      // Need to store which users are being sent the mails / notifications
+      // in order to prevent double-sending mails etc.
+      //
+      // Remove all users who have been sent the automessage before
+      function sentUsers(users, cb) {
+        removeUsersAlreadySent(users, automessage._id, cb);
+      },
+
 
       function sendEmails(users, cb) {
 
@@ -394,3 +455,4 @@ module.exports = function run() {
 
 module.exports._amConsumer = amConsumer;
 module.exports._queue = q;
+module.exports._removeUsersAlreadySent = removeUsersAlreadySent;

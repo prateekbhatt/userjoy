@@ -47,12 +47,6 @@ describe('Worker automessageConsumer', function () {
         setupTestDb(cb);
       },
 
-
-      function clearQueue(cb) {
-        queue.clear(cb);
-      },
-
-
       function createEvent(cb) {
         var aid = saved.automessages.first.aid;
         var uid = saved.users.first._id;
@@ -78,8 +72,21 @@ describe('Worker automessageConsumer', function () {
     before(function (cb) {
       amId = saved.automessages.first._id.toString();
 
-      // queue auto message
-      queue.post(amId, cb);
+
+      async.series([
+
+        function clearQueue(cb) {
+          queue.clear(cb);
+        },
+
+        function postToQueue(cb) {
+          // queue auto message
+          queue.post(amId, cb);
+        }
+
+
+      ], cb)
+
     });
 
 
@@ -162,8 +169,20 @@ describe('Worker automessageConsumer', function () {
 
       amId = saved.automessages.second._id.toString();
 
-      // queue auto message
-      queue.post(amId, cb);
+
+      async.series([
+
+        function clearQueue(cb) {
+          queue.clear(cb);
+        },
+
+        function postToQueue(cb) {
+          // queue auto message
+          queue.post(amId, cb);
+        }
+
+      ], cb);
+
     });
 
     it('should fetch amId and send automessages', function (done) {
@@ -254,6 +273,66 @@ describe('Worker automessageConsumer', function () {
 
             expect(notf[0].body)
               .to.equal('Hey Prat, Welkom to Second CabanaLand!');
+
+            done();
+          });
+
+      });
+
+  });
+
+
+  describe('#removeUsersAlreadySent', function () {
+
+    var amsg, usr1, usr2;
+
+    before(function (done) {
+
+      amsg = saved.automessages.first;
+      usr1 = saved.users.first;
+      usr2 = saved.users.second;
+
+      Event.automessage(
+
+        {
+          aid: amsg.aid,
+          amId: amsg._id,
+          uid: usr1._id
+        },
+
+        'queued',
+        'Create Notification',
+
+        function (err, evn) {
+          done(err);
+        });
+
+    });
+
+
+    it(
+      'should return uids of users who have already been sent the automessage',
+      function (done) {
+        var users = [usr1, usr2];
+
+        worker._removeUsersAlreadySent(users, amsg._id,
+          function (err, newUsers) {
+
+            expect(err)
+              .to.not.exist;
+
+            expect(users)
+              .to.be.an("array")
+              .that.has.length(2);
+
+            expect(newUsers)
+              .to.be.an("array")
+              .that.has.length(1);
+
+            expect(newUsers[0])
+              .to.have.property('_id')
+              .that.equals(usr2._id)
+              .that.not.equals(usr1._id);
 
             done();
           });
