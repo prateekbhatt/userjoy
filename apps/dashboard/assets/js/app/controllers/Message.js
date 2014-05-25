@@ -264,24 +264,24 @@ angular.module('do.message', [])
                     }
 
                     $scope.team = AppService.getCurrentApp().team;
-                    var assignedTo = function (err, email, index) {
+                    var assignedTo = function (err, name, index) {
                         if (err) {
                             return err;
                         }
-                        console.log("$scope.openmsg -->", $scope.openmsg);
+                        console.log("$scope.openmsg -->", $scope.openmsg, name);
                         $scope.openmsg[index].assign = 'Assigned to ' +
-                            email;
+                            name;
                     }
 
                     $scope.assignToMember = function (accId, coId,
-                        email,
+                        name,
                         index) {
-                        console.log("index: email: ", index, email);
+                        console.log("index: name: ", index, name);
                         var data = {
                             assignee: accId
                         };
                         MsgService.assignTo($scope.currApp, coId, data,
-                            index, email, assignedTo);
+                            index, name, assignedTo);
                     }
 
                     $scope.showSelectedMail = function (id) {
