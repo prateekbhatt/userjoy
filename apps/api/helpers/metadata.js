@@ -29,7 +29,7 @@ var _ = require('lodash');
  *
  */
 
-var format = function (data) {
+var toArray = function (data) {
 
   var formatted = _
     .chain(data)
@@ -48,4 +48,31 @@ var format = function (data) {
 };
 
 
-module.exports.format = format;
+/**
+ * Takes in the 'OUTPUT' in the above example,
+ * and returns the 'INPUT'
+ */
+
+var toObject = function (data) {
+
+  var formatted = _.reduce(
+
+    data,
+
+    function (obj, val) {
+
+      obj[val.k] = val.v;
+
+      return obj;
+    },
+
+    {}
+  );
+
+  return formatted;
+
+};
+
+
+module.exports.toArray = toArray;
+module.exports.toObject = toObject;

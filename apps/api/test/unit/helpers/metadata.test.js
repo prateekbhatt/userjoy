@@ -15,16 +15,41 @@ describe('Helper metadata', function () {
     v: 991
   }];
 
-  it('should return an array of key-value pairs', function () {
-    var a = metadata.format(exMetadata);
-    expect(a)
-      .to.eql(expectedOutput);
+  describe('#toArray', function () {
+
+    it('should return an array of key-value pairs', function () {
+      var a = metadata.toArray(exMetadata);
+      expect(a)
+        .to.eql(expectedOutput);
+    });
+
+
+    it('should return empty array if no input', function () {
+      expect(metadata.toArray())
+        .to.eql([]);
+    });
+
   });
 
 
-  it('should return empty array if no input', function () {
-    expect(metadata.format())
-      .to.eql([]);
+  describe('#toObject', function () {
+
+    it('should return an object with key-value pairs', function () {
+
+      var a = metadata.toObject(expectedOutput);
+      expect(a)
+        .to.be.an('object')
+        .that.deep.equals(exMetadata);
+
+    });
+
+
+    it('should return empty object if no input', function () {
+      expect(metadata.toObject())
+        .to.eql({});
+    });
+
   });
+
 
 });
