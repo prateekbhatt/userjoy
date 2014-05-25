@@ -477,7 +477,6 @@ describe('Resource /apps/:aid/conversations', function () {
         var uids = [saved.users.first._id];
         var newMessage = {
           body: 'This is the message I want to send to {{= user.email || "YOU" }}',
-          sName: 'Prateek Bhatt',
           sub: 'Welcome to UserJoy, {{= user.email || "you"}}',
           type: 'email',
           uids: uids,
@@ -501,6 +500,10 @@ describe('Resource /apps/:aid/conversations', function () {
               .to.eql(
                 'This is the message I want to send to prattbhatt@gmail.com'
             );
+
+            expect(res.body[0])
+              .to.have.property('sName')
+              .that.equals(saved.accounts.first.name);
 
             expect(res.body[0].sub)
               .to.eql('Welcome to UserJoy, prattbhatt@gmail.com');
