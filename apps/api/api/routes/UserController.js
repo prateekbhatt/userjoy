@@ -33,6 +33,17 @@ var metadata = require('../../helpers/metadata');
 
 
 /**
+ * Checks if a given timestamp is valid
+ */
+
+function validTimestamp(timestamp) {
+  var valid = (new Date(timestamp))
+    .getTime() > 0;
+  return valid;
+}
+
+
+/**
  * All routes below need to be authenticated
  */
 
@@ -126,29 +137,57 @@ router
 /**
  * GET /apps/:aid/users/:uid/events
  *
- * Returns events of last seven days
+ * @query {date} from from-unix-timestamp
+ * @query {date} to to-unix-timestamp
+ *
+ * Returns events grouped by date, from from-timestamp to to-timestamp
+ *
+ * If from and to query params are not provided, then returns all events in the
+ * last seven days, grouped by date
  */
 
 router
   .route('/:aid/users/:uid/events')
   .get(function (req, res, next) {
 
-    // show events of the last seven days
+    // last seven days
     var sevenDaysAgo = moment()
       .subtract('days', 7)
       .unix();
 
+    var from = parseInt(req.query.from, 10);
+    var to = parseInt(req.query.to, 10);
+
+    // NOTE: multiplying by 1000 to convert from unix timestamp in seconds
+    // to milliseconds
+    sevenDaysAgo = sevenDaysAgo * 1000;
+    from = from * 1000;
+    to = to * 1000;
+
+    // default from timestamp is sevenDaysAgo
+    from = validTimestamp(from) ? from : sevenDaysAgo;
+
+    // default to timestamp is now
+    to = validTimestamp(to) ? to : Date.now();
+
+
     logger.trace({
       at: 'UserController:getEvents',
-      params: req.params
+      params: req.params,
+      query: req.query,
+      valid: validTimestamp(req.query.from),
+      from: from,
+      to: to
     });
+
 
     Event
       .find({
         uid: req.params.uid,
         aid: req.params.aid,
         ct: {
-          $gt: sevenDaysAgo
+          $gt: from,
+          $lt: to
         }
       })
       .sort({
@@ -158,12 +197,22 @@ router
 
         if (err) return next(err);
 
-        // convert metadata array to object
-        var newEvents = _.map(events, function (e) {
-          e = e.toJSON();
-          e.meta = metadata.toObject(e.meta);
-          return e;
-        });
+        // 1. convert metadata array to object
+        // 2. groupBy date unix timestamp
+        var newEvents = _.chain(events)
+          .map(function (e) {
+            e = e.toJSON();
+            e.meta = metadata.toObject(e.meta);
+            return e;
+          })
+          .groupBy(function (e) {
+            var startOfDay = moment(e.ct)
+              .startOf('day')
+              .unix();
+
+            return startOfDay;
+          })
+          .value();
 
         res
           .status(200)
