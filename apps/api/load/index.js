@@ -2,6 +2,7 @@
  * npm dependencies
  */
 
+var _ = require('lodash');
 var async = require('async');
 var express = require('express');
 var path = require('path');
@@ -98,9 +99,9 @@ exports.start = function startServer(done) {
       function startCronJobs(db, server, cb) {
 
 
-        // in the test environment, do not run the workers
+        // in the test / development environment, do not run the workers
 
-        if (process.env.NODE_ENV !== 'test') {
+        if (!_.contains(['test', 'development'], process.env.NODE_ENV)) {
 
           automessagePublisher();
           automessageConsumer();
