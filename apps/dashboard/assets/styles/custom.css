@@ -686,4 +686,37 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
     background-color: #bdc3c7;
     border-color: #bdc3c7;
 }
+.list-group-item-success {
+    color: #2c3e50;
+    border-left: 4px solid #18bc9c;
+    background-color: #ffffff;
+}
+.list-group-item-info {
+    color: #2c3e50;
+    border-left: 4px solid #3498db;
+    background-color: #ffffff;
+}
+.list-group-item-warning {
+    color: #2c3e50;
+    border-left: 4px solid #f39c12;
+    background-color: #ffffff;
+}
+.list-group-item-danger {
+    color: #2c3e50;
+    border-left: 4px solid #e74c3c;
+    background-color: #ffffff;
+}
+#affix-demo {
+    -margin-top:30px;
+    height: 300px;
+    overflow-y:scroll;
+    /*background: lightblue;*/
+    
+}
+#affixMe{
+    width: 100%;
+}
+/*#affixMe.affix {
+    top: 0px;
+}*/
 }
