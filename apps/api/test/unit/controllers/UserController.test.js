@@ -5,6 +5,7 @@ describe('Resource /apps/:aid/users', function () {
    */
 
   var mongoose = require('mongoose');
+  var moment = require('moment');
 
   var randomId = mongoose.Types.ObjectId;
 
@@ -170,7 +171,7 @@ describe('Resource /apps/:aid/users', function () {
       logoutUser(function (err) {
         if (err) return done(err);
 
-        EventFixture(aid, [uid], 100, done);
+        EventFixture(aid, [uid], 20, done);
       });
     });
 
@@ -190,31 +191,75 @@ describe('Resource /apps/:aid/users', function () {
     });
 
 
-    it('should return events of last seven days', function (done) {
+    it('should return events of last seven days by default',
+      function (done) {
 
-      request
-        .get(testUrl)
-        .set('cookie', loginCookie)
-        .expect('Content-Type', /json/)
-        .expect(200)
-        .end(function (err, res) {
+        request
+          .get(testUrl)
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function (err, res) {
 
-          if (err) return done(err);
+            if (err) return done(err);
 
-          expect(res.body)
-            .to.be.an("array")
-            .and.to.have.length(100);
+            expect(res.body)
+              .to.be.an("object");
 
-          // the event meta data should be in the form of an object
-          _.each(res.body, function (e) {
-            expect(e.meta)
-              .to.be.an('object');
+            var startOfDay = Object.keys(res.body)[0];
+
+            // expect the first key of the object to contain events from today's date
+            expect(startOfDay)
+              .to.equal((moment()
+                  .startOf('day')
+                  .unix())
+                .toString());
+
+            expect(res.body[startOfDay])
+              .to.be.an("array")
+              .and.to.have.length(20);
+
+            // the event meta data should be in the form of an object
+            _.each(res.body[startOfDay], function (e) {
+              expect(e.meta)
+                .to.be.an('object');
+            });
+
+            done();
           });
 
-          done();
-        });
+      });
 
-    });
+
+    it('should accept from and to timestamps as query params',
+      function (done) {
+
+        var from = moment()
+          .subtract('minutes', 10)
+          .unix();
+
+        var to = moment()
+          .subtract('minutes', 5)
+          .unix();
+
+        request
+          .get(testUrl + '/?from=' + from + '&to=' + to)
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function (err, res) {
+
+            if (err) return done(err);
+
+            expect(res.body)
+              .to.be.an("object")
+              .that.is.empty;
+
+            done();
+          });
+
+      });
+
 
   });
 
