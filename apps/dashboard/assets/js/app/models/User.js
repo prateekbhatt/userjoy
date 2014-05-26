@@ -52,5 +52,14 @@ angular.module('models.user', ['services'])
                 })
                 .error(cb);
         }
+
+        this.getEvents = function (appId, uid, fromTime, toTime, cb) {
+            $http.get(config.apiUrl + '/apps/' + appId + '/users/' + uid + '/events?from=' + fromTime + '&to=' + toTime)
+                .success(function(data) {
+                    console.log("success: ", data);
+                    cb(null, data);
+                })
+                .error(cb);
+        }
     }
 ]);

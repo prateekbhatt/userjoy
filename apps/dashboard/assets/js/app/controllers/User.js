@@ -1174,11 +1174,12 @@ angular.module('do.users', [])
 .controller('ProfileCtrl', ['$scope', 'UserModel', 'CurrentAppService',
     'InboxMsgService', '$moment', 'UserList', '$modal', 'NotesService',
     '$location', '$timeout', '$state', '$stateParams', '$rootScope',
-    '$log', 'AppService', 'MsgService',
+    '$log', 'AppService', 'MsgService', '$moment',
 
     function ($scope, UserModel, CurrentAppService, InboxMsgService,
         $moment, UserList, $modal, NotesService, $location, $timeout,
-        $state, $stateParams, $rootScope, $log, AppService, MsgService) {
+        $state, $stateParams, $rootScope, $log, AppService, MsgService,
+        $moment) {
         var currentAppId = $stateParams.aid;
         console.log("currentAppId: ", currentAppId);
         $scope.notes = [];
@@ -1197,10 +1198,84 @@ angular.module('do.users', [])
         $scope.country = 'India';
         $scope.os = 'Ubuntu';
         $scope.browser = 'Mozilla Firefox';
+        $scope.events = [];
 
         $scope.user = {
             _id: $stateParams.id
         };
+
+        $scope.fromTime = $moment()
+            .subtract('days', 2)
+            .startOf('day')
+            .unix();
+        $scope.toTime = $moment()
+            .subtract('days', 1)
+            .startOf('day')
+            .unix();
+
+
+        console.log("$scope.fromTime: ", $scope.fromTime);
+
+
+
+
+        var populateEvents = function (err, events) {
+            $scope.events = [];
+            console.log("events: ", events, Object.keys(events)
+                .length);
+            if (err) {
+                console.log("error");
+                return;
+            }
+
+            if(Object.keys(events).length == 0) {
+                console.log("events length is zero");
+                var fT = $scope.fromTime * 1000 - 24*60*60*1000;
+                $scope.fromTime = $moment(fT).startOf('day').unix();
+                var tT = $scope.toTime * 1000 - 24*60*60*1000;
+                $scope.toTime = $moment(tT).startOf('day').unix();
+                UserModel.getEvents(currentAppId, $scope.user._id, $scope.fromTime,
+                $scope.toTime, populateEvents);
+            } 
+            var keys = '';
+            keys = Object.keys(events);
+            console.log("keys: ", keys, keys[0]);
+            var value = [];
+            value = events[keys];
+            if (value != null) {
+                $scope.eventDate = $moment(keys[0] * 1000)
+                    .format('MMMM Do');
+                for (var i = 0; i < value.length; i++) {
+                    // value = events[keys[i]];
+                    console.log("value: ", value);
+                    $scope.events.push({
+                        name: value[i].name,
+                        when: $moment(value[i].ct)
+                            .fromNow()
+                    })
+                };
+            }
+            console.log("$scope.events: ", $scope.events);
+        }
+
+        $scope.showEventNextDate = function () {
+            $scope.fromTime = $moment($scope.fromTime * 1000 - 24 * 60 *
+                60 * 1000)
+                .startOf('day')
+                .unix();
+            $scope.toTime = $moment($scope.toTime * 1000 - 24 * 60 * 60 *
+                1000)
+                .startOf('day')
+                .unix();
+            console.log("new fromTime: ", $scope.fromTime, $moment($scope.fromTime*1000).format());
+            console.log("new toTime: ", $scope.toTime, $moment($scope.toTime * 1000).format());
+            UserModel.getEvents(currentAppId, $scope.user._id, $scope.fromTime,
+                $scope.toTime, populateEvents);
+        }
+
+
+        UserModel.getEvents(currentAppId, $scope.user._id, $scope.fromTime,
+            $scope.toTime, populateEvents);
 
         /**
          * Populating the newly created note in the notes table

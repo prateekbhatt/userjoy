@@ -30,6 +30,8 @@ var app = angular.module('dodatado', [
     'do.automate',
 ])
 
+
+
 .provider('appIdProvider', [
 
     function () {
@@ -213,21 +215,21 @@ var app = angular.module('dodatado', [
 //         }
 //     }
 // ])
-    .run(['$state', 'LoginService', '$rootScope',
-        function ($state, LoginService, $rootScope) {
+.run(['$state', 'LoginService', '$rootScope',
+    function ($state, LoginService, $rootScope) {
 
-            // check if user needs to be logged in to view a specific page
-            $rootScope.$on("$stateChangeStart", function (event,
-                toState,
-                toParams, fromState, fromParams) {
-                if (toState.authenticate && !LoginService.getUserAuthenticated()) {
-                    // User isn’t authenticated
-                    $state.go("login");
-                    event.preventDefault();
-                }
-            });
-        }
-    ])
+        // check if user needs to be logged in to view a specific page
+        $rootScope.$on("$stateChangeStart", function (event,
+            toState,
+            toParams, fromState, fromParams) {
+            if (toState.authenticate && !LoginService.getUserAuthenticated()) {
+                // User isn’t authenticated
+                $state.go("login");
+                event.preventDefault();
+            }
+        });
+    }
+])
 
 /*.run(['ThreadService', 'MsgService',
     function (ThreadService, MsgService) {
