@@ -2,6 +2,7 @@
  * Module dependencies
  */
 
+var moment = require('moment');
 var router = require('express')
   .Router();
 
@@ -11,6 +12,7 @@ var router = require('express')
  */
 
 var Conversation = require('../models/Conversation');
+var Event = require('../models/Event');
 var User = require('../models/User');
 
 
@@ -27,6 +29,7 @@ var hasAccess = require('../policies/hasAccess');
  */
 
 var logger = require('../../helpers/logger');
+var metadata = require('../../helpers/metadata');
 
 
 /**
@@ -114,6 +117,57 @@ router
         res
           .status(200)
           .json(conversations);
+
+      });
+
+  });
+
+
+/**
+ * GET /apps/:aid/users/:uid/events
+ *
+ * Returns events of last seven days
+ */
+
+router
+  .route('/:aid/users/:uid/events')
+  .get(function (req, res, next) {
+
+    // show events of the last seven days
+    var sevenDaysAgo = moment()
+      .subtract('days', 7)
+      .unix();
+
+    logger.trace({
+      at: 'UserController:getEvents',
+      params: req.params
+    });
+
+    Event
+      .find({
+        uid: req.params.uid,
+        aid: req.params.aid,
+        ct: {
+          $gt: sevenDaysAgo
+        }
+      })
+      .sort({
+        ct: -1
+      })
+      .exec(function (err, events) {
+
+        if (err) return next(err);
+
+        // convert metadata array to object
+        var newEvents = _.map(events, function (e) {
+          e = e.toJSON();
+          e.meta = metadata.toObject(e.meta);
+          return e;
+        });
+
+        res
+          .status(200)
+          .json(newEvents);
 
       });
 

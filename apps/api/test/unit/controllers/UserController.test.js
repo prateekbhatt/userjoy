@@ -9,6 +9,13 @@ describe('Resource /apps/:aid/users', function () {
   var randomId = mongoose.Types.ObjectId;
 
 
+  /**
+   * fixtures
+   */
+
+  var EventFixture = require('../../fixtures/EventFixture');
+
+
   before(function (done) {
     setupTestDb(done);
   });
@@ -143,6 +150,66 @@ describe('Resource /apps/:aid/users', function () {
 
           expect(res.body[0])
             .to.have.property('closed');
+
+          done();
+        });
+
+    });
+
+  });
+
+
+  describe('GET /apps/:aid/users/:uid/events', function () {
+
+    var aid, uid, testUrl;
+
+    before(function (done) {
+      aid = saved.apps.first._id;
+      uid = saved.users.first._id;
+      testUrl = '/apps/' + aid + '/users/' + uid + '/events';
+      logoutUser(function (err) {
+        if (err) return done(err);
+
+        EventFixture(aid, [uid], 100, done);
+      });
+    });
+
+
+    it('should return error if not logged in', function (done) {
+
+      request
+        .get(testUrl)
+        .expect('Content-Type', /json/)
+        .expect(401)
+        .end(done);
+    });
+
+
+    it('logging in user', function (done) {
+      loginUser(done);
+    });
+
+
+    it('should return events of last seven days', function (done) {
+
+      request
+        .get(testUrl)
+        .set('cookie', loginCookie)
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function (err, res) {
+
+          if (err) return done(err);
+
+          expect(res.body)
+            .to.be.an("array")
+            .and.to.have.length(100);
+
+          // the event meta data should be in the form of an object
+          _.each(res.body, function (e) {
+            expect(e.meta)
+              .to.be.an('object');
+          });
 
           done();
         });
