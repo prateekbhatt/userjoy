@@ -1066,7 +1066,7 @@ angular.module('do.users', [])
 
 
                 var data = [];
-                $scope.users = []
+                $scope.users = [];
 
                 $scope.checkboxes = {
                     'checked': false,
@@ -1091,7 +1091,7 @@ angular.module('do.users', [])
 
                 $scope.openModal = function () {
                     $scope.mail = [];
-                    console.log("items ticked: ", Object.keys(
+                    console.log("items ticked: ", _.keys(
                             $scope.checkboxes
                             .items)
                         .length);
@@ -1101,9 +1101,9 @@ angular.module('do.users', [])
 
                     console.log("email objects: ", $scope.mail);
                     var prop, value;
-                    var keys = Object.keys($scope.checkboxes
+                    var keys = _.keys($scope.checkboxes
                         .items);
-                    for (var i = 0; i < Object.keys($scope
+                    for (var i = 0; i < _.keys($scope
                             .checkboxes
                             .items)
                         .length; i++) {
@@ -1232,14 +1232,14 @@ angular.module('do.users', [])
 
         var populateEvents = function (err, events) {
             $scope.events = [];
-            console.log("events: ", events, Object.keys(events)
+            console.log("events: ", events, _.keys(events)
                 .length);
             if (err) {
                 console.log("error");
                 return;
             }
 
-            if(Object.keys(events).length == 0) {
+            if(_.keys(events).length == 0) {
                 console.log("events length is zero");
                 var fT = $scope.fromTime * 1000 - 24*60*60*1000;
                 $scope.fromTime = $moment(fT).startOf('day').unix();
@@ -1249,7 +1249,7 @@ angular.module('do.users', [])
                 $scope.toTime, populateEvents);
             } 
             var keys = '';
-            keys = Object.keys(events);
+            keys = _.keys(events);
             console.log("keys: ", keys, keys[0]);
             var value = [];
             value = events[keys];
