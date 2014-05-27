@@ -106,7 +106,8 @@ angular.module('do.message', [])
 
 .controller('InboxCtrl', ['$scope', '$filter', 'ngTableParams', '$log',
     'MsgService', '$location', 'AppService', 'InboxMsgService', '$moment',
-    'login', '$timeout', '$rootScope', 'CurrentAppService', '$stateParams', 'AppModel',
+    'login', '$timeout', '$rootScope', 'CurrentAppService', '$stateParams',
+    'AppModel',
     function ($scope, $filter, ngTableParams, $log, MsgService, $location,
         AppService, InboxMsgService, $moment, login, $timeout, $rootScope,
         CurrentAppService, $stateParams, AppModel) {
@@ -126,7 +127,7 @@ angular.module('do.message', [])
                 console.log('inside inboxctrl and showtable is true');
                 $scope.showTable = true;
 
-                if($scope.currApp == null) {
+                if ($scope.currApp == null) {
                     $scope.currApp = currentApp[0]._id
                 }
 
@@ -263,12 +264,15 @@ angular.module('do.message', [])
                         $scope.assignSelect = true;
                     }
 
-                    $scope.team = AppService.getCurrentApp().team;
+                    $scope.team = AppService.getCurrentApp()
+                        .team;
+                        console.log("Appservice getCurrentApp: ", AppService.getCurrentApp());
                     var assignedTo = function (err, name, index) {
                         if (err) {
                             return err;
                         }
-                        console.log("$scope.openmsg -->", $scope.openmsg, name);
+                        console.log("$scope.openmsg -->", $scope.openmsg,
+                            name);
                         $scope.openmsg[index].assign = 'Assigned to ' +
                             name;
                     }
@@ -334,11 +338,13 @@ angular.module('do.message', [])
                             time: $moment(msg[i].ct)
                                 .fromNow(),
                             close: 'Close',
-                            assign: 'Assign',
+                            assign: 'Assigned to ' + msg[i]
+                                .assignee
+                                .name,
                             coid: msg[i].coId
                         })
                     };
-
+console.log("$scope.unreadmsg --->", $scope.unreadmsg);
                     $scope.columnsSent = [{
                         title: 'User',
                         field: 'name',
@@ -422,6 +428,34 @@ angular.module('do.message', [])
                 $scope.closeConversation = function (coId) {
                     MsgService.closeConversationRequest($scope.currApp,
                         coId);
+                }
+
+                $scope.assignTo = function (id) {
+                    $scope.assignSelect = true;
+                }
+
+                $scope.team = AppService.getCurrentApp()
+                    .team;
+                console.log("$scope.team: ", $scope.team);
+                var assignedTo = function (err, name, index) {
+                    if (err) {
+                        return err;
+                    }
+                    console.log("$scope.unreadmsg -->", $scope.unreadmsg.
+                        name);
+                    $scope.unreadmsg[index].assign = 'Assigned to ' +
+                        name;
+                }
+
+                $scope.assignToMember = function (accId, coId,
+                    name,
+                    index) {
+                    console.log("index: name: ", index, name);
+                    var data = {
+                        assignee: accId
+                    };
+                    MsgService.assignTo($scope.currApp, coId, data,
+                        index, name, assignedTo);
                 }
 
                 $scope.showSelectedMail = function (id) {

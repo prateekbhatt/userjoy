@@ -1273,6 +1273,7 @@ angular.module('do.users', [])
                 if (value != null) {
                     $scope.eventDate = $moment(keys[0] * 1000)
                         .format('MMMM Do');
+                        $scope.lastEventDate = keys[0] * 1000;
                     for (var i = 0; i < value.length; i++) {
                         // value = events[keys[i]];
                         console.log("value: ", value);

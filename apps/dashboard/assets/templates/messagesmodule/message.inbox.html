@@ -133,14 +133,10 @@
                                                             <td data-title="''" style="text-align:center">
                                                                 <li class="dropdown" style="list-style: none;">
                                                                     <a href="#" ng-click="assignTo(user.id)" class="dropdown-toggle">{{user.assign}}</a>
-                                                                    <!-- <a href="#" ng-click="assignTo()" class="dropdown-toggle" ng-show="hasbeenAssigned(user.id)">Assigned to {{assignedToEmail}}</a> -->
                                                                     <ul ng-show="assignSelect" class="dropdown-menu" role="menu" style="left:auto; right: 0">
                                                                         <li role="presentation">
                                                                             <a style="cursor: pointer" ng-repeat="member in team" ng-click="assignToMember(member.accid._id, user.id, member.accid.name, $parent.$index)">{{member.accid.name}}</a>
                                                                         </li>
-                                                                        <!-- <li role="presentation">
-                                                                            <a href="">prateek@dodatado.com</a>
-                                                                        </li> -->
                                                                     </ul>
                                                                 </li>
                                                             </td>
