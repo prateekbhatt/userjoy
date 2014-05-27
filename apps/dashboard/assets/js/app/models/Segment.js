@@ -2,17 +2,16 @@ angular.module('models.Segment', ['services'])
 
 .service('modelsSegment', ['$http', 'config', 'segmentService',
     function ($http, config, segmentService) {
-        this.createSegment = function (appId, data) {
+        this.createSegment = function (appId, data, cb) {
             $http.post(config.apiUrl + '/apps/' + appId + '/segments',
                 data)
                 .success(function (data) {
                     // segmentService
-                    console.log("success");
+                    console.log("success", data);
                     segmentService.setSegments(data.name);
+                    cb(null, data);
                 })
-                .error(function (data) {
-                    console.log("error");
-                })
+                .error(cb);
         }
 
         this.getAllSegments = function (appId, callback) {
