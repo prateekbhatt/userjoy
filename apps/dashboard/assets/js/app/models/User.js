@@ -5,16 +5,15 @@ angular.module('models.user', ['services'])
     function ($http, config, $location, InboxMsgService, UserList,
         NotesService) {
 
-        this.getUserProfile = function (id, appId) {
+        this.getUserProfile = function (id, appId, cb) {
             $http.get(config.apiUrl + '/apps/' + appId + '/users/' + id)
                 .success(function (data) {
                     console.log("success: ", data);
                     UserList.setUserEmail(data.email);
-                    $location.path('/apps/' + appId + '/users/profile/' + id);
+                    cb(null, data, id);
+
                 })
-                .error(function (data) {
-                    console.log("error: ", data);
-                })
+                .error(cb);
         }
 
         this.getLatestConversations = function (appId, uid, cb) {
@@ -56,7 +55,7 @@ angular.module('models.user', ['services'])
         this.getEvents = function (appId, uid, fromTime, toTime, cb) {
             $http.get(config.apiUrl + '/apps/' + appId + '/users/' + uid + '/events?from=' + fromTime + '&to=' + toTime)
                 .success(function(data) {
-                    console.log("success: ", data);
+                    console.log("success: ", data, fromTime, toTime);
                     cb(null, data);
                 })
                 .error(cb);
