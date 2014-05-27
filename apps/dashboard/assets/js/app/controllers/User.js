@@ -849,7 +849,7 @@ angular.module('do.users', [])
                     }
 
                     var populateNewSegment = function (err, data) {
-                        if(err) {
+                        if (err) {
                             return err;
                         }
                         $scope.showPopover = false;
@@ -881,8 +881,9 @@ angular.module('do.users', [])
                         console.log("createSegmentObj: ", $scope.createSegmentObj);
 
                         modelsSegment.createSegment(currentAppId,
-                            $scope.createSegmentObj, populateNewSegment);
-                        
+                            $scope.createSegmentObj,
+                            populateNewSegment);
+
 
                     }
 
@@ -1210,25 +1211,36 @@ angular.module('do.users', [])
         $scope.os = 'Ubuntu';
         $scope.browser = 'Mozilla Firefox';
         $scope.events = [];
-
+        var lastSeen = new Date();
+        console.log("lastSeen: ", lastSeen);
         $scope.user = {
-            _id: $stateParams.id
+            _id: $stateParams.id,
+            lastSeen: lastSeen
         };
-
-        $scope.fromTime = $moment()
-            .subtract('days', 1)
+        console.log("$scope.user.lastSeen: ", $scope.user.lastSeen);
+        // $scope.fromTime = $moment()
+        //     .subtract('days', 2)
+        //     .startOf('day')
+        //     .unix();
+        // $scope.toTime = $moment()
+        //     .subtract('days', 1)
+        //     .startOf('day')
+        //     .unix();
+        $scope.toTime = $moment($scope.user.lastSeen)
             .startOf('day')
             .unix();
-        $scope.toTime = $moment()
-            .subtract('days', 0)
+        $scope.fromTime = $moment($scope.user.lastSeen - 24 * 60 * 60 *
+            1000)
             .startOf('day')
             .unix();
 
+        console.log("$scope.fromTime: ", $scope.fromTime, $scope.toTime);
 
-        console.log("$scope.fromTime: ", $scope.fromTime);
-
-
-
+        $scope.eventDate = $moment($scope.user.lastSeen)
+            .format('MMMM Do');
+        $scope.lastEventDate = $scope.user.lastSeen;
+        console.log("$scope.eventDate: ", $scope.eventDate);
+        $scope.showEvents = false;
 
         var populateEvents = function (err, events) {
             $scope.events = [];
@@ -1238,35 +1250,42 @@ angular.module('do.users', [])
                 console.log("error");
                 return;
             }
-
-            if(_.keys(events).length == 0) {
+            // TODO: Shor recent activity based on last seen data
+            if (_.keys(events)
+                .length == 0) {
                 console.log("events length is zero");
-                var fT = $scope.fromTime * 1000 - 24*60*60*1000;
-                $scope.fromTime = $moment(fT).startOf('day').unix();
-                var tT = $scope.toTime * 1000 - 24*60*60*1000;
-                $scope.toTime = $moment(tT).startOf('day').unix();
-                UserModel.getEvents(currentAppId, $scope.user._id, $scope.fromTime,
-                $scope.toTime, populateEvents);
-            } 
-            var keys = '';
-            keys = _.keys(events);
-            console.log("keys: ", keys, keys[0]);
-            var value = [];
-            value = events[keys];
-            if (value != null) {
-                $scope.eventDate = $moment(keys[0] * 1000)
+                $scope.lastEventDate = $scope.lastEventDate - 24 * 60 * 60 *
+                    1000;
+                $scope.eventDate = $moment($scope.lastEventDate)
                     .format('MMMM Do');
-                for (var i = 0; i < value.length; i++) {
-                    // value = events[keys[i]];
-                    console.log("value: ", value);
-                    $scope.events.push({
-                        name: value[i].name,
-                        when: $moment(value[i].ct)
-                            .fromNow()
-                    })
-                };
+                console.log(
+                    "$scope.eventDate when events length is zero: ",
+                    $scope.eventDate);
+                $scope.showEvents = false;
+
+            } else {
+                $scope.showEvents = true
+                var keys = '';
+                keys = _.keys(events);
+                console.log("keys: ", keys, keys[0]);
+                var value = [];
+                value = events[keys];
+                if (value != null) {
+                    $scope.eventDate = $moment(keys[0] * 1000)
+                        .format('MMMM Do');
+                    for (var i = 0; i < value.length; i++) {
+                        // value = events[keys[i]];
+                        console.log("value: ", value);
+                        $scope.events.push({
+                            name: value[i].name,
+                            when: $moment(value[i].ct)
+                                .fromNow()
+                        })
+                    };
+                }
+                console.log("$scope.events: ", $scope.events);
+
             }
-            console.log("$scope.events: ", $scope.events);
         }
 
         $scope.showEventNextDate = function () {
@@ -1278,8 +1297,12 @@ angular.module('do.users', [])
                 1000)
                 .startOf('day')
                 .unix();
-            console.log("new fromTime: ", $scope.fromTime, $moment($scope.fromTime*1000).format());
-            console.log("new toTime: ", $scope.toTime, $moment($scope.toTime * 1000).format());
+            console.log("new fromTime: ", $scope.fromTime, $moment($scope.fromTime *
+                    1000)
+                .format());
+            console.log("new toTime: ", $scope.toTime, $moment($scope.toTime *
+                    1000)
+                .format());
             UserModel.getEvents(currentAppId, $scope.user._id, $scope.fromTime,
                 $scope.toTime, populateEvents);
         }

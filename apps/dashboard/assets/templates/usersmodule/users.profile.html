@@ -38,7 +38,8 @@
                     <div class="col-md-push-3 col-md-8" id="affix-demo">
                         <br>
                         <p><em>{{eventDate}}</em></p>
-                        <ul class="list-group">
+                        <p ng-show="!showEvents">There was no activity for {{eventDate}}</p>
+                        <ul class="list-group" ng-show="showEvents">
                             <li class="list-group-item list-group-item-success" ng-repeat="event in events">
                                 <span>{{event.name}}</span>
                                 <em class="pull-right">{{event.when}}</em>
