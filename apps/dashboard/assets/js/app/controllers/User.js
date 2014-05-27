@@ -848,6 +848,17 @@ angular.module('do.users', [])
                         $scope.showUpdatePopover = false;
                     }
 
+                    var populateNewSegment = function (err, data) {
+                        if(err) {
+                            return err;
+                        }
+                        $scope.showPopover = false;
+                        $scope.segmentsCreatedName.push({
+                            id: data._id,
+                            name: data.name
+                        })
+                    }
+
                     $scope.createSegmentObj = {};
                     $scope.createSegment = function () {
                         $scope.filtersBackend = [];
@@ -870,8 +881,8 @@ angular.module('do.users', [])
                         console.log("createSegmentObj: ", $scope.createSegmentObj);
 
                         modelsSegment.createSegment(currentAppId,
-                            $scope.createSegmentObj);
-                        $scope.showPopover = false;
+                            $scope.createSegmentObj, populateNewSegment);
+                        
 
                     }
 
@@ -1205,11 +1216,11 @@ angular.module('do.users', [])
         };
 
         $scope.fromTime = $moment()
-            .subtract('days', 2)
+            .subtract('days', 1)
             .startOf('day')
             .unix();
         $scope.toTime = $moment()
-            .subtract('days', 1)
+            .subtract('days', 0)
             .startOf('day')
             .unix();
 
