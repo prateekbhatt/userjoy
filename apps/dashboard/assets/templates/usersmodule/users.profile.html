@@ -14,8 +14,8 @@
                             <div class="col-sm-8 col-md-8">
                                 <br>
                                 <blockquote>
-                                    <p>Savinay Narendra</p> <small><cite title="Source Title">Ahmedabad, India  <i class="glyphicon glyphicon-map-marker"></i></cite></small>
-                                    <small><cite title="Source Title">{{useremail}} <i class="glyphicon glyphicon-envelope"></i></cite></small>
+                                    <p>{{user.name}}</p> <small><cite title="Source Title">Ahmedabad, India  <i class="glyphicon glyphicon-map-marker"></i></cite></small>
+                                    <small><cite title="Source Title">{{user.email}} <i class="glyphicon glyphicon-envelope"></i></cite></small>
                                 </blockquote>
                                 <br>
                                 <br>
@@ -61,18 +61,18 @@
                 <div class="col-sm-4 col-md-5">
                     <div class="panel panel-default" style="height: 200px;">
                         <div class="panel-body">
-                            <p> Pulse: {{healthScore}}/100</p>
-                            <p> Plan: {{plan}}</p>
-                            <p> Plan Value: {{planValue}}</p>
-                            <p> Renewal: {{renewal}}</p>
+                            <p> Pulse: {{user.healthScore}}/100</p>
+                            <p> Plan: {{user.plan}}</p>
+                            <p> Plan Value: {{user.currency}} {{user.planValue}}</p>
+                            <!-- <p> Renewal: {{renewal}}</p> -->
                         </div>
                     </div>
                 </div>
                 <div class="col-sm-5 col-md-5 col-md-offset-1">
                     <div class="panel panel-default" style="height: 200px;">
                         <div class="panel-body">
-                            <p> First Seen: {{firstSeen}}</p>
-                            <p> Last Seen: {{lastSession}}</p>
+                            <p> First Seen: {{user.firstSeen}}</p>
+                            <p> Last Seen: {{user.lastSeen}}</p>
                             <p> Country: {{country}}</p>
                             <p> Platform: {{os}}</p>
                             <p> Browser: {{browser}}</p>
@@ -92,7 +92,7 @@
                                     <br>
                                     <br>
                                     <br>
-                                    <em><h4>No conversations with {{useremail}}</h4></em>
+                                    <em><h4>No conversations with {{user.email}}</h4></em>
                                 </div>
                                 <div class="row" ng-show="msgs.length">
                                     <em><h4><strong>Latest Conversations</strong></h4></em>
@@ -132,7 +132,14 @@
                     <div class="panel panel-default" style="height: 250px;">
                         <div class="panel-body">
                             <div class="container">
-                                <div class="row">
+                                <div class="row" ng-show="notes.length == 0">
+                                    <em><h4><strong>Notes for {{user.email}}</strong></h4></em>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <em><h4>No notes created</h4></em>
+                                </div>
+                                <div class="row" ng-show="notes.length">
                                     <em><h4><strong>Notes created for Savinay</strong></h4></em>
                                     <br>
                                     <div class="col-md-4" style="margin-left: 15px">
