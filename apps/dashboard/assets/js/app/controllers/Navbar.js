@@ -17,9 +17,9 @@ angular.module('do.navbar', [])
 
 .controller('NavbarCtrl', ['$scope', 'AuthService', 'LoginService',
     '$location', '$log', 'AppService', '$http', 'config',
-    'CurrentAppService',
+    'CurrentAppService', '$rootScope',
     function ($scope, AuthService, LoginService, $location, $log,
-        AppService, $http, config, CurrentAppService) {
+        AppService, $http, config, CurrentAppService, $rootScope) {
 
         CurrentAppService.getCurrentApp()
             .then(function (currentApp) {
@@ -36,6 +36,35 @@ angular.module('do.navbar', [])
 
                 var appsconnected;
                 $scope.apps = [];
+
+                console.log("error: ", $rootScope.error, $rootScope.errMsg, $rootScope.loggedIn);
+
+                $scope.$watch($rootScope.errMsg, function () {
+                    console.log("inside $rootscope.errMsg watch: ", $rootScope.errMsg);
+                    $scope.errMessage = $rootScope.errMsg;
+                }) 
+
+                // $scope.error = function () {
+                //     return $rootScope.error;
+                // }
+
+                $scope.error = $rootScope.error;
+
+                $rootScope.hideError = function (event) {
+                    event.preventDefault();
+                    console.log("inside hide error");
+                    $rootScope.error = false;
+                    // $scope.error = false;
+                }
+
+                $scope.success = $rootScope.success;
+
+                $rootScope.hideSuccess = function (event) {
+                    event.preventDefault();
+                    console.log("inside hide success")
+                    $rootScope.success = false;
+                    $scope.success = false;
+                }
 
                 /*$scope.apps = AppService.getLoggedInApps();
             console.log("navbar apps: ", $scope.apps);*/

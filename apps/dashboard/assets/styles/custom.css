@@ -708,7 +708,7 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
 }
 #affix-demo {
     -margin-top:30px;
-    height: 300px;
+    height: 250px;
     overflow-y:scroll;
     /*background: lightblue;*/
     
