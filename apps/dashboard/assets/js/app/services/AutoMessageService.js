@@ -6,6 +6,7 @@ angular.module('services.AutoMsgService', [])
 
         var allAutoMsg = [];
         var singleAutoMsg = [];
+        var autoMsgType = '';
 
         this.setAllAutoMsg = function (value) {
             allAutoMsg = value;
@@ -21,6 +22,14 @@ angular.module('services.AutoMsgService', [])
 
         this.getSingleAutoMsg = function () {
             return singleAutoMsg;
+        }
+
+        this.setAutoMsgType = function (value) {
+            autoMsgType = value;
+        }
+
+        this.getAutoMsgType = function () {
+            return autoMsgType;
         }
 
         return this;
