@@ -53,9 +53,16 @@ module.exports = function errorHelper(err) {
 
           //Otherwise, use util.format to format the message, and passing the path
 
-          errors
-            .push(require('util')
-              .format(messages[eObj.type], eObj.path));
+          // errors
+          //   .push(require('util')
+          //     .format(messages[eObj.type], eObj.path));
+          //     
+          
+
+          // TODO: Modifying the error object to push through the defined message in
+          // the model schema. Check other potential problems this could create
+          
+          errors.push(eObj.message);
         }
 
       });
