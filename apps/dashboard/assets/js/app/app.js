@@ -76,6 +76,28 @@ var app = angular.module('dodatado', [
     }
 ])
 
+.provider('error', [
+
+    function () {
+
+        var showError = false;
+
+        this.$get = [
+
+            function () {
+                return {
+                    setError: function (value) {
+                        showError = value;
+                    },
+                    getError: function () {
+                        return showError;
+                    }
+                };
+            }
+        ];
+    }
+])
+
 .filter('startFrom', function () {
     return function (input, start) {
         start = +start; //parse to int
@@ -87,6 +109,8 @@ var app = angular.module('dodatado', [
     $locationProvider, $httpProvider, $provide, $momentProvider,
     loginProvider) {
 
+    // errorProvider.setError(false);
+    // $rootScope.error = false;
     $momentProvider.asyncLoading(false)
         .scriptUrl(
             '//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js'
@@ -101,8 +125,46 @@ var app = angular.module('dodatado', [
     delete $httpProvider.defaults.headers.common['X-Requested-With'];
 
     $httpProvider.interceptors.push(function ($rootScope, $location, $q) {
+        $rootScope.error = false;
+        $rootScope.success = false;
+        $rootScope.errMsgRootScope = '';
+        $rootScope.successMsgRootScope = '';
+        console.log("$rootScope.errMsgRootScope: app.js: ", $rootScope
+            .errMsgRootScope);
         return {
+            'request': function (config) {
+                // do something on success
+                console.log("success config: ", config);
+
+                return config;
+            },
+            'response': function (response) {
+                if (response.status === 200) {
+                    $rootScope.error = false;
+                    $rootScope.success = false;
+                    $rootScope.errMsgRootScope = '';
+                    $rootScope.successMsgRootScope = '';
+                }
+                if (response.status === 201) {
+                    console.log("success: ", response);
+                    $rootScope.successMsgRootScope = 'Success';
+                    $rootScope.errorMssRootScope = '';
+                    $rootScope.error = false;
+                    $rootScope.success = true;
+                }
+                return response;
+            },
             'responseError': function (rejection) {
+                if (rejection.status === 400 || rejection.status ===
+                    500) {
+                    console.log("error: ", rejection.data.error);
+                    $rootScope.error = true;
+                    $rootScope.errMsgRootScope = rejection.data.error[
+                        0];
+                    $rootScope.successMsgRootScope = '';
+                    $rootScope.success = false;
+                    console.log("$rootScope errMSg: ", $rootScope.errMsgRootScope);
+                }
                 // if we're not logged-in to the web service, redirect to login page
                 if (rejection.status === 401 && $location.path() !=
                     '/login') {
