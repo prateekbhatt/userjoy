@@ -31,7 +31,14 @@ angular.module('models.automate', ['services'])
                     console.log("success in creating automsg: ",
                         response);
                     AutoMsgService.setSingleAutoMsg(response);
-                    $location.path('/messages/automate/test');
+                    if (data.type === "email") {
+                        $location.path('/apps/' + appId +
+                            '/messages/automate/test');
+                    }
+
+                    if(data.type === 'notification') {
+                        $location.path('/apps/' + appId + '/messages/automate/live');
+                    }
                 })
                 .error(function (err) {
                     console.log("error in creating automsg");
@@ -44,6 +51,8 @@ angular.module('models.automate', ['services'])
                 autoMsgId + '/send-test')
                 .success(function (data) {
                     console.log("success");
+                    $location.path('/apps/' + appId +
+                        '/messages/automate/live');
                 })
                 .error(function () {
                     console.log("error");

@@ -716,7 +716,7 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
 #affixMe{
     width: 100%;
 }
-/*#affixMe.affix {
-    top: 0px;
-}*/
+span.emailPreview > p {
+    display: inline;
+}
 }

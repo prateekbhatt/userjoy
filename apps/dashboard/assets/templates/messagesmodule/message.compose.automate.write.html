@@ -40,15 +40,6 @@
             </div>
         </div>
     </div>
-    <div class="row text-center" style="padding-top: 40px;">
-        <button class="btn btn-info" ng-click="saveMessage()">Save Message</button>
-    </div>
-    <div class="row text-center" style="padding-top: 40px;">
-        <div ng-show="showAutoMsgError" id="login-alert" class="alert alert-danger col-md-4 col-md-push-4">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="hideErrorAlert()">&times;</button>
-            {{errMsg}}
-        </div>
-    </div>
     <div class="row" style="padding-top:70px">
         <div class="col-md-6">
             <div class="text-center">
@@ -91,17 +82,18 @@
                 </div>
                 <!-- TODO: Replace template color with the color entered by the user -->
                 <div class="col-md-10 col-md-offset-1" ng-show="showEmail">
-                    <label style="font-size: 18px;">Subject: </label>&nbsp;<p ng-bind-html="subject"></p>
+                    <label style="font-size: 18px;">Subject: </label>&nbsp;<span ng-bind-html="subject" class="emailPreview"></span>
                     <div class="message-template message-email-success" style="min-height: 300px; overflow: auto; max-height: 300px;">
                         <p ng-bind-html="emailBody"></p>
                     </div>
                 </div>
             </div>
-            <!-- <div text-angular text-angular-name="demo1"></div> -->
-            <!-- <div text-angular ng-model="htmlContent" name="demo-editor" ta-text-editor-class="border-around container" ta-html-editor-class="border-around"></div> -->
         </div>
     </div>
     <!-- <p>{{text}}</p> -->
+    <div class="row text-center" style="padding-top: 20px;">
+        <button class="btn btn-info" ng-click="saveMessage()">Save Message</button>
+    </div>
+<br>
+<br>
 </div>
-<br>
-<br>

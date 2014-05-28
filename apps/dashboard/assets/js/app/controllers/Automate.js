@@ -256,9 +256,9 @@ angular.module('do.automate', [])
 
 .controller('textAngularCtrl', ['$scope', 'saveMsgService', '$location',
     'modelsAutomate', 'AppService', 'segmentService', 'ErrMsgService',
-    '$stateParams',
+    '$stateParams', 'AutoMsgService',
     function ($scope, saveMsgService, $location, modelsAutomate,
-        AppService, segmentService, ErrMsgService, $stateParams) {
+        AppService, segmentService, ErrMsgService, $stateParams, AutoMsgService) {
         console.log("inside text Angular Ctrl");
         console.log("sid: ", segmentService.getSingleSegment());
         $scope.currApp = $stateParams.id;
@@ -311,6 +311,9 @@ angular.module('do.automate', [])
                 // console.log("msg: ",saveMsgService)
             }
 
+                AutoMsgService.setAutoMsgType($scope.selectedMessageType.value);
+                console.log("auto MSg type ----->>>>>>>>: ", AutoMsgService.getAutoMsgType());
+
             var data = {
                 body: saveMsgService.getMsg(),
                 sub: saveMsgService.getSub(),
@@ -349,6 +352,17 @@ angular.module('do.automate', [])
         $scope.currApp = $stateParams.id;
         $scope.previewText = saveMsgService.getMsg();
         console.log(saveMsgService.getMsg());
+        $scope.subject = saveMsgService.getSub();
+        console.log("auto test email subject ----->>>>>>: ", saveMsgService.getSub());
+
+        $scope.msgType = AutoMsgService.getAutoMsgType();
+        if($scope.msgType === "Email") {
+            $scope.showEmailPreview = true;
+        }
+
+        if($scope.msgType === "Notification") {
+            $scope.showNotificationPreview = true;
+        }
         $scope.sendTestEmail = function () {
             modelsAutomate.sendTestEmail($scope.currApp, AutoMsgService.getSingleAutoMsg()
                 ._id);
@@ -357,13 +371,27 @@ angular.module('do.automate', [])
 ])
 
 .controller('liveEmailCtrl', ['$scope', 'saveMsgService', 'modelsAutomate',
-    'AppService', 'AutoMsgService',
+    'AppService', 'AutoMsgService', '$stateParams', 
     function ($scope, saveMsgService, modelsAutomate, AppService,
-        AutoMsgService) {
+        AutoMsgService, $stateParams) {
         $scope.currApp = $stateParams.id;
-        $scope.preview = saveMsgService.getMsg();
+        console.log("$scope.currApp ------>>>>>>", $scope.currApp, $stateParams.id);
+        // $scope.preview = saveMsgService.getMsg();
+        $scope.previewText = saveMsgService.getMsg();
+        console.log(saveMsgService.getMsg());
+        $scope.subject = saveMsgService.getSub();
+        console.log("auto test email subject ----->>>>>>: ", saveMsgService.getSub());
+
+        $scope.msgType = AutoMsgService.getAutoMsgType();
+        if($scope.msgType === "Email") {
+            $scope.showEmailPreview = true;
+        }
+
+        if($scope.msgType === "Notification") {
+            $scope.showNotificationPreview = true;
+        }
         $scope.makeMsgLive = function () {
-            modelsAutomate.makeMsgLive($scope.currapp, AutoMsgService.getSingleAutoMsg()
+            modelsAutomate.makeMsgLive($scope.currApp, AutoMsgService.getSingleAutoMsg()
                 ._id);
         }
     }
