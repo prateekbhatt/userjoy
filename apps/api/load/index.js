@@ -17,8 +17,8 @@ var loadRoutes = require('../config/routes');
  * Jobs
  */
 
-var automessagePublisher = require('../workers/automessagePublisher');
-var automessageConsumer = require('../workers/automessageConsumer');
+var automessagePublisher = require('../workers/automessage-publisher');
+var automessageConsumer = require('../workers/automessage-consumer');
 
 
 /**
