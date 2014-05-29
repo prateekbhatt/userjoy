@@ -1,4 +1,4 @@
-describe.only('Worker health', function () {
+describe('Worker usage-consumer', function () {
 
 
   /**
@@ -28,7 +28,7 @@ describe.only('Worker health', function () {
    * Workers
    */
 
-  var worker = require('../../workers/health');
+  var worker = require('../../workers/usage-consumer');
 
 
   /**
@@ -62,7 +62,7 @@ describe.only('Worker health', function () {
 
 
   //   it(
-  //     'should return previous days timestamp if there is no health record for app',
+  //     'should return previous days timestamp if there is no usage record for app',
   //     function (done) {
 
 
@@ -155,7 +155,7 @@ describe.only('Worker health', function () {
   });
 
 
-  describe('#healthWorker', function () {
+  describe('#usageConsumerWorker', function () {
 
 
     it('should aggregate and save usage', function (done) {
@@ -165,15 +165,15 @@ describe.only('Worker health', function () {
 
         [
 
-          function checkBeforeHealth(cb) {
+          function checkBeforeUsage(cb) {
 
             Health
-              .find({}, function (err, healthBefore) {
+              .find({}, function (err, usageBefore) {
 
                 expect(err)
                   .to.not.exist;
 
-                expect(healthBefore)
+                expect(usageBefore)
                   .to.be.an("array")
                   .that.is.empty;
 
@@ -182,9 +182,9 @@ describe.only('Worker health', function () {
           },
 
 
-          function runHealthWorker(cb) {
+          function runUsageWorker(cb) {
 
-            worker._healthWorker(aid, function (err) {
+            worker._usageConsumerWorker(aid, function (err) {
 
               expect(err)
                 .to.not.exist;
@@ -195,19 +195,19 @@ describe.only('Worker health', function () {
           },
 
 
-          function checkAfterHealth(cb) {
+          function checkAfterUsage(cb) {
 
-            Health.find({}, function (err, healthAfter) {
+            Health.find({}, function (err, usageAfter) {
 
               expect(err)
                 .to.not.exist;
 
-              expect(healthAfter)
+              expect(usageAfter)
                 .to.be.an("array")
                 .that.is.not.empty;
 
 
-              _.each(healthAfter, function (h) {
+              _.each(usageAfter, function (h) {
 
                 expect(h)
                   .to.be.an("object")

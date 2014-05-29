@@ -51,7 +51,7 @@ function usageMinutes(aid, timestamp, cb) {
 
 
   logger.trace({
-    at: 'workers/health usageMinutes',
+    at: 'workers/usage-consumer usageMinutes',
     startOfDay: startOfDay,
     endOfDay: endOfDay
   });
@@ -124,7 +124,7 @@ dailyUsage:
 
  */
 
-function saveHealth(aid, dailyUsage, cb) {
+function saveUsage(aid, dailyUsage, cb) {
 
   var saveIterator = function (user, cb) {
 
@@ -151,12 +151,12 @@ function saveHealth(aid, dailyUsage, cb) {
 //       ct: -1
 //     })
 //     .limit(1)
-//     .exec(function (err, health) {
+//     .exec(function (err, usage) {
 
 //       var timestamp;
 
 //       if (err) return cb(err);
-//       if (!health || !health[0]) {
+//       if (!usage || !usage[0]) {
 
 //         // if the app is new and does not have usage records, start with
 //         // measuring usage of activity from the previous day
@@ -165,7 +165,7 @@ function saveHealth(aid, dailyUsage, cb) {
 //           .format();
 
 //       } else {
-//         timestamp = health[0].ct;
+//         timestamp = usage[0].ct;
 //       }
 
 //       cb(null, timestamp);
@@ -173,7 +173,7 @@ function saveHealth(aid, dailyUsage, cb) {
 // }
 
 
-function healthWorker(aid, cb) {
+function usageConsumerWorker(aid, cb) {
 
 
   var previousDay = moment()
@@ -196,7 +196,7 @@ function healthWorker(aid, cb) {
 
         if (_.isEmpty(users)) return cb();
 
-        saveHealth(aid, users, cb);
+        saveUsage(aid, users, cb);
       }
 
     ],
@@ -206,7 +206,7 @@ function healthWorker(aid, cb) {
 
       if (err) {
         logger.crit({
-          at: 'workers/health',
+          at: 'workers/usage-consumer callback',
           err: err,
           aid: aid,
           ts: Date.now()
@@ -224,5 +224,5 @@ function healthWorker(aid, cb) {
 
 module.exports._usageMinutes = usageMinutes;
 // module.exports._nextUpdateTimestamp = nextUpdateTimestamp;
-module.exports._saveHealth = saveHealth;
-module.exports._healthWorker = healthWorker;
+module.exports._saveUsage = saveUsage;
+module.exports._usageConsumerWorker = usageConsumerWorker;
