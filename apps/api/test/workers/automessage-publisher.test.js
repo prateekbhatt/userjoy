@@ -20,7 +20,7 @@ describe('Worker automessagePublisher', function () {
    * Workers
    */
 
-  var worker = require('../../workers/automessagePublisher');
+  var worker = require('../../workers/automessage-publisher');
 
 
   /**
