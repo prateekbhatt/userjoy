@@ -57,6 +57,17 @@ angular.module('do.automate', [])
                 authenticate: true
 
             })
+            .state('automateStatus', {
+                url: '/apps/:id/messages/automate/status/:mid',
+                views: {
+                    "main": {
+                        templateUrl: '/templates/messagesmodule/message.automate.status.html',
+                        controller: 'statusMsgCtrl',
+                    }
+                },
+                authenticate: true
+
+            })
     }
 ])
 
@@ -123,6 +134,12 @@ angular.module('do.automate', [])
                 }
                 modelsAutomate.getAllAutoMessages($scope.currApp,
                     populateAutoMsg);
+
+                $scope.showAutoMsg = function (index) {
+                    $location.path('/apps/' + $scope.currApp +
+                        '/messages/automate/status/' + $scope.automessages[
+                            index].id);
+                }
 
                 $scope.changeMsgStatus = function (id, text, index) {
                     if (text == 'Activate') {
@@ -258,7 +275,8 @@ angular.module('do.automate', [])
     'modelsAutomate', 'AppService', 'segmentService', 'ErrMsgService',
     '$stateParams', 'AutoMsgService',
     function ($scope, saveMsgService, $location, modelsAutomate,
-        AppService, segmentService, ErrMsgService, $stateParams, AutoMsgService) {
+        AppService, segmentService, ErrMsgService, $stateParams,
+        AutoMsgService) {
         console.log("inside text Angular Ctrl");
         console.log("sid: ", segmentService.getSingleSegment());
         $scope.currApp = $stateParams.id;
@@ -311,8 +329,8 @@ angular.module('do.automate', [])
                 // console.log("msg: ",saveMsgService)
             }
 
-                AutoMsgService.setAutoMsgType($scope.selectedMessageType.value);
-                console.log("auto MSg type ----->>>>>>>>: ", AutoMsgService.getAutoMsgType());
+            AutoMsgService.setAutoMsgType($scope.selectedMessageType.value);
+            console.log("auto MSg type ----->>>>>>>>: ", AutoMsgService.getAutoMsgType());
 
             var data = {
                 body: saveMsgService.getMsg(),
@@ -353,14 +371,15 @@ angular.module('do.automate', [])
         $scope.previewText = saveMsgService.getMsg();
         console.log(saveMsgService.getMsg());
         $scope.subject = saveMsgService.getSub();
-        console.log("auto test email subject ----->>>>>>: ", saveMsgService.getSub());
+        console.log("auto test email subject ----->>>>>>: ",
+            saveMsgService.getSub());
 
         $scope.msgType = AutoMsgService.getAutoMsgType();
-        if($scope.msgType === "Email") {
+        if ($scope.msgType === "Email") {
             $scope.showEmailPreview = true;
         }
 
-        if($scope.msgType === "Notification") {
+        if ($scope.msgType === "Notification") {
             $scope.showNotificationPreview = true;
         }
         $scope.sendTestEmail = function () {
@@ -371,28 +390,85 @@ angular.module('do.automate', [])
 ])
 
 .controller('liveEmailCtrl', ['$scope', 'saveMsgService', 'modelsAutomate',
-    'AppService', 'AutoMsgService', '$stateParams', 
+    'AppService', 'AutoMsgService', '$stateParams',
     function ($scope, saveMsgService, modelsAutomate, AppService,
         AutoMsgService, $stateParams) {
         $scope.currApp = $stateParams.id;
-        console.log("$scope.currApp ------>>>>>>", $scope.currApp, $stateParams.id);
+        console.log("$scope.currApp ------>>>>>>", $scope.currApp,
+            $stateParams.id);
         // $scope.preview = saveMsgService.getMsg();
         $scope.previewText = saveMsgService.getMsg();
         console.log(saveMsgService.getMsg());
         $scope.subject = saveMsgService.getSub();
-        console.log("auto test email subject ----->>>>>>: ", saveMsgService.getSub());
+        console.log("auto test email subject ----->>>>>>: ",
+            saveMsgService.getSub());
 
         $scope.msgType = AutoMsgService.getAutoMsgType();
-        if($scope.msgType === "Email") {
+        if ($scope.msgType === "Email") {
             $scope.showEmailPreview = true;
         }
 
-        if($scope.msgType === "Notification") {
+        if ($scope.msgType === "Notification") {
             $scope.showNotificationPreview = true;
         }
         $scope.makeMsgLive = function () {
             modelsAutomate.makeMsgLive($scope.currApp, AutoMsgService.getSingleAutoMsg()
                 ._id);
         }
+    }
+])
+
+.controller('statusMsgCtrl', ['$scope', 'saveMsgService', 'modelsAutomate',
+    'AppService', 'AutoMsgService', '$stateParams',
+    function ($scope, saveMsgService, modelsAutomate, AppService,
+        AutoMsgService, $stateParams) {
+        $scope.currApp = $stateParams.id;
+        $scope.msgId = $stateParams.mid;
+        var showAutoMsgCallback = function (err) {
+            if (err) {
+                console.log("err");
+                return err;
+            }
+            console.log("inside showAutoMsgCallback");
+            console.log("single automsg ------>>>>>>>: ", AutoMsgService.getSingleAutoMsg());
+            $scope.msgType = AutoMsgService.getSingleAutoMsg()
+                .type;
+            $scope.subject = AutoMsgService.getSingleAutoMsg()
+                .sub;
+            $scope.previewText = AutoMsgService.getSingleAutoMsg()
+                .body;
+            if ($scope.msgType === "email") {
+                $scope.showEmailPreview = true;
+            }
+
+            if ($scope.msgType === "notification") {
+                $scope.showNotificationPreview = true;
+            }
+
+            if(AutoMsgService.getSingleAutoMsg().active) {
+                $scope.msgStatus = 'Deactivate this Message';
+            } else {
+                $scope.msgStatus = 'Make it Live';
+            }
+
+        }
+
+        modelsAutomate.getSingleAutoMsg($scope.currApp, $scope.msgId,
+            showAutoMsgCallback);
+
+        $scope.changeAutoMsgStatus = function () {
+            if(AutoMsgService.getSingleAutoMsg().active) {
+                modelsAutomate.deActivateMsg($scope.currApp,
+                            $scope.msgId);
+                $scope.msgStatus = 'Make it Live';
+            } else {
+                modelsAutomate.makeMsgLive($scope.currApp, $scope.msgId);
+                $scope.msgStatus = 'Deactivate this Message';
+            }
+        }
+
+        console.log("$scope.currApp ------>>>>>>", $scope.currApp,
+            $stateParams.id);
+
     }
 ])
