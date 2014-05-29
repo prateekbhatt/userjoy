@@ -80,5 +80,15 @@ angular.module('models.automate', ['services'])
                     console.log("error in making message deactive");
                 })
         }
+
+        this.getSingleAutoMsg = function (appId, msgId, cb) {
+            $http.get(config.apiUrl + '/apps/' + appId + '/automessages/' + msgId)
+                .success(function(data) {
+                    console.log("success in getting a single automsg:", data);
+                    AutoMsgService.setSingleAutoMsg(data);
+                    cb();
+                })
+                .error(cb);
+        }
     }
 ])

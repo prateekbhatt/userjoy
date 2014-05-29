@@ -1,0 +1,33 @@
+<div ng-include src="'/templates/navbar/navbar.html'"></div>
+<div class="row" style="padding-top: 50px;">
+    <div class="col-md-push-4 col-md-4" ng-show="showNotificationPreview">
+        <div class="message-template message-template-danger" style="max-height: 200px; min-height: 200px; overflow: auto;">
+            <p ng-bind-html="previewText"></p>
+        </div>
+        <div class="panel-footer" style="margin-top: -21px;">
+            <div class="input-group">
+                <input id="btn-input" type="text" class="form-control input-sm" placeholder="Type your message here..." disabled="disabled"/>
+                <span class="input-group-btn">
+                <button class="btn btn-danger btn-sm disabled" id="btn-chat">
+                Send</button>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-push-3 col-md-6" ng-show="showEmailPreview">
+        <div class="text-center">
+            <label style="font-size: 18px;">Subject: </label>&nbsp;<span ng-bind-html="subject" class="emailPreview"></span>
+        </div>
+        <div class="message-template message-email-success" style="min-height: 300px; overflow: auto; max-height: 300px;">
+            <p ng-bind-html="previewText"></p>
+        </div>
+    </div>
+</div>
+<br>
+<br>
+<div class="row col-md-push-4 col-md-4" style="padding-left: 24px; padding-right: 0px;" ng-show="showNotificationPreview">
+    <button class="btn btn-info btn-block" ng-click="changeAutoMsgStatus()">{{msgStatus}}</button>
+</div>
+<div class="row col-md-push-3 col-md-6" style="padding-left: 24px; padding-right: 0px;" ng-show="showEmailPreview">
+    <button class="btn btn-info btn-block" ng-click="changeAutoMsgStatus()">{{msgStatus}}</button>
+</div>

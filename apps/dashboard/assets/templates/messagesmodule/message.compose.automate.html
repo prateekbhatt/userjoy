@@ -113,16 +113,16 @@
                                                     </thead>
                                                     <tbody>
                                                         <tr ng-repeat="automessage in automessages">
-                                                            <td class="text-center"> {{automessage.title}} </td>
-                                                            <td class="text-center">
+                                                            <td class="text-center" style="cursor: pointer" ng-click="showAutoMsg($index)"> {{automessage.title}} </td>
+                                                            <td class="text-center" style="cursor: pointer" ng-click="showAutoMsg($index)">
                                                                 {{automessage.type}}
                                                             </td>
-                                                            <td class="text-center">{{automessage.replied}}</td>
-                                                            <td class="text-center">
+                                                            <td class="text-center" style="cursor: pointer" ng-click="showAutoMsg($index)">{{automessage.replied}}</td>
+                                                            <td class="text-center" style="cursor: pointer" ng-click="showAutoMsg($index)">
                                                                 {{automessage.sent}}
                                                             </td>
-                                                            <td class="text-center">{{automessage.seen}}</td>
-                                                            <td class="text-center">{{automessage.clicked}}</td>
+                                                            <td class="text-center" style="cursor: pointer" ng-click="showAutoMsg($index)">{{automessage.seen}}</td>
+                                                            <td class="text-center" style="cursor: pointer" ng-click="showAutoMsg($index)">{{automessage.clicked}}</td>
                                                             <td class="text-center">
                                                                 <a style="cursor: pointer" ng-click="changeMsgStatus(automessage.id, automessage.message, $index)">{{automessage.message}}</a>
                                                             </td>

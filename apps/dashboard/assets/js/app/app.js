@@ -132,14 +132,20 @@ var app = angular.module('dodatado', [
         console.log("$rootScope.errMsgRootScope: app.js: ", $rootScope
             .errMsgRootScope);
         return {
-            'request': function (config) {
+            'request': function (config, response) {
                 // do something on success
-                console.log("success config: ", config);
-
+                console.log("success config: ", config, response);
+                if(config.method === 'PUT') {
+                    $rootScope.successMsgRootScope = 'Success';
+                    $rootScope.errorMssRootScope = '';
+                    $rootScope.error = false;
+                    $rootScope.success = true;
+                }
                 return config;
             },
             'response': function (response) {
-                if (response.status === 200) {
+                console.log("response: ", response);
+                if (response.status === 200 && response.config.method != 'PUT') {
                     $rootScope.error = false;
                     $rootScope.success = false;
                     $rootScope.errMsgRootScope = '';
