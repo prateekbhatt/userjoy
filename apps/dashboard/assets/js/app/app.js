@@ -135,12 +135,12 @@ var app = angular.module('dodatado', [
             'request': function (config, response) {
                 // do something on success
                 console.log("success config: ", config, response);
-                if(config.method === 'PUT') {
-                    $rootScope.successMsgRootScope = 'Success';
-                    $rootScope.errorMssRootScope = '';
-                    $rootScope.error = false;
-                    $rootScope.success = true;
-                }
+                // if(config.method === 'PUT') {
+                //     $rootScope.successMsgRootScope = 'Success';
+                //     $rootScope.errorMssRootScope = '';
+                //     $rootScope.error = false;
+                //     $rootScope.success = true;
+                // }
                 return config;
             },
             'response': function (response) {
@@ -150,6 +150,12 @@ var app = angular.module('dodatado', [
                     $rootScope.success = false;
                     $rootScope.errMsgRootScope = '';
                     $rootScope.successMsgRootScope = '';
+                }
+                if (response.status === 200 && response.config.method === 'PUT') {
+                    $rootScope.successMsgRootScope = 'Success';
+                    $rootScope.errorMssRootScope = '';
+                    $rootScope.error = false;
+                    $rootScope.success = true;
                 }
                 if (response.status === 201) {
                     console.log("success: ", response);
