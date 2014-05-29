@@ -322,7 +322,7 @@ angular.module('do.automate', [])
 
             if ($scope.showEmail) {
                 saveMsgService.setMsg($scope.emailBody);
-                saveMsgService.setSub($scope.subject);
+                saveMsgService.setSub($scope.subject.replace(/<(?:.|\n)*?>/gm, ''));
                 saveMsgService.setTitle($scope.title);
                 console.log("email body: ", saveMsgService.getMsg());
                 console.log("email subject: ", saveMsgService.getSub());
@@ -445,7 +445,8 @@ angular.module('do.automate', [])
                 $scope.showNotificationPreview = true;
             }
 
-            if(AutoMsgService.getSingleAutoMsg().active) {
+            if (AutoMsgService.getSingleAutoMsg()
+                .active) {
                 $scope.msgStatus = 'Deactivate this Message';
             } else {
                 $scope.msgStatus = 'Make it Live';
@@ -457,9 +458,10 @@ angular.module('do.automate', [])
             showAutoMsgCallback);
 
         $scope.changeAutoMsgStatus = function () {
-            if(AutoMsgService.getSingleAutoMsg().active) {
+            if (AutoMsgService.getSingleAutoMsg()
+                .active) {
                 modelsAutomate.deActivateMsg($scope.currApp,
-                            $scope.msgId);
+                    $scope.msgId);
                 $scope.msgStatus = 'Make it Live';
             } else {
                 modelsAutomate.makeMsgLive($scope.currApp, $scope.msgId);
