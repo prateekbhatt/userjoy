@@ -124,15 +124,14 @@ dailyUsage:
 
  */
 
-function saveUsage(aid, dailyUsage, cb) {
+function saveUsage(aid, timestamp, dailyUsage, cb) {
 
   var saveIterator = function (user, cb) {
 
-    DailyReport.create({
-      aid: aid,
-      uid: user._id,
-      usage: user.usage
-    }, cb);
+    var score;
+    var usage = user.usage;
+
+    DailyReport.upsert(aid, user._id, undefined, timestamp, score, usage, cb);
 
   };
 
@@ -141,52 +140,25 @@ function saveUsage(aid, dailyUsage, cb) {
 }
 
 
-// function nextUpdateTimestamp(aid, cb) {
+/**
+ * Updates the usage of each user-company
+ *
+ * @param {string} aid app-id
+ * @param {date} timestamp day for which to update usage
+ * @param {function} cb callback
+ */
 
-//   DailyReport
-//     .find({
-//       aid: aid
-//     })
-//     .sort({
-//       ct: -1
-//     })
-//     .limit(1)
-//     .exec(function (err, usage) {
+function usageConsumerWorker(aid, timestamp, cb) {
 
-//       var timestamp;
-
-//       if (err) return cb(err);
-//       if (!usage || !usage[0]) {
-
-//         // if the app is new and does not have usage records, start with
-//         // measuring usage of activity from the previous day
-//         timestamp = moment()
-//           .subtract('days', 1)
-//           .format();
-
-//       } else {
-//         timestamp = usage[0].ct;
-//       }
-
-//       cb(null, timestamp);
-//     });
-// }
-
-
-function usageConsumerWorker(aid, cb) {
-
-
-  var previousDay = moment()
-    .subtract('days', 1)
+  var time = moment(timestamp)
     .format();
-
 
   async.waterfall(
 
     [
 
       function calculateUsage(cb) {
-        usageMinutes(aid, previousDay, function (err, users) {
+        usageMinutes(aid, time, function (err, users) {
           cb(err, users);
         });
       },
@@ -196,7 +168,7 @@ function usageConsumerWorker(aid, cb) {
 
         if (_.isEmpty(users)) return cb();
 
-        saveUsage(aid, users, cb);
+        saveUsage(aid, time, users, cb);
       }
 
     ],
@@ -223,6 +195,5 @@ function usageConsumerWorker(aid, cb) {
 
 
 module.exports._usageMinutes = usageMinutes;
-// module.exports._nextUpdateTimestamp = nextUpdateTimestamp;
 module.exports._saveUsage = saveUsage;
 module.exports._usageConsumerWorker = usageConsumerWorker;

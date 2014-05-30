@@ -50,52 +50,6 @@ describe('Worker usage-consumer', function () {
   });
 
 
-
-  // describe('#nextUpdateTimestamp', function () {
-
-  //   var aid;
-
-  //   before(function (done) {
-  //     aid = saved.apps.first._id;
-  //     done();
-  //   });
-
-
-  //   it(
-  //     'should return previous days timestamp if there is no usage record for app',
-  //     function (done) {
-
-
-  //       worker._nextUpdateTimestamp(aid, function (err, time) {
-
-  //         var startOfYesterday = moment()
-  //           .subtract('days', 1)
-  //           .startOf('day')
-  //           .unix();
-
-  //         expect(moment(time)
-  //           .startOf('day')
-  //           .unix())
-  //           .to.eql(startOfYesterday);
-
-  //         done();
-
-  //       })
-
-  //     });
-
-  //   it('should return the last day', function (done) {
-
-  //     worker._nextUpdateTimestamp(aid, function (err, timestamp) {
-
-  //     })
-
-
-  //   });
-
-  // });
-
-
   var usr1, usr2, aid, uid1, uid2;
 
   before(function (done) {
@@ -161,6 +115,9 @@ describe('Worker usage-consumer', function () {
     it('should aggregate and save usage', function (done) {
 
 
+      var time = moment();
+      var date = time.date();
+
       async.series(
 
         [
@@ -184,7 +141,8 @@ describe('Worker usage-consumer', function () {
 
           function runUsageWorker(cb) {
 
-            worker._usageConsumerWorker(aid, function (err) {
+            worker._usageConsumerWorker(aid, time.format(), function (
+              err) {
 
               expect(err)
                 .to.not.exist;
@@ -209,9 +167,11 @@ describe('Worker usage-consumer', function () {
 
               _.each(usageAfter, function (h) {
 
+                h = h.toJSON();
+
                 expect(h)
                   .to.be.an("object")
-                  .that.has.property("usage")
+                  .that.has.property("du_" + date)
                   .that.is.a("number")
                   .that.is.within(0, 1440);
               });
