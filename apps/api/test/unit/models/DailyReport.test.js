@@ -23,13 +23,17 @@ describe('Model DailyReport', function () {
   });
 
 
-  describe.only('#preallocate', function () {
+  describe('#upsert', function () {
 
     var aid, uid, cid;
     var time = moment();
     var year = time.year();
     var month = time.month();
+    var timestamp = moment()
+      .format();
 
+    var score = 65;
+    var usage = 155;
 
     before(function () {
       aid = saved.users.first.aid;
@@ -37,6 +41,7 @@ describe('Model DailyReport', function () {
     });
 
     it('should create new document if it does not exist', function (done) {
+
 
       async.series([
 
@@ -56,8 +61,8 @@ describe('Model DailyReport', function () {
 
         function newDocument(cb) {
 
-          DailyReport.preallocate(aid, uid, cid, year, month,
-            function (err, numberAffected, res) {
+          DailyReport.upsert(aid, uid, cid, timestamp, score,
+            usage, function (err, numberAffected, res) {
 
               expect(err)
                 .to.not.exist;
@@ -91,11 +96,55 @@ describe('Model DailyReport', function () {
 
           DailyReport.find({}, function (err, reports) {
 
+            var time = moment(timestamp);
+
+            var date = time.date();
+            var year = time.year();
+            var month = time.month();
+
+            var daysInMonth = time.endOf('month')
+              .date();
+
+            var report = reports[0].toJSON();
+
             expect(err)
               .to.not.exist;
 
             expect(reports.length)
               .to.eql(1);
+
+            expect(report.uid.toString())
+              .to.eql(uid.toString());
+
+            expect(report.aid.toString())
+              .to.eql(aid.toString());
+
+            expect(report)
+              .to.have.property('y', year);
+
+            expect(report)
+              .to.have.property('m', month);
+
+            expect(report)
+              .to.have.property('du_' + date, usage);
+
+            expect(report)
+              .to.have.property('ds_' + date, score);
+
+            for (var i = 1; i <= daysInMonth; i++) {
+
+              // all other dates should be initialized to 0
+              if (i === date) {
+                continue;
+              }
+
+              expect(report)
+                .to.have.property('du_' + i);
+
+              expect(report)
+                .to.have.property('ds_' + i);
+
+            };
 
             cb();
           });
@@ -104,127 +153,324 @@ describe('Model DailyReport', function () {
 
       ], done)
 
-
     });
 
 
-    it('should not create new document if it exists', function (done) {
+    it(
+      'should update usage if valid usage is provided and document exists',
+      function (done) {
 
-      async.series([
-
-        function beforeCheck(cb) {
-          DailyReport.find({}, function (err, reports) {
-
-            expect(err)
-              .to.not.exist;
-
-            expect(reports.length)
-              .to.equal(1);
-
-            cb();
-          });
-        },
+        var newScore;
+        var newUsage = 185;
 
 
-        function newDocument(cb) {
+        async.series([
 
-          DailyReport.preallocate(aid, uid, cid, year, month,
-            function (err, numberAffected, res) {
+
+          function newDocument(cb) {
+
+            DailyReport.upsert(aid, uid, cid, timestamp, newScore,
+              newUsage, function (err, numberAffected, res) {
+
+                expect(err)
+                  .to.not.exist;
+
+                expect(numberAffected)
+                  .to.eql(1);
+
+                expect(res)
+                  .to.be.an("object")
+                  .that.deep.equals({
+                    ok: true,
+                    n: 1,
+                    updatedExisting: true
+                  });
+
+                cb(err);
+              });
+          },
+
+          function afterCheck(cb) {
+
+            DailyReport.find({}, function (err, reports) {
+
+              var time = moment(timestamp);
+
+              var date = time.date();
+              var year = time.year();
+              var month = time.month();
+
+              var daysInMonth = time.endOf('month')
+                .date();
+
+              var report = reports[0].toJSON();
 
               expect(err)
                 .to.not.exist;
 
-              expect(numberAffected)
+              expect(reports.length)
                 .to.eql(1);
 
-              expect(res)
-                .to.be.an("object")
-                .that.deep.equals({
-                  ok: true,
-                  n: 1,
-                  updatedExisting: true
-                });
+              expect(report.uid.toString())
+                .to.eql(uid.toString());
 
-              cb(err);
+              expect(report.aid.toString())
+                .to.eql(aid.toString());
+
+              expect(report)
+                .to.have.property('y', year);
+
+              expect(report)
+                .to.have.property('m', month);
+
+              expect(report)
+                .to.have.property('du_' + date, newUsage);
+
+              expect(report)
+                .to.have.property('ds_' + date, score);
+
+              for (var i = 1; i <= daysInMonth; i++) {
+
+                // all other dates should be initialized to 0
+                if (i === date) {
+                  continue;
+                }
+
+                expect(report)
+                  .to.have.property('du_' + i);
+
+                expect(report)
+                  .to.have.property('ds_' + i);
+
+              };
+
+              cb();
             });
-        },
 
-        function afterCheck(cb) {
+          }
 
-          DailyReport.find({}, function (err, reports) {
+        ], done)
+
+      });
+
+    it(
+      'should update score if valid score is provided and document exists',
+      function (done) {
+
+        var newScore = 99;
+        var newUsage;
+
+
+        async.series([
+
+
+          function newDocument(cb) {
+
+            DailyReport.upsert(aid, uid, cid, timestamp, newScore,
+              newUsage, function (err, numberAffected, res) {
+
+                expect(err)
+                  .to.not.exist;
+
+                expect(numberAffected)
+                  .to.eql(1);
+
+                expect(res)
+                  .to.be.an("object")
+                  .that.deep.equals({
+                    ok: true,
+                    n: 1,
+                    updatedExisting: true
+                  });
+
+                cb(err);
+              });
+          },
+
+          function afterCheck(cb) {
+
+            DailyReport.find({}, function (err, reports) {
+
+              var time = moment(timestamp);
+
+              var date = time.date();
+              var year = time.year();
+              var month = time.month();
+
+              var daysInMonth = time.endOf('month')
+                .date();
+
+              var report = reports[0].toJSON();
+
+              expect(err)
+                .to.not.exist;
+
+              expect(reports.length)
+                .to.eql(1);
+
+              expect(report.uid.toString())
+                .to.eql(uid.toString());
+
+              expect(report.aid.toString())
+                .to.eql(aid.toString());
+
+              expect(report)
+                .to.have.property('y', year);
+
+              expect(report)
+                .to.have.property('m', month);
+
+              expect(report)
+                .to.have.property('du_' + date);
+
+              expect(report)
+                .to.have.property('ds_' + date, newScore);
+
+              for (var i = 1; i <= daysInMonth; i++) {
+
+                // all other dates should be initialized to 0
+                if (i === date) {
+                  continue;
+                }
+
+                expect(report)
+                  .to.have.property('du_' + i);
+
+                expect(report)
+                  .to.have.property('ds_' + i);
+
+              };
+
+              cb();
+            });
+
+          }
+
+        ], done)
+
+      });
+
+
+    it('should return error if score > 100',
+      function (done) {
+
+        var newScore = 101;
+        var newUsage;
+
+        DailyReport.upsert(aid, uid, cid, timestamp, newScore,
+          newUsage, function (err, numberAffected, res) {
 
             expect(err)
-              .to.not.exist;
+              .to.exist
+              .and.have.property('message',
+                'DailyReport upsert provide valid score');
 
-            expect(reports.length)
-              .to.eql(1);
+            done()
+          })
 
-            cb();
+      });
+
+    it('should return error if score < 0',
+      function (done) {
+
+        var newScore = -1;
+        var newUsage;
+
+        DailyReport.upsert(aid, uid, cid, timestamp, newScore,
+          newUsage, function (err, numberAffected, res) {
+
+            expect(err)
+              .to.exist
+              .and.have.property('message',
+                'DailyReport upsert provide valid score');
+
+            done()
+          })
+
+      });
+
+
+    it('should return error if usage > 1440',
+      function (done) {
+
+        var newScore;
+        var newUsage = 1441;
+
+        DailyReport.upsert(aid, uid, cid, timestamp, newScore,
+          newUsage, function (err, numberAffected, res) {
+
+            expect(err)
+              .to.exist
+              .and.have.property('message',
+                'DailyReport upsert provide valid usage');
+
+            done()
+          })
+
+      });
+
+    it('should return error if usage < 0',
+      function (done) {
+
+        var newScore;
+        var newUsage = -1;
+
+        DailyReport.upsert(aid, uid, cid, timestamp, newScore,
+          newUsage, function (err, numberAffected, res) {
+
+            expect(err)
+              .to.exist
+              .and.have.property('message',
+                'DailyReport upsert provide valid usage');
+
+            done()
+          })
+
+      });
+
+
+    it('should return error if invalid timestamp is provided',
+      function (done) {
+
+        var timestamp = '43294AD';
+
+        DailyReport.upsert(aid, uid, cid, timestamp, score,
+          usage, function (err, numberAffected, res) {
+
+            expect(err)
+              .to.exist
+              .and.have.property('message',
+                'DailyReport upsert provide valid time');
+
+            done()
+          })
+
+      });
+
+
+    it('should throw error if all arguments are not provided',
+      function (done) {
+
+        function test() {
+          DailyReport.upsert(aid, uid, cid, score, usage, function (err,
+            numberAffected, res) {
+
+            expect(err)
+              .to.exist
+              .and.have.property('message',
+                'DailyReport upsert provide valid usage');
+
+
           });
-
         }
 
-      ], done)
+        expect(test)
+          .to.
+        throw ('DailyReport upsert requires all arguments');
 
-    });
+        done();
 
-  });
-
-
-
-  describe('#upsert', function () {
-
-    var aid, uid, cid;
-    var score = 35;
-    var usage = 125;
-
-    before(function () {
-      aid = saved.users.first.aid;
-      uid = saved.users.first._id;
-    });
-
-    it('should create new document if not exist', function (done) {
-
-      async.series([
-
-        function beforeCheck(cb) {
-          DailyReport.count({}, function (err, count) {
-            expect(count)
-              .to.equal(0);
-
-            cb();
-          });
-        },
-
-
-        function newDocument(cb) {
-
-          DailyReport.upsert(aid, uid, cid, Date.now(), usage, score,
-            function (err) {
-              console.log('newDocument test', arguments);
-              cb(err);
-            });
-        },
-
-        function afterCheck(cb) {
-
-          DailyReport.find({}, function (err, reports) {
-            console.log('daily report', err, reports);
-            process.exit(1)
-            expect(reports.length)
-              .to.be.above(0);
-
-            cb();
-          });
-
-        }
-
-      ], done)
-
-
-    });
-
-
+      });
   });
 
 });
