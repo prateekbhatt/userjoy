@@ -44,13 +44,6 @@ var DailyReportSchema = new Schema({
     },
 
 
-    // minutes of usage
-    usage: {
-      type: Number,
-      default: 0
-    },
-
-
     y: {
       type: Number,
       min: 2014,
