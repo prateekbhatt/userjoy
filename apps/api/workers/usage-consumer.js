@@ -12,7 +12,7 @@ var moment = require('moment');
  */
 
 var Event = require('../api/models/Event');
-var Health = require('../api/models/Health');
+var DailyReport = require('../api/models/DailyReport');
 
 
 /**
@@ -128,7 +128,7 @@ function saveUsage(aid, dailyUsage, cb) {
 
   var saveIterator = function (user, cb) {
 
-    Health.create({
+    DailyReport.create({
       aid: aid,
       uid: user._id,
       usage: user.usage
@@ -143,7 +143,7 @@ function saveUsage(aid, dailyUsage, cb) {
 
 // function nextUpdateTimestamp(aid, cb) {
 
-//   Health
+//   DailyReport
 //     .find({
 //       aid: aid
 //     })

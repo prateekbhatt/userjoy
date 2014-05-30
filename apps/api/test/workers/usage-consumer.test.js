@@ -13,7 +13,7 @@ describe('Worker usage-consumer', function () {
    * Models
    */
 
-  var Health = require('../../api/models/Health');
+  var DailyReport = require('../../api/models/DailyReport');
   var Event = require('../../api/models/Event');
 
 
@@ -167,7 +167,7 @@ describe('Worker usage-consumer', function () {
 
           function checkBeforeUsage(cb) {
 
-            Health
+            DailyReport
               .find({}, function (err, usageBefore) {
 
                 expect(err)
@@ -197,7 +197,7 @@ describe('Worker usage-consumer', function () {
 
           function checkAfterUsage(cb) {
 
-            Health.find({}, function (err, usageAfter) {
+            DailyReport.find({}, function (err, usageAfter) {
 
               expect(err)
                 .to.not.exist;
