@@ -1,5 +1,5 @@
 /**
- * Model for health scores of users
+ * Model for daily usage and scores of users
  */
 
 
@@ -15,6 +15,14 @@ var moment = require('moment');
 var Schema = mongoose.Schema;
 
 
+// schema strict option needs to be set at false to allow du_ and ds_ keys
+// to store usage and score values
+
+var schemaOptions = {
+  strict: false
+};
+
+
 /**
  * Define schema
  */
@@ -22,96 +30,109 @@ var Schema = mongoose.Schema;
 var DailyReportSchema = new Schema({
 
 
-  // app Id
-  aid: {
-    type: Schema.Types.ObjectId,
-    ref: 'App',
-    required: [true, 'Invalid aid']
+    // app Id
+    aid: {
+      type: Schema.Types.ObjectId,
+      ref: 'App',
+      required: [true, 'Invalid aid']
+    },
+
+
+    cid: {
+      type: Schema.Types.ObjectId,
+      ref: 'Company'
+    },
+
+
+    // minutes of usage
+    usage: {
+      type: Number,
+      default: 0
+    },
+
+
+    y: {
+      type: Number,
+      min: 2014,
+      required: true
+    },
+
+
+    m: {
+      type: Number,
+      min: 1,
+      max: 12,
+      required: true
+    },
+
+
+    // created at timestamp
+    ct: {
+      type: Date,
+      default: Date.now
+    },
+
+
+    uid: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'Invalid user id']
+    }
+
+
+    // ds_ and du_ keys are added to store the daily usage and score data
+
   },
 
-
-  cid: {
-    type: Schema.Types.ObjectId,
-    ref: 'Company'
-  },
-
-
-  // minutes of usage
-  usage: {
-    type: Number,
-    default: 0
-  },
-
-
-  y: {
-    type: Number,
-    min: 2014,
-    required: true
-  },
-
-
-  m: {
-    type: Number,
-    min: 1,
-    max: 12,
-    required: true
-  },
-
-
-  // daily usage
-  d_u: Schema.Types.Mixed,
-
-
-  // daily score
-  d_s: Schema.Types.Mixed,
-
-
-  // created at timestamp
-  ct: {
-    type: Date,
-    default: Date.now
-  },
-
-
-  uid: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: [true, 'Invalid user id']
-  },
-
-});
+  schemaOptions);
 
 
 /**
- * Preallocate daily report documents for the month
+ * Preallocate / update daily report documents for the month
  *
  * @param {string} aid app-id
  * @param {string} uid user-id
  * @param {string} cid company-id
- * @param {number} year (2014-2100)
- * @param {number} month (1-12)
+ * @param {date} timestamp
+ * @param {number} score (0-100)
+ * @param {number} usage (0-1440) (a day has 1440 minutes)
  * @param {function} cb callback
  *
  */
 
-DailyReportSchema.statics.preallocate = function (aid, uid, cid, year, month,
-  cb) {
+DailyReportSchema.statics.upsert = function (aid, uid, cid, timestamp,
+  score, usage, cb) {
 
-  if (arguments.length < 6) {
-    return cb(new Error('DailyReport preallocate requires all arguments'));
+
+  if (arguments.length < 7) {
+    throw new Error('DailyReport upsert requires all arguments');
+  }
+
+  // score must be between (0, 100)
+  if (score && (!_.isNumber(score) || score < 0 || score > 100)) {
+    return cb(new Error('DailyReport upsert provide valid score'));
   }
 
 
-  // NOTE: Limit the year between 2014 and 2100
-  if (typeof (year) !== 'number' || year < 2014 || year > 2100) {
-    return cb(new Error('DailyReport preallocate provide valid year'));
+  // usage must be between (0, 1440) (a day has 1440 minutes)
+  if (usage && (!_.isNumber(usage) || usage < 0 || usage > 1440)) {
+    return cb(new Error('DailyReport upsert provide valid usage'));
   }
 
+  var time = moment(timestamp);
 
-  // in javascript, month varies from 0 to 11
-  if (typeof (month) !== 'number' || month < 0 || month > 11) {
-    return cb(new Error('DailyReport preallocate provide valid month'));
+  if (!time.isValid()) {
+    return cb(new Error('DailyReport upsert provide valid time'));
   }
+
+  var year = time.year();
+  var month = time.month();
+  var date = time.date();
+
+
+  // how many days in the current month (used for preallocation)
+  var totalDaysInMonth = time.endOf('month')
+    .date();
 
 
   // query conditions
@@ -129,29 +150,32 @@ DailyReportSchema.statics.preallocate = function (aid, uid, cid, year, month,
   }
 
 
-  var totalDaysInMonth = moment({
-    year: year,
-    month: month
-  })
-    .endOf('month')
-    .date();
+  // preallocate month long data
+  var setOnInsert = {};
 
-  var monthlyPreallocation = {};
+  // set values for current date
+  var set = {};
+
 
   for (var i = 1; i <= totalDaysInMonth; i++) {
-    monthlyPreallocation[i] = 0;
-  };
 
+    // skip preallocation for current date
+    if (i === date) {
 
-  // preallocate month long data
-  var setOnInsert = {
-    d_s: monthlyPreallocation,
-    d_u: monthlyPreallocation
+      if (usage) set['du_' + date] = usage;
+      if (score) set['ds_' + date] = score;
+
+      continue;
+    }
+
+    setOnInsert['du_' + i] = 0;
+    setOnInsert['ds_' + i] = 0;
   };
 
 
   var update = {
-    $setOnInsert: setOnInsert
+    $setOnInsert: setOnInsert,
+    $set: set
   };
 
 
@@ -163,6 +187,7 @@ DailyReportSchema.statics.preallocate = function (aid, uid, cid, year, month,
   DailyReport.update(conditions, update, options, cb);
 
 };
+
 
 
 var DailyReport = mongoose.model('DailyReport', DailyReportSchema);
