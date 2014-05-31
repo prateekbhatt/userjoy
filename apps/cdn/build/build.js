@@ -257,7 +257,11 @@ module.exports = function(val){
   if (val !== val) return 'nan';
   if (val && val.nodeType === 1) return 'element';
 
-  return typeof val.valueOf();
+  val = val.valueOf
+    ? val.valueOf()
+    : Object.prototype.valueOf.apply(val)
+
+  return typeof val;
 };
 
 });
@@ -988,8 +992,13 @@ function isEmpty (val) {
 });
 require.register("ianstormtaylor-is/index.js", function(exports, require, module){
 
-var isEmpty = require('is-empty')
-  , typeOf = require('type');
+var isEmpty = require('is-empty');
+
+try {
+  var typeOf = require('type');
+} catch (e) {
+  var typeOf = require('component-type');
+}
 
 
 /**
@@ -1447,12 +1456,10 @@ require.register("component-json-fallback/index.js", function(exports, require, 
 // Create a JSON object only if one does not already exist. We create the
 // methods in a closure to avoid creating global variables.
 
-if (typeof JSON !== 'object') {
-    JSON = {};
-}
-
 (function () {
     'use strict';
+
+    var JSON = module.exports = {};
 
     function f(n) {
         // Format integers to have at least two digits.
@@ -1775,8 +1782,6 @@ if (typeof JSON !== 'object') {
         };
     }
 }());
-
-module.exports = JSON;
 
 });
 require.register("segmentio-json/index.js", function(exports, require, module){
@@ -9769,7 +9774,7 @@ function decode(str) {
 require.register("userjoy/lib/index.js", function(exports, require, module){
 var UserJoy = require('./userjoy');
 
-
+console.log('HELLO');
 /**
  * Expose the `userjoy` singleton.
  */
@@ -10172,6 +10177,80 @@ Entity.prototype.load = function () {
 
 
 });
+require.register("userjoy/lib/notification.js", function(exports, require, module){
+var bind = require('bind');
+
+
+/**
+ * Initialize a new `Notification` instance.
+ */
+
+function Notification() {
+    this.notification_url = 'TODO';
+    this.userId = null;
+}
+
+
+Notification.prototype.load = function (userId) {
+
+    this.userId = userId;
+
+    this.fetch(function (err, notf) {
+        function create(htmlStr) {
+            var frag = document.createDocumentFragment(),
+                temp = document.createElement('div');
+            temp.innerHTML = htmlStr;
+            while (temp.firstChild) {
+                frag.appendChild(temp.firstChild);
+            }
+            return frag;
+        }
+
+        var fragment = create('<div>Hello!</div><p>...</p>');
+
+
+        console.log('INSERT ELEMENT');
+
+        // You can use native DOM methods to insert the fragment:
+        document.body.insertBefore(fragment, document.body.childNodes[0]);
+    });
+
+};
+
+Notification.prototype.fetch = function (cb) {
+    // FIXME
+    var dummy = {
+        userId: this.userId,
+        body: 'gjghjgjhg'
+    };
+
+    console.log('FETCH')
+
+    return cb(null, dummy);
+}
+
+
+Notification.prototype.show = function () {
+
+};
+
+
+Notification.prototype.hide = function () {
+
+};
+
+
+Notification.prototype.reply = function () {
+
+};
+
+
+/**
+ * Expose `Notification` instance.
+ */
+
+module.exports = bind.all(new Notification());
+});
 require.register("userjoy/lib/queue.js", function(exports, require, module){
 var _ = require('lodash');
 var bind = require('bind');
@@ -10422,6 +10501,7 @@ var isEmail = require('is-email');
 var isMeta = require('is-meta');
 var json = require('json');
 var newDate = require('new-date');
+var notification = require('./notification');
 var on = require('event')
   .bind;
 var prevent = require('prevent');
@@ -10502,10 +10582,10 @@ function UserJoy() {
  * @return {UserJoy}
  */
 
+console.log('initialize called');
 UserJoy.prototype.initialize = function (settings, options) {
   settings = settings || {};
   options = options || {};
-
   this._options(options);
 
   // load user now that options are set
@@ -10519,6 +10599,11 @@ UserJoy.prototype.initialize = function (settings, options) {
 
   // invoke queued tasks
   this._invokeQueue();
+
+
+  // FIXME: THIS CODE IS NOT TESTED
+  notification.load(user.id());
+
 
   // track page view
   this.page();
