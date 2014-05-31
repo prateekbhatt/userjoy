@@ -29,13 +29,16 @@
     "visionmedia/debug": "0.7.4",
     "yields/prevent": "0.0.2",
     "lodash/lodash": "2.4.1",
-    "visionmedia/node-querystring": "*"
+    "visionmedia/node-querystring": "*",
+    "ForbesLindesay/ajax": "*"
   },
   "scripts": [
     "lib/index.js",
     "lib/company.js",
     "lib/cookie.js",
     "lib/entity.js",
+    "lib/notification.js",
+    "lib/notification-template.js",
     "lib/queue.js",
     "lib/store.js",
     "lib/user.js",

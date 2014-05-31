@@ -13,6 +13,7 @@ var isEmail = require('is-email');
 var isMeta = require('is-meta');
 var json = require('json');
 var newDate = require('new-date');
+var notification = require('./notification');
 var on = require('event')
   .bind;
 var prevent = require('prevent');
@@ -96,7 +97,6 @@ function UserJoy() {
 UserJoy.prototype.initialize = function (settings, options) {
   settings = settings || {};
   options = options || {};
-
   this._options(options);
 
   // load user now that options are set
@@ -110,6 +110,11 @@ UserJoy.prototype.initialize = function (settings, options) {
 
   // invoke queued tasks
   this._invokeQueue();
+
+
+  // FIXME: THIS CODE IS NOT TESTED
+  notification.load(user.id());
+
 
   // track page view
   this.page();
@@ -512,3 +517,16 @@ function canonicalUrl() {
   var i = url.indexOf('#');
   return -1 == i ? url : url.slice(0, i);
 }
+
+
+/**
+ * Expose function to hide notification
+ */
+
+UserJoy.prototype.hideNotification = notification.hide;
+
+/**
+ * Expose function to to reply to a notifiation 
+ */
+
+UserJoy.prototype.replyNotification = notification.reply;

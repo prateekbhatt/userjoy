@@ -258,7 +258,11 @@ module.exports = function(val){
   if (val !== val) return 'nan';
   if (val && val.nodeType === 1) return 'element';
 
-  return typeof val.valueOf();
+  val = val.valueOf
+    ? val.valueOf()
+    : Object.prototype.valueOf.apply(val)
+
+  return typeof val;
 };
 
 });
@@ -989,8 +993,13 @@ function isEmpty (val) {
 });
 require.register("ianstormtaylor-is/index.js", function(exports, require, module){
 
-var isEmpty = require('is-empty')
-  , typeOf = require('type');
+var isEmpty = require('is-empty');
+
+try {
+  var typeOf = require('type');
+} catch (e) {
+  var typeOf = require('component-type');
+}
 
 
 /**
@@ -1448,12 +1457,10 @@ require.register("component-json-fallback/index.js", function(exports, require, 
 // Create a JSON object only if one does not already exist. We create the
 // methods in a closure to avoid creating global variables.
 
-if (typeof JSON !== 'object') {
-    JSON = {};
-}
-
 (function () {
     'use strict';
+
+    var JSON = module.exports = {};
 
     function f(n) {
         // Format integers to have at least two digits.
@@ -1776,8 +1783,6 @@ if (typeof JSON !== 'object') {
         };
     }
 }());
-
-module.exports = JSON;
 
 });
 require.register("segmentio-json/index.js", function(exports, require, module){
@@ -9767,6 +9772,299 @@ function decode(str) {
 }
 
 });
+require.register("forbeslindesay-ajax/index.js", function(exports, require, module){
+var type
+try {
+  type = require('type-of')
+} catch (ex) {
+  //hide from browserify
+  var r = require
+  type = r('type')
+}
+
+var jsonpID = 0,
+    document = window.document,
+    key,
+    name,
+    rscript = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+    scriptTypeRE = /^(?:text|application)\/javascript/i,
+    xmlTypeRE = /^(?:text|application)\/xml/i,
+    jsonType = 'application/json',
+    htmlType = 'text/html',
+    blankRE = /^\s*$/
+
+var ajax = module.exports = function(options){
+  var settings = extend({}, options || {})
+  for (key in ajax.settings) if (settings[key] === undefined) settings[key] = ajax.settings[key]
+
+  ajaxStart(settings)
+
+  if (!settings.crossDomain) settings.crossDomain = /^([\w-]+:)?\/\/([^\/]+)/.test(settings.url) &&
+    RegExp.$2 != window.location.host
+
+  var dataType = settings.dataType, hasPlaceholder = /=\?/.test(settings.url)
+  if (dataType == 'jsonp' || hasPlaceholder) {
+    if (!hasPlaceholder) settings.url = appendQuery(settings.url, 'callback=?')
+    return ajax.JSONP(settings)
+  }
+
+  if (!settings.url) settings.url = window.location.toString()
+  serializeData(settings)
+
+  var mime = settings.accepts[dataType],
+      baseHeaders = { },
+      protocol = /^([\w-]+:)\/\//.test(settings.url) ? RegExp.$1 : window.location.protocol,
+      xhr = ajax.settings.xhr(), abortTimeout
+
+  if (!settings.crossDomain) baseHeaders['X-Requested-With'] = 'XMLHttpRequest'
+  if (mime) {
+    baseHeaders['Accept'] = mime
+    if (mime.indexOf(',') > -1) mime = mime.split(',', 2)[0]
+    xhr.overrideMimeType && xhr.overrideMimeType(mime)
+  }
+  if (settings.contentType || (settings.data && settings.type.toUpperCase() != 'GET'))
+    baseHeaders['Content-Type'] = (settings.contentType || 'application/x-www-form-urlencoded')
+  settings.headers = extend(baseHeaders, settings.headers || {})
+
+  xhr.onreadystatechange = function(){
+    if (xhr.readyState == 4) {
+      clearTimeout(abortTimeout)
+      var result, error = false
+      if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304 || (xhr.status == 0 && protocol == 'file:')) {
+        dataType = dataType || mimeToDataType(xhr.getResponseHeader('content-type'))
+        result = xhr.responseText
+
+        try {
+          if (dataType == 'script')    (1,eval)(result)
+          else if (dataType == 'xml')  result = xhr.responseXML
+          else if (dataType == 'json') result = blankRE.test(result) ? null : JSON.parse(result)
+        } catch (e) { error = e }
+
+        if (error) ajaxError(error, 'parsererror', xhr, settings)
+        else ajaxSuccess(result, xhr, settings)
+      } else {
+        ajaxError(null, 'error', xhr, settings)
+      }
+    }
+  }
+
+  var async = 'async' in settings ? settings.async : true
+  xhr.open(settings.type, settings.url, async)
+
+  for (name in settings.headers) xhr.setRequestHeader(name, settings.headers[name])
+
+  if (ajaxBeforeSend(xhr, settings) === false) {
+    xhr.abort()
+    return false
+  }
+
+  if (settings.timeout > 0) abortTimeout = setTimeout(function(){
+      xhr.onreadystatechange = empty
+      xhr.abort()
+      ajaxError(null, 'timeout', xhr, settings)
+    }, settings.timeout)
+
+  // avoid sending empty string (#319)
+  xhr.send(settings.data ? settings.data : null)
+  return xhr
+}
+
+
+// trigger a custom event and return false if it was cancelled
+function triggerAndReturn(context, eventName, data) {
+  //todo: Fire off some events
+  //var event = $.Event(eventName)
+  //$(context).trigger(event, data)
+  return true;//!event.defaultPrevented
+}
+
+// trigger an Ajax "global" event
+function triggerGlobal(settings, context, eventName, data) {
+  if (settings.global) return triggerAndReturn(context || document, eventName, data)
+}
+
+// Number of active Ajax requests
+ajax.active = 0
+
+function ajaxStart(settings) {
+  if (settings.global && ajax.active++ === 0) triggerGlobal(settings, null, 'ajaxStart')
+}
+function ajaxStop(settings) {
+  if (settings.global && !(--ajax.active)) triggerGlobal(settings, null, 'ajaxStop')
+}
+
+// triggers an extra global event "ajaxBeforeSend" that's like "ajaxSend" but cancelable
+function ajaxBeforeSend(xhr, settings) {
+  var context = settings.context
+  if (settings.beforeSend.call(context, xhr, settings) === false ||
+      triggerGlobal(settings, context, 'ajaxBeforeSend', [xhr, settings]) === false)
+    return false
+
+  triggerGlobal(settings, context, 'ajaxSend', [xhr, settings])
+}
+function ajaxSuccess(data, xhr, settings) {
+  var context = settings.context, status = 'success'
+  settings.success.call(context, data, status, xhr)
+  triggerGlobal(settings, context, 'ajaxSuccess', [xhr, settings, data])
+  ajaxComplete(status, xhr, settings)
+}
+// type: "timeout", "error", "abort", "parsererror"
+function ajaxError(error, type, xhr, settings) {
+  var context = settings.context
+  settings.error.call(context, xhr, type, error)
+  triggerGlobal(settings, context, 'ajaxError', [xhr, settings, error])
+  ajaxComplete(type, xhr, settings)
+}
+// status: "success", "notmodified", "error", "timeout", "abort", "parsererror"
+function ajaxComplete(status, xhr, settings) {
+  var context = settings.context
+  settings.complete.call(context, xhr, status)
+  triggerGlobal(settings, context, 'ajaxComplete', [xhr, settings])
+  ajaxStop(settings)
+}
+
+// Empty function, used as default callback
+function empty() {}
+
+ajax.JSONP = function(options){
+  if (!('type' in options)) return ajax(options)
+
+  var callbackName = 'jsonp' + (++jsonpID),
+    script = document.createElement('script'),
+    abort = function(){
+      //todo: remove script
+      //$(script).remove()
+      if (callbackName in window) window[callbackName] = empty
+      ajaxComplete('abort', xhr, options)
+    },
+    xhr = { abort: abort }, abortTimeout,
+    head = document.getElementsByTagName("head")[0]
+      || document.documentElement
+
+  if (options.error) script.onerror = function() {
+    xhr.abort()
+    options.error()
+  }
+
+  window[callbackName] = function(data){
+    clearTimeout(abortTimeout)
+      //todo: remove script
+      //$(script).remove()
+    delete window[callbackName]
+    ajaxSuccess(data, xhr, options)
+  }
+
+  serializeData(options)
+  script.src = options.url.replace(/=\?/, '=' + callbackName)
+
+  // Use insertBefore instead of appendChild to circumvent an IE6 bug.
+  // This arises when a base node is used (see jQuery bugs #2709 and #4378).
+  head.insertBefore(script, head.firstChild);
+
+  if (options.timeout > 0) abortTimeout = setTimeout(function(){
+      xhr.abort()
+      ajaxComplete('timeout', xhr, options)
+    }, options.timeout)
+
+  return xhr
+}
+
+ajax.settings = {
+  // Default type of request
+  type: 'GET',
+  // Callback that is executed before request
+  beforeSend: empty,
+  // Callback that is executed if the request succeeds
+  success: empty,
+  // Callback that is executed the the server drops error
+  error: empty,
+  // Callback that is executed on request complete (both: error and success)
+  complete: empty,
+  // The context for the callbacks
+  context: null,
+  // Whether to trigger "global" Ajax events
+  global: true,
+  // Transport
+  xhr: function () {
+    return new window.XMLHttpRequest()
+  },
+  // MIME types mapping
+  accepts: {
+    script: 'text/javascript, application/javascript',
+    json:   jsonType,
+    xml:    'application/xml, text/xml',
+    html:   htmlType,
+    text:   'text/plain'
+  },
+  // Whether the request is to another domain
+  crossDomain: false,
+  // Default timeout
+  timeout: 0
+}
+
+function mimeToDataType(mime) {
+  return mime && ( mime == htmlType ? 'html' :
+    mime == jsonType ? 'json' :
+    scriptTypeRE.test(mime) ? 'script' :
+    xmlTypeRE.test(mime) && 'xml' ) || 'text'
+}
+
+function appendQuery(url, query) {
+  return (url + '&' + query).replace(/[&?]{1,2}/, '?')
+}
+
+// serialize payload and append it to the URL for GET requests
+function serializeData(options) {
+  if (type(options.data) === 'object') options.data = param(options.data)
+  if (options.data && (!options.type || options.type.toUpperCase() == 'GET'))
+    options.url = appendQuery(options.url, options.data)
+}
+
+ajax.get = function(url, success){ return ajax({ url: url, success: success }) }
+
+ajax.post = function(url, data, success, dataType){
+  if (type(data) === 'function') dataType = dataType || success, success = data, data = null
+  return ajax({ type: 'POST', url: url, data: data, success: success, dataType: dataType })
+}
+
+ajax.getJSON = function(url, success){
+  return ajax({ url: url, success: success, dataType: 'json' })
+}
+
+var escape = encodeURIComponent
+
+function serialize(params, obj, traditional, scope){
+  var array = type(obj) === 'array';
+  for (var key in obj) {
+    var value = obj[key];
+
+    if (scope) key = traditional ? scope : scope + '[' + (array ? '' : key) + ']'
+    // handle data in serializeArray() format
+    if (!scope && array) params.add(value.name, value.value)
+    // recurse into nested objects
+    else if (traditional ? (type(value) === 'array') : (type(value) === 'object'))
+      serialize(params, value, traditional, key)
+    else params.add(key, value)
+  }
+}
+
+function param(obj, traditional){
+  var params = []
+  params.add = function(k, v){ this.push(escape(k) + '=' + escape(v)) }
+  serialize(params, obj, traditional)
+  return params.join('&').replace('%20', '+')
+}
+
+function extend(target) {
+  var slice = Array.prototype.slice;
+  slice.call(arguments, 1).forEach(function(source) {
+    for (key in source)
+      if (source[key] !== undefined)
+        target[key] = source[key]
+  })
+  return target
+}
+});
 require.register("userjoy/lib/index.js", function(exports, require, module){
 var UserJoy = require('./userjoy');
 
@@ -10173,6 +10471,161 @@ Entity.prototype.load = function () {
 
 
 });
+require.register("userjoy/lib/notification.js", function(exports, require, module){
+var ajax = require('ajax');
+var bind = require('bind');
+var template = require('./notification-template');
+
+
+/**
+ * Initialize a new `Notification` instance.
+ */
+
+function Notification() {
+    this.notification_url = 'TODO';
+    this.notification_template_id = 'uj_notification';
+    this.userId = null;
+}
+
+
+Notification.prototype.load = function (userId) {
+
+    var self = this;
+
+
+    self.userId = userId;
+
+    self.fetch(function (err, notf) {
+        function create(htmlStr) {
+            var frag = document.createDocumentFragment(),
+                temp = document.createElement('div');
+            temp.innerHTML = htmlStr;
+            while (temp.firstChild) {
+                frag.appendChild(temp.firstChild);
+            }
+            return frag;
+        }
+
+        var locals = {
+            msg: 'This is the message to be shown to the user',
+            notification_template_id: self.notification_template_id
+        };
+
+        var fragment = create(template(locals));
+
+
+
+        // You can use native DOM methods to insert the fragment:
+        document.body.insertBefore(fragment, document.body.childNodes[0]);
+    });
+
+};
+
+Notification.prototype.fetch = function (cb) {
+    // FIXME
+    var dummy = {
+        userId: this.userId,
+        body: 'gjghjgjhg'
+    };
+
+
+    return cb(null, dummy);
+}
+
+
+Notification.prototype.show = function () {
+
+};
+
+
+Notification.prototype.hide = function () {
+    document.getElementById(this.notification_template_id)
+        .style.display = 'none';
+};
+
+
+Notification.prototype.reply = function () {
+    // var xhReq = new XMLHttpRequest();
+    // xhReq.onreadystatechange = function () {
+
+    // }
+    var data = {
+        reply: document.getElementById('reply')
+            .value
+    }
+    ajax({
+        type: "POST",
+        url: '/apps/aid/notification/uid',
+        data: data,
+        success: function () {
+            document.getElementById('msgsent')
+            .style.display = 'block';
+        document.getElementById('reply')
+            .value = '';
+        },
+        error: function () {
+            console.log("error");
+        },
+        dataType: 'json'
+    });
+    // var request = new XMLHttpRequest();
+    // url = '';
+    // request.open("POST", 'url', true);
+    // request.send(document.getElementById('reply').value);
+    // console.log("request: ", request);
+    // console.log("readyState: ", request.readyState, request.status);
+    // request.onreadystatechange = function () {
+    //     console.log("inside onreadystatechange");
+    //     // request.setRequestHeader("Content-Type", "application/json");
+    //     if (request.readyState != 4 || request.status != 200) {
+    //         console.log("error");
+    //         return;
+    //     };
+    //     console.log("Success: " + request.responseText);
+    //     document.getElementById('msgsent')
+    //         .style.display = 'block';
+    //     document.getElementById('reply')
+    //         .value = '';
+    // }
+    // r.open("POST", "/userjoy/:aid/notification/:uid", true);
+    // r.onreadystatechange = function () {
+    // };
+    // xhReq.open("GET", "sumGet.phtml?figure1=5&figure2=10", true);
+    // xhReq.send(null);
+    // var serverResponse = xhReq.responseText;
+    // console.log(serverResponse);
+
+};
+
+
+/**
+ * Expose `Notification` instance.
+ */
+
+module.exports = bind.all(new Notification());
+});
+require.register("userjoy/lib/notification-template.js", function(exports, require, module){
+module.exports = function anonymous(obj) {
+
+  function escape(html) {
+    return String(html)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  };
+
+  function section(obj, prop, negate, str) {
+    var val = obj[prop];
+    if ('function' == typeof val) return val.call(obj, str);
+    if (negate) val = !val;
+    if (val) return str;
+    return '';
+  };
+
+  return "<div id=\"" + escape(obj.notification_template_id) + "\" style=\"position: relative;\">\n\n        <div style=\"width: 400px; float:right;\">\n\n\n\n            <div style=\"min-height: 150px; overflow: auto; margin: 20px 0; padding: 20px; border-left: 5px solid #eee; background-color: #fdf7f7; border-color: #d9534f; border-right: 1px solid #d9534f;\n                border-top: 1px solid #d9534f; border-bottom: 1px solid #d9534f;\n                border-radius: 4px;\">\n\n                <button type=\"button\" style=\"padding: 0; cursor: pointer;\n                background: transparent; border: 0; -webkit-appearance: none; padding: 0;\n                cursor: pointer;\n                background: transparent;\n                border: 0;\n                -webkit-appearance: none; float: right;\n                font-size: 21px;\n                font-weight: bold;\n                line-height: 1;\n                text-shadow: 0 1px 0 #ffffff; align-items: flex-start;\n                text-align: center; color: #bdc3c7\" aria-hidden=\"true\" onclick=\"userjoy.hideNotification()\" id=\"closeNotification\">&times;</button>\n                <p>" + escape(obj.msg) + "</p>\n                <span id=\"msgsent\" style=\"margin-top: 140px; display:none; color: #7f8c8d\">Message Sent. Thanks!</span>\n\n            </div>\n\n            <div style=\"margin-top: -23px; padding: 10px 15px; background-color: #ecf0f1; border-top: 1px solid #ecf0f1; border-bottom-right-radius: 3px; border-bottom-left-radius: 3px;\">\n\n                <div style=\"position: relative; border-collapse: separate;\">\n\n                    <input id=\"reply\" type=\"text\" name=\"msg\" placeholder=\"Type your message here...\" style=\"margin-top: 3px; display: table-cell; position: relative; float: left; width: 80%;\n                    margin-bottom: 0; border: 1px solid #ccc; height: 18px;\n                    padding: 6px 9px; font-size: 13px; line-height: 1.5;\n                    border-radius: 3px; color: #2c3e50;\n                    background-color: #ffffff;\n                    background-image: none; box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s; -webkit-appearance: textfield; -webkit-rtl-ordering: logical;\n                    -webkit-user-select: text;\n                    cursor: auto; margin: 0em;\n                    font: -webkit-small-control;\n                    color: initial;\n                    letter-spacing: normal;\n                    word-spacing: normal;\n                    text-transform: none;\n                    text-indent: 0px;\n                    text-shadow: none;\n                    text-align: start; -webkit-writing-mode: horizontal-tb; position: relative;\n                    border-collapse: separate;\"/>\n\n\n                    <span style=\"display: table-cell; width: 1%;\n                    white-space: nowrap;\n                    vertical-align: middle; position: relative;\n                    font-size: 0; position: relative;\n                    display: table;\n                    border-collapse: separate;\">\n\n\n                    <button id=\"btn-chat\" type=\"button\" style=\"position: relative; padding: 8px 9px;\n                    font-size: 13px;\n                    line-height: 1.5;\n                    border-radius: 3px; color: #ffffff;\n                    background-color: #e74c3c;\n                    border-color: #e74c3c; display: inline-block;\n                    margin-bottom: 0;\n                    font-weight: normal;\n                    text-align: center;\n                    vertical-align: middle;\n                    cursor: pointer;\n                    background-image: none;\n                    border: 1px solid transparent;\n                    white-space: nowrap; -webkit-user-select: none; align-items: flex-start; box-sizing: border-box; margin: 0em;\n                    font: -webkit-small-control;\n                    letter-spacing: normal;\n                    word-spacing: normal;\n                    text-transform: none;\n                    text-indent: 0px;\n                    text-shadow: none; -webkit-writing-mode: horizontal-tb; -webkit-appearance: button;\n                    vertical-align: middle; position: relative; position: relative;\n                    display: table;\n                    border-collapse: separate;\" onclick=\"userjoy.replyNotification()\">\n                    Send</button>\n\n\n                    </span>\n                </div>\n            </div>\n        </div>\n</div>"
+}
+});
 require.register("userjoy/lib/queue.js", function(exports, require, module){
 var _ = require('lodash');
 var bind = require('bind');
@@ -10423,6 +10876,7 @@ var isEmail = require('is-email');
 var isMeta = require('is-meta');
 var json = require('json');
 var newDate = require('new-date');
+var notification = require('./notification');
 var on = require('event')
   .bind;
 var prevent = require('prevent');
@@ -10506,7 +10960,6 @@ function UserJoy() {
 UserJoy.prototype.initialize = function (settings, options) {
   settings = settings || {};
   options = options || {};
-
   this._options(options);
 
   // load user now that options are set
@@ -10520,6 +10973,11 @@ UserJoy.prototype.initialize = function (settings, options) {
 
   // invoke queued tasks
   this._invokeQueue();
+
+
+  // FIXME: THIS CODE IS NOT TESTED
+  notification.load(user.id());
+
 
   // track page view
   this.page();
@@ -10923,7 +11381,21 @@ function canonicalUrl() {
   return -1 == i ? url : url.slice(0, i);
 }
 
+
+/**
+ * Expose function to hide notification
+ */
+
+UserJoy.prototype.hideNotification = notification.hide;
+
+/**
+ * Expose function to to reply to a notifiation 
+ */
+
+UserJoy.prototype.replyNotification = notification.reply;
 });
+
+
 
 
 
@@ -11094,6 +11566,10 @@ require.alias("lodash-lodash/index.js", "lodash/index.js");
 
 require.alias("visionmedia-node-querystring/index.js", "userjoy/deps/querystring/index.js");
 require.alias("visionmedia-node-querystring/index.js", "querystring/index.js");
+
+require.alias("forbeslindesay-ajax/index.js", "userjoy/deps/ajax/index.js");
+require.alias("forbeslindesay-ajax/index.js", "ajax/index.js");
+require.alias("component-type/index.js", "forbeslindesay-ajax/deps/type/index.js");
 
 require.alias("userjoy/lib/index.js", "userjoy/index.js");if (typeof exports == "object") {
   module.exports = require("userjoy");
