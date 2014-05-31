@@ -53,8 +53,6 @@ var jsFilesToInject = [
   'bower_components/lodash/dist/lodash.js',
   'bower_components/angular-lodash/angular-lodash.js',
   'bower_components/ng-table/ng-table.js',
-  // 'bower_components/angular-strap/dist/angular-strap.min.js',
-  // 'bower_components/angular-strap/dist/angular-strap.tpl.min.js',
   'bower_components/angular-animate/angular-animate.js',
   'bower_components/angular-sanitize/angular-sanitize.min.js',
   'bower_components/textAngular/dist/textAngular.min.js',
@@ -65,13 +63,7 @@ var jsFilesToInject = [
   'bower_components/colorpicker.js',
   'bower_components/angular-http-auth/src/http-auth-interceptor.js',
   'bower_components/angular-momentjs/angular-momentjs.js',
-  'bower_components/ngScrollSpy/dist/ngScrollSpy.js',
-  // 'bower_components/jquery/jquery.min.js',
-  // 'bower_components/bootstrap/dist/js/bootstrap.js',
-  // 'bower_components/angular-flash/dist/angular-flash.min.js',
-  // 'bower_components/lodash/dist/lodash.js',
-  // 'bower_components/textAngular/textAngular-sanitize.js',
-  // 'js/app/textAng.js',
+  'bower_components/n3-line-chart/dist/line-chart.min.js',
 
   // Bring in the socket.io client
   // 'js/sockets/socket.io.js',
