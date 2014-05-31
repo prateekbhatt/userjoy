@@ -13,6 +13,7 @@ var router = require('express')
  */
 
 var Conversation = require('../models/Conversation');
+var DailyReport = require('../models/DailyReport');
 var Event = require('../models/Event');
 var User = require('../models/User');
 
@@ -218,6 +219,70 @@ router
         res
           .status(200)
           .json(newEvents);
+
+      });
+
+  });
+
+
+/**
+ * GET /apps/:aid/users/:uid/scores
+ *
+ * @query {date} from from-unix-timestamp
+ * @query {date} to to-unix-timestamp
+ *
+ * Returns engagement scores, from from-timestamp to to-timestamp
+ *
+ * If from and to query params are not provided, then returns scores of the last
+ * 30 days
+ */
+
+router
+  .route('/:aid/users/:uid/scores')
+  .get(function (req, res, next) {
+
+    var aid = req.params.aid;
+    var uid = req.params.uid;
+    var cid;
+
+    var thirtyDaysAgo = moment()
+      .subtract('days', 30)
+      .unix();
+
+    var from = parseInt(req.query.from, 10);
+    var to = parseInt(req.query.to, 10);
+
+    // NOTE: multiplying by 1000 to convert from unix timestamp in seconds
+    // to milliseconds
+    thirtyDaysAgo = thirtyDaysAgo * 1000;
+    from = from * 1000;
+    to = to * 1000;
+
+    // default from timestamp is thirtyDaysAgo
+    from = validTimestamp(from) ? from : thirtyDaysAgo;
+
+    // default to timestamp is now
+    to = validTimestamp(to) ? to : Date.now();
+
+
+    logger.trace({
+      at: 'UserController:getScores',
+      params: req.params,
+      query: req.query,
+      valid: validTimestamp(req.query.from),
+      from: from,
+      to: to
+    });
+
+
+    DailyReport
+      .get('score', aid, uid, cid, from, to, function (err, scores) {
+
+        if (err) return next(err);
+
+        res
+          .status(200)
+          .json(scores);
 
       });
 

@@ -14,6 +14,7 @@ describe('Resource /apps/:aid/users', function () {
    * fixtures
    */
 
+  var DailyReportFixture = require('../../fixtures/DailyReportFixture');
   var EventFixture = require('../../fixtures/EventFixture');
 
 
@@ -254,6 +255,120 @@ describe('Resource /apps/:aid/users', function () {
             expect(res.body)
               .to.be.an("object")
               .that.is.empty;
+
+            done();
+          });
+
+      });
+
+
+  });
+
+
+  describe('GET /apps/:aid/users/:uid/scores', function () {
+
+    var aid, uid, testUrl;
+
+    before(function (done) {
+      aid = saved.apps.first._id;
+      uid = saved.users.first._id;
+      testUrl = '/apps/' + aid + '/users/' + uid + '/scores';
+      logoutUser(function (err) {
+        if (err) return done(err);
+
+        DailyReportFixture(aid, [uid], done);
+      });
+    });
+
+
+    it('should return error if not logged in', function (done) {
+
+      request
+        .get(testUrl)
+        .expect('Content-Type', /json/)
+        .expect(401)
+        .end(done);
+    });
+
+
+    it('logging in user', function (done) {
+      loginUser(done);
+    });
+
+
+    it('should return scores of last month by default',
+      function (done) {
+
+        request
+          .get(testUrl)
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function (err, res) {
+
+            if (err) return done(err);
+
+            expect(res.body)
+              .to.be.an("object");
+
+            expect(Object.keys(res.body)
+              .length)
+              .to.be.within(28, 31);
+
+            _.each(res.body, function (score, timestamp) {
+
+              expect(score)
+                .to.be.within(0, 100);
+
+              expect(moment(timestamp * 1000)
+                .isValid())
+                .to.be.true;
+
+            });
+
+            done();
+          });
+
+      });
+
+
+    it('should accept from and to timestamps as query params',
+      function (done) {
+
+        var to = moment()
+          .subtract('minutes', 10)
+          .unix();
+
+        var from = moment()
+          .subtract('days', 45)
+          .unix();
+
+        request
+          .get(testUrl + '/?from=' + from + '&to=' + to)
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function (err, res) {
+
+            if (err) return done(err);
+
+            expect(res.body)
+              .to.be.an("object");
+
+            expect(Object.keys(res.body)
+              .length)
+              .to.eql(45);
+
+            _.each(res.body, function (score, timestamp) {
+
+              expect(score)
+                .to.be.within(0, 100);
+
+              expect(moment(timestamp * 1000)
+                .isValid())
+                .to.be.true;
+            });
+
 
             done();
           });
