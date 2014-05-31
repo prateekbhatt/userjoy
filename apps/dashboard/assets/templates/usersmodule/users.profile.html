@@ -68,7 +68,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-5 col-md-5 col-md-offset-1">
+                <div class="col-sm-5 col-md-5 col-md-offset-2">
                     <div class="panel panel-default" style="height: 200px;">
                         <div class="panel-body">
                             <p> First Seen: {{user.firstSeen}}</p>
@@ -128,7 +128,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-5 col-md-5 col-md-offset-1">
+                <div class="col-sm-5 col-md-5 col-md-offset-2">
                     <div class="panel panel-default" style="height: 250px;">
                         <div class="panel-body">
                             <div class="container">
@@ -171,7 +171,7 @@
         </div>
         <div class="container">
             <div class="row">
-                <div class="col-sm-5 col-md-5">
+                <!-- <div class="col-sm-5 col-md-5">
                     <div class="panel panel-default" style="height: 250px;">
                         <div class="panel-body">
                             <div class="container">
@@ -181,17 +181,16 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-sm-5 col-md-5 col-md-offset-1">
+                </div> -->
+                <div class="col-sm-5 col-md-5">
                     <div class="panel panel-default" style="height: 250px;">
                         <div class="panel-body">
                             <div class="container">
                                 <div class="row">
                                     <em><h4><strong>Pulse</strong></h4></em>
-                                    <div class="col-md-4">
-                                        <!-- line chart is commented. Please FIX THIS #TODO -->
-                                        <!-- <nvd3-line-chart data="exampleData"  id="showXAxisExample" width="550" height="300" xAxisTickFormat="xAxisTickFormatFunction()" yAxisTickFormat="yAxisTickFormatFunction()" showXAxis="true" showYAxis="false"><svg></svg>
-                                        </nvd3-line-chart> -->
+                                    <div>
+                                        <nvd3-line-chart data="graphData"  id="showXAxisExample" width="450" height="200" xAxisTickFormat="xAxisTickFormatFunction()" yAxisTickFormat="yAxisTickFormatFunction()" showXAxis="true" showYAxis="false"><svg style="width: 150%;" height="250"></svg>
+                                        </nvd3-line-chart>
                                     </div>
                                 </div>
                             </div>

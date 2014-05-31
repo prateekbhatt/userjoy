@@ -44,8 +44,8 @@
     "angular-jquery": "~0.2.1"
   },
   "resolutions": {
-    "angular": "~1.2.15",
-    "d3": "~3.4.4",
+    "angular": "1.2.16",
+    "d3": "3.4.8",
     "nvd3": "~1.1.15-beta"
   }
 }

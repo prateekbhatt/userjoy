@@ -60,5 +60,14 @@ angular.module('models.user', ['services'])
                 })
                 .error(cb);
         }
+
+        this.getEngagementScore = function (appId, uid, fromScoreTime, toScoreTime, cb) {
+            $http.get(config.apiUrl + '/apps/' + appId + '/users/' + uid + '/scores?from=' + fromScoreTime + '&to=' + toScoreTime)
+                .success(function(data){
+                    console.log("success getting scores --- >>>>", data);
+                    cb(null, data);
+                })
+                .error(cb);
+        }
     }
 ]);
