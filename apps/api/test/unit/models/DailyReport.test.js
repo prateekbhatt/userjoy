@@ -510,7 +510,7 @@ describe('Model DailyReport', function () {
     });
 
 
-    it('should #get the reports', function (done) {
+    it('should get the usage', function (done) {
 
       var to = moment();
 
@@ -519,7 +519,8 @@ describe('Model DailyReport', function () {
 
       var noOfDays = to.diff(from, 'days');
 
-      DailyReport.get(aid, uid, undefined, from.format(), to.format(),
+      var type = 'usage';
+      DailyReport.get(type, aid, uid, undefined, from.format(), to.format(),
         function (err, data) {
 
           expect(err)
@@ -554,13 +555,46 @@ describe('Model DailyReport', function () {
 
         var noOfDays = to.diff(from, 'days');
 
-        DailyReport.get(aid, uid, undefined, from.format(), to.format(),
+        var type = 'usage';
+
+        DailyReport.get(type, aid, uid, undefined, from.format(), to.format(),
           function (err, data) {
 
             expect(err)
               .to.exist
               .and.to.have.property('message')
-              .that.equals('Currently not allowed to get data more than two months wide');
+              .that.equals(
+                'Currently not allowed to get data more than two months wide'
+            );
+
+            done();
+          })
+
+      });
+
+
+    it(
+      'should return error if type is not one of usage / score',
+      function (done) {
+
+        var to = moment();
+
+        var from = moment()
+          .subtract('days', 65);
+
+        var noOfDays = to.diff(from, 'days');
+
+        var type = 'usageRandom';
+
+        DailyReport.get(type, aid, uid, undefined, from.format(), to.format(),
+          function (err, data) {
+
+            expect(err)
+              .to.exist
+              .and.to.have.property('message')
+              .that.equals(
+                'type must be one of usage / score'
+            );
 
             done();
           })
