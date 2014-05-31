@@ -185,6 +185,7 @@ DailyReportSchema.statics.upsert = function (aid, uid, cid, timestamp,
 /**
  * NOTE: Does not allow fetching data which is more than two months wide
  *
+ * @param {string} type must be one of usage / score
  * @param {string} aid app-id
  * @param {string} uid user-id
  * @param {string} cid company-id
@@ -193,7 +194,16 @@ DailyReportSchema.statics.upsert = function (aid, uid, cid, timestamp,
  * @param {function} cb callback
  */
 
-DailyReportSchema.statics.get = function (aid, uid, cid, from, to, cb) {
+DailyReportSchema.statics.get = function (type, aid, uid, cid, from, to, cb) {
+
+  if (!_.contains(['score', 'usage'], type)) {
+    return cb(new Error('type must be one of usage / score'))
+  }
+
+
+  // if type is usage, then return du_ values else if type is score, return ds_ values
+  var keyShouldStartWith = type === 'usage' ? 'du_' : 'ds_';
+
 
   from = moment(from);
   to = moment(to);
@@ -258,7 +268,7 @@ DailyReportSchema.statics.get = function (aid, uid, cid, from, to, cb) {
           var data = {};
 
           _.each(r, function (val, key) {
-            var startsWith = key.indexOf('du_') === 0;
+            var startsWith = key.indexOf(keyShouldStartWith) === 0;
             var date;
             var time;
 
@@ -266,7 +276,7 @@ DailyReportSchema.statics.get = function (aid, uid, cid, from, to, cb) {
             // filter data if key starts with 'du_'
             if (startsWith) {
 
-              date = key.split('du_')[1];
+              date = key.split(keyShouldStartWith)[1];
               time = moment([year, month, date])
                 .unix();
 
