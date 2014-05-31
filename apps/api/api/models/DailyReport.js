@@ -182,6 +182,117 @@ DailyReportSchema.statics.upsert = function (aid, uid, cid, timestamp,
 };
 
 
+/**
+ * NOTE: Does not allow fetching data which is more than two months wide
+ *
+ * @param {string} aid app-id
+ * @param {string} uid user-id
+ * @param {string} cid company-id
+ * @param {date} from from-timestamp
+ * @param {date} to to-timestamp
+ * @param {function} cb callback
+ */
+
+DailyReportSchema.statics.get = function (aid, uid, cid, from, to, cb) {
+
+  from = moment(from);
+  to = moment(to);
+
+  if (!from.isValid() || !to.isValid()) {
+    return cb(new Error('Provide valid from/to timestamps'));
+  }
+
+  var monthDiff = to.diff(from, 'month');
+
+  if (monthDiff > 1) {
+    return cb(new Error(
+      'Currently not allowed to get data more than two months wide'));
+  }
+
+  var fromYear = from.year();
+  var fromMonth = from.month();
+  var fromUnix = from.unix();
+
+  var toYear = to.year();
+  var toMonth = to.month();
+  var toUnix = to.unix();
+
+  var timeConditions = [
+
+    {
+      y: fromYear,
+      m: fromMonth
+    },
+
+    {
+      y: toYear,
+      m: toMonth
+    }
+
+  ];
+
+
+  var conditions = {
+    aid: aid,
+    uid: uid,
+    $or: timeConditions
+  };
+
+
+  if (cid) conditions.cid = cid;
+
+
+  DailyReport
+    .find(conditions)
+    .exec(function (err, reports) {
+
+      if (err) return cb(err);
+
+      reports = _.chain(reports)
+        .map(function (r) {
+
+          r = r.toJSON();
+
+          var year = r.y;
+          var month = r.m;
+          var data = {};
+
+          _.each(r, function (val, key) {
+            var startsWith = key.indexOf('du_') === 0;
+            var date;
+            var time;
+
+
+            // filter data if key starts with 'du_'
+            if (startsWith) {
+
+              date = key.split('du_')[1];
+              time = moment([year, month, date])
+                .unix();
+
+              // filter data between the 'from' and the 'to' times
+              if (time >= fromUnix && time <= toUnix) {
+                data[time] = val;
+              }
+
+            }
+
+          });
+
+          return data;
+        })
+        .reduce(function (result, val, key) {
+          _.assign(result, val);
+          return result;
+        }, {})
+        .value();
+
+      cb(err, reports);
+    });
+
+};
+
+
 
 var DailyReport = mongoose.model('DailyReport', DailyReportSchema);
 
