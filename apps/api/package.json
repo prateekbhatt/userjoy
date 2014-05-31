@@ -23,7 +23,7 @@
     "lodash": "^2.4.1",
     "method-override": "^1.0.0",
     "moment": "^2.5.1",
-    "mongoose": "^3.8.8",
+    "mongoose": "^3.8.11",
     "mongoose-troop": "0.0.8",
     "mongoose-validator": "^0.2.2",
     "morgan": "~1.0.0",

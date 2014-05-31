@@ -22,7 +22,7 @@ describe('Worker automessageConsumer', function () {
    * Workers
    */
 
-  var worker = require('../../workers/automessageConsumer');
+  var worker = require('../../workers/automessage-consumer');
 
 
   /**
