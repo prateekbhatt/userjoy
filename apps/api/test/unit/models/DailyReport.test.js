@@ -16,16 +16,21 @@ describe('Model DailyReport', function () {
   var DailyReport = require('../../../api/models/DailyReport');
 
   var randomId = mongoose.Types.ObjectId;
+  var aid, uid, cid;
 
 
   before(function (done) {
-    setupTestDb(done);
+    setupTestDb(function (err) {
+      if (err) return done(err);
+      aid = saved.users.first.aid;
+      uid = saved.users.first._id;
+      done();
+    });
   });
 
 
   describe('#upsert', function () {
 
-    var aid, uid, cid;
     var time = moment();
     var year = time.year();
     var month = time.month();
@@ -35,10 +40,6 @@ describe('Model DailyReport', function () {
     var score = 65;
     var usage = 155;
 
-    before(function () {
-      aid = saved.users.first.aid;
-      uid = saved.users.first._id;
-    });
 
     it('should create new document if it does not exist', function (done) {
 
@@ -471,6 +472,104 @@ describe('Model DailyReport', function () {
         done();
 
       });
+
+
   });
+
+
+  describe('#get', function () {
+
+    before(function (done) {
+
+      var thisMonth = moment()
+        .format();
+
+      var lastMonth = moment()
+        .subtract('month', 1)
+        .format();
+
+      var score = 54;
+
+      var usage = 432;
+
+      async.series([
+
+        function oneMonth(cb) {
+          DailyReport.upsert(aid, uid, cid, thisMonth, score, usage,
+            cb);
+        },
+
+        function secondMonth(cb) {
+          DailyReport.upsert(aid, uid, cid, lastMonth, score, usage,
+            cb);
+        }
+
+      ], done)
+
+
+    });
+
+
+    it('should #get the reports', function (done) {
+
+      var to = moment();
+
+      var from = moment()
+        .subtract('month', 1);
+
+      var noOfDays = to.diff(from, 'days');
+
+      DailyReport.get(aid, uid, undefined, from.format(), to.format(),
+        function (err, data) {
+
+          expect(err)
+            .to.not.exist;
+
+          expect(data)
+            .to.be.an('object');
+
+          expect(Object.keys(data)
+            .length)
+            .to.eql(noOfDays);
+
+          expect(data)
+            .to.have.property(to.startOf('day')
+              .unix()
+              .toString());
+
+          done();
+        })
+
+    });
+
+
+    it(
+      'should return error if more than two months diff between to and from timestamps',
+      function (done) {
+
+        var to = moment();
+
+        var from = moment()
+          .subtract('days', 65);
+
+        var noOfDays = to.diff(from, 'days');
+
+        DailyReport.get(aid, uid, undefined, from.format(), to.format(),
+          function (err, data) {
+
+            expect(err)
+              .to.exist
+              .and.to.have.property('message')
+              .that.equals('Currently not allowed to get data more than two months wide');
+
+            done();
+          })
+
+      });
+
+
+  });
+
+
 
 });
