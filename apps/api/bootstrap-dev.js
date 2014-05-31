@@ -33,8 +33,9 @@ function bootstrapDevDB(cb) {
   var loadFixtures = require('./test/fixtures');
   var createUsers = require('./test/fixtures/UserFixture');
   var createEvents = require('./test/fixtures/EventFixture');
+  var createDailyReports = require('./test/fixtures/DailyReportFixture');
 
-
+  var saved; // saved data in the main fixture
   var savedAccount = {};
   var savedApp = {};
   var userIds = [];
@@ -53,11 +54,12 @@ function bootstrapDevDB(cb) {
 
         console.log('loading account, app fixtures ...');
 
-        loadFixtures(function (err, saved) {
+        loadFixtures(function (err, sav) {
           if (err) return cb(err);
-          savedAccount = saved.accounts.first;
-          savedApp = saved.apps.first;
-          savedUser = saved.users.second;
+          saved = sav;
+          savedAccount = sav.accounts.first;
+          savedApp = sav.apps.first;
+          savedUser = sav.users.second;
           aid = savedApp._id;
           cb();
         });
@@ -68,7 +70,7 @@ function bootstrapDevDB(cb) {
 
         console.log('loading user fixtures ...');
 
-        createUsers(aid, 1000, function (err, uids) {
+        createUsers(aid, 100, function (err, uids) {
           if (err) return cb(err);
           userIds = uids;
           userIds.push(savedUser._id);
@@ -82,6 +84,14 @@ function bootstrapDevDB(cb) {
         console.log('loading event fixtures ...');
 
         createEvents(aid, userIds, 10000, cb);
+      },
+
+
+      createReports: function (cb) {
+
+        console.log('loading daily report fixtures ...');
+
+        createDailyReports(aid, userIds, cb);
       }
 
     },
