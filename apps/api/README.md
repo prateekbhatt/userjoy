@@ -98,8 +98,8 @@ App           | team                    | apps belonging to an account
 AutoMessage   |                         | automated messages
 Company       |                         | companies of a specific account
 Conversation  |                         | conversation threads between users and accounts
+DailyReport   |                         | the score, usage of a user for a specific company (monthly)
 Event         | meta (metadata)         | events belonging to a user
-Health        |                         | the healthscore of a user for a specific company
 Invite        |                         | tokens of team members that have been invited to use an app
 Message       |                         | messages between users and accounts
 Notification  |                         | notifications to be shown to the user (only auto)
@@ -220,18 +220,23 @@ UserNote      |                         | notes created by team members about a 
 - ut
 
 
-### Health
+### DailyReport
 
 ##### Columns:
 
 - aid
 - cid
 - ct
-- h
+- ds_{{date}} (score in the day, e.g. "du_23: 43")
+- du_{{date}} (usage in minutes for the day, e.g. "du_23: 455")
+- y (year: 2014-2100)
+- m (month: 1-100)
 - uid
 
 ##### Notes:
 
+- We upsert the usage / score data on a monthly basis. Only one document per user-company per month.
+Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Usage / score default to 0
 - Cron job should update a user's health score daily for each company that he belongs to
 - Storing data in this manner will allow us to visualize the trend in an user's health over a period of time
 

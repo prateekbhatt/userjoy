@@ -4,6 +4,7 @@
 
 var async = require('async');
 var faker = require('Faker');
+var moment = require('moment');
 var mongoose = require('mongoose');
 
 
@@ -81,7 +82,9 @@ function createEvent(aid, uid, cb) {
   var fakeEvent = {
     aid: aid,
     cid: randomId(),
-    uid: uid
+    uid: uid,
+    ct: moment().subtract('minutes', Math.floor(Math.random() * 100000))
+      .format()
   };
 
   fakeEvent.type = randomFromArray(eventTypes);

@@ -74,7 +74,8 @@ var EventSchema = new Schema({
 
   // created at
   ct: {
-    type: Date
+    type: Date,
+    default: Date.now
   },
 
 
@@ -108,20 +109,6 @@ var EventSchema = new Schema({
     required: [true, 'Invalid uid']
   }
 
-});
-
-
-/**
- * Adds updated (ut) timestamps
- * Created timestamp (ct) is added by default
- *
- * Difference between the created and updated timestamps would equal the event
- * time
- */
-
-EventSchema.pre('save', function (next) {
-  this.ct = new Date;
-  next();
 });
 
 
