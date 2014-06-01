@@ -235,6 +235,8 @@ router
 /**
  * POST /apps/:aid/conversations
  *
+ * NOTE: Only emails can be sent by manual messages now, notifications are not allowed
+ *
  * Creates a new conversation, a new message and sends message to user
  */
 
@@ -256,6 +258,10 @@ router
       return res.badRequest('Missing body/sub/type/uids');
     }
 
+    // NOTE: only emails can be sent through manual messages now
+    if (newMsg.type !== 'email') {
+      return res.badRequest('Only emails can be sent through manual messages');
+    }
 
     if (!_.isArray(uids) || _.isEmpty(uids)) {
       return res.badRequest('Provide atleast on user id in the uids array');
