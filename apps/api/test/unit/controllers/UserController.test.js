@@ -209,16 +209,9 @@ describe('Resource /apps/:aid/users', function () {
 
             var startOfDay = Object.keys(res.body)[0];
 
-            // expect the first key of the object to contain events from today's date
-            expect(startOfDay)
-              .to.equal((moment()
-                  .startOf('day')
-                  .unix())
-                .toString());
-
             expect(res.body[startOfDay])
               .to.be.an("array")
-              .and.to.have.length(20);
+              .and.to.have.length.above(0);
 
             // the event meta data should be in the form of an object
             _.each(res.body[startOfDay], function (e) {
@@ -336,15 +329,13 @@ describe('Resource /apps/:aid/users', function () {
       function (done) {
 
         var to = moment()
-          .subtract('minutes', 10)
-          .unix();
+          .subtract('minutes', 10);
 
         var from = moment()
-          .subtract('days', 45)
-          .unix();
+          .subtract('days', 28);
 
         request
-          .get(testUrl + '/?from=' + from + '&to=' + to)
+          .get(testUrl + '/?from=' + from.unix() + '&to=' + to.unix())
           .set('cookie', loginCookie)
           .expect('Content-Type', /json/)
           .expect(200)
@@ -357,7 +348,7 @@ describe('Resource /apps/:aid/users', function () {
 
             expect(Object.keys(res.body)
               .length)
-              .to.eql(45);
+              .to.eql(28);
 
             _.each(res.body, function (score, timestamp) {
 
