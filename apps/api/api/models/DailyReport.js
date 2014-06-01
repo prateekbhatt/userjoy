@@ -183,7 +183,7 @@ DailyReportSchema.statics.upsert = function (aid, uid, cid, timestamp,
 
 
 /**
- * NOTE: Does not allow fetching data which is more than two months wide
+ * NOTE: Does not allow fetching data which is more than 28 days wide
  *
  * @param {string} type must be one of usage / score
  * @param {string} aid app-id
@@ -212,12 +212,14 @@ DailyReportSchema.statics.get = function (type, aid, uid, cid, from, to, cb) {
     return cb(new Error('Provide valid from/to timestamps'));
   }
 
-  var monthDiff = to.diff(from, 'month');
+  var dayDiff = to.diff(from, 'day');
 
-  if (monthDiff > 1) {
+  if (dayDiff > 28) {
+
     return cb(new Error(
-      'Currently not allowed to get data more than two months wide'));
+      'Currently not allowed to get data more than 28 days wide'));
   }
+
 
   var fromYear = from.year();
   var fromMonth = from.month();
@@ -288,7 +290,6 @@ DailyReportSchema.statics.get = function (type, aid, uid, cid, from, to, cb) {
             }
 
           });
-
           return data;
         })
         .reduce(function (result, val, key) {
