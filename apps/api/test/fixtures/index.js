@@ -22,7 +22,6 @@ var App = require('../../api/models/App');
 var AutoMessage = require('../../api/models/AutoMessage');
 var Conversation = require('../../api/models/Conversation');
 var Invite = require('../../api/models/Invite');
-var Message = require('../../api/models/Message');
 var Notification = require('../../api/models/Notification');
 var Segment = require('../../api/models/Segment');
 var User = require('../../api/models/User');
@@ -93,6 +92,12 @@ var accounts = {
     first: {
       assignee: null,
       aid: null,
+      messages: [{
+        body: 'Hello World',
+        from: 'user',
+        sName: 'Prateek',
+        type: 'email'
+      }],
       sub: 'First Conversation!',
       uid: ObjectId()
     },
@@ -100,37 +105,16 @@ var accounts = {
     second: {
       assignee: null,
       aid: null,
+      messages: [{
+        body: 'Hello World 2',
+        from: 'account',
+        sName: 'Prateek2',
+        type: 'notification'
+      }],
       closed: true,
       sub: 'First Conversation!',
       toRead: true,
       uid: ObjectId()
-    }
-  },
-
-  messages = {
-
-    first: {
-      accid: null,
-      aid: null,
-      body: 'Hello World',
-      coId: null,
-      from: 'user',
-      sName: 'Prateek Bhatt',
-      sub: 'New Subject',
-      type: 'email',
-      uid: ObjectId(),
-    },
-
-    second: {
-      accid: null,
-      aid: null,
-      body: 'Hello World',
-      coId: null,
-      from: 'user',
-      sName: 'Prateek Bhatt',
-      sub: 'New Subject',
-      type: 'email',
-      uid: ObjectId(),
     }
   };
 
@@ -256,16 +240,6 @@ function createConversation(accid, aid, uid, con, fn) {
   con.assignee = accid;
   con.uid = uid;
   Conversation.create(con, fn);
-}
-
-function createMessage(accid, aid, coId, uid, message, fn) {
-
-  message.accid = accid;
-  message.aid = aid;
-  message.coId = coId;
-  message.uid = uid;
-  Message.create(message, fn);
-
 }
 
 
@@ -407,38 +381,6 @@ module.exports = function loadFixtures(callback) {
       });
     },
 
-    createFirstMessage: function (cb) {
-
-      var aid = apps.first._id;
-      var accid = accounts.first._id;
-      var coId = conversations.first._id;
-      var uid = users.first._id;
-      var message = messages.first;
-
-      createMessage(accid, aid, coId, uid, message, function (err, msg) {
-        if (err) return cb(err);
-        messages.first = msg;
-        cb();
-      });
-
-    },
-
-    createSecondMessage: function (cb) {
-
-      var aid = apps.first._id;
-      var accid = accounts.first._id;
-      var coId = conversations.first._id;
-      var uid = users.first._id;
-      var message = messages.second;
-
-      createMessage(accid, aid, coId, uid, message, function (err, msg) {
-        if (err) return cb(err);
-        messages.second = msg;
-        cb();
-      });
-
-    },
-
 
     createFirstSegment: function (cb) {
 
@@ -566,7 +508,6 @@ module.exports = function loadFixtures(callback) {
       automessages: automessages,
       conversations: conversations,
       invites: invites,
-      messages: messages,
       notifications: notifications,
       segments: segments,
       users: users,

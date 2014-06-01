@@ -35,9 +35,9 @@ describe('Resource /mandrill', function () {
    */
 
   beforeEach(function () {
-    parentMessageId = saved.messages.first._id;
+    parentMessageId = saved.conversations.first.messages[0]._id;
     conversationId = saved.conversations.first._id;
-    aid = saved.apps.first.team[0]._id;
+    aid = saved.conversations.first.aid;
 
     var replyToEmail = aid +
       '+' +
@@ -46,7 +46,7 @@ describe('Resource /mandrill', function () {
 
 
     var newMessageToEmail = aid + '@mail.userjoy.co';
-    var savedMessageId = saved.messages.first._id;
+    var savedMessageId = parentMessageId;
 
 
     // create reply event
@@ -266,31 +266,83 @@ describe('Resource /mandrill', function () {
 
     it('should create reply', function (done) {
 
-      event.processReply.call(event, function (err, savedReply) {
+      async.series(
 
-        expect(err)
-          .to.not.exist;
 
-        expect(savedReply)
-          .to.not.be.empty;
+        [
 
-        expect(savedReply.coId)
-          .to.eql(conversationId);
 
-        expect(savedReply.from)
-          .to.eql('user');
+          function before(cb) {
 
-        expect(savedReply.type)
-          .to.eql('email');
+            Conversation.findById(conversationId, function (err, con) {
 
-        expect(savedReply.sent)
-          .to.eql(true);
+              expect(con.messages)
+                .to.have.length(2);
 
-        expect(savedReply.body)
-          .to.eql(replyEvent.msg.text);
+              cb();
+            });
 
-        done();
-      })
+          },
+
+
+          function test(cb) {
+
+
+            event.processReply.call(event, function (err, con) {
+
+              expect(err)
+                .to.not.exist;
+
+              expect(con._id)
+                .to.eql(conversationId);
+
+              var savedReply = _.last(con.messages);
+
+              expect(savedReply)
+                .to.not.be.empty;
+
+              expect(savedReply.from)
+                .to.eql('user');
+
+              expect(savedReply.type)
+                .to.eql('email');
+
+              expect(savedReply.sent)
+                .to.eql(true);
+
+              expect(savedReply.body)
+                .to.eql(replyEvent.msg.text);
+
+              cb();
+            })
+
+          },
+
+
+          function after(cb) {
+
+            Conversation.findById(conversationId, function (err, con) {
+
+              expect(con.messages)
+                .to.have.length(3);
+
+              cb();
+            });
+
+          },
+
+        ],
+
+        done
+
+      )
+
+
+
+
+
+
+
     });
 
 
@@ -318,7 +370,6 @@ describe('Resource /mandrill', function () {
   describe('Event#processNewMessage', function () {
 
     var event;
-    var savedNewMessage;
 
     before(function () {
       event = new Event(newMessageEvent);
@@ -327,53 +378,41 @@ describe('Resource /mandrill', function () {
 
     it('should create new message', function (done) {
 
-      event.processNewMessage.call(event, function (err, savedMessage) {
+      event.processNewMessage.call(event, function (err, con) {
 
         expect(err)
           .to.not.exist;
 
-        expect(savedMessage)
+        expect(con)
           .to.not.be.empty;
 
-        savedNewMessage = savedMessage;
+        expect(con.messages)
+          .to.be.an('array')
+          .that.is.not.empty;
 
-        expect(savedMessage)
-          .to.have.property("coId");
+        expect(con)
+          .to.have.property("toRead", true);
 
-        expect(savedMessage)
+        var savedNewMessage = con.messages[0];
+
+        expect(savedNewMessage)
+          .to.have.property("_id");
+
+        expect(savedNewMessage)
           .to.have.property("from", "user");
 
-        expect(savedMessage)
+        expect(savedNewMessage)
           .to.have.property("type", "email");
 
-        expect(savedMessage)
+        expect(savedNewMessage)
           .to.have.property("sent", true);
 
-        expect(savedMessage)
+        expect(savedNewMessage)
           .to.have.property("body", newMessageEvent.msg.text);
 
         done();
       })
     });
-
-    // this test depends on the previous test
-    it('should create new Conversation with toRead status as true',
-      function (done) {
-
-        Conversation
-          .findById(savedNewMessage.coId)
-          .exec(function (err, con) {
-
-            expect(err)
-              .to.not.exist;
-
-            expect(con)
-              .to.have.property("toRead", true);
-
-            done();
-          });
-
-      });
 
   });
 

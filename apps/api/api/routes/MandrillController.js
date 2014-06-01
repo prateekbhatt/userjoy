@@ -24,7 +24,6 @@ var logger = require('../../helpers/logger');
 var Account = require('../models/Account');
 var App = require('../models/App');
 var Conversation = require('../models/Conversation');
-var Message = require('../models/Message');
 var User = require('../models/User');
 
 
@@ -88,27 +87,21 @@ Event.prototype.createMessage = function (cb) {
 
   var self = this;
 
-  var newMessage = {
-
-    accid: self.accid,
-    aid: self.aid,
-    ct: self.ct,
-    coId: self.coId,
-    from: 'user',
-    sent: true,
-    sName: self.fromName,
-    sub: self.subject,
+  var reply = {
 
     // TODO: remove previous messages from body before saving
     // body: removeQuotedText(toEmail, message.msg.body),
     body: self.body,
 
+    ct: self.ct,
+    from: 'user',
+    sent: true,
+    sName: self.fromName,
     type: 'email',
-    uid: self.uid
 
   };
 
-  Message.create(newMessage, cb);
+  Conversation.reply(self.aid, self.coId, reply, cb);
 
 };
 
@@ -242,6 +235,23 @@ Event.prototype.processNewMessage = function (cb) {
           accId: self.accid,
           aid: self.aid,
           ct: self.ct,
+          messages: [
+
+            {
+
+              // TODO: remove previous messages from body before saving
+              // body: removeQuotedText(toEmail, message.msg.body),
+              body: self.body,
+
+              ct: self.ct,
+              from: 'user',
+              sent: true,
+              sName: self.fromName,
+              type: 'email',
+
+            }
+
+          ],
           sub: self.subject,
           toRead: true,
           uid: self.uid
@@ -250,13 +260,8 @@ Event.prototype.processNewMessage = function (cb) {
         Conversation.create(newConv, function (err, con) {
           if (err) return cb(err);
           self.coId = con._id;
-          cb();
+          cb(err, con);
         });
-      },
-
-
-      function createMessage(cb) {
-        self.createMessage.call(self, cb);
       }
 
     ],
@@ -343,15 +348,15 @@ function processMandrillEvents(events, cb) {
       }
 
       if (type === 'send') {
-        return Message.sent(mId, cb);
+        return Conversation.sent(mId, cb);
       }
 
       if (type === 'open') {
-        return Message.opened(mId, cb);
+        return Conversation.opened(mId, cb);
       }
 
       if (type === 'click') {
-        return Message.clicked(mId, cb);
+        return Conversation.clicked(mId, cb);
       }
 
       cb(new Error('Event type ' + type + ' not found'));
