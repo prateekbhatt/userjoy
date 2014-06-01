@@ -470,6 +470,31 @@ describe('Resource /apps/:aid/conversations', function () {
 
       });
 
+    it('should return error if message is not of email type',
+
+      function (done) {
+
+        var newMessage = {
+          body: 'random body',
+          sub: 'random sub',
+          type: 'notification',
+          uids: [randomId()]
+        };
+
+        request
+          .post(basePath)
+          .set('cookie', loginCookie)
+          .send(newMessage)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            status: 400,
+            error: 'Only emails can be sent through manual messages'
+          })
+          .end(done);
+
+      });
+
     it('should create new conversation with message',
 
       function (done) {
