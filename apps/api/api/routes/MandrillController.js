@@ -161,7 +161,7 @@ Event.prototype.getOrCreateUser = function (cb) {
     ct: self.ct
   };
 
-  User.getOrCreate(aid, newUser, cb);
+  User.findOrCreate(aid, newUser, cb);
 };
 
 

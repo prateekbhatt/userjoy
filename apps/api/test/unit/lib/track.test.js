@@ -1,4 +1,4 @@
-describe('Lib event', function () {
+describe('Lib track', function () {
 
   /**
    * Lib
@@ -249,34 +249,34 @@ describe('Lib event', function () {
     });
 
     // beforeEach(function () {
-    //   spy = sinon.spy(User, 'getOrCreate');
+    //   spy = sinon.spy(User, 'findOrCreate');
     // });
 
     // afterEach(function () {
-    //   User.getOrCreate.restore();
+    //   User.findOrCreate.restore();
     // });
 
-    it('should not call User.getOrCreate if uid exists',
+    it('should not call User.findOrCreate if uid exists',
       function (done) {
 
-        spy = sinon.spy(User, 'getOrCreate');
+        spy = sinon.spy(User, 'findOrCreate');
         demoEvent.uid = 'randomUId';
 
         demoEvent._checkOrCreateUser(function (err) {
           expect(spy)
             .not.to.be.called;
 
-          User.getOrCreate.restore();
+          User.findOrCreate.restore();
 
           done();
         });
 
       });
 
-    it('should call User.getOrCreate if uid does not exist',
+    it('should call User.findOrCreate if uid does not exist',
       function (done) {
 
-        spy = sinon.spy(User, 'getOrCreate');
+        spy = sinon.spy(User, 'findOrCreate');
         demoEvent.uid = null;
 
         demoEvent._checkOrCreateUser(function (err) {
@@ -286,7 +286,7 @@ describe('Lib event', function () {
           expect(spy)
             .to.have.been.calledWith(demoEvent.app._id);
 
-          User.getOrCreate.restore();
+          User.findOrCreate.restore();
 
           done();
         });

@@ -10,9 +10,8 @@
 var _ = require('lodash');
 var async = require('async');
 var mongoose = require('mongoose');
-var troop = require('mongoose-troop');
 var validate = require('mongoose-validator')
-    .validate;
+  .validate;
 
 var Schema = mongoose.Schema;
 
@@ -22,6 +21,7 @@ var Schema = mongoose.Schema;
  */
 
 var metadata = require('../../helpers/metadata');
+var logger = require('../../helpers/logger');
 
 
 /**
@@ -101,6 +101,12 @@ var UserSchema = new Schema({
   },
 
 
+  firstSessionAt: {
+    type: Date,
+    default: Date.now
+  },
+
+
   healthScore: {
     type: Number
   },
@@ -158,6 +164,11 @@ var UserSchema = new Schema({
   },
 
 
+  ut: {
+    type: Date,
+    default: Date.now
+  },
+
 
   // billing data is stored in both company and user models
   billing: {
@@ -195,13 +206,13 @@ var UserSchema = new Schema({
 
 
 /**
- * Adds firstSessionAt and ut timestamps
+ * Adds ut timestamps
+ * Created timestamp (ct) is added by default
  */
 
-UserSchema.plugin(troop.timestamp, {
-  createdPath: 'firstSessionAt',
-  modifiedPath: 'ut',
-  useVirtual: false
+UserSchema.pre('save', function (next) {
+  this.ut = new Date;
+  next();
 });
 
 
@@ -213,15 +224,45 @@ UserSchema.plugin(troop.timestamp, {
  * @param {Function} callback function
  */
 
-UserSchema.statics.getOrCreate = function (aid, user, cb) {
+UserSchema.statics.findOrCreate = function (aid, user, cb) {
 
+  var billingStatus = user.billing ? user.billing.status : null;
+  var companies = user.companies || [];
   var email = user.email;
   var user_id = user.user_id;
-  var query = {};
+  var conditions = {};
 
+
+
+  //// VALIDATIONS : START ////
+
+  // if no user identifier provided, return error
   if (!(email || user_id)) {
     return cb(new Error('Please send user_id or email to identify user'));
   }
+
+
+  // if invalid billing status provided, return error
+  if (billingStatus && !_.contains(['trial', 'free', 'paying', 'cancelled'],
+    billingStatus)) {
+
+    return cb(new Error(
+      "Billing status must be one of 'trial', 'free', 'paying' or 'cancelled'"
+    ));
+  }
+
+
+  // if company cid not provided, return error
+  for (var i = 0, len = companies.length; i < len; i++) {
+    if (!companies[i].cid) {
+      return cb(new Error('Please send company cid'));
+    }
+  }
+
+  //// VALIDATIONS : END ////
+
+
+
 
   // add aid to user
   user.aid = aid;
@@ -230,44 +271,24 @@ UserSchema.statics.getOrCreate = function (aid, user, cb) {
   user.meta = metadata.toArray(user.meta);
 
   // aid to query
-  query.aid = aid;
+  conditions.aid = aid;
 
   // add user_id or email to query
   if (user_id) {
-    query.user_id = user_id;
+    conditions.user_id = user_id;
   } else {
-    query.email = email;
+    conditions.email = email;
   }
 
+  var update = {
+    $setOnInsert: user
+  };
 
-  User
-    .findOne(query)
-    .exec(function (err, usr) {
+  var options = {
+    upsert: true
+  };
 
-      if (err) return cb(err);
-
-      if (usr) return cb(null, usr);
-
-      // user not found, create new user
-      User
-        .create(user, function (err, usr2) {
-
-          if (err) {
-            if (err.message === 'Validation failed') {
-              if (err.errors['billing.status']) {
-                return cb(new Error(err.errors['billing.status'].message));
-              }
-            }
-            return cb(err);
-          }
-
-          if (!usr2) return cb(new Error('Error while creating user'));
-
-          cb(null, usr2);
-
-        });
-
-    });
+  User.findOneAndUpdate(conditions, update, options, cb);
 
 };
 
