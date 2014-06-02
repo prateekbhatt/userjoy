@@ -28,7 +28,6 @@ var app = angular.module('dodatado', [
     'http-auth-interceptor',
     'angular-momentjs',
     'do.automate',
-    'n3-line-chart',
 ])
 
 

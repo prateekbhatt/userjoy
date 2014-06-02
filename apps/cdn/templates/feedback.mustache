@@ -1,0 +1,41 @@
+<div>
+    <a style="cursor: pointer" onclick="userjoy.showFeedback()">
+        <div style="position: fixed; bottom:30px; right:20px;">
+            <span style="display: inline-block;
+            min-width: 20px;
+            padding: 10px 14px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1;
+            vertical-align: baseline;
+            white-space: nowrap;
+            text-align: center;
+            background-color: #5bc0de;
+            border-radius: 10px;">&#63;
+            </span>
+        </div>
+    </a>
+    <div style="display: none" id="feedback">
+        <div style="bottom: 80px; position: fixed; right: 9px;" class="col-md-4">
+            <div class="panel panel-default" style="border-color: #ddd;">
+                <div class="panel-heading">
+                    <h3 class="panel-title" style="text-align: center;">Send us a Message</h3>
+                    <button type="button" class="close" aria-hidden="true" onclick="userjoy.hideFeedback()" id="closeFeedback" style="margin-top: -25px;">&times;</button>
+                </div>
+                <div class="panel-body">
+                    <form role="form">
+                        <textarea class="form-control" style="padding: 4px; height: 150px;"></textarea>
+                        <br>
+                        <input type="submit" value="Send Message" class="btn btn-sm btn-info btn-block" style="float: right;">
+                        <hr>
+                        <div style="text-align: center;">
+                        <small>Powered by <a href="http://www.userjoy.co">UserJoy</a></small>
+                        </div>
+                    </form>
+                </div>
+                <div class="arrow"></div>
+            </div>
+        </div>
+    </div>
+</div>

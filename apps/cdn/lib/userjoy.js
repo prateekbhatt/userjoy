@@ -3,16 +3,17 @@ var bind = require('bind');
 var callback = require('callback');
 var canonical = require('canonical');
 var clone = require('clone');
+var company = require('./company');
 var cookie = require('./cookie');
 var debug = require('debug');
 var defaults = require('defaults');
 var each = require('each');
-var company = require('./company');
 var is = require('is');
 var isEmail = require('is-email');
 var isMeta = require('is-meta');
 var json = require('json');
 var newDate = require('new-date');
+var feedback = require('./feedback');
 var notification = require('./notification');
 var on = require('event')
   .bind;
@@ -114,6 +115,10 @@ UserJoy.prototype.initialize = function (settings, options) {
 
   // FIXME: THIS CODE IS NOT TESTED
   notification.load(user.id());
+
+  feedback.load(user.id());
+  // load css file for feedback
+  feedback.loadCss();
 
 
   // track page view
@@ -530,3 +535,7 @@ UserJoy.prototype.hideNotification = notification.hide;
  */
 
 UserJoy.prototype.replyNotification = notification.reply;
+
+UserJoy.prototype.showFeedback = feedback.show;
+
+UserJoy.prototype.hideFeedback = feedback.hide;
