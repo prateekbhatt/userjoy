@@ -136,7 +136,7 @@ Track.prototype._checkOrCreateCompany = function (cb) {
 
 /**
  * Checks if uid exists
- * else calls User.getOrCreate and attaches
+ * else calls User.findOrCreate and attaches
  * this.uid with new user._id
  *
  * @param {function} cb callback function
@@ -148,13 +148,13 @@ Track.prototype._checkOrCreateUser = function (cb) {
   var self = this;
 
   // if valid uid, move on
-  // else getOrCreate user
+  // else findOrCreate user
 
   if (self.uid) {
     return cb();
   }
 
-  User.getOrCreate(self.app._id, self.user, function (err, usr) {
+  User.findOrCreate(self.app._id, self.user, function (err, usr) {
 
     if (err) {
       return cb(err);

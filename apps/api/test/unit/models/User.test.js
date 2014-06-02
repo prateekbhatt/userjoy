@@ -20,27 +20,104 @@ describe('Model User', function () {
    */
 
   var randomId = mongoose.Types.ObjectId;
-  var savedUser;
 
 
-  describe('#create', function () {
+  before(function (done) {
+    setupTestDb(done)
+  });
 
-    it('should create user', function (done) {
 
-      var newUser = {
-        email: 'savinay@dodatado.com'
-      };
+  describe('#findOrCreate', function () {
 
-      User.getOrCreate(randomId(), newUser, function (err, usr) {
+    var existingUser;
+    var savedUser;
+
+    before(function () {
+      existingUser = saved.users.first.toJSON();
+    });
+
+    var newUser = {
+      email: 'prattbhatt@gmail.com'
+    };
+
+    // before(function (done) {
+    //   newUser.aid = randomId();
+    //   User.findOrCreate(newUser, done);
+    // });
+
+
+    it('should return error if user_id and email are missing from user',
+      function (done) {
+
+        var testUser = {
+          name: 'PrateekDoDataDo'
+        };
+
+        User.findOrCreate(randomId(), testUser, function (err, usr) {
+          expect(err)
+            .to.exist;
+          expect(err.message)
+            .to.eql('Please send user_id or email to identify user');
+          done();
+        });
+      });
+
+
+    it('should return user if user exists', function (done) {
+
+      User.findOrCreate(existingUser.aid, existingUser, function (err, usr) {
+
         expect(err)
           .to.not.exist;
-        expect(usr)
-          .to.be.an('object');
+
+        expect(usr._id)
+          .to.eql(existingUser._id);
+
+        expect(usr.email)
+          .to.eql(existingUser.email);
+
+        done();
+      });
+    });
+
+    it('should create user if user does not exist', function (done) {
+
+      var id = randomId();
+
+      var newUser = {
+        email: id + '@dodatado.com',
+        meta: {
+          plan: 'Free Tier',
+          amount: 40
+        }
+      };
+
+      User.findOrCreate(id, newUser, function (err, usr) {
+
+        expect(err)
+          .to.not.exist;
+
+        expect(usr.toJSON())
+          .to.be.an('object')
+          .and.to.have.property("meta")
+          .that.is.an("array")
+          .that.has.length(2)
+          .that.deep.equals([{
+            k: 'plan',
+            v: 'Free Tier'
+          }, {
+            k: 'amount',
+            v: 40
+          }]);
 
         savedUser = usr;
 
         expect(usr.email)
           .to.eql(newUser.email);
+
+        expect(usr.aid)
+          .to.eql(id);
+
         done();
       });
 
@@ -73,9 +150,10 @@ describe('Model User', function () {
     it('should store billing data if billing data object is present',
       function (done) {
 
+        var aid = randomId();
+
         var testUser = {
           email: 'care@dodatado.com',
-          aid: randomId()
         };
 
         var billing = {
@@ -86,7 +164,7 @@ describe('Model User', function () {
 
         testUser.billing = billing;
 
-        User.create(testUser, function (err, usr) {
+        User.findOrCreate(aid, testUser, function (err, usr) {
           expect(err)
             .not.to.exist;
 
@@ -108,6 +186,8 @@ describe('Model User', function () {
       'should return error if billing status is not in [trial, free, paying, cancelled]',
       function (done) {
 
+        var aid = randomId();
+
         var testUser = {
           user_id: 'unique_user_id_here'
         };
@@ -120,15 +200,12 @@ describe('Model User', function () {
 
         testUser.billing = billing;
 
-        User.create(testUser, function (err, usr) {
+        User.findOrCreate(aid, testUser, function (err, usr) {
 
           expect(err)
             .to.exist;
 
           expect(err.message)
-            .to.eql('Validation failed');
-
-          expect(err.errors['billing.status'].message)
             .to.eql(
               "Billing status must be one of 'trial', 'free', 'paying' or 'cancelled'"
           );
@@ -137,17 +214,21 @@ describe('Model User', function () {
         });
       });
 
+
     it('should store company data if exists', function (done) {
+
+      var aid = randomId();
+
       var testUser = {
         email: 'care@dodatado.com',
-        aid: randomId(),
         companies: [{
           cid: randomId(),
           name: 'helloworld'
         }]
       };
 
-      User.create(testUser, function (err, usr) {
+      User.findOrCreate(aid, testUser, function (err, usr) {
+
         expect(err)
           .not.to.exist;
 
@@ -169,116 +250,30 @@ describe('Model User', function () {
 
     it('should return error if company data doesnot have cid',
       function (done) {
+
+        var aid = randomId();
+
         var testUser = {
           email: 'care@dodatado.com',
-          aid: randomId(),
           companies: [{
             name: 'helloworld'
           }]
         };
 
-        User.create(testUser, function (err, usr) {
+        User.findOrCreate(aid, testUser, function (err, usr) {
 
           expect(err)
             .to.exist;
+
           expect(err.message)
-            .to.eql('Validation failed');
+            .to.eql('Please send company cid');
 
           done();
         });
       });
 
-  });
 
 
-  describe('#getOrCreate', function () {
-
-    var newUser = {
-      email: 'prattbhatt@gmail.com'
-    };
-
-    before(function (done) {
-      newUser.aid = randomId();
-      User.create(newUser, done);
-    });
-
-    it('should return user if user exists', function (done) {
-      User.getOrCreate(randomId(), newUser, function (err, usr) {
-        expect(err)
-          .to.not.exist;
-        expect(usr)
-          .to.be.ok;
-        expect(usr.email)
-          .to.eql(newUser.email);
-        done();
-      });
-    });
-
-    it('should create user if user does not exist', function (done) {
-
-      var newUser = {
-        email: randomId() + '@dodatado.com',
-        meta: {
-          plan: 'Free Tier',
-          amount: 40
-        }
-      };
-
-      User.getOrCreate(randomId(), newUser, function (err, usr) {
-
-        expect(err)
-          .to.not.exist;
-
-        expect(usr.toJSON())
-          .to.be.an('object')
-          .and.to.have.property("meta")
-          .that.is.an("array")
-          .that.has.length(2)
-          .that.deep.equals([{
-            k: 'plan',
-            v: 'Free Tier'
-          }, {
-            k: 'amount',
-            v: 40
-          }]);
-
-        savedUser = usr;
-
-        expect(usr.email)
-          .to.eql(newUser.email);
-
-        done();
-      });
-
-    });
-
-    it('should throw error if any argument is missing', function (done) {
-
-      var testFunc = function () {
-        User.getOrCreate({}, function () {});
-      };
-
-      expect(testFunc)
-        .to.
-      throw ('undefined is not a function');
-      done();
-    });
-
-    it('should return error if user_id and email are missing from user',
-      function (done) {
-
-        var testUser = {
-          name: 'PrateekDoDataDo'
-        };
-
-        User.getOrCreate(randomId(), testUser, function (err, usr) {
-          expect(err)
-            .to.exist;
-          expect(err.message)
-            .to.eql('Please send user_id or email to identify user');
-          done();
-        });
-      });
   });
 
 });
