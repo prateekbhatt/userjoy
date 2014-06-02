@@ -60,7 +60,16 @@ Notification.prototype.fetch = function (cb) {
 
 
 Notification.prototype.show = function () {
-
+    ajax({
+        type: 'GET',
+        url: 'api.do.localhost/track/notifications',
+        success: function (data) {
+            console.log("success: ", data);
+        },
+        error: function () {
+            console.log("error");
+        }
+    })
 };
 
 
@@ -79,6 +88,7 @@ Notification.prototype.reply = function () {
         reply: document.getElementById('reply')
             .value
     }
+    console.log("data: ", data);
     ajax({
         type: "POST",
         url: '/apps/aid/notification/uid',
