@@ -10471,6 +10471,143 @@ Entity.prototype.load = function () {
 
 
 });
+require.register("userjoy/lib/feedback.js", function(exports, require, module){
+var ajax = require('ajax');
+var bind = require('bind');
+var template = require('./feedback-template');
+
+
+/**
+ * Initialize a new `Feedback` instance.
+ */
+
+function Feedback() {
+  this.fb_url = 'TODO';
+  this.fb_template_id = 'uj_fb';
+  this.userId = null;
+}
+
+Feedback.prototype.load = function (userId) {
+
+  var self = this;
+
+
+  self.userId = userId;
+
+  function create(htmlStr) {
+    var frag = document.createDocumentFragment(),
+      temp = document.createElement('div');
+    temp.innerHTML = htmlStr;
+    while (temp.firstChild) {
+      frag.appendChild(temp.firstChild);
+    }
+    return frag;
+  }
+
+  // var locals = {
+  //     msg: 'This is the message to be shown to the user',
+  //     notification_template_id: self.notification_template_id
+  // };
+
+  var fragment = create(template());
+
+
+
+  // You can use native DOM methods to insert the fragment:
+  document.body.insertBefore(fragment, document.body.childNodes[0]);
+
+};
+
+
+Feedback.prototype.loadCss = function () {
+
+  var self = this;
+
+  // var style = document.createElement('link');
+  // style.rel = 'text/stylesheet';
+  // style.async = true;
+  // style.url = 'userjoy.css';
+  // var first = document.getElementsByTagName('link')[0];
+  // first.parentNode.insertBefore(style, first);
+  var head = document.getElementsByTagName('head')[0];
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src = 'lib/custom-css.js';
+  head.appendChild(script);
+
+};
+
+
+Feedback.prototype.show = function () {
+  if(document.getElementById('feedback').style.display == 'none') {
+    document.getElementById('feedback')
+      .style.display = 'block';
+  } else {
+    document.getElementById('feedback')
+      .style.display = 'none';
+  }  
+};
+
+
+Feedback.prototype.hide = function () {
+  document.getElementById('feedback')
+    .style.display = 'none';
+};
+
+
+Feedback.prototype.send = function () {
+
+  var data = {
+    reply: document.getElementById('reply')
+      .value
+  }
+  ajax({
+    type: "POST",
+    url: '/apps/aid/fb/uid',
+    data: data,
+    success: function () {
+      document.getElementById('msgsent')
+        .style.display = 'block';
+      document.getElementById('reply')
+        .value = '';
+    },
+    error: function () {
+      console.log("error");
+    },
+    dataType: 'json'
+  });
+
+};
+
+
+/**
+ * Expose `Feedback` instance.
+ */
+
+module.exports = bind.all(new Feedback());
+});
+require.register("userjoy/lib/feedback-template.js", function(exports, require, module){
+module.exports = function anonymous(obj) {
+
+  function escape(html) {
+    return String(html)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  };
+
+  function section(obj, prop, negate, str) {
+    var val = obj[prop];
+    if ('function' == typeof val) return val.call(obj, str);
+    if (negate) val = !val;
+    if (val) return str;
+    return '';
+  };
+
+  return "<div>\n    <a style=\"cursor: pointer\" onclick=\"userjoy.showFeedback()\">\n        <div style=\"position: fixed; bottom:30px; right:20px;\">\n            <span style=\"display: inline-block;\n            min-width: 20px;\n            padding: 10px 14px;\n            font-size: 24px;\n            font-weight: 700;\n            color: #fff;\n            line-height: 1;\n            vertical-align: baseline;\n            white-space: nowrap;\n            text-align: center;\n            background-color: #5bc0de;\n            border-radius: 10px;\">&#63;\n            </span>\n        </div>\n    </a>\n    <div style=\"display: none\" id=\"feedback\">\n        <div style=\"bottom: 80px; position: fixed; right: 9px;\" class=\"col-md-4\">\n            <div class=\"panel panel-default\" style=\"border-color: #ddd;\">\n                <div class=\"panel-heading\">\n                    <h3 class=\"panel-title\" style=\"text-align: center;\">Send us a Message</h3>\n                    <button type=\"button\" class=\"close\" aria-hidden=\"true\" onclick=\"userjoy.hideFeedback()\" id=\"closeFeedback\" style=\"margin-top: -25px;\">&times;</button>\n                </div>\n                <div class=\"panel-body\">\n                    <form role=\"form\">\n                        <textarea class=\"form-control\" style=\"padding: 4px; height: 150px;\"></textarea>\n                        <br>\n                        <input type=\"submit\" value=\"Send Message\" class=\"btn btn-sm btn-info btn-block\" style=\"float: right;\">\n                        <hr>\n                        <div style=\"text-align: center;\">\n                        <small>Powered by <a href=\"http://www.userjoy.co\">UserJoy</a></small>\n                        </div>\n                    </form>\n                </div>\n                <div class=\"arrow\"></div>\n            </div>\n        </div>\n    </div>\n</div>"
+}
+});
 require.register("userjoy/lib/notification.js", function(exports, require, module){
 var ajax = require('ajax');
 var bind = require('bind');
@@ -10623,7 +10760,7 @@ module.exports = function anonymous(obj) {
     return '';
   };
 
-  return "<div id=\"" + escape(obj.notification_template_id) + "\" style=\"position: relative;\">\n\n        <div style=\"width: 400px; float:right;\">\n\n\n\n            <div style=\"min-height: 150px; overflow: auto; margin: 20px 0; padding: 20px; border-left: 5px solid #eee; background-color: #fdf7f7; border-color: #d9534f; border-right: 1px solid #d9534f;\n                border-top: 1px solid #d9534f; border-bottom: 1px solid #d9534f;\n                border-radius: 4px;\">\n\n                <button type=\"button\" style=\"padding: 0; cursor: pointer;\n                background: transparent; border: 0; -webkit-appearance: none; padding: 0;\n                cursor: pointer;\n                background: transparent;\n                border: 0;\n                -webkit-appearance: none; float: right;\n                font-size: 21px;\n                font-weight: bold;\n                line-height: 1;\n                text-shadow: 0 1px 0 #ffffff; align-items: flex-start;\n                text-align: center; color: #bdc3c7\" aria-hidden=\"true\" onclick=\"userjoy.hideNotification()\" id=\"closeNotification\">&times;</button>\n                <p>" + escape(obj.msg) + "</p>\n                <span id=\"msgsent\" style=\"margin-top: 140px; display:none; color: #7f8c8d\">Message Sent. Thanks!</span>\n\n            </div>\n\n            <div style=\"margin-top: -23px; padding: 10px 15px; background-color: #ecf0f1; border-top: 1px solid #ecf0f1; border-bottom-right-radius: 3px; border-bottom-left-radius: 3px;\">\n\n                <div style=\"position: relative; border-collapse: separate;\">\n\n                    <input id=\"reply\" type=\"text\" name=\"msg\" placeholder=\"Type your message here...\" style=\"margin-top: 3px; display: table-cell; position: relative; float: left; width: 80%;\n                    margin-bottom: 0; border: 1px solid #ccc; height: 18px;\n                    padding: 6px 9px; font-size: 13px; line-height: 1.5;\n                    border-radius: 3px; color: #2c3e50;\n                    background-color: #ffffff;\n                    background-image: none; box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s; -webkit-appearance: textfield; -webkit-rtl-ordering: logical;\n                    -webkit-user-select: text;\n                    cursor: auto; margin: 0em;\n                    font: -webkit-small-control;\n                    color: initial;\n                    letter-spacing: normal;\n                    word-spacing: normal;\n                    text-transform: none;\n                    text-indent: 0px;\n                    text-shadow: none;\n                    text-align: start; -webkit-writing-mode: horizontal-tb; position: relative;\n                    border-collapse: separate;\"/>\n\n\n                    <span style=\"display: table-cell; width: 1%;\n                    white-space: nowrap;\n                    vertical-align: middle; position: relative;\n                    font-size: 0; position: relative;\n                    display: table;\n                    border-collapse: separate;\">\n\n\n                    <button id=\"btn-chat\" type=\"button\" style=\"position: relative; padding: 8px 9px;\n                    font-size: 13px;\n                    line-height: 1.5;\n                    border-radius: 3px; color: #ffffff;\n                    background-color: #e74c3c;\n                    border-color: #e74c3c; display: inline-block;\n                    margin-bottom: 0;\n                    font-weight: normal;\n                    text-align: center;\n                    vertical-align: middle;\n                    cursor: pointer;\n                    background-image: none;\n                    border: 1px solid transparent;\n                    white-space: nowrap; -webkit-user-select: none; align-items: flex-start; box-sizing: border-box; margin: 0em;\n                    font: -webkit-small-control;\n                    letter-spacing: normal;\n                    word-spacing: normal;\n                    text-transform: none;\n                    text-indent: 0px;\n                    text-shadow: none; -webkit-writing-mode: horizontal-tb; -webkit-appearance: button;\n                    vertical-align: middle; position: relative; position: relative;\n                    display: table;\n                    border-collapse: separate;\" onclick=\"userjoy.replyNotification()\">\n                    Send</button>\n\n\n                    </span>\n                </div>\n            </div>\n        </div>\n</div>"
+  return "<div id=\"" + escape(obj.notification_template_id) + "\" style=\"position: relative;\">\n    <div style=\"float:right; width: 350px;\">\n        <div class=\"message-template message-template-danger\" style=\"min-height: 175px; overflow: auto;\">\n            <button type=\"button\" class=\"close\" aria-hidden=\"true\" onclick=\"userjoy.hideNotification()\" id=\"closeNotification\">&times;</button>\n            <p>" + escape(obj.msg) + "</p>\n            <span id=\"msgsent\" style=\"margin-top: 140px; display:none; color: #7f8c8d\">Message Sent. Thanks!</span>\n        </div>\n        <div class=\"panel-footer\" style=\"margin-top: -23px;\">\n            <div class=\"input-group\">\n                <input id=\"btn-input\" type=\"text\" name=\"msg\" class=\"form-control input-sm\" placeholder=\"Type your message here...\" style=\"margin-top: 3px; height: 30px;\" />\n                <span class=\"input-group-btn\">\n                <button class=\"btn btn-danger btn-sm\" id=\"btn-chat\" type=\"button\" onclick=\"userjoy.replyNotification()\" style=\"margin-top: 2px; height: 30px;\">\n                Send</button>\n                </span>\n            </div>\n        </div>\n    </div>\n</div>"
 }
 });
 require.register("userjoy/lib/queue.js", function(exports, require, module){
@@ -10866,16 +11003,17 @@ var bind = require('bind');
 var callback = require('callback');
 var canonical = require('canonical');
 var clone = require('clone');
+var company = require('./company');
 var cookie = require('./cookie');
 var debug = require('debug');
 var defaults = require('defaults');
 var each = require('each');
-var company = require('./company');
 var is = require('is');
 var isEmail = require('is-email');
 var isMeta = require('is-meta');
 var json = require('json');
 var newDate = require('new-date');
+var feedback = require('./feedback');
 var notification = require('./notification');
 var on = require('event')
   .bind;
@@ -10977,6 +11115,10 @@ UserJoy.prototype.initialize = function (settings, options) {
 
   // FIXME: THIS CODE IS NOT TESTED
   notification.load(user.id());
+
+  feedback.load(user.id());
+  // load css file for feedback
+  feedback.loadCss();
 
 
   // track page view
@@ -11393,6 +11535,10 @@ UserJoy.prototype.hideNotification = notification.hide;
  */
 
 UserJoy.prototype.replyNotification = notification.reply;
+
+UserJoy.prototype.showFeedback = feedback.show;
+
+UserJoy.prototype.hideFeedback = feedback.hide;
 });
 
 
