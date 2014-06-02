@@ -279,6 +279,47 @@ height: 100%;
     background-color: #39b3d7;
     border-color: #3498db;
 }
+.btn-primary {
+    color: #ffffff;
+    background-color: #428bca;
+    border-color: #357ebd;
+}
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open .dropdown-toggle.btn-primary {
+    color: #ffffff;
+    background-color: #3276b1;
+    border-color: #285e8e;
+}
+.btn-danger {
+    color: #ffffff;
+    background-color: #d9534f;
+    border-color: #d43f3a;
+}
+.btn-danger:hover, .btn-danger:focus, .btn-danger:active, .btn-danger.active, .open .dropdown-toggle.btn-danger {
+    color: #ffffff;
+    background-color: #d2322d;
+    border-color: #ac2925;
+}
+/*.btn-default {
+    color: #ffffff;
+    background-color: #ecf0f1;
+    border-color: #bdc3c7;
+}
+.btn-default:hover, .btn-default:focus, .btn-default:active, .btn-default.active, .open .dropdown-toggle.btn-default {
+    color: #ffffff;
+    background-color: #bdc3c7;
+    border-color: #95a5a6;
+}*/
+
+.btn-warning {
+    color: #ffffff;
+    background-color: #f0ad4e;
+    border-color: #eea236;
+}
+.btn-warning:hover, .btn-warning:focus, .btn-warning:active, .btn-warning.active, .open .dropdown-toggle.btn-warning {
+    color: #ffffff;
+    background-color: #ed9c28;
+    border-color: #d58512;
+}
 .btn-default:hover, .btn-default:focus, .btn-default:active, .btn-default.active, .open .dropdown-toggle.btn-default {
     color: #333;
     background-color: #ebebeb;
@@ -288,6 +329,11 @@ height: 100%;
     color: #333;
     background-color: #fff;
     border-color: #ccc;
+}
+
+.select-color: hover, .select-color: focus {
+    width: 40px;
+    height: 40px;
 }
 .form-control:focus {
     border-color: #66afe9;
@@ -396,7 +442,7 @@ hr {
     border-left: 5px solid #eee;
 }
 .message-template-danger {
-    background-color: #fdf7f7;
+    /*background-color: #fdf7f7;*/
     border-color: #d9534f;
     border-right: 1px solid #d9534f;
     border-top: 1px solid #d9534f;
@@ -582,7 +628,7 @@ hr {
     background-color: #95a5a6;
     border-radius: 10px;
 }
-.btn-breadcrumb .btn:not(:last-child):after {
+.btn-breadcrumb .btn: not(: last-child):after {
     content: " ";
     display: block;
     width: 0;
@@ -596,7 +642,7 @@ hr {
     left: 100%;
     z-index: 3;
 }
-.btn-breadcrumb .btn:not(:last-child):before {
+.btn-breadcrumb .btn: not(: last-child):before {
     content: " ";
     display: block;
     width: 0;
@@ -624,30 +670,30 @@ hr {
 }
 /** Default button **/
 
-.btn-breadcrumb .btn.btn-default:not(:last-child):after {
+.btn-breadcrumb .btn.btn-default: not(: last-child):after {
     border-left: 10px solid #fff;
 }
-.btn-breadcrumb .btn.btn-default:not(:last-child):before {
+.btn-breadcrumb .btn.btn-default: not(: last-child):before {
     border-left: 10px solid #ccc;
 }
-.btn-breadcrumb .btn.btn-default:hover:not(:last-child):after {
+.btn-breadcrumb .btn.btn-default:hover: not(: last-child):after {
     border-left: 10px solid #ebebeb;
 }
-.btn-breadcrumb .btn.btn-default:hover:not(:last-child):before {
+.btn-breadcrumb .btn.btn-default:hover: not(: last-child):before {
     border-left: 10px solid #adadad;
 }
 /** Info button **/
 
-.btn-breadcrumb .btn.btn-info:not(:last-child):after {
+.btn-breadcrumb .btn.btn-info: not(: last-child):after {
     border-left: 10px solid #5bc0de;
 }
-.btn-breadcrumb .btn.btn-info:not(:last-child):before {
+.btn-breadcrumb .btn.btn-info: not(: last-child):before {
     border-left: 10px solid #46b8da;
 }
-.btn-breadcrumb .btn.btn-info:hover:not(:last-child):after {
+.btn-breadcrumb .btn.btn-info:hover: not(: last-child):after {
     border-left: 10px solid #39b3d7;
 }
-.btn-breadcrumb .btn.btn-info:hover:not(:last-child):before {
+.btn-breadcrumb .btn.btn-info:hover: not(: last-child):before {
     border-left: 10px solid #269abc;
 }
 .pager li > a, .pager li > span {
@@ -707,22 +753,18 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
     background-color: #ffffff;
 }
 #affix-demo {
-    -margin-top:30px;
+    -margin-top: 30px;
     height: 250px;
-    overflow-y:scroll;
+    overflow-y: scroll;
     /*background: lightblue;*/
-    
 }
-
 #segment {
-    -margin-top:30px;
+    -margin-top: 30px;
     height: 300px;
-    overflow-y:scroll;
+    overflow-y: scroll;
     /*background: lightblue;*/
-    
 }
-
-#affixMe{
+#affixMe {
     width: 100%;
 }
 span.emailPreview > p {
