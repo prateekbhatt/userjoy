@@ -1,27 +1,38 @@
 describe('Resource /track', function () {
 
-  var TrackController = require(
-    '../../../api/routes/TrackController');
-  var AppModel = require(
-    '../../../api/models/App');
+  /**
+   * npm dependencies
+   */
+
+  var mongoose = require('mongoose');
+  var qs = require('qs');
+
+
+  var TrackController = require('../../../api/routes/TrackController');
+  var AppModel = require('../../../api/models/App');
 
   // define test variables
   var newSession = {
     'hello': 'world'
   };
-  var newUser = {
-    email: 'prattbhatt@gmail.com',
-  };
-  var randomId = '532d6bf862d673ba7131812a';
+
+  var newUser;
+
+  var randomId = mongoose.Types.ObjectId;
   var appKey;
 
 
-
   before(function (done) {
-    newSession = JSON.stringify(newSession);
-    newUser = JSON.stringify(newUser);
     setupTestDb(function (err) {
       appKey = saved.apps.first.testKey;
+
+      newUser = {
+        email: saved.users.first.email,
+      };
+
+      newSession = JSON.stringify(newSession);
+      newUser = JSON.stringify(newUser);
+
       done(err);
     });
   });
@@ -244,5 +255,89 @@ describe('Resource /track', function () {
     });
 
   });
+
+
+  describe('GET /track/notifications', function () {
+
+    var url = '/track/notifications';
+
+    before(function (done) {
+      logoutUser(done);
+    });
+
+    it('should return error if there is no app_id', function (done) {
+
+      request
+        .get(url)
+        .expect('Content-Type', /json/)
+        .expect(400)
+        .expect({
+          status: 400,
+          error: 'Please send app_id with the params'
+        })
+        .end(done);
+    });
+
+    it('should return error if there is no user_id or email',
+      function (done) {
+
+        var testUrl = url + '?app_id=' + appKey;
+
+        request
+          .get(testUrl)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            status: 400,
+            error: 'Please send user_id or email to identify user'
+          })
+          .end(done);
+
+      });
+
+    it('should return most recent queued notification',
+      function (done) {
+
+        var email = saved.users.first.email;
+        var testUrl = url + '?app_id=' + appKey + '&email=' + email;
+
+        request
+          .get(testUrl)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function (err, res) {
+            if (err) return done(err);
+
+            var notf = res.body;
+
+            expect(notf)
+              .to.be.an('object');
+
+            expect(notf)
+              .to.have.property("amId");
+
+            expect(notf)
+              .to.have.property("body");
+
+            expect(notf)
+              .to.have.property("ct");
+
+            expect(notf)
+              .to.have.property("seen");
+
+            expect(notf)
+              .to.have.property("sender");
+
+            expect(notf)
+              .to.have.property("uid");
+
+
+            done();
+          });
+
+      });
+
+  });
+
 
 });

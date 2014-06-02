@@ -97,11 +97,10 @@ Account       |                         | accounts on Userjoy
 App           | team                    | apps belonging to an account
 AutoMessage   |                         | automated messages
 Company       |                         | companies of a specific account
-Conversation  |                         | conversation threads between users and accounts
+Conversation  | Message                 | conversation threads between users and accounts
 DailyReport   |                         | the score, usage of a user for a specific company (monthly)
 Event         | meta (metadata)         | events belonging to a user
 Invite        |                         | tokens of team members that have been invited to use an app
-Message       |                         | messages between users and accounts
 Notification  |                         | notifications to be shown to the user (only auto)
 Segment       | filters                 | all the segments defined for an app
 Trigger       |                         | triggers for sending auto emails / notifications
@@ -337,29 +336,6 @@ as meta properties)
 - ut
 
 
-### Message
-
-##### Columns:
-
-- accid
-- aid
-- body
-- clicked (boolean)
-- coId
-- ct
-- from (enum: [user, account]) (is it sent from a 'user' or an 'account')
-- seen (boolean)
-- sent (boolean)
-- sName
-- sub
-- type (email / notification)
-- uid
-- ut
-
-##### Notes:
-
-- accid is required only when the message is created by an account. If a user has sent the message, then it is not required for the message to have an accid
-
 ### Notification
 
 ##### Columns:
@@ -393,6 +369,27 @@ as meta properties)
 ##### Notes:
 
 - assignee should not be required. It is possible that the conversation is a new one and is not assigned to any team member. In this case we will send emails to all team members/ only admin (?)
+
+##### Embedded Documents:
+
+> ### Message
+>
+> ##### Columns:
+>
+> - accid
+> - body
+> - clicked (boolean)
+> - ct
+> - from (enum: [user, account]) (is it sent from a 'user' or an 'account')
+> - seen (boolean)
+> - sent (boolean)
+> - sName
+> - type (email / notification)
+>
+> ##### Notes:
+>
+> - accid is required only when the message is created by an account. If a user has sent the message, then it is not required for the message to have an accid
+
 
 
 ### Triggers

@@ -515,7 +515,7 @@ describe('Model DailyReport', function () {
       var to = moment();
 
       var from = moment()
-        .subtract('month', 1);
+        .subtract('days', 28);
 
       var noOfDays = to.diff(from, 'days');
 
@@ -545,13 +545,13 @@ describe('Model DailyReport', function () {
 
 
     it(
-      'should return error if more than two months diff between to and from timestamps',
+      'should return error if more than 28 days diff between to and from timestamps',
       function (done) {
 
         var to = moment();
 
         var from = moment()
-          .subtract('days', 65);
+          .subtract('days', 29);
 
         var noOfDays = to.diff(from, 'days');
 
@@ -564,7 +564,7 @@ describe('Model DailyReport', function () {
               .to.exist
               .and.to.have.property('message')
               .that.equals(
-                'Currently not allowed to get data more than two months wide'
+                'Currently not allowed to get data more than 28 days wide'
             );
 
             done();
