@@ -13,7 +13,6 @@ var router = require('express')
  */
 
 var Conversation = require('../models/Conversation');
-var Message = require('../models/Message');
 var User = require('../models/User');
 
 
@@ -204,43 +203,26 @@ router
             .exec(cb);
         },
 
-        function findMessages(con, cb) {
-          Message
-            .find({
-              coId: coId
-            })
-            .sort({
-              ct: 1
-            })
-            .exec(function (err, messages) {
-              cb(err, con, messages)
-            });
-        },
-
-        function messagesAreOpened(con, messages, cb) {
-          var mIds = _.pluck(messages, '_id');
+        function messagesAreOpened(con, cb) {
 
           // update seen status to true for all messages sent from user, which
           // belong to this thread
-          Message.openedByTeamMember(mIds, function (err) {
-            cb(err, con, messages);
+          Conversation.openedByTeamMember(con._id, function (err) {
+            cb(err, con);
           });
         },
 
-        function conversationIsRead(con, messages, cb) {
+        function conversationIsRead(con, cb) {
           Conversation.isRead(con._id, function (err) {
-            cb(err, con, messages);
+            cb(err, con);
           });
         }
 
       ],
 
-      function (err, con, messages) {
+      function (err, con) {
 
         if (err) return next(err);
-
-        con = con.toJSON();
-        con.messages = messages;
 
         res.json(con);
       }
@@ -252,6 +234,8 @@ router
 
 /**
  * POST /apps/:aid/conversations
+ *
+ * NOTE: Only emails can be sent by manual messages now, notifications are not allowed
  *
  * Creates a new conversation, a new message and sends message to user
  */
@@ -274,6 +258,10 @@ router
       return res.badRequest('Missing body/sub/type/uids');
     }
 
+    // NOTE: only emails can be sent through manual messages now
+    if (newMsg.type !== 'email') {
+      return res.badRequest('Only emails can be sent through manual messages');
+    }
 
     if (!_.isArray(uids) || _.isEmpty(uids)) {
       return res.badRequest('Provide atleast on user id in the uids array');
@@ -282,7 +270,6 @@ router
 
     async.waterfall(
       [
-
 
         function findUsers(cb) {
 
@@ -304,73 +291,74 @@ router
 
           var iterator = function (user, iteratorCB) {
 
-            async.waterfall(
+            // locals to be passed for rendering the templates
+            var locals = {
+              user: user
+            };
 
-              [
-
-                function createConversation(cb) {
-                  var newConversation = {
-                    aid: aid,
-                    assignee: assignee,
-                    sub: sub,
-                    uid: user._id
-                  };
-
-                  Conversation.create(newConversation, cb);
-                },
+            // render body and subject
+            newMsg.body = render.string(newMsg.body, locals);
+            sub = render.string(newMsg.sub, locals);
 
 
-                function createMessage(conversation, cb) {
+            var newConversation = {
+              aid: aid,
+              assignee: assignee,
+              messages: [],
+              sub: sub,
+              uid: user._id
+            };
 
-                  newMsg.accid = assignee;
-                  newMsg.aid = aid;
-                  newMsg.coId = conversation._id;
+            newMsg.accid = assignee;
 
-                  // add from as 'account'
-                  newMsg.from = 'account';
+            // add from as 'account'
+            newMsg.from = 'account';
 
-                  // add sender name 'sName' as account name
-                  newMsg.sName = req.user.name || req.user.email;
+            // add sender name 'sName' as account name
+            newMsg.sName = req.user.name || req.user.email;
 
-                  newMsg.uid = user._id;
 
-                  // locals to be passed for rendering the templates
-                  var locals = {
-                    user: user
-                  };
+            newConversation.messages.push(newMsg);
 
-                  // render body and subject
-                  newMsg.body = render.string(newMsg.body, locals);
-                  newMsg.sub = render.string(newMsg.sub, locals);
+            Conversation.create(newConversation, function (err, con) {
 
-                  Message.create(newMsg, function (err, msg) {
+              if (err) return cb(err);
 
-                    if (err) return cb(err);
+              con = con.toJSON();
 
-                    msg = msg.toJSON();
+              var msg = con.messages[0];
 
-                    // NOTE: adding the toEmail and toNames to messages to make
-                    // it simpler while mailing them
+              // NOTE: adding the toEmail and toNames to messages to make
+              // it simpler while mailing them
+              msg.toEmail = user.email;
+              msg.toName = user.name;
 
-                    msg.toEmail = user.email;
-                    msg.toName = user.name;
-                    cb(null, msg);
-                  });
+              msg.coId = con._id;
+              msg.aid = con.aid;
 
-                }
-              ],
+              // preserve the conversation object, while passing the modified
+              // message object for sending emails
+              var obj = {
+                sendMsg: msg,
+                con: con
+              };
 
-              iteratorCB
-
-            );
+              iteratorCB(null, obj);
+            });
 
           };
 
-          async.map(users, iterator, cb);
+          async.map(users, iterator, function (err, objs) {
+
+            var sendMessages = _.pluck(objs, 'sendMsg');
+            var cons = _.pluck(objs, 'con');
+
+            cb(err, sendMessages, cons);
+          });
         },
 
 
-        function sendMessages(messages, cb) {
+        function sendMessages(messages, cons, cb) {
 
           // TODO: check if message is notification or email
 
@@ -385,18 +373,20 @@ router
             });
           };
 
-          async.map(messages, iterator, cb);
+          async.map(messages, iterator, function (err) {
+            cb(err, cons);
+          });
 
         }
 
       ],
 
-      function callback(err, msgs) {
+      function callback(err, cons) {
 
         if (err) return next(err);
         res
           .status(201)
-          .json(msgs);
+          .json(cons);
       }
     );
 
@@ -431,62 +421,65 @@ router
     async.waterfall(
       [
 
-        function findConversation(cb) {
-          Conversation
-            .findById(coId)
-            .populate('uid', 'name email')
-            .exec(cb);
-        },
-
-        function createReplyMessage(conv, cb) {
+        function createReplyMessage(cb) {
 
           reply.accid = accid;
-          reply.aid = aid;
-          reply.coId = conv._id;
 
           // add from as 'account'
           reply.from = 'account';
 
           reply.sName = sName;
 
-          reply.sub = conv.sub;
-
-          // since uid has been populated in the findConversation query above,
-          // we need to access the user's id from conv.uid._id
-          reply.uid = conv.uid._id;
-
           // reply type is always email
           reply.type = 'email';
 
-          Message.create(reply, function (err, savedMsg) {
-            cb(err, conv, savedMsg);
+          Conversation.reply(aid, coId, reply, function (err, con) {
+            cb(err, con);
           });
 
         },
 
-        function sendEmail(conv, msg, cb) {
+        function sendEmail(conv, cb) {
 
-          var toEmail = conv.uid.email;
-          var toName = conv.uid.name;
-          var locals = getMailerLocals('manual', msg, toName, toEmail);
-          mailer.sendManualMessage(locals, function (err) {
-            cb(err, msg);
-          });
+          User
+            .findById(conv.uid)
+            .select('email name')
+            .exec(function (err, user) {
+
+
+              // NOTE: assuming the last message in the messages array was the one
+              // sent now
+              var msg = _.last(conv.messages);
+
+              msg.aid = conv.aid;
+              msg.coId = conv._id;
+
+              var toEmail = user.email;
+              var toName = user.name;
+
+              var locals = getMailerLocals('manual', msg, toName, toEmail);
+
+              mailer.sendManualMessage(locals, function (err) {
+                cb(err, conv);
+              });
+
+            })
+
         }
 
       ],
 
-      function (err, msg) {
+      function (err, con) {
 
         logger.debug('ConversationController Reply', {
           err: !! err,
-          msg: !! msg
+          con: !! con
         });
 
         if (err) return next(err);
         res
           .status(201)
-          .json(msg);
+          .json(con);
       }
     );
 

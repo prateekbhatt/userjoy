@@ -19,7 +19,6 @@ describe('Resource /apps/:aid/conversations', function () {
    */
 
   var Conversation = require('../../../api/models/Conversation');
-  var Message = require('../../../api/models/Message');
 
 
   /**
@@ -369,11 +368,11 @@ describe('Resource /apps/:aid/conversations', function () {
       'should update seen status to true for all messages in the thread, sent from user',
       function (done) {
 
-        Message
-          .find({
-            coId: testCon._id
-          })
-          .exec(function (err, msgs) {
+        Conversation
+          .findById(testCon._id)
+          .exec(function (err, con) {
+
+            var msgs = con.messages;
 
             if (err) return done(err);
 
@@ -471,7 +470,32 @@ describe('Resource /apps/:aid/conversations', function () {
 
       });
 
-    it('should create new message',
+    it('should return error if message is not of email type',
+
+      function (done) {
+
+        var newMessage = {
+          body: 'random body',
+          sub: 'random sub',
+          type: 'notification',
+          uids: [randomId()]
+        };
+
+        request
+          .post(basePath)
+          .set('cookie', loginCookie)
+          .send(newMessage)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            status: 400,
+            error: 'Only emails can be sent through manual messages'
+          })
+          .end(done);
+
+      });
+
+    it('should create new conversation with message',
 
       function (done) {
         var uids = [saved.users.first._id];
@@ -490,23 +514,27 @@ describe('Resource /apps/:aid/conversations', function () {
           .expect(201)
           .expect(function (res) {
 
-            expect(res.body)
+            var con = res.body[0];
+
+            expect(con.sub)
+              .to.eql('Welcome to UserJoy, prattbhatt@gmail.com');
+
+            var messages = con.messages;
+
+            expect(messages)
               .to.be.an("array");
 
-            expect(res.body)
+            expect(messages)
               .to.have.length(1);
 
-            expect(res.body[0].body)
+            expect(messages[0].body)
               .to.eql(
                 'This is the message I want to send to prattbhatt@gmail.com'
             );
 
-            expect(res.body[0])
+            expect(messages[0])
               .to.have.property('sName')
               .that.equals(saved.accounts.first.name);
-
-            expect(res.body[0].sub)
-              .to.eql('Welcome to UserJoy, prattbhatt@gmail.com');
 
           })
           .end(done);
@@ -579,6 +607,11 @@ describe('Resource /apps/:aid/conversations', function () {
           body: 'This is the message I want to reply'
         };
 
+
+        expect(savedCon.messages)
+          .to.have.length(1);
+
+
         request
           .post(testUrl)
           .set('cookie', loginCookie)
@@ -586,9 +619,19 @@ describe('Resource /apps/:aid/conversations', function () {
           .expect('Content-Type', /json/)
           .expect(201)
           .expect(function (res) {
-            expect(res.body.body)
+
+            var con = res.body;
+
+            expect(con.messages)
+              .to.have.length(2);
+
+            expect(con.messages[1].body)
               .to.eql(newMessage.body);
-            expect(res.body.sName)
+
+            expect(con.messages[1].from)
+              .to.eql('account');
+
+            expect(con.messages[1].sName)
               .to.exist;
           })
           .end(done);

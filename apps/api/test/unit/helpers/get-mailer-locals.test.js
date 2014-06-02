@@ -19,7 +19,11 @@ describe('Helper get-mailer-locals', function () {
     beforeEach(function () {
 
       savedAutoMsg = saved.automessages.first.toJSON();
-      savedManualMsg = saved.messages.first.toJSON();
+
+      savedManualMsg = saved.conversations.first.messages[0];
+      savedManualMsg.aid = saved.conversations.first.aid;
+      savedManualMsg.coId = saved.conversations.first._id;
+      savedManualMsg.sub = saved.conversations.first.sub;
 
       // mongoose populate is run to populate the creator account
       creator = saved.accounts.first;

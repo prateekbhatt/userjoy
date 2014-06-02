@@ -234,7 +234,7 @@ router
  * Returns engagement scores, from from-timestamp to to-timestamp
  *
  * If from and to query params are not provided, then returns scores of the last
- * 30 days
+ * 28 days
  */
 
 router
@@ -246,7 +246,7 @@ router
     var cid;
 
     var thirtyDaysAgo = moment()
-      .subtract('days', 30)
+      .subtract('days', 28)
       .unix();
 
     var from = parseInt(req.query.from, 10);
@@ -269,7 +269,7 @@ router
       at: 'UserController:getScores',
       params: req.params,
       query: req.query,
-      valid: validTimestamp(req.query.from),
+      valid: validTimestamp(from),
       from: from,
       to: to
     });
