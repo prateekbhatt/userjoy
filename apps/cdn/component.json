@@ -48,8 +48,6 @@
   ],
 
 
-  // There was a problem installing components with Github redirects
-  // REF: https://github.com/component/builder.js/issues/143#issuecomment-41465994
   "remotes": [
     "https://raw.githubusercontent.com",
     "https://cdn.rawgit.com",
