@@ -46,6 +46,14 @@ var TeamMemberSchema = new Schema({
 var AppSchema = new Schema({
 
 
+  // color theme for notification / feedback templates
+  color: {
+    type: String,
+    default: '#39B3D7',
+    required: [true, 'App theme is required']
+  },
+
+
   ct: {
     type: Date,
     default: Date.now
@@ -78,14 +86,6 @@ var AppSchema = new Schema({
   testKey: {
     type: String,
     unique: true
-  },
-
-
-  // color theme for notification / feedback templates
-  theme: {
-    type: String,
-    default: '#39B3D7',
-    required: [true, 'App theme is required']
   },
 
 

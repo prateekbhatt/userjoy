@@ -36,9 +36,9 @@ describe('Model App', function () {
     });
 
 
-    it('should add default theme', function () {
+    it('should add default color', function () {
       expect(saved.apps.first)
-        .to.have.property("theme", '#39B3D7');
+        .to.have.property("color", '#39B3D7');
     });
 
 
