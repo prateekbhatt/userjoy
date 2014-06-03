@@ -11,7 +11,6 @@ var moment = require('moment');
  * models
  */
 
-var Event = require('../api/models/Event');
 var DailyReport = require('../api/models/DailyReport');
 
 
@@ -26,7 +25,6 @@ var logger = require('../helpers/logger');
  * Constants
  */
 
-var MINUTES = 5;
 var NO_OF_DAYS = 14;
 var USAGE_KEY_PREFIX = 'du_';
 
@@ -190,8 +188,76 @@ function mapReduce(aid, cid, timestamp, cb) {
 }
 
 
+/*
+
+INPUT:
+
+scores:
+
+[
+  { _id: 5385a6f55ed3949d71e34fa8, score: 100 },
+  { _id: 5385a6f55ed3949d71e34fa7, score: 0 }
+]
+
+ */
+
+function saveScores(aid, cid, timestamp, scores, cb) {
+
+  var saveIterator = function (score, cb) {
+
+    var uid = score._id;
+    var score = score.value;
+    var usage;
+
+    DailyReport.upsert(aid, uid, cid, timestamp, score, usage, cb);
+
+  };
+
+  async.each(scores, saveIterator, cb);
+
+}
+
+
+function scoreConsumerWorker(aid, cid, timestamp, cb) {
+  async.waterfall(
+
+    [
+
+      function runMapReduce(cb) {
+        mapReduce(aid, cid, timestamp, function (err, scores) {
+          cb(err, scores);
+        });
+      },
+
+
+      function saveData(scores, cb) {
+        saveScores(aid, cid, timestamp, scores, cb);
+      }
+    ],
+
+
+    function callback(err) {
+
+      if (err) {
+        logger.crit({
+          at: 'workers/score-consumer callback',
+          err: err,
+          aid: aid,
+          ts: Date.now()
+        });
+      }
+
+      cb(err);
+    }
+
+  );
+
+}
+
+
 /**
  * Expose functions for testing
  */
 
 module.exports._mapReduce = mapReduce;
+module.exports._scoreConsumerWorker = scoreConsumerWorker;
