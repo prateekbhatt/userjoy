@@ -770,4 +770,16 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
 span.emailPreview > p {
     display: inline;
 }
+
+.arrow:before {
+    content: "";
+    position: absolute;
+    left: 325px;
+    border-style: solid;
+    border-width: 17px 17px 0;
+    border-color: #ddd transparent;
+    display: block;
+    width: 0;
+    z-index: 0;
+}
 }

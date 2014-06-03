@@ -11,22 +11,22 @@
                         <div class="col-md-8">
                             <div class="bs-example">
                                 <div class="btn-group">
-                                    <button type="button" class="btn select-color" style="background-color: #bdc3c7; width: 30px; height: 30px; margin-right: 15px;"></button>
+                                    <button type="button" class="btn select-color" style="background-color: #39b3d7; width: 30px; height: 30px; margin-right: 15px;" ng-click="showPreview('#39b3d7')"></button>
                                 </div>
                                 <div class="btn-group">
-                                    <button type="button" class="btn select-color" style="background-color: #3276b1; width: 30px; height: 30px; margin-right: 15px;"></button>
+                                    <button type="button" class="btn select-color" style="background-color: #3276b1; width: 30px; height: 30px; margin-right: 15px;" ng-click="showPreview('#3276b1')"></button>
                                 </div>
                                 <div class="btn-group">
-                                    <button type="button" class="btn select-color" style="background-color: #39b3d7; width: 30px; height: 30px; margin-right: 15px;"></button>
+                                    <button type="button" class="btn select-color" style="background-color: #7f8c8d; width: 30px; height: 30px; margin-right: 15px;" ng-click="showPreview('#7f8c8d')"></button>
                                 </div>
                                 <div class="btn-group">
-                                    <button type="button" class="btn select-color" style="background-color: #18bc9c; width: 30px; height: 30px; margin-right: 15px;"></button>
+                                    <button type="button" class="btn select-color" style="background-color: #18bc9c; width: 30px; height: 30px; margin-right: 15px;" ng-click="showPreview('#18bc9c')"></button>
                                 </div>
                                 <div class="btn-group">
-                                    <button type="button" class="btn select-color" style="background-color: #f0ad4e; width: 30px; height: 30px; margin-right: 15px;"></button>
+                                    <button type="button" class="btn select-color" style="background-color: #f0ad4e; width: 30px; height: 30px; margin-right: 15px;" ng-click="showPreview('#f0ad4e')"></button>
                                 </div>
                                 <div class="btn-group">
-                                    <button type="button" class="btn select-color" style="background-color: #d9534f; width: 30px; height: 30px; margin-right: 15px;"></button>
+                                    <button type="button" class="btn select-color" style="background-color: #d9534f; width: 30px; height: 30px; margin-right: 15px;" ng-click="showPreview('#d9534f')"></button>
                                 </div>
                             </div>
                         </div>
@@ -38,15 +38,15 @@
                         <div class="row" style="margin-top: 20px;">
                             <div class="col-md-6">
                                 <div style="width: 350px; float:right;" id="notification">
-                                    <div class="message-template message-template-danger" style="min-height: 150px; overflow: auto;">
-                                        <button type="button" class="close" aria-hidden="true" onclick="hideNotification(event)">&times;</button>
+                                    <div ng-class="{'message-template': true}" ng-style="{'min-height': notfHeight, 'overflow': overflow, 'border-color': borderColor, 'border-right': borderRight, 'border-top': borderTop, 'border-bottom': borderBottom, 'border-radius': borderRadius}">
+                                        <button type="button" class="close" aria-hidden="true">&times;</button>
                                         <span id="msgsent" style="margin-top: 140px; display:none; color: #7f8c8d">Message Sent</span>
                                     </div>
                                     <div class="panel-footer" style="margin-top: -23px;">
                                         <div class="input-group">
-                                            <input id="btn-input" type="text" name="msg" class="form-control input-sm disabled" placeholder="Type your message here..." style="margin-top: 3px;" />
+                                            <input id="btn-input" type="text" name="msg" class="form-control input-sm" disabled placeholder="Type your message here..." style="margin-top: 3px; background-color: #ffffff" />
                                             <span class="input-group-btn">
-                                            <button class="btn btn-danger btn-sm disabled" id="btn-chat" type="submit">
+                                            <button class="btn btn-sm disabled" id="btn-chat" type="submit" style="margin-top: 3px;" ng-style="{'margin-top': marginTop, 'background-color': btnBackgrndColor, 'border-color': btnBorderColor, color: btnColor}">
                                             Send</button>
                                             </span>
                                         </div>
@@ -63,7 +63,7 @@
                                             <form role="form">
                                                 <textarea class="form-control" style="padding: 4px; height: 150px;"></textarea>
                                                 <br>
-                                                <input type="submit" value="Send Message" class="btn btn-sm btn-info btn-block" style="float: right;">
+                                                <input type="submit" value="Send Message" class="btn btn-sm btn-block disabled" style="float: right;" ng-style="{'float': floatRight, 'background-color': btnBackgrndColor, 'color': btnColor}">
                                                 <hr>
                                                 <div style="text-align: center;">
                                                     <small>Powered by UserJoy</small>
@@ -72,6 +72,21 @@
                                         </div>
                                         <div class="arrow"></div>
                                     </div>
+                                    <a style="cursor: pointer">
+                                    <div style="bottom:30px; float:right;">
+                                        <span style="display: inline-block;
+                                        min-width: 20px;
+                                        padding: 10px 14px;
+                                        font-size: 24px;
+                                        font-weight: 700;
+                                        color: #fff;
+                                        line-height: 1;
+                                        vertical-align: baseline;
+                                        white-space: nowrap;
+                                        text-align: center;
+                                        border-radius: 10px;" ng-style="{'background-color': btnBackgrndColor}">&#63;</span>
+                                    </div>
+                                    </a>
                                 </div>
                             </div>
                         </div>
