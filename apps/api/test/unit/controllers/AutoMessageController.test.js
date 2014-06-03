@@ -59,10 +59,10 @@ describe('Resource /apps/:aid/automessages', function () {
           .expect(400)
           .expect({
             "error": [
-              "type is required",
-              "title is required",
-              "sid is required",
-              "body is required",
+              "Provide automessage type",
+              "Provide automessage title",
+              "Invalid segment id",
+              "Provide automessage body",
             ],
             "status": 400
           })
