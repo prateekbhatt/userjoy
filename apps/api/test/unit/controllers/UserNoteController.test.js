@@ -127,7 +127,7 @@ describe('Resource /apps/:aid/usernotes', function () {
           .expect('Content-Type', /json/)
           .expect(400)
           .expect({
-            error: ['note is required'],
+            error: ['Invalid note'],
             status: 400
           })
           .end(done);

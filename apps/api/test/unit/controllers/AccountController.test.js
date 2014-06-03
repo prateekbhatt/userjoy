@@ -144,7 +144,7 @@ describe('Resource /account', function () {
         .expect('Content-Type', /json/)
         .expect(400)
         .expect({
-          "error": ["email is required"],
+          "error": ["Email is required"],
           "status": 400
         })
         .end(done);
@@ -159,7 +159,7 @@ describe('Resource /account', function () {
         .expect('Content-Type', /json/)
         .expect(400)
         .expect({
-          "error": ["password is required"],
+          "error": ["Password is required"],
           "status": 400
         })
         .end(done);

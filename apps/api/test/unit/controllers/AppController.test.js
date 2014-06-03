@@ -6,9 +6,6 @@ describe('Resource /apps', function () {
 
   var mongoose = require('mongoose');
 
-  var newApp = {
-    name: 'My New App'
-  };
 
   var randomId = mongoose.Types.ObjectId;
 
@@ -30,6 +27,10 @@ describe('Resource /apps', function () {
     it('returns error if not logged in',
 
       function (done) {
+
+        var newApp = {
+          name: 'My New App'
+        };
 
         request
           .post('/apps')
@@ -65,7 +66,7 @@ describe('Resource /apps', function () {
         .expect(400)
         .expect({
           "error": [
-            "name is required"
+            "App name is required"
           ],
           "status": 400
         })
@@ -87,7 +88,7 @@ describe('Resource /apps', function () {
         .expect(400)
         .expect({
           "error": [
-            "url is required"
+            "Domain url is required"
           ],
           "status": 400
         })
@@ -149,6 +150,8 @@ describe('Resource /apps', function () {
     it('returns error if not logged in',
 
       function (done) {
+
+        var newApp = {};
 
         request
           .get('/apps')

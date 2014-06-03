@@ -130,13 +130,15 @@ UserNote      |                         | notes created by team members about a 
 
 ##### Columns:
 
-- name
-- admin (accId)
-- team [accIds]
-- testKey
-- liveKey
-- tags [] stores all tags that the app has used for its users
 - ct
+- isActive (boolean)
+- liveKey
+- name
+- team [{accId, admin}]
+- testKey
+- theme (hex color code for notifications / feedback)
+- x tags [] stores all tags that the app has used for its users
+- url (domain url)
 - ut
 
 ##### Notes:
