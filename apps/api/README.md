@@ -330,6 +330,7 @@ as meta properties)
 - lastQueued (timestamp)
 - replied
 - seen
+- sender (account id)
 - sent
 - sid
 - sub (for email type)

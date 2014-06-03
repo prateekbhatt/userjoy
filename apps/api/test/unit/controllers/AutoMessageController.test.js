@@ -77,6 +77,7 @@ describe('Resource /apps/:aid/automessages', function () {
 
         var newAutoMsg = {
           body: 'Hey, Welkom to CabanaLand!',
+          sender: randomId,
           sid: randomId,
           sub: 'Welkom!',
           title: 'Welcome Message',
@@ -94,6 +95,48 @@ describe('Resource /apps/:aid/automessages', function () {
 
             expect(savedMsg)
               .to.have.property("creator", saved.accounts.first._id.toString());
+
+            expect(savedMsg)
+              .to.have.property("sender", newAutoMsg.sender);
+
+            expect(savedMsg)
+              .to.have.property("type", newAutoMsg.email);
+
+            expect(savedMsg)
+              .to.have.property("aid", aid.toString());
+
+          })
+          .end(done);
+
+      });
+
+
+    it('should add logged in user as sender, if sender not provided',
+
+      function (done) {
+
+        var newAutoMsg = {
+          body: 'Hey, Welkom to CabanaLand!',
+          sid: randomId,
+          sub: 'Welkom!',
+          title: 'Welcome Message',
+          type: 'email'
+        };
+
+        request
+          .post(url)
+          .set('cookie', loginCookie)
+          .send(newAutoMsg)
+          .expect('Content-Type', /json/)
+          .expect(201)
+          .expect(function (res) {
+            var savedMsg = res.body;
+
+            expect(savedMsg)
+              .to.have.property("creator", saved.accounts.first._id.toString());
+
+            expect(savedMsg)
+              .to.have.property("sender", saved.accounts.first._id.toString());
 
             expect(savedMsg)
               .to.have.property("type", newAutoMsg.email);

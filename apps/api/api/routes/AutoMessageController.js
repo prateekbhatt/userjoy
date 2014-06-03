@@ -126,9 +126,13 @@ router
     var newAutoMessage = req.body;
     var accid = req.user._id;
     var aid = req.params.aid;
+    var sender = req.body.sender;
 
     newAutoMessage.aid = aid;
     newAutoMessage.creator = accid;
+
+    // if sender account id is not provided, add logged in account as sender
+    newAutoMessage.sender = sender || accid;
 
 
     AutoMessage

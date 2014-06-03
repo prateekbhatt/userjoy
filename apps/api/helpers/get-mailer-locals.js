@@ -45,7 +45,7 @@ var getLocals = function (type, msg, toName, toEmail) {
   if (type === 'auto') {
 
     body = msg.body;
-    fromName = msg.creator.name;
+    fromName = msg.sender.name;
     meta.amId = msg._id;
     replyToEmail = fromEmail;
 
