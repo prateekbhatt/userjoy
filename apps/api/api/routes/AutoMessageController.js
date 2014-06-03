@@ -292,4 +292,44 @@ router
   });
 
 
+/**
+ * PUT /apps/:aid/automessages/:amId
+ *
+ * Updates body, sub and title of auto message
+ */
+
+router
+  .route('/:aid/automessages/:amId')
+  .post(function (req, res, next) {
+
+    logger.trace('Updating automessage');
+
+    var amId = req.params.amId;
+    var body = req.body.body;
+    var sub = req.body.sub;
+    var title = req.body.title;
+
+    AutoMessage
+      .findById(amId, function (err, amsg) {
+        if (err) return next(err);
+
+
+        // if body / sub / title have been provided for update
+        if (body) amsg.body = body;
+        if (sub) amsg.sub = sub;
+        if (title) amsg.title = title;
+
+        amsg.save(function (err, savedAmsg) {
+          if (err) return next(err);
+
+          res
+            .status(201)
+            .json(savedAmsg);
+        })
+
+      });
+
+  });
+
+
 module.exports = router;

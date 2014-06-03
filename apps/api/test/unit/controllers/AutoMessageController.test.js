@@ -396,4 +396,77 @@ describe('Resource /apps/:aid/automessages', function () {
 
   });
 
+  describe('PUT /apps/:aid/automessages/:amId', function () {
+
+    var savedMsg;
+    var newAutoMsg = {};
+    var testUrl;
+
+    before(function (done) {
+      savedMsg = saved.automessages.first;
+      testUrl = url + '/' + savedMsg._id;
+      logoutUser(done);
+    });
+
+
+    it('returns error if not logged in', function (done) {
+
+      request
+        .post(testUrl)
+        .send({})
+        .expect('Content-Type', /json/)
+        .expect(401)
+        .expect({
+          status: 401,
+          error: 'Unauthorized'
+        })
+        .end(done);
+
+    });
+
+
+    it('logging in user',
+
+      function (done) {
+        loginUser(done);
+      });
+
+
+    it('should update automessage body, sub and title',
+
+      function (done) {
+
+        var updatedMsg = {
+          body: 'Updated Land!',
+          sub: 'Updated Subland',
+          title: 'Updated TitleLand!',
+        };
+
+        request
+          .post(testUrl)
+          .set('cookie', loginCookie)
+          .send(updatedMsg)
+          .expect('Content-Type', /json/)
+          .expect(201)
+          .expect(function (res) {
+
+            savedMsg = res.body;
+
+            expect(savedMsg)
+              .to.have.property("body", updatedMsg.body);
+
+            expect(savedMsg)
+              .to.have.property("sub", updatedMsg.sub);
+
+            expect(savedMsg)
+              .to.have.property("title", updatedMsg.title);
+
+          })
+          .end(done);
+
+      });
+
+  });
+
+
 });
