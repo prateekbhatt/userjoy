@@ -155,8 +155,8 @@ DailyReportSchema.statics.upsert = function (aid, uid, cid, timestamp,
     // skip preallocation for current date
     if (i === date) {
 
-      if (usage) set['du_' + date] = usage;
-      if (score) set['ds_' + date] = score;
+      if (usage || usage === 0) set['du_' + date] = usage;
+      if (score || score === 0) set['ds_' + date] = score;
 
       continue;
     }
