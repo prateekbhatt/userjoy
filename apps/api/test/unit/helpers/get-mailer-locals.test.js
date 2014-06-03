@@ -11,7 +11,7 @@ describe('Helper get-mailer-locals', function () {
 
   describe('#getLocals', function () {
 
-    var creator;
+    var sender;
     var locals;
     var savedAutoMsg;
     var savedManualMsg;
@@ -26,8 +26,8 @@ describe('Helper get-mailer-locals', function () {
       savedManualMsg.sub = saved.conversations.first.sub;
 
       // mongoose populate is run to populate the creator account
-      creator = saved.accounts.first;
-      savedAutoMsg.creator = creator;
+      sender = saved.accounts.second;
+      savedAutoMsg.sender = sender;
 
     });
 
@@ -41,7 +41,7 @@ describe('Helper get-mailer-locals', function () {
           '@mail.userjoy.co');
 
       expect(locals)
-        .to.have.property("fromName", creator.name);
+        .to.have.property("fromName", sender.name);
 
       expect(locals)
         .to.have.property("toName", toName);
@@ -60,7 +60,7 @@ describe('Helper get-mailer-locals', function () {
           '@mail.userjoy.co');
 
       expect(locals)
-        .to.have.property("replyToName", 'Reply to ' + creator.name);
+        .to.have.property("replyToName", 'Reply to ' + sender.name);
 
       expect(locals.metadata)
         .to.have.property("amId", savedAutoMsg._id);

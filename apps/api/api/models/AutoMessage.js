@@ -94,6 +94,14 @@ var AutoMessageSchema = new Schema({
   },
 
 
+  // from which account is the automessage being sent
+  sender: {
+    type: Schema.Types.ObjectId,
+    ref: 'Account',
+    required: [true, 'Invalid sender account id']
+  },
+
+
   // segment id
   sid: {
     type: Schema.Types.ObjectId,

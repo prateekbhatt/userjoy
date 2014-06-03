@@ -187,6 +187,7 @@ var automessages = {
     aid: null,
     body: 'Hey, Welkom to CabanaLand!',
     creator: null,
+    sender: null,
     sid: null,
     sub: 'Welkom!',
     title: 'Welcome Message',
@@ -197,6 +198,7 @@ var automessages = {
     aid: null,
     body: 'Hey {{= user.name || "there" }}, Welkom to Second CabanaLand!',
     creator: null,
+    sender: null,
     sid: null,
     sub: 'Welkom Boss!',
     title: 'Welcome Message',
@@ -255,10 +257,11 @@ function createNotification(accid, aid, amId, uid, notf, fn) {
 
 
 
-function createAutoMessage(accid, aid, sid, automessage, fn) {
+function createAutoMessage(accid, aid, sender, sid, automessage, fn) {
 
   automessage.creator = accid;
   automessage.aid = aid;
+  automessage.sender = sender;
   automessage.sid = sid;
 
   AutoMessage.create(automessage, fn);
@@ -401,10 +404,12 @@ module.exports = function loadFixtures(callback) {
 
       var aid = apps.first._id;
       var accid = accounts.first._id;
+      var sender = accounts.second._id;
       var sid = segments.first._id;
       var automessage = automessages.first;
 
-      createAutoMessage(accid, aid, sid, automessage, function (err, amsg) {
+      createAutoMessage(accid, aid, sender, sid, automessage, function (err,
+        amsg) {
         if (err) return cb(err);
         automessages.first = amsg;
         cb();
@@ -417,10 +422,12 @@ module.exports = function loadFixtures(callback) {
 
       var aid = apps.first._id;
       var accid = accounts.first._id;
+      var sender = accounts.second._id;
       var sid = segments.first._id;
       var automessage = automessages.second;
 
-      createAutoMessage(accid, aid, sid, automessage, function (err, amsg) {
+      createAutoMessage(accid, aid, sender, sid, automessage, function (err,
+        amsg) {
         if (err) return cb(err);
         automessages.second = amsg;
         cb();

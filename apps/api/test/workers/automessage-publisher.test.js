@@ -40,6 +40,7 @@ describe('Worker automessagePublisher', function () {
       aid: randomId(),
       body: 'Hey, Welkom to CabanaLand!',
       creator: randomId(),
+      sender: randomId(),
       sid: randomId(),
       sub: 'Welkom!',
       title: 'Welcome Message',

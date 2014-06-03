@@ -111,7 +111,7 @@ function saveNotifications(users, amsg, cb) {
   var aid = amsg.aid;
   var amId = amsg._id;
   var body = amsg.body;
-  var sender = amsg.creator.name;
+  var sender = amsg.sender.name;
   var title = amsg.title;
 
   var iterator = function (u, cb) {
@@ -253,7 +253,7 @@ function amConsumer(cb) {
 
         AutoMessage
           .findById(autoMessageId)
-          .populate('creator')
+          .populate('sender')
           .exec(function (err, amsg) {
 
             logger.trace({
