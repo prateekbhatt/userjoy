@@ -63,7 +63,8 @@ angular.module('models.automate', ['services'])
             $http.put(config.apiUrl + '/apps/' + appId + '/automessages/' +
                 autoMsgId + '/active/true')
                 .success(function (data) {
-                    console.log("message is live");
+                    console.log("message is live: ", data);
+                    AutoMsgService.setSingleAutoMsg(data);
                 })
                 .error(function () {
                     console.log("error in making message live");
@@ -74,7 +75,8 @@ angular.module('models.automate', ['services'])
             $http.put(config.apiUrl + '/apps/' + appId + '/automessages/' +
                 autoMsgId + '/active/false')
                 .success(function (data) {
-                    console.log("message is deactive");
+                    console.log("message is deactive: ", data);
+                    AutoMsgService.setSingleAutoMsg(data);
                 })
                 .error(function () {
                     console.log("error in making message deactive");

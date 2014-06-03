@@ -87,5 +87,19 @@ angular
                     })
                     .error(cb);
             }
+
+            this.updateColor = function (appId, color) {
+                var data = {
+                    color: color
+                }
+                console.log("data: ", data);
+                $http.put(config.apiUrl + '/apps/' + appId + '/color', data)
+                    .success(function(data){
+                        console.log("updated color: ", data);
+                    })
+                    .error(function (){
+                        console.log("error");
+                    })
+            }
         }
     ])

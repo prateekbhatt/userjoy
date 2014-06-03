@@ -460,6 +460,8 @@ angular.module('do.automate', [])
             showAutoMsgCallback);
 
         $scope.changeAutoMsgStatus = function () {
+            console.log("automsgstatus: ", AutoMsgService.getSingleAutoMsg()
+                .active);
             if (AutoMsgService.getSingleAutoMsg()
                 .active) {
                 modelsAutomate.deActivateMsg($scope.currApp,

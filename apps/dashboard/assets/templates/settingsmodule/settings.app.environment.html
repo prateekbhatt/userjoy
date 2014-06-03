@@ -1,38 +1,40 @@
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">{{App}} Environment Settings</h3>
-    </div>
-    <table class="table">
-        <thead>
-            <tr>
-                <th class="text-center">Id</th>
-                <th class="text-center">Environment</th>
-                <th class="text-center"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- TODO: Get Data from Backend -->
-            <tr ng-repeat="app in appsEnvironment">
-                <td class="text-center">{{ app.liveKey | limitTo:numLimit }}</td>
-                <td class="text-center">Production</td>
-                <td class="text-center"><button class="btn btn-info">Active</button></td>
-            </tr>
-            <tr>
-                <td class="text-center">784567t812123</td>
-                <td class="text-center">Development</td>
-                <td class="text-center"><button class="btn btn-default">Switch</button></td>
-            </tr>
-        </tbody>
-    </table>
-    <br>
-    <div class="panel-body">
-        <form role="form" id="envForm" ng-submit="addEnvironment()" class="form-horizontal">
-            <div class="col-md-8">
-                <input type="text" class="form-control" ng-model="envName" placeholder="Environment Name">
-            </div>
-            <div class="col-md-4">
-                <button class="btn btn-info" type="submit" ng-disabled="!envName.length">Add Environment</button>
-            </div>
-        </form>
+<div class="col-md-offset-1" style="margin-top: 20px;">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">{{App}} Environment Settings</h3>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="text-center">Id</th>
+                    <th class="text-center">Environment</th>
+                    <th class="text-center"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- TODO: Get Data from Backend -->
+                <tr ng-repeat="app in appsEnvironment">
+                    <td class="text-center">{{ app.liveKey | limitTo:numLimit }}</td>
+                    <td class="text-center">Production</td>
+                    <td class="text-center"><button class="btn btn-info">Active</button></td>
+                </tr>
+                <tr>
+                    <td class="text-center">784567t812123</td>
+                    <td class="text-center">Development</td>
+                    <td class="text-center"><button class="btn btn-default">Switch</button></td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <div class="panel-body">
+            <form role="form" id="envForm" ng-submit="addEnvironment()" class="form-horizontal">
+                <div class="col-md-8">
+                    <input type="text" class="form-control" ng-model="envName" placeholder="Environment Name">
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-info" type="submit" ng-disabled="!envName.length">Add Environment</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
