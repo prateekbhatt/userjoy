@@ -11,22 +11,22 @@
                         <div class="col-md-8">
                             <div class="bs-example">
                                 <div class="btn-group">
-                                    <button type="button" class="btn select-color" style="background-color: #39b3d7; width: 30px; height: 30px; margin-right: 15px;" ng-click="showPreview('#39b3d7')"></button>
+                                    <button type="button" class="btn" style="background-color: #39b3d7; margin-right: 15px;" ng-click="showPreview('#39b3d7')" ng-style="{'width': btnInfoWidth, 'height': btnInfoHeight}"></button>
                                 </div>
                                 <div class="btn-group">
-                                    <button type="button" class="btn select-color" style="background-color: #3276b1; width: 30px; height: 30px; margin-right: 15px;" ng-click="showPreview('#3276b1')"></button>
+                                    <button type="button" class="btn" style="background-color: #3276b1; margin-right: 15px;" ng-click="showPreview('#3276b1')" ng-style="{'width': btnPrimaryWidth, 'height': btnPrimaryHeight}"></button>
                                 </div>
                                 <div class="btn-group">
-                                    <button type="button" class="btn select-color" style="background-color: #7f8c8d; width: 30px; height: 30px; margin-right: 15px;" ng-click="showPreview('#7f8c8d')"></button>
+                                    <button type="button" class="btn" style="background-color: #7f8c8d; margin-right: 15px;" ng-click="showPreview('#7f8c8d')" ng-style="{'width': btnDefaultWidth, 'height': btnDefaultHeight}"></button>
                                 </div>
                                 <div class="btn-group">
-                                    <button type="button" class="btn select-color" style="background-color: #18bc9c; width: 30px; height: 30px; margin-right: 15px;" ng-click="showPreview('#18bc9c')"></button>
+                                    <button type="button" class="btn" style="background-color: #18bc9c; margin-right: 15px;" ng-click="showPreview('#18bc9c')" ng-style="{'width': btnSuccessWidth, 'height': btnSuccessHeight}"></button>
                                 </div>
                                 <div class="btn-group">
-                                    <button type="button" class="btn select-color" style="background-color: #f0ad4e; width: 30px; height: 30px; margin-right: 15px;" ng-click="showPreview('#f0ad4e')"></button>
+                                    <button type="button" class="btn" style="background-color: #f0ad4e; margin-right: 15px;" ng-click="showPreview('#f0ad4e')" ng-style="{'width': btnWarningWidth, 'height': btnWarningHeight}"></button>
                                 </div>
                                 <div class="btn-group">
-                                    <button type="button" class="btn select-color" style="background-color: #d9534f; width: 30px; height: 30px; margin-right: 15px;" ng-click="showPreview('#d9534f')"></button>
+                                    <button type="button" class="btn" style="background-color: #d9534f; margin-right: 15px;" ng-click="showPreview('#d9534f')" ng-style="{'width': btnDangerWidth, 'height': btnDangerHeight}"></button>
                                 </div>
                             </div>
                         </div>
@@ -61,7 +61,7 @@
                                         </div>
                                         <div class="panel-body">
                                             <form role="form">
-                                                <textarea class="form-control" style="padding: 4px; height: 150px;"></textarea>
+                                                <textarea class="form-control" style="padding: 4px; height: 150px; background-color: #ffffff;" disabled></textarea>
                                                 <br>
                                                 <input type="submit" value="Send Message" class="btn btn-sm btn-block disabled" style="float: right;" ng-style="{'float': floatRight, 'background-color': btnBackgrndColor, 'color': btnColor}">
                                                 <hr>

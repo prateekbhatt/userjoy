@@ -331,7 +331,7 @@ height: 100%;
     border-color: #ccc;
 }
 
-.select-color: hover, .select-color: focus {
+.select-color {
     width: 40px;
     height: 40px;
 }

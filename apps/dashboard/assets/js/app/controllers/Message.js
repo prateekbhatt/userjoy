@@ -96,10 +96,11 @@ angular.module('do.message', [])
         console.log("inside home msg ctrl");
 
         // TODO : change in production
-        if (window.location.href ===
+        /*if (window.location.href ===
             'http://app.do.localhost/messages') {
             $location.path('/messages/inbox');
-        }
+        }*/
+        
 
     }
 ])
