@@ -170,5 +170,29 @@ router
   });
 
 
+/**
+ * PUT /apps/:aid/color
+ *
+ * Update the color theme for the app
+ */
+
+router
+  .route('/:aid/color')
+  .put(function (req, res, next) {
+
+    var color = req.body.color;
+
+    // length must be 7, #FFFFFF
+    if (!color || color.length !== 7) {
+      return res.badRequest('Provide valid color code');
+    }
+
+    req.app.color = color;
+    req.app.save(function (err, app) {
+      if (err) return next(err);
+      res.json(app);
+    });
+  });
+
 
 module.exports = router;

@@ -352,4 +352,82 @@ describe('Resource /apps', function () {
 
   });
 
+
+  describe('PUT /apps/:aid/color', function () {
+
+    before(function (done) {
+      logoutUser(done);
+    });
+
+    it('returns error if not logged in',
+
+      function (done) {
+
+        var newColor = '#FEFEFE';
+
+        request
+          .put('/apps/' + saved.apps.first._id + '/color')
+          .send({
+            color: newColor
+          })
+          .expect('Content-Type', /json/)
+          .expect(401)
+          .end(done);
+
+      });
+
+
+    it('logging in user', function (done) {
+      loginUser(done);
+    });
+
+
+    it('should return error is invalid color code',
+
+      function (done) {
+
+        var newColor = '#FEFE';
+
+        request
+          .put('/apps/' + saved.apps.first._id + '/color')
+          .send({
+            color: newColor
+          })
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            "error": "Provide valid color code",
+            "status": 400
+          })
+          .end(done);
+
+      });
+
+
+
+    it('updates app name',
+
+      function (done) {
+
+        var newColor = '#FEFEFE';
+
+        request
+          .put('/apps/' + saved.apps.first._id + '/color')
+          .send({
+            color: newColor
+          })
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .expect(function (res) {
+            expect(res.body.color)
+              .to.eql(newColor);
+          })
+          .end(done);
+
+      });
+
+  });
+
 });
