@@ -14,6 +14,11 @@ describe('Model App', function () {
 
   var App = require('../../../api/models/App');
 
+
+  /**
+   * Test vars
+   */
+
   var randomId = mongoose.Types.ObjectId;
 
 
@@ -28,6 +33,12 @@ describe('Model App', function () {
         .to.have.property("testKey");
       expect(saved.apps.first)
         .to.have.property("liveKey");
+    });
+
+
+    it('should add default color', function () {
+      expect(saved.apps.first)
+        .to.have.property("color", '#39B3D7');
     });
 
 
@@ -94,7 +105,6 @@ describe('Model App', function () {
 
     it('should return all apps belonging to an account', function (done) {
       App.findByAccountId(saved.accounts.first._id, function (err, apps) {
-        console.log(err, apps[0].team[0].accid);
 
         expect(err)
           .to.not.exist;

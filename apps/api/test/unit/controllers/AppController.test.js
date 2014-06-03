@@ -6,9 +6,6 @@ describe('Resource /apps', function () {
 
   var mongoose = require('mongoose');
 
-  var newApp = {
-    name: 'My New App'
-  };
 
   var randomId = mongoose.Types.ObjectId;
 
@@ -30,6 +27,10 @@ describe('Resource /apps', function () {
     it('returns error if not logged in',
 
       function (done) {
+
+        var newApp = {
+          name: 'My New App'
+        };
 
         request
           .post('/apps')
@@ -65,7 +66,7 @@ describe('Resource /apps', function () {
         .expect(400)
         .expect({
           "error": [
-            "name is required"
+            "App name is required"
           ],
           "status": 400
         })
@@ -87,7 +88,7 @@ describe('Resource /apps', function () {
         .expect(400)
         .expect({
           "error": [
-            "url is required"
+            "Domain url is required"
           ],
           "status": 400
         })
@@ -149,6 +150,8 @@ describe('Resource /apps', function () {
     it('returns error if not logged in',
 
       function (done) {
+
+        var newApp = {};
 
         request
           .get('/apps')
@@ -342,6 +345,84 @@ describe('Resource /apps', function () {
             if (res.body.name !== newName) {
               return 'Name was not updated';
             }
+          })
+          .end(done);
+
+      });
+
+  });
+
+
+  describe('PUT /apps/:aid/color', function () {
+
+    before(function (done) {
+      logoutUser(done);
+    });
+
+    it('returns error if not logged in',
+
+      function (done) {
+
+        var newColor = '#FEFEFE';
+
+        request
+          .put('/apps/' + saved.apps.first._id + '/color')
+          .send({
+            color: newColor
+          })
+          .expect('Content-Type', /json/)
+          .expect(401)
+          .end(done);
+
+      });
+
+
+    it('logging in user', function (done) {
+      loginUser(done);
+    });
+
+
+    it('should return error is invalid color code',
+
+      function (done) {
+
+        var newColor = '#FEFE';
+
+        request
+          .put('/apps/' + saved.apps.first._id + '/color')
+          .send({
+            color: newColor
+          })
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            "error": "Provide valid color code",
+            "status": 400
+          })
+          .end(done);
+
+      });
+
+
+
+    it('updates app name',
+
+      function (done) {
+
+        var newColor = '#FEFEFE';
+
+        request
+          .put('/apps/' + saved.apps.first._id + '/color')
+          .send({
+            color: newColor
+          })
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .expect(function (res) {
+            expect(res.body.color)
+              .to.eql(newColor);
           })
           .end(done);
 
