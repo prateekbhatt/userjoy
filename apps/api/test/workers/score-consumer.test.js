@@ -1,4 +1,4 @@
-describe.only('Worker score-consumer', function () {
+describe('Worker score-consumer', function () {
 
 
   /**
@@ -100,5 +100,101 @@ describe.only('Worker score-consumer', function () {
     });
 
   });
+
+
+  describe('#scoreConsumerWorker', function () {
+
+
+    it('should run mapReduce and save score', function (done) {
+
+
+      var time = moment();
+      var date = time.date();
+
+      async.series(
+
+        [
+
+          function checkBeforeScore(cb) {
+
+            DailyReport
+              .find({}, function (err, scoreBefore) {
+
+                expect(err)
+                  .to.not.exist;
+
+                expect(scoreBefore)
+                  .to.be.an("array")
+                  .that.has.length(4);
+
+                cb();
+              });
+          },
+
+
+          function runScoreWorker(cb) {
+
+            var cid;
+
+            worker._scoreConsumerWorker(aid, cid, time.format(),
+              function (
+                err) {
+
+                expect(err)
+                  .to.not.exist;
+
+                cb();
+              })
+
+          },
+
+
+          function checkAfterScore(cb) {
+
+            DailyReport.find({}, function (err, scoreAfter) {
+
+              expect(err)
+                .to.not.exist;
+
+              expect(scoreAfter)
+                .to.be.an("array")
+                .that.has.length(4);
+
+
+              _.each(scoreAfter, function (h) {
+
+                h = h.toJSON();
+
+                if (h.y === time.year() && h.m === time.month()) {
+
+                  expect(h)
+                    .to.be.an("object")
+                    .that.has.property("du_" + date)
+                    .that.is.a("number")
+                    .that.is.within(0, 1440);
+
+                  // since there are only two users, the score must be either
+                  // 0 or 100
+                  expect(_.contains([0, 100], h["ds_" + date]))
+                    .to.be.true;
+
+                }
+
+              });
+
+              cb();
+            });
+          }
+
+        ],
+
+        done)
+
+
+    });
+
+
+  });
+
 
 });
