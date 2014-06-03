@@ -1,442 +1,466 @@
 angular.module('do.settings', [])
 
 .config(['$stateProvider',
-    function ($stateProvider) {
-        $stateProvider
-            .state('settings', {
-                url: '/account',
-                views: {
-                    "main": {
-                        templateUrl: '/templates/settingsmodule/settings.html',
-                        controller: 'profileSettingsCtrl'
-                    }
-                },
-                authenticate: true
-            })
-            .state('accountsettings', {
-                url: '/account/settings',
-                views: {
-                    "main": {
-                        templateUrl: '/templates/settingsmodule/settings.profile.html',
-                        controller: 'profileSettingsCtrl',
-                    }
-                },
-                authenticate: true
-            })
-            .state('changePassword', {
-                url: '/account/settings/changePassword',
-                views: {
-                    "main": {
-                        templateUrl: '/templates/settingsmodule/settings.profile.changePassword.html',
-                        controller: 'changePasswordCtrl',
-                    }
-                },
-                authenticate: true
-            })
-            .state('appsettings', {
-                url: '/apps/:id/settings',
-                views: {
-                    "main": {
-                        templateUrl: '/templates/settingsmodule/settings.app.html',
-                        controller: 'appSettingsCtrl',
-                    }
-                },
-                authenticate: true
-            })
-            .state('appsettings.general', {
-                url: '/general',
-                views: {
-                    "tab": {
-                        templateUrl: '/templates/settingsmodule/settings.app.general.html',
-                        controller: 'appSettingsGeneralCtrl',
-                    }
-                },
-                authenticate: true
-            })
-            .state('appsettings.team', {
-                url: '/team',
-                views: {
-                    "tab": {
-                        templateUrl: '/templates/settingsmodule/settings.app.team.html',
-                        controller: 'appSettingsTeamCtrl',
-                    }
-                },
-                authenticate: true
-            })
-            .state('appsettings.health', {
-                url: '/health',
-                views: {
-                    "tab": {
-                        templateUrl: '/templates/settingsmodule/settings.app.health.html',
-                        controller: 'appSettingsHealthCtrl',
-                    }
-                },
-                authenticate: true
-            })
-            .state('appsettings.messages', {
-                url: '/messages',
-                views: {
-                    "tab": {
-                        templateUrl: '/templates/settingsmodule/settings.app.messages.html',
-                        controller: 'appSettingsMessagesCtrl',
-                    }
-                },
-                authenticate: true
-            })
-            .state('appsettings.environment', {
-                url: '/environment',
-                views: {
-                    "tab": {
-                        templateUrl: '/templates/settingsmodule/settings.app.environment.html',
-                        controller: 'appSettingsEnvironmentCtrl',
-                    }
-                },
-                authenticate: true
-            })
-            .state('appsettings.billing', {
-                url: '/billing',
-                views: {
-                    "tab": {
-                        templateUrl: '/templates/settingsmodule/settings.app.billing.html',
-                        controller: 'appSettingsBillingCtrl',
-                    }
-                },
-                authenticate: true
-            })
-            .state('appsettings.installation', {
-                url: '/installation',
-                views: {
-                    "tab": {
-                        templateUrl: '/templates/settingsmodule/settings.app.installation.html',
-                        controller: 'appSettingsInstallationCtrl',
-                    }
-                },
-                authenticate: true
-            })
-            .state('redirect', {
-                url: '/apps/:aid/invite/:id',
-                views: {
-                    "main": {
-                        templateUrl: '/templates/settingsmodule/settings.redirect.invite.html',
-                        controller: 'appSettingsInviteCtrl',
-                    }
-                }
-            })
+  function ($stateProvider) {
+    $stateProvider
+      .state('settings', {
+        url: '/account',
+        views: {
+          "main": {
+            templateUrl: '/templates/settingsmodule/settings.html',
+            controller: 'profileSettingsCtrl'
+          }
+        },
+        authenticate: true
+      })
+      .state('accountsettings', {
+        url: '/account/settings',
+        views: {
+          "main": {
+            templateUrl: '/templates/settingsmodule/settings.profile.html',
+            controller: 'profileSettingsCtrl',
+          }
+        },
+        authenticate: true
+      })
+      .state('changePassword', {
+        url: '/account/settings/changePassword',
+        views: {
+          "main": {
+            templateUrl: '/templates/settingsmodule/settings.profile.changePassword.html',
+            controller: 'changePasswordCtrl',
+          }
+        },
+        authenticate: true
+      })
+      .state('appsettings', {
+        url: '/apps/:id/settings',
+        views: {
+          "main": {
+            templateUrl: '/templates/settingsmodule/settings.app.html',
+            controller: 'appSettingsCtrl',
+          }
+        },
+        authenticate: true
+      })
+      .state('appsettings.general', {
+        url: '/general',
+        views: {
+          "tab": {
+            templateUrl: '/templates/settingsmodule/settings.app.general.html',
+            controller: 'appSettingsGeneralCtrl',
+          }
+        },
+        authenticate: true
+      })
+      .state('appsettings.team', {
+        url: '/team',
+        views: {
+          "tab": {
+            templateUrl: '/templates/settingsmodule/settings.app.team.html',
+            controller: 'appSettingsTeamCtrl',
+          }
+        },
+        authenticate: true
+      })
+      .state('appsettings.health', {
+        url: '/health',
+        views: {
+          "tab": {
+            templateUrl: '/templates/settingsmodule/settings.app.health.html',
+            controller: 'appSettingsHealthCtrl',
+          }
+        },
+        authenticate: true
+      })
+      .state('appsettings.messages', {
+        url: '/messages',
+        views: {
+          "tab": {
+            templateUrl: '/templates/settingsmodule/settings.app.messages.html',
+            controller: 'appSettingsMessagesCtrl',
+          }
+        },
+        authenticate: true
+      })
+      .state('appsettings.environment', {
+        url: '/environment',
+        views: {
+          "tab": {
+            templateUrl: '/templates/settingsmodule/settings.app.environment.html',
+            controller: 'appSettingsEnvironmentCtrl',
+          }
+        },
+        authenticate: true
+      })
+      .state('appsettings.billing', {
+        url: '/billing',
+        views: {
+          "tab": {
+            templateUrl: '/templates/settingsmodule/settings.app.billing.html',
+            controller: 'appSettingsBillingCtrl',
+          }
+        },
+        authenticate: true
+      })
+      .state('appsettings.installation', {
+        url: '/installation',
+        views: {
+          "tab": {
+            templateUrl: '/templates/settingsmodule/settings.app.installation.html',
+            controller: 'appSettingsInstallationCtrl',
+          }
+        },
+        authenticate: true
+      })
+      .state('redirect', {
+        url: '/apps/:aid/invite/:id',
+        views: {
+          "main": {
+            templateUrl: '/templates/settingsmodule/settings.redirect.invite.html',
+            controller: 'appSettingsInviteCtrl',
+          }
+        }
+      })
 
-    }
+  }
 ])
 
 
 .controller('profileSettingsCtrl', ['$scope', '$log', '$state', '$location',
-    '$http', 'config', 'AccountService', 'AccountModel',
-    function ($scope, $log, $state, $location, $http, config,
-        AccountService, AccountModel) {
+  '$http', 'config', 'AccountService', 'AccountModel',
+  function ($scope, $log, $state, $location, $http, config,
+    AccountService, AccountModel) {
 
-        $scope.profileNameChangeSuccess = false;
-        $scope.profileNameChangeError = false;
-        $scope.hideSuccessAlert = function () {
-            $scope.profileNameChangeSuccess = false;
-        }
-
-        $scope.hideErrorAlert = function () {
-            $scope.profileNameChangeError = false;
-        }
-
-
-        function setName() {
-            var account = AccountService.get();
-            if (typeof account === 'object') {
-                $scope.name = account.name;
-                console.log("profile name: ", $scope.name, account.name);
-            }
-        }
-
-        function init() {
-            setName();
-        }
-
-        $scope.name = '';
-
-        init();
-
-        $scope.$watch(AccountService.get, setName);
-
-
-        if (window.location.href ===
-            'http://app.do.localhost/account') {
-            $location.path('/users/list');
-        }
-
-        $scope.changeProfileName = function () {
-            console.log("updating profile name");
-            AccountModel.updateName($scope.name, function (err, acc) {
-                if (err) {
-                    $log.error('failed to update name', err);
-                    $scope.profileNameChangeError = true;
-                    return;
-                }
-                $scope.profileNameChangeSuccess = true;
-                AccountService.set(acc);
-            });
-        }
+    $scope.profileNameChangeSuccess = false;
+    $scope.profileNameChangeError = false;
+    $scope.hideSuccessAlert = function () {
+      $scope.profileNameChangeSuccess = false;
     }
+
+    $scope.hideErrorAlert = function () {
+      $scope.profileNameChangeError = false;
+    }
+
+
+    function setName() {
+      var account = AccountService.get();
+      if (typeof account === 'object') {
+        $scope.name = account.name;
+        console.log("profile name: ", $scope.name, account.name);
+      }
+    }
+
+    function init() {
+      setName();
+    }
+
+    $scope.name = '';
+
+    init();
+
+    $scope.$watch(AccountService.get, setName);
+
+
+    if (window.location.href ===
+      'http://app.do.localhost/account') {
+      $location.path('/users/list');
+    }
+
+    $scope.changeProfileName = function () {
+      console.log("updating profile name");
+      AccountModel.updateName($scope.name, function (err, acc) {
+        if (err) {
+          $log.error('failed to update name', err);
+          $scope.profileNameChangeError = true;
+          return;
+        }
+        $scope.profileNameChangeSuccess = true;
+        AccountService.set(acc);
+      });
+    }
+  }
 ])
 
 .controller('changePasswordCtrl', ['$scope', 'AccountModel', '$log',
-    function ($scope, AccountModel, $log) {
+  function ($scope, AccountModel, $log) {
 
-        // $scope.newPwdLen = true;
-        $scope.new_pwd = '';
-        $scope.showError = false;
-        $scope.pwdChangedSuccess = false;
-        $scope.errMsg = '';
-        $scope.hideErrorAlert = function () {
-            $scope.showError = false;
-        }
-
-        $scope.hideSuccessAlert = function () {
-            $scope.pwdChangedSuccess = false;
-        }
-        $scope.changePassword = function () {
-            AccountModel.updatePwd($scope.current_pwd, $scope.new_pwd,
-                function (err, data) {
-                    if (err) {
-                        $log.error('failed to update pwd:', err);
-                        $scope.showError = true;
-                        $scope.errMsg = err.error;
-                        return;
-                    }
-                    $scope.pwdChangedSuccess = true;
-                    $log.info("password changed successfully!");
-                })
-        }
+    // $scope.newPwdLen = true;
+    $scope.new_pwd = '';
+    $scope.showError = false;
+    $scope.pwdChangedSuccess = false;
+    $scope.errMsg = '';
+    $scope.hideErrorAlert = function () {
+      $scope.showError = false;
     }
+
+    $scope.hideSuccessAlert = function () {
+      $scope.pwdChangedSuccess = false;
+    }
+    $scope.changePassword = function () {
+      AccountModel.updatePwd($scope.current_pwd, $scope.new_pwd,
+        function (err, data) {
+          if (err) {
+            $log.error('failed to update pwd:', err);
+            $scope.showError = true;
+            $scope.errMsg = err.error;
+            return;
+          }
+          $scope.pwdChangedSuccess = true;
+          $log.info("password changed successfully!");
+        })
+    }
+  }
 ])
 
 .controller('appSettingsCtrl', ['$scope', '$log', '$state', '$location',
-    function ($scope, $log, $state, $location) {
+  function ($scope, $log, $state, $location) {
 
-        // TODO: get data from backend
-        $scope.App = 'Userjoy';
+    // TODO: get data from backend
+    $scope.App = 'Userjoy';
 
-        if (window.location.href ===
-            'http://app.do.localhost/app/settings') {
-            $location.path('/app/settings/general');
-        }
-
+    if (window.location.href ===
+      'http://app.do.localhost/app/settings') {
+      $location.path('/app/settings/general');
     }
+
+  }
 ])
 
 .controller('appSettingsGeneralCtrl', ['$scope', '$log', '$state',
-    'AppService', 'AppModel',
-    function ($scope, $log, $state, AppService, AppModel) {
-        $scope.name = AppService.getCurrentApp()
-            .name;
-        var appId = AppService.getCurrentApp()
-            ._id;
+  'AppService', 'AppModel',
+  function ($scope, $log, $state, AppService, AppModel) {
+    $scope.name = AppService.getCurrentApp()
+      .name;
+    var appId = AppService.getCurrentApp()
+      ._id;
 
-        $scope.changeAppName = function () {
-            AppModel.updateName($scope.name, appId, function (err, data) {
-                if (err) {
-                    $log.info("Error in updating app name");
-                    return;
-                }
-                $log.info("app name changed successfully!")
-            })
+    $scope.changeAppName = function () {
+      AppModel.updateName($scope.name, appId, function (err, data) {
+        if (err) {
+          $log.info("Error in updating app name");
+          return;
         }
-
+        $log.info("app name changed successfully!")
+      })
     }
+
+  }
 ])
 
 .controller('appSettingsTeamCtrl', ['$scope', '$log', '$state',
-    'CurrentAppService', 'AppModel', 'InviteModel', 'InviteIdService',
-    'AppService', '$stateParams',
-    function ($scope, $log, $state, CurrentAppService, AppModel,
-        InviteModel, InviteIdService, AppService, $stateParams) {
+  'CurrentAppService', 'AppModel', 'InviteModel', 'InviteIdService',
+  'AppService', '$stateParams',
+  function ($scope, $log, $state, CurrentAppService, AppModel,
+    InviteModel, InviteIdService, AppService, $stateParams) {
 
-        // TODO: Get data from backend
-        CurrentAppService.getCurrentApp()
-            .then(function (currentApp) {
+    // TODO: Get data from backend
+    CurrentAppService.getCurrentApp()
+      .then(function (currentApp) {
 
-                $scope.currApp = $stateParams.id;
-                $scope.invTeamMember = false;
-                $scope.showMsgSuccess = false;
-                $scope.team = [];
-                $scope.invitedTeam = [];
+        $scope.currApp = $stateParams.id;
+        $scope.invTeamMember = false;
+        $scope.showMsgSuccess = false;
+        $scope.team = [];
+        $scope.invitedTeam = [];
 
-                var populatePage = function () {
+        var populatePage = function () {
 
-                    $scope.hideMsgSuccessAlert = function () {
-                        $scope.showMsgSuccess = false;
-                    }
+          $scope.hideMsgSuccessAlert = function () {
+            $scope.showMsgSuccess = false;
+          }
 
 
 
-                    var populateInvitedMembers = function () {
-                        $scope.invitedTeam = InviteIdService.getInvitedMembers();
-                        // $scope.showMsgSuccess = true;
-                    }
-                    InviteModel.getPendingInvites($scope.currApp,
-                        populateInvitedMembers);
-                    // $scope.team = currentApp.team;
+          var populateInvitedMembers = function () {
+            $scope.invitedTeam = InviteIdService.getInvitedMembers();
+            // $scope.showMsgSuccess = true;
+          }
+          InviteModel.getPendingInvites($scope.currApp,
+            populateInvitedMembers);
+          // $scope.team = currentApp.team;
 
-                    var length = InviteIdService.getInvitedMembers()
-                        .length;
-                    $scope.$watch('length', function () {
-                        $scope.invTeamMember = true;
-                    })
+          var length = InviteIdService.getInvitedMembers()
+            .length;
+          $scope.$watch('length', function () {
+            $scope.invTeamMember = true;
+          })
 
-                    for (var i = 0; i < AppService.getCurrentApp()
-                        .team.length; i++) {
-                        $scope.team.push({
-                            name: AppService.getCurrentApp()
-                                .team[i].accid.name,
-                            email: AppService.getCurrentApp()
-                                .team[i].accid.email
-                        })
-                    };
-
-                    $scope.removeTeamMember = function (teamMember) {
-                        // TODO: Add code to remove team member
-                        $log.info(
-                            "team member removed function called");
-                        var index = $scope.team.indexOf(teamMember);
-                        $scope.team.splice(index, 1);
-                    }
-
-                    var showSuccessMsg = function (err) {
-                        if(err) {
-                            return err;
-                        }
-
-                        $scope.showMsgSuccess = true;
-                        $scope.invitedTeam.push({
-                            toName: $scope.nameMember,
-                            toEmail: $scope.teamMember
-                        })
-                    }
-
-                    $scope.addTeamMember = function () {
-                        var data = {
-                            email: $scope.teamMember,
-                            name: $scope.nameMember
-                        };
-                        console.log("data: ", data);
-
-                        AppModel.addNewMember(data, $scope.currApp,
-                            showSuccessMsg);
-                    }
-                }
-
-                AppModel.getSingleApp($scope.currApp, populatePage);
+          for (var i = 0; i < AppService.getCurrentApp()
+            .team.length; i++) {
+            $scope.team.push({
+              name: AppService.getCurrentApp()
+                .team[i].accid.name,
+              email: AppService.getCurrentApp()
+                .team[i].accid.email
             })
-    }
+          };
+
+          $scope.removeTeamMember = function (teamMember) {
+            // TODO: Add code to remove team member
+            $log.info(
+              "team member removed function called");
+            var index = $scope.team.indexOf(teamMember);
+            $scope.team.splice(index, 1);
+          }
+
+          var showSuccessMsg = function (err) {
+            if (err) {
+              return err;
+            }
+
+            $scope.showMsgSuccess = true;
+            $scope.invitedTeam.push({
+              toName: $scope.nameMember,
+              toEmail: $scope.teamMember
+            })
+          }
+
+          $scope.addTeamMember = function () {
+            var data = {
+              email: $scope.teamMember,
+              name: $scope.nameMember
+            };
+            console.log("data: ", data);
+
+            AppModel.addNewMember(data, $scope.currApp,
+              showSuccessMsg);
+          }
+        }
+
+        AppModel.getSingleApp($scope.currApp, populatePage);
+      })
+  }
 ])
 
 .controller('appSettingsHealthCtrl', ['$scope', '$log', '$state',
-    function ($scope, $log, $state) {
-        $scope.activitydropdown = [{
-            text: 'Daily'
-        }, {
-            text: 'Weekly'
-        }, {
-            text: 'Monthly'
-        }, {
-            text: 'Inactive'
-        }];
+  function ($scope, $log, $state) {
+    $scope.activitydropdown = [{
+      text: 'Daily'
+    }, {
+      text: 'Weekly'
+    }, {
+      text: 'Monthly'
+    }, {
+      text: 'Inactive'
+    }];
 
-        $scope.spenttimedropdown = [{
-            text: '10 mins'
-        }, {
-            text: '30 mins'
-        }, {
-            text: '1 hr'
-        }, {
-            text: '2 hrs'
-        }, {
-            text: '5 hrs'
-        }];
+    $scope.spenttimedropdown = [{
+      text: '10 mins'
+    }, {
+      text: '30 mins'
+    }, {
+      text: '1 hr'
+    }, {
+      text: '2 hrs'
+    }, {
+      text: '5 hrs'
+    }];
 
-        $scope.pulsedropdown = [{
-            text: '20%'
-        }, {
-            text: '30%'
-        }, {
-            text: '40%'
-        }, {
-            text: '50%'
-        }, {
-            text: '60%'
-        }, {
-            text: '70%'
-        }, {
-            text: '80%'
-        }, {
-            text: '90%'
-        }, {
-            text: '100%'
-        }];
+    $scope.pulsedropdown = [{
+      text: '20%'
+    }, {
+      text: '30%'
+    }, {
+      text: '40%'
+    }, {
+      text: '50%'
+    }, {
+      text: '60%'
+    }, {
+      text: '70%'
+    }, {
+      text: '80%'
+    }, {
+      text: '90%'
+    }, {
+      text: '100%'
+    }];
 
-        $scope.purchasedlicensesdropdown = [{
-            text: '20%'
-        }, {
-            text: '40%'
-        }, {
-            text: '60%'
-        }, {
-            text: '80%'
-        }];
-    }
+    $scope.purchasedlicensesdropdown = [{
+      text: '20%'
+    }, {
+      text: '40%'
+    }, {
+      text: '60%'
+    }, {
+      text: '80%'
+    }];
+  }
 ])
 
 .controller('appSettingsMessagesCtrl', ['$scope', '$log', '$state',
-    function ($scope, $log, $state) {
+  function ($scope, $log, $state) {
+    $scope.color = '#39b3d7'
+    $scope.notfHeight = '150px';
+    $scope.overflow = 'auto'
+    $scope.marginTop = '3px';
+    $scope.borderColor = '#39b3d7';
+    $scope.borderRight = '1px solid' + '#39b3d7';
+    $scope.borderTop = '1px solid' + '#39b3d7';
+    $scope.borderBottom = '1px solid' + '#39b3d7';
+    $scope.btnBackgrndColor = '#39b3d7';
+    $scope.btnBorderColor = '#39b3d7';
+    $scope.btnColor = '#ffffff';
+    $scope.floatRight = 'right';
 
+    $scope.borderRadius = '4px';
+    $scope.showPreview = function (color) {
+      console.log("color: ", color);
+      $scope.borderColor = color;
+      $scope.borderRight = '1px solid' + color;
+      $scope.borderTop = '1px solid' + color;
+      $scope.borderBottom = '1px solid' + color;
+      $scope.btnBackgrndColor = color;
+      $scope.btnBorderColor = color;
+      $scope.btnColor = '#ffffff';
     }
+    // $scope.messagetemplatecolor = 'message-template-danger';
+  }
 ])
 
 .controller('appSettingsEnvironmentCtrl', ['$scope', '$log', '$state',
-    'AppService',
-    function ($scope, $log, $state, AppService) {
-        $scope.numLimit = 10;
-        $scope.appsEnvironment = [];
-        $scope.appsEnvironment = AppService.getLoggedInApps();
-    }
+  'AppService',
+  function ($scope, $log, $state, AppService) {
+    $scope.numLimit = 10;
+    $scope.appsEnvironment = [];
+    $scope.appsEnvironment = AppService.getLoggedInApps();
+  }
 ])
 
 .controller('appSettingsBillingCtrl', ['$scope', '$log', '$state',
-    function ($scope, $log, $state) {
+  function ($scope, $log, $state) {
 
-    }
+  }
 ])
 
 .controller('appSettingsInstallationCtrl', ['$scope', '$log', '$state',
-    function ($scope, $log, $state) {
+  function ($scope, $log, $state) {
 
-    }
+  }
 ])
 
 .controller('appSettingsInviteCtrl', ['$scope', '$rootScope', 'AppModel',
-    'InviteIdService',
-    function ($scope, $rootScope, AppModel, InviteIdService) {
+  'InviteIdService',
+  function ($scope, $rootScope, AppModel, InviteIdService) {
+    $scope.noError = true;
+    $scope.error = false;
+    var url = window.location.href;
+    var appId = url.split("/")[4];
+    var inviteId = url.split("/")[6];
+    InviteIdService.setInviteId(inviteId);
+    var showMsg = function (err) {
+      if (err) {
+        $scope.noError = false;
+        $scope.error = true;
+        return;
+      } else {
         $scope.noError = true;
         $scope.error = false;
-        var url = window.location.href;
-        var appId = url.split("/")[4];
-        var inviteId = url.split("/")[6];
-        InviteIdService.setInviteId(inviteId);
-        var showMsg = function (err) {
-            if (err) {
-                $scope.noError = false;
-                $scope.error = true;
-                return;
-            } else {
-                $scope.noError = true;
-                $scope.error = false;
-            }
-        }
-
-        AppModel.redirectUser(appId, inviteId, showMsg);
-
+      }
     }
+
+    AppModel.redirectUser(appId, inviteId, showMsg);
+
+  }
 ])
