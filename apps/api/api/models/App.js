@@ -45,26 +45,12 @@ var TeamMemberSchema = new Schema({
 
 var AppSchema = new Schema({
 
-  name: {
-    type: String,
-    required: [true, 'App name is required'],
-    // validate: appNameValidator
+
+  ct: {
+    type: Date,
+    default: Date.now
   },
 
-  url: {
-    type: String,
-    required: [true, 'Domain url is required']
-  },
-
-  testKey: {
-    type: String,
-    unique: true
-  },
-
-  liveKey: {
-    type: String,
-    unique: true
-  },
 
   // isActive is set to true when we start recieveing data from the app
   isActive: {
@@ -72,19 +58,60 @@ var AppSchema = new Schema({
     default: false
   },
 
-  team: [TeamMemberSchema]
+
+  liveKey: {
+    type: String,
+    unique: true
+  },
+
+
+  name: {
+    type: String,
+    required: [true, 'App name is required'],
+    // validate: appNameValidator
+  },
+
+
+  team: [TeamMemberSchema],
+
+
+  testKey: {
+    type: String,
+    unique: true
+  },
+
+
+  // color theme for notification / feedback templates
+  theme: {
+    type: String,
+    default: '#39B3D7',
+    required: [true, 'App theme is required']
+  },
+
+
+  url: {
+    type: String,
+    required: [true, 'Domain url is required']
+  },
+
+
+  ut: {
+    type: Date,
+    default: Date.now
+  }
+
 
 });
 
 
 /**
- * Adds ct and ut timestamps
+ * Adds updated (ut) timestamps
+ * Created timestamp (ct) is added by default
  */
 
-AppSchema.plugin(troop.timestamp, {
-  createdPath: 'ct',
-  modifiedPath: 'ut',
-  useVirtual: false
+AppSchema.pre('save', function (next) {
+  this.ut = new Date;
+  next();
 });
 
 
