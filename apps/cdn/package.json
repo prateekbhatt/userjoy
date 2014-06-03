@@ -8,7 +8,7 @@
   "main": "userjoy.js",
   "dependencies": {},
   "devDependencies": {
-    "component": "0.19.5",
+    "component": "~0.19.8",
     "express": "~3.1.0",
     "hbs": "~2.3.0",
     "mocha-phantomjs": "3.1.2",
