@@ -391,35 +391,20 @@ angular.module('do.settings', [])
 ])
 
 .controller('appSettingsMessagesCtrl', ['$scope', '$log', '$state',
-  function ($scope, $log, $state) {
-    $scope.btnInfoWidth = '30px';
-    $scope.btnInfoHeight = '30px';
-    $scope.btnPrimaryWidth = '30px';
-    $scope.btnPrimaryHeight = '30px';
-    $scope.btnDefaultWidth = '30px';
-    $scope.btnDefaultHeight = '30px';
-    $scope.btnSuccessWidth = '30px';
-    $scope.btnSuccessHeight = '30px';
-    $scope.btnWarningWidth = '30px';
-    $scope.btnWarningHeight = '30px';
-    $scope.btnDangerWidth = '30px';
-    $scope.btnDangerHeight = '30px';
-    $scope.color = '#39b3d7'
-    $scope.notfHeight = '150px';
-    $scope.overflow = 'auto'
-    $scope.marginTop = '3px';
-    $scope.borderColor = '#39b3d7';
-    $scope.borderRight = '1px solid' + '#39b3d7';
-    $scope.borderTop = '1px solid' + '#39b3d7';
-    $scope.borderBottom = '1px solid' + '#39b3d7';
-    $scope.btnBackgrndColor = '#39b3d7';
-    $scope.btnBorderColor = '#39b3d7';
-    $scope.btnColor = '#ffffff';
-    $scope.floatRight = 'right';
+  '$stateParams', 'AppModel', 'AppService', 'CurrentAppService',
+  function ($scope, $log, $state, $stateParams, AppModel, AppService,
+    CurrentAppService) {
 
-    $scope.borderRadius = '4px';
-    $scope.showPreview = function (color) {
-        if(color === '#39b3d7') {
+
+    CurrentAppService.getCurrentApp()
+      .then(function (currentApp) {
+
+        $scope.currApp = $stateParams.id;
+        var populatePage = function () {
+          $scope.color = AppService.getCurrentApp()
+            .color;
+          console.log("app color: ", $scope.color);
+          if ($scope.color === '#39b3d7') {
             $scope.btnInfoWidth = '40px';
             $scope.btnInfoHeight = '40px';
             $scope.btnPrimaryWidth = '30px';
@@ -432,8 +417,8 @@ angular.module('do.settings', [])
             $scope.btnWarningHeight = '30px';
             $scope.btnDangerWidth = '30px';
             $scope.btnDangerHeight = '30px';
-        }
-        if(color === '#3276b1') {
+          }
+          if ($scope.color === '#3276b1') {
             $scope.btnInfoWidth = '30px';
             $scope.btnInfoHeight = '30px';
             $scope.btnPrimaryWidth = '40px';
@@ -446,8 +431,8 @@ angular.module('do.settings', [])
             $scope.btnWarningHeight = '30px';
             $scope.btnDangerWidth = '30px';
             $scope.btnDangerHeight = '30px';
-        }
-        if(color === '#7f8c8d') {
+          }
+          if ($scope.color === '#7f8c8d') {
             $scope.btnInfoWidth = '30px';
             $scope.btnInfoHeight = '30px';
             $scope.btnPrimaryWidth = '30px';
@@ -460,8 +445,8 @@ angular.module('do.settings', [])
             $scope.btnWarningHeight = '30px';
             $scope.btnDangerWidth = '30px';
             $scope.btnDangerHeight = '30px';
-        }
-        if(color === '#18bc9c') {
+          }
+          if ($scope.color === '#18bc9c') {
             $scope.btnInfoWidth = '30px';
             $scope.btnInfoHeight = '30px';
             $scope.btnPrimaryWidth = '30px';
@@ -474,8 +459,8 @@ angular.module('do.settings', [])
             $scope.btnWarningHeight = '30px';
             $scope.btnDangerWidth = '30px';
             $scope.btnDangerHeight = '30px';
-        }
-        if(color === '#f0ad4e') {
+          }
+          if ($scope.color === '#f0ad4e') {
             $scope.btnInfoWidth = '30px';
             $scope.btnInfoHeight = '30px';
             $scope.btnPrimaryWidth = '30px';
@@ -488,8 +473,8 @@ angular.module('do.settings', [])
             $scope.btnWarningHeight = '40px';
             $scope.btnDangerWidth = '30px';
             $scope.btnDangerHeight = '30px';
-        }
-        if(color === '#d9534f') {
+          }
+          if ($scope.color === '#d9534f') {
             $scope.btnInfoWidth = '30px';
             $scope.btnInfoHeight = '30px';
             $scope.btnPrimaryWidth = '30px';
@@ -502,19 +487,131 @@ angular.module('do.settings', [])
             $scope.btnWarningHeight = '30px';
             $scope.btnDangerWidth = '40px';
             $scope.btnDangerHeight = '40px';
+          }
+          // $scope.color = '#39b3d7'
+          $scope.notfHeight = '150px';
+          $scope.overflow = 'auto'
+          $scope.marginTop = '3px';
+          $scope.borderColor = $scope.color;
+          $scope.borderRight = '1px solid' + $scope.color;
+          $scope.borderTop = '1px solid' + $scope.color;
+          $scope.borderBottom = '1px solid' + $scope.color;
+          $scope.btnBackgrndColor = $scope.color;
+          $scope.btnBorderColor = $scope.color;
+          $scope.btnColor = '#ffffff';
+          $scope.floatRight = 'right';
+
+          $scope.borderRadius = '4px';
+          $scope.showPreview = function (color) {
+            $scope.color = color;
+            if (color === '#39b3d7') {
+              $scope.btnInfoWidth = '40px';
+              $scope.btnInfoHeight = '40px';
+              $scope.btnPrimaryWidth = '30px';
+              $scope.btnPrimaryHeight = '30px';
+              $scope.btnDefaultWidth = '30px';
+              $scope.btnDefaultHeight = '30px';
+              $scope.btnSuccessWidth = '30px';
+              $scope.btnSuccessHeight = '30px';
+              $scope.btnWarningWidth = '30px';
+              $scope.btnWarningHeight = '30px';
+              $scope.btnDangerWidth = '30px';
+              $scope.btnDangerHeight = '30px';
+            }
+            if (color === '#3276b1') {
+              $scope.btnInfoWidth = '30px';
+              $scope.btnInfoHeight = '30px';
+              $scope.btnPrimaryWidth = '40px';
+              $scope.btnPrimaryHeight = '40px';
+              $scope.btnDefaultWidth = '30px';
+              $scope.btnDefaultHeight = '30px';
+              $scope.btnSuccessWidth = '30px';
+              $scope.btnSuccessHeight = '30px';
+              $scope.btnWarningWidth = '30px';
+              $scope.btnWarningHeight = '30px';
+              $scope.btnDangerWidth = '30px';
+              $scope.btnDangerHeight = '30px';
+            }
+            if (color === '#7f8c8d') {
+              $scope.btnInfoWidth = '30px';
+              $scope.btnInfoHeight = '30px';
+              $scope.btnPrimaryWidth = '30px';
+              $scope.btnPrimaryHeight = '30px';
+              $scope.btnDefaultWidth = '40px';
+              $scope.btnDefaultHeight = '40px';
+              $scope.btnSuccessWidth = '30px';
+              $scope.btnSuccessHeight = '30px';
+              $scope.btnWarningWidth = '30px';
+              $scope.btnWarningHeight = '30px';
+              $scope.btnDangerWidth = '30px';
+              $scope.btnDangerHeight = '30px';
+            }
+            if (color === '#18bc9c') {
+              $scope.btnInfoWidth = '30px';
+              $scope.btnInfoHeight = '30px';
+              $scope.btnPrimaryWidth = '30px';
+              $scope.btnPrimaryHeight = '30px';
+              $scope.btnDefaultWidth = '30px';
+              $scope.btnDefaultHeight = '30px';
+              $scope.btnSuccessWidth = '40px';
+              $scope.btnSuccessHeight = '40px';
+              $scope.btnWarningWidth = '30px';
+              $scope.btnWarningHeight = '30px';
+              $scope.btnDangerWidth = '30px';
+              $scope.btnDangerHeight = '30px';
+            }
+            if (color === '#f0ad4e') {
+              $scope.btnInfoWidth = '30px';
+              $scope.btnInfoHeight = '30px';
+              $scope.btnPrimaryWidth = '30px';
+              $scope.btnPrimaryHeight = '30px';
+              $scope.btnDefaultWidth = '30px';
+              $scope.btnDefaultHeight = '30px';
+              $scope.btnSuccessWidth = '30px';
+              $scope.btnSuccessHeight = '30px';
+              $scope.btnWarningWidth = '40px';
+              $scope.btnWarningHeight = '40px';
+              $scope.btnDangerWidth = '30px';
+              $scope.btnDangerHeight = '30px';
+            }
+            if (color === '#d9534f') {
+              $scope.btnInfoWidth = '30px';
+              $scope.btnInfoHeight = '30px';
+              $scope.btnPrimaryWidth = '30px';
+              $scope.btnPrimaryHeight = '30px';
+              $scope.btnDefaultWidth = '30px';
+              $scope.btnDefaultHeight = '30px';
+              $scope.btnSuccessWidth = '30px';
+              $scope.btnSuccessHeight = '30px';
+              $scope.btnWarningWidth = '30px';
+              $scope.btnWarningHeight = '30px';
+              $scope.btnDangerWidth = '40px';
+              $scope.btnDangerHeight = '40px';
+            }
+            $scope.btnHeight = '40px';
+            $scope.btnWidth = '40px';
+            console.log("color: ", color);
+            $scope.borderColor = color;
+            $scope.borderRight = '1px solid' + color;
+            $scope.borderTop = '1px solid' + color;
+            $scope.borderBottom = '1px solid' + color;
+            $scope.btnBackgrndColor = color;
+            $scope.btnBorderColor = color;
+            $scope.btnColor = '#ffffff';
+          }
+
+          $scope.saveColor = function () {
+            AppModel.updateColor($scope.currApp, $scope.color);
+          }
         }
-        $scope.btnHeight = '40px';
-        $scope.btnWidth = '40px';
-        console.log("color: ", color);
-        $scope.borderColor = color;
-        $scope.borderRight = '1px solid' + color;
-        $scope.borderTop = '1px solid' + color;
-        $scope.borderBottom = '1px solid' + color;
-        $scope.btnBackgrndColor = color;
-        $scope.btnBorderColor = color;
-        $scope.btnColor = '#ffffff';
-    }
-    // $scope.messagetemplatecolor = 'message-template-danger';
+
+
+        AppModel.getSingleApp($scope.currApp, populatePage);
+      })
+
+
+
+
   }
 ])
 
