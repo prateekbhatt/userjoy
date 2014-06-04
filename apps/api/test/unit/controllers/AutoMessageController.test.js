@@ -249,14 +249,22 @@ describe('Resource /apps/:aid/automessages', function () {
           .get(testUrl)
           .set('cookie', loginCookie)
           .expect('Content-Type', /json/)
+          .expect(200)
           .expect(function (res) {
             expect(res.body)
               .to.not.be.empty;
 
+            // it should populate the automessage sender name and email
+            expect(res.body.sender)
+              .to.be.an('object');
+
+            expect(res.body)
+              .to.have.property("sender")
+              .that.has.keys(['_id', 'email', 'name']);
+
             expect(res.body.title)
               .to.eql('Welcome Message');
           })
-          .expect(200)
           .end(done);
 
       });
