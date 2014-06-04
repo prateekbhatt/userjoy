@@ -99,6 +99,14 @@ var ConversationSchema = new Schema({
   },
 
 
+  // if conversation was started as a reply to an automessage, then save the id
+  // of the automessage
+  amId: {
+    type: Schema.Types.ObjectId,
+    ref: 'AutoMessage'
+  },
+
+
   // team member who is assigned
   assignee: {
     type: Schema.Types.ObjectId,
