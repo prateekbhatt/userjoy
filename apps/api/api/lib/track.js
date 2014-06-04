@@ -76,11 +76,10 @@ Track.prototype._setMode = function () {
 Track.prototype._findApp = function (cb) {
 
   var self = this;
-  var mode = self.mode;
   var appKey = self.appKey;
 
   App
-    .findByKey(mode, appKey, function (err, app) {
+    .findByKey(appKey, function (err, app) {
 
       if (err) {
         return cb(err);
