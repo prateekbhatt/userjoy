@@ -204,6 +204,45 @@ describe('Model Segment', function () {
       });
 
 
+    it(
+      'should create segment if for count method filter, val is 0',
+      function (done) {
+
+        var newSegment = {
+          aid: randomId,
+          creator: randomId,
+          list: 'users',
+          name: 'New Segment',
+          op: 'and',
+          filters: [
+
+            {
+              method: 'count',
+              name: 'Create Notification',
+              type: 'feature',
+              op: 'eq',
+              val: 0
+            }
+
+          ]
+        };
+
+
+        Segment.create(newSegment, function (err, seg) {
+
+          expect(err)
+            .to.not.exist;
+
+          expect(seg.aid.toString())
+            .eql(newSegment.aid);
+
+          done();
+        });
+
+
+      });
+
+
     it('should create new segment', function (done) {
 
       var newSegment = {
