@@ -100,6 +100,10 @@ router
 
     AutoMessage
       .findById(amId)
+      .populate({
+        path: 'sender',
+        select: 'name email'
+      })
       .exec(function (err, automsg) {
         if (err) return next(err);
         res
