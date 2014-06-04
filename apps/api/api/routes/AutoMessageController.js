@@ -308,7 +308,7 @@ router
 
 router
   .route('/:aid/automessages/:amId')
-  .post(function (req, res, next) {
+  .put(function (req, res, next) {
 
     logger.trace('Updating automessage');
 

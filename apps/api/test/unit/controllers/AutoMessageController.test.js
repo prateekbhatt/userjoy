@@ -463,7 +463,7 @@ describe('Resource /apps/:aid/automessages', function () {
     it('returns error if not logged in', function (done) {
 
       request
-        .post(testUrl)
+        .put(testUrl)
         .send({})
         .expect('Content-Type', /json/)
         .expect(401)
@@ -494,7 +494,7 @@ describe('Resource /apps/:aid/automessages', function () {
         };
 
         request
-          .post(testUrl)
+          .put(testUrl)
           .set('cookie', loginCookie)
           .send(updatedMsg)
           .expect('Content-Type', /json/)
