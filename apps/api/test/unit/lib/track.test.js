@@ -114,9 +114,30 @@ describe('Lib track', function () {
 
   describe('#_findApp', function () {
 
-    it('should return error if app not found', function (done) {
+    it('should return error if invalid app key', function (done) {
 
       newEvent.appKey = 'randomAppKey';
+
+      newEvent._findApp(function (err, app) {
+
+        expect(err)
+          .to.exist;
+
+        expect(err.message)
+          .to.equal('Provide valid app key');
+
+        expect(app)
+          .not.to.exist;
+
+        done();
+
+      });
+    });
+
+
+    it('should return error if app not found', function (done) {
+
+      newEvent.appKey = 'test_randomAppKey';
 
       newEvent._findApp(function (err, app) {
 

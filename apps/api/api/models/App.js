@@ -154,17 +154,22 @@ AppSchema.statics.findByAccountId = function (accountId, cb) {
 /**
  * Gets app with the key provided
  *
- * @param  {string}   mode test/live
  * @param  {string}   key
- * @param  {function} cb callback function
+ * @param  {function} cb callback
  */
-AppSchema.statics.findByKey = function (mode, key, cb) {
-  var query = {};
+AppSchema.statics.findByKey = function (key, cb) {
 
-  mode === 'live' ? (query.liveKey = key) : (query.testKey = key);
+  var mode = key.split('_')[0];
+  var conditions = {};
+
+  if (!_.contains(['live', 'test'], mode)) {
+    return cb(new Error('Provide valid app key'));
+  }
+
+  mode === 'live' ? (conditions.liveKey = key) : (conditions.testKey = key);
 
   App
-    .findOne(query)
+    .findOne(conditions)
     .exec(cb);
 };
 

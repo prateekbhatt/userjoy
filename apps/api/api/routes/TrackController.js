@@ -41,46 +41,6 @@ router.use(cors());
 
 
 /**
- * Finds app using key and mode
- * Authenticates url in live mode
- *
- * @param  {string}   mode   test/live
- * @param  {string}   appKey
- * @param  {string}   url
- * @param  {Function} cb     callback function
- */
-
-function _findAndVerifyApp(mode, appKey, url, cb) {
-
-  App
-    .findByKey(mode, appKey, function (err, app) {
-
-      if (err) {
-        return cb(err);
-      }
-
-      if (!app) {
-        return cb(new Error('App Not Found'));
-      }
-
-      // in test mode do not check if url is matching
-      // however, in live mode the request url must match the
-      // app url
-
-      if (mode !== 'test') {
-        if (!app.checkUrl(url)) {
-          return cb(new Error('Url Not Matching'));
-        }
-      }
-
-      cb(null, app);
-
-    });
-
-}
-
-
-/**
  * GET /track
  *
  *
@@ -160,8 +120,6 @@ router
     var url = req.host;
     console.log('   /track', req.cookies);
 
-    var mode;
-
 
     // fetch values from cookies
     var uid = req.cookies['dodatado.uid'];
@@ -174,9 +132,6 @@ router
     if (!appKey) {
       return res.badRequest('Please send app_id with the params');
     }
-
-    // check if the request is in test / live mode
-    mode = appKey.split('_')[0];
 
 
     // if both the user identifier and user cookie are not present, respond
@@ -197,23 +152,13 @@ router
         function findAndVerifyApp(cb) {
 
           App
-            .findByKey(mode, appKey, function (err, app) {
+            .findByKey(appKey, function (err, app) {
               if (err) {
                 return cb(err);
               }
 
               if (!app) {
                 return cb(new Error('App Not Found'));
-              }
-
-              // in test mode do not check if url is matching
-              // however, in live mode the request url must match the
-              // app url
-
-              if (mode !== 'test') {
-                if (!app.checkUrl(url)) {
-                  return cb(new Error('Url Not Matching'));
-                }
               }
 
               cb(null, app);
@@ -319,7 +264,6 @@ router
 
     var data = req.query;
     var appKey = data.app_id;
-    var mode;
 
     // Validations
     if (!appKey) {
@@ -337,15 +281,11 @@ router
     }
 
 
-    // check if the request is in test / live mode
-    mode = appKey.split('_')[0];
-
-
     async.waterfall([
 
 
         function getApp(cb) {
-          App.findByKey(mode, appKey, cb);
+          App.findByKey(appKey, cb);
         },
 
 
@@ -422,16 +362,20 @@ router
     var data = req.body;
     var appKey = data.app_id;
     var body = data.body;
-    var mode;
+
+    // if the message is a reply to a conversation, then it should have the
+    // the amId
+    var amId = data.amId;
+
+    // user identifiers
+    var email = data.email;
+    var user_id = data.user_id;
+
 
     // Validations
     if (!appKey) {
       return res.badRequest('Please send app_id with the params');
     }
-
-    // user identifiers
-    var email = data.email;
-    var user_id = data.user_id;
 
     // if user identifier is not present, respond with an error
     if (!email && !user_id) {
@@ -443,15 +387,12 @@ router
       return res.badRequest('Please write a message');
     }
 
-    // check if the request is in test / live mode
-    mode = appKey.split('_')[0];
-
 
     async.waterfall([
 
 
         function getApp(cb) {
-          App.findByKey(mode, appKey, cb);
+          App.findByKey(appKey, cb);
         },
 
 
@@ -524,11 +465,3 @@ router
  */
 
 module.exports = router;
-
-
-
-/**
- * Expose private functions for testing
- */
-
-module.exports._findAndVerifyApp = _findAndVerifyApp;
