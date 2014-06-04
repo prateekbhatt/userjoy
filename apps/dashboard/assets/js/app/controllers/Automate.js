@@ -35,6 +35,17 @@ angular.module('do.automate', [])
                 authenticate: true
 
             })
+            .state('automateUpdate', {
+                url: '/apps/:id/messages/automate/:mid/update',
+                views: {
+                    "main": {
+                        templateUrl: '/templates/messagesmodule/message.automate.update.html',
+                        controller: 'updateAutoMsgCtrl'
+                    }
+                },
+                authenticate: true
+
+            })
             .state('automateTest', {
                 url: '/apps/:id/messages/automate/test',
                 views: {
@@ -158,6 +169,12 @@ angular.module('do.automate', [])
                     }
                 }
 
+                $scope.editAutoMessage = function (id, index) {
+                    $location.path('/apps/' + $scope.currApp +
+                        '/messages/automate/' + id + '/update');
+                    // modelsAutomate.editAutoMsg($scope.currApp, id, index);
+                }
+
                 $scope.isActive = function (viewLocation) {
                     return viewLocation === $location.path();
                 };
@@ -218,8 +235,9 @@ angular.module('do.automate', [])
 
 .controller('automateSegmentCtrl', ['$scope', 'segment', 'modelsSegment',
     'AppService', 'segmentService', 'CurrentAppService', '$stateParams',
+    'AppModel',
     function ($scope, segment, modelsSegment, AppService, segmentService,
-        CurrentAppService, $stateParams) {
+        CurrentAppService, $stateParams, AppModel) {
 
         CurrentAppService.getCurrentApp()
             .then(function (currentApp) {
@@ -228,43 +246,49 @@ angular.module('do.automate', [])
                 $scope.segmenticons = [];
                 $scope.selectedIcon = [];
 
-
-                var checkSegments = function (err) {
-                    if (err) {
-                        return err;
+                var populatePage = function () {
+                    var checkSegments = function (err) {
+                        if (err) {
+                            return err;
+                        }
+                        $scope.selectedIcon.id = segmentService.getSegments()[
+                            0]._id;
+                        $scope.selectedIcon.name = segmentService.getSegments()[
+                            0].name;
+                        if (segmentService.getSegments()
+                            .length > 0) {
+                            for (var i = 0; i < segmentService.getSegments()
+                                .length; i++) {
+                                $scope.segmenticons.push({
+                                    value: segmentService.getSegments()[
+                                        i].name,
+                                    label: segmentService.getSegments()[
+                                        i].name,
+                                    id: segmentService.getSegments()[
+                                        i]
+                                        ._id
+                                })
+                            };
+                        }
                     }
-                    $scope.selectedIcon.id = segmentService.getSegments()[
-                        0]._id;
-                    $scope.selectedIcon.name = segmentService.getSegments()[
-                        0].name;
-                    if (segmentService.getSegments()
-                        .length > 0) {
-                        for (var i = 0; i < segmentService.getSegments()
-                            .length; i++) {
-                            $scope.segmenticons.push({
-                                value: segmentService.getSegments()[
-                                    i].name,
-                                label: segmentService.getSegments()[
-                                    i].name,
-                                id: segmentService.getSegments()[i]
-                                    ._id
-                            })
-                        };
+
+                    modelsSegment.getAllSegments($scope.currApp,
+                        checkSegments);
+                    $scope.changeText = function (ind) {
+                        $scope.selectedIcon.id = $scope.segmenticons[
+                            ind].id;
+                        $scope.selectedIcon.name = $scope.segmenticons[
+                            ind]
+                            .label;
+                    }
+
+                    $scope.storeSegment = function () {
+                        segmentService.setSingleSegment($scope.selectedIcon);
+                        console.log("single segment: ", segmentService
+                            .getSingleSegment());
                     }
                 }
-
-                modelsSegment.getAllSegments($scope.currApp,
-                    checkSegments);
-                $scope.changeText = function (ind) {
-                    $scope.selectedIcon.id = $scope.segmenticons[ind].id;
-                    $scope.selectedIcon.name = $scope.segmenticons[ind]
-                        .label;
-                }
-
-                $scope.storeSegment = function () {
-                    segmentService.setSingleSegment($scope.selectedIcon);
-                    console.log("single segment: ", segmentService.getSingleSegment());
-                }
+                AppModel.getSingleApp($scope.currApp, populatePage);
 
             })
 
@@ -273,93 +297,246 @@ angular.module('do.automate', [])
 
 .controller('textAngularCtrl', ['$scope', 'saveMsgService', '$location',
     'modelsAutomate', 'AppService', 'segmentService', 'ErrMsgService',
-    '$stateParams', 'AutoMsgService',
+    '$stateParams', 'AutoMsgService', 'CurrentAppService', 'AppModel',
+    'AccountService',
     function ($scope, saveMsgService, $location, modelsAutomate,
         AppService, segmentService, ErrMsgService, $stateParams,
-        AutoMsgService) {
-        console.log("inside text Angular Ctrl");
-        console.log("sid: ", segmentService.getSingleSegment());
-        $scope.currApp = $stateParams.id;
-        $scope.showNotification = true;
-        $scope.showEmail = false;
-        $scope.showAutoMsgError = false;
-        $scope.email = "savinay@dodatado.com";
-        $scope.selectedMessageType = {
-            icon: "fa fa-bell",
-            value: "Notification"
-        };
-        console.log("selectedIcon: ", $scope.selectedMessageType);
-        $scope.icons = [{
-            value: "Notification",
-            label: 'fa fa-bell'
-        }, {
-            value: "Email",
-            label: 'fa fa-envelope'
-        }];
+        AutoMsgService, CurrentAppService, AppModel, AccountService) {
 
-        $scope.changeBtnText = function (index) {
-            $scope.selectedMessageType.value = $scope.icons[
-                index].value;
-            $scope.selectedMessageType.icon = $scope.icons[
-                index].label;
-            if ($scope.selectedMessageType.value ===
-                "Notification") {
+
+        CurrentAppService.getCurrentApp()
+            .then(function (currentApp) {
+
+
+                console.log("inside text Angular Ctrl");
+                console.log("sid: ", segmentService.getSingleSegment());
+                $scope.currApp = $stateParams.id;
                 $scope.showNotification = true;
                 $scope.showEmail = false;
-            }
+                $scope.showAutoMsgError = false;
 
-            if ($scope.selectedMessageType.value === "Email") {
-                $scope.showNotification = false;
-                $scope.showEmail = true;
-            }
-        }
 
-        $scope.saveMessage = function () {
-            if ($scope.showNotification) {
-                saveMsgService.setMsg($scope.notificationBody);
-                saveMsgService.setTitle($scope.title);
-            }
+                var populatePage = function () {
+                    // $scope.email = "savinay@dodatado.com";
+                    $scope.selectedMessageType = {
+                        icon: "fa fa-bell",
+                        value: "Notification"
+                    };
+                    console.log("selectedIcon: ", $scope.selectedMessageType);
+                    $scope.icons = [{
+                        value: "Notification",
+                        label: 'fa fa-bell'
+                    }, {
+                        value: "Email",
+                        label: 'fa fa-envelope'
+                    }];
 
-            if ($scope.showEmail) {
-                saveMsgService.setMsg($scope.emailBody);
-                if($scope.subject != null) {
-                    saveMsgService.setSub($scope.subject.replace(/<(?:.|\n)*?>/gm, ''));
+                    $scope.sender = AccountService.get()
+                        .name;
+                    $scope.senderId = AccountService.get()
+                        ._id;
+
+                    $scope.team = AppService.getCurrentApp()
+                        .team;
+
+                    $scope.changeFromEmailText = function (index) {
+                        $scope.sender = $scope.team[index].accid.name;
+                        $scope.senderId = $scope.team[index].accid._id;
+                    }
+
+                    $scope.changeBtnText = function (index) {
+                        $scope.selectedMessageType.value = $scope.icons[
+                            index].value;
+                        $scope.selectedMessageType.icon = $scope.icons[
+                            index].label;
+                        if ($scope.selectedMessageType.value ===
+                            "Notification") {
+                            $scope.showNotification = true;
+                            $scope.showEmail = false;
+                        }
+
+                        if ($scope.selectedMessageType.value ===
+                            "Email") {
+                            $scope.showNotification = false;
+                            $scope.showEmail = true;
+                        }
+                    }
+
+                    $scope.saveMessage = function () {
+                        if ($scope.showNotification) {
+                            saveMsgService.setMsg($scope.notificationBody);
+                            saveMsgService.setTitle($scope.title);
+                        }
+
+                        if ($scope.showEmail) {
+                            saveMsgService.setMsg($scope.emailBody);
+                            if ($scope.subject != null) {
+                                saveMsgService.setSub($scope.subject.replace(
+                                    /<(?:.|\n)*?>/gm, ''));
+                            }
+                            saveMsgService.setTitle($scope.title);
+                            console.log("email body: ", saveMsgService
+                                .getMsg());
+                            console.log("email subject: ",
+                                saveMsgService.getSub());
+                            // console.log("msg: ",saveMsgService)
+                        }
+
+                        AutoMsgService.setAutoMsgType($scope.selectedMessageType
+                            .value);
+                        console.log("auto MSg type ----->>>>>>>>: ",
+                            AutoMsgService.getAutoMsgType());
+
+                        var data = {
+                            body: saveMsgService.getMsg(),
+                            sub: saveMsgService.getSub(),
+                            title: saveMsgService.getTitle(),
+                            type: $scope.selectedMessageType.value.toLowerCase(),
+                            sid: segmentService.getSingleSegment()
+                                .id,
+                            sender: $scope.senderId
+                        }
+
+                        console.log("data: ", data);
+                        modelsAutomate.saveAutoMsg($scope.currApp,
+                            data);
+                        /*                        $scope.$watch(ErrMsgService.getErrorMessage,
+                            function () {
+                                if (ErrMsgService.getErrorMessage()) {
+                                    $scope.showAutoMsgError = true;
+                                    $scope.errMsg = ErrMsgService.getErrorMessage();
+                                }
+                            })*/
+                    }
+
+                    $scope.showText = function (htmlVariable) {
+                        console.log($scope.htmlVariable);
+                    }
+
+                    $scope.hideErrorAlert = function () {
+                        $scope.showAutoMsgError = false;
+                    }
                 }
-                saveMsgService.setTitle($scope.title);
-                console.log("email body: ", saveMsgService.getMsg());
-                console.log("email subject: ", saveMsgService.getSub());
-                // console.log("msg: ",saveMsgService)
-            }
 
-            AutoMsgService.setAutoMsgType($scope.selectedMessageType.value);
-            console.log("auto MSg type ----->>>>>>>>: ", AutoMsgService.getAutoMsgType());
-
-            var data = {
-                body: saveMsgService.getMsg(),
-                sub: saveMsgService.getSub(),
-                title: saveMsgService.getTitle(),
-                type: $scope.selectedMessageType.value.toLowerCase(),
-                sid: segmentService.getSingleSegment()
-                    .id
-            }
-
-            console.log("data: ", data);
-            modelsAutomate.saveAutoMsg($scope.currApp, data);
-            $scope.$watch(ErrMsgService.getErrorMessage, function () {
-                if (ErrMsgService.getErrorMessage()) {
-                    $scope.showAutoMsgError = true;
-                    $scope.errMsg = ErrMsgService.getErrorMessage();
-                }
+                AppModel.getSingleApp($scope.currApp, populatePage);
             })
+
+
+
+    }
+])
+
+.controller('updateAutoMsgCtrl', ['$scope', 'saveMsgService', '$location',
+    'modelsAutomate', 'AppService', 'segmentService', 'ErrMsgService',
+    '$stateParams', 'AutoMsgService', 'CurrentAppService', 'AppModel',
+    'AccountService',
+    function ($scope, saveMsgService, $location, modelsAutomate,
+        AppService, segmentService, ErrMsgService, $stateParams,
+        AutoMsgService, CurrentAppService, AppModel, AccountService) {
+
+
+
+
+        console.log("inside update Auto Msg Ctrl");
+        console.log("sid: ", segmentService.getSingleSegment());
+        $scope.currApp = $stateParams.id;
+        $scope.msgId = $stateParams.mid;
+        $scope.showNotification = false;
+        $scope.showEmail = false;
+        $scope.showAutoMsgError = false;
+
+        var populateAutoMsg = function () {
+            console.log("AutoMsgService getSingleAutoMsg: ",
+                AutoMsgService.getSingleAutoMsg());
+            // $scope.email = "savinay@dodatado.com";
+
+            if (AutoMsgService.getSingleAutoMsg()
+                .type === 'notification') {
+                $scope.showNotification = true;
+                $scope.selectedMessageType = {
+                    icon: "fa fa-bell",
+                    value: "Notification"
+                };
+                $scope.notificationBody = AutoMsgService.getSingleAutoMsg()
+                    .body;
+
+            } else {
+                $scope.showEmail = true;
+                $scope.selectedMessageType = {
+                    icon: "fa fa-envelope",
+                    value: "Email"
+                };
+                $scope.emailBody = AutoMsgService.getSingleAutoMsg()
+                    .body;
+                $scope.subject = AutoMsgService.getSingleAutoMsg()
+                    .sub;
+            }
+
+            $scope.sender = AutoMsgService.getSingleAutoMsg()
+                .sender.name;
+
+
+            console.log("selectedIcon: ", $scope.selectedMessageType);
+            $scope.title = AutoMsgService.getSingleAutoMsg()
+                .title;
+
+            $scope.updateMessage = function () {
+                if ($scope.showNotification) {
+                    saveMsgService.setMsg($scope.notificationBody);
+                    saveMsgService.setTitle($scope.title);
+                }
+
+                if ($scope.showEmail) {
+                    saveMsgService.setMsg($scope.emailBody);
+                    if ($scope.subject != null) {
+                        saveMsgService.setSub($scope.subject.replace(
+                            /<(?:.|\n)*?>/gm, ''));
+                    }
+                    saveMsgService.setTitle($scope.title);
+                    console.log("email body: ", saveMsgService
+                        .getMsg());
+                    console.log("email subject: ",
+                        saveMsgService.getSub());
+                    // console.log("msg: ",saveMsgService)
+                }
+
+                AutoMsgService.setAutoMsgType($scope.selectedMessageType
+                    .value);
+                console.log("auto MSg type ----->>>>>>>>: ",
+                    AutoMsgService.getAutoMsgType());
+
+                var data = {
+                    body: saveMsgService.getMsg(),
+                    sub: saveMsgService.getSub(),
+                    title: saveMsgService.getTitle()
+                }
+
+                console.log("data: ", data);
+                modelsAutomate.editAutoMsg($scope.currApp, $scope.msgId,
+                    data);
+                /*$scope.$watch(ErrMsgService.getErrorMessage,
+                    function () {
+                        if (ErrMsgService.getErrorMessage()) {
+                            $scope.showAutoMsgError = true;
+                            $scope.errMsg = ErrMsgService.getErrorMessage();
+                        }
+                    })*/
+            }
+
+            $scope.showText = function (htmlVariable) {
+                console.log($scope.htmlVariable);
+            }
+
+            $scope.hideErrorAlert = function () {
+                $scope.showAutoMsgError = false;
+            }
         }
 
-        $scope.showText = function (htmlVariable) {
-            console.log($scope.htmlVariable);
-        }
+        modelsAutomate.getSingleAutoMsg($scope.currApp, $scope
+            .msgId,
+            populateAutoMsg);
 
-        $scope.hideErrorAlert = function () {
-            $scope.showAutoMsgError = false;
-        }
+
 
 
     }
@@ -413,9 +590,24 @@ angular.module('do.automate', [])
         if ($scope.msgType === "Notification") {
             $scope.showNotificationPreview = true;
         }
-        $scope.makeMsgLive = function () {
-            modelsAutomate.makeMsgLive($scope.currApp, AutoMsgService.getSingleAutoMsg()
-                ._id);
+        $scope.msgId = AutoMsgService.getSingleAutoMsg()
+            ._id;
+        if (AutoMsgService.getSingleAutoMsg()
+            .active) {
+            $scope.msgStatus = 'Deactivate this Message';
+        } else {
+            $scope.msgStatus = 'Make it Live';
+        }
+        $scope.changeMsgStatus = function () {
+            if (AutoMsgService.getSingleAutoMsg()
+                .active) {
+                modelsAutomate.deActivateMsg($scope.currApp,
+                    $scope.msgId);
+                $scope.msgStatus = 'Make it Live';
+            } else {
+                modelsAutomate.makeMsgLive($scope.currApp, $scope.msgId);
+                $scope.msgStatus = 'Deactivate this Message';
+            }
         }
     }
 ])

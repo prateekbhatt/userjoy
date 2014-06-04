@@ -1,26 +1,31 @@
 <div ng-include src="'/templates/navbar/navbar.html'"></div>
-<div class="row text-center">
+<!-- <div class="row text-center" ng-show="showNotification">
     <div class="btn-group btn-breadcrumb">
         <button class="btn btn-default" style="cursor:not-allowed">Select Segment</button>
         <button class="btn btn-info" style="cursor:not-allowed">Compose Message</button>
-        <button class="btn btn-default" style="cursor:not-allowed">Send Test Email</button>
         <button class="btn btn-default" style="cursor:not-allowed">Make it Live</button>
     </div>
-</div>
-<br>
-<br>
-<div class="panel panel-default" ng-controller="textAngularCtrl">
+</div> -->
+<!-- <div class="row text-center" ng-show="showEmail">
+    <div class="btn-group btn-breadcrumb">
+        <button class="btn btn-info" style="cursor:not-allowed">Update Message</button>
+        <button class="btn btn-default" style="cursor:not-allowed">Send Test Email</button>
+    </div>
+    <br>
+    <br>
+</div> -->
+<div class="panel panel-default">
     <div class="row" style="padding-top: 50px;">
         <div class="col-md-6">
             <label class="col-md-2 col-md-offset-2 control-label" style="font-size: 20px; padding-left: 0px">Type: </label>
             <div class="col-md-6">
-                <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users" class="{{selectedMessageType.icon}}">&nbsp;{{selectedMessageType.value}}</span>&nbsp;<span class="caret"></span></button>
-                <ul class="select dropdown-menu" role="select" style="left: 15px; top:100%;">
+                <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto disabled" data-toggle="dropdown"> <span data-bind="label" id="Users" class="{{selectedMessageType.icon}}">&nbsp;{{selectedMessageType.value}}</span>&nbsp;<span class="caret"></span></button>
+               <!--  <ul class="select dropdown-menu" role="select" style="left: 15px; top:100%;">
                     <li ng-repeat="icon in icons">
                         <a style="cursor: default" ng-click="changeBtnText($index)"><i class="{{icon.label}}"></i>&nbsp;{{icon.value}}
                         </a>
                     </li>
-                </ul>
+                </ul> -->
             </div>
         </div>
     </div>
@@ -29,13 +34,13 @@
             <label class="col-md-2 col-md-offset-2 control-label" style="font-size: 20px; padding-left: 0px">From: </label>
             <div class="col-md-6">
                 <!-- <input class="form-control disabled" ng-model="email"> -->
-                <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">&nbsp;{{sender}}</span>&nbsp;<span class="caret"></span></button>
-                <ul class="select dropdown-menu" role="select" style="left: 15px; top:100%;">
+                <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto disabled" data-toggle="dropdown"> <span data-bind="label" id="Users">&nbsp;{{sender}}</span>&nbsp;<span class="caret"></span></button>
+               <!--  <ul class="select dropdown-menu" role="select" style="left: 15px; top:100%;">
                     <li ng-repeat="member in team">
                         <a style="cursor: default" ng-click="changeFromEmailText($index)">{{member.accid.name}}
                         </a>
                     </li>
-                </ul>
+                </ul> -->
             </div>
         </div>
     </div>
@@ -88,7 +93,7 @@
                     <br>
                 </div>
                 <!-- TODO: Replace template color with the color entered by the user -->
-                <div class="col-md-10 col-md-offset-1" ng-show="showEmail">
+                <div class="col-md-10 col-md-offset-1" ng-show="showEmail" style="margin-top: 40px;">
                     <label style="font-size: 18px;">Subject: </label>&nbsp;<span ng-bind-html="subject" class="emailPreview"></span>
                     <div class="message-template message-email-success" style="min-height: 300px; overflow: auto; max-height: 300px;">
                         <p ng-bind-html="emailBody"></p>
@@ -99,7 +104,7 @@
     </div>
     <!-- <p>{{text}}</p> -->
     <div class="row text-center" style="padding-top: 20px;">
-        <button class="btn btn-info" ng-click="saveMessage()">Save Message</button>
+        <button class="btn btn-info" ng-click="updateMessage()">Update Message</button>
     </div>
 <br>
 <br>

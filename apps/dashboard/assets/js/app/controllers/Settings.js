@@ -229,22 +229,32 @@ angular.module('do.settings', [])
 ])
 
 .controller('appSettingsGeneralCtrl', ['$scope', '$log', '$state',
-  'AppService', 'AppModel',
-  function ($scope, $log, $state, AppService, AppModel) {
-    $scope.name = AppService.getCurrentApp()
-      .name;
-    var appId = AppService.getCurrentApp()
-      ._id;
+  'AppService', 'AppModel', 'CurrentAppService', '$stateParams',
+  function ($scope, $log, $state, AppService, AppModel, CurrentAppService,
+    $stateParams) {
 
-    $scope.changeAppName = function () {
-      AppModel.updateName($scope.name, appId, function (err, data) {
-        if (err) {
-          $log.info("Error in updating app name");
-          return;
+    CurrentAppService.getCurrentApp()
+      .then(function (currentApp) {
+        $scope.currApp = $stateParams.id;
+
+        var populatePage = function () {
+          $scope.name = AppService.getCurrentApp()
+            .name;
+          var appId = AppService.getCurrentApp()
+            ._id;
+
+          $scope.changeAppName = function () {
+            AppModel.updateName($scope.name, appId, function (err, data) {
+              if (err) {
+                $log.info("Error in updating app name");
+                return;
+              }
+              $log.info("app name changed successfully!")
+            })
+          }
         }
-        $log.info("app name changed successfully!")
+        AppModel.getSingleApp($scope.currApp, populatePage);
       })
-    }
 
   }
 ])

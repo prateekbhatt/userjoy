@@ -628,7 +628,7 @@ hr {
     background-color: #95a5a6;
     border-radius: 10px;
 }
-.btn-breadcrumb .btn: not(: last-child):after {
+.btn-breadcrumb .btn:not(:last-child):after {
     content: " ";
     display: block;
     width: 0;
@@ -642,7 +642,7 @@ hr {
     left: 100%;
     z-index: 3;
 }
-.btn-breadcrumb .btn: not(: last-child):before {
+.btn-breadcrumb .btn:not(:last-child):before {
     content: " ";
     display: block;
     width: 0;
@@ -665,35 +665,35 @@ hr {
 .btn-breadcrumb .btn:first-child {
     padding: 6px 6px 6px 10px;
 }
-.btn-breadcrumb .btn: last-child {
+.btn-breadcrumb .btn:last-child {
     padding: 6px 18px 6px 24px;
 }
 /** Default button **/
 
-.btn-breadcrumb .btn.btn-default: not(: last-child):after {
+.btn-breadcrumb .btn.btn-default:not(:last-child):after {
     border-left: 10px solid #fff;
 }
-.btn-breadcrumb .btn.btn-default: not(: last-child):before {
+.btn-breadcrumb .btn.btn-default:not(:last-child):before {
     border-left: 10px solid #ccc;
 }
-.btn-breadcrumb .btn.btn-default:hover: not(: last-child):after {
+.btn-breadcrumb .btn.btn-default:hover:not(:last-child):after {
     border-left: 10px solid #ebebeb;
 }
-.btn-breadcrumb .btn.btn-default:hover: not(: last-child):before {
+.btn-breadcrumb .btn.btn-default:hover:not(:last-child):before {
     border-left: 10px solid #adadad;
 }
 /** Info button **/
 
-.btn-breadcrumb .btn.btn-info: not(: last-child):after {
+.btn-breadcrumb .btn.btn-info:not(:last-child):after {
     border-left: 10px solid #5bc0de;
 }
-.btn-breadcrumb .btn.btn-info: not(: last-child):before {
+.btn-breadcrumb .btn.btn-info:not(:last-child):before {
     border-left: 10px solid #46b8da;
 }
-.btn-breadcrumb .btn.btn-info:hover: not(: last-child):after {
+.btn-breadcrumb .btn.btn-info:hover:not(:last-child):after {
     border-left: 10px solid #39b3d7;
 }
-.btn-breadcrumb .btn.btn-info:hover: not(: last-child):before {
+.btn-breadcrumb .btn.btn-info:hover:not(:last-child):before {
     border-left: 10px solid #269abc;
 }
 .pager li > a, .pager li > span {
@@ -771,7 +771,7 @@ span.emailPreview > p {
     display: inline;
 }
 
-.arrow:before {
+.arrow-feedback:before {
     content: "";
     position: absolute;
     left: 350px;
