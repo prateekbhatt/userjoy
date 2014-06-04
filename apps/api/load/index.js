@@ -1,4 +1,11 @@
 /**
+ * newrelic agent
+ */
+
+require('newrelic');
+
+
+/**
  * npm dependencies
  */
 
