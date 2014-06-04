@@ -166,6 +166,44 @@ describe('Model Segment', function () {
 
       });
 
+
+    it(
+      'should return error if for count method filter, val/op not provided',
+      function (done) {
+
+        var newSegment = {
+          aid: randomId,
+          creator: randomId,
+          list: 'users',
+          name: 'New Segment',
+          op: 'and',
+          filters: [
+
+            {
+              method: 'count',
+              name: 'Create Notification',
+              type: 'feature'
+            }
+
+          ]
+        };
+
+
+        Segment.create(newSegment, function (err, seg) {
+
+          expect(err.message)
+            .to.eql('Provide valid filter operator and filter value');
+
+          expect(seg)
+            .not.to.exist;
+
+          done();
+        });
+
+
+      });
+
+
     it('should create new segment', function (done) {
 
       var newSegment = {
