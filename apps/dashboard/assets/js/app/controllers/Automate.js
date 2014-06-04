@@ -339,6 +339,20 @@ angular.module('do.automate', [])
                     $scope.team = AppService.getCurrentApp()
                         .team;
 
+                    $scope.colorTheme = AppService.getCurrentApp().color;
+                    $scope.borderColor = $scope.colorTheme;
+                    $scope.borderRight = '1px solid' + $scope.colorTheme;
+                    $scope.borderTop = '1px solid' + $scope.colorTheme;
+                    $scope.borderBottom = '1px solid' + $scope.colorTheme;
+                    $scope.borderRadius = '4px';
+                    $scope.backGrndColor = $scope.colorTheme;
+                    $scope.borderColor = $scope.colorTheme;
+
+                    $scope.emailBorderColor = $scope.colorTheme;
+                    $scope.emailBorderRight = '1px solid' + $scope.colorTheme;
+                    $scope.emailBorderTop = '1px solid' + $scope.colorTheme;
+                    $scope.emailBorderBottom = '1px solid' + $scope.colorTheme;
+
                     $scope.changeFromEmailText = function (index) {
                         $scope.sender = $scope.team[index].accid.name;
                         $scope.senderId = $scope.team[index].accid._id;
