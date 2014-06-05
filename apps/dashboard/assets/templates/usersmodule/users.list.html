@@ -83,14 +83,6 @@
                             </div>
                         </div>
                         <br>
-                        <!-- <div class="row">
-                            <div class="col-md-4 col-sm-push-1">
-                                <div ng-show="showErr" id="login-alert" class="alert alert-danger col-sm-12">
-                                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="hideErrorAlert()">&times;</button>
-                                    {{errMsg}}
-                                </div>
-                            </div>
-                        </div> -->
                         <div class="row">
                             <div class="col-md-4" style="margin-left: 20px">
                                 <button class="btn btn-info" ng-click="addAnotherFilter()" ng-show="true">
@@ -148,7 +140,7 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="panel panel-info" style="min-height: 200px" id="segment">
+                    <div class="panel panel-info" style="min-height: 200px; width: 300px;" id="segment">
                         <div class="panel-heading">
                             <h3 class="panel-title">
                             Segments</h3>
@@ -157,11 +149,27 @@
                             <p class="text-center" style="padding-top: 60px;">No Segments Created.</p>
                         </div>
                         <ul class="list-group" ng-show="segmentsCreated">
-                            <a href="#" class="list-group-item" ng-repeat="segname in segmentsCreatedName" ng-click="showQuery(segname.id, $index, segname)" ng-class="{'active': $index === selectedIndex}">{{segname.name}}
-                            </a>
-                        </ul>
+                            <li style="padding-bottom: 2px;" class="list-group-item"  ng-class="{'active': $index === selectedIndex}"  ng-repeat="segname in segmentsCreatedName" ng-mouseenter="showAutoMsgButton()" ng-mouseleave="hideAutoMsgButton()">
+                            <a style="padding: 10px 15px; display: inline-block; cursor: pointer" ng-click="showQuery(segname.id, $index, segname)">{{segname.name}}</a>
+                            <a class="btn btn-sm btn-default pull-right" href="/apps/{{currApp}}/messages/automate/segments/{{segname.id}}/write" style="margin-top: 5px;" ng-show="showAutoMsgBtn">AutoMessage</a>
+                            </li>
+                            <!-- <div class="row" ng-repeat="segname in segmentsCreatedName">
+                                <div class="col-md-6" ng-click="showQuery(segname.id, $index, segname)" >
+                                    <li style="cursor: pointer; padding-bottom: 2px;" class="list-group-item"  ng-class="{'active': $index === selectedIndex}">
+                                        <div class="btn-group">
+                                        <a type="button" class="btn btn-default">{{segname.name}}</a>
+                                        <a type="button" class="btn btn-default">Auto Message</a>
+                                        </div>
+                                        <span style="padding: 10px 15px; display: inline-block;">{{segname.name}}</span>
+                                    </li>
+                                </div>
+                                <div class="col-md-6">
+                                    <a class="btn btn-default pull-right" href="/apps/{{currApp}}/messages/automate/segments/{{segname.id}}/write" ng-show="showAutoMsgBtn">AutoMessage</a>
+                                </div>
+                            </div>
+ -->                        </ul>
                     </div>
-                    <a class="btn btn-info btn-block" ng-show="showAutoMsgBtn" href="/apps/{{currApp}}/messages/automate/write">Auto Message</a>
+                    <!-- <a class="btn btn-info btn-block" ng-show="showAutoMsgBtn" href="/apps/{{currApp}}/messages/automate/segments/{{sid}}/write" style="margin-top: 5px;">Auto Message</a> -->
                 </div>
             </form>
         </div>
@@ -173,17 +181,17 @@
     <h4 class="well text-center">There are no users to be displayed. Run a query!!</h4>
 </div>
 <div class="row"  ng-show="showUsers">
-    <div class="col-md-2">
-        <p style="font-size:20px">All Users</p>
+    <div class="col-md-2" style="margin-top: 10px; margin-left: 20px;">
+        <span class="fa fa-user">&nbsp;&nbsp;{{countUsers}} <b>users</b></span>
     </div>
-    <div class="col-md-6 col-md-push-4">
+    <div class="col-md-6">
         <div class="btn-group col-md-5">
             <button class="fa fa-envelope-o btn btn-info" ng-click="openModal()">
             <span>Message</span></button>
             <button class="fa fa-tag btn btn-info">
             <span>Tag</span></button>
         </div>
-        <div class="col-md-5 col-md-push-1">
+        <div class="col-md-5 col-md-push-10">
             <button type="button" class="btn btn-default btn-block dropdown-toggle"> Select Data
             <span class="caret" style="border-top-color: #333;"></span>
             </button>

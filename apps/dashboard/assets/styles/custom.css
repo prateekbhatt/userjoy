@@ -721,6 +721,10 @@ a.list-group-item:hover, a.list-group-item:focus {
     text-decoration: none;
     background-color: #ecf0f1;
 }
+li.list-group-item:hover, li.list-group-item:focus {
+    text-decoration: none;
+    /*background-color: #ecf0f1;*/
+}
 a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.active:focus {
     z-index: 2;
     color: #000000;
@@ -751,6 +755,7 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
     -margin-top: 30px;
     height: 250px;
     overflow-y: scroll;
+    /*overflow-x: scroll;*/
     /*background: lightblue;*/
 }
 #segment {
@@ -777,11 +782,19 @@ span.emailPreview > p {
     width: 0;
     z-index: 0;
 }
-a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.active:focus {
+.list-group-item {
+    position: relative;
+    display: block;
+    margin-bottom: -1px;
+    background-color: #ffffff;
+    padding: 0px 0px;
+    border: 1px solid #ecf0f1;
+}
+li.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.active:focus {
     z-index: 2;
-    color: #ffffff;
-    background-color: #3276b1;
-    border-color: #3276b1;
+    color: #222;
+    background-color: #ddd;
+    border-color: #ddd;
 }
 
 }
