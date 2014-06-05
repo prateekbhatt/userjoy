@@ -647,7 +647,7 @@ angular.module('do.users', [])
                         if (err) {
                             return err;
                         }
-
+                        $scope.countUsers = UserList.getUsers().length;
                         $scope.users = [];
                         if (UserList.getUsers()
                             .length > 0) {
@@ -997,11 +997,12 @@ angular.module('do.users', [])
                     $scope.showQuery = function (segId, index, segname) {
                         $scope.segmentClicked = true;
                         $scope.showUpdateButton = true;
-                        $scope.showAutoMsgBtn = true;
+                        this.showAutoMsgBtn = true;
                         $scope.selectedIndex = index;
                         $scope.showSaveButton = false;
                         $scope.updatedSegmentName = segname.name;
                         segmentService.setSegmentId(segId);
+                        $scope.sid = segId;
                         console.log("segname: ", segname);
                         $scope.currentSegment.id = segname.id;
                         $scope.currentSegment.name = segname.name;
@@ -1010,6 +1011,14 @@ angular.module('do.users', [])
                             segmentService.getSingleSegment());
                         modelsSegment.getSegment(currentAppId, segId,
                             populateFilterAndRunQuery);
+                    }
+
+                    $scope.showAutoMsgButton = function () {
+                        this.showAutoMsgBtn = true;
+                    }
+
+                    $scope.hideAutoMsgButton = function () {
+                        this.showAutoMsgBtn = false;
                     }
 
                     // $scope.createAutoMsg = function (segId, index) {

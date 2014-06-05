@@ -15,7 +15,7 @@ angular.module('do.automate', [])
 
             })
             .state('automateSegment', {
-                url: '/apps/:id/messages/automate/segment',
+                url: '/apps/:id/messages/automate/segments',
                 views: {
                     "main": {
                         templateUrl: '/templates/messagesmodule/message.automate.segment.html',
@@ -26,7 +26,7 @@ angular.module('do.automate', [])
 
             })
             .state('automateWrite', {
-                url: '/apps/:id/messages/automate/write',
+                url: '/apps/:id/messages/automate/segments/:sid/write',
                 views: {
                     "main": {
                         templateUrl: '/templates/messagesmodule/message.compose.automate.write.html'
@@ -253,6 +253,7 @@ angular.module('do.automate', [])
                         }
                         $scope.selectedIcon._id = segmentService.getSegments()[
                             0]._id;
+                        $scope.sid = $scope.selectedIcon._id;
                         $scope.selectedIcon.name = segmentService.getSegments()[
                             0].name;
                         if (segmentService.getSegments()
@@ -277,6 +278,7 @@ angular.module('do.automate', [])
                     $scope.changeText = function (ind) {
                         $scope.selectedIcon._id = $scope.segmenticons[
                             ind].id;
+                        $scope.sid = $scope.selectedIcon._id;
                         $scope.selectedIcon.name = $scope.segmenticons[
                             ind]
                             .label;
@@ -408,8 +410,7 @@ angular.module('do.automate', [])
                             sub: saveMsgService.getSub(),
                             title: saveMsgService.getTitle(),
                             type: $scope.selectedMessageType.value.toLowerCase(),
-                            sid: segmentService.getSingleSegment()
-                                ._id,
+                            sid: $stateParams.sid,
                             sender: $scope.senderId
                         }
 
