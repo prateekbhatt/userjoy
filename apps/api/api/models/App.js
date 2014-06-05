@@ -67,6 +67,14 @@ var AppSchema = new Schema({
   },
 
 
+  // if the app is live then true, else if the app is in test mode, then false
+  live: {
+    type: Boolean,
+    default: true,
+    required: [true, 'Provide valid live mode for app']
+  },
+
+
   liveKey: {
     type: String,
     unique: true
