@@ -251,7 +251,7 @@ angular.module('do.automate', [])
                         if (err) {
                             return err;
                         }
-                        $scope.selectedIcon.id = segmentService.getSegments()[
+                        $scope.selectedIcon._id = segmentService.getSegments()[
                             0]._id;
                         $scope.selectedIcon.name = segmentService.getSegments()[
                             0].name;
@@ -275,7 +275,7 @@ angular.module('do.automate', [])
                     modelsSegment.getAllSegments($scope.currApp,
                         checkSegments);
                     $scope.changeText = function (ind) {
-                        $scope.selectedIcon.id = $scope.segmenticons[
+                        $scope.selectedIcon._id = $scope.segmenticons[
                             ind].id;
                         $scope.selectedIcon.name = $scope.segmenticons[
                             ind]
@@ -309,7 +309,7 @@ angular.module('do.automate', [])
 
 
                 console.log("inside text Angular Ctrl");
-                console.log("sid: ", segmentService.getSingleSegment());
+                console.log("sid: ", segmentService.getSingleSegment()._id);
                 $scope.currApp = $stateParams.id;
                 $scope.showNotification = true;
                 $scope.showEmail = false;
@@ -333,13 +333,15 @@ angular.module('do.automate', [])
 
                     $scope.sender = AccountService.get()
                         .name;
+                    console.log("sender: ", $scope.sender);
                     $scope.senderId = AccountService.get()
                         ._id;
 
                     $scope.team = AppService.getCurrentApp()
                         .team;
 
-                    $scope.colorTheme = AppService.getCurrentApp().color;
+                    $scope.colorTheme = AppService.getCurrentApp()
+                        .color;
                     $scope.borderColor = $scope.colorTheme;
                     $scope.borderRight = '1px solid' + $scope.colorTheme;
                     $scope.borderTop = '1px solid' + $scope.colorTheme;
@@ -407,7 +409,7 @@ angular.module('do.automate', [])
                             title: saveMsgService.getTitle(),
                             type: $scope.selectedMessageType.value.toLowerCase(),
                             sid: segmentService.getSingleSegment()
-                                .id,
+                                ._id,
                             sender: $scope.senderId
                         }
 
@@ -494,6 +496,21 @@ angular.module('do.automate', [])
             $scope.title = AutoMsgService.getSingleAutoMsg()
                 .title;
 
+            $scope.colorTheme = AppService.getCurrentApp()
+                .color;
+            $scope.borderColor = $scope.colorTheme;
+            $scope.borderRight = '1px solid' + $scope.colorTheme;
+            $scope.borderTop = '1px solid' + $scope.colorTheme;
+            $scope.borderBottom = '1px solid' + $scope.colorTheme;
+            $scope.borderRadius = '4px';
+            $scope.backGrndColor = $scope.colorTheme;
+            $scope.borderColor = $scope.colorTheme;
+
+            $scope.emailBorderColor = $scope.colorTheme;
+            $scope.emailBorderRight = '1px solid' + $scope.colorTheme;
+            $scope.emailBorderTop = '1px solid' + $scope.colorTheme;
+            $scope.emailBorderBottom = '1px solid' + $scope.colorTheme;
+
             $scope.updateMessage = function () {
                 if ($scope.showNotification) {
                     saveMsgService.setMsg($scope.notificationBody);
@@ -528,13 +545,6 @@ angular.module('do.automate', [])
                 console.log("data: ", data);
                 modelsAutomate.editAutoMsg($scope.currApp, $scope.msgId,
                     data);
-                /*$scope.$watch(ErrMsgService.getErrorMessage,
-                    function () {
-                        if (ErrMsgService.getErrorMessage()) {
-                            $scope.showAutoMsgError = true;
-                            $scope.errMsg = ErrMsgService.getErrorMessage();
-                        }
-                    })*/
             }
 
             $scope.showText = function (htmlVariable) {
@@ -566,6 +576,14 @@ angular.module('do.automate', [])
         $scope.subject = saveMsgService.getSub();
         console.log("auto test email subject ----->>>>>>: ",
             saveMsgService.getSub());
+        $scope.colorTheme = AppService.getCurrentApp()
+            .color;
+        $scope.emailBorderColor = $scope.colorTheme;
+        $scope.emailBorderRight = '1px solid' + $scope.colorTheme;
+        $scope.emailBorderTop = '1px solid' + $scope.colorTheme;
+        $scope.emailBorderBottom = '1px solid' + $scope.colorTheme;
+        $scope.borderRadius = '4px';
+        $scope.borderBottom = '1px solid' + $scope.colorTheme;
 
         $scope.msgType = AutoMsgService.getAutoMsgType();
         if ($scope.msgType === "Email") {
@@ -612,6 +630,22 @@ angular.module('do.automate', [])
         } else {
             $scope.msgStatus = 'Make it Live';
         }
+
+        $scope.colorTheme = AppService.getCurrentApp()
+            .color;
+        $scope.borderColor = $scope.colorTheme;
+        $scope.borderRight = '1px solid' + $scope.colorTheme;
+        $scope.borderTop = '1px solid' + $scope.colorTheme;
+        $scope.borderBottom = '1px solid' + $scope.colorTheme;
+        $scope.borderRadius = '4px';
+        $scope.backGrndColor = $scope.colorTheme;
+        $scope.borderColor = $scope.colorTheme;
+
+        $scope.emailBorderColor = $scope.colorTheme;
+        $scope.emailBorderRight = '1px solid' + $scope.colorTheme;
+        $scope.emailBorderTop = '1px solid' + $scope.colorTheme;
+        $scope.emailBorderBottom = '1px solid' + $scope.colorTheme;
+
         $scope.changeMsgStatus = function () {
             if (AutoMsgService.getSingleAutoMsg()
                 .active) {
@@ -645,6 +679,22 @@ angular.module('do.automate', [])
                 .sub;
             $scope.previewText = AutoMsgService.getSingleAutoMsg()
                 .body;
+
+            $scope.colorTheme = AppService.getCurrentApp()
+                .color;
+            $scope.borderColor = $scope.colorTheme;
+            $scope.borderRight = '1px solid' + $scope.colorTheme;
+            $scope.borderTop = '1px solid' + $scope.colorTheme;
+            $scope.borderBottom = '1px solid' + $scope.colorTheme;
+            $scope.borderRadius = '4px';
+            $scope.backGrndColor = $scope.colorTheme;
+            $scope.borderColor = $scope.colorTheme;
+
+            $scope.emailBorderColor = $scope.colorTheme;
+            $scope.emailBorderRight = '1px solid' + $scope.colorTheme;
+            $scope.emailBorderTop = '1px solid' + $scope.colorTheme;
+            $scope.emailBorderBottom = '1px solid' + $scope.colorTheme;
+
             if ($scope.msgType === "email") {
                 $scope.showEmailPreview = true;
             }
