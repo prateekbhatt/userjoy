@@ -75,7 +75,7 @@
                                                 <input type="text" placeholder="Value" ng-model="filter.val" ng-class="{'form-control': true, 'error': filter.val.length == 0 && usersListForm.$dirty}">
                                             </div>
                                             <div class="col-md-2">
-                                                <a class="btn btn-default fa fa-times" ng-click="removeFilter(filter)"></a>
+                                                <a class="btn btn-default fa fa-times" ng-click="removeFilter(filter)" ng-hide="segmentClicked && $first"></a>
                                             </div>
                                         </div>
                                     </div>
@@ -132,7 +132,7 @@
                                     <h3 class="popover-title"> Update segment
                                     </h3>
                                     <div class="popover-content">
-                                        <form name="popoverForm" ng-submit="updateSegment()" novalidate>
+                                        <form name="popoverForm" novalidate>
                                             <div class="row" style="padding: 10px;">
                                                 <input id="segmentName" type="text" class="form-control" name="updatedSegmentName" placeholder="Segment" ng-model="updatedSegmentName" required >
                                                 <br>
