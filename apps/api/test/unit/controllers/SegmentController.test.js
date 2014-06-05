@@ -65,7 +65,8 @@ describe('Resource /apps/:aid/segments', function () {
               method: 'count',
               name: 'Create Notification',
               type: 'feature',
-              val: 'hello'
+              op: 'eq',
+              val: 0
             }
 
           ]

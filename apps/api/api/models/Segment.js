@@ -178,6 +178,15 @@ SegmentSchema.pre('save', function (next) {
     return next(new Error('Provide atleast one segment filter'));
   }
 
+  // if count method, then op and val must be present
+  // 0 should be an acceptable val value
+  _.each(this.filters, function (f) {
+    if (f.method === 'count' && !(f.op && (f.val || f.val === 0) )) {
+      return next(new Error(
+        'Provide valid filter operator and filter value'));
+    }
+  });
+
   this.ut = new Date;
   next();
 });

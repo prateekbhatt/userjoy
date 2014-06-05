@@ -201,6 +201,52 @@ describe('Model Conversation', function () {
 
     });
 
+
+    it('should store amId if provided', function (done) {
+
+      var newConversation = {
+        aid: randomId(),
+        amId: randomId(),
+        assignee: randomId(),
+        messages: [{
+          body: 'Hello World',
+          from: 'user',
+          type: 'email'
+        }],
+        sub: 'My new subject',
+        uid: randomId()
+      };
+
+      Conversation.create(newConversation, function (err, con) {
+
+        expect(err)
+          .to.not.exist;
+
+        expect(con)
+          .to.be.an('object');
+
+        savedConversation = con;
+
+        expect(con)
+          .to.have.property("aid", newConversation.aid);
+
+        expect(con)
+          .to.have.property("amId", newConversation.amId);
+
+        expect(con)
+          .to.have.property("assignee", newConversation.assignee);
+
+        expect(con)
+          .to.have.property("sub", newConversation.sub);
+
+        expect(con)
+          .to.have.property("uid", newConversation.uid);
+
+        done();
+      });
+
+    });
+
   });
 
 
