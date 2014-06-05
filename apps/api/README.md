@@ -133,6 +133,7 @@ UserNote      |                         | notes created by team members about a 
 - color (hex color code for notifications / feedback)
 - ct
 - isActive (boolean)
+- live (boolean) if the app is in test mode, then false
 - liveKey
 - name
 - team [{accId, admin}]
