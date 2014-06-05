@@ -5,9 +5,9 @@
  * REF: https://gist.github.com/jeffchao/5787194
  */
 
-var uuid = require('node-uuid'),
-  crypto = require('crypto'),
-  _ = require('lodash');
+var _ = require('lodash');
+var crypto = require('crypto');
+var uuid = require('node-uuid');
 
 
 /**
@@ -18,12 +18,13 @@ var uuid = require('node-uuid'),
 exports.new = function (env) {
 
   if (!_.contains([ 'live', 'test' ], env)) {
-    throw new Error('Environment must be "test" or "live"');
+    var err = new Error('Environment must be "test" or "live"');
+    throw err;
   }
 
   var key = uuid();
 
-  key = crypto.createHash('sha256')
+  key = crypto.createHash('md5')
   .update(key)
   .update('salt')
   .digest('hex');
