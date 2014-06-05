@@ -83,14 +83,14 @@
                             </div>
                         </div>
                         <br>
-                        <div class="row">
+                        <!-- <div class="row">
                             <div class="col-md-4 col-sm-push-1">
                                 <div ng-show="showErr" id="login-alert" class="alert alert-danger col-sm-12">
                                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="hideErrorAlert()">&times;</button>
                                     {{errMsg}}
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="row">
                             <div class="col-md-4" style="margin-left: 20px">
                                 <button class="btn btn-info" ng-click="addAnotherFilter()" ng-show="true">
@@ -157,9 +157,11 @@
                             <p class="text-center" style="padding-top: 60px;">No Segments Created.</p>
                         </div>
                         <ul class="list-group" ng-show="segmentsCreated">
-                            <a href="#" class="list-group-item" ng-repeat="segname in segmentsCreatedName" ng-click="showQuery(segname.id)">{{segname.name}}</a>
+                            <a href="#" class="list-group-item" ng-repeat="segname in segmentsCreatedName" ng-click="showQuery(segname.id, $index, segname)" ng-class="{'active': $index === selectedIndex}">{{segname.name}}
+                            </a>
                         </ul>
                     </div>
+                    <a class="btn btn-info btn-block" ng-show="showAutoMsgBtn" href="/apps/{{currApp}}/messages/automate/write">Auto Message</a>
                 </div>
             </form>
         </div>
@@ -203,15 +205,6 @@
                 <table ng-table="tableParams" show-filter="true" class="table">
                     <thead>
                         <tr>
-                            <!-- <th ng-repeat="column in columns" ng-show="column.visible"
-                                                                class="text-center" ng-class="{
-                                                                'sort-asc': tableParams.isSortBy(column.field, 'asc'),
-                                                                'sort-desc': tableParams.isSortBy(column.field, 'desc'),
-                                                                'sortable': !$first
-                                                                }"
-                                                                ng-click="tableParams.sorting(column.field, tableParams.isSortBy(column.field, 'asc') ? 'desc' : 'asc')">
-                                                                <div>{{column.title}}</div>
-                            </th> -->
                             <th class="text-center">
                                 <div><input type="checkbox" ng-model="checkboxes.all"></div>
                             </th>

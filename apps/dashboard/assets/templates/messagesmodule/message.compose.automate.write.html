@@ -90,7 +90,7 @@
                     <br>
                 </div>
                 <!-- TODO: Replace template color with the color entered by the user -->
-                <div class="col-md-10 col-md-offset-1" ng-show="showEmail">
+                <div class="col-md-10 col-md-offset-1" ng-show="showEmail" style="margin-top: 40px;">
                     <label style="font-size: 18px;">Subject: </label>&nbsp;<span ng-bind-html="subject" class="emailPreview"></span>
                     <div class="message-template" ng-style="{'border-color': emailBorderColor, 'border-right': emailBorderRight, 'border-top': emailBorderTop, 'border-bottom': borderBottom, 'border-radius': borderRadius}" style="min-height: 300px; overflow: auto; max-height: 300px;">
                         <p ng-bind-html="emailBody"></p>

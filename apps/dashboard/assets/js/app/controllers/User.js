@@ -298,6 +298,8 @@ angular.module('do.users', [])
                 $scope.segmentsCreatedName = [];
                 $scope.showUpdatePopover = false;
                 $scope.showSpinner = false;
+                $scope.showAutoMsgBtn = false;
+                $scope.currApp = $stateParams.id;
                 var checkSegments = function (err) {
                     if (err) {
                         return err;
@@ -970,22 +972,33 @@ angular.module('do.users', [])
 
                     }
 
-                    $scope.showQuery = function (segId) {
+                    $scope.currentSegment = [];
+                    $scope.showQuery = function (segId, index, segname) {
                         $scope.segmentClicked = true;
+                        $scope.showAutoMsgBtn = true;
+                        $scope.selectedIndex = index;
                         $scope.showSaveButton = false;
                         segmentService.setSegmentId(segId);
-                        console.log("segmentId: ", segmentService.getSegmentId());
+                        console.log("segname: ", segname);
+                        $scope.currentSegment.id = segname.id;
+                        $scope.currentSegment.name = segname.name;
+                        segmentService.setSingleSegment($scope.currentSegment);
+                        console.log("segmentId: ", segmentService.getSegmentId(), segmentService.getSingleSegment());
                         modelsSegment.getSegment(currentAppId, segId,
                             populateFilterAndRunQuery);
                     }
 
-                    $scope.showErr = false;
-                    $scope.errMsg = 'Enter the outlined fields';
-                    $scope.errorclass = '';
+                    // $scope.createAutoMsg = function (segId, index) {
+                    //     console.log("create AutoMsg clicked");
+                    // }
 
-                    $scope.hideErrorAlert = function () {
-                        $scope.showErr = false;
-                    }
+                    // $scope.showErr = false;
+                    // $scope.errMsg = 'Enter the outlined fields';
+                    // $scope.errorclass = '';
+
+                    // $scope.hideErrorAlert = function () {
+                    //     $scope.showErr = false;
+                    // }
 
                     $scope.isErr = 'error';
 
@@ -1352,7 +1365,7 @@ angular.module('do.users', [])
                     }
 
                     var populateGraph = function (err, data) {
-                        if(err) {
+                        if (err) {
                             console.log('err');
                             return;
                         }
@@ -1362,7 +1375,8 @@ angular.module('do.users', [])
                         var value = [];
                         for (var i = 0; i < keys.length; i++) {
                             var val = [];
-                            val = [Math.floor(keys[i]) * 1000, data[keys[i]]];
+                            val = [Math.floor(keys[i]) * 1000, data[
+                                keys[i]]];
                             value.push(val);
                         };
                         console.log("value: ", value);
@@ -1375,7 +1389,8 @@ angular.module('do.users', [])
 
                     UserModel.getEngagementScore(currentAppId,
                         $scope.uid,
-                        $scope.fromScoreTime, $scope.toScoreTime, populateGraph);
+                        $scope.fromScoreTime, $scope.toScoreTime,
+                        populateGraph);
 
                     UserModel.getEvents(currentAppId, $scope.uid,
                         $scope.fromTime,
