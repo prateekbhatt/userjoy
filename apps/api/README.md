@@ -360,6 +360,7 @@ as meta properties)
 ##### Columns:
 
 - aid
+- amId (present if conversation was started as a reply to an automessage)
 - assignee (account id)
 - closed (boolean)
 - ct

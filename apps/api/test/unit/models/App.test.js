@@ -65,7 +65,7 @@ describe('Model App', function () {
   describe('#findByKey', function () {
 
     it('should fetch app using provided test key', function (done) {
-      App.findByKey('test', saved.apps.first.testKey, function (err, app) {
+      App.findByKey(saved.apps.first.testKey, function (err, app) {
         expect(err)
           .to.be.null;
         expect(app)
@@ -77,7 +77,7 @@ describe('Model App', function () {
     });
 
     it('should fetch app using provided live key', function (done) {
-      App.findByKey('live', saved.apps.first.liveKey, function (err, app) {
+      App.findByKey(saved.apps.first.liveKey, function (err, app) {
         expect(err)
           .to.be.null;
         expect(app)
@@ -89,15 +89,28 @@ describe('Model App', function () {
     });
 
 
-    it('should return null if key does not exist', function (done) {
-      App.findByKey('test', 'random.testKey', function (err, app) {
-        expect(err)
-          .to.be.null;
-        expect(app)
-          .to.be.null;
-        done();
+    it('should return error if key is invalid, no test_ / live_ prefix',
+      function (done) {
+        App.findByKey('random.testKey', function (err, app) {
+          expect(err)
+            .to.not.be.null;
+          expect(err.message)
+            .to.eql('Provide valid app key');
+          done();
+        });
       });
-    });
+
+
+    it('should return error if no app with key was found',
+      function (done) {
+        App.findByKey('test_testKey', function (err, app) {
+          expect(err)
+            .to.be.null;
+          expect(app)
+            .to.be.null;
+          done();
+        });
+      });
 
   });
 
@@ -137,7 +150,7 @@ describe('Model App', function () {
     var fetchedApp;
 
     before(function (done) {
-      App.findByKey('live', saved.apps.first.liveKey, function (err, app) {
+      App.findByKey(saved.apps.first.liveKey, function (err, app) {
         fetchedApp = app;
         done(err);
       });
