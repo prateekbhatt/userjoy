@@ -42,6 +42,12 @@ describe('Model App', function () {
     });
 
 
+    it('should put the app in live mode by default', function () {
+      expect(saved.apps.first)
+        .to.have.property("live", true);
+    });
+
+
     it('should add account to team and as admin', function () {
 
       var team = saved.apps.first.team;

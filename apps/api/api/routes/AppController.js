@@ -195,4 +195,39 @@ router
   });
 
 
+/**
+ * PUT /apps/:aid/live
+ *
+ * @param {string} live [true/false]
+ *
+ * Update the mode of the app (live / test)
+ */
+
+router
+  .route('/:aid/live')
+  .put(function (req, res, next) {
+
+    logger.trace({
+      at: 'app:updateLive',
+      params: req.params,
+      body: req.body
+    })
+
+    var live = req.body.live;
+
+    if (!_.isBoolean(live)) {
+      return res.badRequest('Provide live val as boolean true / false');
+    }
+
+    req.app.live = live;
+
+    req.app.save(function (err, app) {
+      if (err) return next(err);
+      res
+        .status(201)
+        .json(app);
+    });
+  });
+
+
 module.exports = router;
