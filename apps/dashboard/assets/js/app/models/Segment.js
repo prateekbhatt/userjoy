@@ -36,15 +36,15 @@ angular.module('models.Segment', ['services'])
                 .error(callback);
         }
 
-        this.updateSegment = function (appId, segmentId, data) {
+        this.updateSegmentModels = function (appId, segmentId, data, cb) {
+            console.log("inside models update segment");
             $http.put(config.apiUrl + '/apps/' + appId + '/segments/' +
                 segmentId, data)
                 .success(function (data) {
                     console.log("success: ", data);
+                    cb(null, data);
                 })
-                .error(function () {
-                    console.log("error");
-                })
+                .error(cb);
         }
     }
 ])
