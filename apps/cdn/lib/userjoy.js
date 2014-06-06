@@ -1,3 +1,4 @@
+var app = require('./app');
 var bind = require('bind');
 var callback = require('callback');
 var canonical = require('canonical');
@@ -115,6 +116,9 @@ UserJoy.prototype.initialize = function (settings, options) {
   // invoke queued tasks
   this._invokeQueue();
 
+  app.identify({
+    app_id: window._userjoy_id
+  });
 
   // FIXME: REMOVE ME
   // this.debug();
@@ -161,6 +165,12 @@ UserJoy.prototype.identify = function (traits, fn) {
 
   if (!is.object(traits)) {
     this.debug('err: userjoy.identify must be passed a traits object');
+    return;
+  }
+
+  // if no user identifier, return
+  if (!traits.user_id && !traits.email) {
+    self.debug('userjoy.identify must provide the user_id or email');
     return;
   }
 
