@@ -16,7 +16,6 @@
     "ianstormtaylor/bind": "0.0.2",
     "ianstormtaylor/callback": "0.0.1",
     "ianstormtaylor/is": "0.1.0",
-    "segmentio/after": "0.0.1",
     "segmentio/canonical": "0.0.1",
     "segmentio/extend": "0.0.1",
     "segmentio/is-email": "0.1.1",
@@ -30,15 +29,17 @@
     "yields/prevent": "0.0.2",
     "lodash/lodash": "2.4.1",
     "visionmedia/node-querystring": "*",
-    "ForbesLindesay/ajax": "*"
+    "ForbesLindesay/ajax": "*",
+    "component/dom": "*"
   },
   "scripts": [
     "lib/index.js",
+    "lib/app.js",
     "lib/company.js",
     "lib/cookie.js",
     "lib/entity.js",
-    "lib/feedback.js",
-    "lib/feedback-template.js",
+    "lib/message.js",
+    "lib/message-template.js",
     "lib/notification.js",
     "lib/notification-template.js",
     "lib/queue.js",
@@ -46,8 +47,6 @@
     "lib/user.js",
     "lib/userjoy.js"
   ],
-
-
   "remotes": [
     "https://raw.githubusercontent.com",
     "https://cdn.rawgit.com",
