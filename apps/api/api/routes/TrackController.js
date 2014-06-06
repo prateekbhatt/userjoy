@@ -265,15 +265,17 @@ router
     var data = req.query;
     var appKey = data.app_id;
 
-    // Validations
-    if (!appKey) {
-      return res.badRequest('Please send app_id with the params');
-    }
-
-
     // user identifiers
     var email = data.email;
     var user_id = data.user_id;
+
+
+    // VALIDATIONS
+
+    // if appKey is not present, there is no way to identify an app
+    if (!appKey) {
+      return res.badRequest('Please send app_id with the params');
+    }
 
     // if user identifier is not present, respond with an error
     if (!email && !user_id) {
@@ -285,11 +287,17 @@ router
 
 
         function getApp(cb) {
-          App.findByKey(appKey, cb);
+          App.findByKey(appKey, function (err, app) {
+
+            if (err) return cb(err);
+            if (!app) return cb(new Error(
+              'App not found. Provide valid app id'));
+            cb(null, app);
+          });
         },
 
 
-        function getOrCreateUser(app, cb) {
+        function findUser(app, cb) {
 
           var conditions = {
             aid: app._id
@@ -347,6 +355,8 @@ router
  * POST /track/conversations
  *
  * Creates a new conversation
+ *
+ * If user is replying to a notification, then the amId must be there
  */
 
 router
@@ -372,7 +382,8 @@ router
     var user_id = data.user_id;
 
 
-    // Validations
+    // VALIDATIONS : START //////////////////
+
     if (!appKey) {
       return res.badRequest('Please send app_id with the params');
     }
@@ -387,16 +398,24 @@ router
       return res.badRequest('Please write a message');
     }
 
+    // VALIDATIONS : END ////////////////////
+
+
 
     async.waterfall([
 
 
         function getApp(cb) {
-          App.findByKey(appKey, cb);
+          App.findByKey(appKey, function (err, app) {
+            if (err) return cb(err);
+            if (!app) return cb(new Error(
+              'App not found. Provide valid app id'));
+            cb(null, app);
+          });
         },
 
 
-        function getOrCreateUser(app, cb) {
+        function findUser(app, cb) {
 
           var conditions = {
             aid: app._id
@@ -416,12 +435,17 @@ router
 
         function createConversation(user, cb) {
 
-          var newConversation = {
+          var newCon = {
             aid: user.aid,
             messages: [],
             sub: 'Message from ' + user.email,
             uid: user._id
           };
+
+
+          // if amId is present
+          if (amId) newCon.amId = amId;
+
 
           var msg = {
             body: body,
@@ -429,7 +453,8 @@ router
             // add from as 'user'
             from: 'user',
 
-            type: 'email',
+            // type should be notification
+            type: 'notification',
 
             // add sender name 'sName' as user's name or email
             // TODO: Check is user.name will work
@@ -437,9 +462,9 @@ router
 
           };
 
-          newConversation.messages.push(msg);
+          newCon.messages.push(msg);
 
-          Conversation.create(newConversation, cb);
+          Conversation.create(newCon, cb);
         }
 
       ],
