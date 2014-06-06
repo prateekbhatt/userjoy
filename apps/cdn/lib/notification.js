@@ -14,9 +14,10 @@ var user = require('./user');
 function Notification() {
 
   var userTraits = user.traits();
+  var appTraits = app.traits();
+  var apiUrl = appTraits.apiUrl;
 
-  this.app_id = app.traits()
-    .app_id;
+  this.app_id = appTraits.app_id;
 
   this.automessageId;
   this.debug = debug;
@@ -31,8 +32,8 @@ function Notification() {
   this.NOTIFICATION_TEMPLATE_ID = 'uj_notification';
   this.REPLY_TEMPLATE_ID = 'uj_notification_reply';
   this.SENT_TEMPLATE_ID = 'uj_notification_reply_sent';
-  this.FETCH_URL = 'http://api.do.localhost/track/notifications';
-  this.REPLY_URL = 'http://api.do.localhost/track/conversations';
+  this.FETCH_URL = apiUrl + '/notifications';
+  this.REPLY_URL = apiUrl + '/conversations';
 }
 
 
