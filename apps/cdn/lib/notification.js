@@ -1,4 +1,5 @@
 var ajax = require('ajax');
+var app = require('./app');
 var bind = require('bind');
 var debug = require('debug')('uj:notification');
 var dom = require('dom');
@@ -12,24 +13,37 @@ var user = require('./user');
 
 function Notification() {
 
-  this.debug = debug;
-  this.notification_url = 'TODO';
-  this.automessageId;
-  this.uid;
+  var userTraits = user.traits();
 
-  this.TEMPLATE_ID = 'uj_notification';
+  this.app_id = app.traits()
+    .app_id;
+
+  this.automessageId;
+  this.debug = debug;
+
+  // unique user id as given by app
+  this.user_id = userTraits.user_id;
+
+  // email of user
+  this.email = userTraits.email;
+
+
+  this.NOTIFICATION_TEMPLATE_ID = 'uj_notification';
+  this.REPLY_TEMPLATE_ID = 'uj_notification_reply';
+  this.SENT_TEMPLATE_ID = 'uj_notification_reply_sent';
   this.FETCH_URL = 'http://api.do.localhost/track/notifications';
-  this.REPLY_POST_URL = 'http://api.do.localhost/track/notifications/uid';
+  this.REPLY_URL = 'http://api.do.localhost/track/conversations';
 }
 
 
 Notification.prototype.load = function () {
 
-  var self = this;
-
   this.debug('load');
 
-  self.fetch(function (err, notf) {
+
+  var self = this;
+
+  self._fetch(function (err, notf) {
 
     // If there is an error, it should be logged during debugging
     if (err) {
@@ -44,18 +58,20 @@ Notification.prototype.load = function () {
     }
 
 
-    // Persist the automessageId and the uid from the notification obj.
+    // Persist the automessageId from the notification obj.
     // Would be needed to create a new conversation in case the user
     // replies back
     self.automessageId = notf.amId;
-    self.uid = notf.uid;
 
 
     // Create locals object which would be passed to render the template
     var locals = {
       sender: notf.sender,
       body: notf.body,
-      TEMPLATE_ID: self.TEMPLATE_ID
+
+      NOTIFICATION_TEMPLATE_ID: self.NOTIFICATION_TEMPLATE_ID,
+      REPLY_TEMPLATE_ID: self.REPLY_TEMPLATE_ID,
+      SENT_TEMPLATE_ID: self.SENT_TEMPLATE_ID
     };
 
 
@@ -66,35 +82,21 @@ Notification.prototype.load = function () {
 
 };
 
-Notification.prototype.fetch = function (cb) {
+Notification.prototype._fetch = function (cb) {
 
   var self = this;
 
-  var userTraits = user.traits();
-
-  // get uid from cookie
-  var uid = user.id();
-
-  // unique user id as given by app
-  var user_id = userTraits.user_id;
-
-  // email of user
-  var email = userTraits.email;
-
-  // if no user identifier, return
-  if (!uid && !user_id && !email) {
-    self.debug('no user identifier');
-    return;
-  }
-
   var conditions = {
-    app_id: window._userjoy_id
+    app_id: self.app_id
   };
 
-  if (user_id) {
-    conditions.user_id = user_id;
-  } else if (email) {
-    conditions.email = email
+
+  if (self.user_id) {
+    conditions.user_id = self.user_id;
+  } else if (self.email) {
+    conditions.email = self.email;
+  } else {
+    return;
   }
 
 
@@ -119,7 +121,7 @@ Notification.prototype.show = function () {};
 
 
 Notification.prototype.hide = function () {
-  var id = this.TEMPLATE_ID;
+  var id = this.NOTIFICATION_TEMPLATE_ID;
 
   this.debug('hide', dom(id));
 
@@ -133,25 +135,37 @@ Notification.prototype.reply = function () {
 
   var self = this;
 
-  var data = {
-    reply: dom('#reply')
-      .val()
+  var msg = dom('#' + self.REPLY_TEMPLATE_ID)
+    .val();
+
+  var reply = {
+    amId: this.automessageId,
+    app_id: self.app_id,
+    body: msg
   };
 
-  this.debug("reply", data);
+  if (self.user_id) {
+    reply.user_id = self.user_id;
+  } else if (self.email) {
+    reply.email = self.email;
+  } else {
+    return;
+  }
+
+  this.debug("reply", reply);
 
   ajax({
     type: "POST",
-    url: self.REPLY_POST_URL,
-    data: data,
+    url: self.REPLY_URL,
+    data: reply,
     success: function () {
-      document.getElementById('msgsent')
+      document.getElementById(self.SENT_TEMPLATE_ID)
         .style.display = 'block';
-      document.getElementById('reply')
+      document.getElementById(self.REPLY_TEMPLATE_ID)
         .value = '';
     },
-    error: function () {
-      console.log("error");
+    error: function (err) {
+      self.debug("error: ", err);
     },
     dataType: 'json'
   });
