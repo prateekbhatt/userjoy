@@ -117,7 +117,10 @@ UserJoy.prototype.initialize = function (settings, options) {
   this._invokeQueue();
 
   app.identify({
-    app_id: window._userjoy_id
+    app_id: window._userjoy_id,
+
+    // FIXME change before production
+    apiUrl: 'http://api.do.localhost/track'
   });
 
   // FIXME: REMOVE ME
@@ -524,12 +527,30 @@ function canonicalUrl() {
 
 UserJoy.prototype.hideNotification = notification.hide;
 
+
 /**
  * Expose function to to reply to a notifiation
  */
 
 UserJoy.prototype.replyNotification = notification.reply;
 
+
+/**
+ * Expose function to show conversation box
+ */
+
 UserJoy.prototype.showFeedback = feedback.show;
 
+
+/**
+ * Expose function to hide conversation box
+ */
+
 UserJoy.prototype.hideFeedback = feedback.hide;
+
+
+/**
+ * Expose function to send new conversation
+ */
+
+UserJoy.prototype.sendConversation = feedback.send;
