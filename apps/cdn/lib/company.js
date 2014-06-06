@@ -1,5 +1,5 @@
 
-var debug = require('debug')('userjoy:company');
+var debug = require('debug')('uj:company');
 var Entity = require('./entity');
 var inherit = require('inherit');
 var bind = require('bind');
@@ -10,7 +10,6 @@ var bind = require('bind');
  */
 
 Company.defaults = {
-  persist: true,
   cookie: {
     key: 'userjoy_company_id'
   },
