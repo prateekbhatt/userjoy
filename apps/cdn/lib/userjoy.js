@@ -1,19 +1,19 @@
-var after = require('after');
+var app = require('./app');
 var bind = require('bind');
 var callback = require('callback');
 var canonical = require('canonical');
 var clone = require('clone');
 var company = require('./company');
 var cookie = require('./cookie');
-var debug = require('debug');
+var debug = require('debug')('uj:userjoy');
 var defaults = require('defaults');
 var each = require('each');
 var is = require('is');
 var isEmail = require('is-email');
 var isMeta = require('is-meta');
 var json = require('json');
+var message = require('./message');
 var newDate = require('new-date');
-var feedback = require('./feedback');
 var notification = require('./notification');
 var on = require('event')
   .bind;
@@ -80,6 +80,7 @@ module.exports = UserJoy;
  */
 
 function UserJoy() {
+  this.debug = debug;
   this._timeout = 300;
   this.api_url = '/track';
   this.jsonp_callback = 'foo';
@@ -96,6 +97,9 @@ function UserJoy() {
  */
 
 UserJoy.prototype.initialize = function (settings, options) {
+
+  this.debug('initialize');
+
   settings = settings || {};
   options = options || {};
   this._options(options);
@@ -112,13 +116,22 @@ UserJoy.prototype.initialize = function (settings, options) {
   // invoke queued tasks
   this._invokeQueue();
 
+  app.identify({
+    app_id: window._userjoy_id,
+
+    // FIXME change before production
+    apiUrl: 'http://api.do.localhost/track'
+  });
+
+  // FIXME: REMOVE ME
+  // this.debug();
 
   // FIXME: THIS CODE IS NOT TESTED
-  notification.load(user.id());
+  notification.load();
 
-  feedback.load(user.id());
-  // load css file for feedback
-  feedback.loadCss();
+  message.load();
+  // load css file for message
+  message.loadCss();
 
 
   // track page view
@@ -144,24 +157,27 @@ UserJoy.prototype._invokeQueue = function () {
 };
 
 /**
- * Identify a user by optional `id` and `traits`.
+ * Identify a user by  `traits`.
  *
- * @param {String} id (optional)
  * @param {Object} traits (optional)
  * @param {Function} fn (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.identify = function (id, traits, options, fn) {
-  if (is.fn(options)) fn = options, options = null;
-  if (is.fn(traits)) fn = traits, options = null, traits = null;
-  if (is.object(id)) options = traits, traits = id, id = user.id();
+UserJoy.prototype.identify = function (traits, fn) {
 
-  // clone traits before we manipulate so we don't do anything uncouth, and take
-  // from `user` so that we carryover anonymous traits
-  user.identify(id, traits);
-  id = user.id();
-  traits = user.traits();
+  if (!is.object(traits)) {
+    this.debug('err: userjoy.identify must be passed a traits object');
+    return;
+  }
+
+  // if no user identifier, return
+  if (!traits.user_id && !traits.email) {
+    self.debug('userjoy.identify must provide the user_id or email');
+    return;
+  }
+
+  user.identify(traits);
 
   this._callback(fn);
   return this;
@@ -180,27 +196,21 @@ UserJoy.prototype.user = function () {
 
 
 /**
- * Identify a company by optional `id` and `traits`. Or, if no arguments are
- * supplied, return the current company.
+ * Identify a company by `traits`.
  *
- * @param {String} id (optional)
- * @param {Object} traits (optional)
- * @param {Object} options (optional)
+ * @param {Object} traits
  * @param {Function} fn (optional)
- * @return {UserJoy or Object}
+ * @return {UserJoy}
  */
 
-UserJoy.prototype.company = function (id, traits, options, fn) {
-  if (0 === arguments.length) return company;
-  if (is.fn(options)) fn = options, options = null;
-  if (is.fn(traits)) fn = traits, options = null, traits = null;
-  if (is.object(id)) options = traits, traits = id, id = company.id();
+UserJoy.prototype.company = function (traits, fn) {
 
+  if (!is.object(traits)) {
+    this.debug('err: userjoy.company must be passed a traits object');
+    return this;
+  }
 
-  // grab from company again to make sure we're taking from the source
-  company.identify(id, traits);
-  id = company.id();
-  traits = company.traits();
+  company.identify(traits);
 
   this._callback(fn);
   return this;
@@ -370,21 +380,6 @@ UserJoy.prototype.timeout = function (timeout) {
 
 
 /**
- * Enable or disable debug.
- *
- * @param {String or Boolean} str
- */
-
-UserJoy.prototype.debug = function (str) {
-  if (0 == arguments.length || str) {
-    debug.enable('analytics:' + (str || '*'));
-  } else {
-    debug.disable();
-  }
-};
-
-
-/**
  * Apply options.
  *
  * @param {Object} options
@@ -427,6 +422,8 @@ UserJoy.prototype._callback = function (fn) {
  */
 
 UserJoy.prototype._send = function (type, traits) {
+
+  this.debug()
 
   // TODO: send data to userjoy api here
 
@@ -530,12 +527,30 @@ function canonicalUrl() {
 
 UserJoy.prototype.hideNotification = notification.hide;
 
+
 /**
- * Expose function to to reply to a notifiation 
+ * Expose function to to reply to a notifiation
  */
 
 UserJoy.prototype.replyNotification = notification.reply;
 
-UserJoy.prototype.showFeedback = feedback.show;
 
-UserJoy.prototype.hideFeedback = feedback.hide;
+/**
+ * Expose function to show conversation box
+ */
+
+UserJoy.prototype.showFeedback = message.show;
+
+
+/**
+ * Expose function to hide conversation box
+ */
+
+UserJoy.prototype.hideFeedback = message.hide;
+
+
+/**
+ * Expose function to send new conversation
+ */
+
+UserJoy.prototype.sendConversation = message.send;

@@ -369,8 +369,64 @@ describe('Resource /track', function () {
             expect(notf)
               .to.have.property("uid");
 
+            // it should not have amId
+            expect(notf)
+              .to.not.have.property("amId");
+
+            done();
+          });
+
+      });
+
+
+    it('should create new conversation with amId',
+      function (done) {
+
+        var email = saved.users.first.email;
+        var testUrl = url;
+        var newCon = {
+          'app_id': appKey,
+          'email': saved.users.first.email,
+          'body': 'Hey man, how are you?',
+          'amId': saved.automessages.first._id
+        };
+
+        request
+          .post(testUrl)
+          .send(newCon)
+          .expect('Content-Type', /json/)
+          .expect(201)
+          .end(function (err, res) {
+
+            if (err) return done(err);
+
+            var notf = res.body;
+
+            expect(notf)
+              .to.be.an('object');
+
+            var savedMsg = notf.messages[0];
+
+            expect(savedMsg)
+              .to.have.property("body", newCon.body);
+
+            expect(savedMsg)
+              .to.have.property("ct");
+
+            expect(savedMsg)
+              .to.have.property("seen");
+
+            expect(savedMsg)
+              .to.have.property("sName");
+
             expect(notf)
               .to.have.property("uid");
+
+            expect(notf)
+              .to.have.property("uid");
+
+            expect(notf.amId)
+              .to.eql(newCon.amId.toString());
 
 
             done();
