@@ -2,19 +2,19 @@ angular.module('services.ErrMsgService', [])
 
 .service('ErrMsgService', ['$log',
 
-    function ($log) {
+  function ($log) {
 
-        var errMsg = '';
+    var errMsg = '';
 
-        this.setErrorMessage = function (value) {
-            errMsg = value;
-        };
+    this.setErrorMessage = function (value) {
+      errMsg = value;
+    };
 
-        this.getErrorMessage = function () {
-            return errMsg;
-        };
+    this.getErrorMessage = function () {
+      return errMsg;
+    };
 
-        return this;
+    return this;
 
-    }
+  }
 ])

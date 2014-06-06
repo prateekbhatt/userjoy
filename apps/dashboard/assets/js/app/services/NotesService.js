@@ -2,19 +2,19 @@ angular.module('services.NotesService', [])
 
 .service('NotesService', ['$log',
 
-    function ($log) {
+  function ($log) {
 
-        var notes = [];
+    var notes = [];
 
-        this.setNotes = function (value) {
-            notes = value;
-        };
+    this.setNotes = function (value) {
+      notes = value;
+    };
 
-        this.getNotes = function () {
-            return notes;
-        };
+    this.getNotes = function () {
+      return notes;
+    };
 
-        return this;
+    return this;
 
-    }
+  }
 ])
