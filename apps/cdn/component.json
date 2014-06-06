@@ -34,6 +34,7 @@
   },
   "scripts": [
     "lib/index.js",
+    "lib/app.js",
     "lib/company.js",
     "lib/cookie.js",
     "lib/entity.js",
