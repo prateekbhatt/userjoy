@@ -16,22 +16,27 @@
                 <a href="/" style="font-size:19px;" class="navbar-brand">UserJoy
                 </a>
                 <ul class="nav navbar-nav">
+                    <!-- <li ng-repeat="element in navbarElements">
+                        <a href="{{element.href}}">
+                            <i class="{{element.icon}}"></i>
+                        {{element.name}}</a>
+                    </li> -->
                     <li>
-                        <a href="/feed">
-                        <i class="fa fa-sort-amount-asc">
+                        <a href="/apps/{{appId}}/feed" ng-class="{'active': isActive('feed')}">
+                        <i class="fa fa-sort-amount-asc" >
                         </i>
                         Feed
                         </a>
                     </li>
                     <li>
-                        <a href="/apps/{{appId}}/users/list">
+                        <a href="/apps/{{appId}}/users/list" ng-class="{'active': isActive('users')}">
                         <i class="fa fa-user">
                         </i>
                         Users
                         </a>
                     </li>
                     <li>
-                        <a href="/apps/{{appId}}/messages/open">
+                        <a href="/apps/{{appId}}/messages/open" ng-class="{'active': isActive('messages')}">
                         <i class="fa fa-envelope-o">
                         </i>
                         Messages

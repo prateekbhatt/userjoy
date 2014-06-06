@@ -149,7 +149,7 @@
                             <p class="text-center" style="padding-top: 60px;">No Segments Created.</p>
                         </div>
                         <ul class="list-group" ng-show="segmentsCreated">
-                            <li style="padding-bottom: 2px;" class="list-group-item"  ng-class="{'active': $index === selectedIndex}"  ng-repeat="segname in segmentsCreatedName" ng-mouseenter="showAutoMsgButton()" ng-mouseleave="hideAutoMsgButton()">
+                            <li style="padding-bottom: 2px;" class="list-group-item-segment"  ng-class="{'active': $index === selectedIndex}"  ng-repeat="segname in segmentsCreatedName" ng-mouseenter="showAutoMsgButton()" ng-mouseleave="hideAutoMsgButton()">
                             <a style="padding: 10px 15px; display: inline-block; cursor: pointer" ng-click="showQuery(segname.id, $index, segname)">{{segname.name}}</a>
                             <a class="btn btn-sm btn-default pull-right" href="/apps/{{currApp}}/messages/automate/segments/{{segname.id}}/write" style="margin-top: 5px;" ng-show="showAutoMsgBtn">AutoMessage</a>
                             </li>

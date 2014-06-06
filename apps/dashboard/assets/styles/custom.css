@@ -782,7 +782,7 @@ span.emailPreview > p {
     width: 0;
     z-index: 0;
 }
-.list-group-item {
+.list-group-item-segment {
     position: relative;
     display: block;
     margin-bottom: -1px;
@@ -790,11 +790,15 @@ span.emailPreview > p {
     padding: 0px 0px;
     border: 1px solid #ecf0f1;
 }
-li.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.active:focus {
+li.list-group-item-segment.active, li.list-group-item-segment.active:hover, li.list-group-item-segment.active:focus {
     z-index: 2;
     color: #222;
     background-color: #ddd;
     border-color: #ddd;
+}
+.nav.navbar-nav > li >  a.active {
+    color: #ffffff;
+    background-color: #111212;
 }
 
 }

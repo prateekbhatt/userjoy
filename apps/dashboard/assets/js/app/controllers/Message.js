@@ -24,7 +24,7 @@ angular.module('do.message', [])
                 authenticate: true
             })
             .state('id', {
-                url: '/apps/:id/conversations/:messageId',
+                url: '/apps/:id/messages/conversations/:messageId',
                 views: {
                     "main": {
                         templateUrl: '/templates/messagesmodule/message.inbox.id.html',
@@ -292,7 +292,7 @@ angular.module('do.message', [])
 
                     $scope.showSelectedMail = function (id) {
                         $location.path('/apps/' + $scope.currApp +
-                            '/conversations/' + id);
+                            '/messages/conversations/' + id);
 
 
                     }
@@ -466,7 +466,7 @@ angular.module('do.message', [])
 
                     $scope.showSelectedMail = function (id) {
                         $location.path('/apps/' + $scope.currApp +
-                            '/conversations/' + id);
+                            '/messages/conversations/' + id);
                     }
                 }
 
@@ -560,6 +560,10 @@ angular.module('do.message', [])
 
 
         console.log(AccountService.get());
+
+        $scope.doTheBack = function () {
+            window.history.back();
+        }
 
         function getRandomColor(initials) {
             var letters = '0123456789ABCDEF'.split('');
@@ -994,7 +998,7 @@ angular.module('do.message', [])
 
                     $scope.showClosedConversations = function (id) {
                         $location.path('/apps/' + $scope.currApp +
-                            '/conversations/' + id);
+                            '/messages/conversations/' + id);
 
 
                     }
