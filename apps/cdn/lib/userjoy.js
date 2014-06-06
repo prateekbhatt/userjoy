@@ -1,11 +1,10 @@
-var after = require('after');
 var bind = require('bind');
 var callback = require('callback');
 var canonical = require('canonical');
 var clone = require('clone');
 var company = require('./company');
 var cookie = require('./cookie');
-var debug = require('debug');
+var debug = require('debug')('uj:userjoy');
 var defaults = require('defaults');
 var each = require('each');
 var is = require('is');
@@ -80,6 +79,7 @@ module.exports = UserJoy;
  */
 
 function UserJoy() {
+  this.debug = debug;
   this._timeout = 300;
   this.api_url = '/track';
   this.jsonp_callback = 'foo';
@@ -96,6 +96,9 @@ function UserJoy() {
  */
 
 UserJoy.prototype.initialize = function (settings, options) {
+
+  this.debug('initialize');
+
   settings = settings || {};
   options = options || {};
   this._options(options);
@@ -113,10 +116,13 @@ UserJoy.prototype.initialize = function (settings, options) {
   this._invokeQueue();
 
 
-  // FIXME: THIS CODE IS NOT TESTED
-  notification.load(user.id());
+  // FIXME: REMOVE ME
+  // this.debug();
 
-  feedback.load(user.id());
+  // FIXME: THIS CODE IS NOT TESTED
+  notification.load();
+
+  feedback.load();
   // load css file for feedback
   feedback.loadCss();
 
@@ -144,24 +150,21 @@ UserJoy.prototype._invokeQueue = function () {
 };
 
 /**
- * Identify a user by optional `id` and `traits`.
+ * Identify a user by  `traits`.
  *
- * @param {String} id (optional)
  * @param {Object} traits (optional)
  * @param {Function} fn (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.identify = function (id, traits, options, fn) {
-  if (is.fn(options)) fn = options, options = null;
-  if (is.fn(traits)) fn = traits, options = null, traits = null;
-  if (is.object(id)) options = traits, traits = id, id = user.id();
+UserJoy.prototype.identify = function (traits, fn) {
 
-  // clone traits before we manipulate so we don't do anything uncouth, and take
-  // from `user` so that we carryover anonymous traits
-  user.identify(id, traits);
-  id = user.id();
-  traits = user.traits();
+  if (!is.object(traits)) {
+    this.debug('err: userjoy.identify must be passed a traits object');
+    return;
+  }
+
+  user.identify(traits);
 
   this._callback(fn);
   return this;
@@ -180,27 +183,21 @@ UserJoy.prototype.user = function () {
 
 
 /**
- * Identify a company by optional `id` and `traits`. Or, if no arguments are
- * supplied, return the current company.
+ * Identify a company by `traits`.
  *
- * @param {String} id (optional)
- * @param {Object} traits (optional)
- * @param {Object} options (optional)
+ * @param {Object} traits
  * @param {Function} fn (optional)
- * @return {UserJoy or Object}
+ * @return {UserJoy}
  */
 
-UserJoy.prototype.company = function (id, traits, options, fn) {
-  if (0 === arguments.length) return company;
-  if (is.fn(options)) fn = options, options = null;
-  if (is.fn(traits)) fn = traits, options = null, traits = null;
-  if (is.object(id)) options = traits, traits = id, id = company.id();
+UserJoy.prototype.company = function (traits, fn) {
 
+  if (!is.object(traits)) {
+    this.debug('err: userjoy.company must be passed a traits object');
+    return this;
+  }
 
-  // grab from company again to make sure we're taking from the source
-  company.identify(id, traits);
-  id = company.id();
-  traits = company.traits();
+  company.identify(traits);
 
   this._callback(fn);
   return this;
@@ -370,21 +367,6 @@ UserJoy.prototype.timeout = function (timeout) {
 
 
 /**
- * Enable or disable debug.
- *
- * @param {String or Boolean} str
- */
-
-UserJoy.prototype.debug = function (str) {
-  if (0 == arguments.length || str) {
-    debug.enable('analytics:' + (str || '*'));
-  } else {
-    debug.disable();
-  }
-};
-
-
-/**
  * Apply options.
  *
  * @param {Object} options
@@ -427,6 +409,8 @@ UserJoy.prototype._callback = function (fn) {
  */
 
 UserJoy.prototype._send = function (type, traits) {
+
+  this.debug()
 
   // TODO: send data to userjoy api here
 
@@ -531,7 +515,7 @@ function canonicalUrl() {
 UserJoy.prototype.hideNotification = notification.hide;
 
 /**
- * Expose function to to reply to a notifiation 
+ * Expose function to to reply to a notifiation
  */
 
 UserJoy.prototype.replyNotification = notification.reply;

@@ -1,4 +1,3 @@
-
 var traverse = require('isodate-traverse');
 var defaults = require('defaults');
 var cookie = require('./cookie');
@@ -20,7 +19,7 @@ module.exports = Entity;
  * @param {Object} options
  */
 
-function Entity(options){
+function Entity(options) {
   this.options(options);
 }
 
@@ -31,7 +30,6 @@ function Entity(options){
  * @param {Object} options
  *   @property {Object} cookie
  *   @property {Object} localStorage
- *   @property {Boolean} persist (default: `true`)
  */
 
 Entity.prototype.options = function (options) {
@@ -50,8 +48,10 @@ Entity.prototype.options = function (options) {
 
 Entity.prototype.id = function (id) {
   switch (arguments.length) {
-    case 0: return this._getId();
-    case 1: return this._setId(id);
+  case 0:
+    return this._getId();
+  case 1:
+    return this._setId(id);
   }
 };
 
@@ -63,9 +63,7 @@ Entity.prototype.id = function (id) {
  */
 
 Entity.prototype._getId = function () {
-  var ret = this._options.persist
-    ? cookie.get(this._options.cookie.key)
-    : this._id;
+  var ret = cookie.get(this._options.cookie.key);
   return ret === undefined ? null : ret;
 };
 
@@ -77,27 +75,22 @@ Entity.prototype._getId = function () {
  */
 
 Entity.prototype._setId = function (id) {
-  if (this._options.persist) {
-    cookie.set(this._options.cookie.key, id);
-  } else {
-    this._id = id;
-  }
+  cookie.set(this._options.cookie.key, id);
 };
 
 
 /**
  * Get or set the entity's `traits`.
  *
- * BACKWARDS COMPATIBILITY: aliased to `properties`
- *
  * @param {Object} traits
  */
 
-Entity.prototype.properties =
 Entity.prototype.traits = function (traits) {
   switch (arguments.length) {
-    case 0: return this._getTraits();
-    case 1: return this._setTraits(traits);
+  case 0:
+    return this._getTraits();
+  case 1:
+    return this._setTraits(traits);
   }
 };
 
@@ -110,9 +103,7 @@ Entity.prototype.traits = function (traits) {
  */
 
 Entity.prototype._getTraits = function () {
-  var ret = this._options.persist
-    ? store.get(this._options.localStorage.key)
-    : this._traits;
+  var ret = store.get(this._options.localStorage.key);
   return ret ? traverse(clone(ret)) : {};
 };
 
@@ -125,28 +116,19 @@ Entity.prototype._getTraits = function () {
 
 Entity.prototype._setTraits = function (traits) {
   traits || (traits = {});
-  if (this._options.persist) {
-    store.set(this._options.localStorage.key, traits);
-  } else {
-    this._traits = traits;
-  }
+  store.set(this._options.localStorage.key, traits);
 };
 
 
 /**
- * Identify the entity with an `id` and `traits`. If we it's the same entity,
+ * Identify the entity with `traits`. If we it's the same entity,
  * extend the existing `traits` instead of overwriting.
  *
- * @param {String} id
  * @param {Object} traits
  */
 
-Entity.prototype.identify = function (id, traits) {
+Entity.prototype.identify = function (traits) {
   traits || (traits = {});
-  var current = this.id();
-  if (current === null || current === id) traits = extend(this.traits(), traits);
-  if (id) this.id(id);
-  this.debug('identify %o, %o', id, traits);
   this.traits(traits);
   this.save();
 };
@@ -159,7 +141,6 @@ Entity.prototype.identify = function (id, traits) {
  */
 
 Entity.prototype.save = function () {
-  if (!this._options.persist) return false;
   cookie.set(this._options.cookie.key, this.id());
   store.set(this._options.localStorage.key, this.traits());
   return true;
@@ -196,4 +177,3 @@ Entity.prototype.load = function () {
   this.id(cookie.get(this._options.cookie.key));
   this.traits(store.get(this._options.localStorage.key));
 };
-
