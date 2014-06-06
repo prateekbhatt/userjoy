@@ -34,17 +34,21 @@ angular.module('do.navbar', [])
 
                 $scope.isActive = function (path) {
                     var location = $location.path().split('/')[3];
-                    console.log("location : ", location);
                     return path === location;
+                }
+
+                $scope.isAccountActive = function (path) {
+                    return path === $location.path();
                 }
 
                 $scope.showDropdownApp = function () {
                     $scope.visibleDropdownApp = true;
                 }
 
-                $scope.addActiveClass = function () {
-                    this.isActive = true;
-                }
+                // $scope.isAccountActive = function (path) {
+                //     var location = $location.path('/').split('/')[1];
+                //     return path === location;
+                // }
  
                 var appsconnected;
                 $scope.apps = [];

@@ -63,11 +63,14 @@
                       <table class="twelve columns">
                         <tr>
                           <td>
-                            <h4>Hi {{= user_name || 'there'}},</h4>
+                            <h4>Hi {{= name || 'there' }},</h4>
                             <br>
-                            <p>Thank you for signing up for UserJoy. Click on the link below to confirm your email.
-                            </p>
-                            
+                            <img src="./img/thumbnail.jpeg" style="width: 60px; margin-right: 15px;">
+                            <!-- <p>You requested a password change for your UserJoy account. Set up a new password by clicking on the link below.</p> -->
+                            <p style="font-size: 15px; margin-top: 10px;"><b>Savinay<b></p>
+                            <p style="font-size: 13px;">Assignee: Prateek</p>
+                            <br>
+                            <p>{{Message}}</p>
                           </td>
                           <td class="expander"></td>
                         </tr>
@@ -84,7 +87,7 @@
                                   <table class="button">
                                     <tr>
                                       <td>
-                                        <a href="{{= confirmUrl }}">Confirm Email</a>
+                                        <a href="#">View Ticket</a>
                                       </td>
                                     </tr>
                                   </table>
@@ -95,15 +98,6 @@
                         </tr>
                       </table>
                       <br>
-                      <table class="twelve columns">
-                        <tr>
-                          <td>
-                            <p>You will get your tracking code once you confirm your email. Install the code on your webpage.</p>
-                          </td>
-                          <td class="expander"></td>
-                        </tr>
-                      </table>
-                      <br>
                       <br>
                       <table class="twelve columns">
                         <tr>
@@ -111,7 +105,7 @@
                             <p>
                               Thanks!
                               <br>
-                              - UserJoy Team
+                              - Team UserJoy
                             </p>
                           </td>
                         </tr>
@@ -130,16 +124,3 @@
   </table>
     </body>
 </html>
-
-<!-- <h1>Hi {{= name || 'there' }}</h1>
-
-<p>Congratulations on joining UserJoy!</p>
-
-<p>To confirm your email, click this link: <a href="{{= confirmUrl }}">{{= confirmUrl }}</a></p>
-
-<p>
-Thanks,
-<br>
-Team UserJoy
-</p>
- -->

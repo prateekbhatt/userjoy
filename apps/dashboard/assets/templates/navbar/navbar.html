@@ -81,12 +81,12 @@
                         </a>
                         <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" ng-show="visibleDropdown">
                             <li role="presentation">
-                                <a role="menuitem" tabindex="-1" href="/account/settings">
+                                <a role="menuitem" tabindex="-1" href="/account/settings" ng-class="{'active': isAccountActive('/account/settings')}">
                                 <span class="glyphicon glyphicon-cog"></span>&nbsp;&nbsp;&nbsp;&nbsp;Settings
                                 </a>
                             </li>
                             <li role="presentation">
-                                <a role="menuitem" tabindex="-1" href="#">
+                                <a role="menuitem" tabindex="-1" href="#" ng-class="{'active': isAccountActive('/account/docs')}">
                                 <i class="fa fa-book"></i>&nbsp;&nbsp;&nbsp;&nbsp;Docs
                                 </a>
                             </li>
