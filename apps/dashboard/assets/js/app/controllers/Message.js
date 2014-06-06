@@ -148,7 +148,7 @@ angular.module('do.message', [])
                         }
                         console.log("msg show Manual Msg: ", msg);
                         for (var i = 0; i < msg.length; i++) {
-                            if (msg[i].assignee.name) {
+                            if (msg[i].assignee!=null && msg[i].assignee.name!=null && msg[i].assignee.name) {
                                 $scope.openmsg.push({
                                     id: msg[i]._id,
                                     name: msg[i].sName,
