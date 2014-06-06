@@ -20,6 +20,7 @@
     "express-session": "^1.0.2",
     "include-all": "^0.1.6",
     "iron_mq": "^0.2.3",
+    "juice": "^0.4.0",
     "lodash": "^2.4.1",
     "method-override": "^1.0.0",
     "moment": "^2.5.1",

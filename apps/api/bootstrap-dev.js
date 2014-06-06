@@ -116,6 +116,9 @@ function bootstrapDevDB(cb) {
         console.log('uid:', savedUser._id);
         console.log('email:', savedUser.email);
         console.log('');
+        console.log('To test cdn app, use the following key:');
+        console.log('');
+        console.log(savedApp.liveKey);
         console.log('');
         console.log('');
 
