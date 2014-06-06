@@ -100,7 +100,7 @@ angular.module('do.message', [])
             'http://app.do.localhost/messages') {
             $location.path('/messages/inbox');
         }*/
-        
+
 
     }
 ])
@@ -146,36 +146,32 @@ angular.module('do.message', [])
                         if (!msg.length) {
                             $scope.showOpenConversations = false;
                         }
-                        console.log("msg show Manual Msg: ", msg);
+
                         for (var i = 0; i < msg.length; i++) {
-                            if (msg[i].assignee.name) {
-                                $scope.openmsg.push({
-                                    id: msg[i]._id,
-                                    name: msg[i].sName,
-                                    subject: msg[i].sub,
-                                    time: $moment(msg[i].ct)
-                                        .fromNow(),
-                                    close: 'Close',
-                                    assign: 'Assigned to ' + msg[i]
-                                        .assignee
-                                        .name,
-                                    coid: msg[i].coId
-                                })
+
+                            var m = {
+                                id: msg[i]._id,
+                                name: msg[i].sName,
+                                subject: msg[i].sub,
+                                time: $moment(msg[i].ct)
+                                    .fromNow(),
+                                close: 'Close',
+                                coid: msg[i].coId
+                            };
+
+                            var assignee = msg[i].assignee || {};
+
+                            if (assignee.name) {
+                                m.assign = 'Assigned to ' + assignee.name;
+                            } else if (assignee.email) {
+                                m.assign = 'Assigned to ' + assignee.email;
                             } else {
-                                $scope.openmsg.push({
-                                    id: msg[i]._id,
-                                    name: msg[i].sName,
-                                    subject: msg[i].sub,
-                                    time: $moment(msg[i].ct)
-                                        .fromNow(),
-                                    close: 'Close',
-                                    assign: 'Assigned to ' + msg[i]
-                                        .assignee
-                                        .email,
-                                    coid: msg[i].coId
-                                })
+                                m.assign = 'Assign';
                             }
+
+                            $scope.openmsg.push(m);
                         }
+
                         console.log("$scope.data: ", $scope.openmsg);
                         $scope.columnsInbox = [{
                             title: 'User',
@@ -302,7 +298,7 @@ angular.module('do.message', [])
                 AppModel.getSingleApp($scope.currApp, populatePage);
             })
 
-        // 
+        //
 
     }
 ])
