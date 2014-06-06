@@ -231,6 +231,10 @@ height: 100%;
     color: #ffffff;
     background-color: #7b8a8b;
 }
+.dropdown-menu > li > a.active {
+    color: #ffffff;
+    background-color: #bdc3c7;
+}
 .navbar-header . .navbar-inverse .navbar-right .navbar-nav > li.dropdown > a:hover, .navbar-inverse .navbar-right .navbar-nav > li.dropdown > a:focus {
     color: #fff;
     background-color: #000;
