@@ -2,19 +2,19 @@ angular.module('services.LoginService', [])
 
 .service('LoginService', ['$log',
 
-    function ($log) {
+  function ($log) {
 
-        var userIsAuthenticated = false;
+    var userIsAuthenticated = false;
 
-        this.setUserAuthenticated = function (value) {
-            userIsAuthenticated = value;
-        };
+    this.setUserAuthenticated = function (value) {
+      userIsAuthenticated = value;
+    };
 
-        this.getUserAuthenticated = function () {
-            return userIsAuthenticated;
-        };
+    this.getUserAuthenticated = function () {
+      return userIsAuthenticated;
+    };
 
-        return this;
+    return this;
 
-    }
+  }
 ])
