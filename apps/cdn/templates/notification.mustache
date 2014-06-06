@@ -1,14 +1,14 @@
-<div id="{{notification_template_id}}" style="position: relative;">
+<div id="{{NOTIFICATION_TEMPLATE_ID}}" style="position: relative;">
     <div style="float:right; width: 350px;">
         <div class="message-template message-template-danger" style="min-height: 175px; overflow: auto;">
             <button type="button" class="close" aria-hidden="true" onclick="userjoy.hideNotification()" id="closeNotification">&times;</button>
             <p>{{sender}}</p>
             <p>{{body}}</p>
-            <span id="msgsent" style="margin-top: 140px; display:none; color: #7f8c8d">Message Sent. Thanks!</span>
+            <span id="{{SENT_TEMPLATE_ID}}" style="margin-top: 140px; display:none; color: #7f8c8d">Message Sent. Thanks!</span>
         </div>
         <div class="panel-footer" style="margin-top: -23px;">
             <div class="input-group">
-                <input id="reply" type="text" name="msg" class="form-control input-sm" placeholder="Type your message here..." style="margin-top: 3px; height: 30px;" />
+                <input id="{{REPLY_TEMPLATE_ID}}" type="text" name="msg" class="form-control input-sm" placeholder="Type your message here..." style="margin-top: 3px; height: 30px;" />
                 <span class="input-group-btn">
                 <button class="btn btn-danger btn-sm" id="btn-chat" type="button" onclick="userjoy.replyNotification()" style="margin-top: 2px; height: 30px;">
                 Send</button>
