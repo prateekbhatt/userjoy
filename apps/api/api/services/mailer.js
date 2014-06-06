@@ -4,6 +4,7 @@
 
 var _ = require('lodash');
 var async = require('async');
+var juice = require('juice');
 var nodemailer = require('nodemailer');
 var path = require('path');
 
@@ -185,8 +186,19 @@ Mailer.prototype.sendUJMail = function (cb) {
   var templatePath = path.join(templatesDir, this.template);
 
   render.file(templatePath, this.locals, function (err, html, text) {
-    self.html = html;
-    self.send.call(self, cb);
+
+
+    // FIXME : put this in the config file before production
+    var opts = {
+      url: 'http://api.do.localhost/'
+    };
+
+    // inline the html
+    juice.juiceContent(html, opts, function (err, inlinedHtml) {
+      self.html = inlinedHtml;
+      self.send.call(self, cb);
+    });
+
   });
 
 };
