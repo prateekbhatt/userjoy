@@ -737,15 +737,15 @@ exports.parse = function(url){
   a.href = url;
   return {
     href: a.href,
-    host: a.host,
-    port: a.port,
+    host: a.host || location.host,
+    port: ('0' === a.port || '' === a.port) ? port(a.protocol) : a.port,
     hash: a.hash,
-    hostname: a.hostname,
-    pathname: a.pathname,
-    protocol: a.protocol,
+    hostname: a.hostname || location.hostname,
+    pathname: a.pathname.charAt(0) != '/' ? '/' + a.pathname : a.pathname,
+    protocol: !a.protocol || ':' == a.protocol ? location.protocol : a.protocol,
     search: a.search,
     query: a.search.slice(1)
-  }
+  };
 };
 
 /**
@@ -757,9 +757,7 @@ exports.parse = function(url){
  */
 
 exports.isAbsolute = function(url){
-  if (0 == url.indexOf('//')) return true;
-  if (~url.indexOf('://')) return true;
-  return false;
+  return 0 == url.indexOf('//') || !!~url.indexOf('://');
 };
 
 /**
@@ -771,7 +769,7 @@ exports.isAbsolute = function(url){
  */
 
 exports.isRelative = function(url){
-  return ! exports.isAbsolute(url);
+  return !exports.isAbsolute(url);
 };
 
 /**
@@ -784,10 +782,29 @@ exports.isRelative = function(url){
 
 exports.isCrossDomain = function(url){
   url = exports.parse(url);
-  return url.hostname != location.hostname
-    || url.port != location.port
-    || url.protocol != location.protocol;
+  return url.hostname !== location.hostname
+    || url.port !== location.port
+    || url.protocol !== location.protocol;
 };
+
+/**
+ * Return default port for `protocol`.
+ *
+ * @param  {String} protocol
+ * @return {String}
+ * @api private
+ */
+function port (protocol){
+  switch (protocol) {
+    case 'http:':
+      return 80;
+    case 'https:':
+      return 443;
+    default:
+      return location.port;
+  }
+}
+
 });
 require.register("component-bind/index.js", function(exports, require, module){
 /**
@@ -993,13 +1010,8 @@ function isEmpty (val) {
 });
 require.register("ianstormtaylor-is/index.js", function(exports, require, module){
 
-var isEmpty = require('is-empty');
-
-try {
-  var typeOf = require('type');
-} catch (e) {
-  var typeOf = require('component-type');
-}
+var isEmpty = require('is-empty')
+  , typeOf = require('type');
 
 
 /**
@@ -1067,20 +1079,6 @@ function generate (type) {
     return type === typeOf(value);
   };
 }
-});
-require.register("segmentio-after/index.js", function(exports, require, module){
-
-module.exports = function after (times, func) {
-  // After 0, really?
-  if (times <= 0) return func();
-
-  // That's more like it.
-  return function() {
-    if (--times < 1) {
-      return func.apply(this, arguments);
-    }
-  };
-};
 });
 require.register("segmentio-canonical/index.js", function(exports, require, module){
 module.exports = function canonical () {
@@ -10065,8 +10063,2747 @@ function extend(target) {
   return target
 }
 });
+require.register("discore-closest/index.js", function(exports, require, module){
+var matches = require('matches-selector')
+
+module.exports = function (element, selector, checkYoSelf, root) {
+  element = checkYoSelf ? {parentNode: element} : element
+
+  root = root || document
+
+  // Make sure `element !== document` and `element != null`
+  // otherwise we get an illegal invocation
+  while ((element = element.parentNode) && element !== document) {
+    if (matches(element, selector))
+      return element
+    // After `matches` on the edge case that
+    // the selector matches the root
+    // (when the root is not the document)
+    if (element === root)
+      return  
+  }
+}
+});
+require.register("component-delegate/index.js", function(exports, require, module){
+/**
+ * Module dependencies.
+ */
+
+var closest = require('closest')
+  , event = require('event');
+
+/**
+ * Delegate event `type` to `selector`
+ * and invoke `fn(e)`. A callback function
+ * is returned which may be passed to `.unbind()`.
+ *
+ * @param {Element} el
+ * @param {String} selector
+ * @param {String} type
+ * @param {Function} fn
+ * @param {Boolean} capture
+ * @return {Function}
+ * @api public
+ */
+
+exports.bind = function(el, selector, type, fn, capture){
+  return event.bind(el, type, function(e){
+    var target = e.target || e.srcElement;
+    e.delegateTarget = closest(target, selector, true, el);
+    if (e.delegateTarget) fn.call(el, e);
+  }, capture);
+};
+
+/**
+ * Unbind event `type`'s callback `fn`.
+ *
+ * @param {Element} el
+ * @param {String} type
+ * @param {Function} fn
+ * @param {Boolean} capture
+ * @api public
+ */
+
+exports.unbind = function(el, type, fn, capture){
+  event.unbind(el, type, fn, capture);
+};
+
+});
+require.register("component-domify/index.js", function(exports, require, module){
+
+/**
+ * Expose `parse`.
+ */
+
+module.exports = parse;
+
+/**
+ * Wrap map from jquery.
+ */
+
+var map = {
+  legend: [1, '<fieldset>', '</fieldset>'],
+  tr: [2, '<table><tbody>', '</tbody></table>'],
+  col: [2, '<table><tbody></tbody><colgroup>', '</colgroup></table>'],
+  _default: [0, '', '']
+};
+
+map.td =
+map.th = [3, '<table><tbody><tr>', '</tr></tbody></table>'];
+
+map.option =
+map.optgroup = [1, '<select multiple="multiple">', '</select>'];
+
+map.thead =
+map.tbody =
+map.colgroup =
+map.caption =
+map.tfoot = [1, '<table>', '</table>'];
+
+map.text =
+map.circle =
+map.ellipse =
+map.line =
+map.path =
+map.polygon =
+map.polyline =
+map.rect = [1, '<svg xmlns="http://www.w3.org/2000/svg" version="1.1">','</svg>'];
+
+/**
+ * Parse `html` and return the children.
+ *
+ * @param {String} html
+ * @return {Array}
+ * @api private
+ */
+
+function parse(html) {
+  if ('string' != typeof html) throw new TypeError('String expected');
+  
+  // tag name
+  var m = /<([\w:]+)/.exec(html);
+  if (!m) return document.createTextNode(html);
+
+  html = html.replace(/^\s+|\s+$/g, ''); // Remove leading/trailing whitespace
+
+  var tag = m[1];
+
+  // body support
+  if (tag == 'body') {
+    var el = document.createElement('html');
+    el.innerHTML = html;
+    return el.removeChild(el.lastChild);
+  }
+
+  // wrap map
+  var wrap = map[tag] || map._default;
+  var depth = wrap[0];
+  var prefix = wrap[1];
+  var suffix = wrap[2];
+  var el = document.createElement('div');
+  el.innerHTML = prefix + html + suffix;
+  while (depth--) el = el.lastChild;
+
+  // one element
+  if (el.firstChild == el.lastChild) {
+    return el.removeChild(el.firstChild);
+  }
+
+  // several elements
+  var fragment = document.createDocumentFragment();
+  while (el.firstChild) {
+    fragment.appendChild(el.removeChild(el.firstChild));
+  }
+
+  return fragment;
+}
+
+});
+require.register("component-indexof/index.js", function(exports, require, module){
+module.exports = function(arr, obj){
+  if (arr.indexOf) return arr.indexOf(obj);
+  for (var i = 0; i < arr.length; ++i) {
+    if (arr[i] === obj) return i;
+  }
+  return -1;
+};
+});
+require.register("component-classes/index.js", function(exports, require, module){
+
+/**
+ * Module dependencies.
+ */
+
+var index = require('indexof');
+
+/**
+ * Whitespace regexp.
+ */
+
+var re = /\s+/;
+
+/**
+ * toString reference.
+ */
+
+var toString = Object.prototype.toString;
+
+/**
+ * Wrap `el` in a `ClassList`.
+ *
+ * @param {Element} el
+ * @return {ClassList}
+ * @api public
+ */
+
+module.exports = function(el){
+  return new ClassList(el);
+};
+
+/**
+ * Initialize a new ClassList for `el`.
+ *
+ * @param {Element} el
+ * @api private
+ */
+
+function ClassList(el) {
+  this.el = el;
+  this.list = el.classList;
+}
+
+/**
+ * Add class `name` if not already present.
+ *
+ * @param {String} name
+ * @return {ClassList}
+ * @api public
+ */
+
+ClassList.prototype.add = function(name){
+  // classList
+  if (this.list) {
+    this.list.add(name);
+    return this;
+  }
+
+  // fallback
+  var arr = this.array();
+  var i = index(arr, name);
+  if (!~i) arr.push(name);
+  this.el.className = arr.join(' ');
+  return this;
+};
+
+/**
+ * Remove class `name` when present, or
+ * pass a regular expression to remove
+ * any which match.
+ *
+ * @param {String|RegExp} name
+ * @return {ClassList}
+ * @api public
+ */
+
+ClassList.prototype.remove = function(name){
+  if ('[object RegExp]' == toString.call(name)) {
+    return this.removeMatching(name);
+  }
+
+  // classList
+  if (this.list) {
+    this.list.remove(name);
+    return this;
+  }
+
+  // fallback
+  var arr = this.array();
+  var i = index(arr, name);
+  if (~i) arr.splice(i, 1);
+  this.el.className = arr.join(' ');
+  return this;
+};
+
+/**
+ * Remove all classes matching `re`.
+ *
+ * @param {RegExp} re
+ * @return {ClassList}
+ * @api private
+ */
+
+ClassList.prototype.removeMatching = function(re){
+  var arr = this.array();
+  for (var i = 0; i < arr.length; i++) {
+    if (re.test(arr[i])) {
+      this.remove(arr[i]);
+    }
+  }
+  return this;
+};
+
+/**
+ * Toggle class `name`.
+ *
+ * @param {String} name
+ * @return {ClassList}
+ * @api public
+ */
+
+ClassList.prototype.toggle = function(name){
+  // classList
+  if (this.list) {
+    this.list.toggle(name);
+    return this;
+  }
+
+  // fallback
+  if (this.has(name)) {
+    this.remove(name);
+  } else {
+    this.add(name);
+  }
+  return this;
+};
+
+/**
+ * Return an array of classes.
+ *
+ * @return {Array}
+ * @api public
+ */
+
+ClassList.prototype.array = function(){
+  var str = this.el.className.replace(/^\s+|\s+$/g, '');
+  var arr = str.split(re);
+  if ('' === arr[0]) arr.shift();
+  return arr;
+};
+
+/**
+ * Check if class `name` is present.
+ *
+ * @param {String} name
+ * @return {ClassList}
+ * @api public
+ */
+
+ClassList.prototype.has =
+ClassList.prototype.contains = function(name){
+  return this.list
+    ? this.list.contains(name)
+    : !! ~index(this.array(), name);
+};
+
+});
+require.register("ianstormtaylor-to-no-case/index.js", function(exports, require, module){
+
+/**
+ * Expose `toNoCase`.
+ */
+
+module.exports = toNoCase;
+
+
+/**
+ * Test whether a string is camel-case.
+ */
+
+var hasSpace = /\s/;
+var hasCamel = /[a-z][A-Z]/;
+var hasSeparator = /[\W_]/;
+
+
+/**
+ * Remove any starting case from a `string`, like camel or snake, but keep
+ * spaces and punctuation that may be important otherwise.
+ *
+ * @param {String} string
+ * @return {String}
+ */
+
+function toNoCase (string) {
+  if (hasSpace.test(string)) return string.toLowerCase();
+
+  if (hasSeparator.test(string)) string = unseparate(string);
+  if (hasCamel.test(string)) string = uncamelize(string);
+  return string.toLowerCase();
+}
+
+
+/**
+ * Separator splitter.
+ */
+
+var separatorSplitter = /[\W_]+(.|$)/g;
+
+
+/**
+ * Un-separate a `string`.
+ *
+ * @param {String} string
+ * @return {String}
+ */
+
+function unseparate (string) {
+  return string.replace(separatorSplitter, function (m, next) {
+    return next ? ' ' + next : '';
+  });
+}
+
+
+/**
+ * Camelcase splitter.
+ */
+
+var camelSplitter = /(.)([A-Z]+)/g;
+
+
+/**
+ * Un-camelcase a `string`.
+ *
+ * @param {String} string
+ * @return {String}
+ */
+
+function uncamelize (string) {
+  return string.replace(camelSplitter, function (m, previous, uppers) {
+    return previous + ' ' + uppers.toLowerCase().split('').join(' ');
+  });
+}
+});
+require.register("ianstormtaylor-to-space-case/index.js", function(exports, require, module){
+
+var clean = require('to-no-case');
+
+
+/**
+ * Expose `toSpaceCase`.
+ */
+
+module.exports = toSpaceCase;
+
+
+/**
+ * Convert a `string` to space case.
+ *
+ * @param {String} string
+ * @return {String}
+ */
+
+
+function toSpaceCase (string) {
+  return clean(string).replace(/[\W_]+(.|$)/g, function (matches, match) {
+    return match ? ' ' + match : '';
+  });
+}
+});
+require.register("ianstormtaylor-to-camel-case/index.js", function(exports, require, module){
+
+var toSpace = require('to-space-case');
+
+
+/**
+ * Expose `toCamelCase`.
+ */
+
+module.exports = toCamelCase;
+
+
+/**
+ * Convert a `string` to camel case.
+ *
+ * @param {String} string
+ * @return {String}
+ */
+
+
+function toCamelCase (string) {
+  return toSpace(string).replace(/\s(\w)/g, function (matches, letter) {
+    return letter.toUpperCase();
+  });
+}
+});
+require.register("component-within-document/index.js", function(exports, require, module){
+
+/**
+ * Check if `el` is within the document.
+ *
+ * @param {Element} el
+ * @return {Boolean}
+ * @api private
+ */
+
+module.exports = function(el) {
+  var node = el;
+  while (node = node.parentNode) {
+    if (node == document) return true;
+  }
+  return false;
+};
+});
+require.register("component-css/index.js", function(exports, require, module){
+/**
+ * Module Dependencies
+ */
+
+var debug = require('debug')('css');
+var set = require('./lib/style');
+var get = require('./lib/css');
+
+/**
+ * Expose `css`
+ */
+
+module.exports = css;
+
+/**
+ * Get and set css values
+ *
+ * @param {Element} el
+ * @param {String|Object} prop
+ * @param {Mixed} val
+ * @return {Element} el
+ * @api public
+ */
+
+function css(el, prop, val) {
+  if (!el) return;
+
+  if (undefined !== val) {
+    var obj = {};
+    obj[prop] = val;
+    debug('setting styles %j', obj);
+    return setStyles(el, obj);
+  }
+
+  if ('object' == typeof prop) {
+    debug('setting styles %j', prop);
+    return setStyles(el, prop);
+  }
+
+  debug('getting %s', prop);
+  return get(el, prop);
+}
+
+/**
+ * Set the styles on an element
+ *
+ * @param {Element} el
+ * @param {Object} props
+ * @return {Element} el
+ */
+
+function setStyles(el, props) {
+  for (var prop in props) {
+    set(el, prop, props[prop]);
+  }
+
+  return el;
+}
+
+});
+require.register("component-css/lib/css.js", function(exports, require, module){
+/**
+ * Module Dependencies
+ */
+
+var debug = require('debug')('css:css');
+var camelcase = require('to-camel-case');
+var computed = require('./computed');
+var property = require('./prop');
+
+/**
+ * Expose `css`
+ */
+
+module.exports = css;
+
+/**
+ * CSS Normal Transforms
+ */
+
+var cssNormalTransform = {
+  letterSpacing: 0,
+  fontWeight: 400
+};
+
+/**
+ * Get a CSS value
+ *
+ * @param {Element} el
+ * @param {String} prop
+ * @param {Mixed} extra
+ * @param {Array} styles
+ * @return {String}
+ */
+
+function css(el, prop, extra, styles) {
+  var hooks = require('./hooks');
+  var orig = camelcase(prop);
+  var style = el.style;
+  var val;
+
+  prop = property(prop, style);
+  var hook = hooks[prop] || hooks[orig];
+
+  // If a hook was provided get the computed value from there
+  if (hook && hook.get) {
+    debug('get hook provided. use that');
+    val = hook.get(el, true, extra);
+  }
+
+  // Otherwise, if a way to get the computed value exists, use that
+  if (undefined == val) {
+    debug('fetch the computed value of %s', prop);
+    val = computed(el, prop);
+  }
+
+  if ('normal' == val && cssNormalTransform[prop]) {
+    val = cssNormalTransform[prop];
+    debug('normal => %s', val);
+  }
+
+  // Return, converting to number if forced or a qualifier was provided and val looks numeric
+  if ('' == extra || extra) {
+    debug('converting value: %s into a number');
+    var num = parseFloat(val);
+    return true === extra || isNumeric(num) ? num || 0 : val;
+  }
+
+  return val;
+}
+
+/**
+ * Is Numeric
+ *
+ * @param {Mixed} obj
+ * @return {Boolean}
+ */
+
+function isNumeric(obj) {
+  return !isNan(parseFloat(obj)) && isFinite(obj);
+}
+
+});
+require.register("component-css/lib/prop.js", function(exports, require, module){
+/**
+ * Module dependencies
+ */
+
+var debug = require('debug')('css:prop');
+var camelcase = require('to-camel-case');
+var vendor = require('./vendor');
+
+/**
+ * Export `prop`
+ */
+
+module.exports = prop;
+
+/**
+ * Normalize Properties
+ */
+
+var cssProps = {
+  'float': 'cssFloat' in document.body.style ? 'cssFloat' : 'styleFloat'
+};
+
+/**
+ * Get the vendor prefixed property
+ *
+ * @param {String} prop
+ * @param {String} style
+ * @return {String} prop
+ * @api private
+ */
+
+function prop(prop, style) {
+  prop = cssProps[prop] || (cssProps[prop] = vendor(prop, style));
+  debug('transform property: %s => %s');
+  return prop;
+}
+
+});
+require.register("component-css/lib/swap.js", function(exports, require, module){
+/**
+ * Export `swap`
+ */
+
+module.exports = swap;
+
+/**
+ * Initialize `swap`
+ *
+ * @param {Element} el
+ * @param {Object} options
+ * @param {Function} fn
+ * @param {Array} args
+ * @return {Mixed}
+ */
+
+function swap(el, options, fn, args) {
+  // Remember the old values, and insert the new ones
+  for (var key in options) {
+    old[key] = el.style[key];
+    el.style[key] = options[key];
+  }
+
+  ret = fn.apply(el, args || []);
+
+  // Revert the old values
+  for (key in options) {
+    el.style[key] = old[key];
+  }
+
+  return ret;
+}
+
+});
+require.register("component-css/lib/style.js", function(exports, require, module){
+/**
+ * Module Dependencies
+ */
+
+var debug = require('debug')('css:style');
+var camelcase = require('to-camel-case');
+var support = require('./support');
+var property = require('./prop');
+var hooks = require('./hooks');
+
+/**
+ * Expose `style`
+ */
+
+module.exports = style;
+
+/**
+ * Possibly-unitless properties
+ *
+ * Don't automatically add 'px' to these properties
+ */
+
+var cssNumber = {
+  "columnCount": true,
+  "fillOpacity": true,
+  "fontWeight": true,
+  "lineHeight": true,
+  "opacity": true,
+  "order": true,
+  "orphans": true,
+  "widows": true,
+  "zIndex": true,
+  "zoom": true
+};
+
+/**
+ * Set a css value
+ *
+ * @param {Element} el
+ * @param {String} prop
+ * @param {Mixed} val
+ * @param {Mixed} extra
+ */
+
+function style(el, prop, val, extra) {
+  // Don't set styles on text and comment nodes
+  if (!el || el.nodeType === 3 || el.nodeType === 8 || !el.style ) return;
+
+  var orig = camelcase(prop);
+  var style = el.style;
+  var type = typeof val;
+
+  if (!val) return get(el, prop, orig, extra);
+
+  prop = property(prop, style);
+
+  var hook = hooks[prop] || hooks[orig];
+
+  // If a number was passed in, add 'px' to the (except for certain CSS properties)
+  if ('number' == type && !cssNumber[orig]) {
+    debug('adding "px" to end of number');
+    val += 'px';
+  }
+
+  // Fixes jQuery #8908, it can be done more correctly by specifying setters in cssHooks,
+  // but it would mean to define eight (for every problematic property) identical functions
+  if (!support.clearCloneStyle && '' === val && 0 === prop.indexOf('background')) {
+    debug('set property (%s) value to "inherit"', prop);
+    style[prop] = 'inherit';
+  }
+
+  // If a hook was provided, use that value, otherwise just set the specified value
+  if (!hook || !hook.set || undefined !== (val = hook.set(el, val, extra))) {
+    // Support: Chrome, Safari
+    // Setting style to blank string required to delete "style: x !important;"
+    debug('set hook defined. setting property (%s) to %s', prop, val);
+    style[prop] = '';
+    style[prop] = val;
+  }
+
+}
+
+/**
+ * Get the style
+ *
+ * @param {Element} el
+ * @param {String} prop
+ * @param {String} orig
+ * @param {Mixed} extra
+ * @return {String}
+ */
+
+function get(el, prop, orig, extra) {
+  var style = el.style;
+  var hook = hooks[prop] || hooks[orig];
+  var ret;
+
+  if (hook && hook.get && undefined !== (ret = hook.get(el, false, extra))) {
+    debug('get hook defined, returning: %s', ret);
+    return ret;
+  }
+
+  ret = style[prop];
+  debug('getting %s', ret);
+  return ret;
+}
+
+});
+require.register("component-css/lib/hooks.js", function(exports, require, module){
+/**
+ * Module Dependencies
+ */
+
+var each = require('each');
+var css = require('./css');
+var cssShow = { position: 'absolute', visibility: 'hidden', display: 'block' };
+var pnum = (/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/).source;
+var rnumnonpx = new RegExp( '^(' + pnum + ')(?!px)[a-z%]+$', 'i');
+var rnumsplit = new RegExp( '^(' + pnum + ')(.*)$', 'i');
+var rdisplayswap = /^(none|table(?!-c[ea]).+)/;
+var styles = require('./styles');
+var support = require('./support');
+var swap = require('./swap');
+var computed = require('./computed');
+var cssExpand = [ "Top", "Right", "Bottom", "Left" ];
+
+/**
+ * Height & Width
+ */
+
+each(['width', 'height'], function(name) {
+  exports[name] = {};
+
+  exports[name].get = function(el, compute, extra) {
+    if (!compute) return;
+    // certain elements can have dimension info if we invisibly show them
+    // however, it must have a current display style that would benefit from this
+    return 0 == el.offsetWidth && rdisplayswap.test(css(el, 'display'))
+      ? swap(el, cssShow, function() { return getWidthOrHeight(el, name, extra); })
+      : getWidthOrHeight(el, name, extra);
+  }
+
+  exports[name].set = function(el, val, extra) {
+    var styles = extra && styles(el);
+    return setPositiveNumber(el, val, extra
+      ? augmentWidthOrHeight(el, name, extra, 'border-box' == css(el, 'boxSizing', false, styles), styles)
+      : 0
+    );
+  };
+
+});
+
+/**
+ * Opacity
+ */
+
+exports.opacity = {};
+exports.opacity.get = function(el, compute) {
+  if (!compute) return;
+  var ret = computed(el, 'opacity');
+  return '' == ret ? '1' : ret;
+}
+
+/**
+ * Utility: Set Positive Number
+ *
+ * @param {Element} el
+ * @param {Mixed} val
+ * @param {Number} subtract
+ * @return {Number}
+ */
+
+function setPositiveNumber(el, val, subtract) {
+  var matches = rnumsplit.exec(val);
+  return matches ?
+    // Guard against undefined 'subtract', e.g., when used as in cssHooks
+    Math.max(0, matches[1]) + (matches[2] || 'px') :
+    val;
+}
+
+/**
+ * Utility: Get the width or height
+ *
+ * @param {Element} el
+ * @param {String} prop
+ * @param {Mixed} extra
+ * @return {String}
+ */
+
+function getWidthOrHeight(el, prop, extra) {
+  // Start with offset property, which is equivalent to the border-box value
+  var valueIsBorderBox = true;
+  var val = prop === 'width' ? el.offsetWidth : el.offsetHeight;
+  var styles = computed(el);
+  var isBorderBox = support.boxSizing && css(el, 'boxSizing') === 'border-box';
+
+  // some non-html elements return undefined for offsetWidth, so check for null/undefined
+  // svg - https://bugzilla.mozilla.org/show_bug.cgi?id=649285
+  // MathML - https://bugzilla.mozilla.org/show_bug.cgi?id=491668
+  if (val <= 0 || val == null) {
+    // Fall back to computed then uncomputed css if necessary
+    val = computed(el, prop, styles);
+
+    if (val < 0 || val == null) {
+      val = el.style[prop];
+    }
+
+    // Computed unit is not pixels. Stop here and return.
+    if (rnumnonpx.test(val)) {
+      return val;
+    }
+
+    // we need the check for style in case a browser which returns unreliable values
+    // for getComputedStyle silently falls back to the reliable el.style
+    valueIsBorderBox = isBorderBox && (support.boxSizingReliable() || val === el.style[prop]);
+
+    // Normalize ', auto, and prepare for extra
+    val = parseFloat(val) || 0;
+  }
+
+  // use the active box-sizing model to add/subtract irrelevant styles
+  extra = extra || (isBorderBox ? 'border' : 'content');
+  val += augmentWidthOrHeight(el, prop, extra, valueIsBorderBox, styles);
+  return val + 'px';
+}
+
+/**
+ * Utility: Augment the width or the height
+ *
+ * @param {Element} el
+ * @param {String} prop
+ * @param {Mixed} extra
+ * @param {Boolean} isBorderBox
+ * @param {Array} styles
+ */
+
+function augmentWidthOrHeight(el, prop, extra, isBorderBox, styles) {
+  // If we already have the right measurement, avoid augmentation,
+  // Otherwise initialize for horizontal or vertical properties
+  var i = extra === (isBorderBox ? 'border' : 'content') ? 4 : 'width' == prop ? 1 : 0;
+  var val = 0;
+
+  for (; i < 4; i += 2) {
+    // both box models exclude margin, so add it if we want it
+    if (extra === 'margin') {
+      val += css(el, extra + cssExpand[i], true, styles);
+    }
+
+    if (isBorderBox) {
+      // border-box includes padding, so remove it if we want content
+      if (extra === 'content') {
+        val -= css(el, 'padding' + cssExpand[i], true, styles);
+      }
+
+      // at this point, extra isn't border nor margin, so remove border
+      if (extra !== 'margin') {
+        val -= css(el, 'border' + cssExpand[i] + 'Width', true, styles);
+      }
+    } else {
+      // at this point, extra isn't content, so add padding
+      val += css(el, 'padding' + cssExpand[i], true, styles);
+
+      // at this point, extra isn't content nor padding, so add border
+      if (extra !== 'padding') {
+        val += css(el, 'border' + cssExpand[i] + 'Width', true, styles);
+      }
+    }
+  }
+
+  return val;
+}
+
+});
+require.register("component-css/lib/styles.js", function(exports, require, module){
+/**
+ * Expose `styles`
+ */
+
+module.exports = styles;
+
+/**
+ * Get all the styles
+ *
+ * @param {Element} el
+ * @return {Array}
+ */
+
+function styles(el) {
+  if (window.getComputedStyle) {
+    return el.ownerDocument.defaultView.getComputedStyle(el, null);
+  } else {
+    return el.currentStyle;
+  }
+}
+
+});
+require.register("component-css/lib/vendor.js", function(exports, require, module){
+/**
+ * Module Dependencies
+ */
+
+var prefixes = ['Webkit', 'O', 'Moz', 'ms'];
+
+/**
+ * Expose `vendor`
+ */
+
+module.exports = vendor;
+
+/**
+ * Get the vendor prefix for a given property
+ *
+ * @param {String} prop
+ * @param {Object} style
+ * @return {String}
+ */
+
+function vendor(prop, style) {
+  // shortcut for names that are not vendor prefixed
+  if (style[prop]) return prop;
+
+  // check for vendor prefixed names
+  var capName = prop[0].toUpperCase() + prop.slice(1);
+  var original = prop;
+  var i = prefixes.length;
+
+  while (i--) {
+    prop = prefixes[i] + capName;
+    if (prop in style) return prop;
+  }
+
+  return original;
+}
+
+});
+require.register("component-css/lib/support.js", function(exports, require, module){
+/**
+ * Support values
+ */
+
+var reliableMarginRight;
+var boxSizingReliableVal;
+var pixelPositionVal;
+var clearCloneStyle;
+
+/**
+ * Container setup
+ */
+
+var docElem = document.documentElement;
+var container = document.createElement('div');
+var div = document.createElement('div');
+
+/**
+ * Clear clone style
+ */
+
+div.style.backgroundClip = 'content-box';
+div.cloneNode(true).style.backgroundClip = '';
+exports.clearCloneStyle = div.style.backgroundClip === 'content-box';
+
+container.style.cssText = 'border:0;width:0;height:0;position:absolute;top:0;left:-9999px;margin-top:1px';
+container.appendChild(div);
+
+/**
+ * Pixel position
+ *
+ * Webkit bug: https://bugs.webkit.org/show_bug.cgi?id=29084
+ * getComputedStyle returns percent when specified for top/left/bottom/right
+ * rather than make the css module depend on the offset module, we just check for it here
+ */
+
+exports.pixelPosition = function() {
+  if (undefined == pixelPositionVal) computePixelPositionAndBoxSizingReliable();
+  return pixelPositionVal;
+}
+
+/**
+ * Reliable box sizing
+ */
+
+exports.boxSizingReliable = function() {
+  if (undefined == boxSizingReliableVal) computePixelPositionAndBoxSizingReliable();
+  return boxSizingReliableVal;
+}
+
+/**
+ * Reliable margin right
+ *
+ * Support: Android 2.3
+ * Check if div with explicit width and no margin-right incorrectly
+ * gets computed margin-right based on width of container. (#3333)
+ * WebKit Bug 13343 - getComputedStyle returns wrong value for margin-right
+ * This support function is only executed once so no memoizing is needed.
+ *
+ * @return {Boolean}
+ */
+
+exports.reliableMarginRight = function() {
+  var ret;
+  var marginDiv = div.appendChild(document.createElement("div" ));
+
+  marginDiv.style.cssText = div.style.cssText = divReset;
+  marginDiv.style.marginRight = marginDiv.style.width = "0";
+  div.style.width = "1px";
+  docElem.appendChild(container);
+
+  ret = !parseFloat(window.getComputedStyle(marginDiv, null).marginRight);
+
+  docElem.removeChild(container);
+
+  // Clean up the div for other support tests.
+  div.innerHTML = "";
+
+  return ret;
+}
+
+/**
+ * Executing both pixelPosition & boxSizingReliable tests require only one layout
+ * so they're executed at the same time to save the second computation.
+ */
+
+function computePixelPositionAndBoxSizingReliable() {
+  // Support: Firefox, Android 2.3 (Prefixed box-sizing versions).
+  div.style.cssText = "-webkit-box-sizing:border-box;-moz-box-sizing:border-box;" +
+    "box-sizing:border-box;padding:1px;border:1px;display:block;width:4px;margin-top:1%;" +
+    "position:absolute;top:1%";
+  docElem.appendChild(container);
+
+  var divStyle = window.getComputedStyle(div, null);
+  pixelPositionVal = divStyle.top !== "1%";
+  boxSizingReliableVal = divStyle.width === "4px";
+
+  docElem.removeChild(container);
+}
+
+
+
+});
+require.register("component-css/lib/computed.js", function(exports, require, module){
+/**
+ * Module Dependencies
+ */
+
+var debug = require('debug')('css:computed');
+var withinDocument = require('within-document');
+var styles = require('./styles');
+
+/**
+ * Expose `computed`
+ */
+
+module.exports = computed;
+
+/**
+ * Get the computed style
+ *
+ * @param {Element} el
+ * @param {String} prop
+ * @param {Array} precomputed (optional)
+ * @return {Array}
+ * @api private
+ */
+
+function computed(el, prop, precomputed) {
+  var computed = precomputed || styles(el);
+  var ret;
+  
+  if (!computed) return;
+
+  if (computed.getPropertyValue) {
+    ret = computed.getPropertyValue(prop) || computed[prop];
+  } else {
+    ret = computed[prop];
+  }
+
+  if ('' === ret && !withinDocument(el)) {
+    debug('element not within document, try finding from style attribute');
+    var style = require('./style');
+    ret = style(el, prop);
+  }
+
+  debug('computed value of %s: %s', prop, ret);
+
+  // Support: IE
+  // IE returns zIndex value as an integer.
+  return undefined === ret ? ret : ret + '';
+}
+
+});
+require.register("component-value/index.js", function(exports, require, module){
+
+/**
+ * Module dependencies.
+ */
+
+var typeOf = require('type');
+
+/**
+ * Set or get `el`'s' value.
+ *
+ * @param {Element} el
+ * @param {Mixed} val
+ * @return {Mixed}
+ * @api public
+ */
+
+module.exports = function(el, val){
+  if (2 == arguments.length) return set(el, val);
+  return get(el);
+};
+
+/**
+ * Get `el`'s value.
+ */
+
+function get(el) {
+  switch (type(el)) {
+    case 'checkbox':
+    case 'radio':
+      if (el.checked) {
+        var attr = el.getAttribute('value');
+        return null == attr ? true : attr;
+      } else {
+        return false;
+      }
+    case 'radiogroup':
+      for (var i = 0, radio; radio = el[i]; i++) {
+        if (radio.checked) return radio.value;
+      }
+      break;
+    case 'select':
+      for (var i = 0, option; option = el.options[i]; i++) {
+        if (option.selected) return option.value;
+      }
+      break;
+    default:
+      return el.value;
+  }
+}
+
+/**
+ * Set `el`'s value.
+ */
+
+function set(el, val) {
+  switch (type(el)) {
+    case 'checkbox':
+    case 'radio':
+      if (val) {
+        el.checked = true;
+      } else {
+        el.checked = false;
+      }
+      break;
+    case 'radiogroup':
+      for (var i = 0, radio; radio = el[i]; i++) {
+        radio.checked = radio.value === val;
+      }
+      break;
+    case 'select':
+      for (var i = 0, option; option = el.options[i]; i++) {
+        option.selected = option.value === val;
+      }
+      break;
+    default:
+      el.value = val;
+  }
+}
+
+/**
+ * Element type.
+ */
+
+function type(el) {
+  var group = 'array' == typeOf(el) || 'object' == typeOf(el);
+  if (group) el = el[0];
+  var name = el.nodeName.toLowerCase();
+  var type = el.getAttribute('type');
+
+  if (group && type && 'radio' == type.toLowerCase()) return 'radiogroup';
+  if ('input' == name && type && 'checkbox' == type.toLowerCase()) return 'checkbox';
+  if ('input' == name && type && 'radio' == type.toLowerCase()) return 'radio';
+  if ('select' == name) return 'select';
+  return name;
+}
+
+});
+require.register("component-query/index.js", function(exports, require, module){
+
+function one(selector, el) {
+  return el.querySelector(selector);
+}
+
+exports = module.exports = function(selector, el){
+  el = el || document;
+  return one(selector, el);
+};
+
+exports.all = function(selector, el){
+  el = el || document;
+  return el.querySelectorAll(selector);
+};
+
+exports.engine = function(obj){
+  if (!obj.one) throw new Error('.one callback required');
+  if (!obj.all) throw new Error('.all callback required');
+  one = obj.one;
+  exports.all = obj.all;
+};
+
+});
+require.register("component-matches-selector/index.js", function(exports, require, module){
+/**
+ * Module dependencies.
+ */
+
+var query = require('query');
+
+/**
+ * Element prototype.
+ */
+
+var proto = Element.prototype;
+
+/**
+ * Vendor function.
+ */
+
+var vendor = proto.matches
+  || proto.webkitMatchesSelector
+  || proto.mozMatchesSelector
+  || proto.msMatchesSelector
+  || proto.oMatchesSelector;
+
+/**
+ * Expose `match()`.
+ */
+
+module.exports = match;
+
+/**
+ * Match `el` to `selector`.
+ *
+ * @param {Element} el
+ * @param {String} selector
+ * @return {Boolean}
+ * @api public
+ */
+
+function match(el, selector) {
+  if (vendor) return vendor.call(el, selector);
+  var nodes = query.all(selector, el.parentNode);
+  for (var i = 0; i < nodes.length; ++i) {
+    if (nodes[i] == el) return true;
+  }
+  return false;
+}
+
+});
+require.register("yields-traverse/index.js", function(exports, require, module){
+
+/**
+ * dependencies
+ */
+
+var matches = require('matches-selector');
+
+/**
+ * Traverse with the given `el`, `selector` and `len`.
+ *
+ * @param {String} type
+ * @param {Element} el
+ * @param {String} selector
+ * @param {Number} len
+ * @return {Array}
+ * @api public
+ */
+
+module.exports = function(type, el, selector, len){
+  var el = el[type]
+    , n = len || 1
+    , ret = [];
+
+  if (!el) return ret;
+
+  do {
+    if (n == ret.length) break;
+    if (1 != el.nodeType) continue;
+    if (matches(el, selector)) ret.push(el);
+    if (!selector) ret.push(el);
+  } while (el = el[type]);
+
+  return ret;
+}
+
+});
+require.register("yields-isarray/index.js", function(exports, require, module){
+
+/**
+ * isArray
+ */
+
+var isArray = Array.isArray;
+
+/**
+ * toString
+ */
+
+var str = Object.prototype.toString;
+
+/**
+ * Wether or not the given `val`
+ * is an array.
+ *
+ * example:
+ *
+ *        isArray([]);
+ *        // > true
+ *        isArray(arguments);
+ *        // > false
+ *        isArray('');
+ *        // > false
+ *
+ * @param {mixed} val
+ * @return {bool}
+ */
+
+module.exports = isArray || function (val) {
+  return !! val && '[object Array]' == str.call(val);
+};
+
+});
+require.register("component-props/index.js", function(exports, require, module){
+/**
+ * Global Names
+ */
+
+var globals = /\b(this|Array|Date|Object|Math|JSON)\b/g;
+
+/**
+ * Return immediate identifiers parsed from `str`.
+ *
+ * @param {String} str
+ * @param {String|Function} map function or prefix
+ * @return {Array}
+ * @api public
+ */
+
+module.exports = function(str, fn){
+  var p = unique(props(str));
+  if (fn && 'string' == typeof fn) fn = prefixed(fn);
+  if (fn) return map(str, p, fn);
+  return p;
+};
+
+/**
+ * Return immediate identifiers in `str`.
+ *
+ * @param {String} str
+ * @return {Array}
+ * @api private
+ */
+
+function props(str) {
+  return str
+    .replace(/\.\w+|\w+ *\(|"[^"]*"|'[^']*'|\/([^/]+)\//g, '')
+    .replace(globals, '')
+    .match(/[$a-zA-Z_]\w*/g)
+    || [];
+}
+
+/**
+ * Return `str` with `props` mapped with `fn`.
+ *
+ * @param {String} str
+ * @param {Array} props
+ * @param {Function} fn
+ * @return {String}
+ * @api private
+ */
+
+function map(str, props, fn) {
+  var re = /\.\w+|\w+ *\(|"[^"]*"|'[^']*'|\/([^/]+)\/|[a-zA-Z_]\w*/g;
+  return str.replace(re, function(_){
+    if ('(' == _[_.length - 1]) return fn(_);
+    if (!~props.indexOf(_)) return _;
+    return fn(_);
+  });
+}
+
+/**
+ * Return unique array.
+ *
+ * @param {Array} arr
+ * @return {Array}
+ * @api private
+ */
+
+function unique(arr) {
+  var ret = [];
+
+  for (var i = 0; i < arr.length; i++) {
+    if (~ret.indexOf(arr[i])) continue;
+    ret.push(arr[i]);
+  }
+
+  return ret;
+}
+
+/**
+ * Map with prefix `str`.
+ */
+
+function prefixed(str) {
+  return function(_){
+    return str + _;
+  };
+}
+
+});
+require.register("component-to-function/index.js", function(exports, require, module){
+/**
+ * Module Dependencies
+ */
+
+var expr = require('props');
+
+/**
+ * Expose `toFunction()`.
+ */
+
+module.exports = toFunction;
+
+/**
+ * Convert `obj` to a `Function`.
+ *
+ * @param {Mixed} obj
+ * @return {Function}
+ * @api private
+ */
+
+function toFunction(obj) {
+  switch ({}.toString.call(obj)) {
+    case '[object Object]':
+      return objectToFunction(obj);
+    case '[object Function]':
+      return obj;
+    case '[object String]':
+      return stringToFunction(obj);
+    case '[object RegExp]':
+      return regexpToFunction(obj);
+    default:
+      return defaultToFunction(obj);
+  }
+}
+
+/**
+ * Default to strict equality.
+ *
+ * @param {Mixed} val
+ * @return {Function}
+ * @api private
+ */
+
+function defaultToFunction(val) {
+  return function(obj){
+    return val === obj;
+  }
+}
+
+/**
+ * Convert `re` to a function.
+ *
+ * @param {RegExp} re
+ * @return {Function}
+ * @api private
+ */
+
+function regexpToFunction(re) {
+  return function(obj){
+    return re.test(obj);
+  }
+}
+
+/**
+ * Convert property `str` to a function.
+ *
+ * @param {String} str
+ * @return {Function}
+ * @api private
+ */
+
+function stringToFunction(str) {
+  // immediate such as "> 20"
+  if (/^ *\W+/.test(str)) return new Function('_', 'return _ ' + str);
+
+  // properties such as "name.first" or "age > 18" or "age > 18 && age < 36"
+  return new Function('_', 'return ' + get(str));
+}
+
+/**
+ * Convert `object` to a function.
+ *
+ * @param {Object} object
+ * @return {Function}
+ * @api private
+ */
+
+function objectToFunction(obj) {
+  var match = {}
+  for (var key in obj) {
+    match[key] = typeof obj[key] === 'string'
+      ? defaultToFunction(obj[key])
+      : toFunction(obj[key])
+  }
+  return function(val){
+    if (typeof val !== 'object') return false;
+    for (var key in match) {
+      if (!(key in val)) return false;
+      if (!match[key](val[key])) return false;
+    }
+    return true;
+  }
+}
+
+/**
+ * Built the getter function. Supports getter style functions
+ *
+ * @param {String} str
+ * @return {String}
+ * @api private
+ */
+
+function get(str) {
+  var props = expr(str);
+  if (!props.length) return '_.' + str;
+
+  var val;
+  for(var i = 0, prop; prop = props[i]; i++) {
+    val = '_.' + prop;
+    val = "('function' == typeof " + val + " ? " + val + "() : " + val + ")";
+    str = str.replace(new RegExp(prop, 'g'), val);
+  }
+
+  return str;
+}
+
+});
+require.register("matthewp-keys/index.js", function(exports, require, module){
+var has = Object.prototype.hasOwnProperty;
+
+module.exports = Object.keys || function(obj){
+  var keys = [];
+
+  for (var key in obj) {
+    if (has.call(obj, key)) {
+      keys.push(key);
+    }
+  }
+
+  return keys;
+};
+
+});
+require.register("matthewp-text/index.js", function(exports, require, module){
+
+var text = 'innerText' in document.createElement('div')
+  ? 'innerText'
+  : 'textContent'
+
+module.exports = function (el, val) {
+  if (val == null) return el[text];
+  el[text] = val;
+};
+
+});
+require.register("component-dom/index.js", function(exports, require, module){
+/**
+ * Module dependencies.
+ */
+
+var isArray = require('isArray');
+var domify = require('domify');
+var each = require('each');
+var events = require('event');
+var getKeys = require('keys');
+var query = require('query');
+var trim = require('trim');
+var slice = [].slice;
+
+/**
+ * Attributes supported.
+ */
+
+var attrs = [
+  'id',
+  'src',
+  'rel',
+  'cols',
+  'rows',
+  'type',
+  'name',
+  'href',
+  'title',
+  'style',
+  'width',
+  'height',
+  'action',
+  'method',
+  'tabindex',
+  'placeholder'
+];
+
+/*
+ * A simple way to check for HTML strings or ID strings
+ */
+
+var quickExpr = /^(?:[^#<]*(<[\w\W]+>)[^>]*$|#([\w\-]*)$)/;
+
+/**
+ * Expose `dom()`.
+ */
+
+module.exports = dom;
+
+/**
+ * Return a dom `List` for the given
+ * `html`, selector, or element.
+ *
+ * @param {String|Element|List} selector
+ * @param {String|ELement|context} context
+ * @return {List}
+ * @api public
+ */
+
+function dom(selector, context) {
+  // array
+  if (isArray(selector)) {
+    return new List(selector);
+  }
+
+  // List
+  if (selector instanceof List) {
+    return selector;
+  }
+
+  // node
+  if (selector.nodeName) {
+    return new List([selector]);
+  }
+
+  if ('string' != typeof selector) {
+    throw new TypeError('invalid selector');
+  }
+
+  // html
+  var htmlselector = trim.left(selector);
+  if (isHTML(htmlselector)) {
+    return new List([domify(htmlselector)], htmlselector);
+  }
+
+  // selector
+  var ctx = context
+    ? (context instanceof List ? context[0] : context)
+    : document;
+
+  return new List(query.all(selector, ctx), selector);
+}
+
+/**
+ * Static: Expose `List`
+ */
+
+dom.List = List;
+
+/**
+ * Static: Expose supported attrs.
+ */
+
+dom.attrs = attrs;
+
+/**
+ * Static: Mixin a function
+ *
+ * @param {Object|String} name
+ * @param {Object|Function} obj
+ * @return {List} self
+ */
+
+dom.use = function(name, fn) {
+  var keys = [];
+  var tmp;
+
+  if (2 == arguments.length) {
+    keys.push(name);
+    tmp = {};
+    tmp[name] = fn;
+    fn = tmp;
+  } else if (name.name) {
+    // use function name
+    fn = name;
+    name = name.name;
+    keys.push(name);
+    tmp = {};
+    tmp[name] = fn;
+    fn = tmp;
+  } else {
+    keys = getKeys(name);
+    fn = name;
+  }
+
+  for(var i = 0, len = keys.length; i < len; i++) {
+    List.prototype[keys[i]] = fn[keys[i]];
+  }
+
+  return this;
+}
+
+/**
+ * Initialize a new `List` with the
+ * given array-ish of `els` and `selector`
+ * string.
+ *
+ * @param {Mixed} els
+ * @param {String} selector
+ * @api private
+ */
+
+function List(els, selector) {
+  els = els || [];
+  var len = this.length = els.length;
+  for(var i = 0; i < len; i++) this[i] = els[i];
+  this.selector = selector;
+}
+
+/**
+ * Remake the list
+ *
+ * @param {String|ELement|context} context
+ * @return {List}
+ * @api private
+ */
+
+List.prototype.dom = dom;
+
+/**
+ * Make `List` an array-like object
+ */
+
+List.prototype.length = 0;
+List.prototype.splice = Array.prototype.splice;
+
+/**
+ * Array-like object to array
+ *
+ * @return {Array}
+ */
+
+List.prototype.toArray = function() {
+  return slice.call(this);
+}
+
+/**
+ * Attribute accessors.
+ */
+
+each(attrs, function(name){
+  List.prototype[name] = function(val){
+    if (0 == arguments.length) return this.attr(name);
+    return this.attr(name, val);
+  };
+});
+
+/**
+ * Mixin the API
+ */
+
+dom.use(require('./lib/attributes'));
+dom.use(require('./lib/classes'));
+dom.use(require('./lib/events'));
+dom.use(require('./lib/manipulate'));
+dom.use(require('./lib/traverse'));
+
+/**
+ * Check if the string is HTML
+ *
+ * @param {String} str
+ * @return {Boolean}
+ * @api private
+ */
+
+function isHTML(str) {
+  // Faster than running regex, if str starts with `<` and ends with `>`, assume it's HTML
+  if (str.charAt(0) === '<' && str.charAt(str.length - 1) === '>' && str.length >= 3) return true;
+
+  // Run the regex
+  var match = quickExpr.exec(str);
+  return !!(match && match[1]);
+}
+
+});
+require.register("component-dom/lib/traverse.js", function(exports, require, module){
+/**
+ * Module Dependencies
+ */
+
+var proto = Array.prototype;
+var each = require('each');
+var traverse = require('traverse');
+var toFunction = require('to-function');
+var matches = require('matches-selector');
+
+/**
+ * Find children matching the given `selector`.
+ *
+ * @param {String} selector
+ * @return {List}
+ * @api public
+ */
+
+exports.find = function(selector){
+  return this.dom(selector, this);
+};
+
+/**
+ * Check if the any element in the selection
+ * matches `selector`.
+ *
+ * @param {String} selector
+ * @return {Boolean}
+ * @api public
+ */
+
+exports.is = function(selector){
+  for(var i = 0, el; el = this[i]; i++) {
+    if (matches(el, selector)) return true;
+  }
+
+  return false;
+};
+
+/**
+ * Get parent(s) with optional `selector` and `limit`
+ *
+ * @param {String} selector
+ * @param {Number} limit
+ * @return {List}
+ * @api public
+ */
+
+exports.parent = function(selector, limit){
+  return this.dom(traverse('parentNode',
+    this[0],
+    selector,
+    limit
+    || 1));
+};
+
+/**
+ * Get next element(s) with optional `selector` and `limit`.
+ *
+ * @param {String} selector
+ * @param {Number} limit
+ * @retrun {List}
+ * @api public
+ */
+
+exports.next = function(selector, limit){
+  return this.dom(traverse('nextSibling',
+    this[0],
+    selector,
+    limit
+    || 1));
+};
+
+/**
+ * Get previous element(s) with optional `selector` and `limit`.
+ *
+ * @param {String} selector
+ * @param {Number} limit
+ * @return {List}
+ * @api public
+ */
+
+exports.prev =
+exports.previous = function(selector, limit){
+  return this.dom(traverse('previousSibling',
+    this[0],
+    selector,
+    limit
+    || 1));
+};
+
+/**
+ * Iterate over each element creating a new list with
+ * one item and invoking `fn(list, i)`.
+ *
+ * @param {Function} fn
+ * @return {List} self
+ * @api public
+ */
+
+exports.each = function(fn){
+  var dom = this.dom;
+
+  for (var i = 0, list, len = this.length; i < len; i++) {
+    list = dom(this[i]);
+    fn.call(list, list, i);
+  }
+
+  return this;
+};
+
+/**
+ * Iterate over each element and invoke `fn(el, i)`
+ *
+ * @param {Function} fn
+ * @return {List} self
+ * @api public
+ */
+
+exports.forEach = function(fn) {
+  for (var i = 0, len = this.length; i < len; i++) {
+    fn.call(this[i], this[i], i);
+  }
+
+  return this;
+};
+
+/**
+ * Map each return value from `fn(val, i)`.
+ *
+ * Passing a callback function:
+ *
+ *    inputs.map(function(input){
+ *      return input.type
+ *    })
+ *
+ * Passing a property string:
+ *
+ *    inputs.map('type')
+ *
+ * @param {Function} fn
+ * @return {List} self
+ * @api public
+ */
+
+exports.map = function(fn){
+  fn = toFunction(fn);
+  var dom = this.dom;
+  var out = [];
+
+  for (var i = 0, len = this.length; i < len; i++) {
+    out.push(fn.call(dom(this[i]), this[i], i));
+  }
+
+  return this.dom(out);
+};
+
+/**
+ * Select all values that return a truthy value of `fn(val, i)`.
+ *
+ *    inputs.select(function(input){
+ *      return input.type == 'password'
+ *    })
+ *
+ *  With a property:
+ *
+ *    inputs.select('type == password')
+ *
+ * @param {Function|String} fn
+ * @return {List} self
+ * @api public
+ */
+
+exports.filter =
+exports.select = function(fn){
+  fn = toFunction(fn);
+  var dom = this.dom;
+  var out = [];
+  var val;
+
+  for (var i = 0, len = this.length; i < len; i++) {
+    val = fn.call(dom(this[i]), this[i], i);
+    if (val) out.push(this[i]);
+  }
+
+  return this.dom(out);
+};
+
+/**
+ * Reject all values that return a truthy value of `fn(val, i)`.
+ *
+ * Rejecting using a callback:
+ *
+ *    input.reject(function(user){
+ *      return input.length < 20
+ *    })
+ *
+ * Rejecting with a property:
+ *
+ *    items.reject('password')
+ *
+ * Rejecting values via `==`:
+ *
+ *    data.reject(null)
+ *    input.reject(file)
+ *
+ * @param {Function|String|Mixed} fn
+ * @return {List}
+ * @api public
+ */
+
+exports.reject = function(fn){
+  var dom = this.dom;
+  var out = [];
+  var len = this.length;
+  var val, i;
+
+  if ('string' == typeof fn) fn = toFunction(fn);
+
+  if (fn) {
+    for (i = 0; i < len; i++) {
+      val = fn.call(dom(this[i]), this[i], i);
+      if (!val) out.push(this[i]);
+    }
+  } else {
+    for (i = 0; i < len; i++) {
+      if (this[i] != fn) out.push(this[i]);
+    }
+  }
+
+  return this.dom(out);
+};
+
+/**
+ * Return a `List` containing the element at `i`.
+ *
+ * @param {Number} i
+ * @return {List}
+ * @api public
+ */
+
+exports.at = function(i){
+  return this.dom(this[i]);
+};
+
+/**
+ * Return a `List` containing the first element.
+ *
+ * @param {Number} i
+ * @return {List}
+ * @api public
+ */
+
+exports.first = function(){
+  return this.dom(this[0]);
+};
+
+/**
+ * Return a `List` containing the last element.
+ *
+ * @param {Number} i
+ * @return {List}
+ * @api public
+ */
+
+exports.last = function(){
+  return this.dom(this[this.length - 1]);
+};
+
+/**
+ * Mixin the array functions
+ */
+
+each([
+  'push',
+  'pop',
+  'shift',
+  'splice',
+  'unshift',
+  'reverse',
+  'sort',
+  'toString',
+  'concat',
+  'join',
+  'slice'
+], function(method) {
+  exports[method] = function() {
+    return proto[method].apply(this.toArray(), arguments);
+  };
+});
+
+});
+require.register("component-dom/lib/manipulate.js", function(exports, require, module){
+/**
+ * Module Dependencies
+ */
+
+var value = require('value');
+var css = require('css');
+var text = require('text');
+
+/**
+ * Return element text.
+ *
+ * @param {String} str
+ * @return {String|List}
+ * @api public
+ */
+
+exports.text = function(str) {
+  if (1 == arguments.length) {
+    return this.forEach(function(el) {
+      if (11 == el.nodeType) {
+        var node;
+        while (node = el.firstChild) el.removeChild(node);
+        el.appendChild(document.createTextNode(str));
+      } else {
+        text(el, str);
+      }
+    });
+  }
+
+  var out = '';
+  this.forEach(function(el) {
+    if (11 == el.nodeType) {
+      out += getText(el.firstChild);
+    } else {
+      out += text(el);
+    }
+  });
+
+  return out;
+};
+
+/**
+ * Get text helper from Sizzle.
+ *
+ * Source: https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L914-L947
+ *
+ * @param {Element|Array} el
+ * @return {String}
+ */
+
+function getText(el) {
+  var ret = '';
+  var type = el.nodeType;
+  var node;
+
+  switch(type) {
+    case 1:
+    case 9:
+      ret = text(el);
+      break;
+    case 11:
+      ret = el.textContent || el.innerText;
+      break;
+    case 3:
+    case 4:
+      return el.nodeValue;
+    default:
+      while (node = el[i++]) {
+        ret += getText(node);
+      }
+  }
+
+  return ret;
+}
+
+/**
+ * Return element html.
+ *
+ * @return {String} html
+ * @api public
+ */
+
+exports.html = function(html) {
+  if (1 == arguments.length) {
+    return this.forEach(function(el) {
+      el.innerHTML = html;
+    });
+  }
+
+  // TODO: real impl
+  return this[0] && this[0].innerHTML;
+};
+
+/**
+ * Get and set the css value
+ *
+ * @param {String|Object} prop
+ * @param {Mixed} val
+ * @return {Mixed}
+ * @api public
+ */
+
+exports.css = function(prop, val) {
+  // getter
+  if (!val && 'object' != typeof prop) {
+    return css(this[0], prop);
+  }
+  // setter
+  this.forEach(function(el) {
+    css(el, prop, val);
+  });
+
+  return this;
+};
+
+/**
+ * Prepend `val`.
+ *
+ * From jQuery: if there is more than one target element
+ * cloned copies of the inserted element will be created
+ * for each target after the first.
+ *
+ * @param {String|Element|List} val
+ * @return {List} self
+ * @api public
+ */
+
+exports.prepend = function(val) {
+  var dom = this.dom;
+
+  this.forEach(function(target, i) {
+    dom(val).forEach(function(selector) {
+      selector = i ? selector.cloneNode(true) : selector;
+      if (target.children.length) {
+        target.insertBefore(selector, target.firstChild);
+      } else {
+        target.appendChild(selector);
+      }
+    });
+  });
+
+  return this;
+};
+
+/**
+ * Append `val`.
+ *
+ * From jQuery: if there is more than one target element
+ * cloned copies of the inserted element will be created
+ * for each target after the first.
+ *
+ * @param {String|Element|List} val
+ * @return {List} self
+ * @api public
+ */
+
+exports.append = function(val) {
+  var dom = this.dom;
+
+  this.forEach(function(target, i) {
+    dom(val).forEach(function(el) {
+      el = i ? el.cloneNode(true) : el;
+      target.appendChild(el);
+    });
+  });
+
+  return this;
+};
+
+/**
+ * Insert self's `els` after `val`
+ *
+ * From jQuery: if there is more than one target element,
+ * cloned copies of the inserted element will be created
+ * for each target after the first, and that new set
+ * (the original element plus clones) is returned.
+ *
+ * @param {String|Element|List} val
+ * @return {List} self
+ * @api public
+ */
+
+exports.insertAfter = function(val) {
+  var dom = this.dom;
+
+  this.forEach(function(el) {
+    dom(val).forEach(function(target, i) {
+      if (!target.parentNode) return;
+      el = i ? el.cloneNode(true) : el;
+      target.parentNode.insertBefore(el, target.nextSibling);
+    });
+  });
+
+  return this;
+};
+
+/**
+ * Append self's `el` to `val`
+ *
+ * @param {String|Element|List} val
+ * @return {List} self
+ * @api public
+ */
+
+exports.appendTo = function(val) {
+  this.dom(val).append(this);
+  return this;
+};
+
+/**
+ * Replace elements in the DOM.
+ *
+ * @param {String|Element|List} val
+ * @return {List} self
+ * @api public
+ */
+
+exports.replace = function(val) {
+  var self = this;
+  var list = this.dom(val);
+
+  list.forEach(function(el, i) {
+    var old = self[i];
+    var parent = old.parentNode;
+    if (!parent) return;
+    el = i ? el.cloneNode(true) : el;
+    parent.replaceChild(el, old);
+  });
+
+  return this;
+};
+
+/**
+ * Empty the dom list
+ *
+ * @return self
+ * @api public
+ */
+
+exports.empty = function() {
+  return this.forEach(function(el) {
+    text(el, "");
+  });
+};
+
+/**
+ * Remove all elements in the dom list
+ *
+ * @return {List} self
+ * @api public
+ */
+
+exports.remove = function() {
+  return this.forEach(function(el) {
+    var parent = el.parentNode;
+    if (parent) parent.removeChild(el);
+  });
+};
+
+/**
+ * Return a cloned dom list with all elements cloned.
+ *
+ * @return {List}
+ * @api public
+ */
+
+exports.clone = function() {
+  var out = this.map(function(el) {
+    return el.cloneNode(true);
+  });
+
+  return this.dom(out);
+};
+
+/**
+ * Focus the first dom element in our list.
+ * 
+ * @return {List} self
+ * @api public
+ */
+
+exports.focus = function(){
+  this[0].focus();
+  return this;
+};
+
+});
+require.register("component-dom/lib/classes.js", function(exports, require, module){
+/**
+ * Module Dependencies
+ */
+
+var classes = require('classes');
+
+/**
+ * Add the given class `name`.
+ *
+ * @param {String} name
+ * @return {List} self
+ * @api public
+ */
+
+exports.addClass = function(name){
+  return this.forEach(function(el) {
+    el._classes = el._classes || classes(el);
+    el._classes.add(name);
+  });
+};
+
+/**
+ * Remove the given class `name`.
+ *
+ * @param {String|RegExp} name
+ * @return {List} self
+ * @api public
+ */
+
+exports.removeClass = function(name){
+  return this.forEach(function(el) {
+    el._classes = el._classes || classes(el);
+    el._classes.remove(name);
+  });
+};
+
+/**
+ * Toggle the given class `name`,
+ * optionally a `bool` may be given
+ * to indicate that the class should
+ * be added when truthy.
+ *
+ * @param {String} name
+ * @param {Boolean} bool
+ * @return {List} self
+ * @api public
+ */
+
+exports.toggleClass = function(name, bool){
+  var fn = 'toggle';
+
+  // toggle with boolean
+  if (2 == arguments.length) {
+    fn = bool ? 'add' : 'remove';
+  }
+
+  return this.forEach(function(el) {
+    el._classes = el._classes || classes(el);
+    el._classes[fn](name);
+  })
+};
+
+/**
+ * Check if the given class `name` is present.
+ *
+ * @param {String} name
+ * @return {Boolean}
+ * @api public
+ */
+
+exports.hasClass = function(name){
+  var el;
+
+  for(var i = 0, len = this.length; i < len; i++) {
+    el = this[i];
+    el._classes = el._classes || classes(el);
+    if (el._classes.has(name)) return true;
+  }
+
+  return false;
+};
+
+});
+require.register("component-dom/lib/attributes.js", function(exports, require, module){
+/**
+ * Module Dependencies
+ */
+
+var value = require('value');
+
+/**
+ * Set attribute `name` to `val`, or get attr `name`.
+ *
+ * @param {String} name
+ * @param {String} [val]
+ * @return {String|List} self
+ * @api public
+ */
+
+exports.attr = function(name, val){
+  // get
+  if (1 == arguments.length) {
+    return this[0] && this[0].getAttribute(name);
+  }
+
+  // remove
+  if (null == val) {
+    return this.removeAttr(name);
+  }
+
+  // set
+  return this.forEach(function(el){
+    el.setAttribute(name, val);
+  });
+};
+
+/**
+ * Remove attribute `name`.
+ *
+ * @param {String} name
+ * @return {List} self
+ * @api public
+ */
+
+exports.removeAttr = function(name){
+  return this.forEach(function(el){
+    el.removeAttribute(name);
+  });
+};
+
+/**
+ * Set property `name` to `val`, or get property `name`.
+ *
+ * @param {String} name
+ * @param {String} [val]
+ * @return {Object|List} self
+ * @api public
+ */
+
+exports.prop = function(name, val){
+  if (1 == arguments.length) {
+    return this[0] && this[0][name];
+  }
+
+  return this.forEach(function(el){
+    el[name] = val;
+  });
+};
+
+/**
+ * Get the first element's value or set selected
+ * element values to `val`.
+ *
+ * @param {Mixed} [val]
+ * @return {Mixed}
+ * @api public
+ */
+
+exports.val =
+exports.value = function(val){
+  if (0 == arguments.length) {
+    return this[0]
+      ? value(this[0])
+      : undefined;
+  }
+
+  return this.forEach(function(el){
+    value(el, val);
+  });
+};
+
+});
+require.register("component-dom/lib/events.js", function(exports, require, module){
+/**
+ * Module Dependencies
+ */
+
+var events = require('event');
+var delegate = require('delegate');
+
+/**
+ * Bind to `event` and invoke `fn(e)`. When
+ * a `selector` is given then events are delegated.
+ *
+ * @param {String} event
+ * @param {String} [selector]
+ * @param {Function} fn
+ * @param {Boolean} capture
+ * @return {List}
+ * @api public
+ */
+
+exports.on = function(event, selector, fn, capture){
+  if ('string' == typeof selector) {
+    return this.forEach(function (el) {
+      fn._delegate = delegate.bind(el, selector, event, fn, capture);
+    });
+  }
+
+  capture = fn;
+  fn = selector;
+
+  return this.forEach(function (el) {
+    events.bind(el, event, fn, capture);
+  });
+};
+
+/**
+ * Unbind to `event` and invoke `fn(e)`. When
+ * a `selector` is given then delegated event
+ * handlers are unbound.
+ *
+ * @param {String} event
+ * @param {String} [selector]
+ * @param {Function} fn
+ * @param {Boolean} capture
+ * @return {List}
+ * @api public
+ */
+
+exports.off = function(event, selector, fn, capture){
+  if ('string' == typeof selector) {
+    return this.forEach(function (el) {
+      // TODO: add selector support back
+      delegate.unbind(el, event, fn._delegate, capture);
+    });
+  }
+
+  capture = fn;
+  fn = selector;
+
+  return this.forEach(function (el) {
+    events.unbind(el, event, fn, capture);
+  });
+};
+
+});
 require.register("userjoy/lib/index.js", function(exports, require, module){
+var debug = require('debug');
 var UserJoy = require('./userjoy');
+
+
+/**
+ * Enable or disable debug.
+ *
+ * @param {String or Boolean} str
+ */
+
+var showDebug = function (str) {
+  if (0 == arguments.length || str) {
+    debug.enable('uj:' + (str || '*'));
+  } else {
+    debug.disable();
+  }
+};
+
+
+// FIXME REMOVE ME SHOULD BE ENABLED ONLY IN DEVELOPMENT
+showDebug();
 
 
 /**
@@ -10094,9 +12831,75 @@ exports.VERSION = '1.0.0';
 userjoy.initialize();
 
 });
+require.register("userjoy/lib/app.js", function(exports, require, module){
+
+var debug = require('debug')('uj:app');
+var Entity = require('./entity');
+var inherit = require('inherit');
+var bind = require('bind');
+var cookie = require('./cookie');
+
+
+/**
+ * App defaults
+ */
+
+App.defaults = {
+  cookie: {
+    key: 'userjoy_app_id'
+  },
+  localStorage: {
+    key: 'userjoy_app_traits'
+  }
+};
+
+
+/**
+ * Initialize a new `App` with `options`.
+ *
+ * @param {Object} options
+ */
+
+function App (options) {
+  this.defaults = App.defaults;
+  this.debug = debug;
+  Entity.call(this, options);
+}
+
+
+/**
+ * Inherit `Entity`
+ */
+
+inherit(App, Entity);
+
+
+/**
+ * Load saved app `id` or `traits` from storage.
+ */
+
+App.prototype.load = function () {
+  Entity.prototype.load.call(this);
+};
+
+
+/**
+ * Expose the app singleton.
+ */
+
+module.exports = bind.all(new App());
+
+
+/**
+ * Expose the `App` constructor.
+ */
+
+module.exports.App = App;
+
+});
 require.register("userjoy/lib/company.js", function(exports, require, module){
 
-var debug = require('debug')('userjoy:company');
+var debug = require('debug')('uj:company');
 var Entity = require('./entity');
 var inherit = require('inherit');
 var bind = require('bind');
@@ -10107,7 +12910,6 @@ var bind = require('bind');
  */
 
 Company.defaults = {
-  persist: true,
   cookie: {
     key: 'userjoy_company_id'
   },
@@ -10270,7 +13072,6 @@ module.exports = bind.all(new Cookie());
 module.exports.Cookie = Cookie;
 });
 require.register("userjoy/lib/entity.js", function(exports, require, module){
-
 var traverse = require('isodate-traverse');
 var defaults = require('defaults');
 var cookie = require('./cookie');
@@ -10292,7 +13093,7 @@ module.exports = Entity;
  * @param {Object} options
  */
 
-function Entity(options){
+function Entity(options) {
   this.options(options);
 }
 
@@ -10303,7 +13104,6 @@ function Entity(options){
  * @param {Object} options
  *   @property {Object} cookie
  *   @property {Object} localStorage
- *   @property {Boolean} persist (default: `true`)
  */
 
 Entity.prototype.options = function (options) {
@@ -10322,8 +13122,10 @@ Entity.prototype.options = function (options) {
 
 Entity.prototype.id = function (id) {
   switch (arguments.length) {
-    case 0: return this._getId();
-    case 1: return this._setId(id);
+  case 0:
+    return this._getId();
+  case 1:
+    return this._setId(id);
   }
 };
 
@@ -10335,9 +13137,7 @@ Entity.prototype.id = function (id) {
  */
 
 Entity.prototype._getId = function () {
-  var ret = this._options.persist
-    ? cookie.get(this._options.cookie.key)
-    : this._id;
+  var ret = cookie.get(this._options.cookie.key);
   return ret === undefined ? null : ret;
 };
 
@@ -10349,27 +13149,22 @@ Entity.prototype._getId = function () {
  */
 
 Entity.prototype._setId = function (id) {
-  if (this._options.persist) {
-    cookie.set(this._options.cookie.key, id);
-  } else {
-    this._id = id;
-  }
+  cookie.set(this._options.cookie.key, id);
 };
 
 
 /**
  * Get or set the entity's `traits`.
  *
- * BACKWARDS COMPATIBILITY: aliased to `properties`
- *
  * @param {Object} traits
  */
 
-Entity.prototype.properties =
 Entity.prototype.traits = function (traits) {
   switch (arguments.length) {
-    case 0: return this._getTraits();
-    case 1: return this._setTraits(traits);
+  case 0:
+    return this._getTraits();
+  case 1:
+    return this._setTraits(traits);
   }
 };
 
@@ -10382,9 +13177,7 @@ Entity.prototype.traits = function (traits) {
  */
 
 Entity.prototype._getTraits = function () {
-  var ret = this._options.persist
-    ? store.get(this._options.localStorage.key)
-    : this._traits;
+  var ret = store.get(this._options.localStorage.key);
   return ret ? traverse(clone(ret)) : {};
 };
 
@@ -10397,28 +13190,19 @@ Entity.prototype._getTraits = function () {
 
 Entity.prototype._setTraits = function (traits) {
   traits || (traits = {});
-  if (this._options.persist) {
-    store.set(this._options.localStorage.key, traits);
-  } else {
-    this._traits = traits;
-  }
+  store.set(this._options.localStorage.key, traits);
 };
 
 
 /**
- * Identify the entity with an `id` and `traits`. If we it's the same entity,
+ * Identify the entity with `traits`. If we it's the same entity,
  * extend the existing `traits` instead of overwriting.
  *
- * @param {String} id
  * @param {Object} traits
  */
 
-Entity.prototype.identify = function (id, traits) {
+Entity.prototype.identify = function (traits) {
   traits || (traits = {});
-  var current = this.id();
-  if (current === null || current === id) traits = extend(this.traits(), traits);
-  if (id) this.id(id);
-  this.debug('identify %o, %o', id, traits);
   this.traits(traits);
   this.save();
 };
@@ -10431,7 +13215,6 @@ Entity.prototype.identify = function (id, traits) {
  */
 
 Entity.prototype.save = function () {
-  if (!this._options.persist) return false;
   cookie.set(this._options.cookie.key, this.id());
   store.set(this._options.localStorage.key, this.traits());
   return true;
@@ -10469,129 +13252,160 @@ Entity.prototype.load = function () {
   this.traits(store.get(this._options.localStorage.key));
 };
 
-
 });
-require.register("userjoy/lib/feedback.js", function(exports, require, module){
+require.register("userjoy/lib/message.js", function(exports, require, module){
+var app = require('./app');
 var ajax = require('ajax');
 var bind = require('bind');
-var template = require('./feedback-template');
+var debug = require('debug')('uj:message');
+var dom = require('dom');
+var template = require('./message-template');
+var user = require('./user');
 
 
 /**
- * Initialize a new `Feedback` instance.
+ * Initialize a new `Message` instance.
  */
 
-function Feedback() {
-  this.fb_url = 'TODO';
-  this.fb_template_id = 'uj_fb';
-  this.userId = null;
+function Message() {
+
+  var userTraits = user.traits();
+  var appTraits = app.traits();
+  var apiUrl = appTraits.apiUrl;
+
+  this.app_id = appTraits.app_id;
+  this.debug = debug;
+
+  // email of user
+  this.email = userTraits.email;
+
+  // unique user id as given by app
+  this.user_id = userTraits.user_id;
+
+  this.MSG_POST_URL = apiUrl + '/conversations';
+  this.MSG_TEMPLATE_ID = 'uj_message';
+  this.MSG_BODY_TEMPLATE_ID = 'uj_message_body';
+  this.MSG_SENT_TEMPLATE_ID = 'uj_message_sent';
 }
 
-Feedback.prototype.load = function (userId) {
+
+Message.prototype.load = function (userId) {
 
   var self = this;
-
 
   self.userId = userId;
 
-  function create(htmlStr) {
-    var frag = document.createDocumentFragment(),
-      temp = document.createElement('div');
-    temp.innerHTML = htmlStr;
-    while (temp.firstChild) {
-      frag.appendChild(temp.firstChild);
-    }
-    return frag;
-  }
+  var locals = {
+    MSG_TEMPLATE_ID: self.MSG_TEMPLATE_ID,
+    MSG_BODY_TEMPLATE_ID: self.MSG_BODY_TEMPLATE_ID,
+    MSG_SENT_TEMPLATE_ID: self.MSG_SENT_TEMPLATE_ID
+  };
 
-  // var locals = {
-  //     msg: 'This is the message to be shown to the user',
-  //     notification_template_id: self.notification_template_id
-  // };
-
-  var fragment = create(template());
-
-
-
-  // You can use native DOM methods to insert the fragment:
-  document.body.insertBefore(fragment, document.body.childNodes[0]);
+  dom('body')
+    .prepend(template(locals));
 
 };
 
 
-Feedback.prototype.loadCss = function () {
+Message.prototype.loadCss = function () {
+
+  var self = this;
+  var style = document.createElement('style');
+  style.type = 'text/css';
+  style.innerHTML =
+    'body{font:14px/1.4 Georgia,serif}.foot{display:table-row;vertical-align:bottom;height:1px}body,html{height:100%}#wrap{min-height:100%}#main{overflow:auto;padding-bottom:150px}#footer{position:relative;margin-top:-150px;height:150px;clear:both}#page-wrap{width:75%;margin:80px auto}h1{font:700 36px Sans-Serif;margin:0 0 20px}.form-control{height:43px;padding:10px 15px;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);-webkit-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}.message-template{margin:20px 0;padding:20px;border-left:5px solid #eee}.message-template-danger{background-color:#fdf7f7;border-color:#d9534f;border-right:1px solid #d9534f;border-top:1px solid #d9534f;border-bottom:1px solid #d9534f;border-radius:4px}.message-template-warning{background-color:#fcf8f2;border-color:#f0ad4e;border-right:1px solid #fcf8f2;border-top:1px solid #fcf8f2;border-bottom:1px solid #fcf8f2;border-radius:4px}.message-template-info{background-color:#f4f8fa;border-color:#5bc0de;border-right:1px solid #f4f8fa;border-top:1px solid #f4f8fa;border-bottom:1px solid #f4f8fa;border-radius:4px}.message-template-success{background-color:#F4FDF0;border-color:#3C763D;border-right:1px solid #F4FDF0;border-top:1px solid #F4FDF0;border-bottom:1px solid #F4FDF0;border-radius:4px}.message-template-default{background-color:#EEE;border-color:#B4B4B4;border-right:1px solid #EEE;border-top:1px solid #EEE;border-bottom:1px solid #EEE;border-radius:4px}.message-template-notice{background-color:#FCFCDD;border-color:#BDBD89;border-right:1px solid #FCFCDD;border-top:1px solid #FCFCDD;border-bottom:1px solid #FCFCDD;border-radius:4px}.dropdown-menu>li>a{display:block;padding:3px 20px;clear:both;font-weight:400;line-height:1.42857143;color:#7b8a8b;white-space:nowrap}.message-email-success{border-color:#BDBD89;border-right:1px solid #bdc3c7;border-top:1px solid #bdc3c7;border-bottom:1px solid #bdc3c7;border-radius:4px}.input-group{position:relative;display:table;border-collapse:separate}.panel-footer{padding:10px 15px;background-color:#ecf0f1;border-top:1px solid #ecf0f1;border-bottom-right-radius:3px;border-bottom-left-radius:3px}.input-sm{height:18px;padding:6px 9px;font-size:13px;line-height:1.5;border-radius:3px}.form-control:focus{border-color:#66afe9;outline:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6)}.btn{display:inline-block;cursor:pointer;padding:10px 15px;font-size:15px;line-height:1.42857143;border-radius:4px;-moz-user-select:none;-ms-user-select:none;user-select:none}.btn-danger{color:#fff;background-color:#e74c3c;border-color:#e74c3c}.input-group .form-control{position:relative;float:left;width:100%;margin-bottom:0}.input-group-btn{position:relative;font-size:0}.input-group-addon,.input-group-btn{width:1%;white-space:nowrap;vertical-align:middle}.input-group .form-control,.input-group-addon,.input-group-btn{display:table-cell}.input-group-btn>.btn{position:relative}.close{float:right;font-size:21px;font-weight:700;line-height:1;color:#000;text-shadow:0 1px 0 #fff;opacity:.2;filter:alpha(opacity=20)}.close:focus,.close:hover{color:#000;text-decoration:none;cursor:pointer;opacity:.5;filter:alpha(opacity=50)}button.close{padding:0;cursor:pointer;background:0 0;border:0;-webkit-appearance:none}.badge{display:inline-block;min-width:20px;padding:10px 14px;font-size:24px;font-weight:700;color:#fff;line-height:1;vertical-align:baseline;white-space:nowrap;text-align:center;background-color:#5bc0de;border-radius:10px}.panel-default{color:#333;background-color:#bdc3c7}.panel-heading{background-color:#f5f5f5}.col-md-4{width:352px}.row{margin-left:-15px;margin-right:-15px}.arrow:after{content:"";position:absolute;bottom:-25px;left:175px;border-style:solid;border-width:25px 25px 0;border-color:#FFF transparent;display:block;width:0;z-index:1}.arrow:before{content:"";position:absolute;left:296px;border-style:solid;border-width:17px 17px 0;border-color:#ddd transparent;display:block;width:0;z-index:0}*{box-sizing:border-box}body{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:14px;line-height:1.42857143;color:#333;background-color:#fff}.panel-default{border-color:#ddd}.panel{margin-bottom:20px;background-color:#fff;border:1px solid transparent;border-radius:4px;box-shadow:0 1px 1px rgba(0,0,0,.05)}.panel-default>.panel-heading{color:#333;background-color:#f5f5f5;border-color:#ddd}.panel-heading{padding:10px 15px;border-bottom:1px solid transparent;border-top-right-radius:3px;border-top-left-radius:3px}.panel-title{margin-top:0;margin-bottom:0;font-size:16px;color:inherit}.h3{font-family:inherit;font-weight:500;line-height:1.1}.panel-body{padding:15px}.form-control{display:block;width:100%;font-size:14px;line-height:1.42857143;color:#555;background-color:#fff;background-image:none;border:1px solid #ccc;border-radius:4px;box-shadow:inset 0 1px 1px rgba(0,0,0,.075);transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}.btn-block{display:block;width:100%;padding-left:0;padding-right:0}.btn-group-sm>.btn,.btn-sm{padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}.btn-info{color:#fff;background-color:#5bc0de;border-color:#46b8da}.btn{margin-bottom:0;font-weight:400;text-align:center;vertical-align:middle;background-image:none;border:1px solid transparent;white-space:nowrap;-webkit-user-select:none}hr{margin-top:20px;margin-bottom:20px;border:0;border-top:1px solid #eee;box-sizing:content-box;height:0}.small,small{font-size:85%}';
+
+  dom('head')
+    .prepend(style);
+
+};
+
+
+Message.prototype.show = function () {
+
+  var id = this.MSG_TEMPLATE_ID;
+
+  this.debug('show');
+
+  document.getElementById(id)
+    .style.display = (document.getElementById(id)
+      .style.display === 'none') ? 'block' : 'none';
+
+};
+
+
+Message.prototype.hide = function () {
+
+  var id = self.MSG_TEMPLATE_ID;
+
+  document.getElementById(id)
+    .style.display = 'none';
+
+};
+
+
+Message.prototype.send = function () {
 
   var self = this;
 
-  // var style = document.createElement('link');
-  // style.rel = 'text/stylesheet';
-  // style.async = true;
-  // style.url = 'userjoy.css';
-  // var first = document.getElementsByTagName('link')[0];
-  // first.parentNode.insertBefore(style, first);
-  // var head = document.getElementsByTagName('head')[0];
-  // var script = document.createElement('script');
-  // script.type = 'text/javascript';
-  // script.src = 'lib/custom-css.js';
-  // head.appendChild(script);
-  var style = document.createElement('style')
-  style.type = 'text/css'
-  style.innerHTML = 'body{font:14px/1.4 Georgia,serif}.foot{display:table-row;vertical-align:bottom;height:1px}body,html{height:100%}#wrap{min-height:100%}#main{overflow:auto;padding-bottom:150px}#footer{position:relative;margin-top:-150px;height:150px;clear:both}#page-wrap{width:75%;margin:80px auto}h1{font:700 36px Sans-Serif;margin:0 0 20px}.form-control{height:43px;padding:10px 15px;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);-webkit-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}.message-template{margin:20px 0;padding:20px;border-left:5px solid #eee}.message-template-danger{background-color:#fdf7f7;border-color:#d9534f;border-right:1px solid #d9534f;border-top:1px solid #d9534f;border-bottom:1px solid #d9534f;border-radius:4px}.message-template-warning{background-color:#fcf8f2;border-color:#f0ad4e;border-right:1px solid #fcf8f2;border-top:1px solid #fcf8f2;border-bottom:1px solid #fcf8f2;border-radius:4px}.message-template-info{background-color:#f4f8fa;border-color:#5bc0de;border-right:1px solid #f4f8fa;border-top:1px solid #f4f8fa;border-bottom:1px solid #f4f8fa;border-radius:4px}.message-template-success{background-color:#F4FDF0;border-color:#3C763D;border-right:1px solid #F4FDF0;border-top:1px solid #F4FDF0;border-bottom:1px solid #F4FDF0;border-radius:4px}.message-template-default{background-color:#EEE;border-color:#B4B4B4;border-right:1px solid #EEE;border-top:1px solid #EEE;border-bottom:1px solid #EEE;border-radius:4px}.message-template-notice{background-color:#FCFCDD;border-color:#BDBD89;border-right:1px solid #FCFCDD;border-top:1px solid #FCFCDD;border-bottom:1px solid #FCFCDD;border-radius:4px}.dropdown-menu>li>a{display:block;padding:3px 20px;clear:both;font-weight:400;line-height:1.42857143;color:#7b8a8b;white-space:nowrap}.message-email-success{border-color:#BDBD89;border-right:1px solid #bdc3c7;border-top:1px solid #bdc3c7;border-bottom:1px solid #bdc3c7;border-radius:4px}.input-group{position:relative;display:table;border-collapse:separate}.panel-footer{padding:10px 15px;background-color:#ecf0f1;border-top:1px solid #ecf0f1;border-bottom-right-radius:3px;border-bottom-left-radius:3px}.input-sm{height:18px;padding:6px 9px;font-size:13px;line-height:1.5;border-radius:3px}.form-control:focus{border-color:#66afe9;outline:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6)}.btn{display:inline-block;cursor:pointer;padding:10px 15px;font-size:15px;line-height:1.42857143;border-radius:4px;-moz-user-select:none;-ms-user-select:none;user-select:none}.btn-danger{color:#fff;background-color:#e74c3c;border-color:#e74c3c}.input-group .form-control{position:relative;float:left;width:100%;margin-bottom:0}.input-group-btn{position:relative;font-size:0}.input-group-addon,.input-group-btn{width:1%;white-space:nowrap;vertical-align:middle}.input-group .form-control,.input-group-addon,.input-group-btn{display:table-cell}.input-group-btn>.btn{position:relative}.close{float:right;font-size:21px;font-weight:700;line-height:1;color:#000;text-shadow:0 1px 0 #fff;opacity:.2;filter:alpha(opacity=20)}.close:focus,.close:hover{color:#000;text-decoration:none;cursor:pointer;opacity:.5;filter:alpha(opacity=50)}button.close{padding:0;cursor:pointer;background:0 0;border:0;-webkit-appearance:none}.badge{display:inline-block;min-width:20px;padding:10px 14px;font-size:24px;font-weight:700;color:#fff;line-height:1;vertical-align:baseline;white-space:nowrap;text-align:center;background-color:#5bc0de;border-radius:10px}.panel-default{color:#333;background-color:#bdc3c7}.panel-heading{background-color:#f5f5f5}.col-md-4{width:352px}.row{margin-left:-15px;margin-right:-15px}.arrow:after{content:"";position:absolute;bottom:-25px;left:175px;border-style:solid;border-width:25px 25px 0;border-color:#FFF transparent;display:block;width:0;z-index:1}.arrow:before{content:"";position:absolute;left:296px;border-style:solid;border-width:17px 17px 0;border-color:#ddd transparent;display:block;width:0;z-index:0}*{box-sizing:border-box}body{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:14px;line-height:1.42857143;color:#333;background-color:#fff}.panel-default{border-color:#ddd}.panel{margin-bottom:20px;background-color:#fff;border:1px solid transparent;border-radius:4px;box-shadow:0 1px 1px rgba(0,0,0,.05)}.panel-default>.panel-heading{color:#333;background-color:#f5f5f5;border-color:#ddd}.panel-heading{padding:10px 15px;border-bottom:1px solid transparent;border-top-right-radius:3px;border-top-left-radius:3px}.panel-title{margin-top:0;margin-bottom:0;font-size:16px;color:inherit}.h3{font-family:inherit;font-weight:500;line-height:1.1}.panel-body{padding:15px}.form-control{display:block;width:100%;font-size:14px;line-height:1.42857143;color:#555;background-color:#fff;background-image:none;border:1px solid #ccc;border-radius:4px;box-shadow:inset 0 1px 1px rgba(0,0,0,.075);transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}.btn-block{display:block;width:100%;padding-left:0;padding-right:0}.btn-group-sm>.btn,.btn-sm{padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}.btn-info{color:#fff;background-color:#5bc0de;border-color:#46b8da}.btn{margin-bottom:0;font-weight:400;text-align:center;vertical-align:middle;background-image:none;border:1px solid transparent;white-space:nowrap;-webkit-user-select:none}hr{margin-top:20px;margin-bottom:20px;border:0;border-top:1px solid #eee;box-sizing:content-box;height:0}.small,small{font-size:85%}'
-  document.getElementsByTagName('head')[0].appendChild(style);
-
-};
+  var msgBody = dom('#' + self.MSG_BODY_TEMPLATE_ID)
+    .val();
 
 
-Feedback.prototype.show = function () {
-  if (document.getElementById('feedback')
-    .style.display == 'none') {
-    document.getElementById('feedback')
-      .style.display = 'block';
+  if (!msgBody) {
+    // FIXME SHOW ERROR MESSAGE HERE
+    this.debug('Provide valid message body');
+    return;
+  }
+
+
+  var msg = {
+    app_id: self.app_id,
+    body: msgBody
+  };
+
+  if (self.user_id) {
+    msg.user_id = self.user_id;
+  } else if (self.email) {
+    msg.email = self.email;
   } else {
-    document.getElementById('feedback')
-      .style.display = 'none';
+    return;
   }
-};
 
 
-Feedback.prototype.hide = function () {
-  document.getElementById('feedback')
-    .style.display = 'none';
-};
-
-
-Feedback.prototype.send = function () {
-
-  var data = {
-    reply: document.getElementById('reply')
-      .value
-  }
   ajax({
     type: "POST",
-    url: '/apps/aid/fb/uid',
-    data: data,
-    success: function () {
-      document.getElementById('msgsent')
+    url: self.MSG_POST_URL,
+    data: msg,
+    dataType: 'json',
+
+    success: function (saved) {
+
+      self.debug('saved', saved);
+
+      document.getElementById(self.MSG_SENT_TEMPLATE_ID)
         .style.display = 'block';
-      document.getElementById('reply')
+
+      document.getElementById(self.MSG_TEMPLATE_ID)
         .value = '';
     },
-    error: function () {
-      console.log("error");
-    },
-    dataType: 'json'
+
+    error: function (err) {
+      self.debug("error", err);
+    }
   });
 
 };
 
 
 /**
- * Expose `Feedback` instance.
+ * Expose `Message` instance.
  */
 
-module.exports = bind.all(new Feedback());
+module.exports = bind.all(new Message());
+
 });
-require.register("userjoy/lib/feedback-template.js", function(exports, require, module){
+require.register("userjoy/lib/message-template.js", function(exports, require, module){
 module.exports = function anonymous(obj) {
 
   function escape(html) {
@@ -10610,13 +13424,17 @@ module.exports = function anonymous(obj) {
     return '';
   };
 
-  return "<div>\n    <a style=\"cursor: pointer\" onclick=\"userjoy.showFeedback()\">\n        <div style=\"position: fixed; bottom:30px; right:20px;\">\n            <span style=\"display: inline-block;\n            min-width: 20px;\n            padding: 10px 14px;\n            font-size: 24px;\n            font-weight: 700;\n            color: #fff;\n            line-height: 1;\n            vertical-align: baseline;\n            white-space: nowrap;\n            text-align: center;\n            background-color: #5bc0de;\n            border-radius: 10px;\">&#63;\n            </span>\n        </div>\n    </a>\n    <div style=\"display: none\" id=\"feedback\">\n        <div style=\"bottom: 80px; position: fixed; right: 9px;\" class=\"col-md-4\">\n            <div class=\"panel panel-default\" style=\"border-color: #ddd;\">\n                <div class=\"panel-heading\">\n                    <h3 class=\"panel-title\" style=\"text-align: center;\">Send us a Message</h3>\n                    <button type=\"button\" class=\"close\" aria-hidden=\"true\" onclick=\"userjoy.hideFeedback()\" id=\"closeFeedback\" style=\"margin-top: -25px;\">&times;</button>\n                </div>\n                <div class=\"panel-body\">\n                    <form role=\"form\">\n                        <textarea class=\"form-control\" style=\"padding: 4px; height: 150px;\"></textarea>\n                        <br>\n                        <input type=\"submit\" value=\"Send Message\" class=\"btn btn-sm btn-info btn-block\" style=\"float: right;\">\n                        <hr>\n                        <div style=\"text-align: center;\">\n                        <small>Powered by <a href=\"http://www.userjoy.co\">UserJoy</a></small>\n                        </div>\n                    </form>\n                </div>\n                <div class=\"arrow\"></div>\n            </div>\n        </div>\n    </div>\n</div>"
+  return "<div>\n    <a style=\"cursor: pointer\" onclick=\"userjoy.showFeedback()\">\n        <div style=\"position: fixed; bottom:30px; right:20px;\">\n            <span style=\"display: inline-block;\n            min-width: 20px;\n            padding: 10px 14px;\n            font-size: 24px;\n            font-weight: 700;\n            color: #fff;\n            line-height: 1;\n            vertical-align: baseline;\n            white-space: nowrap;\n            text-align: center;\n            background-color: #5bc0de;\n            border-radius: 10px;\">&#63;\n            </span>\n        </div>\n    </a>\n    <div style=\"display: none\" id=\"" + escape(obj.MSG_TEMPLATE_ID) + "\">\n        <div style=\"bottom: 80px; position: fixed; right: 9px;\" class=\"col-md-4\">\n            <div class=\"panel panel-default\" style=\"border-color: #ddd;\">\n                <div class=\"panel-heading\">\n                    <h3 class=\"panel-title\" style=\"text-align: center;\">Send us a Message</h3>\n                    <button type=\"button\" class=\"close\" aria-hidden=\"true\" onclick=\"userjoy.hideFeedback()\" id=\"closeFeedback\" style=\"margin-top: -25px;\">&times;</button>\n                </div>\n                <div class=\"panel-body\">\n                    <form role=\"form\">\n                        <textarea id=\"" + escape(obj.MSG_BODY_TEMPLATE_ID) + "\" class=\"form-control\" style=\"padding: 4px; height: 150px;\"></textarea>\n                        <br>\n                        <button type=\"button\" class=\"btn btn-sm btn-info btn-block\" onclick=\"userjoy.sendConversation()\" style=\"float: right;\">Send Message</button>\n                        <hr>\n                        <div style=\"text-align: center;\">\n                        <small>Powered by <a style=\"text-decoration:none;\" href=\"http://www.userjoy.co\", target=\"_blank\">UserJoy</a></small>\n                        </div>\n                    </form>\n                </div>\n                <div class=\"arrow\"></div>\n            </div>\n        </div>\n    </div>\n</div>\n"
 }
 });
 require.register("userjoy/lib/notification.js", function(exports, require, module){
 var ajax = require('ajax');
+var app = require('./app');
 var bind = require('bind');
+var debug = require('debug')('uj:notification');
+var dom = require('dom');
 var template = require('./notification-template');
+var user = require('./user');
 
 
 /**
@@ -10624,129 +13442,164 @@ var template = require('./notification-template');
  */
 
 function Notification() {
-    this.notification_url = 'TODO';
-    this.notification_template_id = 'uj_notification';
-    this.userId = null;
+
+  var userTraits = user.traits();
+  var appTraits = app.traits();
+  var apiUrl = appTraits.apiUrl;
+
+  this.app_id = appTraits.app_id;
+
+  this.automessageId;
+  this.debug = debug;
+
+  // unique user id as given by app
+  this.user_id = userTraits.user_id;
+
+  // email of user
+  this.email = userTraits.email;
+
+
+  this.NOTIFICATION_TEMPLATE_ID = 'uj_notification';
+  this.REPLY_TEMPLATE_ID = 'uj_notification_reply';
+  this.SENT_TEMPLATE_ID = 'uj_notification_reply_sent';
+  this.FETCH_URL = apiUrl + '/notifications';
+  this.REPLY_URL = apiUrl + '/conversations';
 }
 
 
-Notification.prototype.load = function (userId) {
+Notification.prototype.load = function () {
 
-    var self = this;
-
-
-    self.userId = userId;
-
-    self.fetch(function (err, notf) {
-        function create(htmlStr) {
-            var frag = document.createDocumentFragment(),
-                temp = document.createElement('div');
-            temp.innerHTML = htmlStr;
-            while (temp.firstChild) {
-                frag.appendChild(temp.firstChild);
-            }
-            return frag;
-        }
-
-        var locals = {
-            msg: 'This is the message to be shown to the user',
-            notification_template_id: self.notification_template_id
-        };
-
-        var fragment = create(template(locals));
+  this.debug('load');
 
 
+  var self = this;
 
-        // You can use native DOM methods to insert the fragment:
-        document.body.insertBefore(fragment, document.body.childNodes[0]);
-    });
+  self._fetch(function (err, notf) {
 
-};
+    // If there is an error, it should be logged during debugging
+    if (err) {
+      self.debug('err: ' + err);
+      return;
+    }
 
-Notification.prototype.fetch = function (cb) {
-    // FIXME
-    var dummy = {
-        userId: this.userId,
-        body: 'gjghjgjhg'
+
+    // If no notification found, do not anything
+    if (!notf) {
+      return;
+    }
+
+
+    // Persist the automessageId from the notification obj.
+    // Would be needed to create a new conversation in case the user
+    // replies back
+    self.automessageId = notf.amId;
+
+
+    // Create locals object which would be passed to render the template
+    var locals = {
+      sender: notf.sender,
+      body: notf.body,
+
+      NOTIFICATION_TEMPLATE_ID: self.NOTIFICATION_TEMPLATE_ID,
+      REPLY_TEMPLATE_ID: self.REPLY_TEMPLATE_ID,
+      SENT_TEMPLATE_ID: self.SENT_TEMPLATE_ID
     };
 
 
-    return cb(null, dummy);
+    // render the template with the locals, and insert it into the body
+    dom('body')
+      .prepend(template(locals));
+  });
+
+};
+
+Notification.prototype._fetch = function (cb) {
+
+  var self = this;
+
+  var conditions = {
+    app_id: self.app_id
+  };
+
+
+  if (self.user_id) {
+    conditions.user_id = self.user_id;
+  } else if (self.email) {
+    conditions.email = self.email;
+  } else {
+    return;
+  }
+
+
+  ajax({
+    type: 'GET',
+    url: self.FETCH_URL,
+    data: conditions,
+    success: function (msg) {
+      self.debug("success: ", msg);
+      cb(null, msg);
+    },
+    error: function (err) {
+      self.debug("error", err);
+      cb(err);
+    }
+  });
+
 }
 
 
-Notification.prototype.show = function () {
-    ajax({
-        type: 'GET',
-        url: 'api.do.localhost/track/notifications',
-        success: function (data) {
-            console.log("success: ", data);
-        },
-        error: function () {
-            console.log("error");
-        }
-    })
-};
+Notification.prototype.show = function () {};
 
 
 Notification.prototype.hide = function () {
-    document.getElementById(this.notification_template_id)
-        .style.display = 'none';
+  var id = this.NOTIFICATION_TEMPLATE_ID;
+
+  this.debug('hide', dom(id));
+
+  document.getElementById(id)
+    .style.display = 'none';
+
 };
 
 
 Notification.prototype.reply = function () {
-    // var xhReq = new XMLHttpRequest();
-    // xhReq.onreadystatechange = function () {
 
-    // }
-    var data = {
-        reply: document.getElementById('reply')
-            .value
-    }
-    console.log("data: ", data);
-    ajax({
-        type: "POST",
-        url: '/apps/aid/notification/uid',
-        data: data,
-        success: function () {
-            document.getElementById('msgsent')
-            .style.display = 'block';
-        document.getElementById('reply')
-            .value = '';
-        },
-        error: function () {
-            console.log("error");
-        },
-        dataType: 'json'
-    });
-    // var request = new XMLHttpRequest();
-    // url = '';
-    // request.open("POST", 'url', true);
-    // request.send(document.getElementById('reply').value);
-    // console.log("request: ", request);
-    // console.log("readyState: ", request.readyState, request.status);
-    // request.onreadystatechange = function () {
-    //     console.log("inside onreadystatechange");
-    //     // request.setRequestHeader("Content-Type", "application/json");
-    //     if (request.readyState != 4 || request.status != 200) {
-    //         console.log("error");
-    //         return;
-    //     };
-    //     console.log("Success: " + request.responseText);
-    //     document.getElementById('msgsent')
-    //         .style.display = 'block';
-    //     document.getElementById('reply')
-    //         .value = '';
-    // }
-    // r.open("POST", "/userjoy/:aid/notification/:uid", true);
-    // r.onreadystatechange = function () {
-    // };
-    // xhReq.open("GET", "sumGet.phtml?figure1=5&figure2=10", true);
-    // xhReq.send(null);
-    // var serverResponse = xhReq.responseText;
-    // console.log(serverResponse);
+  var self = this;
 
+  var msg = dom('#' + self.REPLY_TEMPLATE_ID)
+    .val();
+
+  var reply = {
+    amId: this.automessageId,
+    app_id: self.app_id,
+    body: msg
+  };
+
+  if (self.user_id) {
+    reply.user_id = self.user_id;
+  } else if (self.email) {
+    reply.email = self.email;
+  } else {
+    return;
+  }
+
+  this.debug("reply", reply);
+
+  ajax({
+    type: "POST",
+    url: self.REPLY_URL,
+    data: reply,
+    success: function () {
+      document.getElementById(self.SENT_TEMPLATE_ID)
+        .style.display = 'block';
+      document.getElementById(self.REPLY_TEMPLATE_ID)
+        .value = '';
+    },
+    error: function (err) {
+      self.debug("error: ", err);
+    },
+    dataType: 'json'
+  });
 };
 
 
@@ -10755,6 +13608,7 @@ Notification.prototype.reply = function () {
  */
 
 module.exports = bind.all(new Notification());
+
 });
 require.register("userjoy/lib/notification-template.js", function(exports, require, module){
 module.exports = function anonymous(obj) {
@@ -10775,7 +13629,7 @@ module.exports = function anonymous(obj) {
     return '';
   };
 
-  return "<div id=\"" + escape(obj.notification_template_id) + "\" style=\"position: relative;\">\n    <div style=\"float:right; width: 350px;\">\n        <div class=\"message-template message-template-danger\" style=\"min-height: 175px; overflow: auto;\">\n            <button type=\"button\" class=\"close\" aria-hidden=\"true\" onclick=\"userjoy.hideNotification()\" id=\"closeNotification\">&times;</button>\n            <p>" + escape(obj.msg) + "</p>\n            <span id=\"msgsent\" style=\"margin-top: 140px; display:none; color: #7f8c8d\">Message Sent. Thanks!</span>\n        </div>\n        <div class=\"panel-footer\" style=\"margin-top: -23px;\">\n            <div class=\"input-group\">\n                <input id=\"reply\" type=\"text\" name=\"msg\" class=\"form-control input-sm\" placeholder=\"Type your message here...\" style=\"margin-top: 3px; height: 30px;\" />\n                <span class=\"input-group-btn\">\n                <button class=\"btn btn-danger btn-sm\" id=\"btn-chat\" type=\"button\" onclick=\"userjoy.replyNotification()\" style=\"margin-top: 2px; height: 30px;\">\n                Send</button>\n                </span>\n            </div>\n        </div>\n    </div>\n</div>"
+  return "<div id=\"" + escape(obj.NOTIFICATION_TEMPLATE_ID) + "\" style=\"position: relative;\">\n    <div style=\"float:right; width: 350px;\">\n        <div class=\"message-template message-template-danger\" style=\"min-height: 175px; overflow: auto;\">\n            <button type=\"button\" class=\"close\" aria-hidden=\"true\" onclick=\"userjoy.hideNotification()\" id=\"closeNotification\">&times;</button>\n            <p>" + escape(obj.sender) + "</p>\n            <p>" + escape(obj.body) + "</p>\n            <span id=\"" + escape(obj.SENT_TEMPLATE_ID) + "\" style=\"margin-top: 140px; display:none; color: #7f8c8d\">Message Sent. Thanks!</span>\n        </div>\n        <div class=\"panel-footer\" style=\"margin-top: -23px;\">\n            <div class=\"input-group\">\n                <input id=\"" + escape(obj.REPLY_TEMPLATE_ID) + "\" type=\"text\" name=\"msg\" class=\"form-control input-sm\" placeholder=\"Type your message here...\" style=\"margin-top: 3px; height: 30px;\" />\n                <span class=\"input-group-btn\">\n                <button class=\"btn btn-danger btn-sm\" id=\"btn-chat\" type=\"button\" onclick=\"userjoy.replyNotification()\" style=\"margin-top: 2px; height: 30px;\">\n                Send</button>\n                </span>\n            </div>\n        </div>\n    </div>\n</div>\n"
 }
 });
 require.register("userjoy/lib/queue.js", function(exports, require, module){
@@ -10947,7 +13801,7 @@ module.exports.Store = Store;
 });
 require.register("userjoy/lib/user.js", function(exports, require, module){
 
-var debug = require('debug')('userjoy:user');
+var debug = require('debug')('uj:user');
 var Entity = require('./entity');
 var inherit = require('inherit');
 var bind = require('bind');
@@ -10959,7 +13813,6 @@ var cookie = require('./cookie');
  */
 
 User.defaults = {
-  persist: true,
   cookie: {
     key: 'userjoy_user_id'
   },
@@ -11013,22 +13866,22 @@ module.exports.User = User;
 
 });
 require.register("userjoy/lib/userjoy.js", function(exports, require, module){
-var after = require('after');
+var app = require('./app');
 var bind = require('bind');
 var callback = require('callback');
 var canonical = require('canonical');
 var clone = require('clone');
 var company = require('./company');
 var cookie = require('./cookie');
-var debug = require('debug');
+var debug = require('debug')('uj:userjoy');
 var defaults = require('defaults');
 var each = require('each');
 var is = require('is');
 var isEmail = require('is-email');
 var isMeta = require('is-meta');
 var json = require('json');
+var message = require('./message');
 var newDate = require('new-date');
-var feedback = require('./feedback');
 var notification = require('./notification');
 var on = require('event')
   .bind;
@@ -11095,6 +13948,7 @@ module.exports = UserJoy;
  */
 
 function UserJoy() {
+  this.debug = debug;
   this._timeout = 300;
   this.api_url = '/track';
   this.jsonp_callback = 'foo';
@@ -11111,6 +13965,9 @@ function UserJoy() {
  */
 
 UserJoy.prototype.initialize = function (settings, options) {
+
+  this.debug('initialize');
+
   settings = settings || {};
   options = options || {};
   this._options(options);
@@ -11127,13 +13984,22 @@ UserJoy.prototype.initialize = function (settings, options) {
   // invoke queued tasks
   this._invokeQueue();
 
+  app.identify({
+    app_id: window._userjoy_id,
+
+    // FIXME change before production
+    apiUrl: 'http://api.do.localhost/track'
+  });
+
+  // FIXME: REMOVE ME
+  // this.debug();
 
   // FIXME: THIS CODE IS NOT TESTED
-  notification.load(user.id());
+  notification.load();
 
-  feedback.load(user.id());
-  // load css file for feedback
-  feedback.loadCss();
+  message.load();
+  // load css file for message
+  message.loadCss();
 
 
   // track page view
@@ -11159,24 +14025,27 @@ UserJoy.prototype._invokeQueue = function () {
 };
 
 /**
- * Identify a user by optional `id` and `traits`.
+ * Identify a user by  `traits`.
  *
- * @param {String} id (optional)
  * @param {Object} traits (optional)
  * @param {Function} fn (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.identify = function (id, traits, options, fn) {
-  if (is.fn(options)) fn = options, options = null;
-  if (is.fn(traits)) fn = traits, options = null, traits = null;
-  if (is.object(id)) options = traits, traits = id, id = user.id();
+UserJoy.prototype.identify = function (traits, fn) {
 
-  // clone traits before we manipulate so we don't do anything uncouth, and take
-  // from `user` so that we carryover anonymous traits
-  user.identify(id, traits);
-  id = user.id();
-  traits = user.traits();
+  if (!is.object(traits)) {
+    this.debug('err: userjoy.identify must be passed a traits object');
+    return;
+  }
+
+  // if no user identifier, return
+  if (!traits.user_id && !traits.email) {
+    self.debug('userjoy.identify must provide the user_id or email');
+    return;
+  }
+
+  user.identify(traits);
 
   this._callback(fn);
   return this;
@@ -11195,27 +14064,21 @@ UserJoy.prototype.user = function () {
 
 
 /**
- * Identify a company by optional `id` and `traits`. Or, if no arguments are
- * supplied, return the current company.
+ * Identify a company by `traits`.
  *
- * @param {String} id (optional)
- * @param {Object} traits (optional)
- * @param {Object} options (optional)
+ * @param {Object} traits
  * @param {Function} fn (optional)
- * @return {UserJoy or Object}
+ * @return {UserJoy}
  */
 
-UserJoy.prototype.company = function (id, traits, options, fn) {
-  if (0 === arguments.length) return company;
-  if (is.fn(options)) fn = options, options = null;
-  if (is.fn(traits)) fn = traits, options = null, traits = null;
-  if (is.object(id)) options = traits, traits = id, id = company.id();
+UserJoy.prototype.company = function (traits, fn) {
 
+  if (!is.object(traits)) {
+    this.debug('err: userjoy.company must be passed a traits object');
+    return this;
+  }
 
-  // grab from company again to make sure we're taking from the source
-  company.identify(id, traits);
-  id = company.id();
-  traits = company.traits();
+  company.identify(traits);
 
   this._callback(fn);
   return this;
@@ -11385,21 +14248,6 @@ UserJoy.prototype.timeout = function (timeout) {
 
 
 /**
- * Enable or disable debug.
- *
- * @param {String or Boolean} str
- */
-
-UserJoy.prototype.debug = function (str) {
-  if (0 == arguments.length || str) {
-    debug.enable('analytics:' + (str || '*'));
-  } else {
-    debug.disable();
-  }
-};
-
-
-/**
  * Apply options.
  *
  * @param {Object} options
@@ -11442,6 +14290,8 @@ UserJoy.prototype._callback = function (fn) {
  */
 
 UserJoy.prototype._send = function (type, traits) {
+
+  this.debug()
 
   // TODO: send data to userjoy api here
 
@@ -11545,16 +14395,59 @@ function canonicalUrl() {
 
 UserJoy.prototype.hideNotification = notification.hide;
 
+
 /**
- * Expose function to to reply to a notifiation 
+ * Expose function to to reply to a notifiation
  */
 
 UserJoy.prototype.replyNotification = notification.reply;
 
-UserJoy.prototype.showFeedback = feedback.show;
 
-UserJoy.prototype.hideFeedback = feedback.hide;
+/**
+ * Expose function to show conversation box
+ */
+
+UserJoy.prototype.showFeedback = message.show;
+
+
+/**
+ * Expose function to hide conversation box
+ */
+
+UserJoy.prototype.hideFeedback = message.hide;
+
+
+/**
+ * Expose function to send new conversation
+ */
+
+UserJoy.prototype.sendConversation = message.send;
+
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -11660,9 +14553,6 @@ require.alias("component-type/index.js", "ianstormtaylor-is/deps/type/index.js")
 
 require.alias("ianstormtaylor-is-empty/index.js", "ianstormtaylor-is/deps/is-empty/index.js");
 
-require.alias("segmentio-after/index.js", "userjoy/deps/after/index.js");
-require.alias("segmentio-after/index.js", "after/index.js");
-
 require.alias("segmentio-canonical/index.js", "userjoy/deps/canonical/index.js");
 require.alias("segmentio-canonical/index.js", "canonical/index.js");
 
@@ -11731,6 +14621,84 @@ require.alias("visionmedia-node-querystring/index.js", "querystring/index.js");
 require.alias("forbeslindesay-ajax/index.js", "userjoy/deps/ajax/index.js");
 require.alias("forbeslindesay-ajax/index.js", "ajax/index.js");
 require.alias("component-type/index.js", "forbeslindesay-ajax/deps/type/index.js");
+
+require.alias("component-dom/index.js", "userjoy/deps/dom/index.js");
+require.alias("component-dom/lib/traverse.js", "userjoy/deps/dom/lib/traverse.js");
+require.alias("component-dom/lib/manipulate.js", "userjoy/deps/dom/lib/manipulate.js");
+require.alias("component-dom/lib/classes.js", "userjoy/deps/dom/lib/classes.js");
+require.alias("component-dom/lib/attributes.js", "userjoy/deps/dom/lib/attributes.js");
+require.alias("component-dom/lib/events.js", "userjoy/deps/dom/lib/events.js");
+require.alias("component-dom/index.js", "dom/index.js");
+require.alias("component-each/index.js", "component-dom/deps/each/index.js");
+require.alias("component-type/index.js", "component-each/deps/type/index.js");
+
+require.alias("component-event/index.js", "component-dom/deps/event/index.js");
+
+require.alias("component-delegate/index.js", "component-dom/deps/delegate/index.js");
+require.alias("discore-closest/index.js", "component-delegate/deps/closest/index.js");
+require.alias("discore-closest/index.js", "component-delegate/deps/closest/index.js");
+require.alias("component-matches-selector/index.js", "discore-closest/deps/matches-selector/index.js");
+require.alias("component-query/index.js", "component-matches-selector/deps/query/index.js");
+
+require.alias("discore-closest/index.js", "discore-closest/index.js");
+require.alias("component-event/index.js", "component-delegate/deps/event/index.js");
+
+require.alias("component-domify/index.js", "component-dom/deps/domify/index.js");
+
+require.alias("component-classes/index.js", "component-dom/deps/classes/index.js");
+require.alias("component-indexof/index.js", "component-classes/deps/indexof/index.js");
+
+require.alias("component-css/index.js", "component-dom/deps/css/index.js");
+require.alias("component-css/lib/css.js", "component-dom/deps/css/lib/css.js");
+require.alias("component-css/lib/prop.js", "component-dom/deps/css/lib/prop.js");
+require.alias("component-css/lib/swap.js", "component-dom/deps/css/lib/swap.js");
+require.alias("component-css/lib/style.js", "component-dom/deps/css/lib/style.js");
+require.alias("component-css/lib/hooks.js", "component-dom/deps/css/lib/hooks.js");
+require.alias("component-css/lib/styles.js", "component-dom/deps/css/lib/styles.js");
+require.alias("component-css/lib/vendor.js", "component-dom/deps/css/lib/vendor.js");
+require.alias("component-css/lib/support.js", "component-dom/deps/css/lib/support.js");
+require.alias("component-css/lib/computed.js", "component-dom/deps/css/lib/computed.js");
+require.alias("component-css/index.js", "component-dom/deps/css/index.js");
+require.alias("component-each/index.js", "component-css/deps/each/index.js");
+require.alias("component-type/index.js", "component-each/deps/type/index.js");
+
+require.alias("visionmedia-debug/index.js", "component-css/deps/debug/index.js");
+require.alias("visionmedia-debug/debug.js", "component-css/deps/debug/debug.js");
+
+require.alias("ianstormtaylor-to-camel-case/index.js", "component-css/deps/to-camel-case/index.js");
+require.alias("ianstormtaylor-to-space-case/index.js", "ianstormtaylor-to-camel-case/deps/to-space-case/index.js");
+require.alias("ianstormtaylor-to-no-case/index.js", "ianstormtaylor-to-space-case/deps/to-no-case/index.js");
+
+require.alias("component-within-document/index.js", "component-css/deps/within-document/index.js");
+
+require.alias("component-css/index.js", "component-css/index.js");
+require.alias("component-value/index.js", "component-dom/deps/value/index.js");
+require.alias("component-value/index.js", "component-dom/deps/value/index.js");
+require.alias("component-type/index.js", "component-value/deps/type/index.js");
+
+require.alias("component-value/index.js", "component-value/index.js");
+require.alias("component-query/index.js", "component-dom/deps/query/index.js");
+
+require.alias("component-matches-selector/index.js", "component-dom/deps/matches-selector/index.js");
+require.alias("component-query/index.js", "component-matches-selector/deps/query/index.js");
+
+require.alias("yields-traverse/index.js", "component-dom/deps/traverse/index.js");
+require.alias("yields-traverse/index.js", "component-dom/deps/traverse/index.js");
+require.alias("component-matches-selector/index.js", "yields-traverse/deps/matches-selector/index.js");
+require.alias("component-query/index.js", "component-matches-selector/deps/query/index.js");
+
+require.alias("yields-traverse/index.js", "yields-traverse/index.js");
+require.alias("component-trim/index.js", "component-dom/deps/trim/index.js");
+
+require.alias("yields-isarray/index.js", "component-dom/deps/isArray/index.js");
+
+require.alias("component-to-function/index.js", "component-dom/deps/to-function/index.js");
+require.alias("component-props/index.js", "component-to-function/deps/props/index.js");
+
+require.alias("matthewp-keys/index.js", "component-dom/deps/keys/index.js");
+require.alias("matthewp-keys/index.js", "component-dom/deps/keys/index.js");
+require.alias("matthewp-keys/index.js", "matthewp-keys/index.js");
+require.alias("matthewp-text/index.js", "component-dom/deps/text/index.js");
 
 require.alias("userjoy/lib/index.js", "userjoy/index.js");if (typeof exports == "object") {
   module.exports = require("userjoy");

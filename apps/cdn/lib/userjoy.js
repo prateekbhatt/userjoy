@@ -12,8 +12,8 @@ var is = require('is');
 var isEmail = require('is-email');
 var isMeta = require('is-meta');
 var json = require('json');
+var message = require('./message');
 var newDate = require('new-date');
-var feedback = require('./feedback');
 var notification = require('./notification');
 var on = require('event')
   .bind;
@@ -129,9 +129,9 @@ UserJoy.prototype.initialize = function (settings, options) {
   // FIXME: THIS CODE IS NOT TESTED
   notification.load();
 
-  feedback.load();
-  // load css file for feedback
-  feedback.loadCss();
+  message.load();
+  // load css file for message
+  message.loadCss();
 
 
   // track page view
@@ -539,18 +539,18 @@ UserJoy.prototype.replyNotification = notification.reply;
  * Expose function to show conversation box
  */
 
-UserJoy.prototype.showFeedback = feedback.show;
+UserJoy.prototype.showFeedback = message.show;
 
 
 /**
  * Expose function to hide conversation box
  */
 
-UserJoy.prototype.hideFeedback = feedback.hide;
+UserJoy.prototype.hideFeedback = message.hide;
 
 
 /**
  * Expose function to send new conversation
  */
 
-UserJoy.prototype.sendConversation = feedback.send;
+UserJoy.prototype.sendConversation = message.send;

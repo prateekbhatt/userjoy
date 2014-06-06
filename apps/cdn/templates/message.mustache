@@ -16,7 +16,7 @@
             </span>
         </div>
     </a>
-    <div style="display: none" id="{{fb_template_id}}">
+    <div style="display: none" id="{{MSG_TEMPLATE_ID}}">
         <div style="bottom: 80px; position: fixed; right: 9px;" class="col-md-4">
             <div class="panel panel-default" style="border-color: #ddd;">
                 <div class="panel-heading">
@@ -25,12 +25,12 @@
                 </div>
                 <div class="panel-body">
                     <form role="form">
-                        <textarea class="form-control" style="padding: 4px; height: 150px;"></textarea>
+                        <textarea id="{{MSG_BODY_TEMPLATE_ID}}" class="form-control" style="padding: 4px; height: 150px;"></textarea>
                         <br>
-                        <input type="submit" value="Send Message" class="btn btn-sm btn-info btn-block" style="float: right;">
+                        <button type="button" class="btn btn-sm btn-info btn-block" onclick="userjoy.sendConversation()" style="float: right;">Send Message</button>
                         <hr>
                         <div style="text-align: center;">
-                        <small>Powered by <a href="http://www.userjoy.co">UserJoy</a></small>
+                        <small>Powered by <a style="text-decoration:none;" href="http://www.userjoy.co", target="_blank">UserJoy</a></small>
                         </div>
                     </form>
                 </div>
