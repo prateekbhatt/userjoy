@@ -4,7 +4,7 @@ angular.module('do.feed', [])
     function ($stateProvider) {
         $stateProvider
             .state('feed', {
-                url: '/feed',
+                url: '/apps/:id/feed',
                 views: {
                     "main": {
                         templateUrl: '/templates/feedmodule/feed.html',

@@ -1,4 +1,7 @@
 <div ng-include src="'/templates/navbar/navbar.html'"></div>
+<button class="btn btn-danger" style="width: 200px;" ng-click="doTheBack()">Back</button>
+<br>
+<br>
 <div>
     <div class="col-md-3 well">
         <div class="row">
@@ -83,7 +86,7 @@
                                 <strong>{{user}}</strong></h4>
                             </div>
                             <!-- <div class="col-md-push-3 col-md-3">
-                                <span class="label label-success">Seen</span>
+                                                                <span class="label label-success">Seen</span>
                             </div> -->
                             <div class="col-md-push-4 col-md-3">
                                 <em>
@@ -101,7 +104,7 @@
                     </div>
                 </div>
                 <!-- <div ng-show="!insideReplyBox">
-                    <textarea class="form-control" placeholder="Click here to Reply or Forward" ng-click="showReplyButton()"></textarea>
+                                        <textarea class="form-control" placeholder="Click here to Reply or Forward" ng-click="showReplyButton()"></textarea>
                 </div> -->
                 <div>
                     <div class="col-md-5" style="padding-top: 30px;" ng-show="showerror">
