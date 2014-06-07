@@ -4,7 +4,7 @@ angular.module('models.message', ['services'])
   'InboxMsgService', '$modal', '$location', 'ThreadService',
   function ($http, config, AppService, InboxMsgService, $modal,
     $location, ThreadService) {
-    this.sendManualMessage = function (sub, text, uid, cb) {
+    this.sendManualMessage = function (sub, text, uid, appId, cb) {
       console.log("uid: ", uid)
       var data = {
         sName: 'Savinay',
@@ -14,9 +14,9 @@ angular.module('models.message', ['services'])
         uids: uid
       }
       console.log("message data: ", data);
-      console.log("LIAS", AppService.getCurrentApp());
-      var appId = AppService.getCurrentApp()
-        ._id;
+      // console.log("LIAS", AppService.getCurrentApp());
+      // var appId = AppService.getCurrentApp()
+      //   ._id;
 
 
       $http.post(config.apiUrl + '/apps/' + appId + '/conversations',

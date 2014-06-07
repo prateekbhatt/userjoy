@@ -1198,14 +1198,15 @@ angular.module('do.users', [])
                 return;
               }
             }
-
             modalInstance.result.then(function (mail) {
-              console.log("mail: ", mail)
+              var sanitizedMsg = mail.msgtext.replace(/\n/g, '<br/>');
+
               console.log("subject : ", mail.sub);
               console.log("msgtext: ", mail.msgtext);
+              console.log("sanitizedMsg: ", sanitizedMsg);
               console.log("uid : ", UidService.get());
               MsgService.sendManualMessage(mail.sub,
-                mail.msgtext, UidService.get(),
+                sanitizedMsg, UidService.get(), currentAppId,
                 populateMsgOnCreation);
             }, function () {
               $log.info('Modal dismissed at: ' + new Date());
@@ -1231,7 +1232,7 @@ angular.module('do.users', [])
     $scope.sendManualMessage = function () {
       $modalInstance.close($scope.mail);
       console.log("sub: ", $scope.mail.sub);
-      console.log("msg: ", $scope.mail.msgtext);
+      console.log("send Message Ctrl msg: ", $scope.mail.msgtext);
     }
   }
 ])
