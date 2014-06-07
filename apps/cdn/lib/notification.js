@@ -32,8 +32,10 @@ function Notification() {
   this.NOTIFICATION_TEMPLATE_ID = 'uj_notification';
   this.REPLY_TEMPLATE_ID = 'uj_notification_reply';
   this.SENT_TEMPLATE_ID = 'uj_notification_reply_sent';
+  this.ERROR_ID = 'uj_error';
   this.FETCH_URL = apiUrl + '/notifications';
   this.REPLY_URL = apiUrl + '/conversations';
+  this.img_src = '../templates/img/img_person.jpg';
 }
 
 
@@ -72,7 +74,9 @@ Notification.prototype.load = function () {
 
       NOTIFICATION_TEMPLATE_ID: self.NOTIFICATION_TEMPLATE_ID,
       REPLY_TEMPLATE_ID: self.REPLY_TEMPLATE_ID,
-      SENT_TEMPLATE_ID: self.SENT_TEMPLATE_ID
+      SENT_TEMPLATE_ID: self.SENT_TEMPLATE_ID,
+      ERROR_ID: self.ERROR_ID,
+      img_src: self.img_src
     };
 
 
@@ -125,7 +129,7 @@ Notification.prototype.hide = function () {
   var id = this.NOTIFICATION_TEMPLATE_ID;
 
   this.debug('hide', dom(id));
-
+  console.log("inside hide notification", id);
   document.getElementById(id)
     .style.display = 'none';
 
@@ -138,6 +142,14 @@ Notification.prototype.reply = function () {
 
   var msg = dom('#' + self.REPLY_TEMPLATE_ID)
     .val();
+
+  console.log("msg: ", msg, "ABCD", msg.length);
+  if (!msg.length) {
+    console.log("msg length is zero", self.ERROR_ID);
+    document.getElementById(self.ERROR_ID)
+      .style.display = 'block';
+    return;
+  }
 
   var reply = {
     amId: this.automessageId,
@@ -164,6 +176,11 @@ Notification.prototype.reply = function () {
         .style.display = 'block';
       document.getElementById(self.REPLY_TEMPLATE_ID)
         .value = '';
+
+      setTimeout(function () {
+        document.getElementById(self.NOTIFICATION_TEMPLATE_ID)
+          .style.display = 'none';
+      }, 5000);
     },
     error: function (err) {
       self.debug("error: ", err);
