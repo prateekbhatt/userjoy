@@ -1,138 +1,138 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <meta name="viewport" content="width=device-width"/>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.2.3/css/foundation.css"> <!-- For testing only -->
-        <style type="text/css">
-            
-            /* Ink styles go here in production */
-            
-        </style>
-        <style type="text/css">
-            #center {
-              font-size: 16px;
-            }
-            body {
-              font-size: 20px;
-            }
-            /* Your custom styles go here */
-        </style>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+      <meta name="viewport" content="width=device-width"/>
+      <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/zurb-ink/1.0.5/ink.min.css"> <!-- For testing only -->
+      <style type="text/css">
+          
+          /* Ink styles go here in production */
+          
+      </style>
+      <style type="text/css">
+        #center {
+          font-size: 16px;
+        }
+        body {
+          font-size: 20px;
+        }
+        /* Your custom styles go here */
+      </style>
     </head>
     <body>
-        <table class="body">
-    <tr>
-      <td id="center" class="center" align="center" valign="top">
-        <center>
+      <table class="body">
+        <tr>
+          <td id="center" class="center" align="center" valign="top">
+            <center>
 
-          <table class="row header" style="background-color: #f5f4f1;">
-            <tr>
-              <td class="center" align="center">
-                <center>
+              <table class="row header" style="background-color: #f5f4f1;">
+                <tr>
+                  <td class="center" align="center">
+                    <center>
 
-                  <table class="container">
-                    <tr>
-                      <td class="wrapper last">
-
-                        <table class="twelve columns">
-                          <tr>
-                            <td class="six sub-columns">
-                              <img src="./img/userjoy_logo.png">
-                            </td>
-                            <!-- <td class="six sub-columns last" style="text-align:right; vertical-align:middle;">
-                              <span class="template-label">SIDEBAR HERO</span>
-                            </td> -->
-                            <td class="expander"></td>
-                          </tr>
-                        </table>
-
-                      </td>
-                    </tr>
-                  </table>
-
-                </center>
-              </td>
-            </tr>
-          </table>
-
-          <br>
-
-          <table class="container">
-            <tr>
-              <td>
-
-              <!-- content start -->
-                <table class="row">
-                  <tr>
-                    <td class="wrapper last">
-
-                      <table class="twelve columns">
+                      <table class="container">
                         <tr>
-                          <td>
-                            <h4>Hi {{= user_name || 'there'}},</h4>
-                            <br>
-                            <p>Thank you for signing up for UserJoy. Click on the link below to confirm your email.
-                            </p>
-                            
-                          </td>
-                          <td class="expander"></td>
-                        </tr>
-                      </table>
+                          <td class="wrapper last">
 
-
-                      <table class="row">
-                        <tr>
-                          <td class="wrapper offset-by-three">
-                            <table class="six columns">
+                            <table class="twelve columns">
                               <tr>
-                                <td class="center">
-
-                                  <table class="button">
-                                    <tr>
-                                      <td>
-                                        <a href="{{= confirmUrl }}">Confirm Email</a>
-                                      </td>
-                                    </tr>
-                                  </table>
+                                <td class="six sub-columns">
+                                  <img src="./img/userjoy_logo.png">
                                 </td>
+                                <!-- <td class="six sub-columns last" style="text-align:right; vertical-align:middle;">
+                                  <span class="template-label">SIDEBAR HERO</span>
+                                </td> -->
+                                <td class="expander"></td>
                               </tr>
                             </table>
-                          </td>
-                        </tr>
-                      </table>
-                      <br>
-                      <table class="twelve columns">
-                        <tr>
-                          <td>
-                            <p>You will get your tracking code once you confirm your email. Install the code on your webpage.</p>
-                          </td>
-                          <td class="expander"></td>
-                        </tr>
-                      </table>
-                      <br>
-                      <br>
-                      <table class="twelve columns">
-                        <tr>
-                          <td>
-                            <p>
-                              Thanks!
-                              <br>
-                              - UserJoy Team
-                            </p>
+
                           </td>
                         </tr>
                       </table>
 
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
+                    </center>
+                  </td>
+                </tr>
+              </table>
 
-        </center>
-      </td>
-    </tr>
-  </table>
+              <br>
+
+              <table class="container">
+                <tr>
+                  <td>
+
+                  <!-- content start -->
+                    <table class="row">
+                      <tr>
+                        <td class="wrapper last">
+
+                          <table class="twelve columns">
+                            <tr>
+                              <td>
+                                <h4>Hi {{= user_name || 'there'}},</h4>
+                                <br>
+                                <p>Thank you for signing up for UserJoy. Click on the link below to confirm your email.
+                                </p>
+                                
+                              </td>
+                              <td class="expander"></td>
+                            </tr>
+                          </table>
+
+
+                          <table class="row">
+                            <tr>
+                              <td class="wrapper offset-by-three">
+                                <table class="six columns">
+                                  <tr>
+                                    <td class="center">
+
+                                      <table class="button">
+                                        <tr>
+                                          <td>
+                                            <a href="{{= confirmUrl }}">Confirm Email</a>
+                                          </td>
+                                        </tr>
+                                      </table>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                          </table>
+                          <br>
+                          <table class="twelve columns">
+                            <tr>
+                              <td>
+                                <p>You will get your tracking code once you confirm your email. Install the code on your webpage.</p>
+                              </td>
+                              <td class="expander"></td>
+                            </tr>
+                          </table>
+                          <br>
+                          <br>
+                          <table class="twelve columns">
+                            <tr>
+                              <td>
+                                <p>
+                                  Thanks!
+                                  <br>
+                                  - UserJoy Team
+                                </p>
+                              </td>
+                            </tr>
+                          </table>
+
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+            </center>
+          </td>
+        </tr>
+      </table>
     </body>
 </html>
