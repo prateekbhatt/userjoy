@@ -137,6 +137,9 @@ angular.module('do.message', [])
             $scope.showTable = true;
           }
 
+          $scope.pageNo = '';
+          $scope.pageCount = '';
+
           var msg = [];
 
           function showManualMsg() {
@@ -150,7 +153,7 @@ angular.module('do.message', [])
 
               var m = {
                 id: msg[i]._id,
-                name: msg[i].sName,
+                name: msg[i].name,
                 subject: msg[i].sub,
                 time: $moment(msg[i].ct)
                   .fromNow(),
@@ -203,6 +206,9 @@ angular.module('do.message', [])
             }, {
               total: $scope.openmsg.length, // length of data
               getData: function ($defer, params) {
+                $scope.pageNo = params.page();
+                $scope.pageCount = params.count();
+                console.log("page No page Count: ", $scope.pageNo, $scope.pageCount);
                 $defer.resolve($scope.openmsg.slice(
                   (
                     params.page() -
@@ -370,8 +376,9 @@ angular.module('do.message', [])
               return err;
             }
             console.log("$scope.openmsg -->", $scope.openmsg,
-              name);
-            $scope.openmsg[index].assign = 'Assigned to ' +
+              name, index);
+            var newIndex = ($scope.pageNo - 1) * $scope.pageCount + index;
+            $scope.openmsg[newIndex].assign = 'Assigned to ' +
               name;
           }
 
@@ -936,7 +943,8 @@ angular.module('do.message', [])
             if ($scope.replytext.length > 0) {
               console.log("reply button clicked and validated");
               $scope.replyButtonClicked = true;
-              MsgService.replyToMsg($scope.appId, $scope.coId, $scope.replytext,
+              var sanitizedReply = $scope.replytext.replace(/\n/g, '<br/>');
+              MsgService.replyToMsg($scope.appId, $scope.coId, sanitizedReply,
                 AccountService.get()
                 ._id, replyCallBack);
 
@@ -951,7 +959,7 @@ angular.module('do.message', [])
 
               if ($scope.replytext.length > 0) {
                 $scope.replyButtonClicked = true;
-                $scope.replytextInDiv = $scope.replytext;
+                $scope.replytextInDiv = $scope.replytext.replace(/\n/g, '<br/>');
                 MsgService.replyToMsg($scope.appId, $scope.coId, $scope.replytextInDiv,
                   AccountService.get()
                   ._id, closeOrReopenReplyCallBack);

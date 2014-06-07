@@ -244,6 +244,12 @@ router
   .route('/:aid/conversations')
   .post(function (req, res, next) {
 
+    logger.trace({
+      at: 'ConversationController:createConversation',
+      params: req.params,
+      body: req.body
+    })
+
     var newMsg = req.body;
     var assignee = req.user._id;
     var aid = req.app._id;
