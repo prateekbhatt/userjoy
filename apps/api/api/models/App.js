@@ -171,7 +171,7 @@ AppSchema.statics.findByKey = function (key, cb) {
   var conditions = {};
 
   if (!_.contains(['live', 'test'], mode)) {
-    return cb(new Error('Provide valid app key'));
+    return cb(new Error('INVALID_APP_KEY'));
   }
 
   mode === 'live' ? (conditions.liveKey = key) : (conditions.testKey = key);
