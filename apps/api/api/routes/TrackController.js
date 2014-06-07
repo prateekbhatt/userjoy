@@ -290,8 +290,7 @@ router
           App.findByKey(appKey, function (err, app) {
 
             if (err) return cb(err);
-            if (!app) return cb(new Error(
-              'App not found. Provide valid app id'));
+            if (!app) return cb(new Error('APP_NOT_FOUND'));
             cb(null, app);
           });
         },
@@ -338,7 +337,18 @@ router
 
       function callback(err, notification) {
 
-        if (err) return next(err);
+        if (err) {
+
+          if (err.message === 'INVALID_APP_KEY') {
+            return res.badRequest('Provide valid app id');
+          }
+
+          if (err.message === 'APP_NOT_FOUND') {
+            return res.badRequest('Provide valid app id');
+          }
+
+          return next(err);
+        }
 
         res
           .status(200)
@@ -408,8 +418,7 @@ router
         function getApp(cb) {
           App.findByKey(appKey, function (err, app) {
             if (err) return cb(err);
-            if (!app) return cb(new Error(
-              'App not found. Provide valid app id'));
+            if (!app) return cb(new Error('APP_NOT_FOUND'));
             cb(null, app);
           });
         },
@@ -472,7 +481,18 @@ router
 
       function callback(err, conversation) {
 
-        if (err) return next(err);
+        if (err) {
+
+          if (err.message === 'INVALID_APP_KEY') {
+            return res.badRequest('Provide valid app id');
+          }
+
+          if (err.message === 'APP_NOT_FOUND') {
+            return res.badRequest('Provide valid app id');
+          }
+
+          return next(err);
+        }
 
         res
           .status(201)
