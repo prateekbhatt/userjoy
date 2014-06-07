@@ -216,6 +216,40 @@ describe('Resource /track', function () {
 
       });
 
+    it('should return error if invalid app_id',
+      function (done) {
+        var testUrl = url + '?app_id=' + "randomappKey" + '&email=' +
+          saved.users.first.email;
+
+        request
+          .get(testUrl)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            status: 400,
+            error: 'Provide valid app id'
+          })
+          .end(done);
+
+      });
+
+    it('should return error if app not found',
+      function (done) {
+        var testUrl = url + '?app_id=' + "test_randomappKey" + '&email=' +
+          saved.users.first.email;
+
+        request
+          .get(testUrl)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            status: 400,
+            error: 'Provide valid app id'
+          })
+          .end(done);
+
+      });
+
     it('should return most recent queued notification',
       function (done) {
 
@@ -322,6 +356,52 @@ describe('Resource /track', function () {
           .expect({
             status: 400,
             error: 'Please write a message'
+          })
+          .end(done);
+
+      });
+
+    it('should return error if invalid app_id',
+      function (done) {
+        var testUrl = url;
+
+        var newCon = {
+          'app_id': 'randomappKey',
+          'email': saved.users.first.email,
+          'body': 'Hey man, how are you?'
+        };
+
+        request
+          .post(testUrl)
+          .send(newCon)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            status: 400,
+            error: 'Provide valid app id'
+          })
+          .end(done);
+
+      });
+
+    it('should return error if app not found',
+      function (done) {
+        var testUrl = url;
+
+        var newCon = {
+          'app_id': 'test_randomappKey',
+          'email': saved.users.first.email,
+          'body': 'Hey man, how are you?'
+        };
+
+        request
+          .post(testUrl)
+          .send(newCon)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            status: 400,
+            error: 'Provide valid app id'
           })
           .end(done);
 
