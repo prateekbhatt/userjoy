@@ -101,7 +101,7 @@ describe('Model App', function () {
           expect(err)
             .to.not.be.null;
           expect(err.message)
-            .to.eql('Provide valid app key');
+            .to.eql('INVALID_APP_KEY');
           done();
         });
       });
