@@ -105,6 +105,12 @@ var app = angular.module('dodatado', [
   }
 })
 
+.filter('newlines', function () {
+  return function (text) {
+    return text.replace(/\n/g, '<br/>');
+  }
+})
+
 .config(function ($stateProvider, $urlRouterProvider,
   $locationProvider, $httpProvider, $provide, $momentProvider,
   loginProvider) {

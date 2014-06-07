@@ -3,20 +3,26 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="viewport" content="width=device-width"/>
-        <link rel="stylesheet" href="./css/email.css"> <!-- For testing only -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.2.3/css/foundation.css"> <!-- For testing only -->
         <style type="text/css">
             
             /* Ink styles go here in production */
             
         </style>
         <style type="text/css">
+            #center {
+              font-size: 16px;
+            }
+            body {
+              font-size: 20px;
+            }
             /* Your custom styles go here */
         </style>
     </head>
     <body>
         <table class="body">
     <tr>
-      <td class="center" align="center" valign="top">
+      <td id="center" class="center" align="center" valign="top">
         <center>
 
           <table class="row header" style="background-color: #f5f4f1;">
@@ -130,16 +136,3 @@
   </table>
     </body>
 </html>
-
-<!-- <h1>Hi {{= name || 'there' }}</h1>
-
-<p>Congratulations on joining UserJoy!</p>
-
-<p>To confirm your email, click this link: <a href="{{= confirmUrl }}">{{= confirmUrl }}</a></p>
-
-<p>
-Thanks,
-<br>
-Team UserJoy
-</p>
- -->
