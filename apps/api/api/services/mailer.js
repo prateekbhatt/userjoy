@@ -43,16 +43,14 @@ if (!_.contains(['production', 'development'], process.env.NODE_ENV)) {
   });
 }
 
-
 /*
-
 USAGE:
 
 var options = {
   locals: {
     user: {
       name: 'Prateek'
-    },
+    }
     body: 'This is what I wanted to send to {{= user.name || "you" }}'
   },
   from {
@@ -87,36 +85,35 @@ function Mailer(opts) {
   this.locals = opts.locals;
   this.subject = opts.subject;
 
-  / / in
-case of automessages, the message body must be provided.
-// the message body should be in ejs format,
-// and will be rendered before sending the email
-this.body = opts.body || null;
+  // in case of automessages, the message body must be provided.
+  // the message body should be in ejs format,
+  // and will be rendered before sending the email
+  this.body = opts.body || null;
 
-// if there is template file, then this should be defined
-this.template = null;
+  // if there is template file, then this should be defined
+  this.template = null;
 
-this.aid = opts.aid;
+  this.aid = opts.aid;
 
-this.fromEmail = opts.from.email;
-this.fromName = opts.from.name;
-
-
-this.mId = opts.mId;
-
-if (opts.replyTo) {
-  this.replyToEmail = opts.replyTo.email;
-  this.replyToName = opts.replyTo.name;
-}
+  this.fromEmail = opts.from.email;
+  this.fromName = opts.from.name;
 
 
-this.toEmail = opts.to.email;
-this.toName = opts.to.name;
+  this.mId = opts.mId;
+
+  if (opts.replyTo) {
+    this.replyToEmail = opts.replyTo.email;
+    this.replyToName = opts.replyTo.name;
+  }
 
 
-this.html = null;
+  this.toEmail = opts.to.email;
+  this.toName = opts.to.name;
 
-return this;
+
+  this.html = null;
+
+  return this;
 }
 
 
@@ -139,7 +136,7 @@ Mailer.prototype.transport = nodemailer.createTransport("SMTP", {
  * @param {string} email
  * @param {string} name
  * @return {string} full email address
-
+ */
 
 Mailer.prototype.createAddress = function (email, name) {
   if (name) {
