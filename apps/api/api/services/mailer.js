@@ -45,6 +45,7 @@ if (!_.contains(['production', 'development'], process.env.NODE_ENV)) {
 
 
 /*
+
 USAGE:
 
 var options = {
@@ -77,8 +78,9 @@ mailer.sendToUser(options);
 
 
 
-/ * * * @constructor Mailer *
-  /
+/**
+ * @constructor Mailer
+ */
 
 function Mailer(opts) {
 
@@ -137,7 +139,7 @@ Mailer.prototype.transport = nodemailer.createTransport("SMTP", {
  * @param {string} email
  * @param {string} name
  * @return {string} full email address
- */
+
 
 Mailer.prototype.createAddress = function (email, name) {
   if (name) {
