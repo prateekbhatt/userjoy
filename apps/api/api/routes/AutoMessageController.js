@@ -27,8 +27,9 @@ var isAuthenticated = require('../policies/isAuthenticated');
  * Helpers
  */
 
+var appEmail = require('../../helpers/app-email');
 var logger = require('../../helpers/logger');
-var getMailerLocals = require('../../helpers/get-mailer-locals');
+var render = require('../../helpers/render-message');
 
 
 /**
@@ -162,15 +163,6 @@ router
 
     var aid = req.params.aid;
     var amId = req.params.amId;
-    var toEmail = req.user.email;
-    var toName = req.user.name || toEmail;
-
-    var to = [];
-    to.push({
-      name: toName,
-      email: toEmail
-    });
-
 
     async.waterfall(
 
@@ -182,7 +174,7 @@ router
               aid: aid,
               _id: amId
             })
-            .populate('creator')
+            .populate('sender')
             .exec(function (err, amsg) {
               if (err) return cb(err);
               if (!amsg) return cb(new Error('AutoMessage not found'));
@@ -193,22 +185,54 @@ router
 
         function sendMail(amsg, cb) {
 
-          var locals = getMailerLocals('auto', amsg, toName, toEmail);
+          var locals = {
+            user: req.user
+          };
 
-          mailer.sendAutoMessage(locals, function (err, responseStatus) {
+          // render body and subject in BEFORE calling mailer service
+          var body = render.string(amsg.body, locals);
+          var subject = render.string(mailer.subject, locals);
+
+          var fromEmail = appEmail(aid);
+          var fromName = amsg.sender.name;
+
+          var options = {
+            locals: {
+              body: body
+            },
+            from: {
+              email: fromEmail,
+              name: fromName
+            },
+            metadata: {
+              'type': 'automessage',
+              'amId': amsg._id
+            },
+            replyTo: {
+              email: fromEmail,
+              name: 'Reply to ' + fromName
+            },
+            subject: subject,
+            to: {
+              email: req.user.email,
+              name: req.user.name
+            },
+          };
+
+          mailer.sendAutoMessage(options, function (err, responseStatus) {
 
             if (err) {
 
               logger.crit({
                 at: 'automessage:send-test',
-                toEmail: toEmail,
+                toEmail: req.user.email,
                 err: err,
                 res: responseStatus
               });
             } else {
               logger.debug({
                 at: 'automessage:send-test',
-                toEmail: toEmail,
+                toEmail: req.user.email,
                 res: responseStatus
               });
             }
