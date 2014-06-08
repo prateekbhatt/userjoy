@@ -250,7 +250,8 @@ describe('Resource /track', function () {
 
       });
 
-    it('should return most recent queued notification',
+    it(
+      'should return most recent queued notification, alongwith the theme color',
       function (done) {
 
         var email = saved.users.first.email;
@@ -286,11 +287,60 @@ describe('Resource /track', function () {
             expect(notf)
               .to.have.property("uid");
 
+            expect(notf)
+              .to.have.property("color");
+
 
             done();
           });
 
       });
+
+    it('should return the theme color if no new notification',
+      function (done) {
+
+        var email = saved.users.first.email;
+        var testUrl = url + '?app_id=' + appKey + '&email=' + email;
+
+        request
+          .get(testUrl)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function (err, res) {
+            if (err) return done(err);
+
+            var notf = res.body;
+
+            expect(notf)
+              .to.be.an('object');
+
+            expect(notf)
+              .to.not.have.property("amId");
+
+            expect(notf)
+              .to.not.have.property("body");
+
+            expect(notf)
+              .to.not.have.property("ct");
+
+            expect(notf)
+              .to.not.have.property("seen");
+
+            expect(notf)
+              .to.not.have.property("sender");
+
+            expect(notf)
+              .to.not.have.property("uid");
+
+            expect(notf)
+              .to.have.property("color");
+
+
+            done();
+          });
+
+      });
+
 
   });
 
