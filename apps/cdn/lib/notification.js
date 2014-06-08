@@ -37,7 +37,7 @@ function Notification() {
 }
 
 
-Notification.prototype.load = function () {
+Notification.prototype.load = function (cb) {
 
   this.debug('load');
 
@@ -49,13 +49,23 @@ Notification.prototype.load = function () {
     // If there is an error, it should be logged during debugging
     if (err) {
       self.debug('err: ' + err);
-      return;
+      return cb();
     }
+
+    if (!notf) {
+      self.debug('no response to notification');
+      return cb();
+    }
+
+    // add color to the app traits
+    app.setTrait('color', notf.color);
+
+    self.debug('color', app.traits())
 
 
     // If no notification found, do not anything
-    if (!notf) {
-      return;
+    if (!notf.body) {
+      return cb();
     }
 
 
@@ -63,6 +73,7 @@ Notification.prototype.load = function () {
     // Would be needed to create a new conversation in case the user
     // replies back
     self.automessageId = notf.amId;
+
 
 
     // Create locals object which would be passed to render the template
@@ -79,6 +90,8 @@ Notification.prototype.load = function () {
     // render the template with the locals, and insert it into the body
     dom('body')
       .prepend(template(locals));
+
+    cb();
   });
 
 };
