@@ -250,7 +250,8 @@ describe('Resource /track', function () {
 
       });
 
-    it('should return most recent queued notification',
+    it(
+      'should return most recent queued notification, alongwith the theme color',
       function (done) {
 
         var email = saved.users.first.email;
@@ -285,6 +286,9 @@ describe('Resource /track', function () {
 
             expect(notf)
               .to.have.property("uid");
+
+            expect(notf)
+              .to.have.property("color");
 
 
             done();
