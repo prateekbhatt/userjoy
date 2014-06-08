@@ -53,19 +53,19 @@ var options = {
     }
     body: 'This is what I wanted to send to {{= user.name || "you" }}'
   },
-  from {
+  from: {
     email: '532d6bf862d673ba7131812e@mail.userjoy.co',
     name: 'Prateek from UserJoy'
   },
   metadata: {
     'mId': '535d131c67d02dc60b2b1764'
   },
-  replyTo {
+  replyTo: {
     email: '532d6bf862d673ba7131812e+535d131c67d02dc60b2b1764@mail.userjoy.co',
     name: 'Reply to Prateek from UserJoy'
   },
   subject: 'Welcome to UserJoy',
-  to {
+  to: {
     email: 'prattbhatt@gmail.com',
     name: 'Prateek Bhatt'
   },
@@ -250,14 +250,7 @@ exports.sendConfirmation = function (options, cb) {
 
 exports.sendAutoMessage = function (options, cb) {
   var mailer = new Mailer(options);
-
-
-  // FIXME ALERT ALERT ALERT
-  // render body and subject in BEFORE calling mailer service
-  mailer.html = render.string(mailer.body, mailer.locals);
-  mailer.subject = render.string(mailer.subject, mailer.locals);
   mailer.template = 'automessage.ejs';
-
   mailer.send(cb);
 };
 
