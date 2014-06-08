@@ -98,6 +98,8 @@ function UserJoy() {
 
 UserJoy.prototype.initialize = function (settings, options) {
 
+  var self = this;
+
   this.debug('initialize');
 
   settings = settings || {};
@@ -127,11 +129,16 @@ UserJoy.prototype.initialize = function (settings, options) {
   // this.debug();
 
   // FIXME: THIS CODE IS NOT TESTED
-  notification.load();
+  notification.load(function (err) {
 
-  message.load();
-  // load css file for message
-  message.loadCss();
+    self.debug('loaded', err);
+
+    // load css file for message
+    message.loadCss();
+
+    message.load();
+  });
+
 
 
   // track page view
