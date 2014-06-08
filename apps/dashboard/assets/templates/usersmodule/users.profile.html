@@ -46,7 +46,11 @@
                             </li>
                         </ul>
                         <div class="text-center">
-                            <button class="btn btn-default btn-sm text-center" ng-click="showEventNextDate()">Next</button>
+                            <button class="btn btn-default btn-sm text-center" ng-click="showEventNextDate()" ng-show="!showPreviousBtn">Next</button>
+                            <div class="btn-group" ng-show="showPreviousBtn">
+                                <button class="btn btn-default btn-sm text-center" ng-click="showEventPreviousDate()">Previous</button>
+                                <button class="btn btn-default btn-sm text-center" ng-click="showEventNextDate()">Next</button>
+                            </div>
                         </div>
                     </div>
                 </div>

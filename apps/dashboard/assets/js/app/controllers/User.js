@@ -1291,6 +1291,7 @@ angular.module('do.users', [])
           $scope.toTime = $moment($scope.user.lastSession)
             .startOf('day')
             .unix();
+          $scope.showPreviousBtn = false;
 
           console.log($moment($scope.user.lastSession)
             .unix() * 1000, $scope.user.lastSession);
@@ -1327,14 +1328,23 @@ angular.module('do.users', [])
               console.log("error");
               return;
             }
-            // TODO: Shor recent activity based on last seen data
+            // TODO: Show recent activity based on last seen data
             if (_.keys(events)
               .length == 0) {
               console.log("events length is zero");
-              $scope.lastEventDate = $moment($scope.lastEventDate)
-                .unix() * 1000 -
-                24 * 60 * 60 *
-                1000;
+              if ($scope.nextClicked) {
+                $scope.lastEventDate = $moment($scope.lastEventDate)
+                  .unix() * 1000 -
+                  24 * 60 * 60 *
+                  1000;
+              }
+              if ($scope.previousClicked) {
+                $scope.lastEventDate = $moment($scope.lastEventDate)
+                  .unix() * 1000 +
+                  24 * 60 * 60 *
+                  1000;
+              }
+
               $scope.eventDate = $moment($scope.lastEventDate)
                 .format('MMMM Do');
               console.log(
@@ -1369,7 +1379,60 @@ angular.module('do.users', [])
             }
           }
 
+          $scope.nextClicked = false;
+          $scope.previousClicked = false;
+
+          $scope.showEventPreviousDate = function () {
+            $scope.previousClicked = true;
+            $scope.nextClicked = false;
+            $scope.fromTime = $moment($scope.fromTime *
+              1000 +
+              24 * 60 *
+              60 * 1000)
+              .startOf('day')
+              .unix();
+            $scope.toTime = $moment($scope.toTime *
+              1000 +
+              24 *
+              60 * 60 *
+              1000)
+              .startOf('day')
+              .unix();
+            if ($scope.toTime === $moment($scope.user.lastSession)
+              .startOf('day')
+              .unix()) {
+              $scope.showPreviousBtn = false;
+            } else {
+              $scope.showPreviousBtn = true;
+            }
+            console.log("new fromTime: ", $scope.fromTime,
+              $moment($scope.fromTime *
+                1000)
+              .format());
+            console.log("new toTime: ", $scope.toTime,
+              $moment(
+                $scope.toTime *
+                1000)
+              .format());
+            UserModel.getEvents(currentAppId, $scope.uid,
+              $scope.fromTime,
+              $scope.toTime, populateEvents);
+          }
+
           $scope.showEventNextDate = function () {
+            // console.log("last session: ", $moment($scope.user.lastSession)
+            // .startOf('day')
+            // .unix());
+            // if($scope.toTime ===  $moment($scope.user.lastSession)
+            // .startOf('day')
+            // .unix()) {
+            //   $scope.showPreviousBtn = false;
+            // } else {
+            //   $scope.showPreviousBtn = true;
+            // }
+            $scope.showPreviousBtn = true;
+            $scope.nextClicked = true;
+            $scope.previousClicked = false;
             console.log("fromTime toTime: ", $scope.fromTime,
               $scope.toTime);
             $scope.fromTime = $moment($scope.fromTime *
@@ -1606,7 +1669,8 @@ angular.module('do.users', [])
 
           $scope.toolTipContentFunction = function () {
             return function (key, x, y, e, graph) {
-              return '<p>' + y + ' at ' + $moment(x).format('MMMM Do') + '</p>'
+              return '<p>' + y + ' at ' + $moment(x)
+                .format('MMMM Do') + '</p>'
             }
           }
         }
