@@ -169,6 +169,7 @@ router
     Conversation
       .find(condition)
       .populate('assignee', 'name email')
+      .populate('uid', 'email')
       .sort({
         ct: -1
       })
@@ -200,6 +201,7 @@ router
           Conversation
             .findById(coId)
             .populate('assignee', 'name email')
+            .populate('uid', 'email')
             .exec(cb);
         },
 
