@@ -414,7 +414,7 @@ angular.module('do.settings', [])
           $scope.color = AppService.getCurrentApp()
             .color;
           console.log("app color: ", $scope.color);
-          if ($scope.color === '#39b3d7') {
+          if ($scope.color.toUpperCase() === '#39b3d7'.toUpperCase()) {
             $scope.btnInfoWidth = '40px';
             $scope.btnInfoHeight = '40px';
             $scope.btnPrimaryWidth = '30px';
@@ -428,7 +428,7 @@ angular.module('do.settings', [])
             $scope.btnDangerWidth = '30px';
             $scope.btnDangerHeight = '30px';
           }
-          if ($scope.color === '#3276b1') {
+          if ($scope.color.toUpperCase() === '#3276B1'.toUpperCase()) {
             $scope.btnInfoWidth = '30px';
             $scope.btnInfoHeight = '30px';
             $scope.btnPrimaryWidth = '40px';
@@ -442,7 +442,7 @@ angular.module('do.settings', [])
             $scope.btnDangerWidth = '30px';
             $scope.btnDangerHeight = '30px';
           }
-          if ($scope.color === '#7f8c8d') {
+          if ($scope.color.toUpperCase() === '#7f8c8d'.toUpperCase()) {
             $scope.btnInfoWidth = '30px';
             $scope.btnInfoHeight = '30px';
             $scope.btnPrimaryWidth = '30px';
@@ -456,7 +456,7 @@ angular.module('do.settings', [])
             $scope.btnDangerWidth = '30px';
             $scope.btnDangerHeight = '30px';
           }
-          if ($scope.color === '#18bc9c') {
+          if ($scope.color.toUpperCase() === '#18bc9c'.toUpperCase()) {
             $scope.btnInfoWidth = '30px';
             $scope.btnInfoHeight = '30px';
             $scope.btnPrimaryWidth = '30px';
@@ -470,7 +470,7 @@ angular.module('do.settings', [])
             $scope.btnDangerWidth = '30px';
             $scope.btnDangerHeight = '30px';
           }
-          if ($scope.color === '#f0ad4e') {
+          if ($scope.color.toUpperCase() === '#f0ad4e'.toUpperCase()) {
             $scope.btnInfoWidth = '30px';
             $scope.btnInfoHeight = '30px';
             $scope.btnPrimaryWidth = '30px';
@@ -484,7 +484,7 @@ angular.module('do.settings', [])
             $scope.btnDangerWidth = '30px';
             $scope.btnDangerHeight = '30px';
           }
-          if ($scope.color === '#d9534f') {
+          if ($scope.color.toUpperCase() === '#d9534f'.toUpperCase()) {
             $scope.btnInfoWidth = '30px';
             $scope.btnInfoHeight = '30px';
             $scope.btnPrimaryWidth = '30px';

@@ -655,10 +655,10 @@ angular.module('do.message', [])
 
 .controller('MessageBodyCtrl', ['$scope', 'MsgService', 'AppService',
   'ThreadService', '$moment', 'InboxMsgService', 'AccountService',
-  '$log', '$stateParams', 'CurrentAppService', 'AppModel',
+  '$log', '$stateParams', 'CurrentAppService', 'AppModel', 'UserModel',
   function ($scope, MsgService, AppService, ThreadService, $moment,
     InboxMsgService, AccountService, $log, $stateParams, CurrentAppService,
-    AppModel) {
+    AppModel, UserModel) {
 
 
     CurrentAppService.getCurrentApp()
@@ -688,6 +688,20 @@ angular.module('do.message', [])
             return color;
           }
 
+          var populateUserProfile = function (err, data, id) {
+            if(err) {
+              return err;
+            }
+            console.log("data: ", data);
+            $scope.customerEmail = data.email;
+            // TODO: You have to get more data from backend
+          }
+
+          function getUserProfile() {
+            UserModel.getUserProfile(ThreadService.getThread().uid._id, $scope.appId, populateUserProfile);
+          }
+
+
           function setMessagesIntoScope() {
             var msgThread = [];
             msgThread = ThreadService.getThread();
@@ -700,6 +714,13 @@ angular.module('do.message', [])
               $scope.buttontext = 'Close';
             }
             console.log("msg thread: -> ->", msgThread);
+            if(msgThread.messages[0].from == 'account') {
+                $scope.fromTo = 'to';
+              }
+            if(msgThread.messages[0].from == 'user') {
+              $scope.fromTo = 'from';
+            }
+            $scope.individualCustomer = msgThread.uid.email;
             for (var i = 0; i < msgThread.messages.length; i++) {
               var isSeen = false;
               if (msgThread.messages[i].seen && msgThread.messages[i]
@@ -710,7 +731,7 @@ angular.module('do.message', [])
               $scope.messages.push({
                 messagebody: msgThread.messages[i].body,
                 createdby: msgThread.messages[i].sName,
-                createdat: $moment(msgThread.messages[i].ut)
+                createdat: $moment(msgThread.messages[i].ct)
                   .fromNow(),
                 seen: isSeen
               })
@@ -815,6 +836,7 @@ angular.module('do.message', [])
             if (err) return $log.error(err);
             setMessagesIntoScope();
             setAvatarColors();
+            getUserProfile();
             console.log("$scope.messages: ", $scope.messages);
           };
 
