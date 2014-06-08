@@ -44,60 +44,77 @@ if (!_.contains(['production', 'development'], process.env.NODE_ENV)) {
 }
 
 
-//
-// USAGE:
-//
-// var options = {
-//   locals: {
-//     user: {
-//       name: 'Prateek'
-//     }
-//   },
-//   fromEmail: '532d6bf862d673ba7131812e@mail.userjoy.co',
-//   fromName: 'Prateek from UserJoy',
-//   metadata: {
-//     'mId': '535d131c67d02dc60b2b1764'
-//   },
-//   replyToEmail: '532d6bf862d673ba7131812e+535d131c67d02dc60b2b1764@mail.userjoy.co',
-//   replyToName: 'Reply to Prateek from UserJoy',
-//   subject: 'Welcome to UserJoy',
-//   toEmail: 'prattbhatt@gmail.com',
-//   toName: 'Prateek Bhatt',
-//   body: 'This is what I wanted to send to {{= user.name || "you" }}'
-// };
-// mailer.sendToUser(options);
-//
+/*
+USAGE:
+
+var options = {
+  locals: {
+    user: {
+      name: 'Prateek'
+    },
+    body: 'This is what I wanted to send to {{= user.name || "you" }}'
+  },
+  from {
+    email: '532d6bf862d673ba7131812e@mail.userjoy.co',
+    name: 'Prateek from UserJoy'
+  },
+  metadata: {
+    'mId': '535d131c67d02dc60b2b1764'
+  },
+  replyTo {
+    email: '532d6bf862d673ba7131812e+535d131c67d02dc60b2b1764@mail.userjoy.co',
+    name: 'Reply to Prateek from UserJoy'
+  },
+  subject: 'Welcome to UserJoy',
+  to {
+    email: 'prattbhatt@gmail.com',
+    name: 'Prateek Bhatt'
+  },
+};
+mailer.sendToUser(options);
+
+* /
 
 
-/**
- * @constructor Mailer
- */
+
+/ * * * @constructor Mailer *
+  /
 
 function Mailer(opts) {
 
   this.locals = opts.locals;
   this.subject = opts.subject;
 
-  // in case of automessages, the message body must be provided.
-  // the message body should be in ejs format,
-  // and will be rendered before sending the email
-  this.body = opts.body || null;
+  / / in
+case of automessages, the message body must be provided.
+// the message body should be in ejs format,
+// and will be rendered before sending the email
+this.body = opts.body || null;
 
-  // if there is template file, then this should be defined
-  this.template = null;
+// if there is template file, then this should be defined
+this.template = null;
 
-  this.aid = opts.aid;
-  this.fromEmail = opts.fromEmail;
-  this.fromName = opts.fromName;
-  this.mId = opts.mId;
-  this.replyToEmail = opts.replyToEmail;
-  this.replyToName = opts.replyToName;
-  this.toEmail = opts.toEmail;
-  this.toName = opts.toName;
+this.aid = opts.aid;
 
-  this.html = null;
+this.fromEmail = opts.from.email;
+this.fromName = opts.from.name;
 
-  return this;
+
+this.mId = opts.mId;
+
+if (opts.replyTo) {
+  this.replyToEmail = opts.replyTo.email;
+  this.replyToName = opts.replyTo.name;
+}
+
+
+this.toEmail = opts.to.email;
+this.toName = opts.to.name;
+
+
+this.html = null;
+
+return this;
 }
 
 
@@ -160,7 +177,7 @@ Mailer.prototype.options = function () {
  * sends email with the proper template
  */
 
-Mailer.prototype.send = function (cb) {
+Mailer.prototype._sendMail = function (cb) {
 
   var self = this;
   var opts = self.options();
@@ -180,7 +197,7 @@ Mailer.prototype.send = function (cb) {
 };
 
 
-Mailer.prototype.sendUJMail = function (cb) {
+Mailer.prototype.send = function (cb) {
 
   var self = this;
   var templatePath = path.join(templatesDir, this.template);
@@ -196,7 +213,7 @@ Mailer.prototype.sendUJMail = function (cb) {
     // inline the html
     juice.juiceContent(html, opts, function (err, inlinedHtml) {
       self.html = inlinedHtml;
-      self.send.call(self, cb);
+      self._sendMail.call(self, cb);
     });
 
   });
@@ -211,12 +228,17 @@ Mailer.prototype.sendUJMail = function (cb) {
  */
 
 exports.sendConfirmation = function (options, cb) {
+
+  options.from = {
+    name: UJ_SUPPORT_NAME,
+    email: UJ_SUPPORT_EMAIL
+  };
+
+  options.subject = 'Welcome to UserJoy';
+
   var mailer = new Mailer(options);
-  mailer.fromName = UJ_SUPPORT_NAME;
-  mailer.fromEmail = UJ_SUPPORT_EMAIL;
-  mailer.subject = 'Welcome to UserJoy';
   mailer.template = 'email-confirmation.ejs';
-  mailer.sendUJMail(cb);
+  mailer.send(cb);
 };
 
 
@@ -230,9 +252,12 @@ exports.sendConfirmation = function (options, cb) {
 exports.sendAutoMessage = function (options, cb) {
   var mailer = new Mailer(options);
 
-  // render body and subject
+
+  // FIXME ALERT ALERT ALERT
+  // render body and subject in BEFORE calling mailer service
   mailer.html = render.string(mailer.body, mailer.locals);
   mailer.subject = render.string(mailer.subject, mailer.locals);
+  mailer.template = 'automessage.ejs';
 
   mailer.send(cb);
 };
@@ -248,9 +273,7 @@ exports.sendAutoMessage = function (options, cb) {
 exports.sendManualMessage = function (options, cb) {
   var mailer = new Mailer(options);
 
-  // since the body is already rendered in Conversation controller,
-  // we will use the body as the final html output for the mail
-  mailer.html = mailer.body;
+  mailer.template = 'user-conversation.ejs';
 
   mailer.send(cb);
 };
@@ -264,12 +287,15 @@ exports.sendManualMessage = function (options, cb) {
  */
 
 exports.sendInvite = function (options, cb) {
+
+  options.from = {
+    name: UJ_SUPPORT_NAME,
+    email: UJ_SUPPORT_EMAIL
+  };
+
+  options.subject = 'Invite to join UserJoy';
+
   var mailer = new Mailer(options);
-
-  mailer.fromName = UJ_SUPPORT_NAME;
-  mailer.fromEmail = UJ_SUPPORT_EMAIL;
-  mailer.subject = 'Invite to join UserJoy';
   mailer.template = 'invite.ejs';
-
-  mailer.sendUJMail(cb);
+  mailer.send(cb);
 };
