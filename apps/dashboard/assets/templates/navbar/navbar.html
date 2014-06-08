@@ -65,10 +65,13 @@
                                 <a role="menuitem" tabindex="-1" href="#" ng-show="apps" ng-click="changeApp(app)">
                                 &nbsp;&nbsp;&nbsp;&nbsp;{{app.name}}
                                 </a>
-                                &nbsp;&nbsp;<a href="#" style="padding-top: 0px; color: #07c; background-color: #fff; font-size: 14px" ng-show="apps" ng-click="goToSettings(app)"><span class="glyphicon glyphicon-cog">&nbsp;Settings for {{app.name}}</span></a>
+                                &nbsp;
+                                <a href="#" style="padding-top: 0px; font-size: 14px" ng-show="apps" ng-click="goToSettings(app)" class="glyphicon glyphicon-cog">&nbsp;Settings for {{app.name}}</a>
                                 <hr ng-show="!$last">
                                 <!-- <button class="gylphicon glyphicon"></button> -->
                             </li>
+                            <hr>
+                            <a ui-sref="onboarding" class="btn btn-sm btn-info btn-block fa fa-plus" style="margin-right: 18px; margin-left: 18px; margin-bottom: 15px; width: 85%;">&nbsp;New App</a>
                         </ul>
                     </li>
                     <li class="dropdown">
