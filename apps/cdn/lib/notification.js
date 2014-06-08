@@ -82,6 +82,7 @@ Notification.prototype.load = function (cb) {
     var locals = {
       sender: notf.sender,
       body: notf.body,
+      color: app.traits().color,
 
       NOTIFICATION_TEMPLATE_ID: self.NOTIFICATION_TEMPLATE_ID,
       REPLY_TEMPLATE_ID: self.REPLY_TEMPLATE_ID,

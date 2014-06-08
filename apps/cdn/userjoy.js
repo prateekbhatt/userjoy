@@ -13197,6 +13197,21 @@ Entity.prototype.identify = function (traits) {
 
 
 /**
+ * Extend the existing `traits` instead of overwriting.
+ *
+ * @param {String} name
+ * @param {String} val
+ */
+
+Entity.prototype.setTrait = function (name, val) {
+  var traits = this.traits();
+  traits[name] = val;
+  this.traits(traits);
+  this.save();
+};
+
+
+/**
  * Save the entity to local storage and the cookie.
  *
  * @return {Boolean}
@@ -13288,7 +13303,8 @@ Message.prototype.load = function (userId) {
     MSG_TEMPLATE_ID: self.MSG_TEMPLATE_ID,
     MSG_BODY_TEMPLATE_ID: self.MSG_BODY_TEMPLATE_ID,
     MSG_SENT_TEMPLATE_ID: self.MSG_SENT_TEMPLATE_ID,
-    MSG_ERROR_ID: self.MSG_ERROR_ID
+    MSG_ERROR_ID: self.MSG_ERROR_ID,
+    color: app.traits().color
   };
 
   dom('body')
@@ -13424,7 +13440,7 @@ module.exports = function anonymous(obj) {
     return '';
   };
 
-  return "<div>\n    <a style=\"cursor: pointer\" onclick=\"userjoy.showFeedback()\">\n        <div style=\"position: fixed; bottom:30px; right:20px;\">\n            <span style=\"display: inline-block;\n            min-width: 20px;\n            padding: 10px 14px;\n            font-size: 24px;\n            font-weight: 700;\n            color: #fff;\n            line-height: 1;\n            vertical-align: baseline;\n            white-space: nowrap;\n            text-align: center;\n            background-color: #5bc0de;\n            border-radius: 10px;\">&#63;\n            </span>\n        </div>\n    </a>\n    <div style=\"display: none\" id=\"" + escape(obj.MSG_TEMPLATE_ID) + "\">\n        <div style=\"bottom: 80px; position: fixed; right: 9px;\" class=\"uj-col-md-4\">\n            <div class=\"uj-panel uj-panel-default\" style=\"border-color: #ddd;\">\n                <div class=\"uj-panel-heading\">\n                    <h3 class=\"uj-panel-title\" style=\"text-align: center;\">Send us a Message</h3>\n                    <button type=\"button\" class=\"uj-close\" aria-hidden=\"true\" onclick=\"userjoy.hideFeedback()\" id=\"closeFeedback\" style=\"margin-top: -25px;\">&times;</button>\n                </div>\n                <div class=\"uj-panel-body\">\n                    <form role=\"form\">\n                        <textarea id=\"" + escape(obj.MSG_BODY_TEMPLATE_ID) + "\" class=\"uj-form-control\" style=\"padding: 4px; height: 150px;\"></textarea>\n                        <span style=\"display: none; margin-top: 10px;\" id=\"" + escape(obj.MSG_SENT_TEMPLATE_ID) + "\">\n                        Message Sent. Thanks!</span>\n                        <span id=\"" + escape(obj.MSG_ERROR_ID) + "\" style=\" display:none; color: #a94442; margin-top: 10px;\">\n                        Your reply cannot be blank\n                        </span>\n                        <button type=\"button\" class=\"uj-btn uj-btn-sm uj-btn-info uj-btn-block\" onclick=\"userjoy.sendConversation()\" style=\"float: right; margin-top: 10px;\">Send Message</button>\n                        <hr>\n                        <div style=\"text-align: center;\">\n                        <small>Powered by <a style=\"text-decoration:none;\" href=\"http://www.userjoy.co\", target=\"_blank\">UserJoy</a></small>\n                        </div>\n                    </form>\n                </div>\n                <div class=\"uj-arrow\"></div>\n            </div>\n        </div>\n    </div>\n</div>\n"
+  return "<div>\n    <a style=\"cursor: pointer\" onclick=\"userjoy.showFeedback()\">\n        <div style=\"position: fixed; bottom:30px; right:20px;\">\n            <span style=\"display: inline-block;\n            min-width: 20px;\n            padding: 10px 14px;\n            font-size: 24px;\n            font-weight: 700;\n            color: #fff;\n            line-height: 1;\n            vertical-align: baseline;\n            white-space: nowrap;\n            text-align: center;\n            background-color: " + escape(obj.color) + ";\n            border-radius: 10px;\">&#63;\n            </span>\n        </div>\n    </a>\n    <div style=\"display: none\" id=\"" + escape(obj.MSG_TEMPLATE_ID) + "\">\n        <div style=\"bottom: 80px; position: fixed; right: 9px;\" class=\"uj-col-md-4\">\n            <div class=\"uj-panel uj-panel-default\" style=\"border-color: #ddd;\">\n                <div class=\"uj-panel-heading\">\n                    <h3 class=\"uj-panel-title\" style=\"text-align: center;\">Send us a Message</h3>\n                    <button type=\"button\" class=\"uj-close\" aria-hidden=\"true\" onclick=\"userjoy.hideFeedback()\" id=\"closeFeedback\" style=\"margin-top: -25px;\">&times;</button>\n                </div>\n                <div class=\"uj-panel-body\">\n                    <form role=\"form\">\n                        <textarea id=\"" + escape(obj.MSG_BODY_TEMPLATE_ID) + "\" class=\"uj-form-control\" style=\"padding: 4px; height: 150px;\"></textarea>\n                        <span style=\"display: none; margin-top: 10px;\" id=\"" + escape(obj.MSG_SENT_TEMPLATE_ID) + "\">\n                        Message Sent. Thanks!</span>\n                        <span id=\"" + escape(obj.MSG_ERROR_ID) + "\" style=\" display:none; color: #a94442; margin-top: 10px;\">\n                        Your reply cannot be blank\n                        </span>\n                        <button type=\"button\" class=\"uj-btn uj-btn-sm uj-btn-block\" onclick=\"userjoy.sendConversation()\" style=\"float: right; margin-top: 10px; color: #fff; background-color: " + escape(obj.color) + "; border-color: " + escape(obj.color) + "\">Send Message</button>\n                        <div style=\"text-align: center;\">\n                        <small>Powered by <a style=\"text-decoration:none;\" href=\"http://www.userjoy.co\", target=\"_blank\">UserJoy</a></small>\n                        </div>\n                    </form>\n                </div>\n                <div class=\"uj-arrow\"></div>\n            </div>\n        </div>\n    </div>\n</div>\n"
 }
 });
 require.register("userjoy/lib/notification.js", function(exports, require, module){
@@ -13469,7 +13485,7 @@ function Notification() {
 }
 
 
-Notification.prototype.load = function () {
+Notification.prototype.load = function (cb) {
 
   this.debug('load');
 
@@ -13481,13 +13497,23 @@ Notification.prototype.load = function () {
     // If there is an error, it should be logged during debugging
     if (err) {
       self.debug('err: ' + err);
-      return;
+      return cb();
     }
+
+    if (!notf) {
+      self.debug('no response to notification');
+      return cb();
+    }
+
+    // add color to the app traits
+    app.setTrait('color', notf.color);
+
+    self.debug('color', app.traits())
 
 
     // If no notification found, do not anything
-    if (!notf) {
-      return;
+    if (!notf.body) {
+      return cb();
     }
 
 
@@ -13497,10 +13523,12 @@ Notification.prototype.load = function () {
     self.automessageId = notf.amId;
 
 
+
     // Create locals object which would be passed to render the template
     var locals = {
       sender: notf.sender,
       body: notf.body,
+      color: app.traits().color,
 
       NOTIFICATION_TEMPLATE_ID: self.NOTIFICATION_TEMPLATE_ID,
       REPLY_TEMPLATE_ID: self.REPLY_TEMPLATE_ID,
@@ -13513,6 +13541,8 @@ Notification.prototype.load = function () {
     // render the template with the locals, and insert it into the body
     dom('body')
       .prepend(template(locals));
+
+    cb();
   });
 
 };
@@ -13625,6 +13655,7 @@ Notification.prototype.reply = function () {
  */
 
 module.exports = bind.all(new Notification());
+
 });
 require.register("userjoy/lib/notification-template.js", function(exports, require, module){
 module.exports = function anonymous(obj) {
@@ -13645,7 +13676,7 @@ module.exports = function anonymous(obj) {
     return '';
   };
 
-  return "<div id=\"" + escape(obj.NOTIFICATION_TEMPLATE_ID) + "\" style=\"position: relative;\">\n    <div style=\"float:right; width: 350px;\">\n        <div class=\"uj-message-template uj-message-template-danger\" style=\"min-height: 175px; overflow: auto;\">\n            <button type=\"button\" class=\"uj-close\" aria-hidden=\"true\" onclick=\"userjoy.hideNotification()\" style=\"margin-top: -15px;\">&times;</button>\n            <img src=\"" + escape(obj.img_src) + "\" width=\"60px\">\n            <div style=\"margin-top: -75px; margin-left: 75px;\">\n                <p><b>" + escape(obj.sender) + "</b></p>\n                <p>" + escape(obj.body) + "</p>\n            </div>\n            <span id=\"" + escape(obj.SENT_TEMPLATE_ID) + "\" style=\"bottom: -180px; display:none; color: #7f8c8d; position: absolute;\">Message Sent. Thanks!</span>\n            <span id=\"" + escape(obj.ERROR_ID) + "\" style=\"bottom: -180px; display:none; color: #a94442; position: absolute;\">Your reply cannot be blank</span>\n        </div>\n        <div class=\"uj-panel-footer\" style=\"margin-top: -23px;\">\n            <div class=\"uj-input-group\">\n                <textarea id=\"" + escape(obj.REPLY_TEMPLATE_ID) + "\" type=\"text\" name=\"msg\" class=\"uj-form-control uj-input-sm\" placeholder=\"Type your message here...\" style=\"margin-top: 3px; height: 34px;\"></textarea>\n                <span class=\"uj-input-group-btn\">\n                <button class=\"uj-btn uj-btn-danger uj-btn-sm\" id=\"btn-chat\" type=\"button\" onclick=\"userjoy.replyNotification()\" style=\"margin-top: 3px; height: 34px;\">\n                Send</button>\n                </span>\n            </div>\n        </div>\n    </div>\n</div>\n"
+  return "<div id=\"" + escape(obj.NOTIFICATION_TEMPLATE_ID) + "\" style=\"position: relative;\">\n    <div style=\"float:right; width: 350px;\">\n        <div class=\"uj-message-template\" style=\"min-height: 175px; overflow: auto; border-color: " + escape(obj.color) + "; border-right: 1px solid " + escape(obj.color) + ";border-top: 1px solid " + escape(obj.color) + "; border-bottom: 1px solid " + escape(obj.color) + "; border-radius: 4px;\">\n            <button type=\"button\" class=\"uj-close\" aria-hidden=\"true\" onclick=\"userjoy.hideNotification()\" style=\"margin-top: -15px;\">&times;</button>\n            <img src=\"" + escape(obj.img_src) + "\" width=\"60px\">\n            <div style=\"margin-top: -75px; margin-left: 75px;\">\n                <p><b>" + escape(obj.sender) + "</b></p>\n                <p>" + escape(obj.body) + "</p>\n            </div>\n            <span id=\"" + escape(obj.SENT_TEMPLATE_ID) + "\" style=\"bottom: -180px; display:none; color: #7f8c8d; position: absolute;\">Message Sent. Thanks!</span>\n            <span id=\"" + escape(obj.ERROR_ID) + "\" style=\"bottom: -180px; display:none; color: #a94442; position: absolute;\">Your reply cannot be blank</span>\n        </div>\n        <div class=\"uj-panel-footer\" style=\"margin-top: -23px;\">\n            <div class=\"uj-input-group\">\n                <textarea id=\"" + escape(obj.REPLY_TEMPLATE_ID) + "\" type=\"text\" name=\"msg\" class=\"uj-form-control uj-input-sm\" placeholder=\"Type your message here...\" style=\"margin-top: 3px; height: 34px;\"></textarea>\n                <span class=\"uj-input-group-btn\">\n                <button class=\"uj-btn uj-btn-sm\" id=\"btn-chat\" type=\"button\" onclick=\"userjoy.replyNotification()\" style=\"margin-top: 3px; height: 34px; color: #fff; background-color: " + escape(obj.color) + "; border-color: " + escape(obj.color) + "\">\n                Send</button>\n                </span>\n            </div>\n        </div>\n    </div>\n</div>\n"
 }
 });
 require.register("userjoy/lib/queue.js", function(exports, require, module){
@@ -13982,6 +14013,8 @@ function UserJoy() {
 
 UserJoy.prototype.initialize = function (settings, options) {
 
+  var self = this;
+
   this.debug('initialize');
 
   settings = settings || {};
@@ -14011,11 +14044,16 @@ UserJoy.prototype.initialize = function (settings, options) {
   // this.debug();
 
   // FIXME: THIS CODE IS NOT TESTED
-  notification.load();
+  notification.load(function (err) {
 
-  message.load();
-  // load css file for message
-  message.loadCss();
+    self.debug('loaded', err);
+
+    // load css file for message
+    message.loadCss();
+
+    message.load();
+  });
+
 
 
   // track page view

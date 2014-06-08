@@ -44,7 +44,8 @@ Message.prototype.load = function (userId) {
     MSG_TEMPLATE_ID: self.MSG_TEMPLATE_ID,
     MSG_BODY_TEMPLATE_ID: self.MSG_BODY_TEMPLATE_ID,
     MSG_SENT_TEMPLATE_ID: self.MSG_SENT_TEMPLATE_ID,
-    MSG_ERROR_ID: self.MSG_ERROR_ID
+    MSG_ERROR_ID: self.MSG_ERROR_ID,
+    color: app.traits().color
   };
 
   dom('body')
