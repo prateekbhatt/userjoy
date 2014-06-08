@@ -36,9 +36,23 @@ var mailer = require('../services/mailer');
  */
 
 var appEmail = require('../../helpers/app-email');
-var getMailerLocals = require('../../helpers/get-mailer-locals');
 var logger = require('../../helpers/logger');
 var render = require('../../helpers/render-message');
+
+
+/**
+ * Creates the Reply-To email to track conversation threads
+ *
+ * e.g. '532d6bf862d673ba7131812e+535d131c67d02dc60b2b1764@mail.userjoy.co'
+ */
+
+function replyToEmailManual(fromEmail, conversationId) {
+  var emailSplit = fromEmail.split('@');
+  var emailLocal = emailSplit[0];
+  var emailDomain = emailSplit[1];
+  var email = emailLocal + '+' + conversationId + '@' + emailDomain;
+  return email;
+}
 
 
 /**
@@ -268,7 +282,8 @@ router
 
     // NOTE: only emails can be sent through manual messages now
     if (newMsg.type !== 'email') {
-      return res.badRequest('Only emails can be sent through manual messages');
+      return res.badRequest(
+        'Only emails can be sent through manual messages');
     }
 
     if (!_.isArray(uids) || _.isEmpty(uids)) {
@@ -334,55 +349,89 @@ router
 
               con = con.toJSON();
 
-              var msg = con.messages[0];
-
-              // NOTE: adding the toEmail and toNames to messages to make
+              // NOTE: adding the toEmail and toNames to con to make
               // it simpler while mailing them
-              msg.toEmail = user.email;
-              msg.toName = user.name;
+              con.toEmail = user.email;
+              con.toName = user.name;
 
-              msg.coId = con._id;
-              msg.aid = con.aid;
-
-              // preserve the conversation object, while passing the modified
-              // message object for sending emails
-              var obj = {
-                sendMsg: msg,
-                con: con
-              };
-
-              iteratorCB(null, obj);
+              // pass the modified con object for sending emails
+              iteratorCB(null, con);
             });
 
           };
 
-          async.map(users, iterator, function (err, objs) {
-
-            var sendMessages = _.pluck(objs, 'sendMsg');
-            var cons = _.pluck(objs, 'con');
-
-            cb(err, sendMessages, cons);
+          async.map(users, iterator, function (err, cons) {
+            cb(err, cons);
           });
         },
 
 
-        function sendMessages(messages, cons, cb) {
+        function sendMessages(cons, cb) {
 
           // TODO: check if message is notification or email
 
           if (newMsg.type !== "email") return cb(err, messages);
 
-          var iterator = function (msg, cb) {
-            var toEmail = msg.toEmail;
-            var toName = msg.toName;
-            var locals = getMailerLocals('manual', msg, toName, toEmail);
-            mailer.sendManualMessage(locals, function (err) {
-              cb(err, msg);
-            });
+          var iterator = function (conv, cb) {
+            var toEmail = conv.toEmail;
+            var toName = conv.toName;
+
+            // assume the reply message was the last message
+            var msgId = _.last(conv.messages)
+              ._id;
+
+            var fromEmail = appEmail(aid);
+            var fromName = req.user.name;
+            var replyToEmail = replyToEmailManual(fromEmail, conv._id);
+
+            var opts = {
+
+              from: {
+                email: fromEmail,
+                name: fromName
+              },
+
+              locals: {
+                messages: conv.messages
+              },
+
+              // pass the message id of the reply
+              // this would be used to track if the message was opened
+              metadata: {
+                'mId': msgId
+              },
+
+              replyTo: {
+                email: replyToEmail,
+                name: 'Reply to ' + fromName
+              },
+
+              subject: conv.sub,
+
+              to: {
+                email: toEmail,
+                name: toName
+              }
+
+            };
+
+            mailer.sendManualMessage(opts, cb);
           };
 
-          async.map(messages, iterator, function (err) {
-            cb(err, cons);
+          async.map(cons, iterator, function (err) {
+
+            if (err) return cb(err);
+
+            // the cons were modified in the last function, toEmail and toName
+            // fields were added to make it easier for sending emails. remove
+            // those fields before passing the response
+            _.each(cons, function (c) {
+              delete c.toEmail;
+              delete c.toName;
+            });
+
+
+            cb(null, cons);
           });
 
         }
@@ -454,20 +503,47 @@ router
             .select('email name')
             .exec(function (err, user) {
 
+              // assume the reply message was the last message
+              var msgId = _.last(conv.messages)
+                ._id;
 
-              // NOTE: assuming the last message in the messages array was the one
-              // sent now
-              var msg = _.last(conv.messages);
+              var fromEmail = appEmail(aid);
+              var fromName = req.user.name;
+              var replyToEmail = replyToEmailManual(fromEmail, conv._id);
 
-              msg.aid = conv.aid;
-              msg.coId = conv._id;
+              var opts = {
 
-              var toEmail = user.email;
-              var toName = user.name;
+                from: {
+                  email: fromEmail,
+                  name: fromName
+                },
 
-              var locals = getMailerLocals('manual', msg, toName, toEmail);
+                locals: {
+                  messages: conv.messages
+                },
 
-              mailer.sendManualMessage(locals, function (err) {
+                // pass the message id of the reply
+                // this would be used to track if the message was opened
+                metadata: {
+                  'mId': msgId
+                },
+
+                replyTo: {
+                  email: replyToEmail,
+                  name: 'Reply to ' + fromName
+                },
+
+                subject: conv.sub,
+
+                to: {
+                  email: user.email,
+                  name: user.name
+                }
+
+              };
+
+
+              mailer.sendManualMessage(opts, function (err) {
                 cb(err, conv);
               });
 
