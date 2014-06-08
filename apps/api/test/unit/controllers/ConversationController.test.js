@@ -189,7 +189,7 @@ describe('Resource /apps/:aid/conversations', function () {
       });
 
 
-    it('should return all open conversations belonging to app',
+    it('should return all open conversations belonging to app, and populate uid / assignee',
 
       function (done) {
 
@@ -207,6 +207,11 @@ describe('Resource /apps/:aid/conversations', function () {
               .to.have.property('assignee')
               .that.is.an('object')
               .that.has.keys(['_id', 'name', 'email']);
+
+            expect(res.body[0])
+              .to.have.property('uid')
+              .that.is.an('object')
+              .that.has.keys(['_id', 'email']);
 
             _.each(res.body, function (m) {
               expect(m.closed)
@@ -330,7 +335,8 @@ describe('Resource /apps/:aid/conversations', function () {
       });
 
 
-    it('should return all messages belonging to message thread',
+    it(
+      'should return all messages belonging to conversation, and populate uid and assignee',
 
       // TODO: make sure atleast two messages are there in the thread
 
@@ -350,6 +356,11 @@ describe('Resource /apps/:aid/conversations', function () {
               .to.have.property('assignee')
               .that.is.an('object')
               .that.has.keys(['name', 'email', '_id']);
+
+            expect(res.body)
+              .to.have.property('uid')
+              .that.is.an('object')
+              .that.has.keys(['email', '_id']);
 
             expect(res.body)
               .to.have.property('messages')
