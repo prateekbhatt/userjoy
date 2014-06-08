@@ -16,10 +16,8 @@ var path = require('path');
 var templatesDir = path.resolve(__dirname, '../..', 'email_templates');
 
 
-var MANDRILL_USER = 'prateek@dodatado.com';
-var MANDRILL_PRODUCTION_KEY = 'yhR70QpRFKF76wmlM7wNRg';
-var MANDRILL_TEST_KEY = 'H2mkRaMDFP07M02p0MFhCg';
-var INBOUND_MAIL_DOMAIN = 'mail.userjoy.co';
+var MAILGUN_USER = 'postmaster@mail.userjoy.co';
+var MAILGUN_PASS = '5k0o37dg6od7';
 var UJ_SUPPORT_EMAIL = 'support@userjoy.co';
 var UJ_SUPPORT_NAME = 'UserJoy';
 
@@ -31,17 +29,6 @@ var UJ_SUPPORT_NAME = 'UserJoy';
 var logger = require('../../helpers/logger');
 var render = require('../../helpers/render-message');
 
-
-var MANDRILL_PASS = MANDRILL_PRODUCTION_KEY;
-
-// TODO: This should be handled in the apps/config
-if (!_.contains(['production', 'development'], process.env.NODE_ENV)) {
-  MANDRILL_PASS = MANDRILL_TEST_KEY;
-  logger.trace({
-    at: 'mailer',
-    key: 'Using Mandrill Test Key'
-  });
-}
 
 /*
 USAGE:
@@ -120,11 +107,11 @@ function Mailer(opts) {
 // Prepare nodemailer transport object
 Mailer.prototype.transport = nodemailer.createTransport("SMTP", {
   // secureConnection: true,
-  host: 'smtp.mandrillapp.com',
+  host: 'smtp.mailgun.org',
   port: 587,
   auth: {
-    user: MANDRILL_USER,
-    pass: MANDRILL_PASS
+    user: MAILGUN_USER,
+    pass: MAILGUN_PASS
   }
 });
 
@@ -153,7 +140,7 @@ Mailer.prototype.options = function () {
     to: this.createAddress(this.toEmail, this.toName),
     subject: this.subject,
     html: this.html,
-    generateTextFromHTML: true
+    generateTextFromHTML: true,
   };
 
   if (this.replyToEmail) {
@@ -163,9 +150,30 @@ Mailer.prototype.options = function () {
 
   if (this.metadata) {
     opts.headers = {
-      'X-MC-Metadata': this.metadata
+
+      // REF: http://documentation.mailgun.com/user_manual.html#sending-via-smtp
+      'X-Mailgun-Track': 'yes',
+      'X-Mailgun-Track-Clicks': 'yes',
+      'X-Mailgun-Track-Opens': 'yes',
+
+
+      // REF: http://documentation.mailgun.com/user_manual.html#attaching-data-to-messages
+      'X-Mailgun-Variables': this.metadata
     };
   }
+
+  // in test env, do not send emails
+  // REF 1: http://documentation.mailgun.com/user_manual.html#sending-via-smtp
+  // REF 2: http://documentation.mailgun.com/user_manual.html#sending-in-test-mode
+  if (!_.contains(['production', 'development'], process.env.NODE_ENV)) {
+    opts.headers = opts.headers || {};
+    opts.headers['X-Mailgun-Drop-Message'] = 'yes';
+    logger.trace({
+      at: 'mailer',
+      key: 'Using Mailgun Test Mode'
+    });
+  }
+
 
   return opts;
 
