@@ -135,6 +135,21 @@ Entity.prototype.identify = function (traits) {
 
 
 /**
+ * Extend the existing `traits` instead of overwriting.
+ *
+ * @param {String} name
+ * @param {String} val
+ */
+
+Entity.prototype.setTrait = function (name, val) {
+  var traits = this.traits();
+  traits[name] = val;
+  this.traits(traits);
+  this.save();
+};
+
+
+/**
  * Save the entity to local storage and the cookie.
  *
  * @return {Boolean}
