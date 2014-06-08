@@ -268,8 +268,10 @@ router
               userName: invite.toName,
               appName: req.app.name
             },
-            toEmail: invite.toEmail,
-            toName: invite.toName
+            to: {
+              email: invite.toEmail,
+              name: invite.toName
+            }
           };
 
           mailer.sendInvite(mailOptions, function (err) {
