@@ -114,8 +114,10 @@ function signupWithoutInvite(account, cb) {
             confirmUrl: confirmUrl,
             name: acc.name
           },
-          toEmail: acc.email,
-          toName: acc.name
+          to: {
+            email: acc.email,
+            name: acc.name
+          }
         };
 
         mailer.sendConfirmation(mailOptions, function (err) {
