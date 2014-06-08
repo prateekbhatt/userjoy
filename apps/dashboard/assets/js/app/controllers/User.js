@@ -1306,7 +1306,7 @@ angular.module('do.users', [])
             .startOf('day')
             .unix();
           $scope.fromScoreTime = $moment()
-            .subtract('days', 31)
+            .subtract('days', 29)
             .startOf('day')
             .unix();
 
@@ -1602,6 +1602,12 @@ angular.module('do.users', [])
 
             }
 
+          }
+
+          $scope.toolTipContentFunction = function () {
+            return function (key, x, y, e, graph) {
+              return '<p>' + y + ' at ' + $moment(x).format('MMMM Do') + '</p>'
+            }
           }
         }
 
