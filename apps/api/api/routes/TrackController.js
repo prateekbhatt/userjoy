@@ -247,7 +247,8 @@ router
  *
  * @param {string} id user-id or email
  *
- * Returns the most recent queued auto notification for the user
+ * 1. Returns the most recent queued auto notification for the user
+ * 2. Also contains the theme color of the notification / message-box
  */
 
 router
@@ -310,11 +311,13 @@ router
             return cb(new Error('Please send user_id or email'));
           }
 
-          User.findOne(conditions, cb);
+          User.findOne(conditions, function (err, user) {
+            cb(err, user, app);
+          });
         },
 
 
-        function getNotification(user, cb) {
+        function getNotification(user, app, cb) {
 
           var conditions = {
             uid: user._id
@@ -327,7 +330,9 @@ router
             }
           };
 
-          Notification.findOneAndRemove(conditions, options, cb);
+          Notification.findOneAndRemove(conditions, options, function (err, notf) {
+            cb(err, notf, app);
+          });
 
         }
 
@@ -335,7 +340,7 @@ router
       ],
 
 
-      function callback(err, notification) {
+      function callback(err, notification, app) {
 
         if (err) {
 
@@ -349,6 +354,11 @@ router
 
           return next(err);
         }
+
+        // pass the theme color alongwith the notification
+        notification = notification ? notification.toJSON() : {};
+        notification.color = app.color;
+
 
         res
           .status(200)
