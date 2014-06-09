@@ -16,10 +16,8 @@ var path = require('path');
 var templatesDir = path.resolve(__dirname, '../..', 'email_templates');
 
 
-var MANDRILL_USER = 'prateek@dodatado.com';
-var MANDRILL_PRODUCTION_KEY = 'yhR70QpRFKF76wmlM7wNRg';
-var MANDRILL_TEST_KEY = 'H2mkRaMDFP07M02p0MFhCg';
-var INBOUND_MAIL_DOMAIN = 'mail.userjoy.co';
+var MAILGUN_USER = 'postmaster@mail.userjoy.co';
+var MAILGUN_PASS = '5k0o37dg6od7';
 var UJ_SUPPORT_EMAIL = 'support@userjoy.co';
 var UJ_SUPPORT_NAME = 'UserJoy';
 
@@ -32,18 +30,6 @@ var logger = require('../../helpers/logger');
 var render = require('../../helpers/render-message');
 
 
-var MANDRILL_PASS = MANDRILL_PRODUCTION_KEY;
-
-// TODO: This should be handled in the apps/config
-if (!_.contains(['production', 'development'], process.env.NODE_ENV)) {
-  MANDRILL_PASS = MANDRILL_TEST_KEY;
-  logger.trace({
-    at: 'mailer',
-    key: 'Using Mandrill Test Key'
-  });
-}
-
-
 /*
 USAGE:
 
@@ -51,22 +37,22 @@ var options = {
   locals: {
     user: {
       name: 'Prateek'
-    },
+    }
     body: 'This is what I wanted to send to {{= user.name || "you" }}'
   },
-  from {
+  from: {
     email: '532d6bf862d673ba7131812e@mail.userjoy.co',
     name: 'Prateek from UserJoy'
   },
   metadata: {
     'mId': '535d131c67d02dc60b2b1764'
   },
-  replyTo {
+  replyTo: {
     email: '532d6bf862d673ba7131812e+535d131c67d02dc60b2b1764@mail.userjoy.co',
     name: 'Reply to Prateek from UserJoy'
   },
   subject: 'Welcome to UserJoy',
-  to {
+  to: {
     email: 'prattbhatt@gmail.com',
     name: 'Prateek Bhatt'
   },
@@ -77,55 +63,55 @@ mailer.sendToUser(options);
 
 
 
-/ * * * @constructor Mailer *
-  /
+/**
+ * @constructor Mailer
+ */
 
 function Mailer(opts) {
 
   this.locals = opts.locals;
   this.subject = opts.subject;
 
-  / / in
-case of automessages, the message body must be provided.
-// the message body should be in ejs format,
-// and will be rendered before sending the email
-this.body = opts.body || null;
+  // in case of automessages, the message body must be provided.
+  // the message body should be in ejs format,
+  // and will be rendered before sending the email
+  this.body = opts.body || null;
 
-// if there is template file, then this should be defined
-this.template = null;
+  // if there is template file, then this should be defined
+  this.template = null;
 
-this.aid = opts.aid;
+  this.aid = opts.aid;
 
-this.fromEmail = opts.from.email;
-this.fromName = opts.from.name;
-
-
-this.mId = opts.mId;
-
-if (opts.replyTo) {
-  this.replyToEmail = opts.replyTo.email;
-  this.replyToName = opts.replyTo.name;
-}
+  this.fromEmail = opts.from.email;
+  this.fromName = opts.from.name;
 
 
-this.toEmail = opts.to.email;
-this.toName = opts.to.name;
+  this.mId = opts.mId;
+
+  if (opts.replyTo) {
+    this.replyToEmail = opts.replyTo.email;
+    this.replyToName = opts.replyTo.name;
+  }
 
 
-this.html = null;
+  this.toEmail = opts.to.email;
+  this.toName = opts.to.name;
 
-return this;
+
+  this.html = null;
+
+  return this;
 }
 
 
 // Prepare nodemailer transport object
 Mailer.prototype.transport = nodemailer.createTransport("SMTP", {
   // secureConnection: true,
-  host: 'smtp.mandrillapp.com',
+  host: 'smtp.mailgun.org',
   port: 587,
   auth: {
-    user: MANDRILL_USER,
-    pass: MANDRILL_PASS
+    user: MAILGUN_USER,
+    pass: MAILGUN_PASS
   }
 });
 
@@ -154,7 +140,7 @@ Mailer.prototype.options = function () {
     to: this.createAddress(this.toEmail, this.toName),
     subject: this.subject,
     html: this.html,
-    generateTextFromHTML: true
+    generateTextFromHTML: true,
   };
 
   if (this.replyToEmail) {
@@ -164,9 +150,30 @@ Mailer.prototype.options = function () {
 
   if (this.metadata) {
     opts.headers = {
-      'X-MC-Metadata': this.metadata
+
+      // REF: http://documentation.mailgun.com/user_manual.html#sending-via-smtp
+      'X-Mailgun-Track': 'yes',
+      'X-Mailgun-Track-Clicks': 'yes',
+      'X-Mailgun-Track-Opens': 'yes',
+
+
+      // REF: http://documentation.mailgun.com/user_manual.html#attaching-data-to-messages
+      'X-Mailgun-Variables': this.metadata
     };
   }
+
+  // in test env, do not send emails
+  // REF 1: http://documentation.mailgun.com/user_manual.html#sending-via-smtp
+  // REF 2: http://documentation.mailgun.com/user_manual.html#sending-in-test-mode
+  if (!_.contains(['production', 'development'], process.env.NODE_ENV)) {
+    opts.headers = opts.headers || {};
+    opts.headers['X-Mailgun-Drop-Message'] = 'yes';
+    logger.trace({
+      at: 'mailer',
+      key: 'Using Mailgun Test Mode'
+    });
+  }
+
 
   return opts;
 
@@ -251,14 +258,7 @@ exports.sendConfirmation = function (options, cb) {
 
 exports.sendAutoMessage = function (options, cb) {
   var mailer = new Mailer(options);
-
-
-  // FIXME ALERT ALERT ALERT
-  // render body and subject in BEFORE calling mailer service
-  mailer.html = render.string(mailer.body, mailer.locals);
-  mailer.subject = render.string(mailer.subject, mailer.locals);
   mailer.template = 'automessage.ejs';
-
   mailer.send(cb);
 };
 
