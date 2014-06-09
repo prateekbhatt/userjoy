@@ -4,6 +4,7 @@
 
 var _ = require('lodash');
 var async = require('async');
+var moment = require('moment');
 var router = require('express')
   .Router();
 
@@ -52,6 +53,20 @@ function replyToEmailManual(fromEmail, conversationId) {
   var emailDomain = emailSplit[1];
   var email = emailLocal + '+' + conversationId + '@' + emailDomain;
   return email;
+}
+
+
+// add templateDate property to each message in the conversation for
+// showing well formatted time in the emails
+function addTemplateDate(conv) {
+  conv = conv.toJSON();
+
+  _.each(conv.messages, function (m) {
+    m.templateDate = moment(m.ct)
+      .format('D MMM, h:m a');
+  });
+
+  return conv;
 }
 
 
@@ -373,6 +388,10 @@ router
           if (newMsg.type !== "email") return cb(err, messages);
 
           var iterator = function (conv, cb) {
+
+            // add message dates
+            conv = addTemplateDate(conv);
+
             var toEmail = conv.toEmail;
             var toName = conv.toName;
 
@@ -502,6 +521,9 @@ router
             .findById(conv.uid)
             .select('email name')
             .exec(function (err, user) {
+
+              // add message dates
+              conv = addTemplateDate(conv);
 
               // assume the reply message was the last message
               var msgId = _.last(conv.messages)
