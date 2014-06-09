@@ -20,7 +20,6 @@ var moment = require('moment');
  * Helpers
  */
 
-var getMailerLocals = require('../helpers/get-mailer-locals');
 var logger = require('../helpers/logger');
 
 
@@ -344,9 +343,43 @@ function amConsumer(cb) {
 
           function iterator(u, cb) {
 
-            var locals = getMailerLocals('auto', automessage, u.name, u.email);
+            // locals to render body and subject
+            var locals = {
+              user: u
+            };
 
-            mailer.sendAutoMessage(locals, function (err) {
+            // render body and subject in BEFORE calling mailer service
+            var body = render.string(automessage.body, locals);
+            var subject = render.string(automessage.subject, locals);
+
+            var fromEmail = appEmail(aid);
+            var fromName = amsg.sender.name;
+
+            var options = {
+              locals: {
+                body: body
+              },
+              from {
+                email: fromEmail,
+                name: fromName
+              },
+              metadata: {
+                'type': 'automessage',
+                'amId': amsg._id
+              },
+              replyTo {
+                email: fromEmail,
+                name: 'Reply to ' + fromName
+              },
+              subject: subject,
+              to {
+                email: u.email,
+                name: u.name
+              },
+            };
+
+
+            mailer.sendAutoMessage(options, function (err) {
               if (err) return cb(err);
 
               var ids = {
