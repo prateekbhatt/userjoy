@@ -359,7 +359,7 @@ function amConsumer(cb) {
               locals: {
                 body: body
               },
-              from {
+              from: {
                 email: fromEmail,
                 name: fromName
               },
@@ -367,12 +367,12 @@ function amConsumer(cb) {
                 'type': 'automessage',
                 'amId': amsg._id
               },
-              replyTo {
+              replyTo: {
                 email: fromEmail,
                 name: 'Reply to ' + fromName
               },
               subject: subject,
-              to {
+              to: {
                 email: u.email,
                 name: u.name
               },
