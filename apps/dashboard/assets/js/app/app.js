@@ -177,8 +177,12 @@ var app = angular.module('dodatado', [
           500) {
           console.log("error: ", rejection.data.error);
           $rootScope.error = true;
-          $rootScope.errMsgRootScope = rejection.data.error[
-            0];
+          if(_.isArray(rejection.data.error)) {
+            $rootScope.errMsgRootScope = rejection.data.error[
+              0];
+          } else {
+            $rootScope.errMsgRootScope = rejection.data.error;
+          }
           $rootScope.successMsgRootScope = '';
           $rootScope.success = false;
           console.log("$rootScope errMSg: ", $rootScope.errMsgRootScope);

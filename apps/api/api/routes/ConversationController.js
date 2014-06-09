@@ -392,7 +392,7 @@ router
               },
 
               locals: {
-                messages: conv.messages
+                conversation: conv
               },
 
               // pass the message id of the reply
@@ -519,7 +519,7 @@ router
                 },
 
                 locals: {
-                  messages: conv.messages
+                  conversation: conv
                 },
 
                 // pass the message id of the reply
