@@ -1,1 +1,21 @@
-{{= conversation }}
+<div style="overflow: hidden;"> 
+  <span style="display: none!important;">###-----------------###</span>
+</div>
+<br>
+{{ conversation.messages.reverse().forEach(function (m, i) { }}
+
+  {{ if(i == 0) { }}
+    {{- m.body }}
+  {{  } }}
+  <br>
+  <div style="border-left: 1px solid #999; margin-left: 20px;">
+    {{ if(i != 0) { }}
+      <div style="padding-left: 10px;">
+        <p style="color: #500050;">{{= m.sName }} at {{= m.templateDate }}</p>
+
+
+        <p style="color: #500050;">{{- m.body }}</p>
+      </div>
+    {{ } }}
+  </div>
+{{ }) }}
