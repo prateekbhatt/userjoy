@@ -1606,7 +1606,7 @@ angular.module('do.users', [])
               emailId.push($stateParams.id);
               console.log("uid : ", emailId);
               MsgService.sendManualMessage(mail.sub,
-                mail.msgtext, emailId, $scope.populateMsgOnCreation
+                mail.msgtext, emailId, currentAppId, $scope.populateMsgOnCreation
               );
             }, function () {
               $log.info('Modal dismissed at: ' +
@@ -1632,8 +1632,7 @@ angular.module('do.users', [])
               var data = {
                 note: note
               };
-              UserModel.createNote($scope.currentApp
-                ._id,
+              UserModel.createNote(currentAppId,
                 $scope.user
                 ._id,
                 data,
@@ -1650,9 +1649,7 @@ angular.module('do.users', [])
             console.log(
               "redirecting to conversation: ",
               id);
-            $location.path('/messages/' + $scope.currentApp
-              ._id +
-              '/conversations/' + id);
+            $location.path('/apps/' + currentAppId + '/messages/conversations/' + id);
           };
 
 
