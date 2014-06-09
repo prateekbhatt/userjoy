@@ -191,7 +191,7 @@ router
 
           // render body and subject in BEFORE calling mailer service
           var body = render.string(amsg.body, locals);
-          var subject = render.string(mailer.subject, locals);
+          var subject = render.string(amsg.sub, locals);
 
           var fromEmail = appEmail(aid);
           var fromName = amsg.sender.name;
