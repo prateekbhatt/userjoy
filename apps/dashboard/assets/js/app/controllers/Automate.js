@@ -317,7 +317,7 @@ angular.module('do.automate', [])
         $scope.showNotification = true;
         $scope.showEmail = false;
         $scope.showAutoMsgError = false;
-
+        $scope.segment = segmentService.getSingleSegment().name;
 
         var populatePage = function () {
           // $scope.email = "savinay@dodatado.com";
