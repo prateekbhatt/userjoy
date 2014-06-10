@@ -92,12 +92,23 @@ var accounts = {
     first: {
       assignee: null,
       aid: null,
-      messages: [{
-        body: 'Hello World',
-        from: 'user',
-        sName: 'Prateek',
-        type: 'email'
-      }],
+      messages: [
+
+        {
+          body: 'Hello World',
+          from: 'user',
+          sName: 'Prateek',
+          type: 'email'
+        },
+
+        {
+          accid: null,
+          body: 'Hello World 2',
+          from: 'account',
+          sName: 'Prateek2',
+          type: 'email'
+        }
+      ],
       sub: 'First Conversation!',
       uid: ObjectId()
     },
@@ -363,6 +374,9 @@ module.exports = function loadFixtures(callback) {
       var aid = apps.first._id;
       var uid = users.first._id;
       var newCon = conversations.first;
+
+      // set the account id of the second message to first account _id
+      newCon.messages[1].accid = accid;
 
       createConversation(accid, aid, uid, newCon, function (err, con) {
         if (err) return cb(err);
