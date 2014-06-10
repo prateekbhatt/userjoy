@@ -226,6 +226,8 @@ UserSchema.pre('save', function (next) {
 
 UserSchema.statics.findOrCreate = function (aid, user, cb) {
 
+  user = user || {};
+
   var billingStatus = user.billing ? user.billing.status : null;
   var companies = user.companies || [];
   var email = user.email;
