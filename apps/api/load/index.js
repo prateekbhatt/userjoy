@@ -1,8 +1,10 @@
 /**
- * newrelic agent
+ * run newrelic agent (unless in test environment)
  */
 
-require('newrelic');
+if (process.env.NODE_ENV !== 'test') {
+  require('newrelic');
+}
 
 
 /**
