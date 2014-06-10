@@ -23,7 +23,7 @@
 
 #page-wrapper-settings {
   position: inherit;
-  padding: 0 30px;
+  /*padding: 0 30px;*/
   border-left: 1px solid #e7e7e7;
   min-height: 300px;
 }

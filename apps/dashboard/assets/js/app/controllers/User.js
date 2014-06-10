@@ -273,14 +273,14 @@ angular.module('do.users', [])
   'userAttributes', 'lodash', '$modal',
   'UidService', '$moment', 'UserList', '$timeout', 'modelsSegment',
   'segmentService', 'CurrentAppService', 'UserModel', '$log',
-  'MsgService', '$stateParams',
+  'MsgService', '$stateParams', '$rootScope',
   function ($scope, $location, segment, queryMatching, $filter,
     countOfActions, hasNotDone, hasDoneActions,
     ngTableParams, login, modelsQuery, AppService, segment,
     queryMatching, eventNames, userAttributes, lodash, $modal,
     UidService, $moment, UserList, $timeout, modelsSegment,
     segmentService, CurrentAppService, UserModel, $log, MsgService,
-    $stateParams) {
+    $stateParams, $rootScope) {
 
     CurrentAppService.getCurrentApp()
       .then(function (currentApp) {
@@ -752,7 +752,14 @@ angular.module('do.users', [])
                 console.log("val: ", $scope.filters[i]
                   .val);
                 $scope.showErrorOnInput = true;
+                $rootScope.error = true;
+                $rootScope.errMsgRootScope =
+                  'Provide a value in segment filter';
                 $scope.showErr = true;
+                $scope.showSpinner = false;
+                $timeout(function () {
+                  $rootScope.error = false;
+                }, 5000);
                 return;
                 // $scope.isErr = 'error';
                 // console.log("error class", $scope.isErr);
@@ -799,7 +806,13 @@ angular.module('do.users', [])
                 'attr')) {
                 console.log("val: ", $scope.filters[i]
                   .val);
+                $rootScope.error = true;
+                $rootScope.errMsgRootScope =
+                  'Provide a value in segment filter';
                 $scope.showErr = true;
+                $timeout(function () {
+                  $rootScope.error = false;
+                }, 5000);
                 return;
                 // $scope.isErr = 'error';
                 // console.log("error class", $scope.isErr);
@@ -1649,7 +1662,8 @@ angular.module('do.users', [])
             console.log(
               "redirecting to conversation: ",
               id);
-            $location.path('/apps/' + currentAppId + '/messages/conversations/' + id);
+            $location.path('/apps/' + currentAppId +
+              '/messages/conversations/' + id);
           };
 
 
