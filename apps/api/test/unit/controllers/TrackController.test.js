@@ -9,14 +9,12 @@ describe('Resource /track', function () {
 
 
   var TrackController = require('../../../api/routes/TrackController');
-  var AppModel = require('../../../api/models/App');
 
   // define test variables
   var newSession = {
     'hello': 'world'
   };
 
-  var newUser;
 
   var randomId = mongoose.Types.ObjectId;
   var appId;
@@ -24,15 +22,8 @@ describe('Resource /track', function () {
 
   before(function (done) {
     setupTestDb(function (err) {
-      appId = saved.apps.first._id;
-
-      newUser = {
-        email: saved.users.first.email,
-      };
-
+      appId = saved.apps.first._id.toString();
       newSession = JSON.stringify(newSession);
-      newUser = JSON.stringify(newUser);
-
       done(err);
     });
   });
@@ -173,6 +164,139 @@ describe('Resource /track', function () {
     //       .end(done);
 
     //   });
+
+  });
+
+
+  describe('GET /track/identify', function () {
+
+    var url;
+
+    before(function (done) {
+      logoutUser(done);
+    });
+
+    beforeEach(function () {
+      url = '/track/identify';
+    });
+
+    it('should return error if there is no app_id', function (done) {
+
+      request
+        .get(url)
+        .expect('Content-Type', /json/)
+        .expect(400)
+        .expect({
+          status: 400,
+          error: 'Please send app_id with the params'
+        })
+        .end(done);
+    });
+
+    it('should return error if there is no user object',
+      function (done) {
+
+        var query = qs.stringify({
+          app_id: appId
+        });
+
+        var testUrl = url + '?' + query;
+
+        request
+          .get(testUrl)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            status: 400,
+            error: 'Please send user_id or email to identify user'
+          })
+          .end(done);
+
+      });
+
+    it('should return error if user_id and email are missing',
+      function (done) {
+
+        var query = qs.stringify({
+          app_id: appId,
+          user: {
+            name: 'Prate'
+          }
+        });
+
+        var testUrl = url + '?' + query;
+
+        request
+          .get(testUrl)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            status: 400,
+            error: 'Please send user_id or email to identify user'
+          })
+          .end(done);
+
+      });
+
+    it('should create user if user does not exist', function (done) {
+
+      var query = qs.stringify({
+        app_id: appId.toString(),
+        user: {
+          email: 'randomUserTrackController@example.com'
+        }
+      });
+
+      var testUrl = url + '?' + query;
+
+      request
+        .get(testUrl)
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function (err, res) {
+          if (err) return done(err);
+
+          expect(res.body)
+            .to.have.property("aid");
+
+          expect(res.body)
+            .to.have.property("uid");
+
+          done();
+        });
+
+    });
+
+
+    it('should return aid / uid id user exists', function (done) {
+
+      var existingUser = saved.users.first.toJSON();
+
+      var query = qs.stringify({
+        app_id: appId.toString(),
+        user: {
+          email: existingUser.email
+        }
+      });
+
+      var testUrl = url + '?' + query;
+
+      request
+        .get(testUrl)
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function (err, res) {
+          if (err) return done(err);
+
+          expect(res.body)
+            .to.have.property("aid", existingUser.aid.toString());
+
+          expect(res.body)
+            .to.have.property("uid", existingUser._id.toString());
+
+          done();
+        });
+    });
 
   });
 
