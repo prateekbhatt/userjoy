@@ -234,6 +234,57 @@ router
   });
 
 
+/**
+ * GET /track/identify
+ *
+ * Identifies a user
+ */
+
+router
+  .route('/identify')
+  .get(function (req, res, next) {
+
+
+    logger.trace({
+      at: 'TrackController:identify',
+      query: req.query
+    });
+
+
+    var data = req.query;
+    var aid = data.app_id;
+    var user = data.user;
+
+    // Validations
+    if (!aid) {
+      return res.badRequest('Please send app_id with the params');
+    }
+
+    User.findOrCreate(aid, user, function (err, usr) {
+
+      if (err) {
+
+        if (err.message === 'NO_EMAIL_OR_USER_ID') {
+          return res.badRequest('Please send user_id or email to identify user');
+        }
+
+        return next(err);
+      }
+
+      var obj = {
+        aid: usr.aid,
+        uid: usr._id
+      };
+
+      res
+        .status(200)
+        .json(obj);
+
+    });
+
+  });
+
+
 
 /**
  * GET /track/notifications
