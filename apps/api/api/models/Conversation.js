@@ -19,7 +19,7 @@ var Schema = mongoose.Schema;
  * Define embedded message schema
  */
 
-var ConversationSchema = new Schema({
+var MessageSchema = new Schema({
 
 
   accid: {
@@ -128,7 +128,7 @@ var ConversationSchema = new Schema({
   },
 
 
-  messages: [ConversationSchema],
+  messages: [MessageSchema],
 
 
   // subject

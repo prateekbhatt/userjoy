@@ -57,7 +57,7 @@ describe('Model User', function () {
           expect(err)
             .to.exist;
           expect(err.message)
-            .to.eql('Please send user_id or email to identify user');
+            .to.eql('NO_EMAIL_OR_USER_ID');
           done();
         });
       });
@@ -266,7 +266,7 @@ describe('Model User', function () {
             .to.exist;
 
           expect(err.message)
-            .to.eql('Please send company cid');
+            .to.eql('NO_COMPANY_ID');
 
           done();
         });

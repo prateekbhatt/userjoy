@@ -231,6 +231,7 @@ router
             .findById(coId)
             .populate('assignee', 'name email')
             .populate('uid', 'email')
+            .populate('messages.accid', 'email')
             .exec(cb);
         },
 

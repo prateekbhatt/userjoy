@@ -226,6 +226,8 @@ UserSchema.pre('save', function (next) {
 
 UserSchema.statics.findOrCreate = function (aid, user, cb) {
 
+  user = user || {};
+
   var billingStatus = user.billing ? user.billing.status : null;
   var companies = user.companies || [];
   var email = user.email;
@@ -238,7 +240,7 @@ UserSchema.statics.findOrCreate = function (aid, user, cb) {
 
   // if no user identifier provided, return error
   if (!(email || user_id)) {
-    return cb(new Error('Please send user_id or email to identify user'));
+    return cb(new Error('NO_EMAIL_OR_USER_ID'));
   }
 
 
@@ -255,7 +257,7 @@ UserSchema.statics.findOrCreate = function (aid, user, cb) {
   // if company cid not provided, return error
   for (var i = 0, len = companies.length; i < len; i++) {
     if (!companies[i].cid) {
-      return cb(new Error('Please send company cid'));
+      return cb(new Error('NO_COMPANY_ID'));
     }
   }
 
