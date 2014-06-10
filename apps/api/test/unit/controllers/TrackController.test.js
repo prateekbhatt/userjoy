@@ -19,12 +19,12 @@ describe('Resource /track', function () {
   var newUser;
 
   var randomId = mongoose.Types.ObjectId;
-  var appKey;
+  var appId;
 
 
   before(function (done) {
     setupTestDb(function (err) {
-      appKey = saved.apps.first.testKey;
+      appId = saved.apps.first._id;
 
       newUser = {
         email: saved.users.first.email,
@@ -63,7 +63,7 @@ describe('Resource /track', function () {
 
         var url = '/track?' +
           'app_id=' +
-          appKey;
+          appId;
 
         request
           .get(url)
@@ -84,7 +84,7 @@ describe('Resource /track', function () {
 
         var url = '/track?' +
           'app_id=' +
-          appKey +
+          appId +
           '&user=' +
           user;
 
@@ -104,7 +104,7 @@ describe('Resource /track', function () {
 
       var url = '/track?' +
         'app_id=' +
-        appKey +
+        appId +
         '&user=' +
         newUser;
 
@@ -121,7 +121,7 @@ describe('Resource /track', function () {
 
       var url = '/track?' +
         'app_id=' +
-        appKey +
+        appId +
         '&user=' +
         newUser;
 
@@ -202,7 +202,7 @@ describe('Resource /track', function () {
     it('should return error if there is no user_id or email',
       function (done) {
 
-        var testUrl = url + '?app_id=' + appKey;
+        var testUrl = url + '?app_id=' + appId;
 
         request
           .get(testUrl)
@@ -218,7 +218,7 @@ describe('Resource /track', function () {
 
     it('should return error if invalid app_id',
       function (done) {
-        var testUrl = url + '?app_id=' + "randomappKey" + '&email=' +
+        var testUrl = url + '?app_id=' + "randomappId" + '&email=' +
           saved.users.first.email;
 
         request
@@ -235,7 +235,7 @@ describe('Resource /track', function () {
 
     it('should return error if app not found',
       function (done) {
-        var testUrl = url + '?app_id=' + "test_randomappKey" + '&email=' +
+        var testUrl = url + '?app_id=' + "test_randomappId" + '&email=' +
           saved.users.first.email;
 
         request
@@ -255,7 +255,7 @@ describe('Resource /track', function () {
       function (done) {
 
         var email = saved.users.first.email;
-        var testUrl = url + '?app_id=' + appKey + '&email=' + email;
+        var testUrl = url + '?app_id=' + appId + '&email=' + email;
 
         request
           .get(testUrl)
@@ -300,7 +300,7 @@ describe('Resource /track', function () {
       function (done) {
 
         var email = saved.users.first.email;
-        var testUrl = url + '?app_id=' + appKey + '&email=' + email;
+        var testUrl = url + '?app_id=' + appId + '&email=' + email;
 
         request
           .get(testUrl)
@@ -348,10 +348,10 @@ describe('Resource /track', function () {
   describe('POST /track/conversations', function () {
 
     var url = '/track/conversations';
-    var appKey;
+    var appId;
 
     before(function (done) {
-      appKey = saved.apps.first.liveKey;
+      appId = saved.apps.first._id;
       logoutUser(done);
     });
 
@@ -373,7 +373,7 @@ describe('Resource /track', function () {
 
         var testUrl = url;
         var newCon = {
-          'app_id': appKey
+          'app_id': appId
         };
 
         request
@@ -394,7 +394,7 @@ describe('Resource /track', function () {
 
         var testUrl = url;
         var newCon = {
-          'app_id': appKey,
+          'app_id': appId,
           'email': saved.users.first.email
         };
 
@@ -416,7 +416,7 @@ describe('Resource /track', function () {
         var testUrl = url;
 
         var newCon = {
-          'app_id': 'randomappKey',
+          'app_id': 'randomappId',
           'email': saved.users.first.email,
           'body': 'Hey man, how are you?'
         };
@@ -439,7 +439,7 @@ describe('Resource /track', function () {
         var testUrl = url;
 
         var newCon = {
-          'app_id': 'test_randomappKey',
+          'app_id': 'test_randomappId',
           'email': saved.users.first.email,
           'body': 'Hey man, how are you?'
         };
@@ -463,7 +463,7 @@ describe('Resource /track', function () {
         var email = saved.users.first.email;
         var testUrl = url;
         var newCon = {
-          'app_id': appKey,
+          'app_id': appId,
           'email': saved.users.first.email,
           'body': 'Hey man, how are you?'
         };
@@ -515,7 +515,7 @@ describe('Resource /track', function () {
         var email = saved.users.first.email;
         var testUrl = url;
         var newCon = {
-          'app_id': appKey,
+          'app_id': appId,
           'email': saved.users.first.email,
           'body': 'Hey man, how are you?',
           'amId': saved.automessages.first._id
