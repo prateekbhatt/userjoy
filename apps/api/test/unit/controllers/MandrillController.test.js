@@ -277,7 +277,7 @@ describe('Resource /mandrill', function () {
             Conversation.findById(conversationId, function (err, con) {
 
               expect(con.messages)
-                .to.have.length(2);
+                .to.have.length(3);
 
               cb();
             });
@@ -324,7 +324,7 @@ describe('Resource /mandrill', function () {
             Conversation.findById(conversationId, function (err, con) {
 
               expect(con.messages)
-                .to.have.length(3);
+                .to.have.length(4);
 
               cb();
             });
