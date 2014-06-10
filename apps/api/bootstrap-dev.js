@@ -118,7 +118,7 @@ function bootstrapDevDB(cb) {
         console.log('');
         console.log('To test cdn app, use the following key:');
         console.log('');
-        console.log(savedApp.liveKey);
+        console.log(savedApp._id);
         console.log('');
         console.log('');
 
