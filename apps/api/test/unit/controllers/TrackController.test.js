@@ -30,13 +30,19 @@ describe('Resource /track', function () {
 
   describe('GET /track', function () {
 
+    var url, appId, uid;
+
     before(function (done) {
       logoutUser(done);
     });
 
-    it('should return error if there is no app_id', function (done) {
+    beforeEach(function () {
+      appId = saved.users.first.aid.toString();
+      uid = saved.users.first._id.toString();
+      url = '/track';
+    });
 
-      var url = '/track';
+    it('should return error if there is no app_id', function (done) {
 
       request
         .get(url)
@@ -49,121 +55,151 @@ describe('Resource /track', function () {
         .end(done);
     });
 
-    it('should return error if there is no user object',
-      function (done) {
+    it('should return error if there is no uid (u)', function (done) {
 
-        var url = '/track?' +
-          'app_id=' +
-          appId;
-
-        request
-          .get(url)
-          .expect('Content-Type', /json/)
-          .expect(400)
-          .expect({
-            status: 400,
-            error: 'Please send user_id or email to identify user'
-          })
-          .end(done);
-
+      var q = qs.stringify({
+        app_id: appId
       });
 
-    it('should return error if user_id and email are missing',
-      function (done) {
-
-        var user = JSON.stringify({});
-
-        var url = '/track?' +
-          'app_id=' +
-          appId +
-          '&user=' +
-          user;
-
-        request
-          .get(url)
-          .expect('Content-Type', /json/)
-          .expect(400)
-          .expect({
-            status: 400,
-            error: 'Please send user_id or email to identify user'
-          })
-          .end(done);
-
-      });
-
-    it('should create user if user does not exist', function (done) {
-
-      var url = '/track?' +
-        'app_id=' +
-        appId +
-        '&user=' +
-        newUser;
-
+      var testUrl = url + '?' + q;
 
       request
-        .get(url)
+        .get(testUrl)
         .expect('Content-Type', /json/)
-        .expect(200)
+        .expect(400)
+        .expect({
+          status: 400,
+          error: 'Please send uid with the params'
+        })
         .end(done);
-
     });
 
-    it('should return the uid, cid and sid', function (done) {
-
-      var url = '/track?' +
-        'app_id=' +
-        appId +
-        '&user=' +
-        newUser;
-
-      function hasIds(res) {
-        var obj = res.body;
-        if (!(obj.uid && obj.cid && obj.sid)) {
-          return 'uid/cid/sid missing';
-        }
-      }
-
-      request
-        .get(url)
-        .expect('Content-Type', /json/)
-        .expect(200)
-        .expect(hasIds)
-        .end(done);
-
-    });
-
-
-    // it('should getOrCreate user if user cookie is not present',
+    // it('should return error if there is no user object',
     //   function (done) {
 
-    //   });
+    //     var q = qs.stringify({
+    //       app_id: appId
+    //     });
 
-    // it(
-    //   'should getOrCreate company if company cookie is not present and company object is present',
-    //   function (done) {
-
-    //   });
-
-    // it('should create new session if session cookie is not present',
-    //   function (done) {
-
-    //   });
-
-    // it('should return error if no user object input',
-
-    //   function (done) {
+    //     var testUrl = url + '?' + q;
 
     //     request
-    //       .get('/track?' + 'session=' + newSession)
+    //       .get(testUrl)
     //       .expect('Content-Type', /json/)
     //       .expect(400)
     //       .expect({
     //         status: 400,
-    //         error: 'Please call user.identify with user details'
+    //         error: 'Please send user_id or email to identify user'
     //       })
     //       .end(done);
 
     //   });
+
+    it('should create pageview event and return the aid, uid, cid',
+      function (done) {
+
+        var q = qs.stringify({
+          app_id: appId,
+          u: uid,
+          e: {
+            type: 'pageview',
+            path: '/account/login'
+          }
+        });
+
+        var testUrl = url + '?' + q;
+
+        request
+          .get(testUrl)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function (err, res) {
+            if (err) return done(err);
+
+            expect(res.body)
+              .to.have.property('aid');
+
+            // FIXME check for cid as well
+            // expect(res.body).to.have.property('cid');
+
+            expect(res.body)
+              .to.have.property('uid');
+
+
+            expect(res.body)
+              .to.have.property('eid');
+
+            done();
+          });
+
+      });
+
+    it('should create feature event and return the aid, uid',
+      function (done) {
+
+        var q = qs.stringify({
+          app_id: appId,
+          u: uid,
+          e: {
+            type: 'feature',
+            name: 'Created notification'
+          }
+        });
+
+        var testUrl = url + '?' + q;
+
+        request
+          .get(testUrl)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function (err, res) {
+            if (err) return done(err);
+
+            expect(res.body)
+              .to.have.property('aid', appId);
+
+            // FIXME check for cid as well
+            // expect(res.body).to.have.property('cid');
+
+            expect(res.body)
+              .to.have.property('uid', uid);
+
+
+            expect(res.body)
+              .to.have.property('eid')
+              .that.is.not.empty;
+
+            done();
+          });
+
+      });
+
+    it('should return error if event type is not pageview / feature',
+
+      function (done) {
+
+        var q = qs.stringify({
+          app_id: appId,
+          u: uid,
+          e: {
+            type: 'randomType',
+            path: '/account/login'
+          }
+        });
+
+        var testUrl = url + '?' + q;
+
+        request
+          .get(testUrl)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            status: 400,
+            error: 'Event type is not supported'
+          })
+          .end(done);
+
+      });
 
   });
 
