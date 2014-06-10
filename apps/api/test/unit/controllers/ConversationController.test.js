@@ -189,7 +189,8 @@ describe('Resource /apps/:aid/conversations', function () {
       });
 
 
-    it('should return all open conversations belonging to app, and populate uid / assignee',
+    it(
+      'should return all open conversations belonging to app, and populate uid / assignee',
 
       function (done) {
 
@@ -336,7 +337,7 @@ describe('Resource /apps/:aid/conversations', function () {
 
 
     it(
-      'should return all messages belonging to conversation, and populate uid and assignee',
+      'should return all messages belonging to conversation, and populate uid and assignee, and also populate emails of accounts in all messages sent from account',
 
       // TODO: make sure atleast two messages are there in the thread
 
@@ -366,6 +367,21 @@ describe('Resource /apps/:aid/conversations', function () {
               .to.have.property('messages')
               .to.be.an("array")
               .that.has.length.above(0);
+
+
+            // to check that atleast one message from an account has been tested
+            // and the accid was populated with the email
+            var messagesFromAccount = 0;
+            _.each(res.body.messages, function (m) {
+              if (m.from === 'account') {
+                messagesFromAccount += 1;
+                expect(m.accid)
+                  .to.be.an('object')
+                  .and.has.keys(['_id', 'email']);
+              }
+            })
+            expect(messagesFromAccount)
+              .to.be.above(0);
 
             done();
           });
@@ -620,7 +636,7 @@ describe('Resource /apps/:aid/conversations', function () {
 
 
         expect(savedCon.messages)
-          .to.have.length(1);
+          .to.have.length(2);
 
 
         request
@@ -634,15 +650,15 @@ describe('Resource /apps/:aid/conversations', function () {
             var con = res.body;
 
             expect(con.messages)
-              .to.have.length(2);
+              .to.have.length(3);
 
-            expect(con.messages[1].body)
+            expect(con.messages[2].body)
               .to.eql(newMessage.body);
 
-            expect(con.messages[1].from)
+            expect(con.messages[2].from)
               .to.eql('account');
 
-            expect(con.messages[1].sName)
+            expect(con.messages[2].sName)
               .to.exist;
           })
           .end(done);

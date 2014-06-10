@@ -133,11 +133,8 @@ UserNote      |                         | notes created by team members about a 
 - color (hex color code for notifications / feedback)
 - ct
 - isActive (boolean)
-- live (boolean) if the app is in test mode, then false
-- liveKey
 - name
 - team [{accId, admin}]
-- testKey
 - x tags [] stores all tags that the app has used for its users
 - url (domain url)
 - ut
@@ -145,9 +142,7 @@ UserNote      |                         | notes created by team members about a 
 ##### Notes:
 
 - Admin can add / remove access to team members. On adding / removing access both Accounts and Apps collections have to be updated. The Account should also be notified by email.
-- Keys should be used because they can be easily switched
-- test key should be used in test environment
-- live key should be used in production environment
+- Update 10-06-2014: Earlier, there were three additional keys (`live`, `liveKey`, `testKey`) to switch between live and test modes. Removed them because they were not helping in segregating data in a simple way across the User, Company and Event models. It would be preferable to have an array (embedded documents) of environments instead, and make all queries in the context of an `environment-id` rather than an `app-id`.
 
 ### User
 

@@ -9,43 +9,214 @@ describe('Resource /track', function () {
 
 
   var TrackController = require('../../../api/routes/TrackController');
-  var AppModel = require('../../../api/models/App');
 
   // define test variables
   var newSession = {
     'hello': 'world'
   };
 
-  var newUser;
 
   var randomId = mongoose.Types.ObjectId;
-  var appKey;
+  var appId;
 
 
   before(function (done) {
     setupTestDb(function (err) {
-      appKey = saved.apps.first.testKey;
-
-      newUser = {
-        email: saved.users.first.email,
-      };
-
+      appId = saved.apps.first._id.toString();
       newSession = JSON.stringify(newSession);
-      newUser = JSON.stringify(newUser);
-
       done(err);
     });
   });
 
   describe('GET /track', function () {
 
+    var url, appId, uid;
+
     before(function (done) {
       logoutUser(done);
     });
 
+    beforeEach(function () {
+      appId = saved.users.first.aid.toString();
+      uid = saved.users.first._id.toString();
+      url = '/track';
+    });
+
     it('should return error if there is no app_id', function (done) {
 
-      var url = '/track';
+      request
+        .get(url)
+        .expect('Content-Type', /json/)
+        .expect(400)
+        .expect({
+          status: 400,
+          error: 'Please send app_id with the params'
+        })
+        .end(done);
+    });
+
+    it('should return error if there is no uid (u)', function (done) {
+
+      var q = qs.stringify({
+        app_id: appId
+      });
+
+      var testUrl = url + '?' + q;
+
+      request
+        .get(testUrl)
+        .expect('Content-Type', /json/)
+        .expect(400)
+        .expect({
+          status: 400,
+          error: 'Please send uid with the params'
+        })
+        .end(done);
+    });
+
+    // it('should return error if there is no user object',
+    //   function (done) {
+
+    //     var q = qs.stringify({
+    //       app_id: appId
+    //     });
+
+    //     var testUrl = url + '?' + q;
+
+    //     request
+    //       .get(testUrl)
+    //       .expect('Content-Type', /json/)
+    //       .expect(400)
+    //       .expect({
+    //         status: 400,
+    //         error: 'Please send user_id or email to identify user'
+    //       })
+    //       .end(done);
+
+    //   });
+
+    it('should create pageview event and return the aid, uid, cid',
+      function (done) {
+
+        var q = qs.stringify({
+          app_id: appId,
+          u: uid,
+          e: {
+            type: 'pageview',
+            path: '/account/login'
+          }
+        });
+
+        var testUrl = url + '?' + q;
+
+        request
+          .get(testUrl)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function (err, res) {
+            if (err) return done(err);
+
+            expect(res.body)
+              .to.have.property('aid');
+
+            // FIXME check for cid as well
+            // expect(res.body).to.have.property('cid');
+
+            expect(res.body)
+              .to.have.property('uid');
+
+
+            expect(res.body)
+              .to.have.property('eid');
+
+            done();
+          });
+
+      });
+
+    it('should create feature event and return the aid, uid',
+      function (done) {
+
+        var q = qs.stringify({
+          app_id: appId,
+          u: uid,
+          e: {
+            type: 'feature',
+            name: 'Created notification'
+          }
+        });
+
+        var testUrl = url + '?' + q;
+
+        request
+          .get(testUrl)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function (err, res) {
+            if (err) return done(err);
+
+            expect(res.body)
+              .to.have.property('aid', appId);
+
+            // FIXME check for cid as well
+            // expect(res.body).to.have.property('cid');
+
+            expect(res.body)
+              .to.have.property('uid', uid);
+
+
+            expect(res.body)
+              .to.have.property('eid')
+              .that.is.not.empty;
+
+            done();
+          });
+
+      });
+
+    it('should return error if event type is not pageview / feature',
+
+      function (done) {
+
+        var q = qs.stringify({
+          app_id: appId,
+          u: uid,
+          e: {
+            type: 'randomType',
+            path: '/account/login'
+          }
+        });
+
+        var testUrl = url + '?' + q;
+
+        request
+          .get(testUrl)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            status: 400,
+            error: 'Event type is not supported'
+          })
+          .end(done);
+
+      });
+
+  });
+
+
+  describe('GET /track/identify', function () {
+
+    var url;
+
+    before(function (done) {
+      logoutUser(done);
+    });
+
+    beforeEach(function () {
+      url = '/track/identify';
+    });
+
+    it('should return error if there is no app_id', function (done) {
 
       request
         .get(url)
@@ -61,12 +232,14 @@ describe('Resource /track', function () {
     it('should return error if there is no user object',
       function (done) {
 
-        var url = '/track?' +
-          'app_id=' +
-          appKey;
+        var query = qs.stringify({
+          app_id: appId
+        });
+
+        var testUrl = url + '?' + query;
 
         request
-          .get(url)
+          .get(testUrl)
           .expect('Content-Type', /json/)
           .expect(400)
           .expect({
@@ -80,16 +253,17 @@ describe('Resource /track', function () {
     it('should return error if user_id and email are missing',
       function (done) {
 
-        var user = JSON.stringify({});
+        var query = qs.stringify({
+          app_id: appId,
+          user: {
+            name: 'Prate'
+          }
+        });
 
-        var url = '/track?' +
-          'app_id=' +
-          appKey +
-          '&user=' +
-          user;
+        var testUrl = url + '?' + query;
 
         request
-          .get(url)
+          .get(testUrl)
           .expect('Content-Type', /json/)
           .expect(400)
           .expect({
@@ -102,77 +276,63 @@ describe('Resource /track', function () {
 
     it('should create user if user does not exist', function (done) {
 
-      var url = '/track?' +
-        'app_id=' +
-        appKey +
-        '&user=' +
-        newUser;
-
-
-      request
-        .get(url)
-        .expect('Content-Type', /json/)
-        .expect(200)
-        .end(done);
-
-    });
-
-    it('should return the uid, cid and sid', function (done) {
-
-      var url = '/track?' +
-        'app_id=' +
-        appKey +
-        '&user=' +
-        newUser;
-
-      function hasIds(res) {
-        var obj = res.body;
-        if (!(obj.uid && obj.cid && obj.sid)) {
-          return 'uid/cid/sid missing';
+      var query = qs.stringify({
+        app_id: appId.toString(),
+        user: {
+          email: 'randomUserTrackController@example.com'
         }
-      }
+      });
+
+      var testUrl = url + '?' + query;
 
       request
-        .get(url)
+        .get(testUrl)
         .expect('Content-Type', /json/)
         .expect(200)
-        .expect(hasIds)
-        .end(done);
+        .end(function (err, res) {
+          if (err) return done(err);
+
+          expect(res.body)
+            .to.have.property("aid");
+
+          expect(res.body)
+            .to.have.property("uid");
+
+          done();
+        });
 
     });
 
 
-    // it('should getOrCreate user if user cookie is not present',
-    //   function (done) {
+    it('should return aid / uid id user exists', function (done) {
 
-    //   });
+      var existingUser = saved.users.first.toJSON();
 
-    // it(
-    //   'should getOrCreate company if company cookie is not present and company object is present',
-    //   function (done) {
+      var query = qs.stringify({
+        app_id: appId.toString(),
+        user: {
+          email: existingUser.email
+        }
+      });
 
-    //   });
+      var testUrl = url + '?' + query;
 
-    // it('should create new session if session cookie is not present',
-    //   function (done) {
+      request
+        .get(testUrl)
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function (err, res) {
+          if (err) return done(err);
 
-    //   });
+          expect(res.body)
+            .to.have.property("aid", existingUser.aid.toString());
 
-    // it('should return error if no user object input',
+          expect(res.body)
+            .to.have.property("uid", existingUser._id.toString());
 
-    //   function (done) {
-
-    //     request
-    //       .get('/track?' + 'session=' + newSession)
-    //       .expect('Content-Type', /json/)
-    //       .expect(400)
-    //       .expect({
-    //         status: 400,
-    //         error: 'Please call user.identify with user details'
-    //       })
-    //       .end(done);
-
-    //   });
+          done();
+        });
+    });
 
   });
 
@@ -202,7 +362,7 @@ describe('Resource /track', function () {
     it('should return error if there is no user_id or email',
       function (done) {
 
-        var testUrl = url + '?app_id=' + appKey;
+        var testUrl = url + '?app_id=' + appId;
 
         request
           .get(testUrl)
@@ -218,7 +378,7 @@ describe('Resource /track', function () {
 
     it('should return error if invalid app_id',
       function (done) {
-        var testUrl = url + '?app_id=' + "randomappKey" + '&email=' +
+        var testUrl = url + '?app_id=' + "randomappId" + '&email=' +
           saved.users.first.email;
 
         request
@@ -235,7 +395,7 @@ describe('Resource /track', function () {
 
     it('should return error if app not found',
       function (done) {
-        var testUrl = url + '?app_id=' + "test_randomappKey" + '&email=' +
+        var testUrl = url + '?app_id=' + "test_randomappId" + '&email=' +
           saved.users.first.email;
 
         request
@@ -255,7 +415,7 @@ describe('Resource /track', function () {
       function (done) {
 
         var email = saved.users.first.email;
-        var testUrl = url + '?app_id=' + appKey + '&email=' + email;
+        var testUrl = url + '?app_id=' + appId + '&email=' + email;
 
         request
           .get(testUrl)
@@ -300,7 +460,7 @@ describe('Resource /track', function () {
       function (done) {
 
         var email = saved.users.first.email;
-        var testUrl = url + '?app_id=' + appKey + '&email=' + email;
+        var testUrl = url + '?app_id=' + appId + '&email=' + email;
 
         request
           .get(testUrl)
@@ -348,10 +508,10 @@ describe('Resource /track', function () {
   describe('POST /track/conversations', function () {
 
     var url = '/track/conversations';
-    var appKey;
+    var appId;
 
     before(function (done) {
-      appKey = saved.apps.first.liveKey;
+      appId = saved.apps.first._id;
       logoutUser(done);
     });
 
@@ -373,7 +533,7 @@ describe('Resource /track', function () {
 
         var testUrl = url;
         var newCon = {
-          'app_id': appKey
+          'app_id': appId
         };
 
         request
@@ -394,7 +554,7 @@ describe('Resource /track', function () {
 
         var testUrl = url;
         var newCon = {
-          'app_id': appKey,
+          'app_id': appId,
           'email': saved.users.first.email
         };
 
@@ -416,7 +576,7 @@ describe('Resource /track', function () {
         var testUrl = url;
 
         var newCon = {
-          'app_id': 'randomappKey',
+          'app_id': 'randomappId',
           'email': saved.users.first.email,
           'body': 'Hey man, how are you?'
         };
@@ -439,7 +599,7 @@ describe('Resource /track', function () {
         var testUrl = url;
 
         var newCon = {
-          'app_id': 'test_randomappKey',
+          'app_id': 'test_randomappId',
           'email': saved.users.first.email,
           'body': 'Hey man, how are you?'
         };
@@ -463,7 +623,7 @@ describe('Resource /track', function () {
         var email = saved.users.first.email;
         var testUrl = url;
         var newCon = {
-          'app_id': appKey,
+          'app_id': appId,
           'email': saved.users.first.email,
           'body': 'Hey man, how are you?'
         };
@@ -515,7 +675,7 @@ describe('Resource /track', function () {
         var email = saved.users.first.email;
         var testUrl = url;
         var newCon = {
-          'app_id': appKey,
+          'app_id': appId,
           'email': saved.users.first.email,
           'body': 'Hey man, how are you?',
           'amId': saved.automessages.first._id

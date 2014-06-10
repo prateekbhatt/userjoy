@@ -51,8 +51,9 @@ var mailer = require('../api/services/mailer');
  * Helpers
  */
 
-var render = require('../helpers/render-message');
+var appEmail = require('../helpers/app-email');
 var getRenderData = require('../helpers/get-render-data');
+var render = require('../helpers/render-message');
 
 
 /**
@@ -350,10 +351,10 @@ function amConsumer(cb) {
 
             // render body and subject in BEFORE calling mailer service
             var body = render.string(automessage.body, locals);
-            var subject = render.string(automessage.subject, locals);
+            var subject = render.string(automessage.sub, locals);
 
-            var fromEmail = appEmail(aid);
-            var fromName = amsg.sender.name;
+            var fromEmail = appEmail(automessage.aid);
+            var fromName = automessage.sender.name;
 
             var options = {
               locals: {
@@ -365,7 +366,7 @@ function amConsumer(cb) {
               },
               metadata: {
                 'type': 'automessage',
-                'amId': amsg._id
+                'amId': automessage._id
               },
               replyTo: {
                 email: fromEmail,

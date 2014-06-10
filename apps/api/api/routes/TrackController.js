@@ -15,15 +15,9 @@ var router = require('express')
 
 var App = require('../models/App');
 var Conversation = require('../models/Conversation');
+var Event = require('../models/Event');
 var Notification = require('../models/Notification');
 var User = require('../models/User');
-
-
-/**
- * Lib
- */
-
-var track = require('../lib/track');
 
 
 /**
@@ -43,200 +37,163 @@ router.use(cors());
 /**
  * GET /track
  *
+ * Tracks a 'pageview' or a 'feature' event
  *
- * =======================
- * PSEUDOCODE
- * =======================
- * NOTES:
- *
- * - create a user cookie (dodatado.uid, 2 years) for an identified user
- * - create a session cookie (dodatado.sid, 30 minutes) for an user session
- * - create a company cookie (dodatado.cid, 2 years) for an user session
- * =======================
- * Input
- * =======================
- *
- *  app
- *  session
- *  user || user cookie
- *  company (optional)
- *  event
- *
- * =======================
- * Authenticate
- * =======================
- *
- * fetch app with apikey = dodatado id
- * check if url == request url
- * else return
- *
- *
- * =======================
- * Create Event
- * =======================
- *
- * if no user input or no session input
- *   return
- *
- * if no session id
- *   create session
- * else
- *   fetch session
- *   if not valid session (uid, aid)
- *     create new session
- *
- * create event
- *
- * send session id cookie
- *
- * =======================
- * Create Session
- * =======================
- *
- * if no user input
- *   return
- *
- * if company input
- *   fetch company
- *   if company does not exist
- *     create company
- *
- * fetch user
- * if no user
- *   create user
- *
- * create session
- *
+ * @query {string} app_id
+ * @query {string} u user-id
+ * @query {string} c company-id (optional)
+ * @query {object} e event
+ *        @property {string} type pageview / feature
+ *        @property {string} name (required for feature type)
+ *        @property {string} path (required for pageview type)
+ *        @property {string} other properties (see Event model)
+ * @return {object}
+ *         @property {string} aid app-id
+ *         @property {string} eid event-id
+ *         @property {string} uid user-id
+ *         @property {string} cid company-id (only if company id provided)
  */
 
 router
   .route('/')
   .get(function (req, res, next) {
 
-
-    var data = req.query;
-    var appKey = data.app_id;
-    var user = data.user;
-    var url = req.host;
-    console.log('   /track', req.cookies);
+    logger.trace({
+      at: 'TrackController:track',
+      query: req.query
+    });
 
 
-    // fetch values from cookies
-    var uid = req.cookies['dodatado.uid'];
-    var sid = req.cookies['dodatado.sid'];
-    var cid = req.cookies['dodatado.cid'];
+    var q = req.query;
+    var aid = q.app_id;
+    var uid = q.u;
+    var cid = q.c;
+    var event = q.e;
 
+    // VALIDATIONS : START //////////////////
 
-    // Validations
-
-    if (!appKey) {
+    if (!aid) {
       return res.badRequest('Please send app_id with the params');
     }
 
-
-    // if both the user identifier and user cookie are not present, respond
-    // with an error
-    if (!(user || uid)) {
-      return res.badRequest('Please send user_id or email to identify user');
+    if (!uid) {
+      return res.badRequest('Please send uid with the params');
     }
 
-    user = JSON.parse(user);
+    // VALIDATIONS : END //////////////////
 
-    if (!(user.email || user.user_id)) {
-      return res.badRequest('Please send user_id or email to identify user');
-    }
+    var callback = function (err, event) {
 
-
-    async.waterfall([
-
-        function findAndVerifyApp(cb) {
-
-          App
-            .findByKey(appKey, function (err, app) {
-              if (err) {
-                return cb(err);
-              }
-
-              if (!app) {
-                return cb(new Error('App Not Found'));
-              }
-
-              cb(null, app);
-
-            });
-
-        },
-
-        function checkOrCreateCompany(cb) {
-
-          // if valid cid, move on
-          // else if no valid company object, move on
-          // else getOrCreate company
-
-          if (cid) {
-            return cb();
-          }
-
-          if (!company) {
-            return cb();
-          }
-
-          // TODO : getOrCreate company here
-          cb();
-
-        },
-
-
-        function checkOrCreateUser(app, cb) {
-
-          // if valid uid, move on
-          // else getOrCreate user
-
-          if (uid) {
-            return cb(null, uid);
-          }
-
-          User.getOrCreate(app._id, user, function (err, usr) {
-            cb(err, usr._id);
-          });
-
-        },
-
-
-        function checkOrCreateSession(cb) {
-
-          // if valid session id, move on
-          // else create new session
-
-          if (sid) {
-            return cb();
-          }
-
-          // TODO create new session
-          cb();
-        },
-
-
-        function createEvent(arguments) {
-
+      if (err) {
+        if (err.message === 'NO_EMAIL_OR_USER_ID') {
+          return res.badRequest(
+            'Please send user_id or email to identify user');
         }
 
+        return next(err);
+      }
 
-      ],
+      var obj = {
+        eid: event._id,
+        aid: event.aid,
+        uid: event.uid,
+        cid: event.cid
+      };
 
-      function (err, results) {
+      res
+        .status(200)
+        .json(obj);
 
-        if (err) return next(err);
+    };
 
-        var resObj = {
-          uid: 'user_id',
-          cid: 'company_id',
-          sid: 'session_id'
-        };
+    var ids = {
+      aid: aid,
+      uid: uid
+    };
 
-        res.jsonp(resObj);
+    if (cid) ids.cid = cid;
 
-      });
+    if (event.type === 'pageview') {
+
+      var path = event.path;
+      return Event.pageview(ids, path, callback);
+
+    } else if (event.type === 'feature') {
+
+      var name = event.name;
+      var feature = event.feature;
+      var meta = event.meta;
+
+      return Event.feature(ids, name, feature, meta, callback);
+
+    } else {
+
+      return res.badRequest('Event type is not supported');
+
+    }
+
+
+  });
+
+
+/**
+ * GET /track/identify
+ *
+ * Identifies a user
+ *
+ *
+ * @query {string} app_id
+ * @query {object} user
+ *        @property email
+ *        @property user_id (optional)
+ *        @property other user properties (see user model)
+ * @return {object}
+ *         @property aid app-id
+ *         @property uid user-id
+ */
+
+router
+  .route('/identify')
+  .get(function (req, res, next) {
+
+
+    logger.trace({
+      at: 'TrackController:identify',
+      query: req.query
+    });
+
+
+    var data = req.query;
+    var aid = data.app_id;
+    var user = data.user;
+
+    // Validations
+    if (!aid) {
+      return res.badRequest('Please send app_id with the params');
+    }
+
+    User.findOrCreate(aid, user, function (err, usr) {
+
+      if (err) {
+
+        if (err.message === 'NO_EMAIL_OR_USER_ID') {
+          return res.badRequest(
+            'Please send user_id or email to identify user');
+        }
+
+        return next(err);
+      }
+
+      var obj = {
+        aid: usr.aid,
+        uid: usr._id
+      };
+
+      res
+        .status(200)
+        .json(obj);
+
+    });
 
   });
 
@@ -264,7 +221,7 @@ router
 
 
     var data = req.query;
-    var appKey = data.app_id;
+    var aid = data.app_id;
 
     // user identifiers
     var email = data.email;
@@ -273,8 +230,8 @@ router
 
     // VALIDATIONS
 
-    // if appKey is not present, there is no way to identify an app
-    if (!appKey) {
+    // if aid is not present, there is no way to identify an app
+    if (!aid) {
       return res.badRequest('Please send app_id with the params');
     }
 
@@ -288,9 +245,17 @@ router
 
 
         function getApp(cb) {
-          App.findByKey(appKey, function (err, app) {
+          App.findById(aid, function (err, app) {
 
-            if (err) return cb(err);
+            if (err) {
+
+              if (err.name === 'CastError') {
+                return cb(new Error('INVALID_APP_KEY'));
+              }
+
+              return cb(err);
+            }
+
             if (!app) return cb(new Error('APP_NOT_FOUND'));
             cb(null, app);
           });
@@ -330,7 +295,8 @@ router
             }
           };
 
-          Notification.findOneAndRemove(conditions, options, function (err, notf) {
+          Notification.findOneAndRemove(conditions, options, function (err,
+            notf) {
             cb(err, notf, app);
           });
 
@@ -390,7 +356,7 @@ router
     });
 
     var data = req.body;
-    var appKey = data.app_id;
+    var aid = data.app_id;
     var body = data.body;
 
     // if the message is a reply to a conversation, then it should have the
@@ -404,7 +370,7 @@ router
 
     // VALIDATIONS : START //////////////////
 
-    if (!appKey) {
+    if (!aid) {
       return res.badRequest('Please send app_id with the params');
     }
 
@@ -426,8 +392,15 @@ router
 
 
         function getApp(cb) {
-          App.findByKey(appKey, function (err, app) {
-            if (err) return cb(err);
+          App.findById(aid, function (err, app) {
+            if (err) {
+
+              if (err.name === 'CastError') {
+                return cb(new Error('INVALID_APP_KEY'));
+              }
+
+              return cb(err);
+            }
             if (!app) return cb(new Error('APP_NOT_FOUND'));
             cb(null, app);
           });

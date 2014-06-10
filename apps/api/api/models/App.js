@@ -13,13 +13,6 @@ var Schema = mongoose.Schema;
 
 
 /**
- * Helpers
- */
-
-var apiKey = require('../../helpers/api-key');
-
-
-/**
  * Team members schema
  */
 
@@ -67,20 +60,6 @@ var AppSchema = new Schema({
   },
 
 
-  // if the app is live then true, else if the app is in test mode, then false
-  live: {
-    type: Boolean,
-    default: true,
-    required: [true, 'Provide valid live mode for app']
-  },
-
-
-  liveKey: {
-    type: String,
-    unique: true
-  },
-
-
   name: {
     type: String,
     required: [true, 'App name is required'],
@@ -89,12 +68,6 @@ var AppSchema = new Schema({
 
 
   team: [TeamMemberSchema],
-
-
-  testKey: {
-    type: String,
-    unique: true
-  },
 
 
   url: {
@@ -123,30 +96,6 @@ AppSchema.pre('save', function (next) {
 });
 
 
-/**
- * Middleware to add test/live keys
- * when a new app is created
- */
-
-AppSchema.pre('save', function (next) {
-
-  var app = this;
-
-  // keys should be automatically added
-  // only for new apps
-
-  if (!app.isNew) {
-    return next();
-  }
-
-  app.testKey = apiKey.new('test');
-  app.liveKey = apiKey.new('live');
-
-  next();
-
-});
-
-
 AppSchema.statics.findByAccountId = function (accountId, cb) {
 
   App
@@ -156,29 +105,6 @@ AppSchema.statics.findByAccountId = function (accountId, cb) {
     .populate('team.accid', 'name email')
     .exec(cb);
 
-};
-
-
-/**
- * Gets app with the key provided
- *
- * @param  {string}   key
- * @param  {function} cb callback
- */
-AppSchema.statics.findByKey = function (key, cb) {
-
-  var mode = key.split('_')[0];
-  var conditions = {};
-
-  if (!_.contains(['live', 'test'], mode)) {
-    return cb(new Error('INVALID_APP_KEY'));
-  }
-
-  mode === 'live' ? (conditions.liveKey = key) : (conditions.testKey = key);
-
-  App
-    .findOne(conditions)
-    .exec(cb);
 };
 
 
@@ -229,22 +155,6 @@ AppSchema.statics.addMember = function (aid, accid, cb) {
 
     cb
   );
-};
-
-
-/**
- * Checks if request url matches app url
- * Used to authenticate event calls
- *
- * @param {string} url
- * @return {boolean}
- */
-
-AppSchema.methods.checkUrl = function (url) {
-  if (!url) {
-    throw new Error('Invalid Url');
-  }
-  return (this.url === url);
 };
 
 

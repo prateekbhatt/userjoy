@@ -506,9 +506,9 @@ describe('Model Conversation', function () {
 
         expect(con.messages)
           .to.be.an('array')
-          .that.has.length(2);
+          .that.has.length(3);
 
-        var msg = con.messages[1];
+        var msg = con.messages[2];
 
         expect(msg)
           .to.be.an('object');
