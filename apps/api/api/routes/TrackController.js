@@ -20,13 +20,6 @@ var User = require('../models/User');
 
 
 /**
- * Lib
- */
-
-var track = require('../lib/track');
-
-
-/**
  * Helpers
  */
 
@@ -115,10 +108,10 @@ router
 
 
     var data = req.query;
-    var appKey = data.app_id;
+    var aid = data.app_id;
     var user = data.user;
     var url = req.host;
-    console.log('   /track', req.cookies);
+    console.log('/track', req.cookies, data);
 
 
     // fetch values from cookies
@@ -129,7 +122,7 @@ router
 
     // Validations
 
-    if (!appKey) {
+    if (!aid) {
       return res.badRequest('Please send app_id with the params');
     }
 
@@ -152,7 +145,7 @@ router
         function findAndVerifyApp(cb) {
 
           App
-            .findByKey(appKey, function (err, app) {
+            .findById(aid, function (err, app) {
               if (err) {
                 return cb(err);
               }
@@ -264,7 +257,7 @@ router
 
 
     var data = req.query;
-    var appKey = data.app_id;
+    var aid = data.app_id;
 
     // user identifiers
     var email = data.email;
@@ -273,8 +266,8 @@ router
 
     // VALIDATIONS
 
-    // if appKey is not present, there is no way to identify an app
-    if (!appKey) {
+    // if aid is not present, there is no way to identify an app
+    if (!aid) {
       return res.badRequest('Please send app_id with the params');
     }
 
@@ -288,9 +281,17 @@ router
 
 
         function getApp(cb) {
-          App.findByKey(appKey, function (err, app) {
+          App.findById(aid, function (err, app) {
 
-            if (err) return cb(err);
+            if (err) {
+
+              if (err.name === 'CastError') {
+                return cb(new Error('INVALID_APP_KEY'));
+              }
+
+              return cb(err);
+            }
+
             if (!app) return cb(new Error('APP_NOT_FOUND'));
             cb(null, app);
           });
@@ -330,7 +331,8 @@ router
             }
           };
 
-          Notification.findOneAndRemove(conditions, options, function (err, notf) {
+          Notification.findOneAndRemove(conditions, options, function (err,
+            notf) {
             cb(err, notf, app);
           });
 
@@ -390,7 +392,7 @@ router
     });
 
     var data = req.body;
-    var appKey = data.app_id;
+    var aid = data.app_id;
     var body = data.body;
 
     // if the message is a reply to a conversation, then it should have the
@@ -404,7 +406,7 @@ router
 
     // VALIDATIONS : START //////////////////
 
-    if (!appKey) {
+    if (!aid) {
       return res.badRequest('Please send app_id with the params');
     }
 
@@ -426,8 +428,15 @@ router
 
 
         function getApp(cb) {
-          App.findByKey(appKey, function (err, app) {
-            if (err) return cb(err);
+          App.findById(aid, function (err, app) {
+            if (err) {
+
+              if (err.name === 'CastError') {
+                return cb(new Error('INVALID_APP_KEY'));
+              }
+
+              return cb(err);
+            }
             if (!app) return cb(new Error('APP_NOT_FOUND'));
             cb(null, app);
           });
