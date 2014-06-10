@@ -1,5 +1,5 @@
-<div ng-controller="NavbarCtrl" ng-class="class" ng-show="loggedIn" style= "padding-top: 70px;">
-    <nav role="navigation" style="background-color: #222; border-color: #080808" class="navbar navbar-inverse navbar-fixed-top" bs-navbar>
+<div ng-controller="NavbarCtrl" ng-class="class" ng-show="loggedIn">
+    <nav role="navigation" style="background-color: #f8f8f8; border-color: #e7e7e7;" class="navbar navbar-inverse navbar-fixed-top" bs-navbar>
         <div class="container">
             <div class="navbar-header">
                 <button type="button" data-toggle="collapse" data-target=".navbar-ex1-collapse" class="navbar-toggle">
@@ -17,9 +17,9 @@
                 </a>
                 <ul class="nav navbar-nav">
                     <!-- <li ng-repeat="element in navbarElements">
-                        <a href="{{element.href}}">
-                            <i class="{{element.icon}}"></i>
-                        {{element.name}}</a>
+                                                                        <a href="{{element.href}}">
+                                                                            <i class="{{element.icon}}"></i>
+                                                                        {{element.name}}</a>
                     </li> -->
                     <li>
                         <a href="/apps/{{appId}}/feed" ng-class="{'active': isActive('feed')}">
@@ -43,6 +43,10 @@
                         </a>
                     </li>
                 </ul>
+            </div>
+            <div class="col-md-4" style="margin-top: 15px;">
+                <div class="alert alert-success text-center" style="padding: 3px; border-color: #30b661; margin-bottom: 0px; position: absolute; width: 400px;" ng-show="success">{{successMsgRootScope}}</div>
+                <div class="alert alert-danger text-center" style="padding: 3px; border-color: #c0392b; margin-bottom: 0px; position: absolute; width: 400px;" ng-show="error">{{errMsgRootScope}}</div>
             </div>
             <div role="navigation" class="collapse navbar-collapse navbar-right navbar-ex1-collapse">
                 <ul class="nav navbar-nav">
@@ -106,16 +110,16 @@
         </div>
     </nav>
 </div>
-<div class="row showError" ng-show="error">
-    <div class="alert alert-danger text-center navbar-fixed-top" style="margin-top: 61px; margin-bottom: 30px; z-index: 20;">
-        <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="hideError($event)">&times;</button>
-        {{errMsgRootScope}}
-    </div>
-    <!-- <alert type="danger" close="closeAlert($index)">{{alert}}</alert> -->
+<!-- <div class="row showError" ng-show="error">
+            <div class="alert alert-danger text-center navbar-fixed-top" style="margin-top: 61px; margin-bottom: 30px; z-index: 20;">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="hideError($event)">&times;</button>
+                        {{errMsgRootScope}}
+            </div>
+            <alert type="danger" close="closeAlert($index)">{{alert}}</alert>
 </div>
 <div class="row showSuccess" ng-show="success">
-    <div class="alert alert-success text-center navbar-fixed-top" style="margin-top: 61px; margin-bottom: 30px; z-index: 20;">
-        <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="hideSuccess($event)">&times;</button>
-        {{successMsgRootScope}}
-    </div>
-</div>
+            <div class="alert alert-success text-center navbar-fixed-top" style="margin-top: 61px; margin-bottom: 30px; z-index: 20;">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="hideSuccess($event)">&times;</button>
+                        {{successMsgRootScope}}
+            </div>
+</div> -->
