@@ -67,45 +67,41 @@ angular.module('do.navbar', [])
         //   }, 5000);
         // }
 
-        $scope.$watch($rootScope.errMsg, function () {
-          console.log("inside $rootscope.errMsg watch: ",
-            $rootScope.errMsg);
-          $scope.errMessage = $rootScope.errMsg;
-        })
+        // $scope.$watch($rootScope.errMsg, function () {
+        //   console.log("inside $rootscope.errMsg watch: ",
+        //     $rootScope.errMsg);
+        //   $scope.errMessage = $rootScope.errMsg;
+        // })
+        
+        // $scope.$watch($rootScope.error, function () {
+        //   $timeout(function () {
+        //     $scope.error = false;
+        //     $rootScope.error = false;
+        //   }, 5000);
+        // })
 
-        // $scope.error = function () {
-        //     return $rootScope.error;
+        // $timeout(function () {
+        //   $scope.success = false;
+        //   $rootScope.success = false;
+        // }, 5000);
+
+        // $scope.$watch($rootScope.success, function () {
+        //   console.log(
+        //     "success msg is displayed YOYOOYOYOOYOYOY!!!!!!!!!"
+        //   )
+        //   $timeout(function () {
+        //     $scope.success = false;
+        //     $rootScope.success = false;
+        //   }, 5000);
+        // })
+
+        // if ($rootScope.success) {
+        //   console.log(
+        //     "success msg is displayed YOYOOYOYOOYOYOY!!!!!!!!!"
+        //   );
         // }
-        // 
-        $scope.$watch($rootScope.error, function () {
-          $timeout(function () {
-            $scope.error = false;
-            $rootScope.error = false;
-          }, 5000);
-        })
 
-        $timeout(function () {
-          $scope.success = false;
-          $rootScope.success = false;
-        }, 5000);
-
-        $scope.$watch($rootScope.success, function () {
-          console.log(
-            "success msg is displayed YOYOOYOYOOYOYOY!!!!!!!!!"
-          )
-          $timeout(function () {
-            $scope.success = false;
-            $rootScope.success = false;
-          }, 5000);
-        })
-
-        if ($rootScope.success) {
-          console.log(
-            "success msg is displayed YOYOOYOYOOYOYOY!!!!!!!!!"
-          );
-        }
-
-        $scope.error = $rootScope.error;
+        // $scope.error = $rootScope.error;
 
         // var callback = function () {
         //     $timeout(function(){
@@ -117,22 +113,22 @@ angular.module('do.navbar', [])
         // }
 
 
-        $rootScope.hideError = function (event) {
-          event.preventDefault();
-          console.log("inside hide error");
-          $rootScope.error = false;
-          // $scope.error = false;
-        }
+        // $rootScope.hideError = function (event) {
+        //   event.preventDefault();
+        //   console.log("inside hide error");
+        //   $rootScope.error = false;
+        //   // $scope.error = false;
+        // }
 
-        $scope.success = $rootScope.success;
+        // $scope.success = $rootScope.success;
 
 
-        $rootScope.hideSuccess = function (event) {
-          event.preventDefault();
-          console.log("inside hide success")
-          $rootScope.success = false;
-          $scope.success = false;
-        }
+        // $rootScope.hideSuccess = function (event) {
+        //   event.preventDefault();
+        //   console.log("inside hide success")
+        //   $rootScope.success = false;
+        //   $scope.success = false;
+        // }
 
         /*$scope.apps = AppService.getLoggedInApps();
             console.log("navbar apps: ", $scope.apps);*/
@@ -222,8 +218,15 @@ angular.module('do.navbar', [])
 
     $scope.logout = function () {
       AuthService.logout();
-      // $scope.apps = [];
+      // $scope.apps = []; 
       // $location.path('/login');
     };
   }
-]);
+])
+  .controller('serverErrSuccessCtrl', ['$scope',
+    function ($scope) {
+        
+
+
+    }
+  ]);

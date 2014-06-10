@@ -130,7 +130,7 @@ var app = angular.module('dodatado', [
   $httpProvider.defaults.withCredentials = true;
   delete $httpProvider.defaults.headers.common['X-Requested-With'];
 
-  $httpProvider.interceptors.push(function ($rootScope, $location, $q) {
+  $httpProvider.interceptors.push(function ($rootScope, $location, $q, $timeout) {
     $rootScope.error = false;
     $rootScope.success = false;
     $rootScope.errMsgRootScope = '';
@@ -162,6 +162,9 @@ var app = angular.module('dodatado', [
           $rootScope.errorMssRootScope = '';
           $rootScope.error = false;
           $rootScope.success = true;
+          $timeout(function(){
+            $rootScope.success = false;
+          }, 3000);
         }
         if (response.status === 201) {
           console.log("success: ", response);
@@ -169,6 +172,9 @@ var app = angular.module('dodatado', [
           $rootScope.errorMssRootScope = '';
           $rootScope.error = false;
           $rootScope.success = true;
+          $timeout(function(){
+            $rootScope.success = false;
+          }, 3000);
         }
         return response;
       },
@@ -186,6 +192,9 @@ var app = angular.module('dodatado', [
           $rootScope.successMsgRootScope = '';
           $rootScope.success = false;
           console.log("$rootScope errMSg: ", $rootScope.errMsgRootScope);
+          $timeout(function(){
+            $rootScope.error = false;
+          }, 5000);
         }
         // if we're not logged-in to the web service, redirect to login page
         if (rejection.status === 401 && $location.path() !=
