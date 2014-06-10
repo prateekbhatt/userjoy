@@ -300,10 +300,10 @@ angular.module('do.automate', [])
 .controller('textAngularCtrl', ['$scope', 'saveMsgService', '$location',
   'modelsAutomate', 'AppService', 'segmentService', 'ErrMsgService',
   '$stateParams', 'AutoMsgService', 'CurrentAppService', 'AppModel',
-  'AccountService',
+  'AccountService', 'modelsSegment',
   function ($scope, saveMsgService, $location, modelsAutomate,
     AppService, segmentService, ErrMsgService, $stateParams,
-    AutoMsgService, CurrentAppService, AppModel, AccountService) {
+    AutoMsgService, CurrentAppService, AppModel, AccountService, modelsSegment) {
 
 
     CurrentAppService.getCurrentApp()
@@ -314,13 +314,22 @@ angular.module('do.automate', [])
         console.log("sid: ", segmentService.getSingleSegment()
           ._id);
         $scope.currApp = $stateParams.id;
+        $scope.segid = $stateParams.sid;
         $scope.showNotification = true;
         $scope.showEmail = false;
         $scope.showAutoMsgError = false;
-        $scope.segment = segmentService.getSingleSegment().name;
 
         var populatePage = function () {
           // $scope.email = "savinay@dodatado.com";
+          
+          var cb = function (err) {
+            if(err) {
+              return err;
+            }
+            console.log("success in getting a segment");
+            $scope.segment = segmentService.getSingleSegment().name;
+          }
+          modelsSegment.getSegment($scope.currApp, $scope.segid, cb);
           $scope.selectedMessageType = {
             icon: "fa fa-bell",
             value: "Notification"
