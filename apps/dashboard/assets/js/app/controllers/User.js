@@ -1187,10 +1187,11 @@ angular.module('do.users', [])
 
 
           if ($scope.mail.length > 50) {
-            $scope.showMaxMsgErr = true;
-            $scope.maxMsgErr =
-              "Maximum Messages that can be sent at once is 50";
-
+            $rootScope.error = true;
+            $rootScope.errMsgRootScope = 'Maximum Messages that can be sent at once is 50';
+            $timeout(function(){
+              $rootScope.error = false;
+            }, 5000);
           } else {
 
             var modalInstance = $modal.open({
