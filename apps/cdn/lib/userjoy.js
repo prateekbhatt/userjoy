@@ -1,3 +1,4 @@
+var ajax = require('ajax');
 var app = require('./app');
 var bind = require('bind');
 var callback = require('callback');
@@ -22,50 +23,8 @@ var querystring = require('querystring');
 var queue = require('./queue');
 var size = require('object')
   .length;
-var store = require('./store');
 var url = require('url');
 var user = require('./user');
-
-/**
- * TODO
- *
- * - ASSUME THERE IS ONLY ONE INTEGRATION AND THEN REMOVE UNNECESSARY
- * ABSTRACTION
- * - Remove all facade contructors
- * - In place of facade functions, use constructors in company and user modules
- * - Create new constructors for Alias, Track and Page in the root dir
- * - Update _invoke function to send data
- * - Remove Emitter
- * - Remove all integration related functions
- * - Remove all unused 'components'
- * - Update tests
- *
- *
- * ===================
- * PSEUDO-CODE
- * ===================
- *
- * In initialize, load user and company from storage
- *
- * In invokeQueue, check if identify user / company
- * functions are present in the queue. If yes, invoke these functions
- * before invoking other event-related functions
- *
- * In identify user / company, if unique id is not
- * equal to the id stored in cookie, then reset
- * user / company, and then set new id / traits
- * change entity.prototype.identify function to delete current id / traits
- *
- * Session: create separate session cookie with maxAge of 30 minutes.
- * Every time a new event happens, check if the session exists. If it does
- * not exist, create a new session and pass session related data to the new
- * session. Session should be an entity with its own traits. if there is a
- * valid session id, send it alongwith the request, else the server should
- * create a new session, and send back the session id in the jsonp callback
- *
- */
-
-
 
 
 /**
@@ -81,34 +40,28 @@ module.exports = UserJoy;
 
 function UserJoy() {
   this.debug = debug;
-  this._timeout = 300;
-  this.api_url = '/track';
-  this.jsonp_callback = 'foo';
+  this._timeout = 20000;
+  this.TRACK_URL = 'http://api.do.localhost/track';
+  this.IDENTIFY_URL = 'http://api.do.localhost/track/identify';
+  this.COMPANY_URL = 'http://api.do.localhost/track/company';
+
   bind.all(this);
 }
 
 
 /**
- * Initialize with the given `settings` and `options`.
+ * Initialize.
  *
- * @param {Object} settings
- * @param {Object} options (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.initialize = function (settings, options) {
-
+UserJoy.prototype.initialize = function () {
   var self = this;
 
   this.debug('initialize');
 
-  settings = settings || {};
-  options = options || {};
-  this._options(options);
-
-  // load user now that options are set
-  user.load();
-  company.load();
+  // set the app id
+  this.aid = window._userjoy_id;
 
   // set tasks which were queued before initialization
   queue
@@ -122,11 +75,12 @@ UserJoy.prototype.initialize = function (settings, options) {
     app_id: window._userjoy_id,
 
     // FIXME change before production
-    apiUrl: 'http://api.do.localhost/track'
+    apiUrl: self.TRACK_URL
   });
 
-  // FIXME: REMOVE ME
-  // this.debug();
+  setTimeout(function () {
+
+  }, 500)
 
   // FIXME: THIS CODE IS NOT TESTED
   notification.load(function (err) {
@@ -140,9 +94,7 @@ UserJoy.prototype.initialize = function (settings, options) {
   });
 
 
-
-  // track page view
-  this.page();
+  this.debug('INITIALIZED:: %o', this);
 
   return this;
 };
@@ -155,8 +107,8 @@ UserJoy.prototype.initialize = function (settings, options) {
  */
 
 UserJoy.prototype._invokeQueue = function () {
-
   for (var i = queue.tasks.length - 1; i >= 0; i--) {
+    this.debug('_invokeQueue %o', queue.tasks);
     this.push(queue.tasks.shift());
   };
 
@@ -172,6 +124,9 @@ UserJoy.prototype._invokeQueue = function () {
  */
 
 UserJoy.prototype.identify = function (traits, fn) {
+  var self = this;
+
+  this.debug('identify');
 
   if (!is.object(traits)) {
     this.debug('err: userjoy.identify must be passed a traits object');
@@ -186,38 +141,78 @@ UserJoy.prototype.identify = function (traits, fn) {
 
   user.identify(traits);
 
+  var data = {
+    app_id: self.aid,
+    user: user.traits()
+  };
+
+  ajax({
+    type: 'GET',
+    url: self.IDENTIFY_URL,
+    data: data,
+    success: function (ids) {
+      self.debug("identify success: %o", ids);
+      ids || (ids = {});
+
+      // set uid to cookie
+      cookie.uid(ids.uid);
+    },
+    error: function (err) {
+      self.debug("identify error: %o", err);
+    }
+  });
+
   this._callback(fn);
   return this;
 };
 
 
 /**
- * Return the current user.
- *
- * @return {Object}
- */
-
-UserJoy.prototype.user = function () {
-  return user;
-};
-
-
-/**
  * Identify a company by `traits`.
  *
- * @param {Object} traits
+ * @param {Object} traits (optional)
  * @param {Function} fn (optional)
  * @return {UserJoy}
  */
 
 UserJoy.prototype.company = function (traits, fn) {
+  var self = this;
+
+  this.debug('company');
 
   if (!is.object(traits)) {
     this.debug('err: userjoy.company must be passed a traits object');
-    return this;
+    return;
+  }
+
+  // if no company identifier, return
+  if (!traits.company_id) {
+    self.debug('userjoy.company must provide the company_id');
+    return;
   }
 
   company.identify(traits);
+
+  var data = {
+    app_id: self.aid,
+    company: company.traits()
+  };
+
+  ajax({
+    type: 'GET',
+    url: self.COMPANY_URL,
+    data: data,
+    success: function (ids) {
+      self.debug("company success: %o", ids);
+      ids || (ids = {});
+
+      // set cid to cookie
+      cookie.cid(ids.cid);
+    },
+    error: function (err) {
+      self.debug("company error: %o", err);
+    }
+  });
 
   this._callback(fn);
   return this;
@@ -229,20 +224,21 @@ UserJoy.prototype.company = function (traits, fn) {
  *
  * @param {String} event
  * @param {Object} properties (optional)
- * @param {Object} options (optional)
  * @param {Function} fn (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.track = function (event, properties, options, fn) {
-  if (is.fn(options)) fn = options, options = null;
-  if (is.fn(properties)) fn = properties, options = null, properties = null;
+UserJoy.prototype.track = function (event, properties, fn) {
 
-  this._send('track', {
-    properties: properties,
-    options: options,
-    event: event
-  });
+
+  this.debug('track', event, properties);
+
+  if (is.fn(properties)) fn = properties, properties = null;
+
+
+  // FIXME: add additional event types on the server: form, click
+
+  this._sendEvent('feature', event, null, properties);
 
   this._callback(fn);
   return this;
@@ -262,6 +258,9 @@ UserJoy.prototype.track = function (event, properties, options, fn) {
 UserJoy.prototype.trackLink = function (links, event, properties) {
   if (!links) return this;
   if (is.element(links)) links = [links]; // always arrays, handles jquery
+
+  // if no name attached to event, do not track
+  if (!event) return this;
 
   var self = this;
   each(links, function (el) {
@@ -294,6 +293,10 @@ UserJoy.prototype.trackLink = function (links, event, properties) {
  */
 
 UserJoy.prototype.trackForm = function (forms, event, properties) {
+
+
+  this.debug('trackForm')
+
   if (!forms) return this;
   if (is.element(forms)) forms = [forms]; // always arrays, handles jquery
 
@@ -333,19 +336,17 @@ UserJoy.prototype.trackForm = function (forms, event, properties) {
  * @param {String} category (optional)
  * @param {String} name (optional)
  * @param {Object or String} properties (or path) (optional)
- * @param {Object} options (optional)
  * @param {Function} fn (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.page = function (category, name, properties, options, fn) {
+UserJoy.prototype.page = function (category, name, properties, fn) {
 
-  if (is.fn(options)) fn = options, options = null;
-  if (is.fn(properties)) fn = properties, options = properties = null;
-  if (is.fn(name)) fn = name, options = properties = name = null;
-  if (is.object(category)) options = name, properties = category, name =
-    category = null;
-  if (is.object(name)) options = properties, properties = name, name = null;
+  if (category && !is.string(category)) return this; // SHOW ERROR
+
+  if (is.fn(properties)) fn = properties, properties = null;
+  if (is.fn(name)) fn = name, properties = name = null;
+  if (is.object(name)) properties = name, name = null;
   if (is.string(category) && !is.string(name)) name = category, category =
     null;
 
@@ -358,17 +359,14 @@ UserJoy.prototype.page = function (category, name, properties, options, fn) {
   };
 
   if (name) defs.name = name;
+
+  name = defs.path;
   if (category) defs.category = category;
 
   properties = clone(properties) || {};
   defaults(properties, defs);
 
-  this._send('page', {
-    properties: properties,
-    category: category,
-    options: options,
-    name: name
-  });
+  this._sendEvent('pageview', name, category, properties);
 
   this._callback(fn);
   return this;
@@ -383,24 +381,6 @@ UserJoy.prototype.page = function (category, name, properties, options, fn) {
 
 UserJoy.prototype.timeout = function (timeout) {
   this._timeout = timeout;
-};
-
-
-/**
- * Apply options.
- *
- * @param {Object} options
- * @return {UserJoy}
- * @api private
- */
-
-UserJoy.prototype._options = function (options) {
-  options = options || {};
-  cookie.options(options.cookie);
-  store.options(options.localStorage);
-  user.options(options.user);
-  company.options(options.company);
-  return this;
 };
 
 
@@ -428,60 +408,41 @@ UserJoy.prototype._callback = function (fn) {
  * @api private
  */
 
-UserJoy.prototype._send = function (type, traits) {
+UserJoy.prototype._sendEvent = function (type, name, module, properties) {
 
-  this.debug()
-
+  var self = this;
   // TODO: send data to userjoy api here
 
+  var uid = cookie.uid();
+  var cid = cookie.cid();
+
   var data = {
-    event: {
+    app_id: self.aid,
+    e: {
       type: type,
-      traits: traits
+      name: name,
     },
-    user: {
-      id: user.id(),
-      traits: user.traits()
-    }
+    u: uid
   };
 
-  if (company.id()) {
-    data.company = {
-      id: company.id(),
-      traits: company.traits()
-    };
-  }
+  if (cid) data.c = cid;
 
-  this._jsonp(data);
-  return this;
-};
+  if (module) data.e.feature = module;
+  if (properties) data.e.meta = properties;
 
 
-/**
- * Send data to api using JSON-P
- *
- * @param {Object} data to be sent
- * @return {userjoy}
- */
+  ajax({
+    type: 'GET',
+    url: self.TRACK_URL,
+    data: data,
+    success: function (msg) {
+      self.debug("success " + msg);
+    },
+    error: function (err) {
+      self.debug("error " + err);
+    }
+  });
 
-UserJoy.prototype._jsonp = function (data) {
-
-  function foo(data) {
-    // do stuff with JSON
-    console.log('recieved foo data', data);
-  }
-
-  data.callback = foo;
-
-  data = json.stringify(data);
-
-  // var script = document.createElement('script');
-
-  // script.src = this.api_url +
-  //   '?data=' +
-  //   data;
-
-  // document.getElementsByTagName('head')[0].appendChild(script);
   return this;
 };
 
