@@ -41,7 +41,6 @@ angular.module('models.auth', ['services'])
                 console.log(
                   "AppService data Auth.js",
                   AppService.getLoggedInApps());
-                // $state.go('list');
                 $location.path('/apps/' + AppService.getLoggedInApps()[0]
                   ._id + '/users/list');
                 AppService.setCurrentApp(AppService.getLoggedInApps()[0]);
@@ -57,7 +56,7 @@ angular.module('models.auth', ['services'])
         .error(function (err) {
           console.log("error in signing in");
           console.log(err.error);
-          ErrMsgService.setErrorMessage(err.error);
+          $rootScope.errMsgRootScope = err.error;
         })
     };
 
