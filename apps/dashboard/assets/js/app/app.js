@@ -170,7 +170,7 @@ var app = angular.module('dodatado', [
         }
         if (response.status === 200 && response.config.method === 'PUT') {
           $rootScope.successMsgRootScope = 'Success';
-          $rootScope.errorMssRootScope = '';
+          $rootScope.errorMsgRootScope = '';
           $rootScope.error = false;
           $rootScope.success = true;
           $timeout(function () {
@@ -203,6 +203,17 @@ var app = angular.module('dodatado', [
           $rootScope.successMsgRootScope = '';
           $rootScope.success = false;
           console.log("$rootScope errMSg: ", $rootScope.errMsgRootScope);
+          $timeout(function () {
+            $rootScope.error = false;
+          }, 5000);
+        }
+
+        if (rejection.status === 401 && $location.path() == '/login') {
+          console.log("rejection loggin in : ", rejection.data.error);
+          $rootScope.errMsgRootScope = rejection.data.error;
+          $rootScope.error = true;
+          $rootScope.success = false;
+          $rootScope.successMsgRootScope = '';
           $timeout(function () {
             $rootScope.error = false;
           }, 5000);
