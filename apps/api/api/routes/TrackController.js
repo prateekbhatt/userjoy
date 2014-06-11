@@ -25,6 +25,7 @@ var User = require('../models/User');
  */
 
 var logger = require('../../helpers/logger');
+var nocache = require('../../helpers/no-cache-headers');
 
 
 /**
@@ -32,6 +33,13 @@ var logger = require('../../helpers/logger');
  */
 
 router.use(cors());
+
+
+/**
+ * Disable caching of all requests to /track
+ */
+
+router.use(nocache);
 
 
 /**
