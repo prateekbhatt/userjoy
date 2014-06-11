@@ -88,22 +88,22 @@
                         <br>
                         <div class="row">
                             <div class="col-md-4" style="margin-left: 20px">
-                                <button class="btn btn-info" ng-click="addAnotherFilter()" ng-show="true">
+                                <button class="btn btn-info btn-sm" ng-click="addAnotherFilter()" ng-show="true">
                                 <i class="fa fa-plus-square"></i>
-                                Add Filter
+                                Filter
                                 </button>
                             </div>
                         </div>
                         <br>
                         <div class="row">
                             <div class="col-md-12" style="margin-left: 20px">
-                                <button class="btn btn-info fa fa-toggle-right" ng-click="runQuery()" style="font-size: 16px; padding: 11px 27px">
+                                <button class="btn btn-info btn-sm fa fa-toggle-right" ng-click="runQuery()">
                                 Run
                                 </button>
-                                <button class="btn btn-info fa fa-save" ng-click="saveQuery()" style="font-size: 16px; padding: 11px 27px;" ng-show="showSaveButton">
+                                <button class="btn btn-info btn-sm fa fa-save" ng-click="saveQuery()" ng-show="showSaveButton">
                                 Save
                                 </button>
-                                <div class="popover right" tabindex="-1" style="display: block; position: absolute; top: -73px; left: 236px;" ng-show="showPopover">
+                                <div class="popover right" tabindex="-1" style="display: block; position: absolute; top: -73px; left: 145px;" ng-show="showPopover">
                                     <div class="arrow"></div>
                                     <h3 class="popover-title"> Save segment
                                     </h3>
@@ -112,17 +112,17 @@
                                             <div class="row" style="padding: 10px;">
                                                 <input id="segmentName" type="text" class="form-control" name="segmentName" placeholder="Segment" ng-model="segmentName" required >
                                                 <br>
-                                                <button type="submit" class="btn btn-info" ng-click="createSegment()">Create</button>
-                                                <button class="btn btn-info" ng-click="closePopover($event)">Close</button>
+                                                <button type="submit" class="btn btn-info btn-sm" ng-click="createSegment()">Create</button>
+                                                <button class="btn btn-info btn-sm" ng-click="closePopover($event)">Close</button>
                                             </div>
                                         </form>
                                     </div>
                                 </div>
-                                <button class="btn btn-info fa fa-save" ng-click="updateQuery()" style="font-size: 16px; padding: 11px 27px;" ng-show="showUpdateButton">
+                                <button class="btn btn-info fa fa-save btn-sm" ng-click="updateQuery()" ng-show="showUpdateButton">
                                 Update
                                 </button>
                                 <img src="/images/spiffygif_30x30.gif" ng-show="showSpinner">
-                                <div class="popover right" tabindex="-1" style="display: block; position: absolute; top: -73px; left: 255px;" ng-show="showUpdatePopover">
+                                <div class="popover right" tabindex="-1" style="display: block; position: absolute; top: -73px; left: 160px;" ng-show="showUpdatePopover">
                                     <div class="arrow"></div>
                                     <h3 class="popover-title"> Update segment
                                     </h3>
@@ -131,8 +131,8 @@
                                             <div class="row" style="padding: 10px;">
                                                 <input id="segmentName" type="text" class="form-control" name="updatedSegmentName" placeholder="Segment" ng-model="updatedSegmentName" required >
                                                 <br>
-                                                <button type="submit" class="btn btn-info" ng-click="updateSegment()">Update</button>
-                                                <button class="btn btn-info" ng-click="closeUpdatePopover($event)">Close</button>
+                                                <button type="submit" class="btn btn-info btn-sm" ng-click="updateSegment()">Update</button>
+                                                <button class="btn btn-info btn-sm" ng-click="closeUpdatePopover($event)">Close</button>
                                             </div>
                                         </form>
                                     </div>
@@ -203,9 +203,6 @@
             </ul>
         </div>
     </div>
-</div>
-<div ng-show="showMaxMsgErr" class="alert alert-danger col-md-push-4 col-md-4 text-center">
-    <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="hideMaxMsgErrorAlert()">&times;</button>{{maxMsgErr}}
 </div>
 <br>
 <br>

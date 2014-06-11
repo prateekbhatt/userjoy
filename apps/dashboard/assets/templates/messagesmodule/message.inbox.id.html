@@ -51,7 +51,8 @@
                     <br ng-show="!$first">
                     <div class="blockquote-box clearfix">
                         <div class="square pull-left">
-                            <img src={{message.src}} alt="" class="" />
+                            <img ng-src={{message.gravatar}} alt="" class="" fallback-src={{message.src}} width="60" height="60" />
+                            <!-- <img gravatar-src="'a@b.com'" gravatar-size="80" default={{message.src}}> -->
                         </div>
                         <div class="col-md-3">
                             <h4>
@@ -120,7 +121,7 @@
                     <div class="col-md-12" style="padding-top: 45px;">
                         <div>
                             <div class="square pull-left">
-                                <img src={{replysrc}} alt="" class="" />
+                                <img ng-src={{replygravatar}} alt="" class="" fallback-src={{replysrc}} width="60" height="60" />
                             </div>
                         </div>
                         <div class="col-md-10" style="width: 85%">

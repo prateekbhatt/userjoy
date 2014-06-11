@@ -30,7 +30,17 @@ var app = angular.module('dodatado', [
   'do.automate',
 ])
 
-
+.directive('fallbackSrc', function () {
+  var fallbackSrc = {
+    link: function postLink(scope, iElement, iAttrs) {
+      iElement.bind('error', function () {
+        angular.element(this)
+          .attr("src", iAttrs.fallbackSrc);
+      });
+    }
+  }
+  return fallbackSrc;
+})
 
 .provider('appIdProvider', [
 
@@ -130,7 +140,8 @@ var app = angular.module('dodatado', [
   $httpProvider.defaults.withCredentials = true;
   delete $httpProvider.defaults.headers.common['X-Requested-With'];
 
-  $httpProvider.interceptors.push(function ($rootScope, $location, $q, $timeout) {
+  $httpProvider.interceptors.push(function ($rootScope, $location, $q,
+    $timeout) {
     $rootScope.error = false;
     $rootScope.success = false;
     $rootScope.errMsgRootScope = '';
@@ -162,7 +173,7 @@ var app = angular.module('dodatado', [
           $rootScope.errorMssRootScope = '';
           $rootScope.error = false;
           $rootScope.success = true;
-          $timeout(function(){
+          $timeout(function () {
             $rootScope.success = false;
           }, 3000);
         }
@@ -172,7 +183,7 @@ var app = angular.module('dodatado', [
           $rootScope.errorMssRootScope = '';
           $rootScope.error = false;
           $rootScope.success = true;
-          $timeout(function(){
+          $timeout(function () {
             $rootScope.success = false;
           }, 3000);
         }
@@ -183,7 +194,7 @@ var app = angular.module('dodatado', [
           500) {
           console.log("error: ", rejection.data.error);
           $rootScope.error = true;
-          if(_.isArray(rejection.data.error)) {
+          if (_.isArray(rejection.data.error)) {
             $rootScope.errMsgRootScope = rejection.data.error[
               0];
           } else {
@@ -192,7 +203,7 @@ var app = angular.module('dodatado', [
           $rootScope.successMsgRootScope = '';
           $rootScope.success = false;
           console.log("$rootScope errMSg: ", $rootScope.errMsgRootScope);
-          $timeout(function(){
+          $timeout(function () {
             $rootScope.error = false;
           }, 5000);
         }

@@ -1,4 +1,4 @@
-<div ng-controller="NavbarCtrl" ng-class="class" ng-show="loggedIn">
+<div ng-controller="NavbarCtrl" ng-class="class">
     <nav role="navigation" style="background-color: #f8f8f8; border-color: #e7e7e7;" class="navbar navbar-inverse navbar-fixed-top" bs-navbar>
         <div class="container">
             <div class="navbar-header">
@@ -16,11 +16,6 @@
                 <a href="/" style="font-size:19px;" class="navbar-brand">UserJoy
                 </a>
                 <ul class="nav navbar-nav">
-                    <!-- <li ng-repeat="element in navbarElements">
-                                                                        <a href="{{element.href}}">
-                                                                            <i class="{{element.icon}}"></i>
-                                                                        {{element.name}}</a>
-                    </li> -->
                     <li>
                         <a href="/apps/{{appId}}/feed" ng-class="{'active': isActive('feed')}">
                         <i class="fa fa-sort-amount-asc" >
