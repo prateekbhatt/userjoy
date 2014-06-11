@@ -689,71 +689,61 @@ angular.module('do.message', [])
             return color;
           }
 
-          var populateUserProfile = function (err, data, id) {
-            if (err) {
-              return err;
+          // var gravatar = '';
+          // var src = '';
+
+
+
+          function setMessagesIntoScope() {
+            var msgThread = [];
+            msgThread = ThreadService.getThread();
+            console.log("msg is closed: ", msgThread.closed);
+            if (msgThread.closed) {
+              console.log("buttontext: Reopen");
+              $scope.buttontext = 'Reopen';
+            } else {
+              console.log("buttontext: Close");
+              $scope.buttontext = 'Close';
             }
-            console.log("data: ", data);
-            $scope.customerEmail = data.email;
-            // TODO: You have to get more data from backend
-          }
-
-            function getUserProfile() {
-              UserModel.getUserProfile(ThreadService.getThread()
-                .uid._id, $scope.appId, populateUserProfile);
+            console.log("msg thread: -> ->", msgThread);
+            if (msgThread.messages[0].from == 'account') {
+              $scope.fromTo = 'to';
+            }
+            if (msgThread.messages[0].from == 'user') {
+              $scope.fromTo = 'from';
             }
 
 
-            function setMessagesIntoScope() {
-              var msgThread = [];
-              msgThread = ThreadService.getThread();
-              console.log("msg is closed: ", msgThread.closed);
-              if (msgThread.closed) {
-                console.log("buttontext: Reopen");
-                $scope.buttontext = 'Reopen';
-              } else {
-                console.log("buttontext: Close");
-                $scope.buttontext = 'Close';
-              }
-              console.log("msg thread: -> ->", msgThread);
-              if (msgThread.messages[0].from == 'account') {
-                $scope.fromTo = 'to';
-              }
-              if (msgThread.messages[0].from == 'user') {
-                $scope.fromTo = 'from';
-              }
+            var userEmail = msgThread.uid.email;
+
+            $scope.individualCustomer = userEmail;
 
 
-              var userEmail = msgThread.uid.email;
-
-              $scope.individualCustomer = userEmail;
-
-
-              for (var i = 0; i < msgThread.messages.length; i++) {
-                var m = msgThread.messages[i];
-                var isSeen = false;
-                var mObj = {
-                  messagebody: m.body,
-                  createdby: m.sName,
-                  createdat: $moment(m.ct)
-                    .fromNow(),
-                  seen: isSeen
-                };
-                if (m.from === 'user') {
-                  mObj.email = userEmail;
-                }
-                if (m.from === 'account') {
-                  console.log("accoid.email: ", m.accid.email);
-                  mObj.email = m.accid.email;
-                }
-
-                mObj.seen = (m.from === 'account') && m.seen;
-
-
-                $scope.messages.push(mObj);
+            for (var i = 0; i < msgThread.messages.length; i++) {
+              var m = msgThread.messages[i];
+              var isSeen = false;
+              var mObj = {
+                messagebody: m.body,
+                createdby: m.sName,
+                createdat: $moment(m.ct)
+                  .fromNow(),
+                seen: isSeen
               };
-              console.log("$scope.messages: ", $scope.messages);
-            }
+              if (m.from === 'user') {
+                mObj.email = userEmail;
+              }
+              if (m.from === 'account') {
+                console.log("accoid.email: ", m.accid.email);
+                mObj.email = m.accid.email;
+              }
+
+              mObj.seen = (m.from === 'account') && m.seen;
+
+
+              $scope.messages.push(mObj);
+            };
+            console.log("$scope.messages: ", $scope.messages);
+          }
 
 
 
@@ -1079,6 +1069,23 @@ angular.module('do.message', [])
           }
 
 
+          var populateUserProfile = function (err, data, id) {
+            if (err) {
+              return err;
+            }
+            console.log("data: ", data);
+            $scope.customerEmail = data.email;
+            $scope.customergravatar = get_gravatar(data.email, 80);
+            $scope.customersrc = 'http://placehold.it/60/' + getRandomColor() +
+              '/FFF&text=' +
+              data.email.charAt(0);
+            // TODO: You have to get more data from backend
+          }
+
+            function getUserProfile() {
+              UserModel.getUserProfile(ThreadService.getThread()
+                .uid._id, $scope.appId, populateUserProfile);
+            }
 
           $scope.healthScore = '50';
           $scope.plan = 'Basic';
