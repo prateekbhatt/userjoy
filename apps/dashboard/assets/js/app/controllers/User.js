@@ -1523,7 +1523,7 @@ angular.module('do.users', [])
           var gravatar = '';
           var src = '';
           gravatar = get_gravatar(data.email, 80);
-          src = 'http://placehold.it/60/' + getRandomColor() +
+          src = 'http://placehold.it/150/' + getRandomColor() +
                   '/FFF&text=' +
                   data.email.charAt(0); 
           $scope.user = {
