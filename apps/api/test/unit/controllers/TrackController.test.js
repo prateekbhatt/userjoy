@@ -103,7 +103,7 @@ describe('Resource /track', function () {
           u: uid,
           e: {
             type: 'pageview',
-            path: '/account/login'
+            name: '/account/login'
           }
         });
 
@@ -329,6 +329,141 @@ describe('Resource /track', function () {
 
           expect(res.body)
             .to.have.property("uid", existingUser._id.toString());
+
+          done();
+        });
+    });
+
+  });
+
+
+  describe('GET /track/company', function () {
+
+    var url;
+
+    before(function (done) {
+      logoutUser(done);
+    });
+
+    beforeEach(function () {
+      url = '/track/company';
+    });
+
+    it('should return error if there is no app_id', function (done) {
+
+      request
+        .get(url)
+        .expect('Content-Type', /json/)
+        .expect(400)
+        .expect({
+          status: 400,
+          error: 'Please send app_id with the params'
+        })
+        .end(done);
+    });
+
+    it('should return error if there is no company object',
+      function (done) {
+
+        var query = qs.stringify({
+          app_id: appId
+        });
+
+        var testUrl = url + '?' + query;
+
+        request
+          .get(testUrl)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            status: 400,
+            error: 'Please send company_id to identify company'
+          })
+          .end(done);
+
+      });
+
+    it('should return error if company_id are missing',
+      function (done) {
+
+        var query = qs.stringify({
+          app_id: appId,
+          company: {
+            name: 'Prate'
+          }
+        });
+
+        var testUrl = url + '?' + query;
+
+        request
+          .get(testUrl)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            status: 400,
+            error: 'Please send company_id to identify company'
+          })
+          .end(done);
+
+      });
+
+    it('should create company if user does not exist', function (done) {
+
+      var query = qs.stringify({
+        app_id: appId.toString(),
+        company: {
+          company_id: 'randomUserTrackController@example.com'
+        }
+      });
+
+      var testUrl = url + '?' + query;
+
+      request
+        .get(testUrl)
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function (err, res) {
+          if (err) return done(err);
+
+
+          console.log('randOMMMM', res.body, testUrl);
+          expect(res.body)
+            .to.have.property("aid");
+
+          expect(res.body)
+            .to.have.property("cid");
+
+          done();
+        });
+
+    });
+
+
+    it('should return aid / cid id company exists', function (done) {
+
+      var existingCom = saved.companies.first.toJSON();
+
+      var query = qs.stringify({
+        app_id: appId.toString(),
+        company: {
+          company_id: existingCom.company_id
+        }
+      });
+
+      var testUrl = url + '?' + query;
+
+      request
+        .get(testUrl)
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function (err, res) {
+          if (err) return done(err);
+
+          expect(res.body)
+            .to.have.property("aid", existingCom.aid.toString());
+
+          expect(res.body)
+            .to.have.property("cid", existingCom._id.toString());
 
           done();
         });
