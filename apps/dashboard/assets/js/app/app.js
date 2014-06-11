@@ -152,12 +152,6 @@ var app = angular.module('dodatado', [
       'request': function (config, response) {
         // do something on success
         console.log("success config: ", config, response);
-        // if(config.method === 'PUT') {
-        //     $rootScope.successMsgRootScope = 'Success';
-        //     $rootScope.errorMssRootScope = '';
-        //     $rootScope.error = false;
-        //     $rootScope.success = true;
-        // }
         return config;
       },
       'response': function (response) {
@@ -207,9 +201,8 @@ var app = angular.module('dodatado', [
             $rootScope.error = false;
           }, 5000);
         }
-
-        if (rejection.status === 401 && $location.path() == '/login') {
-          console.log("rejection loggin in : ", rejection.data.error);
+        if (rejection.status === 401 && $location.path() === '/login' && rejection.config.method === 'POST') {
+          console.log("rejection loggin in : ", rejection);
           $rootScope.errMsgRootScope = rejection.data.error;
           $rootScope.error = true;
           $rootScope.success = false;
@@ -218,6 +211,7 @@ var app = angular.module('dodatado', [
             $rootScope.error = false;
           }, 5000);
         }
+
         // if we're not logged-in to the web service, redirect to login page
         if (rejection.status === 401 && $location.path() !=
           '/login') {
