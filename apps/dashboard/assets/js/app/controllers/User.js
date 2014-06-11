@@ -1529,21 +1529,21 @@ angular.module('do.users', [])
           $scope.user = {
             _id: uid,
             email: data.email,
-            // healthScore: data.healthScore,
-            // lastSeen: $moment(data.lastSessionAt)
-            //   .fromNow(),
-            // lastSession: data.lastSessionAt,
-            // firstSeen: $moment(data.firstSessionAt)
-            //   .fromNow(),
-            // plan: data.billing.plan,
-            // planValue: data.billing.amount,
-            // currency: data.billing.currency.toUpperCase(),
-            // unsubscribed: data.unbubscribed,
-            // location: data.location,
-            // country: data.country,
-            // platform: data.platform,
-            // browser: data.browser,
-            // name: data.name,
+            healthScore: data.healthScore,
+            lastSeen: $moment(data.lastSessionAt)
+              .fromNow(),
+            lastSession: data.lastSessionAt,
+            firstSeen: $moment(data.firstSessionAt)
+              .fromNow(),
+            plan: data.billing.plan,
+            planValue: data.billing.amount,
+            currency: data.billing.currency.toUpperCase(),
+            unsubscribed: data.unbubscribed,
+            location: data.location,
+            country: data.country,
+            platform: data.platform,
+            browser: data.browser,
+            name: data.name,
             profilegravatar: gravatar,
             profilesrc: src
           }
