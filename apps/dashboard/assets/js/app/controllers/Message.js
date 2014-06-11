@@ -998,9 +998,9 @@ angular.module('do.message', [])
               for (var j = 0; j < i; j++) {
                 console.log("i: ", i);
                 // TODO : Get data from backend and match it based on uid
-                if ($scope.messages[j].createdby == $scope.messages[
+                if ($scope.messages[j].email == $scope.messages[
                     i]
-                  .createdby) {
+                  .email) {
                   count++;
                   storedimgsrc = $scope.messagesWithSrc[j].src;
                   break;
@@ -1027,7 +1027,8 @@ angular.module('do.message', [])
                   createdat: $scope.messages[i].createdat,
                   src: imgsrc,
                   gravatar: imggravatar,
-                  seen: $scope.messages[i].seen
+                  seen: $scope.messages[i].seen,
+                  email: $scope.messages[i].email
                 })
               } else {
                 $scope.messagesWithSrc.push({
@@ -1036,7 +1037,8 @@ angular.module('do.message', [])
                   createdat: $scope.messages[i].createdat,
                   src: storedimgsrc,
                   gravatar: imggravatar,
-                  seen: $scope.messages[i].seen
+                  seen: $scope.messages[i].seen,
+                  email: $scope.messages[i].email
                 })
               }
 
@@ -1053,7 +1055,7 @@ angular.module('do.message', [])
               .email;
 
             for (var i = 0; i < $scope.messagesWithSrc.length; i++) {
-              if ($scope.user == $scope.messagesWithSrc[i].createdby) {
+              if ($scope.loggedInEmail == $scope.messagesWithSrc[i].email) {
                 $scope.replysrc = $scope.messagesWithSrc[i].src;
                 $scope.replygravatar = $scope.messagesWithSrc[i].gravatar;
                 break;
@@ -1082,10 +1084,10 @@ angular.module('do.message', [])
             // TODO: You have to get more data from backend
           }
 
-            function getUserProfile() {
-              UserModel.getUserProfile(ThreadService.getThread()
-                .uid._id, $scope.appId, populateUserProfile);
-            }
+          function getUserProfile() {
+            UserModel.getUserProfile(ThreadService.getThread()
+              .uid._id, $scope.appId, populateUserProfile);
+          }
 
           $scope.healthScore = '50';
           $scope.plan = 'Basic';
@@ -1129,17 +1131,17 @@ angular.module('do.message', [])
           $scope.customer = 'John';
           $scope.custsrc = '';
 
-          for (var i = 0; i < $scope.messagesWithSrc.length; i++) {
-            if ($scope.customer == $scope.messagesWithSrc[i].createdby) {
-              $scope.custsrc = $scope.messagesWithSrc[i].src;
-              break;
-            } else {
-              var colorReply = getRandomColor();
-              $scope.custsrc = 'http://placehold.it/60/' +
-                colorReply +
-                '/FFF&text=' + $scope.user.charAt(0);
-            }
-          };
+          // for (var i = 0; i < $scope.messagesWithSrc.length; i++) {
+          //   if ($scope.customer == $scope.messagesWithSrc[i].createdby) {
+          //     $scope.custsrc = $scope.messagesWithSrc[i].src;
+          //     break;
+          //   } else {
+          //     var colorReply = getRandomColor();
+          //     $scope.custsrc = 'http://placehold.it/60/' +
+          //       colorReply +
+          //       '/FFF&text=' + $scope.user.charAt(0);
+          //   }
+          // };
 
 
           $scope.replies = [];
