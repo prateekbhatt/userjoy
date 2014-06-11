@@ -21,12 +21,14 @@ describe('Model Company', function () {
 
       var newCompany = {
         name: 'Do Data Do 2',
+        company_id: '12345678',
         aid: randomId
       };
 
       Company.create(newCompany, function (err, com) {
         expect(err)
           .to.not.exist;
+
         expect(com)
           .to.be.an('object');
 
@@ -34,6 +36,10 @@ describe('Model Company', function () {
 
         expect(com.name)
           .to.eql(newCompany.name);
+
+        expect(com.company_id)
+          .to.eql(newCompany.company_id);
+
         done();
       });
 
@@ -47,10 +53,11 @@ describe('Model Company', function () {
   });
 
 
-  describe('#getOrCreate', function () {
+  describe('#findOrCreate', function () {
 
     var newCompany = {
-      name: 'BlaBlaCar'
+      name: 'BlaBlaCar',
+      company_id: 'bla_bla_car'
     };
 
     before(function (done) {
@@ -59,7 +66,7 @@ describe('Model Company', function () {
     });
 
     it('should return company if company exists', function (done) {
-      Company.getOrCreate(randomId, newCompany, function (err, com) {
+      Company.findOrCreate(randomId, newCompany, function (err, com) {
 
         expect(err)
           .to.not.exist;
@@ -74,10 +81,11 @@ describe('Model Company', function () {
     it('should create company if company does not exist', function (done) {
 
       var newCompany = {
-        name: 'Do Data Do'
+        name: 'Do Data Do',
+        company_id: 'thisisarandomcompanyid??'
       };
 
-      Company.getOrCreate(randomId, newCompany, function (err, com) {
+      Company.findOrCreate(randomId, newCompany, function (err, com) {
         // TODO: this test needs to be updated, it only needs to check if
         // User.create is called with the right params (using sinon.spy)
         expect(err)
@@ -94,7 +102,7 @@ describe('Model Company', function () {
     it('should throw error if any argument is missing', function (done) {
 
       var testFunc = function () {
-        Company.getOrCreate({}, function () {});
+        Company.findOrCreate({}, function () {});
       };
 
       expect(testFunc)
@@ -104,18 +112,18 @@ describe('Model Company', function () {
     });
 
     it(
-      'should return error if company_id and name are missing from company',
+      'should return error if company_id is missing from company',
       function (done) {
 
         var testCompany = {
           status: 'blabla'
         };
 
-        Company.getOrCreate(randomId, testCompany, function (err, com) {
+        Company.findOrCreate(randomId, testCompany, function (err, com) {
           expect(err)
             .to.exist;
           expect(err.message)
-            .to.eql('Please send company_id or name to identify company');
+            .to.eql('NO_COMPANY_ID');
           done();
         });
       });
@@ -124,7 +132,8 @@ describe('Model Company', function () {
       function (done) {
 
         var testCompany = {
-          name: 'NEW_COMPANY'
+          name: 'NEW_COMPANY',
+          company_id: '1234567'
         };
 
         var billing = {
@@ -135,7 +144,7 @@ describe('Model Company', function () {
 
         testCompany.billing = billing;
 
-        Company.getOrCreate(randomId, testCompany, function (err, com) {
+        Company.findOrCreate(randomId, testCompany, function (err, com) {
           expect(err)
             .not.to.exist;
 
@@ -158,7 +167,8 @@ describe('Model Company', function () {
       function (done) {
 
         var testCompany = {
-          name: 'NEW_COMPANY_ANOTHER'
+          name: 'NEW_COMPANY_ANOTHER',
+          company_id: 'anewcompanyid'
         };
 
         var billing = {
@@ -169,7 +179,7 @@ describe('Model Company', function () {
 
         testCompany.billing = billing;
 
-        Company.getOrCreate(randomId, testCompany, function (err, com) {
+        Company.findOrCreate(randomId, testCompany, function (err, com) {
 
           expect(err)
             .to.exist;
