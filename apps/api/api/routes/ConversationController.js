@@ -59,7 +59,9 @@ function replyToEmailManual(fromEmail, conversationId) {
 // add templateDate property to each message in the conversation for
 // showing well formatted time in the emails
 function addTemplateDate(conv) {
-  conv = conv.toJSON();
+
+  // convert conv obj to JSON if BSON
+  conv = conv.toJSON ? conv.toJSON() : conv;
 
   _.each(conv.messages, function (m) {
     m.templateDate = moment(m.ct)
