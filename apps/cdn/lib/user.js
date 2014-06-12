@@ -1,23 +1,8 @@
 
+var bind = require('bind');
 var debug = require('debug')('uj:user');
 var Entity = require('./entity');
 var inherit = require('inherit');
-var bind = require('bind');
-var cookie = require('./cookie');
-
-
-/**
- * User defaults
- */
-
-User.defaults = {
-  cookie: {
-    key: 'userjoy_user_id'
-  },
-  localStorage: {
-    key: 'userjoy_user_traits'
-  }
-};
 
 
 /**
@@ -27,7 +12,7 @@ User.defaults = {
  */
 
 function User (options) {
-  this.defaults = User.defaults;
+  this.defaults = {};
   this.debug = debug;
   Entity.call(this, options);
 }

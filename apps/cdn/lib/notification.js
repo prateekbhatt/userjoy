@@ -247,29 +247,20 @@ function get_gravatar(email, size) {
 
 function Notification() {
 
-  var userTraits = user.traits();
-  var appTraits = app.traits();
-  var apiUrl = appTraits.apiUrl;
-
-  this.app_id = appTraits.app_id;
-
-  this.automessageId;
   this.debug = debug;
 
-  // unique user id as given by app
-  this.user_id = userTraits.user_id;
+  // persist the automessage id of the notification and send it over if the
+  // the user replies
+  this.automessageId;
 
-  // email of user
-  this.email = userTraits.email;
+  this.app_id;
+  this.FETCH_URL;
+  this.REPLY_URL;
 
-  this.gravatar = get_gravatar(userTraits.email, 80);
+  this.ERROR_ID = 'uj_error';
   this.NOTIFICATION_TEMPLATE_ID = 'uj_notification';
   this.REPLY_TEMPLATE_ID = 'uj_notification_reply';
   this.SENT_TEMPLATE_ID = 'uj_notification_reply_sent';
-  this.ERROR_ID = 'uj_error';
-  this.FETCH_URL = apiUrl + '/notifications';
-  this.REPLY_URL = apiUrl + '/conversations';
-  this.img_src = '../templates/img/img_person.jpg';
 }
 
 
@@ -277,32 +268,32 @@ Notification.prototype.load = function (cb) {
 
   this.debug('load');
 
+  var appTraits = app.traits();
+
+  // set app and route variables
+  this.app_id = appTraits.app_id;
+  this.FETCH_URL = appTraits.apiUrl + '/notifications';
+  this.REPLY_URL = appTraits.apiUrl + '/conversations';
 
   var self = this;
-
   self._fetch(function (err, notf) {
+
+    self.debug('fetch %o : %o', err, notf)
 
     // If there is an error, it should be logged during debugging
     if (err) {
-      self.debug('err: ' + err);
+      self.debug('err %o', err);
       return cb();
     }
 
-    if (!notf) {
-      self.debug('no response to notification');
-      return cb();
-    }
+    // if there was no notification, return
+    if (!notf) return cb();
 
     // add color to the app traits
     app.setTrait('color', notf.color);
 
-    self.debug('color', app.traits())
-
-
-    // If no notification found, do not anything
-    if (!notf.body) {
-      return cb();
-    }
+    // If no response, move on
+    if (!notf.body) return cb();
 
 
     // Persist the automessageId from the notification obj.
@@ -310,7 +301,7 @@ Notification.prototype.load = function (cb) {
     // replies back
     self.automessageId = notf.amId;
 
-
+    var userTraits = user.traits();
 
     // Create locals object which would be passed to render the template
     var locals = {
@@ -324,7 +315,7 @@ Notification.prototype.load = function (cb) {
       SENT_TEMPLATE_ID: self.SENT_TEMPLATE_ID,
       ERROR_ID: self.ERROR_ID,
       img_src: self.img_src,
-      gravatar: self.gravatar
+      gravatar: get_gravatar(userTraits.email, 80)
     };
 
 
@@ -339,19 +330,21 @@ Notification.prototype.load = function (cb) {
 
 Notification.prototype._fetch = function (cb) {
 
+
   var self = this;
+  var userTraits = user.traits();
 
   var conditions = {
     app_id: self.app_id
   };
 
-
-  if (self.user_id) {
-    conditions.user_id = self.user_id;
-  } else if (self.email) {
-    conditions.email = self.email;
+  // if no user identifier, there would be no notification
+  if (userTraits.user_id) {
+    conditions.user_id = userTraits.user_id;
+  } else if (userTraits.email) {
+    conditions.email = userTraits.email;
   } else {
-    return;
+    return cb();
   }
 
 

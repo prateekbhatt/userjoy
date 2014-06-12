@@ -1,5 +1,7 @@
 var _ = require('lodash');
 var bind = require('bind');
+var debug = require('debug')('uj:queue');
+var each = require('each');
 var is = require('is');
 
 
@@ -15,6 +17,7 @@ module.exports = bind.all(new Queue());
  */
 
 function Queue() {
+  this.debug = debug;
   this.tasks = [];
   return this;
 }
@@ -27,12 +30,13 @@ function Queue() {
  */
 
 Queue.prototype.create = function (arr) {
+  if (!is.array(arr)) return this;
 
-  if (!is.array(arr)) {
-    // TODO: Log error message to help while development
-    return this;
-  }
-  this.tasks = arr;
+  var self = this;
+  each(arr, function (task) {
+    self.tasks.push(task);
+  });
+
   return this;
 };
 

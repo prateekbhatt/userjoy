@@ -14,6 +14,7 @@ var router = require('express')
  */
 
 var App = require('../models/App');
+var Company = require('../models/Company');
 var Conversation = require('../models/Conversation');
 var Event = require('../models/Event');
 var Notification = require('../models/Notification');
@@ -25,6 +26,7 @@ var User = require('../models/User');
  */
 
 var logger = require('../../helpers/logger');
+var nocache = require('../../helpers/no-cache-headers');
 
 
 /**
@@ -32,6 +34,13 @@ var logger = require('../../helpers/logger');
  */
 
 router.use(cors());
+
+
+/**
+ * Disable caching of all requests to /track
+ */
+
+router.use(nocache);
 
 
 /**
@@ -115,8 +124,10 @@ router
 
     if (event.type === 'pageview') {
 
-      var path = event.path;
-      return Event.pageview(ids, path, callback);
+      // FIXME : pageview events must accept module name and meta data
+
+      var name = event.name;
+      return Event.pageview(ids, name, callback);
 
     } else if (event.type === 'feature') {
 
@@ -187,6 +198,68 @@ router
       var obj = {
         aid: usr.aid,
         uid: usr._id
+      };
+
+      res
+        .status(200)
+        .json(obj);
+
+    });
+
+  });
+
+
+/**
+ * GET /track/company
+ *
+ * Identifies a company
+ *
+ *
+ * @query {string} app_id
+ * @query {object} company
+ *        @property company_id
+ *        @property name (optional)
+ *        @property other company properties (see company model)
+ * @return {object}
+ *         @property aid app-id
+ *         @property uid company-id
+ */
+
+router
+  .route('/company')
+  .get(function (req, res, next) {
+
+
+    logger.trace({
+      at: 'TrackController:company',
+      query: req.query
+    });
+
+
+    var data = req.query;
+    var aid = data.app_id;
+    var company = data.company;
+
+    // Validations
+    if (!aid) {
+      return res.badRequest('Please send app_id with the params');
+    }
+
+    Company.findOrCreate(aid, company, function (err, com) {
+
+      if (err) {
+
+        if (err.message === 'NO_COMPANY_ID') {
+          return res.badRequest(
+            'Please send company_id to identify company');
+        }
+
+        return next(err);
+      }
+
+      var obj = {
+        aid: com.aid,
+        cid: com._id
       };
 
       res

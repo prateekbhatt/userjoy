@@ -24,6 +24,38 @@ var billingStatusValidator = require('../../helpers/billing-status-validator');
 
 
 /**
+ * Helpers
+ */
+
+var metadata = require('../../helpers/metadata');
+
+
+/**
+ * Define metadata schema (embedded document)
+ */
+
+var MetaDataSchema = new Schema({
+
+    // key
+    k: {
+      type: Schema.Types.Mixed,
+      required: true
+    },
+
+    // value
+    v: {
+      type: Schema.Types.Mixed,
+      required: true
+    }
+
+  },
+
+  {
+    _id: false
+  });
+
+
+/**
  * Define schema
  */
 
@@ -36,8 +68,11 @@ var CompanySchema = new Schema({
   },
 
   company_id: {
-    type: String
+    type: String,
+    required: [true, 'Invalid company id']
   },
+
+  meta: [MetaDataSchema],
 
   name: {
     type: String
@@ -109,58 +144,59 @@ CompanySchema.plugin(troop.timestamp, {
  * @param {Function} callback function
  */
 
-CompanySchema.statics.getOrCreate = function (aid, company, cb) {
+CompanySchema.statics.findOrCreate = function (aid, company, cb) {
 
-  var name = company.name;
+  company = company || {};
+
+  var billingStatus = company.billing ? company.billing.status : null;
   var company_id = company.company_id;
-  var query = {};
+  var conditions = {};
 
-  if (!(name || company_id)) {
-    return cb(new Error('Please send company_id or name to identify company'));
+
+
+  //// VALIDATIONS : START ////
+
+  // if no company identifier provided, return error
+  if (!company_id) {
+    return cb(new Error('NO_COMPANY_ID'));
   }
+
+
+  // if invalid billing status provided, return error
+  if (billingStatus && !_.contains(['trial', 'free', 'paying', 'cancelled'],
+    billingStatus)) {
+
+    return cb(new Error(
+      "Billing status must be one of 'trial', 'free', 'paying' or 'cancelled'"
+    ));
+  }
+
+  //// VALIDATIONS : END ////
+
+
+
 
   // add aid to company
   company.aid = aid;
 
+  // format metadata to array
+  company.meta = metadata.toArray(company.meta);
+
   // aid to query
-  query.aid = aid;
+  conditions.aid = aid;
 
-  // add company_id or name to query
-  if (company_id) {
-    query.company_id = company_id;
-  } else {
-    query.name = name;
-  }
+  // add company_id to query conditions
+  conditions.company_id = company_id;
 
+  var update = {
+    $setOnInsert: company
+  };
 
-  Company
-    .findOne(query)
-    .exec(function (err, usr) {
+  var options = {
+    upsert: true
+  };
 
-      if (err) return cb(err);
-
-      if (usr) return cb(null, usr);
-
-      // company not found, create new company
-      Company
-        .create(company, function (err, usr2) {
-
-          if (err) {
-            if (err.message === 'Validation failed') {
-              if (err.errors['billing.status']) {
-                return cb(new Error(err.errors['billing.status'].message));
-              }
-            }
-            return cb(err);
-          }
-
-          if (!usr2) return cb(new Error('Error while creating company'));
-
-          cb(null, usr2);
-
-        });
-
-    });
+  Company.findOneAndUpdate(conditions, update, options, cb);
 
 };
 
