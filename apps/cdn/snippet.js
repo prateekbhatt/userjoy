@@ -1,6 +1,6 @@
 window.userjoy = window.userjoy || [];
 
-window.userjoy.methods = ['identify', 'company', 'track', 'page'];
+window.userjoy.methods = ['identify', 'company', 'track', 'page', 'trackLink', 'trackForm'];
 
 window.userjoy.factory = function (method) {
   return function () {

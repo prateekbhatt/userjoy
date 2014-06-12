@@ -20,6 +20,7 @@ var ObjectId = require('mongoose')
 var Account = require('../../api/models/Account');
 var App = require('../../api/models/App');
 var AutoMessage = require('../../api/models/AutoMessage');
+var Company = require('../../api/models/Company');
 var Conversation = require('../../api/models/Conversation');
 var Invite = require('../../api/models/Invite');
 var Notification = require('../../api/models/Notification');
@@ -218,6 +219,15 @@ var automessages = {
 };
 
 
+var companies = {
+
+  first: {
+    aid: null,
+    company_id: ObjectId()
+  }
+};
+
+
 function createAccount(account, fn) {
 
   var rawPassword = account.password;
@@ -245,6 +255,12 @@ function createApp(accid, app, fn) {
 function createUser(aid, user, fn) {
   user.aid = aid;
   User.create(user, fn);
+}
+
+
+function createCompany(aid, company, fn) {
+  company.aid = aid;
+  Company.create(company, fn);
 }
 
 
@@ -368,6 +384,18 @@ module.exports = function loadFixtures(callback) {
         cb();
       });
     },
+
+
+    createFirstCompany: function (cb) {
+      var aid = apps.first._id;
+      var newCom = companies.first;
+      createCompany(aid, newCom, function (err, com) {
+        if (err) return cb(err);
+        companies.first = com;
+        cb();
+      });
+    },
+
 
     createFirstConversation: function (cb) {
       var accid = accounts.first._id;
@@ -527,6 +555,7 @@ module.exports = function loadFixtures(callback) {
       accounts: accounts,
       apps: apps,
       automessages: automessages,
+      companies: companies,
       conversations: conversations,
       invites: invites,
       notifications: notifications,

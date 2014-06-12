@@ -1,22 +1,8 @@
 
+var bind = require('bind');
 var debug = require('debug')('uj:company');
 var Entity = require('./entity');
 var inherit = require('inherit');
-var bind = require('bind');
-
-
-/**
- * Company defaults
- */
-
-Company.defaults = {
-  cookie: {
-    key: 'userjoy_company_id'
-  },
-  localStorage: {
-    key: 'userjoy_company_properties'
-  }
-};
 
 
 /**
@@ -26,7 +12,7 @@ Company.defaults = {
  */
 
 function Company (options) {
-  this.defaults = Company.defaults;
+  this.defaults = {};
   this.debug = debug;
   Entity.call(this, options);
 }

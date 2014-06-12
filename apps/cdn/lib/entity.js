@@ -1,7 +1,6 @@
 var traverse = require('isodate-traverse');
 var defaults = require('defaults');
 var cookie = require('./cookie');
-var store = require('./store');
 var extend = require('extend');
 var clone = require('clone');
 
@@ -63,7 +62,7 @@ Entity.prototype.id = function (id) {
  */
 
 Entity.prototype._getId = function () {
-  var ret = cookie.get(this._options.cookie.key);
+  var ret = this._id;
   return ret === undefined ? null : ret;
 };
 
@@ -75,7 +74,7 @@ Entity.prototype._getId = function () {
  */
 
 Entity.prototype._setId = function (id) {
-  cookie.set(this._options.cookie.key, id);
+  this._id = id;
 };
 
 
@@ -103,7 +102,7 @@ Entity.prototype.traits = function (traits) {
  */
 
 Entity.prototype._getTraits = function () {
-  var ret = store.get(this._options.localStorage.key);
+  var ret = this._traits;
   return ret ? traverse(clone(ret)) : {};
 };
 
@@ -116,7 +115,7 @@ Entity.prototype._getTraits = function () {
 
 Entity.prototype._setTraits = function (traits) {
   traits || (traits = {});
-  store.set(this._options.localStorage.key, traits);
+  this._traits = traits;
 };
 
 
@@ -130,7 +129,6 @@ Entity.prototype._setTraits = function (traits) {
 Entity.prototype.identify = function (traits) {
   traits || (traits = {});
   this.traits(traits);
-  this.save();
 };
 
 
@@ -145,20 +143,6 @@ Entity.prototype.setTrait = function (name, val) {
   var traits = this.traits();
   traits[name] = val;
   this.traits(traits);
-  this.save();
-};
-
-
-/**
- * Save the entity to local storage and the cookie.
- *
- * @return {Boolean}
- */
-
-Entity.prototype.save = function () {
-  cookie.set(this._options.cookie.key, this.id());
-  store.set(this._options.localStorage.key, this.traits());
-  return true;
 };
 
 
@@ -169,8 +153,6 @@ Entity.prototype.save = function () {
 Entity.prototype.logout = function () {
   this.id(null);
   this.traits({});
-  cookie.remove(this._options.cookie.key);
-  store.remove(this._options.localStorage.key);
 };
 
 
@@ -181,14 +163,4 @@ Entity.prototype.logout = function () {
 Entity.prototype.reset = function () {
   this.logout();
   this.options({});
-};
-
-
-/**
- * Load saved entity `id` or `traits` from storage.
- */
-
-Entity.prototype.load = function () {
-  this.id(cookie.get(this._options.cookie.key));
-  this.traits(store.get(this._options.localStorage.key));
 };
