@@ -108,7 +108,6 @@ UserJoy.prototype.initialize = function () {
 
 UserJoy.prototype._invokeQueue = function () {
   for (var i = queue.tasks.length - 1; i >= 0; i--) {
-    this.debug('_invokeQueue %o', queue.tasks);
     this.push(queue.tasks.shift());
   };
 
@@ -255,7 +254,7 @@ UserJoy.prototype.track = function (event, properties, fn) {
  * @return {UserJoy}
  */
 
-UserJoy.prototype.trackLink = function (links, event, properties) {
+UserJoy.prototype.track_link = function (links, event, properties) {
   if (!links) return this;
   if (is.element(links)) links = [links]; // always arrays, handles jquery
 
@@ -292,10 +291,8 @@ UserJoy.prototype.trackLink = function (links, event, properties) {
  * @return {UserJoy}
  */
 
-UserJoy.prototype.trackForm = function (forms, event, properties) {
+UserJoy.prototype.track_form = function (forms, event, properties) {
 
-
-  this.debug('trackForm')
 
   if (!forms) return this;
   if (is.element(forms)) forms = [forms]; // always arrays, handles jquery
