@@ -297,6 +297,8 @@ describe('Resource /apps/:aid/segments', function () {
         name: 'Updated Name',
         filters: updatedFilters,
         op: 'or',
+        fromAgo: 10,
+        toAgo: 5
       };
 
       request
@@ -329,6 +331,17 @@ describe('Resource /apps/:aid/segments', function () {
             .that.equals(updateSegment.name)
             .that.not.equals(testSeg.name);
 
+          expect(res.body)
+            .to.have.property("fromAgo")
+            .that.is.an("number")
+            .that.equals(updateSegment.fromAgo)
+            .that.not.equals(testSeg.fromAgo);
+
+          expect(res.body)
+            .to.have.property("toAgo")
+            .that.is.an("number")
+            .that.equals(updateSegment.toAgo)
+            .that.not.equals(testSeg.toAgo);
 
         })
         .end(done);
