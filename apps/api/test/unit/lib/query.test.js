@@ -549,6 +549,12 @@ describe('Lib query', function () {
         .to.eql(getDateUnix(moment()
           .format(), q.fromAgo));
 
+      expect(cond.ct.$gt)
+        .to.be.a('date');
+
+      expect(cond.ct.$lt)
+        .to.be.a('date');
+
       expect(moment(cond.ct.$lt)
         .startOf('day')
         .unix())
