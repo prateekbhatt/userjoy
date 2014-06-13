@@ -9,6 +9,7 @@
 
 var _ = require('lodash');
 var async = require('async');
+var moment = require('moment');
 var ObjectId = require('mongoose')
   .Types.ObjectId;
 
@@ -94,6 +95,8 @@ module.exports = Query;
  * {
  *   list: 'users',
  *   op: 'and',
+ *   fromAgo: 7,
+ *   toAgo: 2,
  *   filters: [
  *       {
  *         method: 'count',
@@ -153,6 +156,9 @@ function Query(aid, query) {
   query = sanitize(query);
 
   this.aid = aid;
+  this.fromAgo = query.fromAgo;
+  this.toAgo = query.toAgo;
+
   this.countFilterUserIds = [];
 
   // set root level operator as $and/$or
@@ -391,11 +397,9 @@ Query.prototype.runCountQuery = function (cb) {
 
   Event
     .aggregate()
-    .match({
-      aid: new ObjectId(self.aid.toString())
-    })
+    .match(self.genCountBaseMatchCond.call(self))
     .group(self.genCountGroupCond.call(self))
-    .match(self.genCountMatchCond.call(self))
+    .match(self.genCountGroupMatchCond.call(self))
     .project({
       _id: 1
     })
@@ -511,12 +515,50 @@ Query.prototype.genCountGroupCond = function () {
 
 
 /**
- * Generates the condition for the match operator in runCountQuery
+ * Generates the condition for the first match operator in runCountQuery
  *
  * @return {object} match pipe condition
  */
 
-Query.prototype.genCountMatchCond = function () {
+Query.prototype.genCountBaseMatchCond = function () {
+
+  var self = this;
+
+  var matchConds = {
+    aid: new ObjectId(self.aid.toString())
+  };
+
+
+  // if fromAgo and/or toAgo are present, add created time condions
+
+  if (self.fromAgo || self.toAgo) {
+    matchConds.ct = {};
+
+    if (self.fromAgo) {
+      matchConds.ct.$gt = moment()
+        .subtract('days', self.fromAgo)
+        .format()
+    }
+
+    if (self.toAgo) {
+      matchConds.ct.$lt = moment()
+        .subtract('days', self.toAgo)
+        .format()
+    }
+  }
+
+  return matchConds;
+
+};
+
+
+/**
+ * Generates the condition for the match operator after group in runCountQuery
+ *
+ * @return {object} match pipe condition
+ */
+
+Query.prototype.genCountGroupMatchCond = function () {
 
   var self = this;
   var pipe = {};
@@ -654,6 +696,10 @@ function sanitize(q) {
   if (_.isArray(q.op)) {
     q.op = q.op[0];
   }
+
+  // if query has fromAgo and toAgo vals, parseInt the fromAgo/toAgo vals
+  if (q.fromAgo) q.fromAgo = parseInt(q.fromAgo, 10);
+  if (q.toAgo) q.toAgo = parseInt(q.toAgo, 10);
 
   logger.trace({
     at: 'lib/query sanitized',
