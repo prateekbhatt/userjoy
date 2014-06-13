@@ -135,6 +135,13 @@ var SegmentSchema = new Schema({
   filters: [SegmentFilterSchema],
 
 
+  // number of days since when the count queries would be run
+  fromAgo: {
+    type: Number,
+    min: 1
+  },
+
+
   // list upon segment
   list: {
     type: String,
@@ -154,6 +161,13 @@ var SegmentSchema = new Schema({
     type: String,
     required: [true, 'Invalid operator'],
     enum: OPERATOR_TYPES
+  },
+
+
+  // number of days till when the count queries would be run
+  toAgo: {
+    type: Number,
+    min: 0
   },
 
 
@@ -186,6 +200,14 @@ SegmentSchema.pre('save', function (next) {
         'Provide valid filter operator and filter value'));
     }
   });
+
+
+  // if fromAgo and toAgo values are provided, then fromAgo must be greater than
+  // toAgo
+  if (this.fromAgo && this.toAgo && !(this.fromAgo > this.toAgo)) {
+    return next(new Error('fromAgo must be greater than toAgo'));
+  }
+
 
   this.ut = new Date;
   next();
