@@ -1,5 +1,5 @@
-var _ = require('lodash');
 var bind = require('bind');
+var contains = require('contains');
 var debug = require('debug')('uj:queue');
 var each = require('each');
 var is = require('is');
@@ -43,7 +43,7 @@ Queue.prototype.create = function (arr) {
 
 /**
  * Reorders queue
- * Moves tasks which identify user / group to the front of the queue
+ * Moves tasks which identify user / company to the front of the queue
  *
  * @return {Queue}
  */
@@ -61,7 +61,7 @@ Queue.prototype.prioritize = function () {
 
 
 /**
- * Checks if queue has functions which identify user / group
+ * Checks if queue has functions which identify user / company
  * Removes found identify tasks from the queue
  * Sets this.identifyTasks
  *
@@ -71,11 +71,24 @@ Queue.prototype.prioritize = function () {
 
 Queue.prototype._pullIdentify = function () {
 
-  var identifyFuncs = ['identify'];
+  var identifyFuncs = ['identify', 'company'];
 
-  return _.remove(this.tasks, function (task) {
-    return _.contains(identifyFuncs, task[0]);
+  var identifyTasks = [];
+  var otherTasks = [];
+
+  each(this.tasks, function (t, i) {
+    if (contains(identifyFuncs, t[0])) {
+      identifyTasks.push(t);
+    } else {
+      otherTasks.push(t);
+    }
   });
+
+  // update tasks object to contain only the other tasks (not the identify tasks)
+  this.tasks = otherTasks;
+
+  // return the identify tasks
+  return identifyTasks;
 
   return this;
 };
