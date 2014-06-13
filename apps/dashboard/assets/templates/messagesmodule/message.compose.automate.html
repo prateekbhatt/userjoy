@@ -1,4 +1,7 @@
 <div ng-include src="'/templates/navbar/navbar.html'"></div>
+<div class="row">
+    <div ng-include src="'/templates/navbar/server-error-success.html'" class="col-md-offset-4 col-md-4"></div>
+</div>
 <div class="panel" style="min-height: 500px;">
     <div class="panel-body">
         <div class="row">
@@ -8,10 +11,10 @@
                     <div id="sidebar-wrapper-settings">
                         <ul class="sidebar-nav">
                             <li>
-                                <a href="/apps/{{currApp}}/messages/open" ng-click="showTableInbox()"><i class="fa fa-inbox"></i> Open Conversations <span class="badge">12</span></a>
+                                <a href="/apps/{{currApp}}/messages/open" ng-click="showTableInbox()"><i class="fa fa-inbox"></i> Open Conversations</a>
                             </li>
                             <li>
-                                <a href="/apps/{{currApp}}/messages/unread"><i class="fa fa-exclamation"></i>&nbsp; Unread Conversations <span class="badge">26</span></a>
+                                <a href="/apps/{{currApp}}/messages/unread"><i class="fa fa-exclamation"></i>&nbsp; Unread Conversations</a>
                             </li>
                             <li>
                                 <a href="/apps/{{currApp}}/messages/automate"><i class="fa fa-edit"></i> Automate Messages </a>
@@ -93,7 +96,7 @@
                             <br>
                             <div class="panel panel-default" >
                                 <div class="panel-heading">
-                                    <i class="fa fa-inbox"></i> Messages
+                                    <i class="fa fa-inbox"></i> Auto Messages
                                 </div>
                                 <!-- /.panel-heading -->
                                 <div class="panel-body">
@@ -109,6 +112,7 @@
                                                         <th class="text-center">Sent</th>
                                                         <th class="text-center">Seen</th>
                                                         <th class="text-center">Clicked</th>
+                                                        <th></th>
                                                         <th></th>
                                                     </thead>
                                                     <tbody>
@@ -126,6 +130,9 @@
                                                             <td class="text-center">
                                                                 <a style="cursor: pointer" ng-click="changeMsgStatus(automessage.id, automessage.message, $index)">{{automessage.message}}</a>
                                                             </td>
+                                                            <td class="text-center">
+                                                                <a style="cursor: pointer;" ng-click="editAutoMessage(automessage.id, $index)">Edit</a>
+                                                            </td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -134,7 +141,7 @@
                                         </div>
                                         <div class="text-center" style="padding-top: 20px;">
                                             <div class="col-md-push-4 col-md-4">
-                                                <a class="btn btn-info btn-block" href="/apps/{{currApp}}/messages/automate/segment">Create New Auto Message</a>
+                                                <a class="btn btn-info btn-block" href="/apps/{{currApp}}/messages/automate/segments">Create New Auto Message</a>
                                             </div>
                                         </div>
                                     </div>

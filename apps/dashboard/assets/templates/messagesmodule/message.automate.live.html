@@ -1,4 +1,7 @@
 <div ng-include src="'/templates/navbar/navbar.html'"></div>
+<div class="row">
+    <div ng-include src="'/templates/navbar/server-error-success.html'" class="col-md-offset-4 col-md-4"></div>
+</div>
 <div class="row text-center" ng-show="showEmailPreview">
     <div class="btn-group btn-breadcrumb">
         <button class="btn btn-default" style="cursor:not-allowed">Select Segment</button>
@@ -19,14 +22,14 @@
 <div>
     <div class="row" style="padding-top: 50px;">
         <div class="col-md-push-4 col-md-4" ng-show="showNotificationPreview">
-            <div class="message-template message-template-danger" style="max-height: 200px; min-height: 200px; overflow: auto;">
+            <div class="message-template" style="max-height: 200px; min-height: 200px; overflow: auto;" ng-style="{'border-color': borderColor, 'border-right': borderRight, 'border-top': borderTop, 'border-bottom': borderBottom, 'border-radius': borderRadius}">
                 <p ng-bind-html="previewText"></p>
             </div>
             <div class="panel-footer" style="margin-top: -21px;">
                 <div class="input-group">
                     <input id="btn-input" type="text" class="form-control input-sm" placeholder="Type your message here..." disabled="disabled"/>
                     <span class="input-group-btn">
-                    <button class="btn btn-danger btn-sm disabled" id="btn-chat">
+                    <button class="btn btn-sm disabled" id="btn-chat" ng-style="{'background-color': backGrndColor, 'border-color': borderColor}" style="color: #ffffff">
                     Send</button>
                     </span>
                 </div>
@@ -36,7 +39,7 @@
             <div class="text-center">
                 <label style="font-size: 18px;">Subject: </label>&nbsp;<span ng-bind-html="subject" class="emailPreview"></span>
             </div>
-            <div class="message-template message-email-success" style="min-height: 300px; overflow: auto; max-height: 300px;">
+            <div class="message-template" style="min-height: 300px; overflow: auto; max-height: 300px;" ng-style="{'border-color': emailBorderColor, 'border-right': emailBorderRight, 'border-top': emailBorderTop, 'border-bottom': borderBottom, 'border-radius': borderRadius}">
                 <p ng-bind-html="previewText"></p>
             </div>
         </div>
@@ -44,9 +47,9 @@
     <br>
     <br>
     <div class="row col-md-push-4 col-md-4" style="padding-left: 24px; padding-right: 0px;" ng-show="showNotificationPreview">
-        <button class="btn btn-info btn-block" ng-click="makeMsgLive()">Make it Live</button>
+        <button class="btn btn-info btn-block" ng-click="changeMsgStatus()">{{msgStatus}}</button>
     </div>
     <div class="row col-md-push-3 col-md-6" style="padding-left: 24px; padding-right: 0px;" ng-show="showEmailPreview">
-        <button class="btn btn-info btn-block" ng-click="makeMsgLive()">Make it Live</button>
+        <button class="btn btn-info btn-block" ng-click="changeMsgStatus()">{{msgStatus}}</button>
     </div>
 </div>

@@ -1,4 +1,7 @@
 <div ng-include src="'/templates/navbar/navbar.html'"></div>
+<div class="row">
+    <div ng-include src="'/templates/navbar/server-error-success.html'" class="col-md-offset-4 col-md-4"></div>
+</div>
 <div class="row text-center">
     <div class="btn-group btn-breadcrumb">
         <button class="btn btn-default" style="cursor:not-allowed">Select Segment</button>
@@ -14,7 +17,7 @@
         <div class="text-center">
             <label style="font-size: 18px;">Subject: </label>&nbsp;<span ng-bind-html="subject" class="emailPreview"></span>
         </div>
-        <div class="message-template message-email-success" style="min-height: 300px; overflow: auto; max-height: 300px;">
+        <div class="message-template" style="min-height: 300px; overflow: auto; max-height: 300px;" ng-style="{'border-color': emailBorderColor, 'border-right': emailBorderRight, 'border-top': emailBorderTop, 'border-bottom': borderBottom, 'border-radius': borderRadius}">
             <p ng-bind-html="previewText"></p>
         </div>
     </div>

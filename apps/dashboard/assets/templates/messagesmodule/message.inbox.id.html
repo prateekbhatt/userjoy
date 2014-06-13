@@ -1,13 +1,19 @@
 <div ng-include src="'/templates/navbar/navbar.html'"></div>
+<div class="row">
+    <div ng-include src="'/templates/navbar/server-error-success.html'" class="col-md-offset-4 col-md-4"></div>
+</div>
+<button class="fa fa-backward btn btn-danger" style="width: 200px;" ng-click="doTheBack()"><span>&nbsp;&nbsp;Back</span></button>
+<br>
+<br>
 <div>
     <div class="col-md-3 well">
         <div class="row">
             <div class="col-md-4">
-                <img src={{custsrc}}
-                alt="" class="img-rounded img-responsive" style="height:70px"/>
+                <img ng-src={{customergravatar}}
+                alt="" class="img-rounded img-responsive" style="height:70px" fallback-src={{customersrc}} />
             </div>
             <div class="col-md-4">
-                <h3>John</h3>
+                <h3>{{customername}}</h3>
             </div>
         </div>
         <br>
@@ -16,7 +22,7 @@
             <div class="col-md-12">
                 <blockquote>
                     <small><cite title="Source Title">Ahmedabad, India  <i class="glyphicon glyphicon-map-marker"></i></cite></small>
-                    <small><cite title="Source Title">john@dodatado.com  <i class="glyphicon glyphicon-envelope"></i></cite></small>
+                    <small><cite title="Source Title">{{customerEmail}}  <i class="glyphicon glyphicon-envelope"></i></cite></small>
                 </blockquote>
             </div>
             <br>
@@ -37,7 +43,7 @@
     <div class="col-md-9">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <i class="fa fa-envelope"></i> Message from John
+                <i class="fa fa-envelope"></i> Message {{fromTo}} {{individualCustomer}}
             </div>
             <div class="panel-body">
                 <div class="col-md-12" ng-repeat="message in messagesWithSrc">
@@ -45,7 +51,8 @@
                     <br ng-show="!$first">
                     <div class="blockquote-box clearfix">
                         <div class="square pull-left">
-                            <img src={{message.src}} alt="" class="" />
+                            <img ng-src={{message.gravatar}} alt="" class="" fallback-src={{message.src}} width="60" height="60" />
+                            <!-- <img gravatar-src="'a@b.com'" gravatar-size="80" default={{message.src}}> -->
                         </div>
                         <div class="col-md-3">
                             <h4>
@@ -62,8 +69,7 @@
                             </em>
                         </div>
                         <div class="col-md-9">
-                            <p>
-                            {{message.messagebody}}
+                            <p ng-bind-html="message.messagebody | newlines">
                             </p>
                         </div>
                     </div>
@@ -76,14 +82,14 @@
                         <br>
                         <div class="blockquote-box clearfix">
                             <div class="square pull-left">
-                                <img src={{replysrc}} alt="" class="" />
+                                <img ng-src={{replygravatar}} alt="" class="" fallback-src={{replysrc}} width="60" height="60" />
                             </div>
                             <div class="col-md-3">
                                 <h4>
                                 <strong>{{user}}</strong></h4>
                             </div>
                             <!-- <div class="col-md-push-3 col-md-3">
-                                <span class="label label-success">Seen</span>
+                                                                <span class="label label-success">Seen</span>
                             </div> -->
                             <div class="col-md-push-4 col-md-3">
                                 <em>
@@ -93,15 +99,14 @@
                                 </em>
                             </div>
                             <div class="col-md-9">
-                                <p value="reply.body">
-                                {{reply.body}}
+                                <p value="reply.body" ng-bind-html="reply.body | newlines">
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- <div ng-show="!insideReplyBox">
-                    <textarea class="form-control" placeholder="Click here to Reply or Forward" ng-click="showReplyButton()"></textarea>
+                                        <textarea class="form-control" placeholder="Click here to Reply or Forward" ng-click="showReplyButton()"></textarea>
                 </div> -->
                 <div>
                     <div class="col-md-5" style="padding-top: 30px;" ng-show="showerror">
@@ -116,7 +121,7 @@
                     <div class="col-md-12" style="padding-top: 45px;">
                         <div>
                             <div class="square pull-left">
-                                <img src={{replysrc}} alt="" class="" />
+                                <img ng-src={{replygravatar}} alt="" class="" fallback-src={{replysrc}} width="60" height="60" />
                             </div>
                         </div>
                         <div class="col-md-10" style="width: 85%">

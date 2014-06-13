@@ -11,30 +11,33 @@
             vertical-align: baseline;
             white-space: nowrap;
             text-align: center;
-            background-color: #5bc0de;
+            background-color: {{color}};
             border-radius: 10px;">&#63;
             </span>
         </div>
     </a>
     <div style="display: none" id="{{MSG_TEMPLATE_ID}}">
-        <div style="bottom: 80px; position: fixed; right: 9px;" class="col-md-4">
-            <div class="panel panel-default" style="border-color: #ddd;">
-                <div class="panel-heading">
-                    <h3 class="panel-title" style="text-align: center;">Send us a Message</h3>
-                    <button type="button" class="close" aria-hidden="true" onclick="userjoy.hideFeedback()" id="closeFeedback" style="margin-top: -25px;">&times;</button>
+        <div style="bottom: 80px; position: fixed; right: 9px;" class="uj-col-md-4">
+            <div class="uj-panel uj-panel-default" style="border-color: #ddd;">
+                <div class="uj-panel-heading">
+                    <h3 class="uj-panel-title" style="text-align: center;">Send us a Message</h3>
+                    <button type="button" class="uj-close" aria-hidden="true" onclick="userjoy.hideFeedback()" id="closeFeedback" style="margin-top: -25px;">&times;</button>
                 </div>
-                <div class="panel-body">
+                <div class="uj-panel-body">
                     <form role="form">
-                        <textarea id="{{MSG_BODY_TEMPLATE_ID}}" class="form-control" style="padding: 4px; height: 150px;"></textarea>
-                        <br>
-                        <button type="button" class="btn btn-sm btn-info btn-block" onclick="userjoy.sendConversation()" style="float: right;">Send Message</button>
-                        <hr>
+                        <textarea id="{{MSG_BODY_TEMPLATE_ID}}" class="uj-form-control" style="padding: 4px; height: 150px;"></textarea>
+                        <span style="display: none; margin-top: 10px;" id="{{MSG_SENT_TEMPLATE_ID}}">
+                        Message Sent. Thanks!</span>
+                        <span id="{{MSG_ERROR_ID}}" style=" display:none; color: #a94442; margin-top: 10px;">
+                        Your reply cannot be blank
+                        </span>
+                        <button type="button" class="uj-btn uj-btn-sm uj-btn-block" onclick="userjoy.sendConversation()" style="float: right; margin-top: 10px; color: #fff; background-color: {{color}}; border-color: {{color}}">Send Message</button>
                         <div style="text-align: center;">
                         <small>Powered by <a style="text-decoration:none;" href="http://www.userjoy.co", target="_blank">UserJoy</a></small>
                         </div>
                     </form>
                 </div>
-                <div class="arrow"></div>
+                <div class="uj-arrow"></div>
             </div>
         </div>
     </div>

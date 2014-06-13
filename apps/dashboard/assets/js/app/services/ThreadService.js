@@ -2,29 +2,29 @@ angular.module('services.ThreadService', [])
 
 .service('ThreadService', ['$log',
 
-    function ($log) {
+  function ($log) {
 
-        var threadMsg = [];
-        var reply = [];
+    var threadMsg = [];
+    var reply = [];
 
-        this.setThread = function (value) {
-            console.log("setting thread conversation");
-            threadMsg = value;
-        };
+    this.setThread = function (value) {
+      console.log("setting thread conversation");
+      threadMsg = value;
+    };
 
-        this.getThread = function () {
-            return threadMsg;
-        };
+    this.getThread = function () {
+      return threadMsg;
+    };
 
-        this.setReply = function (value) {
-            reply = value;
-        }
-
-        this.getReply = function (value) {
-            return reply;
-        }
-
-        return this;
-
+    this.setReply = function (value) {
+      reply = value;
     }
+
+    this.getReply = function (value) {
+      return reply;
+    }
+
+    return this;
+
+  }
 ])

@@ -4,7 +4,7 @@
 
 var _ = require('lodash');
 var async = require('async');
-var juice = require('juice');
+var juice = require('juice2');
 var nodemailer = require('nodemailer');
 var path = require('path');
 
@@ -214,7 +214,7 @@ Mailer.prototype.send = function (cb) {
 
     // FIXME : put this in the config file before production
     var opts = {
-      url: 'http://api.do.localhost/'
+      url: path.resolve(__dirname, '../../email_templates')
     };
 
     // inline the html
