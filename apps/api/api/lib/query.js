@@ -9,7 +9,6 @@
 
 var _ = require('lodash');
 var async = require('async');
-var moment = require('moment');
 var ObjectId = require('mongoose')
   .Types.ObjectId;
 
@@ -529,21 +528,25 @@ Query.prototype.genCountBaseMatchCond = function () {
   };
 
 
+  function dateDaysAgo(days) {
+    var date = new Date(new Date()
+      .getTime() - 86400000 * days);
+
+    return date;
+  }
+
+
   // if fromAgo and/or toAgo are present, add created time condions
 
   if (self.fromAgo || self.toAgo) {
     matchConds.ct = {};
 
     if (self.fromAgo) {
-      matchConds.ct.$gt = moment()
-        .subtract('days', self.fromAgo)
-        .format()
+      matchConds.ct.$gt = dateDaysAgo(self.fromAgo)
     }
 
     if (self.toAgo) {
-      matchConds.ct.$lt = moment()
-        .subtract('days', self.toAgo)
-        .format()
+      matchConds.ct.$lt = dateDaysAgo(self.toAgo)
     }
   }
 
