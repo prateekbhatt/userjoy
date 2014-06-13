@@ -274,11 +274,13 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
  - aid
  - creator (account id)
  - ct
- - ut
- - list
+ - filters (embedded documents)
+ - fromAgo (optional, number of days since when count queries should be run)
+ - list (to unix timestamp for count queries)
  - name
  - op
- - filters (embedded documents)
+ - toAgo (optional, number of days till when count queries should be run)
+ - ut
 
 ##### Embedded Documents:
 

@@ -243,6 +243,85 @@ describe('Model Segment', function () {
       });
 
 
+    it('should return error if fromAgo < 1 and toAgo < 0', function (done) {
+
+      var newSegment = {
+        aid: randomId,
+        creator: randomId,
+        list: 'users',
+        name: 'New Segment',
+        op: 'and',
+        fromAgo: 0,
+        toAgo: -1,
+        filters: [
+
+          {
+            method: 'hasdone',
+            type: 'feature',
+            name: 'Create Notification'
+          }
+
+        ]
+      };
+
+      Segment.create(newSegment, function (err, seg) {
+
+        expect(err)
+          .to.exist;
+
+        expect(Object.keys(err.errors))
+          .to.contain('toAgo');
+
+        expect(Object.keys(err.errors))
+          .to.contain('fromAgo');
+
+        expect(seg)
+          .to.not.exist;
+
+        done();
+      });
+
+    });
+
+
+    it('should return error if fromAgo < toAgo', function (done) {
+
+      var newSegment = {
+        aid: randomId,
+        creator: randomId,
+        list: 'users',
+        name: 'New Segment',
+        op: 'and',
+        fromAgo: 10,
+        toAgo: 11,
+        filters: [
+
+          {
+            method: 'hasdone',
+            type: 'feature',
+            name: 'Create Notification'
+          }
+
+        ]
+      };
+
+      Segment.create(newSegment, function (err, seg) {
+
+        expect(err)
+          .to.exist;
+
+        expect(err.message)
+          .to.eql('fromAgo must be greater than toAgo');
+
+        expect(seg)
+          .to.not.exist;
+
+        done();
+      });
+
+    });
+
+
     it('should create new segment', function (done) {
 
       var newSegment = {
@@ -251,6 +330,8 @@ describe('Model Segment', function () {
         list: 'users',
         name: 'New Segment',
         op: 'and',
+        fromAgo: 3,
+        toAgo: 1,
         filters: [
 
           {
@@ -269,6 +350,12 @@ describe('Model Segment', function () {
 
         expect(seg)
           .to.be.an('object');
+
+        expect(seg.fromAgo)
+          .to.eql(newSegment.fromAgo);
+
+        expect(seg.toAgo)
+          .to.eql(newSegment.toAgo);
 
         savedSegment = seg;
 
