@@ -91,6 +91,11 @@ var UserSchema = new Schema({
   companies: [UserCompanySchema],
 
 
+  country: {
+    type: String
+  },
+
+
   ct: {
     type: Date
   },
@@ -109,6 +114,11 @@ var UserSchema = new Schema({
 
   healthScore: {
     type: Number
+  },
+
+
+  ip: {
+    type: String
   },
 
 
