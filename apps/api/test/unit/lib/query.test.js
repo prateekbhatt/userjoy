@@ -4,6 +4,7 @@ describe('Lib query', function () {
    * npm dependencies
    */
 
+  var moment = require('moment');
   var mongoose = require('mongoose');
 
 
@@ -509,6 +510,56 @@ describe('Lib query', function () {
   });
 
 
+  describe('#genCountBaseMatchCond', function () {
+    var aid = randomId();
+
+    var q = {
+      list: 'users',
+      op: 'and',
+      fromAgo: '10',
+      toAgo: '9'
+    };
+
+    var qObj;
+
+    beforeEach(function () {
+      Query.prototype.reset();
+      qObj = new Query(aid, q);
+    });
+
+
+    it('should add gt/lt timestamps for fromAgo, toAgo', function () {
+
+      var cond = qObj.genCountBaseMatchCond.call(qObj);
+
+      expect(cond.aid)
+        .to.eql(aid);
+
+
+      function getDateUnix(actual, daysAgo) {
+        return moment(actual)
+          .subtract('days', daysAgo)
+          .startOf('day')
+          .unix();
+      }
+
+      expect(moment(cond.ct.$gt)
+        .startOf('day')
+        .unix())
+        .to.eql(getDateUnix(moment()
+          .format(), q.fromAgo));
+
+      expect(moment(cond.ct.$lt)
+        .startOf('day')
+        .unix())
+        .to.eql(getDateUnix(moment()
+          .format(), q.toAgo));
+
+    });
+
+  });
+
+
   describe('#genCountGroupCond', function () {
 
     var spy;
@@ -692,7 +743,7 @@ describe('Lib query', function () {
   });
 
 
-  describe('#genCountMatchCond', function () {
+  describe('#genCountGroupMatchCond', function () {
 
     var spy;
     var countFilters = [
@@ -727,7 +778,7 @@ describe('Lib query', function () {
 
         Query.prototype.rootOperator = '$and';
         Query.prototype.countFilters = countFilters;
-        var cond = Query.prototype.genCountMatchCond();
+        var cond = Query.prototype.genCountGroupMatchCond();
 
         expect(cond.$and)
           .to.be.an('array');
@@ -739,7 +790,7 @@ describe('Lib query', function () {
 
         Query.prototype.rootOperator = '$and';
         Query.prototype.countFilters = countFilters;
-        var cond = Query.prototype.genCountMatchCond();
+        var cond = Query.prototype.genCountGroupMatchCond();
 
         expect(cond.$and.length)
           .to.eql(countFilters.length);
@@ -751,7 +802,7 @@ describe('Lib query', function () {
 
         Query.prototype.rootOperator = '$and';
         Query.prototype.countFilters = countFilters;
-        var cond = Query.prototype.genCountMatchCond();
+        var cond = Query.prototype.genCountGroupMatchCond();
 
         expect(cond.$and[0].c_0)
           .to.exist;
@@ -766,7 +817,7 @@ describe('Lib query', function () {
 
         Query.prototype.rootOperator = '$and';
         Query.prototype.countFilters = countFilters;
-        var cond = Query.prototype.genCountMatchCond();
+        var cond = Query.prototype.genCountGroupMatchCond();
 
         expect(cond.$and[1].c_1)
           .not.to.have.property('$eq');
@@ -781,7 +832,7 @@ describe('Lib query', function () {
 
         Query.prototype.rootOperator = '$and';
         Query.prototype.countFilters = countFilters;
-        var cond = Query.prototype.genCountMatchCond();
+        var cond = Query.prototype.genCountGroupMatchCond();
 
         expect(cond.$and[0].c_0)
           .to.have.property('$gt');
@@ -853,16 +904,16 @@ describe('Lib query', function () {
     });
 
 
-    it('should call #genCountMatchCond', function (done) {
+    it('should call #genCountGroupMatchCond', function (done) {
 
-      var spy = sinon.spy(Query.prototype, 'genCountMatchCond');
+      var spy = sinon.spy(Query.prototype, 'genCountGroupMatchCond');
 
       Query.prototype.runCountQuery(function (err, uids) {
 
         expect(spy)
           .to.be.calledOnce;
 
-        Query.prototype.genCountMatchCond.restore();
+        Query.prototype.genCountGroupMatchCond.restore();
         done();
       });
 
@@ -1225,6 +1276,45 @@ describe('Lib query', function () {
       expect(before)
         .to.eql(after);
     });
+
+    it('should parseInt fromAgo, toAgo vals if present', function () {
+
+      var before = {
+        list: 'users',
+        op: 'and',
+        fromAgo: '10',
+        toAgo: '9'
+      }
+
+      var after = {
+        list: 'users',
+        op: 'and',
+        fromAgo: 10,
+        toAgo: 9
+      };
+
+
+      expect(before.fromAgo)
+        .to.be.a("string");
+
+      expect(before.toAgo)
+        .to.be.a("string");
+
+      expect(before)
+        .to.not.eql(after);
+
+      Query.sanitize(before);
+
+      expect(before.fromAgo)
+        .to.be.a("number");
+
+      expect(before.toAgo)
+        .to.be.a("number");
+
+      expect(before)
+        .to.eql(after);
+    });
+
 
 
     it(
