@@ -182,6 +182,8 @@ router
           seg.filters = santizedSeg.filters;
           seg.name = santizedSeg.name;
           seg.op = santizedSeg.op;
+          seg.fromAgo = santizedSeg.fromAgo;
+          seg.toAgo = santizedSeg.toAgo;
 
           seg.save(cb);
 
