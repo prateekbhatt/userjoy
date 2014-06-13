@@ -737,15 +737,15 @@ exports.parse = function(url){
   a.href = url;
   return {
     href: a.href,
-    host: a.host || location.host,
-    port: ('0' === a.port || '' === a.port) ? port(a.protocol) : a.port,
+    host: a.host,
+    port: a.port,
     hash: a.hash,
-    hostname: a.hostname || location.hostname,
-    pathname: a.pathname.charAt(0) != '/' ? '/' + a.pathname : a.pathname,
-    protocol: !a.protocol || ':' == a.protocol ? location.protocol : a.protocol,
+    hostname: a.hostname,
+    pathname: a.pathname,
+    protocol: a.protocol,
     search: a.search,
     query: a.search.slice(1)
-  };
+  }
 };
 
 /**
@@ -757,7 +757,9 @@ exports.parse = function(url){
  */
 
 exports.isAbsolute = function(url){
-  return 0 == url.indexOf('//') || !!~url.indexOf('://');
+  if (0 == url.indexOf('//')) return true;
+  if (~url.indexOf('://')) return true;
+  return false;
 };
 
 /**
@@ -769,7 +771,7 @@ exports.isAbsolute = function(url){
  */
 
 exports.isRelative = function(url){
-  return !exports.isAbsolute(url);
+  return ! exports.isAbsolute(url);
 };
 
 /**
@@ -782,29 +784,10 @@ exports.isRelative = function(url){
 
 exports.isCrossDomain = function(url){
   url = exports.parse(url);
-  return url.hostname !== location.hostname
-    || url.port !== location.port
-    || url.protocol !== location.protocol;
+  return url.hostname != location.hostname
+    || url.port != location.port
+    || url.protocol != location.protocol;
 };
-
-/**
- * Return default port for `protocol`.
- *
- * @param  {String} protocol
- * @return {String}
- * @api private
- */
-function port (protocol){
-  switch (protocol) {
-    case 'http:':
-      return 80;
-    case 'https:':
-      return 443;
-    default:
-      return location.port;
-  }
-}
-
 });
 require.register("component-bind/index.js", function(exports, require, module){
 /**
@@ -1010,8 +993,13 @@ function isEmpty (val) {
 });
 require.register("ianstormtaylor-is/index.js", function(exports, require, module){
 
-var isEmpty = require('is-empty')
-  , typeOf = require('type');
+var isEmpty = require('is-empty');
+
+try {
+  var typeOf = require('type');
+} catch (e) {
+  var typeOf = require('component-type');
+}
 
 
 /**
@@ -1896,161 +1884,6 @@ exports.parse = function (seconds) {
   var millis = parseInt(seconds, 10) * 1000;
   return new Date(millis);
 };
-});
-require.register("segmentio-store.js/store.js", function(exports, require, module){
-;(function(win){
-	var store = {},
-		doc = win.document,
-		localStorageName = 'localStorage',
-		namespace = '__storejs__',
-		storage
-
-	store.disabled = false
-	store.set = function(key, value) {}
-	store.get = function(key) {}
-	store.remove = function(key) {}
-	store.clear = function() {}
-	store.transact = function(key, defaultVal, transactionFn) {
-		var val = store.get(key)
-		if (transactionFn == null) {
-			transactionFn = defaultVal
-			defaultVal = null
-		}
-		if (typeof val == 'undefined') { val = defaultVal || {} }
-		transactionFn(val)
-		store.set(key, val)
-	}
-	store.getAll = function() {}
-
-	store.serialize = function(value) {
-		return JSON.stringify(value)
-	}
-	store.deserialize = function(value) {
-		if (typeof value != 'string') { return undefined }
-		try { return JSON.parse(value) }
-		catch(e) { return value || undefined }
-	}
-
-	// Functions to encapsulate questionable FireFox 3.6.13 behavior
-	// when about.config::dom.storage.enabled === false
-	// See https://github.com/marcuswestin/store.js/issues#issue/13
-	function isLocalStorageNameSupported() {
-		try { return (localStorageName in win && win[localStorageName]) }
-		catch(err) { return false }
-	}
-
-	if (isLocalStorageNameSupported()) {
-		storage = win[localStorageName]
-		store.set = function(key, val) {
-			if (val === undefined) { return store.remove(key) }
-			storage.setItem(key, store.serialize(val))
-			return val
-		}
-		store.get = function(key) { return store.deserialize(storage.getItem(key)) }
-		store.remove = function(key) { storage.removeItem(key) }
-		store.clear = function() { storage.clear() }
-		store.getAll = function() {
-			var ret = {}
-			for (var i=0; i<storage.length; ++i) {
-				var key = storage.key(i)
-				ret[key] = store.get(key)
-			}
-			return ret
-		}
-	} else if (doc.documentElement.addBehavior) {
-		var storageOwner,
-			storageContainer
-		// Since #userData storage applies only to specific paths, we need to
-		// somehow link our data to a specific path.  We choose /favicon.ico
-		// as a pretty safe option, since all browsers already make a request to
-		// this URL anyway and being a 404 will not hurt us here.  We wrap an
-		// iframe pointing to the favicon in an ActiveXObject(htmlfile) object
-		// (see: http://msdn.microsoft.com/en-us/library/aa752574(v=VS.85).aspx)
-		// since the iframe access rules appear to allow direct access and
-		// manipulation of the document element, even for a 404 page.  This
-		// document can be used instead of the current document (which would
-		// have been limited to the current path) to perform #userData storage.
-		try {
-			storageContainer = new ActiveXObject('htmlfile')
-			storageContainer.open()
-			storageContainer.write('<s' + 'cript>document.w=window</s' + 'cript><iframe src="/favicon.ico"></iframe>')
-			storageContainer.close()
-			storageOwner = storageContainer.w.frames[0].document
-			storage = storageOwner.createElement('div')
-		} catch(e) {
-			// somehow ActiveXObject instantiation failed (perhaps some special
-			// security settings or otherwse), fall back to per-path storage
-			storage = doc.createElement('div')
-			storageOwner = doc.body
-		}
-		function withIEStorage(storeFunction) {
-			return function() {
-				var args = Array.prototype.slice.call(arguments, 0)
-				args.unshift(storage)
-				// See http://msdn.microsoft.com/en-us/library/ms531081(v=VS.85).aspx
-				// and http://msdn.microsoft.com/en-us/library/ms531424(v=VS.85).aspx
-				storageOwner.appendChild(storage)
-				storage.addBehavior('#default#userData')
-				storage.load(localStorageName)
-				var result = storeFunction.apply(store, args)
-				storageOwner.removeChild(storage)
-				return result
-			}
-		}
-
-		// In IE7, keys may not contain special chars. See all of https://github.com/marcuswestin/store.js/issues/40
-		var forbiddenCharsRegex = new RegExp("[!\"#$%&'()*+,/\\\\:;<=>?@[\\]^`{|}~]", "g")
-		function ieKeyFix(key) {
-			return key.replace(forbiddenCharsRegex, '___')
-		}
-		store.set = withIEStorage(function(storage, key, val) {
-			key = ieKeyFix(key)
-			if (val === undefined) { return store.remove(key) }
-			storage.setAttribute(key, store.serialize(val))
-			storage.save(localStorageName)
-			return val
-		})
-		store.get = withIEStorage(function(storage, key) {
-			key = ieKeyFix(key)
-			return store.deserialize(storage.getAttribute(key))
-		})
-		store.remove = withIEStorage(function(storage, key) {
-			key = ieKeyFix(key)
-			storage.removeAttribute(key)
-			storage.save(localStorageName)
-		})
-		store.clear = withIEStorage(function(storage) {
-			var attributes = storage.XMLDocument.documentElement.attributes
-			storage.load(localStorageName)
-			for (var i=0, attr; attr=attributes[i]; i++) {
-				storage.removeAttribute(attr.name)
-			}
-			storage.save(localStorageName)
-		})
-		store.getAll = withIEStorage(function(storage) {
-			var attributes = storage.XMLDocument.documentElement.attributes
-			var ret = {}
-			for (var i=0, attr; attr=attributes[i]; ++i) {
-				var key = ieKeyFix(attr.name)
-				ret[attr.name] = store.deserialize(storage.getAttribute(key))
-			}
-			return ret
-		})
-	}
-
-	try {
-		store.set(namespace, namespace)
-		if (store.get(namespace) != namespace) { store.disabled = true }
-		store.remove(namespace)
-	} catch(e) {
-		store.disabled = true
-	}
-	store.enabled = !store.disabled
-	if (typeof module != 'undefined' && module.exports) { module.exports = store }
-	else if (typeof define === 'function' && define.amd) { define(store) }
-	else { win.store = store }
-})(this.window || global);
-
 });
 require.register("segmentio-top-domain/index.js", function(exports, require, module){
 
@@ -12833,25 +12666,10 @@ userjoy.initialize();
 });
 require.register("userjoy/lib/app.js", function(exports, require, module){
 
+var bind = require('bind');
 var debug = require('debug')('uj:app');
 var Entity = require('./entity');
 var inherit = require('inherit');
-var bind = require('bind');
-var cookie = require('./cookie');
-
-
-/**
- * App defaults
- */
-
-App.defaults = {
-  cookie: {
-    key: 'userjoy_app_id'
-  },
-  localStorage: {
-    key: 'userjoy_app_traits'
-  }
-};
 
 
 /**
@@ -12861,7 +12679,7 @@ App.defaults = {
  */
 
 function App (options) {
-  this.defaults = App.defaults;
+  this.defaults = {}
   this.debug = debug;
   Entity.call(this, options);
 }
@@ -12899,24 +12717,10 @@ module.exports.App = App;
 });
 require.register("userjoy/lib/company.js", function(exports, require, module){
 
+var bind = require('bind');
 var debug = require('debug')('uj:company');
 var Entity = require('./entity');
 var inherit = require('inherit');
-var bind = require('bind');
-
-
-/**
- * Company defaults
- */
-
-Company.defaults = {
-  cookie: {
-    key: 'userjoy_company_id'
-  },
-  localStorage: {
-    key: 'userjoy_company_properties'
-  }
-};
 
 
 /**
@@ -12926,7 +12730,7 @@ Company.defaults = {
  */
 
 function Company (options) {
-  this.defaults = Company.defaults;
+  this.defaults = {};
   this.debug = debug;
   Entity.call(this, options);
 }
@@ -12954,54 +12758,39 @@ module.exports.Company = Company;
 
 });
 require.register("userjoy/lib/cookie.js", function(exports, require, module){
-
 var bind = require('bind');
 var cookie = require('cookie');
 var clone = require('clone');
+var debug = require('debug')('uj:cookie');
 var defaults = require('defaults');
-var json = require('json');
 var topDomain = require('top-domain');
 
 
 /**
- * Initialize a new `Cookie` with `options`.
- *
- * @param {Object} options
+ * Initialize a new `Cookie`.
  */
 
-function Cookie (options) {
-  this.options(options);
-}
+function Cookie() {
 
+  // TODO: Needs to be updated
+  this.aid = window._userjoy_id;
 
-/**
- * Get or set the cookie options.
- *
- * @param {Object} options
- *   @field {Number} maxage (1 year)
- *   @field {String} domain
- *   @field {String} path
- *   @field {Boolean} secure
- */
+  // all cookies should be prefixed with _uj
+  this.cookiePrefix = '_uj';
 
-Cookie.prototype.options = function (options) {
-  if (arguments.length === 0) return this._options;
-
-  options = options || {};
+  this.debug = debug;
 
   var domain = '.' + topDomain(window.location.href);
 
   // localhost cookies are special: http://curl.haxx.se/rfc/cookie_spec.html
   if (domain === '.localhost') domain = '';
 
-  defaults(options, {
+  this._options = {
     maxage: 31536000000, // default to a year
     path: '/',
     domain: domain
-  });
-
-  this._options = options;
-};
+  };
+}
 
 
 /**
@@ -13013,13 +12802,7 @@ Cookie.prototype.options = function (options) {
  */
 
 Cookie.prototype.set = function (key, value) {
-  try {
-    value = json.stringify(value);
-    cookie(key, value, clone(this._options));
-    return true;
-  } catch (e) {
-    return false;
-  }
+  return cookie(key, value, clone(this._options));
 };
 
 
@@ -13031,13 +12814,7 @@ Cookie.prototype.set = function (key, value) {
  */
 
 Cookie.prototype.get = function (key) {
-  try {
-    var value = cookie(key);
-    value = value ? json.parse(value) : null;
-    return value;
-  } catch (e) {
-    return null;
-  }
+  return cookie(key);
 };
 
 
@@ -13049,12 +12826,170 @@ Cookie.prototype.get = function (key) {
  */
 
 Cookie.prototype.remove = function (key) {
-  try {
-    cookie(key, null, clone(this._options));
-    return true;
-  } catch (e) {
-    return false;
+  cookie(key, null, clone(this._options));
+};
+
+
+
+//////////////////////////////////////////////
+// METHODS ABOVE ARE GENERIC COOKIE GETTER/SETTER/DELETE METHODS
+// METHODS BELOW ARE SPECIFIC TO USERJOY SUCH AS GETTER/SETTER FOR AID, UID, CID
+//////////////////////////////////////////////
+
+
+
+/**
+ * Get the cookie name
+ *
+ * e.g. '_uj.1234567' where '1234567' is the app id
+ *
+ * @return {String}
+ */
+
+Cookie.prototype._name = function () {
+  return this.cookiePrefix + '.' + this.aid;
+};
+
+
+/**
+ * Gets the uid and the cid from the cookies
+ *
+ * @return {Object}
+ *         @property {String} uid user-id
+ *         @property {String} cid company-id
+ */
+
+Cookie.prototype._getIds = function () {
+  var aid = this.aid;
+  var name = this._name(aid);
+  var cook = this.get(name);
+  var split;
+  var ids = {};
+
+  if (cook) {
+    split = cook.split('.')
+    ids.uid = split[0] || '';
+    ids.cid = split[1] || '';
   }
+
+  return ids;
+};
+
+
+/**
+ * Sets uid and cid on the cookie
+ *
+ * @param {Object} ids
+ *        @property {String} uid user-id (optional)
+ *        @property {String} cid company-id (optional)
+ * @return {Boolean}
+ */
+
+Cookie.prototype._setIds = function (ids) {
+
+  var aid = this.aid;
+  if (!aid) return false;
+
+  ids || (ids = {});
+  ids.uid || (ids.uid = '');
+  ids.cid || (ids.cid = '');
+
+  var name = this._name(aid);
+  var val = ids.uid + '.' + ids.cid;
+
+  return this.set(name, val);
+};
+
+
+/**
+ * Get or set uid into / from cookie
+ *
+ * @param {String} id user-id (optional)
+ */
+
+Cookie.prototype.uid = function (uid) {
+
+  this.debug('uid %s', uid);
+
+  var aid = this.aid;
+
+  switch (arguments.length) {
+  case 0:
+    return this._getUid();
+  case 1:
+    return this._setUid(uid);
+  }
+};
+
+
+/**
+ * Gets uid from the cookie
+ *
+ * @return {String} user-id
+ */
+
+Cookie.prototype._getUid = function () {
+  var aid = this.aid;
+  return this._getIds()['uid'];
+};
+
+
+/**
+ * Sets the uid into the cookie without disturbing the company-id
+ *
+ * @param {String} uid
+ * @return {Boolean}
+ */
+
+Cookie.prototype._setUid = function (uid) {
+  var aid = this.aid;
+  var ids = this._getIds();
+  ids.uid = uid || ids.uid || '';
+  return this._setIds(ids);
+};
+
+
+/**
+ * Get or set uid into / from cookie
+ *
+ * @param {String} id company-id (optional)
+ */
+
+Cookie.prototype.cid = function (cid) {
+  var aid = this.aid;
+
+  switch (arguments.length) {
+  case 0:
+    return this._getCid();
+  case 1:
+    return this._setCid(cid);
+  }
+};
+
+
+/**
+ * Gets cid from the cookie
+ *
+ * @return {String} company-id
+ */
+
+Cookie.prototype._getCid = function () {
+  var aid = this.aid;
+  return this._getIds()['cid'];
+};
+
+
+/**
+ * Sets the cid into the cookie without disturbing the company-id
+ *
+ * @param {String} cid
+ * @return {Boolean}
+ */
+
+Cookie.prototype._setCid = function (cid) {
+  var ids = this._getIds();
+  ids.cid = cid || ids.cid || '';
+  return this._setIds(ids);
 };
 
 
@@ -13070,12 +13005,12 @@ module.exports = bind.all(new Cookie());
  */
 
 module.exports.Cookie = Cookie;
+
 });
 require.register("userjoy/lib/entity.js", function(exports, require, module){
 var traverse = require('isodate-traverse');
 var defaults = require('defaults');
 var cookie = require('./cookie');
-var store = require('./store');
 var extend = require('extend');
 var clone = require('clone');
 
@@ -13137,7 +13072,7 @@ Entity.prototype.id = function (id) {
  */
 
 Entity.prototype._getId = function () {
-  var ret = cookie.get(this._options.cookie.key);
+  var ret = this._id;
   return ret === undefined ? null : ret;
 };
 
@@ -13149,7 +13084,7 @@ Entity.prototype._getId = function () {
  */
 
 Entity.prototype._setId = function (id) {
-  cookie.set(this._options.cookie.key, id);
+  this._id = id;
 };
 
 
@@ -13177,7 +13112,7 @@ Entity.prototype.traits = function (traits) {
  */
 
 Entity.prototype._getTraits = function () {
-  var ret = store.get(this._options.localStorage.key);
+  var ret = this._traits;
   return ret ? traverse(clone(ret)) : {};
 };
 
@@ -13190,7 +13125,7 @@ Entity.prototype._getTraits = function () {
 
 Entity.prototype._setTraits = function (traits) {
   traits || (traits = {});
-  store.set(this._options.localStorage.key, traits);
+  this._traits = traits;
 };
 
 
@@ -13204,20 +13139,20 @@ Entity.prototype._setTraits = function (traits) {
 Entity.prototype.identify = function (traits) {
   traits || (traits = {});
   this.traits(traits);
-  this.save();
 };
 
 
 /**
- * Save the entity to local storage and the cookie.
+ * Extend the existing `traits` instead of overwriting.
  *
- * @return {Boolean}
+ * @param {String} name
+ * @param {String} val
  */
 
-Entity.prototype.save = function () {
-  cookie.set(this._options.cookie.key, this.id());
-  store.set(this._options.localStorage.key, this.traits());
-  return true;
+Entity.prototype.setTrait = function (name, val) {
+  var traits = this.traits();
+  traits[name] = val;
+  this.traits(traits);
 };
 
 
@@ -13228,8 +13163,6 @@ Entity.prototype.save = function () {
 Entity.prototype.logout = function () {
   this.id(null);
   this.traits({});
-  cookie.remove(this._options.cookie.key);
-  store.remove(this._options.localStorage.key);
 };
 
 
@@ -13240,16 +13173,6 @@ Entity.prototype.logout = function () {
 Entity.prototype.reset = function () {
   this.logout();
   this.options({});
-};
-
-
-/**
- * Load saved entity `id` or `traits` from storage.
- */
-
-Entity.prototype.load = function () {
-  this.id(cookie.get(this._options.cookie.key));
-  this.traits(store.get(this._options.localStorage.key));
 };
 
 });
@@ -13286,6 +13209,7 @@ function Message() {
   this.MSG_TEMPLATE_ID = 'uj_message';
   this.MSG_BODY_TEMPLATE_ID = 'uj_message_body';
   this.MSG_SENT_TEMPLATE_ID = 'uj_message_sent';
+  this.MSG_ERROR_ID = 'uj_message_error';
 }
 
 
@@ -13298,7 +13222,9 @@ Message.prototype.load = function (userId) {
   var locals = {
     MSG_TEMPLATE_ID: self.MSG_TEMPLATE_ID,
     MSG_BODY_TEMPLATE_ID: self.MSG_BODY_TEMPLATE_ID,
-    MSG_SENT_TEMPLATE_ID: self.MSG_SENT_TEMPLATE_ID
+    MSG_SENT_TEMPLATE_ID: self.MSG_SENT_TEMPLATE_ID,
+    MSG_ERROR_ID: self.MSG_ERROR_ID,
+    color: app.traits().color
   };
 
   dom('body')
@@ -13313,7 +13239,7 @@ Message.prototype.loadCss = function () {
   var style = document.createElement('style');
   style.type = 'text/css';
   style.innerHTML =
-    'body{font:14px/1.4 Georgia,serif}.foot{display:table-row;vertical-align:bottom;height:1px}body,html{height:100%}#wrap{min-height:100%}#main{overflow:auto;padding-bottom:150px}#footer{position:relative;margin-top:-150px;height:150px;clear:both}#page-wrap{width:75%;margin:80px auto}h1{font:700 36px Sans-Serif;margin:0 0 20px}.form-control{height:43px;padding:10px 15px;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);-webkit-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}.message-template{margin:20px 0;padding:20px;border-left:5px solid #eee}.message-template-danger{background-color:#fdf7f7;border-color:#d9534f;border-right:1px solid #d9534f;border-top:1px solid #d9534f;border-bottom:1px solid #d9534f;border-radius:4px}.message-template-warning{background-color:#fcf8f2;border-color:#f0ad4e;border-right:1px solid #fcf8f2;border-top:1px solid #fcf8f2;border-bottom:1px solid #fcf8f2;border-radius:4px}.message-template-info{background-color:#f4f8fa;border-color:#5bc0de;border-right:1px solid #f4f8fa;border-top:1px solid #f4f8fa;border-bottom:1px solid #f4f8fa;border-radius:4px}.message-template-success{background-color:#F4FDF0;border-color:#3C763D;border-right:1px solid #F4FDF0;border-top:1px solid #F4FDF0;border-bottom:1px solid #F4FDF0;border-radius:4px}.message-template-default{background-color:#EEE;border-color:#B4B4B4;border-right:1px solid #EEE;border-top:1px solid #EEE;border-bottom:1px solid #EEE;border-radius:4px}.message-template-notice{background-color:#FCFCDD;border-color:#BDBD89;border-right:1px solid #FCFCDD;border-top:1px solid #FCFCDD;border-bottom:1px solid #FCFCDD;border-radius:4px}.dropdown-menu>li>a{display:block;padding:3px 20px;clear:both;font-weight:400;line-height:1.42857143;color:#7b8a8b;white-space:nowrap}.message-email-success{border-color:#BDBD89;border-right:1px solid #bdc3c7;border-top:1px solid #bdc3c7;border-bottom:1px solid #bdc3c7;border-radius:4px}.input-group{position:relative;display:table;border-collapse:separate}.panel-footer{padding:10px 15px;background-color:#ecf0f1;border-top:1px solid #ecf0f1;border-bottom-right-radius:3px;border-bottom-left-radius:3px}.input-sm{height:18px;padding:6px 9px;font-size:13px;line-height:1.5;border-radius:3px}.form-control:focus{border-color:#66afe9;outline:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6)}.btn{display:inline-block;cursor:pointer;padding:10px 15px;font-size:15px;line-height:1.42857143;border-radius:4px;-moz-user-select:none;-ms-user-select:none;user-select:none}.btn-danger{color:#fff;background-color:#e74c3c;border-color:#e74c3c}.input-group .form-control{position:relative;float:left;width:100%;margin-bottom:0}.input-group-btn{position:relative;font-size:0}.input-group-addon,.input-group-btn{width:1%;white-space:nowrap;vertical-align:middle}.input-group .form-control,.input-group-addon,.input-group-btn{display:table-cell}.input-group-btn>.btn{position:relative}.close{float:right;font-size:21px;font-weight:700;line-height:1;color:#000;text-shadow:0 1px 0 #fff;opacity:.2;filter:alpha(opacity=20)}.close:focus,.close:hover{color:#000;text-decoration:none;cursor:pointer;opacity:.5;filter:alpha(opacity=50)}button.close{padding:0;cursor:pointer;background:0 0;border:0;-webkit-appearance:none}.badge{display:inline-block;min-width:20px;padding:10px 14px;font-size:24px;font-weight:700;color:#fff;line-height:1;vertical-align:baseline;white-space:nowrap;text-align:center;background-color:#5bc0de;border-radius:10px}.panel-default{color:#333;background-color:#bdc3c7}.panel-heading{background-color:#f5f5f5}.col-md-4{width:352px}.row{margin-left:-15px;margin-right:-15px}.arrow:after{content:"";position:absolute;bottom:-25px;left:175px;border-style:solid;border-width:25px 25px 0;border-color:#FFF transparent;display:block;width:0;z-index:1}.arrow:before{content:"";position:absolute;left:296px;border-style:solid;border-width:17px 17px 0;border-color:#ddd transparent;display:block;width:0;z-index:0}*{box-sizing:border-box}body{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:14px;line-height:1.42857143;color:#333;background-color:#fff}.panel-default{border-color:#ddd}.panel{margin-bottom:20px;background-color:#fff;border:1px solid transparent;border-radius:4px;box-shadow:0 1px 1px rgba(0,0,0,.05)}.panel-default>.panel-heading{color:#333;background-color:#f5f5f5;border-color:#ddd}.panel-heading{padding:10px 15px;border-bottom:1px solid transparent;border-top-right-radius:3px;border-top-left-radius:3px}.panel-title{margin-top:0;margin-bottom:0;font-size:16px;color:inherit}.h3{font-family:inherit;font-weight:500;line-height:1.1}.panel-body{padding:15px}.form-control{display:block;width:100%;font-size:14px;line-height:1.42857143;color:#555;background-color:#fff;background-image:none;border:1px solid #ccc;border-radius:4px;box-shadow:inset 0 1px 1px rgba(0,0,0,.075);transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}.btn-block{display:block;width:100%;padding-left:0;padding-right:0}.btn-group-sm>.btn,.btn-sm{padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}.btn-info{color:#fff;background-color:#5bc0de;border-color:#46b8da}.btn{margin-bottom:0;font-weight:400;text-align:center;vertical-align:middle;background-image:none;border:1px solid transparent;white-space:nowrap;-webkit-user-select:none}hr{margin-top:20px;margin-bottom:20px;border:0;border-top:1px solid #eee;box-sizing:content-box;height:0}.small,small{font-size:85%}';
+    '.uj-foot{display:table-row;vertical-align:bottom;height:1px}#uj-wrap{min-height:100%}#uj-main{overflow:auto;padding-bottom:150px}#uj-footer{position:relative;margin-top:-150px;height:150px;clear:both}#uj-page-wrap{width:75%;margin:80px auto}.uj-form-control{height:43px;padding:10px 15px;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);-webkit-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}.uj-message-template{margin:20px 0;padding:20px;border-left:1px solid #eee}.uj-message-template-danger{border-color:#d9534f;border-right:1px solid #d9534f;border-top:1px solid #d9534f;border-bottom:1px solid #d9534f;border-radius:4px}.uj-message-template-warning{background-color:#fcf8f2;border-color:#f0ad4e;border-right:1px solid #fcf8f2;border-top:1px solid #fcf8f2;border-bottom:1px solid #fcf8f2;border-radius:4px}.uj-message-template-info{background-color:#f4f8fa;border-color:#5bc0de;border-right:1px solid #f4f8fa;border-top:1px solid #f4f8fa;border-bottom:1px solid #f4f8fa;border-radius:4px}.uj-message-template-success{background-color:#F4FDF0;border-color:#3C763D;border-right:1px solid #F4FDF0;border-top:1px solid #F4FDF0;border-bottom:1px solid #F4FDF0;border-radius:4px}.uj-message-template-default{background-color:#EEE;border-color:#B4B4B4;border-right:1px solid #EEE;border-top:1px solid #EEE;border-bottom:1px solid #EEE;border-radius:4px}.uj-message-template-notice{background-color:#FCFCDD;border-color:#BDBD89;border-right:1px solid #FCFCDD;border-top:1px solid #FCFCDD;border-bottom:1px solid #FCFCDD;border-radius:4px}.uj-dropdown-menu>li>a{display:block;padding:3px 20px;clear:both;font-weight:400;line-height:1.42857143;color:#7b8a8b;white-space:nowrap}.uj-message-email-success{border-color:#BDBD89;border-right:1px solid #bdc3c7;border-top:1px solid #bdc3c7;border-bottom:1px solid #bdc3c7;border-radius:4px}.uj-input-group{position:relative;display:table;border-collapse:separate}.uj-panel-footer{padding:10px 15px;background-color:#ecf0f1;border-top:1px solid #ecf0f1;border-bottom-right-radius:3px;border-bottom-left-radius:3px}.uj-input-sm{height:18px;padding:6px 9px;font-size:13px;line-height:1.5;border-radius:3px}.uj-form-control:focus{border-color:#66afe9;outline:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6)}.uj-btn{display:inline-block;cursor:pointer;padding:10px 15px;font-size:15px;line-height:1.42857143;border-radius:4px;-moz-user-select:none;-ms-user-select:none;user-select:none}.uj-btn-danger{color:#fff;background-color:#e74c3c;border-color:#e74c3c}.uj-input-group .uj-form-control{position:relative;float:left;width:100%;margin-bottom:0}.uj-input-group-btn{position:relative;font-size:0}.uj-input-group-addon,.uj-input-group-btn{width:1%;white-space:nowrap;vertical-align:middle}.uj-input-group .uj-form-control,.uj-input-group-addon,.uj-input-group-btn{display:table-cell}.uj-input-group-btn>.uj-btn{position:relative}.uj-close{float:right;font-size:21px;font-weight:700;line-height:1;color:#000;text-shadow:0 1px 0 #fff;opacity:.2;filter:alpha(opacity=20)}.uj-close:focus,.uj-close:hover{color:#000;text-decoration:none;cursor:pointer;opacity:.5;filter:alpha(opacity=50)}button.uj-close{padding:0;cursor:pointer;background:0 0;border:0;-webkit-appearance:none}.uj-badge{display:inline-block;min-width:20px;padding:10px 14px;font-size:24px;font-weight:700;color:#fff;line-height:1;vertical-align:baseline;white-space:nowrap;text-align:center;background-color:#5bc0de;border-radius:10px}.uj-panel-default{color:#333;background-color:#bdc3c7}.uj-panel-heading{background-color:#f5f5f5}.uj-col-md-4{width:352px}.uj-row{margin-left:-15px;margin-right:-15px}.uj-arrow:after{content:"";position:absolute;bottom:-25px;left:175px;border-style:solid;border-width:25px 25px 0;border-color:#FFF transparent;display:block;width:0;z-index:1}.uj-arrow:before{content:"";position:absolute;left:296px;border-style:solid;border-width:17px 17px 0;border-color:#ddd transparent;display:block;width:0;z-index:0}*{box-sizing:border-box}.uj-panel-default{border-color:#ddd}.uj-panel{margin-bottom:20px;background-color:#fff;border:1px solid transparent;border-radius:4px;box-shadow:0 1px 1px rgba(0,0,0,.05)}.uj-panel-default>.uj-panel-heading{color:#333;background-color:#f5f5f5;border-color:#ddd}.uj-panel-heading{padding:10px 15px;border-bottom:1px solid transparent;border-top-right-radius:3px;border-top-left-radius:3px}.uj-panel-title{margin-top:0;margin-bottom:0;font-size:16px;color:inherit}.uj-panel-body{padding:15px}.uj-form-control{display:block;width:100%;font-size:14px;line-height:1.42857143;color:#555;background-color:#fff;background-image:none;border:1px solid #ccc;border-radius:4px;box-shadow:inset 0 1px 1px rgba(0,0,0,.075);transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}.uj-btn-block{display:block;width:100%;padding-left:0;padding-right:0}.uj-btn-group-sm>.uj-btn,.uj-btn-sm{padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}.uj-btn-info{color:#fff;background-color:#5bc0de;border-color:#46b8da}.uj-btn{margin-bottom:0;font-weight:400;text-align:center;vertical-align:middle;background-image:none;border:1px solid transparent;white-space:nowrap;-webkit-user-select:none}';
 
   dom('head')
     .prepend(style);
@@ -13331,12 +13257,16 @@ Message.prototype.show = function () {
     .style.display = (document.getElementById(id)
       .style.display === 'none') ? 'block' : 'none';
 
+  document.getElementById(this.MSG_SENT_TEMPLATE_ID).style.display = 'none';
+  document.getElementById(this.MSG_ERROR_ID).style.display = 'none';
+  document.getElementById(this.MSG_BODY_TEMPLATE_ID).focus();
+
 };
 
 
 Message.prototype.hide = function () {
 
-  var id = self.MSG_TEMPLATE_ID;
+  var id = this.MSG_TEMPLATE_ID;
 
   document.getElementById(id)
     .style.display = 'none';
@@ -13354,10 +13284,9 @@ Message.prototype.send = function () {
 
   if (!msgBody) {
     // FIXME SHOW ERROR MESSAGE HERE
-    this.debug('Provide valid message body');
+    document.getElementById(self.MSG_ERROR_ID).style.display = 'block';
     return;
   }
-
 
   var msg = {
     app_id: self.app_id,
@@ -13388,6 +13317,14 @@ Message.prototype.send = function () {
 
       document.getElementById(self.MSG_TEMPLATE_ID)
         .value = '';
+
+      document.getElementById(self.MSG_BODY_TEMPLATE_ID)
+        .value = '';
+
+      setTimeout(function () {
+        document.getElementById(self.MSG_TEMPLATE_ID)
+          .style.display = 'none';
+      }, 5000);
     },
 
     error: function (err) {
@@ -13403,7 +13340,6 @@ Message.prototype.send = function () {
  */
 
 module.exports = bind.all(new Message());
-
 });
 require.register("userjoy/lib/message-template.js", function(exports, require, module){
 module.exports = function anonymous(obj) {
@@ -13424,7 +13360,7 @@ module.exports = function anonymous(obj) {
     return '';
   };
 
-  return "<div>\n    <a style=\"cursor: pointer\" onclick=\"userjoy.showFeedback()\">\n        <div style=\"position: fixed; bottom:30px; right:20px;\">\n            <span style=\"display: inline-block;\n            min-width: 20px;\n            padding: 10px 14px;\n            font-size: 24px;\n            font-weight: 700;\n            color: #fff;\n            line-height: 1;\n            vertical-align: baseline;\n            white-space: nowrap;\n            text-align: center;\n            background-color: #5bc0de;\n            border-radius: 10px;\">&#63;\n            </span>\n        </div>\n    </a>\n    <div style=\"display: none\" id=\"" + escape(obj.MSG_TEMPLATE_ID) + "\">\n        <div style=\"bottom: 80px; position: fixed; right: 9px;\" class=\"col-md-4\">\n            <div class=\"panel panel-default\" style=\"border-color: #ddd;\">\n                <div class=\"panel-heading\">\n                    <h3 class=\"panel-title\" style=\"text-align: center;\">Send us a Message</h3>\n                    <button type=\"button\" class=\"close\" aria-hidden=\"true\" onclick=\"userjoy.hideFeedback()\" id=\"closeFeedback\" style=\"margin-top: -25px;\">&times;</button>\n                </div>\n                <div class=\"panel-body\">\n                    <form role=\"form\">\n                        <textarea id=\"" + escape(obj.MSG_BODY_TEMPLATE_ID) + "\" class=\"form-control\" style=\"padding: 4px; height: 150px;\"></textarea>\n                        <br>\n                        <button type=\"button\" class=\"btn btn-sm btn-info btn-block\" onclick=\"userjoy.sendConversation()\" style=\"float: right;\">Send Message</button>\n                        <hr>\n                        <div style=\"text-align: center;\">\n                        <small>Powered by <a style=\"text-decoration:none;\" href=\"http://www.userjoy.co\", target=\"_blank\">UserJoy</a></small>\n                        </div>\n                    </form>\n                </div>\n                <div class=\"arrow\"></div>\n            </div>\n        </div>\n    </div>\n</div>\n"
+  return "<div>\n    <a style=\"cursor: pointer\" onclick=\"userjoy.showFeedback()\">\n        <div style=\"position: fixed; bottom:30px; right:20px;\">\n            <span style=\"display: inline-block;\n            min-width: 20px;\n            padding: 10px 14px;\n            font-size: 24px;\n            font-weight: 700;\n            color: #fff;\n            line-height: 1;\n            vertical-align: baseline;\n            white-space: nowrap;\n            text-align: center;\n            background-color: " + escape(obj.color) + ";\n            border-radius: 10px;\">&#63;\n            </span>\n        </div>\n    </a>\n    <div style=\"display: none\" id=\"" + escape(obj.MSG_TEMPLATE_ID) + "\">\n        <div style=\"bottom: 80px; position: fixed; right: 9px;\" class=\"uj-col-md-4\">\n            <div class=\"uj-panel uj-panel-default\" style=\"border-color: #ddd;\">\n                <div class=\"uj-panel-heading\">\n                    <h3 class=\"uj-panel-title\" style=\"text-align: center;\">Send us a Message</h3>\n                    <button type=\"button\" class=\"uj-close\" aria-hidden=\"true\" onclick=\"userjoy.hideFeedback()\" id=\"closeFeedback\" style=\"margin-top: -25px;\">&times;</button>\n                </div>\n                <div class=\"uj-panel-body\">\n                    <form role=\"form\">\n                        <textarea id=\"" + escape(obj.MSG_BODY_TEMPLATE_ID) + "\" class=\"uj-form-control\" style=\"padding: 4px; height: 150px;\"></textarea>\n                        <span style=\"display: none; margin-top: 10px;\" id=\"" + escape(obj.MSG_SENT_TEMPLATE_ID) + "\">\n                        Message Sent. Thanks!</span>\n                        <span id=\"" + escape(obj.MSG_ERROR_ID) + "\" style=\" display:none; color: #a94442; margin-top: 10px;\">\n                        Your reply cannot be blank\n                        </span>\n                        <button type=\"button\" class=\"uj-btn uj-btn-sm uj-btn-block\" onclick=\"userjoy.sendConversation()\" style=\"float: right; margin-top: 10px; color: #fff; background-color: " + escape(obj.color) + "; border-color: " + escape(obj.color) + "\">Send Message</button>\n                        <div style=\"text-align: center;\">\n                        <small>Powered by <a style=\"text-decoration:none;\" href=\"http://www.userjoy.co\", target=\"_blank\">UserJoy</a></small>\n                        </div>\n                    </form>\n                </div>\n                <div class=\"uj-arrow\"></div>\n            </div>\n        </div>\n    </div>\n</div>\n"
 }
 });
 require.register("userjoy/lib/notification.js", function(exports, require, module){
@@ -13437,56 +13373,293 @@ var template = require('./notification-template');
 var user = require('./user');
 
 
+
+/**
+ * Get Gravatar image while rendering notifications
+ */
+
+function get_gravatar(email, size) {
+
+  // MD5 (Message-Digest Algorithm) by WebToolkit
+  // 
+
+  var MD5 = function (s) {
+    function L(k, d) {
+      return (k << d) | (k >>> (32 - d))
+    }
+
+    function K(G, k) {
+      var I, d, F, H, x;
+      F = (G & 2147483648);
+      H = (k & 2147483648);
+      I = (G & 1073741824);
+      d = (k & 1073741824);
+      x = (G & 1073741823) + (k & 1073741823);
+      if (I & d) {
+        return (x ^ 2147483648 ^ F ^ H)
+      }
+      if (I | d) {
+        if (x & 1073741824) {
+          return (x ^ 3221225472 ^ F ^ H)
+        } else {
+          return (x ^ 1073741824 ^ F ^ H)
+        }
+      } else {
+        return (x ^ F ^ H)
+      }
+    }
+
+    function r(d, F, k) {
+      return (d & F) | ((~d) & k)
+    }
+
+    function q(d, F, k) {
+      return (d & k) | (F & (~k))
+    }
+
+    function p(d, F, k) {
+      return (d ^ F ^ k)
+    }
+
+    function n(d, F, k) {
+      return (F ^ (d | (~k)))
+    }
+
+    function u(G, F, aa, Z, k, H, I) {
+      G = K(G, K(K(r(F, aa, Z), k), I));
+      return K(L(G, H), F)
+    }
+
+    function f(G, F, aa, Z, k, H, I) {
+      G = K(G, K(K(q(F, aa, Z), k), I));
+      return K(L(G, H), F)
+    }
+
+    function D(G, F, aa, Z, k, H, I) {
+      G = K(G, K(K(p(F, aa, Z), k), I));
+      return K(L(G, H), F)
+    }
+
+    function t(G, F, aa, Z, k, H, I) {
+      G = K(G, K(K(n(F, aa, Z), k), I));
+      return K(L(G, H), F)
+    }
+
+    function e(G) {
+      var Z;
+      var F = G.length;
+      var x = F + 8;
+      var k = (x - (x % 64)) / 64;
+      var I = (k + 1) * 16;
+      var aa = Array(I - 1);
+      var d = 0;
+      var H = 0;
+      while (H < F) {
+        Z = (H - (H % 4)) / 4;
+        d = (H % 4) * 8;
+        aa[Z] = (aa[Z] | (G.charCodeAt(H) << d));
+        H++
+      }
+      Z = (H - (H % 4)) / 4;
+      d = (H % 4) * 8;
+      aa[Z] = aa[Z] | (128 << d);
+      aa[I - 2] = F << 3;
+      aa[I - 1] = F >>> 29;
+      return aa
+    }
+
+    function B(x) {
+      var k = "",
+        F = "",
+        G, d;
+      for (d = 0; d <= 3; d++) {
+        G = (x >>> (d * 8)) & 255;
+        F = "0" + G.toString(16);
+        k = k + F.substr(F.length - 2, 2)
+      }
+      return k
+    }
+
+    function J(k) {
+      k = k.replace(/rn/g, "n");
+      var d = "";
+      for (var F = 0; F < k.length; F++) {
+        var x = k.charCodeAt(F);
+        if (x < 128) {
+          d += String.fromCharCode(x)
+        } else {
+          if ((x > 127) && (x < 2048)) {
+            d += String.fromCharCode((x >> 6) | 192);
+            d += String.fromCharCode((x & 63) | 128)
+          } else {
+            d += String.fromCharCode((x >> 12) | 224);
+            d += String.fromCharCode(((x >> 6) & 63) | 128);
+            d += String.fromCharCode((x & 63) | 128)
+          }
+        }
+      }
+      return d
+    }
+    var C = Array();
+    var P, h, E, v, g, Y, X, W, V;
+    var S = 7,
+      Q = 12,
+      N = 17,
+      M = 22;
+    var A = 5,
+      z = 9,
+      y = 14,
+      w = 20;
+    var o = 4,
+      m = 11,
+      l = 16,
+      j = 23;
+    var U = 6,
+      T = 10,
+      R = 15,
+      O = 21;
+    s = J(s);
+    C = e(s);
+    Y = 1732584193;
+    X = 4023233417;
+    W = 2562383102;
+    V = 271733878;
+    for (P = 0; P < C.length; P += 16) {
+      h = Y;
+      E = X;
+      v = W;
+      g = V;
+      Y = u(Y, X, W, V, C[P + 0], S, 3614090360);
+      V = u(V, Y, X, W, C[P + 1], Q, 3905402710);
+      W = u(W, V, Y, X, C[P + 2], N, 606105819);
+      X = u(X, W, V, Y, C[P + 3], M, 3250441966);
+      Y = u(Y, X, W, V, C[P + 4], S, 4118548399);
+      V = u(V, Y, X, W, C[P + 5], Q, 1200080426);
+      W = u(W, V, Y, X, C[P + 6], N, 2821735955);
+      X = u(X, W, V, Y, C[P + 7], M, 4249261313);
+      Y = u(Y, X, W, V, C[P + 8], S, 1770035416);
+      V = u(V, Y, X, W, C[P + 9], Q, 2336552879);
+      W = u(W, V, Y, X, C[P + 10], N, 4294925233);
+      X = u(X, W, V, Y, C[P + 11], M, 2304563134);
+      Y = u(Y, X, W, V, C[P + 12], S, 1804603682);
+      V = u(V, Y, X, W, C[P + 13], Q, 4254626195);
+      W = u(W, V, Y, X, C[P + 14], N, 2792965006);
+      X = u(X, W, V, Y, C[P + 15], M, 1236535329);
+      Y = f(Y, X, W, V, C[P + 1], A, 4129170786);
+      V = f(V, Y, X, W, C[P + 6], z, 3225465664);
+      W = f(W, V, Y, X, C[P + 11], y, 643717713);
+      X = f(X, W, V, Y, C[P + 0], w, 3921069994);
+      Y = f(Y, X, W, V, C[P + 5], A, 3593408605);
+      V = f(V, Y, X, W, C[P + 10], z, 38016083);
+      W = f(W, V, Y, X, C[P + 15], y, 3634488961);
+      X = f(X, W, V, Y, C[P + 4], w, 3889429448);
+      Y = f(Y, X, W, V, C[P + 9], A, 568446438);
+      V = f(V, Y, X, W, C[P + 14], z, 3275163606);
+      W = f(W, V, Y, X, C[P + 3], y, 4107603335);
+      X = f(X, W, V, Y, C[P + 8], w, 1163531501);
+      Y = f(Y, X, W, V, C[P + 13], A, 2850285829);
+      V = f(V, Y, X, W, C[P + 2], z, 4243563512);
+      W = f(W, V, Y, X, C[P + 7], y, 1735328473);
+      X = f(X, W, V, Y, C[P + 12], w, 2368359562);
+      Y = D(Y, X, W, V, C[P + 5], o, 4294588738);
+      V = D(V, Y, X, W, C[P + 8], m, 2272392833);
+      W = D(W, V, Y, X, C[P + 11], l, 1839030562);
+      X = D(X, W, V, Y, C[P + 14], j, 4259657740);
+      Y = D(Y, X, W, V, C[P + 1], o, 2763975236);
+      V = D(V, Y, X, W, C[P + 4], m, 1272893353);
+      W = D(W, V, Y, X, C[P + 7], l, 4139469664);
+      X = D(X, W, V, Y, C[P + 10], j, 3200236656);
+      Y = D(Y, X, W, V, C[P + 13], o, 681279174);
+      V = D(V, Y, X, W, C[P + 0], m, 3936430074);
+      W = D(W, V, Y, X, C[P + 3], l, 3572445317);
+      X = D(X, W, V, Y, C[P + 6], j, 76029189);
+      Y = D(Y, X, W, V, C[P + 9], o, 3654602809);
+      V = D(V, Y, X, W, C[P + 12], m, 3873151461);
+      W = D(W, V, Y, X, C[P + 15], l, 530742520);
+      X = D(X, W, V, Y, C[P + 2], j, 3299628645);
+      Y = t(Y, X, W, V, C[P + 0], U, 4096336452);
+      V = t(V, Y, X, W, C[P + 7], T, 1126891415);
+      W = t(W, V, Y, X, C[P + 14], R, 2878612391);
+      X = t(X, W, V, Y, C[P + 5], O, 4237533241);
+      Y = t(Y, X, W, V, C[P + 12], U, 1700485571);
+      V = t(V, Y, X, W, C[P + 3], T, 2399980690);
+      W = t(W, V, Y, X, C[P + 10], R, 4293915773);
+      X = t(X, W, V, Y, C[P + 1], O, 2240044497);
+      Y = t(Y, X, W, V, C[P + 8], U, 1873313359);
+      V = t(V, Y, X, W, C[P + 15], T, 4264355552);
+      W = t(W, V, Y, X, C[P + 6], R, 2734768916);
+      X = t(X, W, V, Y, C[P + 13], O, 1309151649);
+      Y = t(Y, X, W, V, C[P + 4], U, 4149444226);
+      V = t(V, Y, X, W, C[P + 11], T, 3174756917);
+      W = t(W, V, Y, X, C[P + 2], R, 718787259);
+      X = t(X, W, V, Y, C[P + 9], O, 3951481745);
+      Y = K(Y, h);
+      X = K(X, E);
+      W = K(W, v);
+      V = K(V, g)
+    }
+    var i = B(Y) + B(X) + B(W) + B(V);
+    return i.toLowerCase()
+  };
+
+  var size = size || 80;
+  return 'http://www.gravatar.com/avatar/' + MD5(email) +
+    '.jpg?d=mm';
+}
+
 /**
  * Initialize a new `Notification` instance.
  */
 
 function Notification() {
 
-  var userTraits = user.traits();
-  var appTraits = app.traits();
-  var apiUrl = appTraits.apiUrl;
-
-  this.app_id = appTraits.app_id;
-
-  this.automessageId;
   this.debug = debug;
 
-  // unique user id as given by app
-  this.user_id = userTraits.user_id;
+  // persist the automessage id of the notification and send it over if the
+  // the user replies
+  this.automessageId;
 
-  // email of user
-  this.email = userTraits.email;
+  this.app_id;
+  this.FETCH_URL;
+  this.REPLY_URL;
 
-
+  this.ERROR_ID = 'uj_error';
   this.NOTIFICATION_TEMPLATE_ID = 'uj_notification';
   this.REPLY_TEMPLATE_ID = 'uj_notification_reply';
   this.SENT_TEMPLATE_ID = 'uj_notification_reply_sent';
-  this.FETCH_URL = apiUrl + '/notifications';
-  this.REPLY_URL = apiUrl + '/conversations';
 }
 
 
-Notification.prototype.load = function () {
+Notification.prototype.load = function (cb) {
 
   this.debug('load');
 
+  var appTraits = app.traits();
+
+  // set app and route variables
+  this.app_id = appTraits.app_id;
+  this.FETCH_URL = appTraits.apiUrl + '/notifications';
+  this.REPLY_URL = appTraits.apiUrl + '/conversations';
 
   var self = this;
-
   self._fetch(function (err, notf) {
+
+    self.debug('fetch %o : %o', err, notf)
 
     // If there is an error, it should be logged during debugging
     if (err) {
-      self.debug('err: ' + err);
-      return;
+      self.debug('err %o', err);
+      return cb();
     }
 
+    // if there was no notification, return
+    if (!notf) return cb();
 
-    // If no notification found, do not anything
-    if (!notf) {
-      return;
-    }
+    // add color to the app traits
+    app.setTrait('color', notf.color);
+
+    // If no response, move on
+    if (!notf.body) return cb();
 
 
     // Persist the automessageId from the notification obj.
@@ -13494,40 +13667,50 @@ Notification.prototype.load = function () {
     // replies back
     self.automessageId = notf.amId;
 
+    var userTraits = user.traits();
 
     // Create locals object which would be passed to render the template
     var locals = {
       sender: notf.sender,
       body: notf.body,
+      color: app.traits()
+        .color,
 
       NOTIFICATION_TEMPLATE_ID: self.NOTIFICATION_TEMPLATE_ID,
       REPLY_TEMPLATE_ID: self.REPLY_TEMPLATE_ID,
-      SENT_TEMPLATE_ID: self.SENT_TEMPLATE_ID
+      SENT_TEMPLATE_ID: self.SENT_TEMPLATE_ID,
+      ERROR_ID: self.ERROR_ID,
+      img_src: self.img_src,
+      gravatar: get_gravatar(userTraits.email, 80)
     };
 
 
     // render the template with the locals, and insert it into the body
     dom('body')
       .prepend(template(locals));
+
+    cb();
   });
 
 };
 
 Notification.prototype._fetch = function (cb) {
 
+
   var self = this;
+  var userTraits = user.traits();
 
   var conditions = {
     app_id: self.app_id
   };
 
-
-  if (self.user_id) {
-    conditions.user_id = self.user_id;
-  } else if (self.email) {
-    conditions.email = self.email;
+  // if no user identifier, there would be no notification
+  if (userTraits.user_id) {
+    conditions.user_id = userTraits.user_id;
+  } else if (userTraits.email) {
+    conditions.email = userTraits.email;
   } else {
-    return;
+    return cb();
   }
 
 
@@ -13555,7 +13738,7 @@ Notification.prototype.hide = function () {
   var id = this.NOTIFICATION_TEMPLATE_ID;
 
   this.debug('hide', dom(id));
-
+  console.log("inside hide notification", id);
   document.getElementById(id)
     .style.display = 'none';
 
@@ -13568,6 +13751,14 @@ Notification.prototype.reply = function () {
 
   var msg = dom('#' + self.REPLY_TEMPLATE_ID)
     .val();
+
+  console.log("msg: ", msg, "ABCD", msg.length);
+  if (!msg.length) {
+    console.log("msg length is zero", self.ERROR_ID);
+    document.getElementById(self.ERROR_ID)
+      .style.display = 'block';
+    return;
+  }
 
   var reply = {
     amId: this.automessageId,
@@ -13594,6 +13785,11 @@ Notification.prototype.reply = function () {
         .style.display = 'block';
       document.getElementById(self.REPLY_TEMPLATE_ID)
         .value = '';
+
+      setTimeout(function () {
+        document.getElementById(self.NOTIFICATION_TEMPLATE_ID)
+          .style.display = 'none';
+      }, 5000);
     },
     error: function (err) {
       self.debug("error: ", err);
@@ -13629,12 +13825,14 @@ module.exports = function anonymous(obj) {
     return '';
   };
 
-  return "<div id=\"" + escape(obj.NOTIFICATION_TEMPLATE_ID) + "\" style=\"position: relative;\">\n    <div style=\"float:right; width: 350px;\">\n        <div class=\"message-template message-template-danger\" style=\"min-height: 175px; overflow: auto;\">\n            <button type=\"button\" class=\"close\" aria-hidden=\"true\" onclick=\"userjoy.hideNotification()\" id=\"closeNotification\">&times;</button>\n            <p>" + escape(obj.sender) + "</p>\n            <p>" + escape(obj.body) + "</p>\n            <span id=\"" + escape(obj.SENT_TEMPLATE_ID) + "\" style=\"margin-top: 140px; display:none; color: #7f8c8d\">Message Sent. Thanks!</span>\n        </div>\n        <div class=\"panel-footer\" style=\"margin-top: -23px;\">\n            <div class=\"input-group\">\n                <input id=\"" + escape(obj.REPLY_TEMPLATE_ID) + "\" type=\"text\" name=\"msg\" class=\"form-control input-sm\" placeholder=\"Type your message here...\" style=\"margin-top: 3px; height: 30px;\" />\n                <span class=\"input-group-btn\">\n                <button class=\"btn btn-danger btn-sm\" id=\"btn-chat\" type=\"button\" onclick=\"userjoy.replyNotification()\" style=\"margin-top: 2px; height: 30px;\">\n                Send</button>\n                </span>\n            </div>\n        </div>\n    </div>\n</div>\n"
+  return "<div id=\"" + escape(obj.NOTIFICATION_TEMPLATE_ID) + "\" style=\"position: relative;\">\n    <div style=\"float:right; width: 350px;\">\n        <div class=\"uj-message-template\" style=\"min-height: 175px; overflow: auto; border-color: " + escape(obj.color) + "; border-right: 1px solid " + escape(obj.color) + ";border-top: 1px solid " + escape(obj.color) + "; border-bottom: 1px solid " + escape(obj.color) + "; border-radius: 4px;\">\n            <button type=\"button\" class=\"uj-close\" aria-hidden=\"true\" onclick=\"userjoy.hideNotification()\" style=\"margin-top: -15px;\">&times;</button>\n            <img src=\"" + escape(obj.gravatar) + "\" width=\"60px\">\n            <div style=\"margin-top: -75px; margin-left: 75px;\">\n                <p><b>" + escape(obj.sender) + "</b></p>\n                <p>" + escape(obj.body) + "</p>\n            </div>\n            <span id=\"" + escape(obj.SENT_TEMPLATE_ID) + "\" style=\"bottom: -180px; display:none; color: #7f8c8d; position: absolute;\">Message Sent. Thanks!</span>\n            <span id=\"" + escape(obj.ERROR_ID) + "\" style=\"bottom: -180px; display:none; color: #a94442; position: absolute;\">Your reply cannot be blank</span>\n        </div>\n        <div class=\"uj-panel-footer\" style=\"margin-top: -23px;\">\n            <div class=\"uj-input-group\">\n                <textarea id=\"" + escape(obj.REPLY_TEMPLATE_ID) + "\" type=\"text\" name=\"msg\" class=\"uj-form-control uj-input-sm\" placeholder=\"Type your message here...\" style=\"margin-top: 3px; height: 34px;\"></textarea>\n                <span class=\"uj-input-group-btn\">\n                <button class=\"uj-btn uj-btn-sm\" id=\"btn-chat\" type=\"button\" onclick=\"userjoy.replyNotification()\" style=\"margin-top: 3px; height: 34px; color: #fff; background-color: " + escape(obj.color) + "; border-color: " + escape(obj.color) + "\">\n                Send</button>\n                </span>\n            </div>\n        </div>\n    </div>\n</div>\n"
 }
 });
 require.register("userjoy/lib/queue.js", function(exports, require, module){
 var _ = require('lodash');
 var bind = require('bind');
+var debug = require('debug')('uj:queue');
+var each = require('each');
 var is = require('is');
 
 
@@ -13650,6 +13848,7 @@ module.exports = bind.all(new Queue());
  */
 
 function Queue() {
+  this.debug = debug;
   this.tasks = [];
   return this;
 }
@@ -13662,12 +13861,13 @@ function Queue() {
  */
 
 Queue.prototype.create = function (arr) {
+  if (!is.array(arr)) return this;
 
-  if (!is.array(arr)) {
-    // TODO: Log error message to help while development
-    return this;
-  }
-  this.tasks = arr;
+  var self = this;
+  each(arr, function (task) {
+    self.tasks.push(task);
+  });
+
   return this;
 };
 
@@ -13712,114 +13912,12 @@ Queue.prototype._pullIdentify = function () {
 };
 
 });
-require.register("userjoy/lib/store.js", function(exports, require, module){
-
-var bind = require('bind');
-var defaults = require('defaults');
-var store = require('store');
-
-
-/**
- * Initialize a new `Store` with `options`.
- *
- * @param {Object} options
- */
-
-function Store (options) {
-  this.options(options);
-}
-
-
-/**
- * Set the `options` for the store.
- *
- * @param {Object} options
- *   @field {Boolean} enabled (true)
- */
-
-Store.prototype.options = function (options) {
-  if (arguments.length === 0) return this._options;
-
-  options = options || {};
-  defaults(options, { enabled : true });
-
-  this.enabled  = options.enabled && store.enabled;
-  this._options = options;
-};
-
-
-/**
- * Set a `key` and `value` in local storage.
- *
- * @param {String} key
- * @param {Object} value
- */
-
-Store.prototype.set = function (key, value) {
-  if (!this.enabled) return false;
-  return store.set(key, value);
-};
-
-
-/**
- * Get a value from local storage by `key`.
- *
- * @param {String} key
- * @return {Object}
- */
-
-Store.prototype.get = function (key) {
-  if (!this.enabled) return null;
-  return store.get(key);
-};
-
-
-/**
- * Remove a value from local storage by `key`.
- *
- * @param {String} key
- */
-
-Store.prototype.remove = function (key) {
-  if (!this.enabled) return false;
-  return store.remove(key);
-};
-
-
-/**
- * Expose the store singleton.
- */
-
-module.exports = bind.all(new Store());
-
-
-/**
- * Expose the `Store` constructor.
- */
-
-module.exports.Store = Store;
-});
 require.register("userjoy/lib/user.js", function(exports, require, module){
 
+var bind = require('bind');
 var debug = require('debug')('uj:user');
 var Entity = require('./entity');
 var inherit = require('inherit');
-var bind = require('bind');
-var cookie = require('./cookie');
-
-
-/**
- * User defaults
- */
-
-User.defaults = {
-  cookie: {
-    key: 'userjoy_user_id'
-  },
-  localStorage: {
-    key: 'userjoy_user_traits'
-  }
-};
 
 
 /**
@@ -13829,7 +13927,7 @@ User.defaults = {
  */
 
 function User (options) {
-  this.defaults = User.defaults;
+  this.defaults = {};
   this.debug = debug;
   Entity.call(this, options);
 }
@@ -13866,6 +13964,7 @@ module.exports.User = User;
 
 });
 require.register("userjoy/lib/userjoy.js", function(exports, require, module){
+var ajax = require('ajax');
 var app = require('./app');
 var bind = require('bind');
 var callback = require('callback');
@@ -13890,50 +13989,8 @@ var querystring = require('querystring');
 var queue = require('./queue');
 var size = require('object')
   .length;
-var store = require('./store');
 var url = require('url');
 var user = require('./user');
-
-/**
- * TODO
- *
- * - ASSUME THERE IS ONLY ONE INTEGRATION AND THEN REMOVE UNNECESSARY
- * ABSTRACTION
- * - Remove all facade contructors
- * - In place of facade functions, use constructors in company and user modules
- * - Create new constructors for Alias, Track and Page in the root dir
- * - Update _invoke function to send data
- * - Remove Emitter
- * - Remove all integration related functions
- * - Remove all unused 'components'
- * - Update tests
- *
- *
- * ===================
- * PSEUDO-CODE
- * ===================
- *
- * In initialize, load user and company from storage
- *
- * In invokeQueue, check if identify user / company
- * functions are present in the queue. If yes, invoke these functions
- * before invoking other event-related functions
- *
- * In identify user / company, if unique id is not
- * equal to the id stored in cookie, then reset
- * user / company, and then set new id / traits
- * change entity.prototype.identify function to delete current id / traits
- *
- * Session: create separate session cookie with maxAge of 30 minutes.
- * Every time a new event happens, check if the session exists. If it does
- * not exist, create a new session and pass session related data to the new
- * session. Session should be an entity with its own traits. if there is a
- * valid session id, send it alongwith the request, else the server should
- * create a new session, and send back the session id in the jsonp callback
- *
- */
-
-
 
 
 /**
@@ -13949,32 +14006,28 @@ module.exports = UserJoy;
 
 function UserJoy() {
   this.debug = debug;
-  this._timeout = 300;
-  this.api_url = '/track';
-  this.jsonp_callback = 'foo';
+  this._timeout = 20000;
+  this.TRACK_URL = 'http://api.do.localhost/track';
+  this.IDENTIFY_URL = 'http://api.do.localhost/track/identify';
+  this.COMPANY_URL = 'http://api.do.localhost/track/company';
+
   bind.all(this);
 }
 
 
 /**
- * Initialize with the given `settings` and `options`.
+ * Initialize.
  *
- * @param {Object} settings
- * @param {Object} options (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.initialize = function (settings, options) {
+UserJoy.prototype.initialize = function () {
+  var self = this;
 
   this.debug('initialize');
 
-  settings = settings || {};
-  options = options || {};
-  this._options(options);
-
-  // load user now that options are set
-  user.load();
-  company.load();
+  // set the app id
+  this.aid = window._userjoy_id;
 
   // set tasks which were queued before initialization
   queue
@@ -13988,22 +14041,26 @@ UserJoy.prototype.initialize = function (settings, options) {
     app_id: window._userjoy_id,
 
     // FIXME change before production
-    apiUrl: 'http://api.do.localhost/track'
+    apiUrl: self.TRACK_URL
   });
 
-  // FIXME: REMOVE ME
-  // this.debug();
+  setTimeout(function () {
+
+  }, 500)
 
   // FIXME: THIS CODE IS NOT TESTED
-  notification.load();
+  notification.load(function (err) {
 
-  message.load();
-  // load css file for message
-  message.loadCss();
+    self.debug('loaded', err);
+
+    // load css file for message
+    message.loadCss();
+
+    message.load();
+  });
 
 
-  // track page view
-  this.page();
+  this.debug('INITIALIZED:: %o', this);
 
   return this;
 };
@@ -14016,8 +14073,8 @@ UserJoy.prototype.initialize = function (settings, options) {
  */
 
 UserJoy.prototype._invokeQueue = function () {
-
   for (var i = queue.tasks.length - 1; i >= 0; i--) {
+    this.debug('_invokeQueue %o', queue.tasks);
     this.push(queue.tasks.shift());
   };
 
@@ -14033,6 +14090,9 @@ UserJoy.prototype._invokeQueue = function () {
  */
 
 UserJoy.prototype.identify = function (traits, fn) {
+  var self = this;
+
+  this.debug('identify');
 
   if (!is.object(traits)) {
     this.debug('err: userjoy.identify must be passed a traits object');
@@ -14047,38 +14107,78 @@ UserJoy.prototype.identify = function (traits, fn) {
 
   user.identify(traits);
 
+  var data = {
+    app_id: self.aid,
+    user: user.traits()
+  };
+
+  ajax({
+    type: 'GET',
+    url: self.IDENTIFY_URL,
+    data: data,
+    success: function (ids) {
+      self.debug("identify success: %o", ids);
+      ids || (ids = {});
+
+      // set uid to cookie
+      cookie.uid(ids.uid);
+    },
+    error: function (err) {
+      self.debug("identify error: %o", err);
+    }
+  });
+
   this._callback(fn);
   return this;
 };
 
 
 /**
- * Return the current user.
- *
- * @return {Object}
- */
-
-UserJoy.prototype.user = function () {
-  return user;
-};
-
-
-/**
  * Identify a company by `traits`.
  *
- * @param {Object} traits
+ * @param {Object} traits (optional)
  * @param {Function} fn (optional)
  * @return {UserJoy}
  */
 
 UserJoy.prototype.company = function (traits, fn) {
+  var self = this;
+
+  this.debug('company');
 
   if (!is.object(traits)) {
     this.debug('err: userjoy.company must be passed a traits object');
-    return this;
+    return;
+  }
+
+  // if no company identifier, return
+  if (!traits.company_id) {
+    self.debug('userjoy.company must provide the company_id');
+    return;
   }
 
   company.identify(traits);
+
+  var data = {
+    app_id: self.aid,
+    company: company.traits()
+  };
+
+  ajax({
+    type: 'GET',
+    url: self.COMPANY_URL,
+    data: data,
+    success: function (ids) {
+      self.debug("company success: %o", ids);
+      ids || (ids = {});
+
+      // set cid to cookie
+      cookie.cid(ids.cid);
+    },
+    error: function (err) {
+      self.debug("company error: %o", err);
+    }
+  });
 
   this._callback(fn);
   return this;
@@ -14090,20 +14190,21 @@ UserJoy.prototype.company = function (traits, fn) {
  *
  * @param {String} event
  * @param {Object} properties (optional)
- * @param {Object} options (optional)
  * @param {Function} fn (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.track = function (event, properties, options, fn) {
-  if (is.fn(options)) fn = options, options = null;
-  if (is.fn(properties)) fn = properties, options = null, properties = null;
+UserJoy.prototype.track = function (event, properties, fn) {
 
-  this._send('track', {
-    properties: properties,
-    options: options,
-    event: event
-  });
+
+  this.debug('track', event, properties);
+
+  if (is.fn(properties)) fn = properties, properties = null;
+
+
+  // FIXME: add additional event types on the server: form, click
+
+  this._sendEvent('feature', event, null, properties);
 
   this._callback(fn);
   return this;
@@ -14123,6 +14224,9 @@ UserJoy.prototype.track = function (event, properties, options, fn) {
 UserJoy.prototype.trackLink = function (links, event, properties) {
   if (!links) return this;
   if (is.element(links)) links = [links]; // always arrays, handles jquery
+
+  // if no name attached to event, do not track
+  if (!event) return this;
 
   var self = this;
   each(links, function (el) {
@@ -14155,6 +14259,10 @@ UserJoy.prototype.trackLink = function (links, event, properties) {
  */
 
 UserJoy.prototype.trackForm = function (forms, event, properties) {
+
+
+  this.debug('trackForm')
+
   if (!forms) return this;
   if (is.element(forms)) forms = [forms]; // always arrays, handles jquery
 
@@ -14194,19 +14302,17 @@ UserJoy.prototype.trackForm = function (forms, event, properties) {
  * @param {String} category (optional)
  * @param {String} name (optional)
  * @param {Object or String} properties (or path) (optional)
- * @param {Object} options (optional)
  * @param {Function} fn (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.page = function (category, name, properties, options, fn) {
+UserJoy.prototype.page = function (category, name, properties, fn) {
 
-  if (is.fn(options)) fn = options, options = null;
-  if (is.fn(properties)) fn = properties, options = properties = null;
-  if (is.fn(name)) fn = name, options = properties = name = null;
-  if (is.object(category)) options = name, properties = category, name =
-    category = null;
-  if (is.object(name)) options = properties, properties = name, name = null;
+  if (category && !is.string(category)) return this; // SHOW ERROR
+
+  if (is.fn(properties)) fn = properties, properties = null;
+  if (is.fn(name)) fn = name, properties = name = null;
+  if (is.object(name)) properties = name, name = null;
   if (is.string(category) && !is.string(name)) name = category, category =
     null;
 
@@ -14219,17 +14325,14 @@ UserJoy.prototype.page = function (category, name, properties, options, fn) {
   };
 
   if (name) defs.name = name;
+
+  name = defs.path;
   if (category) defs.category = category;
 
   properties = clone(properties) || {};
   defaults(properties, defs);
 
-  this._send('page', {
-    properties: properties,
-    category: category,
-    options: options,
-    name: name
-  });
+  this._sendEvent('pageview', name, category, properties);
 
   this._callback(fn);
   return this;
@@ -14244,24 +14347,6 @@ UserJoy.prototype.page = function (category, name, properties, options, fn) {
 
 UserJoy.prototype.timeout = function (timeout) {
   this._timeout = timeout;
-};
-
-
-/**
- * Apply options.
- *
- * @param {Object} options
- * @return {UserJoy}
- * @api private
- */
-
-UserJoy.prototype._options = function (options) {
-  options = options || {};
-  cookie.options(options.cookie);
-  store.options(options.localStorage);
-  user.options(options.user);
-  company.options(options.company);
-  return this;
 };
 
 
@@ -14289,60 +14374,41 @@ UserJoy.prototype._callback = function (fn) {
  * @api private
  */
 
-UserJoy.prototype._send = function (type, traits) {
+UserJoy.prototype._sendEvent = function (type, name, module, properties) {
 
-  this.debug()
-
+  var self = this;
   // TODO: send data to userjoy api here
 
+  var uid = cookie.uid();
+  var cid = cookie.cid();
+
   var data = {
-    event: {
+    app_id: self.aid,
+    e: {
       type: type,
-      traits: traits
+      name: name,
     },
-    user: {
-      id: user.id(),
-      traits: user.traits()
-    }
+    u: uid
   };
 
-  if (company.id()) {
-    data.company = {
-      id: company.id(),
-      traits: company.traits()
-    };
-  }
+  if (cid) data.c = cid;
 
-  this._jsonp(data);
-  return this;
-};
+  if (module) data.e.feature = module;
+  if (properties) data.e.meta = properties;
 
 
-/**
- * Send data to api using JSON-P
- *
- * @param {Object} data to be sent
- * @return {userjoy}
- */
+  ajax({
+    type: 'GET',
+    url: self.TRACK_URL,
+    data: data,
+    success: function (msg) {
+      self.debug("success " + msg);
+    },
+    error: function (err) {
+      self.debug("error " + err);
+    }
+  });
 
-UserJoy.prototype._jsonp = function (data) {
-
-  function foo(data) {
-    // do stuff with JSON
-    console.log('recieved foo data', data);
-  }
-
-  data.callback = foo;
-
-  data = json.stringify(data);
-
-  // var script = document.createElement('script');
-
-  // script.src = this.api_url +
-  //   '?data=' +
-  //   data;
-
-  // document.getElementsByTagName('head')[0].appendChild(script);
   return this;
 };
 
@@ -14424,8 +14490,6 @@ UserJoy.prototype.hideFeedback = message.hide;
 UserJoy.prototype.sendConversation = message.send;
 
 });
-
-
 
 
 
@@ -14594,10 +14658,6 @@ require.alias("ianstormtaylor-is-empty/index.js", "ianstormtaylor-is/deps/is-emp
 require.alias("segmentio-isodate/index.js", "segmentio-new-date/deps/isodate/index.js");
 
 require.alias("segmentio-new-date/lib/index.js", "segmentio-new-date/index.js");
-require.alias("segmentio-store.js/store.js", "userjoy/deps/store/store.js");
-require.alias("segmentio-store.js/store.js", "userjoy/deps/store/index.js");
-require.alias("segmentio-store.js/store.js", "store/index.js");
-require.alias("segmentio-store.js/store.js", "segmentio-store.js/index.js");
 require.alias("segmentio-top-domain/index.js", "userjoy/deps/top-domain/index.js");
 require.alias("segmentio-top-domain/index.js", "userjoy/deps/top-domain/index.js");
 require.alias("segmentio-top-domain/index.js", "top-domain/index.js");

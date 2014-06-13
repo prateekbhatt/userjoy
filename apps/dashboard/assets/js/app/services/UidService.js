@@ -2,19 +2,19 @@ angular.module('services.UidService', [])
 
 .service('UidService', ['$log',
 
-    function ($log) {
+  function ($log) {
 
-        var uid = '';
+    var uid = '';
 
-        this.set = function (value) {
-            uid = value;
-        };
+    this.set = function (value) {
+      uid = value;
+    };
 
-        this.get = function () {
-            return uid;
-        };
+    this.get = function () {
+      return uid;
+    };
 
-        return this;
+    return this;
 
-    }
+  }
 ])

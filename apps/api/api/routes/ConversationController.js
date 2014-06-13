@@ -4,6 +4,7 @@
 
 var _ = require('lodash');
 var async = require('async');
+var moment = require('moment');
 var router = require('express')
   .Router();
 
@@ -52,6 +53,22 @@ function replyToEmailManual(fromEmail, conversationId) {
   var emailDomain = emailSplit[1];
   var email = emailLocal + '+' + conversationId + '@' + emailDomain;
   return email;
+}
+
+
+// add templateDate property to each message in the conversation for
+// showing well formatted time in the emails
+function addTemplateDate(conv) {
+
+  // convert conv obj to JSON if BSON
+  conv = conv.toJSON ? conv.toJSON() : conv;
+
+  _.each(conv.messages, function (m) {
+    m.templateDate = moment(m.ct)
+      .format('D MMM, h:m a');
+  });
+
+  return conv;
 }
 
 
@@ -261,6 +278,12 @@ router
   .route('/:aid/conversations')
   .post(function (req, res, next) {
 
+    logger.trace({
+      at: 'ConversationController:createConversation',
+      params: req.params,
+      body: req.body
+    })
+
     var newMsg = req.body;
     var assignee = req.user._id;
     var aid = req.app._id;
@@ -368,6 +391,10 @@ router
           if (newMsg.type !== "email") return cb(err, messages);
 
           var iterator = function (conv, cb) {
+
+            // add message dates
+            conv = addTemplateDate(conv);
+
             var toEmail = conv.toEmail;
             var toName = conv.toName;
 
@@ -387,7 +414,7 @@ router
               },
 
               locals: {
-                messages: conv.messages
+                conversation: conv
               },
 
               // pass the message id of the reply
@@ -498,6 +525,9 @@ router
             .select('email name')
             .exec(function (err, user) {
 
+              // add message dates
+              conv = addTemplateDate(conv);
+
               // assume the reply message was the last message
               var msgId = _.last(conv.messages)
                 ._id;
@@ -514,7 +544,7 @@ router
                 },
 
                 locals: {
-                  messages: conv.messages
+                  conversation: conv
                 },
 
                 // pass the message id of the reply

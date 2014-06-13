@@ -1,5 +1,5 @@
 <div ng-include src="'/templates/navbar/navbar.html'"></div>
-<div class="panel panel-default">
+<div class="panel">
     <div class="panel-body">
         <div class="col-md-4">
             <div id="wrapper-settings">
@@ -19,10 +19,10 @@
         </div>
         <div class="col-md-8" id="page-wrapper-settings">
             <form id="settings_profile_form" class="form-horizontal" role="form" ng-submit="changeProfileName()" novalidate name="name_update_form">
-                <div ng-show="profileNameChangeSuccess" class="alert alert-success">
+               <!--  <div ng-show="profileNameChangeSuccess" class="alert alert-success">
                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="hideSuccessAlert()">&times;</button>
                     Profile Name Changed Successfully
-                </div>
+                </div> -->
                 <div ng-show="profileNameChangeError" class="alert alert-danger">
                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="hideErrorAlert()">&times;</button>
                     Error in changing profile name

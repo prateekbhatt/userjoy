@@ -1,4 +1,7 @@
 <div ng-include src="'/templates/navbar/navbar.html'"></div>
+<div class="row">
+    <div ng-include src="'/templates/navbar/server-error-success.html'" class="col-md-offset-4 col-md-4"></div>
+</div>
 <div class="panel" style="min-height: 500px;">
     <div class="panel-body">
         <div class="row">
@@ -8,10 +11,10 @@
                     <div id="sidebar-wrapper-settings">
                         <ul class="sidebar-nav">
                             <li>
-                                <a href="/apps/{{currApp}}/messages/open" ng-click="showTableInbox()"><i class="fa fa-inbox"></i> Open Conversations <span class="badge">12</span></a>
+                                <a href="/apps/{{currApp}}/messages/open" ng-click="showTableInbox()"><i class="fa fa-inbox"></i> Open Conversations</a>
                             </li>
                             <li>
-                                <a href="/apps/{{currApp}}/messages/unread"><i class="fa fa-exclamation"></i>&nbsp; Unread Conversations <span class="badge">26</span></a>
+                                <a href="/apps/{{currApp}}/messages/unread"><i class="fa fa-exclamation"></i>&nbsp; Unread Conversations</a>
                             </li>
                             <li>
                                 <a href="/apps/{{currApp}}/messages/automate"><i class="fa fa-edit"></i> Automate Messages </a>
