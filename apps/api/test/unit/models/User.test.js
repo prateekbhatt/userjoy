@@ -65,7 +65,8 @@ describe('Model User', function () {
 
     it('should return user if user exists', function (done) {
 
-      User.findOrCreate(existingUser.aid, existingUser, function (err, usr) {
+      User.findOrCreate(existingUser.aid, existingUser, function (err,
+        usr) {
 
         expect(err)
           .to.not.exist;
@@ -86,6 +87,8 @@ describe('Model User', function () {
 
       var newUser = {
         email: id + '@dodatado.com',
+        country: 'IN',
+        ip: '115.118.149.224',
         meta: {
           plan: 'Free Tier',
           amount: 40
@@ -117,6 +120,16 @@ describe('Model User', function () {
 
         expect(usr.aid)
           .to.eql(id);
+
+        expect(usr)
+          .to.have.property("ip")
+          .that.is.an("string")
+          .that.equals(newUser.ip);
+
+        expect(usr)
+          .to.have.property("country")
+          .that.is.an("string")
+          .that.equals(newUser.country);
 
         done();
       });

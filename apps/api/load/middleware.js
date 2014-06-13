@@ -31,6 +31,9 @@ var sessionStore = require('./sessionStore')(session);
  */
 module.exports.common = function loadCommonMiddleware(app) {
 
+  // enable trust proxy for reverse proxy
+  app.enable('trust proxy');
+
   if (process.env.NODE_ENV === 'development') {
     app.use(logger('dev'));
   }

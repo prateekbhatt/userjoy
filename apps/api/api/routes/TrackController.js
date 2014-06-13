@@ -5,6 +5,7 @@
 var _ = require('lodash');
 var async = require('async');
 var cors = require('cors');
+var geoip = require('geoip-lite');
 var router = require('express')
   .Router();
 
@@ -182,6 +183,15 @@ router
     if (!aid) {
       return res.badRequest('Please send app_id with the params');
     }
+
+
+    // user's ip should be the first element in req.ips object (TODO: check this)
+    var clientIP = req.ips[0];
+    user.ip = clientIP;
+
+    // get location info from ip
+    var loc = geoip.lookup(user.ip);
+    if (_.isObject(loc) && loc.country) user.country = loc.country;
 
     User.findOrCreate(aid, user, function (err, usr) {
 

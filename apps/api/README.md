@@ -151,6 +151,7 @@ UserNote      |                         | notes created by team members about a 
 - aid
 - user_id (to allow the app to recognize a user even if the user changes email/username)
 - email (required)
+- country (2 letter ISO-3166-1 country code, (REF)[https://github.com/bluesmoon/node-geoip#looking-up-an-ip-address])
 - x name
 - x username
 - x meta (object containing additonal info about users)
@@ -165,8 +166,8 @@ UserNote      |                         | notes created by team members about a 
 - lastSessionAt
 - lastHeardAt
 - healthScore (latest value from User Health)
+- ip
 - x tags [] Stores tags for categorizing users
-- x notes
 - companies [{cid, companyName, billing{}, healthScore, totalSessions}]
 - billing {
     status,
