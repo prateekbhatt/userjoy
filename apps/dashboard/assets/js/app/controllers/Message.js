@@ -1061,6 +1061,7 @@ angular.module('do.message', [])
                 break;
               } else {
                 var colorReply = getRandomColor();
+                console.log("$scope.user: ", $scope.user);
                 $scope.replysrc = 'http://placehold.it/60/' +
                   colorReply +
                   '/FFF&text=' + $scope.user.charAt(0);
