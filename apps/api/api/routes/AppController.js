@@ -13,6 +13,7 @@ var router = require('express')
  */
 
 var App = require('../models/App');
+var User = require('../models/User');
 
 
 /**
@@ -194,6 +195,63 @@ router
     });
   });
 
+
+/**
+ * PUT /apps/:aid/activate
+ *
+ * Checks whether userjoy has received any data from the app, if so the isActive
+ * status is updated to true.
+ *
+ * @return {Boolean} isActive
+ */
+
+router
+  .route('/:aid/activate')
+  .put(function (req, res, next) {
+
+    var aid = req.app._id;
+
+
+    async.waterfall(
+
+      [
+
+        function checkIfActive(cb) {
+          User
+            .findOne({
+              aid: aid
+            })
+            .exec(function (err, usr) {
+              cb(err, !! usr);
+            });
+        },
+
+        function updateStatusIfActive(isActive, cb) {
+
+          // if not active, move on
+          if (!isActive) return cb(null, isActive);
+
+          // active, so update active status
+          req.app.isActive = isActive;
+          req.app.save(function (err) {
+            cb(err, isActive);
+          });
+
+        }
+      ],
+
+      function (err, isActive) {
+        if (err) return next(err);
+
+        res
+          .status(200)
+          .json({
+            isActive: isActive
+          });
+      }
+    );
+
+  });
 
 
 module.exports = router;

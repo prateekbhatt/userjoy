@@ -7,6 +7,13 @@ describe('Resource /apps', function () {
   var mongoose = require('mongoose');
 
 
+  /**
+   * Models
+   */
+
+  var App = require('../../../api/models/App');
+
+
   var randomId = mongoose.Types.ObjectId;
 
 
@@ -425,6 +432,90 @@ describe('Resource /apps', function () {
               .to.eql(newColor);
           })
           .end(done);
+
+      });
+
+  });
+
+
+  describe('PUT /apps/:aid/activate', function () {
+
+    var url;
+    var aid;
+
+    before(function (done) {
+      logoutUser(done);
+      aid = saved.apps.first._id;
+      url = '/apps/' + aid + '/activate';
+    });
+
+    it('should return error if not logged in', function (done) {
+
+      request
+        .put(url)
+        .expect('Content-Type', /json/)
+        .expect(401)
+        .end(done);
+
+    });
+
+
+    it('logging in user', function (done) {
+      loginUser(done);
+    });
+
+
+    it('should activate app',
+
+      function (done) {
+
+
+        async.series([
+
+          function shouldBeInActive(cb) {
+            App.findById(aid, function (err, app) {
+              expect(err)
+                .to.not.exist;
+
+              expect(app.isActive)
+                .to.be.false;
+
+              cb();
+            })
+          },
+
+
+          function activateApp(cb) {
+
+            request
+              .put(url)
+              .set('cookie', loginCookie)
+              .expect('Content-Type', /json/)
+              .expect(200)
+              .expect(function (res) {
+                expect(res.body.isActive)
+                  .to.be.true;
+              })
+              .end(cb);
+          },
+
+
+          function shouldBeActive(cb) {
+
+            App.findById(aid, function (err, app) {
+              expect(err)
+                .to.not.exist;
+
+              expect(app.isActive)
+                .to.be.true;
+
+              cb();
+            })
+
+          }
+
+
+        ], done);
 
       });
 
