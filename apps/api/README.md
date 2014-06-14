@@ -161,6 +161,9 @@ UserNote      |                         | notes created by team members about a 
 - ct
 - ut
 - joined (when did the user join the service)
+- plan
+- revenue
+- status
 - totalSessions
 - lastContactedAt
 - lastSessionAt
@@ -169,15 +172,6 @@ UserNote      |                         | notes created by team members about a 
 - ip
 - x tags [] Stores tags for categorizing users
 - companies [{cid, companyName, billing{}, healthScore, totalSessions}]
-- billing {
-    status,
-    plan,
-    currency,
-    amount,
-    licenses,
-    usage,
-    unit
-  }
 
 ##### Notes:
 
@@ -187,7 +181,7 @@ UserNote      |                         | notes created by team members about a 
     - totalSessions
     - billing
 
-- Billing status must be one of [trial, free, paying, cancelled]
+- status must be one of [trial, free, paying, cancelled]
 - Health score should be calculated based on total sessions in last 30 days, total time spent on site [?]
 
 - Ignoring: user acquisition data like (since we do not have data for non loggedin users):
