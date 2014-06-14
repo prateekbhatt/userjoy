@@ -78,6 +78,24 @@ var CompanySchema = new Schema({
     type: String
   },
 
+
+  plan: {
+    type: String
+  },
+
+
+  revenue: {
+    type: Number
+  },
+
+
+  // billing status
+  status: {
+    type: String,
+    validate: billingStatusValidator
+  },
+
+
   totalSessions: {
     type: Number,
     default: 0
@@ -89,38 +107,6 @@ var CompanySchema = new Schema({
 
   ct: {
     type: Date
-  },
-
-  // billing data is stored in both company and user models
-  billing: {
-    status: {
-      type: String,
-      validate: billingStatusValidator
-    },
-
-    plan: {
-      type: String
-    },
-
-    currency: {
-      type: String
-    },
-
-    amount: {
-      type: Number
-    },
-
-    licenses: {
-      type: Number
-    },
-
-    usage: {
-      type: Number
-    },
-
-    unit: {
-      type: String
-    }
   }
 
 });
@@ -148,7 +134,7 @@ CompanySchema.statics.findOrCreate = function (aid, company, cb) {
 
   company = company || {};
 
-  var billingStatus = company.billing ? company.billing.status : null;
+  var billingStatus = company.status;
   var company_id = company.company_id;
   var conditions = {};
 
