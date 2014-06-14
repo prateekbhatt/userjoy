@@ -75,8 +75,29 @@
                                                         </li>
                                                     </ul>
                                                 </div>
-                                                <div ng-if="filter.checkMethod" style="float: left; padding-left: 24px;">
+                                                <div ng-if="filter.checkMethod && filter.isEvent" style="float: left; padding-left: 24px;">
+                                                    <input type="text" placeholder="Value" ng-model="filter.val" ng-class="{'form-control': true, 'error': filter.val.length == 0 && usersListForm.$dirty}" style="width: 70px;">
+                                                </div>
+                                                <div ng-if="filter.checkMethod && !filter.isEvent" style="float: left; padding-left: 24px;">
                                                     <input type="text" placeholder="Value" ng-model="filter.val" ng-class="{'form-control': true, 'error': filter.val.length == 0 && usersListForm.$dirty}">
+                                                </div>
+                                                <div ng-if="filter.isEvent" style="float: left; padding-left: 24px;" ng-show="$first">
+                                                    <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.timeRange}}</span>&nbsp;<span class="caret"></span></button>
+                                                    <ul class="select dropdown-menu" role="select" style="left: auto">
+                                                        <li ng-repeat="range in timeSpan">
+                                                            <a style="cursor: default;" ng-click="chngrange($parent.$index, $index)">{{range.name}}
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div ng-if="filter.isEvent" style="float: left; padding-left: 24px;" ng-show="!$first">
+                                                    <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto disabled" data-toggle="dropdown"> <span data-bind="label" id="Users">{{otherTimeRange}}</span>&nbsp;<span class="caret"></span></button>
+                                                    <!-- <ul class="select dropdown-menu" role="select" style="left: auto">
+                                                        <li ng-repeat="range in timeSpan">
+                                                            <a style="cursor: default;" ng-click="chngrange($parent.$index, $index)">{{range.name}}
+                                                            </a>
+                                                        </li>
+                                                    </ul> -->
                                                 </div>
                                                 <div style="float: left; padding-left: 24px;">
                                                     <a class="btn btn-default fa fa-times" ng-click="removeFilter(filter)" ng-hide="segmentClicked && $first"></a>

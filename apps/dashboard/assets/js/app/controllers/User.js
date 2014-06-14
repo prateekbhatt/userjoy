@@ -466,16 +466,38 @@ angular.module('do.users', [])
           $scope.attributes = [];
           $scope.attributes = attributes;
 
+          $scope.timeSpan = [{
+            name: 'at any time',
+            value: ''
+          }, {
+            name: 'within a day',
+            value: 1
+          }, {
+            name: 'within 3 days',
+            value: 3
+          }, {
+            name: 'within a week',
+            value: 7
+          }, {
+            name: 'within a month',
+            value: 30
+          }]
+
+          $scope.otherTimeRange = 'at any time';
+
           $scope.changeFilterAttribute = function (
             parentindex, index,
             evt) {
             $scope.filters[parentindex].checkMethod = true;
+            $scope.filters[parentindex].isEvent = false;
             $scope.filters[parentindex].btntext = $scope.attributes[
               index].name;
             $scope.filters[parentindex].method = 'attr';
             $scope.filters[parentindex].name = $scope.attributes[
               index].name;
             $scope.filters[parentindex].type = '';
+            $scope.filters[parentindex].timeRange = '';
+            $scope.filters[parentindex].optext = 'equal';
           }
 
           $scope.changeFilterHasDone = function (parentindex,
@@ -483,6 +505,7 @@ angular.module('do.users', [])
             $scope.method = 'hasdone';
             $scope.filters[parentindex].checkMethod =
               false;
+            $scope.filters[parentindex].isEvent = true;
             console.log("has done: ", parentindex);
             $scope.filters[parentindex].btntext =
               'Has Done';
@@ -494,6 +517,7 @@ angular.module('do.users', [])
             $scope.filters[parentindex].val = '';
             $scope.filters[parentindex].type = $scope.hasDoneItems[
               index].type;
+            $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
           }
 
           $scope.changeFilterHasNotDone = function (
@@ -502,6 +526,7 @@ angular.module('do.users', [])
             $scope.method = 'hasnotdone';
             $scope.filters[parentindex].checkMethod =
               false;
+            $scope.filters[parentindex].isEvent = true;
             console.log("has not done: ", parentindex);
             $scope.filters[parentindex].method =
               'hasnotdone';
@@ -514,6 +539,7 @@ angular.module('do.users', [])
             $scope.filters[parentindex].val = '';
             $scope.filters[parentindex].type = $scope.hasNotDoneItems[
               index].type;
+            $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
             console.log($scope.filters);
           }
 
@@ -523,6 +549,7 @@ angular.module('do.users', [])
             index, evt) {
             $scope.method = 'count';
             $scope.filters[parentindex].checkMethod = true;
+            $scope.filters[parentindex].isEvent = true;
             console.log("count: ", parentindex);
             $scope.filters[parentindex].method = 'count';
             $scope.filters[parentindex].btntext =
@@ -534,6 +561,8 @@ angular.module('do.users', [])
                 index].name;
             $scope.filters[parentindex].type = $scope.countOfItems[
               index].type;
+            $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
+            $scope.filters[parentindex].optext = 'equal';
           }
 
           var segments = segment.get.all();
@@ -581,6 +610,17 @@ angular.module('do.users', [])
             console.log($scope.filters);
           }
 
+          $scope.chngrange = function (parentindex, index) {
+            $scope.filters[0].timeRange = $scope.timeSpan[index]
+              .name;
+            $scope.otherTimeRange = $scope.filters[0].timeRange;
+            $scope.filters[0].timeRangeValue = $scope.timeSpan[index].value;
+            // for (var i = 0; i < $scope.filters.length; i++) {
+            //   $scope.filters[i].timeRange = $scope.timeSpan[index].name;
+            //   $scope.filters[i].timeRangeValue = $scope.timeSpan[index].value;
+            // };
+          }
+
 
           console.log("queryDisplayed: ", $scope.queryDisplayed);
 
@@ -594,13 +634,27 @@ angular.module('do.users', [])
             $scope.filters.push({
               method: 'count',
               btntext: 'Choose',
-              checkMethod: 'true',
+              checkMethod: true,
+              isEvent: false,
+              days: '',
               name: '',
               op: 'eq',
               optext: 'equal',
               val: '',
               type: ''
-            })
+            });
+            console.log("$scope.filters[0]: ", $scope.filters[0]);
+            if($scope.filters.length > 0) {
+              console.log("getting inside filters length > 0");
+              for (var i = 1; i < $scope.filters.length; i++) {
+                $scope.filters[i].timeRange = $scope.filters[0].timeRange;
+                $scope.filters[i].timeRangeValue = $scope.filters[0].timeRangeValue;
+              };
+              console.log("$scope.filters[i]: ", $scope.filters);
+            } else {
+              $scope.filters[0].timeRange = 'at any time';
+              $scope.filters[0].timeRangeValue = '';
+            }
             if ($scope.filters.length > 0 && $scope.segmentClicked ==
               false) {
               $scope.showSaveButton = true;
@@ -609,8 +663,9 @@ angular.module('do.users', [])
 
             if ($scope.segmentClicked == true) {
               $scope.showSaveButton = false;
-              $scope.showUpdateButton = true;
+              $scope.shmsgowUpdateButton = true;
             }
+            console.log("$scope.filters: ", $scope.filters);
           }
 
           $scope.removeFilter = function removeFilter(
@@ -768,6 +823,11 @@ angular.module('do.users', [])
                 // $scope.isErr = '';
               }
             };
+            if($scope.filters.length > 0) {
+              $scope.fromTime = $scope.filters[0].timeRangeValue;
+            } else {
+              $scope.fromTime = '';
+            }
             $scope.filtersBackend = [];
             console.log("run Query: ", $scope.filters);
             for (var i = 0; i < $scope.filters.length; i++) {
@@ -777,14 +837,14 @@ angular.module('do.users', [])
                 name: $scope.filters[i].name,
                 op: $scope.filters[i].op,
                 val: $scope.filters[i].val,
-                type: $scope.filters[i].type
-
+                type: $scope.filters[i].type,
               })
             };
 
             $scope.queryObj.list = $scope.selectedIcon.toLowerCase();
             $scope.queryObj.op = $scope.text.toLowerCase();
             $scope.queryObj.filters = $scope.filtersBackend;
+            $scope.queryObj.fromAgo = $scope.fromTime;
 
             var stringifiedQuery = stringify($scope.queryObj);
             console.log('queryObj', $scope.queryObj);
@@ -871,6 +931,7 @@ angular.module('do.users', [])
             $scope.updateSegmentObj.name = $scope.updatedSegmentName;
             $scope.updateSegmentObj.op = $scope.text.toLowerCase();
             $scope.updateSegmentObj.filters = $scope.filtersBackend;
+            $scope.updateSegmentObj.fromAgo = $scope.filters[0].timeRangeValue;
             console.log("updateSegmentObj: ", $scope.updateSegmentObj);
 
             modelsSegment.updateSegmentModels(currentAppId,
@@ -909,6 +970,7 @@ angular.module('do.users', [])
             $scope.createSegmentObj.name = $scope.segmentName;
             $scope.createSegmentObj.op = $scope.text.toLowerCase();
             $scope.createSegmentObj.filters = $scope.filtersBackend;
+            $scope.createSegmentObj.fromAgo = $scope.filters[0].timeRangeValue;
             console.log("createSegmentObj: ", $scope.createSegmentObj);
 
             modelsSegment.createSegment(currentAppId,
@@ -924,9 +986,31 @@ angular.module('do.users', [])
             $scope.segmentLength = '';
             $scope.queryObject = {};
             $scope.filtersFrontEnd = [];
+            $scope.fromTimeBackend = ''
             var getFilters = [];
             $scope.filters = [];
             console.log("$scope.queries: ", $scope.queries);
+            console.log("segment: ", segmentService.getSingleSegment());
+            if(segmentService.getSingleSegment().fromAgo) {
+              $scope.fromTimeBackend = segmentService.getSingleSegment().fromAgo;
+            } else {
+              $scope.fromTimeBackend = '';
+            }
+            console.log("$scope.fromTimeBackend: ", $scope.fromTimeBackend, $scope.timeSpan.length);
+            for (var i = 0; i < $scope.timeSpan.length; i++) {
+              console.log("$scope.timeSpan[i]: $scope.fromTimeBackend: ", $scope.timeSpan[i].value);
+              if($scope.fromTimeBackend === $scope.timeSpan[i].value) {
+                console.log("$scope.fromTimeBackend: ", $scope.timeSpan[i].value);
+                $scope.fromTimeFrontEnd = $scope.timeSpan[i].name;
+                $scope.fromTimeFrontEndValue = $scope.timeSpan[i].value;
+                break; 
+              }
+            };
+            console.log("$scope.fromTimeFrontEnd: ", $scope.fromTimeFrontEnd);
+            // if($scope.fromTimeBackend === 1) {
+            //   $scope.fromTimeFrontEnd = 'within a day';
+            // }
+
             getFilters = segmentService.getSingleSegment()
               .filters;
             $scope.segmentLength = getFilters.length;
@@ -953,22 +1037,34 @@ angular.module('do.users', [])
                 buttonText = "Has Done";
                 btnName = getFilters[i].name;
                 chkMethod = false;
+                isEvent = true;
+                timeRange = $scope.fromTimeFrontEnd;
+                timeRangeValue = $scope.fromTimeFrontEndValue;
               }
               if (getFilters[i].method == 'hasnotdone') {
                 buttonText = "Has not Done";
                 btnName = getFilters[i].name;
                 chkMethod = false;
+                isEvent = true;
+                timeRange = $scope.fromTimeFrontEnd;
+                timeRangeValue = $scope.fromTimeFrontEndValue; 
               }
               if (getFilters[i].method == 'count') {
                 buttonText = "Count of " + getFilters[
                   i].name;
                 btnName = getFilters[i].name;
                 chkMethod = true;
+                isEvent = true;
+                timeRange = $scope.fromTimeFrontEnd;
+                timeRangeValue = $scope.fromTimeFrontEndValue;
               }
               if (getFilters[i].method == 'attr') {
                 buttonText = getFilters[i].name;
                 btnName = getFilters[i].name;
                 chkMethod = true;
+                isEvent = false;
+                timeRange = '';
+                timeRangeValue = '';
               }
               $scope.filters.push({
                 method: getFilters[i].method,
@@ -978,7 +1074,10 @@ angular.module('do.users', [])
                 op: getFilters[i].op,
                 optext: operationText,
                 val: getFilters[i].val,
-                type: getFilters[i].type
+                type: getFilters[i].type,
+                timeRange: timeRange,
+                isEvent: isEvent,
+                timeRangeValue: timeRangeValue
               })
               // if($scope.segmentClicked && i == 0) {
               //     console.log("$scope.filters: ", $scope.filters);
@@ -987,7 +1086,8 @@ angular.module('do.users', [])
 
             };
 
-
+            console.log("$scope.filters: ", $scope.filters);
+            $scope.otherTimeRange = $scope.filters[0].timeRange;
             $scope.queryObject.list = segmentService.getSingleSegment()
               .list;
             $scope.queryObject.op = segmentService.getSingleSegment()
@@ -1188,8 +1288,9 @@ angular.module('do.users', [])
 
           if ($scope.mail.length > 50) {
             $rootScope.error = true;
-            $rootScope.errMsgRootScope = 'Maximum Messages that can be sent at once is 50';
-            $timeout(function(){
+            $rootScope.errMsgRootScope =
+              'Maximum Messages that can be sent at once is 50';
+            $timeout(function () {
               $rootScope.error = false;
             }, 5000);
           } else {
@@ -1524,8 +1625,8 @@ angular.module('do.users', [])
           var src = '';
           gravatar = get_gravatar(data.email, 80);
           src = 'http://placehold.it/150/' + getRandomColor() +
-                  '/FFF&text=' +
-                  data.email.charAt(0); 
+            '/FFF&text=' +
+            data.email.charAt(0);
           $scope.user = {
             _id: uid,
             email: data.email,
@@ -1586,7 +1687,7 @@ angular.module('do.users', [])
           console.log("$scope.eventDate: ", $scope.eventDate);
           $scope.showEvents = false;
 
-          
+
 
           var populateEvents = function (err, events) {
             $scope.events = [];
