@@ -14,7 +14,7 @@ angular.module('do.install', [])
         authenticate: true
       })
       .state('addcode', {
-        url: '/addcode',
+        url: '/apps/:id/addcode',
         views: {
           "main": {
             templateUrl: '/templates/onboardingAppmodule/installation.addcode.html',
@@ -53,21 +53,26 @@ angular.module('do.install', [])
 ])
 
 .controller('installAddcodeAppCtrl', ['$scope', '$http', 'AppService',
-  '$location', 'CurrentAppService',
-  function ($scope, $http, AppService, $location, CurrentAppService) {
+  '$location', 'CurrentAppService', 'AppModel', '$stateParams', '$rootScope',
+  function ($scope, $http, AppService, $location, CurrentAppService, AppModel, $stateParams, $rootScope) {
     CurrentAppService.getCurrentApp()
       .then(function (currentApp) {
-        if (AppService.getCurrentApp()
-          ._id != null) {
-          $scope.appId = AppService.getCurrentApp()
-            ._id;
-
-        } else {
-          $scope.appId = currentApp[0]._id;
+        $scope.appId = $stateParams.id;
+        var callback = function (err, data) {
+          if(err) {
+            console.log("error");
+            return;
+          }
+          if(data.isActive) {
+            $location.path('/apps/' + $scope.appId + '/users/list');
+          } else {
+            $rootScope.info = true;
+            $rootScope.infoMsgRootScope = 'We have not received any data yet. Please check if the UserJoy Code is installed on your app.' 
+          }
         }
         console.log("$scope.appId ---->>>>>", $scope.appId);
         $scope.startTracking = function () {
-          $location.path('/apps/' + $scope.appId + '/users/list');
+          AppModel.checkIfActive($scope.appId, callback);
         }
 
       })
