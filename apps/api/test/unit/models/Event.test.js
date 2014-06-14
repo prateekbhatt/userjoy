@@ -154,13 +154,13 @@ describe('Model Event', function () {
       };
 
       var name = 'Open chat';
-      var feature = 'Group';
+      var module = 'Group';
 
       var meta = {
         members: 99
       };
 
-      Event.track(ids, name, feature, meta, function (err, evn) {
+      Event.track(ids, name, module, meta, function (err, evn) {
 
         evn = evn.toJSON();
 
@@ -180,7 +180,7 @@ describe('Model Event', function () {
           .to.have.property("name", "Open chat");
 
         expect(evn)
-          .to.have.property("feature", "Group");
+          .to.have.property("module", "Group");
 
         expect(evn.meta)
           .to.eql([{

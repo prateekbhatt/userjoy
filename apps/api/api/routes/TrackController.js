@@ -47,15 +47,15 @@ router.use(nocache);
 /**
  * GET /track
  *
- * Tracks a 'pageview' or a 'feature' event
+ * Tracks a 'form'/'link'/'page'/'track' event
  *
  * @query {string} app_id
  * @query {string} u user-id
  * @query {string} c company-id (optional)
  * @query {object} e event
- *        @property {string} type pageview / feature
- *        @property {string} name (required for feature type)
- *        @property {string} path (required for pageview type)
+ *        @property {string} type form / link / page / track
+ *        @property {string} name (required for track type)
+ *        @property {string} path (required for page type)
  *        @property {string} other properties (see Event model)
  * @return {object}
  *         @property {string} aid app-id
@@ -133,10 +133,10 @@ router
     } else if (event.type === 'track') {
 
       var name = event.name;
-      var feature = event.feature;
+      var module = event.module;
       var meta = event.meta;
 
-      return Event.track(ids, name, feature, meta, callback);
+      return Event.track(ids, name, module, meta, callback);
 
     } else {
 

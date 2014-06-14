@@ -74,7 +74,7 @@ var SegmentFilterSchema = new Schema({
     },
 
 
-    feature: {
+    module: {
       type: String
     },
 
