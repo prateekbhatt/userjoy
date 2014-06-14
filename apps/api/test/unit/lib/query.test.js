@@ -368,6 +368,13 @@ describe('Lib query', function () {
             name: 'totalEvents',
             op: 'gt',
             val: 999
+          },
+
+          {
+            method: 'attr',
+            name: 'email',
+            op: 'contains',
+            val: 'bhatt'
           }
         ]
       }
@@ -407,6 +414,16 @@ describe('Lib query', function () {
           '$gt': 999
         });
     });
+
+
+    it('should handle "contains" operator', function () {
+
+      expect(cond.email)
+        .to.eql({
+          '$regex': ".*bhatt.*"
+        });
+    });
+
 
     it('should set $in filter on _id if there are countFilters',
       function () {
