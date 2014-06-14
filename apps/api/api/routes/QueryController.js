@@ -93,45 +93,45 @@ router
   .get(function (req, res, next) {
 
     var aid = req.params.aid;
-    var userAttributes = ['user_id', 'email'];
+    var userAttributes = ['user_id', 'email', 'country', 'joined'];
 
     async.waterfall(
       [
 
-        function getFeatureNames(cb) {
+        function getTrackNames(cb) {
           Event
             .distinct('name', {
-              type: 'feature'
+              type: 'track'
             })
-            .exec(function (err, featureNames) {
+            .exec(function (err, trackNames) {
 
-              var features = _.map(featureNames, function (name) {
+              var trackEvents = _.map(trackNames, function (name) {
                 var f = {
-                  type: 'feature',
+                  type: 'track',
                   name: name
                 };
                 return f;
               });
 
-              cb(err, features);
+              cb(err, trackEvents);
             });
         },
 
-        function getPageviewNames(features, cb) {
+        function getPageviewNames(trackEvents, cb) {
           Event
             .distinct('name', {
-              type: 'pageview'
+              type: 'page'
             })
             .exec(function (err, pvNames) {
               var pvs = _.map(pvNames, function (name) {
                 var f = {
-                  type: 'pageview',
+                  type: 'page',
                   name: name
                 };
                 return f;
               });
 
-              cb(err, features, pvs);
+              cb(err, trackEvents, pvs);
             });
         }
 

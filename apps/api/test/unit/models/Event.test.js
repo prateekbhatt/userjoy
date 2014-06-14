@@ -76,7 +76,7 @@ describe('Model Event', function () {
 
           expect(err.errors.type.message)
             .to.eql(
-              "Event type must be one of 'pageview/feature/automessage'"
+              "Event type must be one of 'auto/form/link/page/track'"
           );
 
           done();
@@ -91,7 +91,7 @@ describe('Model Event', function () {
         var newEvent = {
           aid: randomId(),
           name: 'Create Action',
-          type: 'feature',
+          type: 'track',
           uid: randomId(),
           meta: [{
             k: 'status',
@@ -105,7 +105,7 @@ describe('Model Event', function () {
             .to.not.exist;
 
           expect(evn)
-            .to.have.property("type", "feature");
+            .to.have.property("type", "track");
 
           savedEvent = evn;
 
@@ -135,18 +135,18 @@ describe('Model Event', function () {
   });
 
 
-  describe('#feature', function () {
+  describe('#track', function () {
 
     it('should return error if less than 5 arguments are passed',
       function () {
 
-        expect(Event.feature)
+        expect(Event.track)
           .to.
-        throw ('Event.feature: Expected five arguments');
+        throw ('Event.track: Expected five arguments');
 
       });
 
-    it('should create a new feature event', function (done) {
+    it('should create a new track event', function (done) {
 
       var ids = {
         uid: randomId(),
@@ -154,13 +154,13 @@ describe('Model Event', function () {
       };
 
       var name = 'Open chat';
-      var feature = 'Group';
+      var module = 'Group';
 
       var meta = {
         members: 99
       };
 
-      Event.feature(ids, name, feature, meta, function (err, evn) {
+      Event.track(ids, name, module, meta, function (err, evn) {
 
         evn = evn.toJSON();
 
@@ -174,13 +174,13 @@ describe('Model Event', function () {
           .to.have.length(1);
 
         expect(evn)
-          .to.have.property("type", "feature");
+          .to.have.property("type", "track");
 
         expect(evn)
           .to.have.property("name", "Open chat");
 
         expect(evn)
-          .to.have.property("feature", "Group");
+          .to.have.property("module", "Group");
 
         expect(evn.meta)
           .to.eql([{
@@ -195,7 +195,7 @@ describe('Model Event', function () {
   });
 
 
-  describe('#pageview', function () {
+  describe('#page', function () {
 
     it('should create a new pageview event', function (done) {
 
@@ -206,7 +206,7 @@ describe('Model Event', function () {
 
       var name = '/login';
 
-      Event.pageview(ids, name, function (err, evn) {
+      Event.page(ids, name, function (err, evn) {
 
         evn = evn.toJSON();
 
@@ -217,7 +217,7 @@ describe('Model Event', function () {
           .to.be.an("array");
 
         expect(evn)
-          .to.have.property("type", "pageview");
+          .to.have.property("type", "page");
 
         expect(evn)
           .to.have.property("name", "/login");
@@ -249,7 +249,7 @@ describe('Model Event', function () {
         evn = evn.toJSON();
 
         expect(evn)
-          .to.have.property("type", "automessage");
+          .to.have.property("type", "auto");
 
         expect(evn)
           .to.have.property("name", "In App Welcome Message");

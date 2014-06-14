@@ -1,13 +1,4 @@
 /**
- * run newrelic agent (unless in test environment)
- */
-
-if (process.env.NODE_ENV !== 'test') {
-  require('newrelic');
-}
-
-
-/**
  * npm dependencies
  */
 
@@ -58,6 +49,15 @@ exports.start = function startServer(done) {
 
   app.set('port', process.env.PORT || 8002);
   setEnv();
+
+
+  /**
+   * run newrelic agent (unless in test environment)
+   */
+
+  if (process.env.NODE_ENV !== 'test') {
+    require('newrelic');
+  }
 
 
   // common middleware for all routes

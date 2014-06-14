@@ -79,8 +79,8 @@ var EventSchema = new Schema({
   },
 
 
-  // name of the feature : TODO: Rename feature to module
-  feature: String,
+  // name of the module
+  module: String,
 
 
   // metadata about the event
@@ -113,28 +113,28 @@ var EventSchema = new Schema({
 
 
 /**
- * Create a new feature event
+ * Create a new track event
  *
  * @param {object} ids (should contain aid, uid, cid)
  * @param {string} action
- * @param {string} feature
+ * @param {string} module
  * @param {object} meta contains a list of metadata of the event
  * @param {function} cb callback
  */
 
-EventSchema.statics.feature = function (ids, name, feature, meta, cb) {
+EventSchema.statics.track = function (ids, name, module, meta, cb) {
 
   if (arguments.length !== 5) {
-    throw new Error('Event.feature: Expected five arguments');
+    throw new Error('Event.track: Expected five arguments');
   }
 
   var newEvent = {
     aid: ids.aid,
     cid: ids.cid,
-    feature: feature,
+    module: module,
     meta: metadata.toArray(meta),
     name: name,
-    type: 'feature',
+    type: 'track',
     uid: ids.uid
   };
 
@@ -142,13 +142,13 @@ EventSchema.statics.feature = function (ids, name, feature, meta, cb) {
 };
 
 
-EventSchema.statics.pageview = function (ids, path, cb) {
+EventSchema.statics.page = function (ids, path, cb) {
 
   var newEvent = {
     aid: ids.aid,
     cid: ids.cid,
     name: path,
-    type: 'pageview',
+    type: 'page',
     uid: ids.uid
   };
 
@@ -215,7 +215,7 @@ EventSchema.statics.automessage = function (ids, state, title, cb) {
   var newEvent = {
     aid: ids.aid,
     name: title,
-    type: 'automessage',
+    type: 'auto',
     uid: ids.uid
   };
 

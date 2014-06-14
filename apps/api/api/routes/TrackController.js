@@ -47,15 +47,15 @@ router.use(nocache);
 /**
  * GET /track
  *
- * Tracks a 'pageview' or a 'feature' event
+ * Tracks a 'form'/'link'/'page'/'track' event
  *
  * @query {string} app_id
  * @query {string} u user-id
  * @query {string} c company-id (optional)
  * @query {object} e event
- *        @property {string} type pageview / feature
- *        @property {string} name (required for feature type)
- *        @property {string} path (required for pageview type)
+ *        @property {string} type form / link / page / track
+ *        @property {string} name (required for track type)
+ *        @property {string} path (required for page type)
  *        @property {string} other properties (see Event model)
  * @return {object}
  *         @property {string} aid app-id
@@ -123,20 +123,20 @@ router
 
     if (cid) ids.cid = cid;
 
-    if (event.type === 'pageview') {
+    if (event.type === 'page') {
 
       // FIXME : pageview events must accept module name and meta data
 
       var name = event.name;
-      return Event.pageview(ids, name, callback);
+      return Event.page(ids, name, callback);
 
-    } else if (event.type === 'feature') {
+    } else if (event.type === 'track') {
 
       var name = event.name;
-      var feature = event.feature;
+      var module = event.module;
       var meta = event.meta;
 
-      return Event.feature(ids, name, feature, meta, callback);
+      return Event.track(ids, name, module, meta, callback);
 
     } else {
 
@@ -185,13 +185,21 @@ router
     }
 
 
-    // user's ip should be the first element in req.ips object (TODO: check this)
-    var clientIP = req.ips[0];
-    user.ip = clientIP;
+    if (user) {
 
-    // get location info from ip
-    var loc = geoip.lookup(user.ip);
-    if (_.isObject(loc) && loc.country) user.country = loc.country;
+      // user's ip should be the first element in req.ips object (TODO: check this)
+      var clientIP = req.ips[0];
+
+      if (clientIP) {
+        user.ip = clientIP;
+
+        // get location info from ip
+        var loc = geoip.lookup(user.ip);
+        if (_.isObject(loc) && loc.country) user.country = loc.country;
+      }
+
+    }
+
 
     User.findOrCreate(aid, user, function (err, usr) {
 
