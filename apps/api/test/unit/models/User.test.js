@@ -95,7 +95,10 @@ describe('Model User', function () {
         meta: {
           plan: 'Free Tier',
           amount: 40
-        }
+        },
+        plan: 'enterprise',
+        revenue: 499,
+        status: 'trial',
       };
 
       User.findOrCreate(id, newUser, function (err, usr) {
@@ -126,23 +129,38 @@ describe('Model User', function () {
 
         expect(usr)
           .to.have.property("ip")
-          .that.is.an("string")
+          .that.is.a("string")
           .that.equals(newUser.ip);
 
         expect(usr)
           .to.have.property("country")
-          .that.is.an("string")
+          .that.is.a("string")
           .that.equals(newUser.country);
 
         expect(usr)
           .to.have.property("joined")
-          .that.is.an("date");
+          .that.is.a("date");
         expect(moment(usr.joined)
           .startOf('day')
           .unix())
           .to.eql(moment(newUser.joined)
             .startOf('day')
             .unix());
+
+        expect(usr)
+          .to.have.property("plan")
+          .that.is.a("string")
+          .that.equals(newUser.plan);
+
+        expect(usr)
+          .to.have.property("revenue")
+          .that.is.a("number")
+          .that.equals(newUser.revenue);
+
+        expect(usr)
+          .to.have.property("status")
+          .that.is.a("string")
+          .that.equals(newUser.status);
 
         done();
       });
@@ -173,41 +191,6 @@ describe('Model User', function () {
       });
 
 
-    it('should store billing data if billing data object is present',
-      function (done) {
-
-        var aid = randomId();
-
-        var testUser = {
-          email: 'care@dodatado.com',
-        };
-
-        var billing = {
-          status: 'paying',
-          plan: 'Basic',
-          currency: 'USD'
-        };
-
-        testUser.billing = billing;
-
-        User.findOrCreate(aid, testUser, function (err, usr) {
-          expect(err)
-            .not.to.exist;
-
-          expect(usr)
-            .to.be.an('object');
-
-          expect(usr.email)
-            .to.eql(testUser.email);
-
-          expect(usr.billing.status)
-            .to.eql(billing.status);
-
-          done();
-        });
-      });
-
-
     it(
       'should return error if billing status is not in [trial, free, paying, cancelled]',
       function (done) {
@@ -215,16 +198,10 @@ describe('Model User', function () {
         var aid = randomId();
 
         var testUser = {
-          user_id: 'unique_user_id_here'
-        };
-
-        var billing = {
+          user_id: 'unique_user_id_here',
           status: 'randomStatus',
-          plan: 'Basic',
-          currency: 'USD'
         };
 
-        testUser.billing = billing;
 
         User.findOrCreate(aid, testUser, function (err, usr) {
 
