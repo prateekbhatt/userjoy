@@ -360,6 +360,62 @@ describe('Resource /apps', function () {
   });
 
 
+  describe('POST /apps/:aid/send-code-to-developer', function () {
+
+    var url;
+    var sendToEmail = 'prattbhatt@gmail.com';
+
+    before(function (done) {
+      logoutUser(done);
+      url = '/apps/' + saved.apps.first._id + '/send-code-to-developer';
+    });
+
+    it('returns error if not logged in',
+
+      function (done) {
+
+        request
+          .post(url)
+          .send({
+            email: sendToEmail
+          })
+          .expect('Content-Type', /json/)
+          .expect(401)
+          .end(done);
+
+      });
+
+
+    it('logging in user', function (done) {
+      loginUser(done);
+    });
+
+
+    it('should send the installation code to developer',
+
+      function (done) {
+
+        request
+          .post(url)
+          .send({
+            email: sendToEmail
+          })
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .expect(function (res) {
+
+            expect(res.body.message)
+              .to.eql('Mail sent');
+
+          })
+          .end(done);
+
+      });
+
+  });
+
+
   describe('PUT /apps/:aid/color', function () {
 
     before(function (done) {
