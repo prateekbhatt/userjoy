@@ -64,7 +64,7 @@ describe('Resource /apps/:aid/segments', function () {
             {
               method: 'count',
               name: 'Create Notification',
-              type: 'feature',
+              type: 'track',
               op: 'eq',
               val: 0
             }
@@ -287,7 +287,7 @@ describe('Resource /apps/:aid/segments', function () {
         {
           method: 'hasdone',
           name: 'Add User',
-          type: 'feature'
+          type: 'track'
         }
 
       ];

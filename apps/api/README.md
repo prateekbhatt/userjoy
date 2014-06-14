@@ -37,7 +37,7 @@ This app contains an expressjs api which exposes a rest interface for the db.
 
 ###### Definitions
 
-Show the list of defined features, actions and sent events for an app
+Show the list of defined modules, actions and sent events for an app
 
 ###### Query engine
 
@@ -151,7 +151,7 @@ UserNote      |                         | notes created by team members about a 
 - aid
 - user_id (to allow the app to recognize a user even if the user changes email/username)
 - email (required)
-- country (2 letter ISO-3166-1 country code, (REF)[https://github.com/bluesmoon/node-geoip#looking-up-an-ip-address])
+- country (2 letter ISO-3166-1 country code, [REF](https://github.com/bluesmoon/node-geoip#looking-up-an-ip-address)
 - x name
 - x username
 - x meta (object containing additonal info about users)
@@ -160,7 +160,7 @@ UserNote      |                         | notes created by team members about a 
 - unsubscribedThrough (messageId, subject)
 - ct
 - ut
-- firstSessionAt
+- joined (when did the user join the service)
 - totalSessions
 - lastContactedAt
 - lastSessionAt
@@ -188,8 +188,6 @@ UserNote      |                         | notes created by team members about a 
     - billing
 
 - Billing status must be one of [trial, free, paying, cancelled]
-- The firstSessionAt attribute is added when a new user is created
-- ct property needs to be provided to the js snippet
 - Health score should be calculated based on total sessions in last 30 days, total time spent on site [?]
 
 - Ignoring: user acquisition data like (since we do not have data for non loggedin users):
@@ -292,7 +290,7 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 > - method
 > - type
 > - name
-> - feature
+> - module
 > - op
 > - val (Schema.Types.Mixed - to allow integer/string etc types)
 
@@ -304,7 +302,7 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 - aid (required)
 - cid
 - ct
-- feature
+- module
 - meta [Metadata]
 - name (required)
 - type (required)

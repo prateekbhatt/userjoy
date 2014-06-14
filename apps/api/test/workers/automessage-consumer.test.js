@@ -54,7 +54,7 @@ describe('Worker automessageConsumer', function () {
         var newEvent = {
           aid: aid,
           uid: uid,
-          type: 'feature',
+          type: 'track',
           name: 'Create Notification'
         };
 
@@ -114,7 +114,7 @@ describe('Worker automessageConsumer', function () {
     it('should create new automessage queue event', function (done) {
 
       var query = {
-        type: 'automessage',
+        type: 'auto',
         meta: {
           $all: [
 
@@ -209,7 +209,7 @@ describe('Worker automessageConsumer', function () {
     it('should create new automessage queue event', function (done) {
 
       var query = {
-        type: 'automessage',
+        type: 'auto',
         meta: {
           $all: [
 

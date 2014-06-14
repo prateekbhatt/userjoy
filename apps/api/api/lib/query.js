@@ -39,7 +39,11 @@ var OP_MAP = {
   or: '$or',
   eq: '$eq',
   gt: '$gt',
-  lt: '$lt'
+  lt: '$lt',
+
+  // special case, self defined
+  // REF: http://stackoverflow.com/a/10616781/1463434
+  contains: '$contains'
 };
 
 
@@ -113,9 +117,9 @@ module.exports = Query;
  *
  *       {
  *         method: 'hasnotdone',
- *         type: 'feature',
+ *         type: 'track',
  *         name: 'new chat',
- *         feature: 'group'
+ *         module: 'group'
  *       },
  *
  *       {
@@ -455,10 +459,18 @@ Query.prototype.genAttrMatchCond = function () {
 
     } else {
 
-      // FIXME: add checks for contains, does not contain operations
-
       cond[filter.name] = {};
-      cond[filter.name][filter.op] = filter['val'];
+
+      if (operation === '$contains') {
+
+        // REF: http://stackoverflow.com/a/10616781/1463434
+        cond[filter.name]['$regex'] = ".*" + filter['val'] + ".*";
+
+      } else {
+
+        cond[filter.name][filter.op] = filter['val'];
+      }
+
     }
 
   });
@@ -619,9 +631,9 @@ Query.prototype.getCountFilterCond = function (filter) {
     });
   }
 
-  if (filter.feature) {
+  if (filter.module) {
     cond['$and'].push({
-      $eq: ['$feature', filter.feature]
+      $eq: ['$module', filter.module]
     });
   }
 
@@ -643,7 +655,7 @@ Query.prototype.getCountFilterCond = function (filter) {
  *   filters: [
  *     {
  *       method: 'hasdone',
- *       type: 'feature',
+ *       type: 'track',
  *       name: 'Define Segment',
  *       op: '',
  *       val: ''
@@ -660,7 +672,7 @@ Query.prototype.getCountFilterCond = function (filter) {
  *   filters: [
  *     {
  *       method: 'hasdone',
- *       type: 'feature',
+ *       type: 'track',
  *       name: 'Define Segment'
  *     }
  *   ]

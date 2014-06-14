@@ -197,7 +197,7 @@ describe('Lib query', function () {
         filters = [{
           method: 'count',
           name: 'Create new chat',
-          feature: 'Group',
+          module: 'Group',
           op: 'gt',
           val: 15
         }];
@@ -213,7 +213,7 @@ describe('Lib query', function () {
       filters = [{
         method: 'count',
         name: 'Add member',
-        feature: 'Group',
+        module: 'Group',
         op: 'gt',
         val: 15
       }, {
@@ -238,7 +238,7 @@ describe('Lib query', function () {
         filters = [{
           method: 'count',
           name: 'Create new chat',
-          feature: 'Group',
+          module: 'Group',
           op: 'gt',
           val: 15
         }];
@@ -255,7 +255,7 @@ describe('Lib query', function () {
         filters = [{
           method: 'count',
           name: 'Add member',
-          feature: 'Group',
+          module: 'Group',
           op: 'gt',
           val: 15
         }, {
@@ -368,6 +368,13 @@ describe('Lib query', function () {
             name: 'totalEvents',
             op: 'gt',
             val: 999
+          },
+
+          {
+            method: 'attr',
+            name: 'email',
+            op: 'contains',
+            val: 'bhatt'
           }
         ]
       }
@@ -408,11 +415,21 @@ describe('Lib query', function () {
         });
     });
 
+
+    it('should handle "contains" operator', function () {
+
+      expect(cond.email)
+        .to.eql({
+          '$regex': ".*bhatt.*"
+        });
+    });
+
+
     it('should set $in filter on _id if there are countFilters',
       function () {
         var countFilters = [{
           method: 'count',
-          type: 'pageview',
+          type: 'page',
           name: '/login'
         }];
         var countFilterUserIds = [
@@ -691,14 +708,14 @@ describe('Lib query', function () {
 
         var filter = {
           method: 'count',
-          type: 'feature'
+          type: 'track'
         };
 
         var cond = Query.prototype.getCountFilterCond(filter);
 
         expect(cond.$and[0])
           .to.eql({
-            '$eq': ['$type', 'feature']
+            '$eq': ['$type', 'track']
           });
 
 
@@ -710,7 +727,7 @@ describe('Lib query', function () {
 
         var filter = {
           method: 'count',
-          type: 'feature',
+          type: 'track',
           name: 'Clicked login btn',
           op: 'gt',
           val: 10
@@ -725,13 +742,13 @@ describe('Lib query', function () {
 
       });
 
-    it('should add events.feature condition if feature attr present',
+    it('should add events.module condition if module attr present',
       function () {
 
         var filter = {
           method: 'count',
-          type: 'feature',
-          feature: 'Authentication',
+          type: 'track',
+          module: 'Authentication',
           name: 'Clicked login btn',
           op: 'gt',
           val: 10
@@ -741,7 +758,7 @@ describe('Lib query', function () {
 
         expect(cond.$and[2])
           .to.eql({
-            '$eq': ['$feature', 'Authentication']
+            '$eq': ['$module', 'Authentication']
           });
 
       });
@@ -860,7 +877,7 @@ describe('Lib query', function () {
 
       {
         method: 'count',
-        type: 'pageview',
+        type: 'page',
         name: '/account/login',
         op: '$gt',
         val: 0
@@ -868,7 +885,7 @@ describe('Lib query', function () {
 
       {
         method: 'count',
-        type: 'feature',
+        type: 'track',
         name: 'Clicked logout btn',
         op: '$lt',
         val: 10000
@@ -882,7 +899,7 @@ describe('Lib query', function () {
 
       aid = saved.apps.first._id;
       uids = [uid1, uid2];
-      createEventFixtures(aid, uids, 100, done);
+      createEventFixtures(aid, uids, 1000, done);
     });
 
     beforeEach(function () {
@@ -953,7 +970,7 @@ describe('Lib query', function () {
           // hasdone
           {
             method: 'count',
-            type: 'feature',
+            type: 'track',
             name: 'Define Segment',
             op: 'gt',
             val: 0
@@ -963,7 +980,7 @@ describe('Lib query', function () {
           // hasnotdone
           {
             method: 'count',
-            type: 'feature',
+            type: 'track',
             name: 'Define Segment',
             op: 'eq',
             val: 0
@@ -999,7 +1016,7 @@ describe('Lib query', function () {
 
       {
         method: 'count',
-        type: 'pageview',
+        type: 'page',
         name: '/account/login',
         op: '$gt',
         val: 0
@@ -1198,7 +1215,7 @@ describe('Lib query', function () {
           op: 'and',
           filters: [{
             method: 'hasdone',
-            type: 'feature',
+            type: 'track',
             name: 'Define Segment',
             op: '',
             val: ''
@@ -1212,7 +1229,7 @@ describe('Lib query', function () {
           op: 'and',
           filters: [{
             method: 'hasdone',
-            type: 'feature',
+            type: 'track',
             name: 'Define Segment'
           }]
         };
@@ -1246,7 +1263,7 @@ describe('Lib query', function () {
         op: 'and',
         filters: [{
           method: 'count',
-          type: 'feature',
+          type: 'track',
           name: 'Define Segment',
           op: 'gt',
           val: '10'
@@ -1258,7 +1275,7 @@ describe('Lib query', function () {
         op: 'and',
         filters: [{
           method: 'count',
-          type: 'feature',
+          type: 'track',
           name: 'Define Segment',
           op: 'gt',
           val: 10
@@ -1332,7 +1349,7 @@ describe('Lib query', function () {
           op: ['and', ''],
           filters: [{
             method: 'hasdone',
-            type: 'feature',
+            type: 'track',
             name: 'Define Segment'
           }]
         }
@@ -1344,7 +1361,7 @@ describe('Lib query', function () {
           op: 'and',
           filters: [{
             method: 'hasdone',
-            type: 'feature',
+            type: 'track',
             name: 'Define Segment'
           }]
         };

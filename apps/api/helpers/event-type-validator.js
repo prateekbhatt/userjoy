@@ -12,10 +12,10 @@ var validate = require('mongoose-validator')
 
 
 var validator = [validate({
-    message: "Event type must be one of 'pageview/feature/automessage'",
+    message: "Event type must be one of 'auto/form/link/page/track'",
     passIfEmpty: true
   },
-  'isIn', ['pageview', 'feature', 'automessage']
+  'isIn', ['auto', 'form', 'link', 'page', 'track']
 )];
 
 module.exports = validator;

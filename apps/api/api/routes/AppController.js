@@ -32,6 +32,13 @@ var logger = require('../../helpers/logger');
 
 
 /**
+ * Services
+ */
+
+var mailer = require('../services/mailer');
+
+
+/**
  * All routes below need to be authenticated
  */
 
@@ -193,6 +200,49 @@ router
       if (err) return next(err);
       res.json(app);
     });
+  });
+
+
+/**
+ * PUT /apps/:aid/send-code-to-developer
+ *
+ * Sends installation code to developer
+ */
+
+router
+  .route('/:aid/send-code-to-developer')
+  .post(function (req, res, next) {
+
+
+    var aid = req.app._id;
+    var email = req.body.email;
+
+    logger.trace({
+      at: 'apps:send-install-code',
+      aid: aid,
+      body: req.body
+    });
+
+    var mailerOpts = {
+      locals: {
+        aid: aid,
+        appName: req.app.name
+      },
+
+      to: {
+        email: email
+      }
+    };
+
+    mailer.sendInstallCode(mailerOpts, function (err) {
+      if (err) return next(err);
+      res
+        .status(200)
+        .json({
+          message: 'Mail sent'
+        });
+    });
+
   });
 
 

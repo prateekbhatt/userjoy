@@ -300,7 +300,26 @@ exports.sendInvite = function (options, cb) {
   mailer.send(cb);
 };
 
+/**
+ * Sends installation code to developer
+ *
+ * @param {object} options
+ * @param {function} cb callback
+ */
 
+exports.sendInstallCode = function (options, cb) {
+
+  options.from = {
+    name: UJ_SUPPORT_NAME,
+    email: UJ_SUPPORT_EMAIL
+  };
+
+  options.subject = 'Install Code for UserJoy';
+
+  var mailer = new Mailer(options);
+  mailer.template = 'install-code.ejs';
+  mailer.send(cb);
+};
 
 /**
  * FOR TESTING PURPOSE
