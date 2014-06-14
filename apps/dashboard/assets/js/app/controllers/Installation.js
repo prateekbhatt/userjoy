@@ -54,25 +54,64 @@ angular.module('do.install', [])
 
 .controller('installAddcodeAppCtrl', ['$scope', '$http', 'AppService',
   '$location', 'CurrentAppService', 'AppModel', '$stateParams', '$rootScope',
-  function ($scope, $http, AppService, $location, CurrentAppService, AppModel, $stateParams, $rootScope) {
+  '$timeout',
+  function ($scope, $http, AppService, $location, CurrentAppService,
+    AppModel, $stateParams, $rootScope, $timeout) {
     CurrentAppService.getCurrentApp()
       .then(function (currentApp) {
         $scope.appId = $stateParams.id;
-        var callback = function (err, data) {
-          if(err) {
+        // $scope.codeSnippet = '';
+
+        var populateCode = function (err) {
+          if (err) {
             console.log("error");
             return;
           }
-          if(data.isActive) {
+          console.log("currentApp: ", AppService.getCurrentApp());
+          $scope.apiKey = AppService.getCurrentApp()
+            ._id;
+        }
+
+        AppModel.getSingleApp($scope.appId, populateCode)
+
+        var callback = function (err, data) {
+          if (err) {
+            console.log("error");
+            return;
+          }
+          if (data.isActive) {
             $location.path('/apps/' + $scope.appId + '/users/list');
           } else {
             $rootScope.info = true;
-            $rootScope.infoMsgRootScope = 'We have not received any data yet. Please check if the UserJoy Code is installed on your app.' 
+            $rootScope.infoMsgRootScope =
+              'We have not received any data yet. Please check if the UserJoy Code is installed on your app.';
+            $timeout(function () {
+              $rootScope.info = false;
+              $rootScope.infoMsgRootScope = '';
+            }, 5000);
           }
         }
+
+        $scope.selectText = function(containerid) {
+          if (document.selection) {
+            var range = document.body.createTextRange();
+            range.moveToElementText(document.getElementById(containerid));
+            range.select();
+          } else if (window.getSelection) {
+            var range = document.createRange();
+            range.selectNode(document.getElementById(containerid));
+            window.getSelection()
+              .addRange(range);
+          }
+        }
+
         console.log("$scope.appId ---->>>>>", $scope.appId);
         $scope.startTracking = function () {
           AppModel.checkIfActive($scope.appId, callback);
+        }
+        console.log("codeSnippet: ", $scope.codeSnippet);
+        $scope.getTextToCopy = function () {
+          return $scope.codeSnippet;
         }
 
       })
