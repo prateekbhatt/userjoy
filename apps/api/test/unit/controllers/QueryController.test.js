@@ -325,6 +325,8 @@ describe('Resource /query', function () {
               .to.contain("email");
             expect(res.body.userAttributes)
               .to.contain("joined");
+            expect(res.body.userAttributes)
+              .to.contain("country");
           })
           .end(done);
 
