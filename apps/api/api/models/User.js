@@ -141,6 +141,25 @@ var UserSchema = new Schema({
   meta: [MetaDataSchema],
 
 
+  // name of plan
+  plan: {
+    type: String
+  },
+
+
+  // amount of revenue from this user
+  revenue: {
+    type: Number
+  },
+
+
+  // billing status
+  status: {
+    type: String,
+    validate: billingStatusValidator
+  },
+
+
   totalSessions: {
     type: Number,
     default: 1
@@ -180,39 +199,6 @@ var UserSchema = new Schema({
     default: Date.now
   },
 
-
-  // billing data is stored in both company and user models
-  billing: {
-    status: {
-      type: String,
-      validate: billingStatusValidator
-    },
-
-    plan: {
-      type: String
-    },
-
-    currency: {
-      type: String
-    },
-
-    amount: {
-      type: Number
-    },
-
-    licenses: {
-      type: Number
-    },
-
-    usage: {
-      type: Number
-    },
-
-    unit: {
-      type: String
-    }
-  },
-
 });
 
 
@@ -239,7 +225,7 @@ UserSchema.statics.findOrCreate = function (aid, user, cb) {
 
   user = user || {};
 
-  var billingStatus = user.billing ? user.billing.status : null;
+  var billingStatus = user.status;
   var companies = user.companies || [];
   var email = user.email;
   var user_id = user.user_id;
