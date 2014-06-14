@@ -113,9 +113,9 @@ module.exports = Query;
  *
  *       {
  *         method: 'hasnotdone',
- *         type: 'feature',
+ *         type: 'track',
  *         name: 'new chat',
- *         feature: 'group'
+ *         module: 'group'
  *       },
  *
  *       {
@@ -619,9 +619,9 @@ Query.prototype.getCountFilterCond = function (filter) {
     });
   }
 
-  if (filter.feature) {
+  if (filter.module) {
     cond['$and'].push({
-      $eq: ['$feature', filter.feature]
+      $eq: ['$module', filter.module]
     });
   }
 
@@ -643,7 +643,7 @@ Query.prototype.getCountFilterCond = function (filter) {
  *   filters: [
  *     {
  *       method: 'hasdone',
- *       type: 'feature',
+ *       type: 'track',
  *       name: 'Define Segment',
  *       op: '',
  *       val: ''
@@ -660,7 +660,7 @@ Query.prototype.getCountFilterCond = function (filter) {
  *   filters: [
  *     {
  *       method: 'hasdone',
- *       type: 'feature',
+ *       type: 'track',
  *       name: 'Define Segment'
  *     }
  *   ]

@@ -30,10 +30,10 @@ var eventTypes = ['auto', 'form', 'link', 'page', 'track'];
 
 
 /**
- * feature event names
+ * track event names
  */
 
-var featureEventNames = [
+var trackEventNames = [
   'Complete Integration',
   'Define Segment',
   'List Users',
@@ -59,7 +59,7 @@ var pageviewEventNames = [
 
 var domainNames = ['dodatado.com', 'userjoy.co'];
 var pathNames = ['/messages', '/users', '/install'];
-var featureNames = ['Users', 'Messages', 'Onboarding'];
+var moduleNames = ['Users', 'Messages', 'Onboarding'];
 
 
 /**
@@ -90,8 +90,8 @@ function createEvent(aid, uid, cb) {
   fakeEvent.type = randomFromArray(eventTypes);
 
   if (fakeEvent.type === 'track') {
-    fakeEvent.name = randomFromArray(featureEventNames);
-    fakeEvent.feature = randomFromArray(featureNames);
+    fakeEvent.name = randomFromArray(trackEventNames);
+    fakeEvent.module = randomFromArray(moduleNames);
   } else {
     fakeEvent.name = randomFromArray(pageviewEventNames);
   }

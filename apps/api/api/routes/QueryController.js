@@ -98,14 +98,14 @@ router
     async.waterfall(
       [
 
-        function getFeatureNames(cb) {
+        function getTrackNames(cb) {
           Event
             .distinct('name', {
               type: 'track'
             })
-            .exec(function (err, featureNames) {
+            .exec(function (err, trackNames) {
 
-              var features = _.map(featureNames, function (name) {
+              var trackEvents = _.map(trackNames, function (name) {
                 var f = {
                   type: 'track',
                   name: name
@@ -113,11 +113,11 @@ router
                 return f;
               });
 
-              cb(err, features);
+              cb(err, trackEvents);
             });
         },
 
-        function getPageviewNames(features, cb) {
+        function getPageviewNames(trackEvents, cb) {
           Event
             .distinct('name', {
               type: 'page'
@@ -131,7 +131,7 @@ router
                 return f;
               });
 
-              cb(err, features, pvs);
+              cb(err, trackEvents, pvs);
             });
         }
 

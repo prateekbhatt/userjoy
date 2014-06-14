@@ -197,7 +197,7 @@ describe('Lib query', function () {
         filters = [{
           method: 'count',
           name: 'Create new chat',
-          feature: 'Group',
+          module: 'Group',
           op: 'gt',
           val: 15
         }];
@@ -213,7 +213,7 @@ describe('Lib query', function () {
       filters = [{
         method: 'count',
         name: 'Add member',
-        feature: 'Group',
+        module: 'Group',
         op: 'gt',
         val: 15
       }, {
@@ -238,7 +238,7 @@ describe('Lib query', function () {
         filters = [{
           method: 'count',
           name: 'Create new chat',
-          feature: 'Group',
+          module: 'Group',
           op: 'gt',
           val: 15
         }];
@@ -255,7 +255,7 @@ describe('Lib query', function () {
         filters = [{
           method: 'count',
           name: 'Add member',
-          feature: 'Group',
+          module: 'Group',
           op: 'gt',
           val: 15
         }, {
@@ -725,13 +725,13 @@ describe('Lib query', function () {
 
       });
 
-    it('should add events.feature condition if feature attr present',
+    it('should add events.module condition if module attr present',
       function () {
 
         var filter = {
           method: 'count',
           type: 'track',
-          feature: 'Authentication',
+          module: 'Authentication',
           name: 'Clicked login btn',
           op: 'gt',
           val: 10
@@ -741,7 +741,7 @@ describe('Lib query', function () {
 
         expect(cond.$and[2])
           .to.eql({
-            '$eq': ['$feature', 'Authentication']
+            '$eq': ['$module', 'Authentication']
           });
 
       });
