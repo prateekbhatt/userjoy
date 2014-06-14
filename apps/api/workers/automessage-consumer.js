@@ -168,7 +168,7 @@ function saveNotifications(users, amsg, cb) {
 function removeUsersAlreadySent(users, amId, cb) {
   Event
     .find({
-      type: 'automessage',
+      type: 'auto',
       meta: {
         $elemMatch: {
           k: 'amId',

@@ -26,7 +26,7 @@ var randomId = mongoose.Types.ObjectId;
  * allowed event types
  */
 
-var eventTypes = ['pageview', 'feature'];
+var eventTypes = ['auto', 'form', 'link', 'page', 'track'];
 
 
 /**
@@ -89,7 +89,7 @@ function createEvent(aid, uid, cb) {
 
   fakeEvent.type = randomFromArray(eventTypes);
 
-  if (fakeEvent.type === 'feature') {
+  if (fakeEvent.type === 'track') {
     fakeEvent.name = randomFromArray(featureEventNames);
     fakeEvent.feature = randomFromArray(featureNames);
   } else {

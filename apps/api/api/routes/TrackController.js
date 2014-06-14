@@ -123,20 +123,20 @@ router
 
     if (cid) ids.cid = cid;
 
-    if (event.type === 'pageview') {
+    if (event.type === 'page') {
 
       // FIXME : pageview events must accept module name and meta data
 
       var name = event.name;
-      return Event.pageview(ids, name, callback);
+      return Event.page(ids, name, callback);
 
-    } else if (event.type === 'feature') {
+    } else if (event.type === 'track') {
 
       var name = event.name;
       var feature = event.feature;
       var meta = event.meta;
 
-      return Event.feature(ids, name, feature, meta, callback);
+      return Event.track(ids, name, feature, meta, callback);
 
     } else {
 
@@ -185,13 +185,21 @@ router
     }
 
 
-    // user's ip should be the first element in req.ips object (TODO: check this)
-    var clientIP = req.ips[0];
-    user.ip = clientIP;
+    if (user) {
 
-    // get location info from ip
-    var loc = geoip.lookup(user.ip);
-    if (_.isObject(loc) && loc.country) user.country = loc.country;
+      // user's ip should be the first element in req.ips object (TODO: check this)
+      var clientIP = req.ips[0];
+
+      if (clientIP) {
+        user.ip = clientIP;
+
+        // get location info from ip
+        var loc = geoip.lookup(user.ip);
+        if (_.isObject(loc) && loc.country) user.country = loc.country;
+      }
+
+    }
+
 
     User.findOrCreate(aid, user, function (err, usr) {
 

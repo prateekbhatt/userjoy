@@ -536,6 +536,11 @@ router
               var fromName = req.user.name;
               var replyToEmail = replyToEmailManual(fromEmail, conv._id);
 
+
+              // clone the conversation, in order to avoid the messages array
+              // from being disordered while rendering the mailer template
+              var clonedConv = _.cloneDeep(conv);
+
               var opts = {
 
                 from: {
@@ -544,7 +549,7 @@ router
                 },
 
                 locals: {
-                  conversation: conv
+                  conversation: clonedConv
                 },
 
                 // pass the message id of the reply

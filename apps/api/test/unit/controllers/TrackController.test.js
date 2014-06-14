@@ -95,14 +95,14 @@ describe('Resource /track', function () {
 
     //   });
 
-    it('should create pageview event and return the aid, uid, cid',
+    it('should create page event and return the aid, uid, cid',
       function (done) {
 
         var q = qs.stringify({
           app_id: appId,
           u: uid,
           e: {
-            type: 'pageview',
+            type: 'page',
             name: '/account/login'
           }
         });
@@ -134,14 +134,14 @@ describe('Resource /track', function () {
 
       });
 
-    it('should create feature event and return the aid, uid',
+    it('should create track event and return the aid, uid',
       function (done) {
 
         var q = qs.stringify({
           app_id: appId,
           u: uid,
           e: {
-            type: 'feature',
+            type: 'track',
             name: 'Created notification'
           }
         });
@@ -174,7 +174,7 @@ describe('Resource /track', function () {
 
       });
 
-    it('should return error if event type is not pageview / feature',
+    it('should return error if event type is not page / track',
 
       function (done) {
 
@@ -182,7 +182,7 @@ describe('Resource /track', function () {
           app_id: appId,
           u: uid,
           e: {
-            type: 'randomType',
+            type: 'pageview',
             path: '/account/login'
           }
         });

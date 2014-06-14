@@ -80,7 +80,7 @@ describe('Resource /query', function () {
 
           {
             method: 'hasdone',
-            type: 'feature',
+            type: 'track',
             name: 'Create Message'
           },
 
@@ -149,13 +149,13 @@ describe('Resource /query', function () {
 
             {
               method: 'hasdone',
-              type: 'feature',
+              type: 'track',
               name: 'Define Segment'
             },
 
             {
               method: 'hasnotdone',
-              type: 'feature',
+              type: 'track',
               name: 'Define Segment'
             }
           ]
@@ -197,7 +197,7 @@ describe('Resource /query', function () {
 
             {
               method: 'count',
-              type: 'feature',
+              type: 'track',
               name: 'Define Segment',
               op: 'gt',
               val: 0
@@ -300,16 +300,24 @@ describe('Resource /query', function () {
           .expect(function (res) {
 
             expect(res.body.events)
-              .to.be.an("array");
+              .to.be.an("array")
+              .and.to.not.be.empty;
 
-            expect(res.body.events)
-              .to.not.be.empty;
+            _.each(res.body.events, function (e) {
 
-            expect(res.body.events[0])
-              .to.have.property('type');
+              expect(e)
+                .to.have.property('type');
 
-            expect(res.body.events[0])
-              .to.have.property('name');
+              expect(e)
+                .to.have.property('name');
+
+              expect(_.contains(['auto', 'form', 'link', 'page',
+                'track'
+              ], e.type))
+                .to.be.true;
+
+            });
+
 
             expect(res.body.userAttributes)
               .to.contain("user_id");
