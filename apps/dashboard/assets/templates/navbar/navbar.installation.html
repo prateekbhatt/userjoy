@@ -16,6 +16,12 @@
                 <a href="/" style="font-size:19px;" class="navbar-brand">UserJoy
                 </a>
             </div>
+            <div class="col-md-4 col-md-push-3" style="margin-top: 5px;">
+                <div class="alert alert-info text-center" style="padding: 3px; border-color: #bce8f1; margin-bottom: 0px; position: absolute; width: 400px;" ng-show="info">{{infoMsgRootScope}}</div>
+            </div>
+            <div class="col-md-4 col-md-push-3" style="margin-top: 15px;">
+                <div class="alert alert-danger text-center" style="padding: 3px; border-color: #c0392b; margin-bottom: 0px; position: absolute; width: 400px;" ng-show="error">{{errMsgRootScope}}</div>
+            </div>
             <div role="navigation" class="collapse navbar-collapse navbar-right navbar-ex1-collapse">
                 <ul class="nav navbar-nav">
                     <li class="dropdown">
