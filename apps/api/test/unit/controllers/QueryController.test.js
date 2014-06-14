@@ -321,9 +321,10 @@ describe('Resource /query', function () {
 
             expect(res.body.userAttributes)
               .to.contain("user_id");
-
             expect(res.body.userAttributes)
               .to.contain("email");
+            expect(res.body.userAttributes)
+              .to.contain("joined");
           })
           .end(done);
 

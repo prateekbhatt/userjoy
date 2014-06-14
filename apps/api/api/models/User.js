@@ -97,7 +97,8 @@ var UserSchema = new Schema({
 
 
   ct: {
-    type: Date
+    type: Date,
+    default: Date.now
   },
 
 
@@ -106,7 +107,7 @@ var UserSchema = new Schema({
   },
 
 
-  firstSessionAt: {
+  joined: {
     type: Date,
     default: Date.now
   },
