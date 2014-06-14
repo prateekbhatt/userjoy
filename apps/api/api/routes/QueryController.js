@@ -101,13 +101,13 @@ router
         function getFeatureNames(cb) {
           Event
             .distinct('name', {
-              type: 'feature'
+              type: 'track'
             })
             .exec(function (err, featureNames) {
 
               var features = _.map(featureNames, function (name) {
                 var f = {
-                  type: 'feature',
+                  type: 'track',
                   name: name
                 };
                 return f;
@@ -120,12 +120,12 @@ router
         function getPageviewNames(features, cb) {
           Event
             .distinct('name', {
-              type: 'pageview'
+              type: 'page'
             })
             .exec(function (err, pvNames) {
               var pvs = _.map(pvNames, function (name) {
                 var f = {
-                  type: 'pageview',
+                  type: 'page',
                   name: name
                 };
                 return f;

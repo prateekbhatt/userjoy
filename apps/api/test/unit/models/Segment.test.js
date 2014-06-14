@@ -155,7 +155,7 @@ describe('Model Segment', function () {
             .to.eql(1);
 
           expect(err.errors['filters.0.type'].message)
-            .to.eql("Invalid filter method type");
+            .to.eql("Event type must be one of 'auto/form/link/page/track'");
 
           expect(seg)
             .not.to.exist;
@@ -182,7 +182,7 @@ describe('Model Segment', function () {
             {
               method: 'count',
               name: 'Create Notification',
-              type: 'feature'
+              type: 'track'
             }
 
           ]
@@ -219,7 +219,7 @@ describe('Model Segment', function () {
             {
               method: 'count',
               name: 'Create Notification',
-              type: 'feature',
+              type: 'track',
               op: 'eq',
               val: 0
             }
@@ -257,7 +257,7 @@ describe('Model Segment', function () {
 
           {
             method: 'hasdone',
-            type: 'feature',
+            type: 'track',
             name: 'Create Notification'
           }
 
@@ -298,7 +298,7 @@ describe('Model Segment', function () {
 
           {
             method: 'hasdone',
-            type: 'feature',
+            type: 'track',
             name: 'Create Notification'
           }
 
@@ -336,7 +336,7 @@ describe('Model Segment', function () {
 
           {
             method: 'hasdone',
-            type: 'feature',
+            type: 'track',
             name: 'Create Notification'
           }
 
@@ -450,7 +450,7 @@ describe('Model Segment', function () {
           list: 'companies',
           op: 'and',
           filters: [{
-            type: 'pageview',
+            type: 'page',
           }]
         };
 
@@ -476,7 +476,7 @@ describe('Model Segment', function () {
           op: 'and',
           filters: [{
             method: 'random',
-            type: 'feature',
+            type: 'track',
             name: 'Create chat'
           }]
         };

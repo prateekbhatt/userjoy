@@ -113,7 +113,7 @@ var EventSchema = new Schema({
 
 
 /**
- * Create a new feature event
+ * Create a new track event
  *
  * @param {object} ids (should contain aid, uid, cid)
  * @param {string} action
@@ -122,10 +122,10 @@ var EventSchema = new Schema({
  * @param {function} cb callback
  */
 
-EventSchema.statics.feature = function (ids, name, feature, meta, cb) {
+EventSchema.statics.track = function (ids, name, feature, meta, cb) {
 
   if (arguments.length !== 5) {
-    throw new Error('Event.feature: Expected five arguments');
+    throw new Error('Event.track: Expected five arguments');
   }
 
   var newEvent = {
@@ -134,7 +134,7 @@ EventSchema.statics.feature = function (ids, name, feature, meta, cb) {
     feature: feature,
     meta: metadata.toArray(meta),
     name: name,
-    type: 'feature',
+    type: 'track',
     uid: ids.uid
   };
 
@@ -142,13 +142,13 @@ EventSchema.statics.feature = function (ids, name, feature, meta, cb) {
 };
 
 
-EventSchema.statics.pageview = function (ids, path, cb) {
+EventSchema.statics.page = function (ids, path, cb) {
 
   var newEvent = {
     aid: ids.aid,
     cid: ids.cid,
     name: path,
-    type: 'pageview',
+    type: 'page',
     uid: ids.uid
   };
 
@@ -215,7 +215,7 @@ EventSchema.statics.automessage = function (ids, state, title, cb) {
   var newEvent = {
     aid: ids.aid,
     name: title,
-    type: 'automessage',
+    type: 'auto',
     uid: ids.uid
   };
 

@@ -20,7 +20,9 @@ var Schema = mongoose.Schema;
  * validations
  */
 
-var EVENT_TYPES = ['pageview', 'feature'];
+
+var eventTypeValidator = require('../../helpers/event-type-validator');
+
 var LIST_TYPES = ['users', 'companies'];
 var METHOD_TYPES = ['count', 'hasdone', 'hasnotdone', 'attr'];
 var OPERATOR_TYPES = ['or', 'and'];
@@ -30,14 +32,6 @@ var methodValidator = [validate({
     passIfEmpty: true
   },
   'isIn', METHOD_TYPES
-)];
-
-
-var eventTypeValidator = [validate({
-    message: "Invalid filter method type",
-    passIfEmpty: true
-  },
-  'isIn', EVENT_TYPES
 )];
 
 

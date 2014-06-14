@@ -166,7 +166,7 @@ var segments = {
 
       {
         method: 'hasdone',
-        type: 'feature',
+        type: 'track',
         name: 'Create Notification'
       }
 
