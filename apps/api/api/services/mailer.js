@@ -299,3 +299,25 @@ exports.sendInvite = function (options, cb) {
   mailer.template = 'invite.ejs';
   mailer.send(cb);
 };
+
+
+
+/**
+ * FOR TESTING PURPOSE
+ *
+ * @param {object} options
+ * @param {function} cb callback
+ */
+
+exports.sendTestMail = function (options, cb) {
+  options.from = {
+    name: UJ_SUPPORT_NAME,
+    email: UJ_SUPPORT_EMAIL
+  };
+
+  options.subject = 'Email Confirmation UserJoy';
+
+  var mailer = new Mailer(options);
+  mailer.template = 'email-confirmation.ejs';
+  mailer.send(cb);
+}
