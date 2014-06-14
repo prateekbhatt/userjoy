@@ -5,6 +5,7 @@ describe('Model User', function () {
    * npm dependencies
    */
 
+  var moment = require('moment');
   var mongoose = require('mongoose');
 
 
@@ -89,6 +90,8 @@ describe('Model User', function () {
         email: id + '@dodatado.com',
         country: 'IN',
         ip: '115.118.149.224',
+        joined: moment()
+          .unix() * 1000,
         meta: {
           plan: 'Free Tier',
           amount: 40
@@ -131,15 +134,25 @@ describe('Model User', function () {
           .that.is.an("string")
           .that.equals(newUser.country);
 
+        expect(usr)
+          .to.have.property("joined")
+          .that.is.an("date");
+        expect(moment(usr.joined)
+          .startOf('day')
+          .unix())
+          .to.eql(moment(newUser.joined)
+            .startOf('day')
+            .unix());
+
         done();
       });
 
     });
 
 
-    it('should add firstSessionAt timestamp to user', function () {
+    it('should add ct timestamp to user', function () {
       expect(savedUser)
-        .to.have.property('firstSessionAt');
+        .to.have.property('ct');
     });
 
 
@@ -148,9 +161,9 @@ describe('Model User', function () {
         .to.have.property('ut');
     });
 
-    it('should not add ct timestamp unless provided', function () {
+    it('should not add ct timestamp', function () {
       expect(savedUser)
-        .not.to.have.property('ct');
+        .to.have.property('ct');
     });
 
     it('should have totalSessions as 1 when the user is created',
