@@ -279,4 +279,62 @@ describe('Model User', function () {
 
   });
 
+
+  describe('#addCompany', function () {
+
+    var existingUser;
+    var savedUser;
+
+    before(function () {
+      existingUser = saved.users.first;
+
+      expect(existingUser.companies)
+        .to.be.empty;
+
+    });
+
+    it('should add company',
+      function (done) {
+
+        var company = saved.companies.first.toJSON();
+
+        existingUser.addCompany(company._id, company.name, function (err,
+          usr) {
+
+          expect(err)
+            .to.not.exist;
+
+          expect(usr.companies)
+            .to.be.an('array')
+            .that.has.length(1);
+
+          expect(usr.companies[0].cid)
+            .to.eql(company._id);
+
+          expect(usr.companies[0].name)
+            .to.eql(company.name);
+
+          done();
+        });
+      });
+
+    it('should return error if company already exists in User-companies',
+      function (done) {
+
+        var company = saved.companies.first.toJSON();
+
+        existingUser.addCompany(company._id, company.name, function (err,
+          usr) {
+
+          expect(err)
+            .to.exist;
+
+          expect(err.message)
+            .to.eql('USER_ALREADY_BELONGS_TO_COMPANY');
+          done();
+        });
+      });
+
+  });
+
 });

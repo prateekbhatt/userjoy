@@ -292,6 +292,40 @@ UserSchema.statics.findOrCreate = function (aid, user, cb) {
 };
 
 
+/**
+ * Adds a new company to the user-companies embedded document
+ *
+ * @param {string} cid company-id
+ * @param {string} name name-of-the-company
+ * @param {function} cb callback
+ */
+
+UserSchema.methods.addCompany = function (cid, name, cb) {
+
+  var self = this;
+
+  // check if the company already belongs to the user
+  var exists = _.find(self.companies, function (c) {
+    return c.cid.toString() === cid.toString();
+  });
+
+  // if company already exists, then return error
+  if (!_.isEmpty(exists)) {
+    return cb(new Error('USER_ALREADY_BELONGS_TO_COMPANY'));
+  }
+
+  // add new company to user
+  self.companies.push({
+    cid: cid,
+    name: name
+  });
+
+  // save user
+  return self.save(cb);
+
+};
+
+
 var User = mongoose.model('User', UserSchema);
 
 module.exports = User;
