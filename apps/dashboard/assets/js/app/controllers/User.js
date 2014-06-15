@@ -491,6 +491,7 @@ angular.module('do.users', [])
 
             if ($scope.attributes[index].name == 'joined') {
               $scope.showDatePicker = true;
+              $scope.showOtherAttributesQuery = false;
               console.log("inside joined attribute: ", $scope.showDatePicker);
 
               $scope.filters[parentindex].checkMethod = true;
@@ -507,6 +508,7 @@ angular.module('do.users', [])
               $scope.filters[parentindex].op = 'gt';
               console.log("$scope.filters error attributes: ", $scope.filters);
             } else {
+              $scope.showOtherAttributesQuery = true;
               $scope.showDatePicker = false;
               $scope.filters[parentindex].checkMethod = true;
               $scope.filters[parentindex].isEvent = false;
@@ -518,12 +520,14 @@ angular.module('do.users', [])
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
               $scope.filters[parentindex].optext = 'equal';
+              $scope.filters[parentindex].val = '';
             }
           }
 
           $scope.changeFilterHasDone = function (parentindex,
             index, evt) {
             $scope.showDatePicker = false;
+            $scope.showOtherAttributesQuery = false
             $scope.method = 'hasdone';
             $scope.filters[parentindex].checkMethod =
               false;
@@ -540,12 +544,14 @@ angular.module('do.users', [])
             $scope.filters[parentindex].type = $scope.hasDoneItems[
               index].type;
             $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
+            $scope.filters[parentindex].val = '';
           }
 
           $scope.changeFilterHasNotDone = function (
             parentindex, index,
             evt) {
             $scope.showDatePicker = false;
+            $scope.showOtherAttributesQuery = false
             $scope.method = 'hasnotdone';
             $scope.filters[parentindex].checkMethod =
               false;
@@ -563,6 +569,7 @@ angular.module('do.users', [])
             $scope.filters[parentindex].type = $scope.hasNotDoneItems[
               index].type;
             $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
+            $scope.filters[parentindex].val = '';
             console.log($scope.filters);
           }
 
@@ -571,6 +578,7 @@ angular.module('do.users', [])
           $scope.changeFilterCountOf = function (parentindex,
             index, evt) {
             $scope.showDatePicker = false;
+            $scope.showOtherAttributesQuery = false
             $scope.method = 'count';
             $scope.filters[parentindex].checkMethod = true;
             $scope.filters[parentindex].isEvent = true;
@@ -587,6 +595,7 @@ angular.module('do.users', [])
               index].type;
             $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
             $scope.filters[parentindex].optext = 'equal';
+            $scope.filters[parentindex].val = '';
           }
 
           var segments = segment.get.all();
@@ -655,6 +664,14 @@ angular.module('do.users', [])
             key: 'lt'
           }]
 
+          $scope.otherAttributesQuery = [{
+            name: 'equal',
+            key: 'eq'
+          }, {
+            name: 'contains',
+            key: 'cn'
+          }]
+
           $scope.chngquery = function (parentindex, index) {
             console.log("parentindex: ", parentindex);
             $scope.filters[parentindex].optext = $scope.queries[
@@ -664,6 +681,14 @@ angular.module('do.users', [])
               index].key;
             console.log($scope.filters[parentindex].op);
             console.log($scope.filters);
+          }
+
+          $scope.changeOtherAttributesQuery = function () {
+            $scope.filters[parentindex].optext = $scope.otherAttributesQuery[
+              index]
+              .name;
+            $scope.filters[parentindex].op = $scope.otherAttributesQuery[
+              index].key;
           }
 
           $scope.chngDatePickerQuery = function (parentindex, index) {

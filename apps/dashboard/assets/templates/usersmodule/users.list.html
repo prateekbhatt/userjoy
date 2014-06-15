@@ -57,11 +57,20 @@
                                                         <li ng-repeat="attribute in attributes" ><a style="cursor: default;" ng-click="changeFilterAttribute($parent.$index, $index, $event)">{{attribute.name}}</a></li>
                                                     </ul>
                                                 </div>
-                                                <div ng-if="filter.checkMethod && !showDatePicker" style="float: left; padding-left: 24px;">
+                                                <div ng-if="filter.checkMethod && !showDatePicker && !showOtherAttributesQuery" style="float: left; padding-left: 24px;">
                                                     <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto">
                                                         <li ng-repeat="query in selectedqueries">
                                                             <a style="cursor: default;" ng-click="chngquery($parent.$index, $index)">{{query.value}}
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div ng-if="filter.checkMethod && !showDatePicker && showOtherAttributesQuery" style="float: left; padding-left: 24px;">
+                                                    <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
+                                                    <ul class="select dropdown-menu" role="select" style="left: auto">
+                                                        <li ng-repeat="query in otherAttributesQuery">
+                                                            <a style="cursor: default;" ng-click="changeOtherAttributesQuery($parent.$index, $index)">{{query.name}}
                                                             </a>
                                                         </li>
                                                     </ul>
