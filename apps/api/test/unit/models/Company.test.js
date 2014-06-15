@@ -57,7 +57,10 @@ describe('Model Company', function () {
 
     var newCompany = {
       name: 'BlaBlaCar',
-      company_id: 'bla_bla_car'
+      company_id: 'bla_bla_car',
+      plan: 'enterprise',
+      revenue: 399,
+      status: 'free'
     };
 
     before(function (done) {
@@ -74,6 +77,22 @@ describe('Model Company', function () {
           .to.be.ok;
         expect(com.name)
           .to.eql(newCompany.name);
+
+        expect(com)
+          .to.have.property("plan")
+          .that.is.a("string")
+          .that.equals(newCompany.plan);
+
+        expect(com)
+          .to.have.property("revenue")
+          .that.is.a("number")
+          .that.equals(newCompany.revenue);
+
+        expect(com)
+          .to.have.property("status")
+          .that.is.a("string")
+          .that.equals(newCompany.status);
+
         done();
       });
     });
@@ -128,39 +147,6 @@ describe('Model Company', function () {
         });
       });
 
-    it('should store billing data if billing data object is present',
-      function (done) {
-
-        var testCompany = {
-          name: 'NEW_COMPANY',
-          company_id: '1234567'
-        };
-
-        var billing = {
-          status: 'paying',
-          plan: 'Basic',
-          currency: 'USD'
-        };
-
-        testCompany.billing = billing;
-
-        Company.findOrCreate(randomId, testCompany, function (err, com) {
-          expect(err)
-            .not.to.exist;
-
-          expect(com)
-            .to.be.an('object');
-
-          expect(com.name)
-            .to.eql(testCompany.name);
-
-          expect(com.billing.status)
-            .to.eql(billing.status);
-
-          done();
-        });
-      });
-
 
     it(
       'should return error if billing status is neither of [trial, free, paying, cancelled]',
@@ -168,16 +154,9 @@ describe('Model Company', function () {
 
         var testCompany = {
           name: 'NEW_COMPANY_ANOTHER',
-          company_id: 'anewcompanyid'
-        };
-
-        var billing = {
+          company_id: 'anewcompanyid',
           status: 'randomStatus',
-          plan: 'Basic',
-          currency: 'USD'
         };
-
-        testCompany.billing = billing;
 
         Company.findOrCreate(randomId, testCompany, function (err, com) {
 
