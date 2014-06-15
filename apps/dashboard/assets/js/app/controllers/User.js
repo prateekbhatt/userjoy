@@ -595,6 +595,7 @@ angular.module('do.users', [])
               index].type;
             $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
             $scope.filters[parentindex].optext = 'equal';
+            $scope.filters[parentindex].op = 'eq';
             $scope.filters[parentindex].val = '';
           }
 
@@ -669,7 +670,7 @@ angular.module('do.users', [])
             key: 'eq'
           }, {
             name: 'contains',
-            key: 'cn'
+            key: 'contains'
           }]
 
           $scope.chngquery = function (parentindex, index) {
@@ -683,7 +684,7 @@ angular.module('do.users', [])
             console.log($scope.filters);
           }
 
-          $scope.changeOtherAttributesQuery = function () {
+          $scope.changeOtherAttributesQuery = function (parentindex, index) {
             $scope.filters[parentindex].optext = $scope.otherAttributesQuery[
               index]
               .name;
