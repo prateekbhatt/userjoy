@@ -1,4 +1,4 @@
-describe('Model User', function () {
+describe.only('Model User', function () {
 
 
   /**
@@ -184,6 +184,21 @@ describe('Model User', function () {
         .to.have.property('ct');
     });
 
+    it('should add default health as average', function () {
+      expect(savedUser)
+        .to.have.property('health')
+        .that.is.a('string')
+        .and.eqls('average');
+    });
+
+    it('should add default score as 50', function () {
+
+      expect(savedUser)
+        .to.have.property('score')
+        .that.is.a('number')
+        .and.eqls(50);
+    });
+
     it('should have totalSessions as 1 when the user is created',
       function () {
         expect(savedUser.totalSessions)
@@ -336,5 +351,159 @@ describe('Model User', function () {
       });
 
   });
+
+
+  describe('#setHealth', function () {
+
+    var existingUser;
+    var savedUser;
+
+    before(function () {
+      existingUser = saved.users.first;
+    });
+
+    it('should return error if health is not in [good, average, bad]',
+      function (done) {
+
+        var uid = existingUser._id;
+        var health = 'good123';
+
+        User.setHealth(uid, health, function (err, usr) {
+
+          expect(err)
+            .to.exist
+            .and.to.be.an("object")
+            .and.has.property('errors')
+            .that.is.an('object')
+            .and.has.property('health')
+            .that.is.an('object')
+            .and.has.property('message')
+            .that.is.a('string')
+            .and.eqls(
+              'Health status must be one of \'good\', \'average\' or \'bad\''
+          );
+
+          done();
+        });
+      });
+
+
+    it('should update health',
+      function (done) {
+
+        var uid = existingUser._id;
+        var health = 'good';
+
+        expect(existingUser.health)
+          .to.eql('average');
+
+        User.setHealth(uid, health, function (err, usr) {
+
+          expect(err)
+            .to.not.exist;
+
+          expect(usr)
+            .to.exist
+            .and.to.be.an("object")
+            .that.has.property('health')
+            .that.is.a('string')
+            .and.eqls(health);;
+
+          done();
+        });
+      });
+
+  });
+
+
+  describe('#setScore', function () {
+
+    var existingUser;
+    var savedUser;
+
+    before(function () {
+      existingUser = saved.users.first;
+    });
+
+    it('should return error if score is less than 0',
+      function (done) {
+
+        var uid = existingUser._id;
+        var score = -1;
+
+        User.setScore(uid, score, function (err, usr) {
+
+          expect(err)
+            .to.exist
+            .and.to.be.an("object")
+            .and.has.property('errors')
+            .that.is.an('object')
+            .and.has.property('score')
+            .that.is.an('object')
+            .and.has.property('message')
+            .that.is.a('string')
+            .and.eqls(
+              "Path `score` (-1) is less than minimum allowed value (0)."
+          );
+
+          done();
+        });
+      });
+
+    it('should return error if score is greater than 100',
+      function (done) {
+
+        var uid = existingUser._id;
+        var score = 101;
+
+        User.setScore(uid, score, function (err, usr) {
+
+          expect(err)
+            .to.exist
+            .and.to.be.an("object")
+            .and.has.property('errors')
+            .that.is.an('object')
+            .and.has.property('score')
+            .that.is.an('object')
+            .and.has.property('message')
+            .that.is.a('string')
+            .and.eqls(
+              "Path `score` (101) is more than maximum allowed value (100)."
+          );
+
+          done();
+        });
+      });
+
+
+    it('should update score',
+      function (done) {
+
+        var uid = existingUser._id;
+        var score = 55;
+
+        expect(existingUser.score)
+          .to.eql(50);
+
+        User.setScore(uid, score, function (err, usr) {
+
+          expect(err)
+            .to.not.exist;
+
+          expect(usr)
+            .to.exist
+            .and.to.be.an("object")
+            .that.has.property('score')
+            .that.is.a('number')
+            .and.eqls(score);
+
+          done();
+        });
+      });
+
+  });
+
+
+
 
 });

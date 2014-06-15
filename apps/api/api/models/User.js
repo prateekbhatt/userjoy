@@ -29,6 +29,7 @@ var logger = require('../../helpers/logger');
  */
 
 var billingStatusValidator = require('../../helpers/billing-status-validator');
+var healthStatusValidator = require('../../helpers/health-status-validator');
 
 
 /**
@@ -113,8 +114,11 @@ var UserSchema = new Schema({
   },
 
 
-  healthScore: {
-    type: Number
+  // latest health status of the user
+  health: {
+    type: String,
+    validate: healthStatusValidator,
+    default: 'average'
   },
 
 
@@ -150,6 +154,15 @@ var UserSchema = new Schema({
   // amount of revenue from this user
   revenue: {
     type: Number
+  },
+
+
+  // latest engagement score
+  score: {
+    type: Number,
+    default: 50,
+    min: 0,
+    max: 100
   },
 
 
@@ -324,6 +337,71 @@ UserSchema.methods.addCompany = function (cid, name, cb) {
   return self.save(cb);
 
 };
+
+
+/**
+ * Sets health of user to good/average/poor
+ *
+ * NOTE: Not using findAndModify to let the mongoose validators kick in
+ *
+ * @param {string} uid user-id
+ * @param {string} health good/average/bad
+ * @param {function} cb callback
+ */
+
+UserSchema.statics.setHealth = function (uid, health, cb) {
+
+  async.waterfall(
+
+    [
+
+      function findUser(cb) {
+        User.findById(uid, cb)
+      },
+
+      function updateHealth(user, cb) {
+        user.health = health;
+        user.save(cb);
+      }
+    ],
+
+    cb
+  );
+
+};
+
+
+/**
+ * Sets score of user (0-100)
+ *
+ * NOTE: Not using findAndModify to let the mongoose validators kick in
+ *
+ * @param {string} uid user-id
+ * @param {string} score (0-100)
+ * @param {function} cb callback
+ */
+
+UserSchema.statics.setScore = function (uid, score, cb) {
+
+  async.waterfall(
+
+    [
+
+      function findUser(cb) {
+        User.findById(uid, cb)
+      },
+
+      function updateScore(user, cb) {
+        user.score = score;
+        user.save(cb);
+      }
+    ],
+
+    cb
+  );
+
+};
+
 
 
 var User = mongoose.model('User', UserSchema);
