@@ -256,35 +256,95 @@ router
 
     var data = req.query;
     var aid = data.app_id;
+    var uid = data.u;
     var company = data.company;
 
-    // Validations
+    // Validations: Start ////////////////////
+
     if (!aid) {
       return res.badRequest('Please send app_id with the params');
     }
 
-    Company.findOrCreate(aid, company, function (err, com) {
+    // to add the user to the company
+    if (!uid) {
+      return res.badRequest('Please send uid with the params');
+    }
 
-      if (err) {
+    // Validations: End ////////////////////
 
-        if (err.message === 'NO_COMPANY_ID') {
-          return res.badRequest(
-            'Please send company_id to identify company');
+
+    async.waterfall(
+
+      [
+
+        function findOrCreateCompany(cb) {
+
+          Company.findOrCreate(aid, company, function (err, com) {
+            cb(err, com);
+          });
+
+        },
+
+
+        function findAndAddCompanyToUser(com, cb) {
+
+          User.findById(uid, function (err, usr) {
+
+            if (err) return next(err);
+            if (!usr) return cb(new Error('USER_NOT_FOUND'));
+
+            usr.addCompany(com._id, com.name, function (err, usr) {
+              cb(err, com);
+            });
+
+          });
+
         }
 
-        return next(err);
+      ],
+
+      function (err, com) {
+
+        if (err) {
+
+          if (err.message === 'NO_COMPANY_ID') {
+
+            return res.badRequest(
+              'Please send company_id to identify company');
+
+          } else if (err.message === 'USER_NOT_FOUND') {
+
+            return res.badRequest(
+              'Please send valid uid');
+
+          } else if (err.message === 'INVALID_COMPANY_NAME') {
+
+            return res.badRequest(
+              'Please send company name');
+
+          } else if (err.message === 'USER_ALREADY_BELONGS_TO_COMPANY') {
+
+            // do nothing
+            // sending success response
+
+          } else {
+
+            return next(err);
+          }
+
+        }
+
+        var obj = {
+          aid: com.aid,
+          cid: com._id
+        };
+
+        res
+          .status(200)
+          .json(obj);
       }
 
-      var obj = {
-        aid: com.aid,
-        cid: com._id
-      };
-
-      res
-        .status(200)
-        .json(obj);
-
-    });
+    )
 
   });
 
