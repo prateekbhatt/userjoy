@@ -158,15 +158,16 @@ UserNote      |                         | notes created by team members about a 
 - unsubscribedThrough (messageId, subject)
 - ct
 - ut
+- health (latest health status of the user, defaults to average for new user)
 - joined (when did the user join the service)
 - plan
 - revenue
+- score (latest engagement score of user, defaults to 50 for new user)
 - status
 - totalSessions
 - lastContactedAt
 - lastSessionAt
 - lastHeardAt
-- healthScore (latest value from User Health)
 - ip
 - x tags [] Stores tags for categorizing users
 - companies [{cid, companyName, billing{}, healthScore, totalSessions}]
@@ -260,6 +261,7 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
  - ct
  - filters (embedded documents)
  - fromAgo (optional, number of days since when count queries should be run)
+ - health (good/average/bad, for predefined health segments)
  - list (to unix timestamp for count queries)
  - name
  - op
