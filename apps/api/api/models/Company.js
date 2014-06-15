@@ -74,8 +74,10 @@ var CompanySchema = new Schema({
 
   meta: [MetaDataSchema],
 
+
   name: {
-    type: String
+    type: String,
+    required: [true, 'INVALID_COMPANY_NAME']
   },
 
 
@@ -136,6 +138,7 @@ CompanySchema.statics.findOrCreate = function (aid, company, cb) {
 
   var billingStatus = company.status;
   var company_id = company.company_id;
+  var name = company.name;
   var conditions = {};
 
 
@@ -145,6 +148,10 @@ CompanySchema.statics.findOrCreate = function (aid, company, cb) {
   // if no company identifier provided, return error
   if (!company_id) {
     return cb(new Error('NO_COMPANY_ID'));
+  }
+
+  if (!name) {
+    return cb(new Error('INVALID_COMPANY_NAME'));
   }
 
 
