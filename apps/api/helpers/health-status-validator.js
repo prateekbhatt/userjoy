@@ -12,10 +12,10 @@ var validate = require('mongoose-validator')
 
 
 var validator = [validate({
-    message: "Health status must be one of 'good', 'average' or 'bad'",
+    message: "Health status must be one of 'good', 'average' or 'poor'",
     passIfEmpty: true
   },
-  'isIn', ['good', 'average', 'bad']
+  'isIn', ['good', 'average', 'poor']
 )];
 
 module.exports = validator;

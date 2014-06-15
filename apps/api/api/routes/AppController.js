@@ -13,6 +13,7 @@ var router = require('express')
  */
 
 var App = require('../models/App');
+var Segment = require('../models/Segment');
 var User = require('../models/User');
 
 
@@ -287,6 +288,21 @@ router
             cb(err, isActive);
           });
 
+        },
+
+
+        function createPredefinedSegments(isActive, cb) {
+
+          // if not active, move on
+          if (!isActive) return cb(null, isActive);
+
+          var adminUid = _.find(req.app.team, {
+            admin: true
+          }).accid;
+
+          Segment.createPredefined(aid, adminUid, function (err) {
+            cb(err, isActive);
+          });
         }
       ],
 

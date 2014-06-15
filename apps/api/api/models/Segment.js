@@ -22,6 +22,7 @@ var Schema = mongoose.Schema;
 
 
 var eventTypeValidator = require('../../helpers/event-type-validator');
+var healthStatusValidator = require('../../helpers/health-status-validator');
 
 var LIST_TYPES = ['users', 'companies'];
 var METHOD_TYPES = ['count', 'hasdone', 'hasnotdone', 'attr'];
@@ -136,6 +137,13 @@ var SegmentSchema = new Schema({
   },
 
 
+  // if predefined health segment, then store which of good/average/poor
+  health: {
+    type: String,
+    validate: healthStatusValidator
+  },
+
+
   // list upon segment
   list: {
     type: String,
@@ -196,7 +204,7 @@ SegmentSchema.pre('save', function (next) {
   // if count method, then op and val must be present
   // 0 should be an acceptable val value
   _.each(this.filters, function (f) {
-    if (f.method === 'count' && !(f.op && (f.val || f.val === 0) )) {
+    if (f.method === 'count' && !(f.op && (f.val || f.val === 0))) {
       return next(new Error(
         'Provide valid filter operator and filter value'));
     }
@@ -213,6 +221,94 @@ SegmentSchema.pre('save', function (next) {
   this.ut = new Date;
   next();
 });
+
+
+/**
+ * Creates predefined health / lifecycle segments
+ *
+ * @param {string} aid app-id
+ * @param {string} adminUid app admin would be the default creator
+ * @param {function} cb callback
+ */
+
+SegmentSchema.statics.createPredefined = function (aid, adminUid, cb) {
+
+  var allNewSegments = [
+
+
+    // goodHealthSegment
+    {
+      name: 'Good Health',
+      health: 'good',
+      filters: [
+
+        {
+          method: 'attr',
+          name: 'score',
+          op: 'gt',
+          val: 67
+        }
+
+      ]
+    },
+
+
+    // avgHealthSegment
+    {
+      name: 'Average Health',
+      health: 'average',
+      filters: [
+
+        {
+          method: 'attr',
+          name: 'score',
+          op: 'gt',
+          val: 33
+        },
+
+
+        {
+          method: 'attr',
+          name: 'score',
+          op: 'lt',
+          val: 68
+        }
+
+      ]
+    },
+
+
+    // poorHealthSegment
+    {
+      name: 'Poor Health',
+      health: 'poor',
+      filters: [
+
+        {
+          method: 'attr',
+          name: 'score',
+          op: 'lt',
+          val: 34
+        }
+
+      ]
+    }
+
+  ];
+
+  _.each(allNewSegments, function (s) {
+
+    s.aid = aid;
+    s.creator = adminUid;
+    s.list = 'users';
+    s.op = 'and';
+    s.predefined = true;
+
+  });
+
+  Segment.create(allNewSegments, cb);
+
+};
 
 
 var Segment = mongoose.model('Segment', SegmentSchema);

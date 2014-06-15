@@ -1,4 +1,4 @@
-describe.only('Model User', function () {
+describe('Model User', function () {
 
 
   /**
@@ -362,7 +362,7 @@ describe.only('Model User', function () {
       existingUser = saved.users.first;
     });
 
-    it('should return error if health is not in [good, average, bad]',
+    it('should return error if health is not in [good, average, poor]',
       function (done) {
 
         var uid = existingUser._id;
@@ -380,7 +380,7 @@ describe.only('Model User', function () {
             .and.has.property('message')
             .that.is.a('string')
             .and.eqls(
-              'Health status must be one of \'good\', \'average\' or \'bad\''
+              'Health status must be one of \'good\', \'average\' or \'poor\''
           );
 
           done();

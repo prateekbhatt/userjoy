@@ -345,7 +345,7 @@ UserSchema.methods.addCompany = function (cid, name, cb) {
  * NOTE: Not using findAndModify to let the mongoose validators kick in
  *
  * @param {string} uid user-id
- * @param {string} health good/average/bad
+ * @param {string} health good/average/poor
  * @param {function} cb callback
  */
 
