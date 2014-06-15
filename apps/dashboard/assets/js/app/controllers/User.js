@@ -488,20 +488,42 @@ angular.module('do.users', [])
           $scope.changeFilterAttribute = function (
             parentindex, index,
             evt) {
-            $scope.filters[parentindex].checkMethod = true;
-            $scope.filters[parentindex].isEvent = false;
-            $scope.filters[parentindex].btntext = $scope.attributes[
-              index].name;
-            $scope.filters[parentindex].method = 'attr';
-            $scope.filters[parentindex].name = $scope.attributes[
-              index].name;
-            $scope.filters[parentindex].type = '';
-            $scope.filters[parentindex].timeRange = '';
-            $scope.filters[parentindex].optext = 'equal';
+
+            if ($scope.attributes[index].name == 'joined') {
+              $scope.showDatePicker = true;
+              console.log("inside joined attribute: ", $scope.showDatePicker);
+
+              $scope.filters[parentindex].checkMethod = true;
+              $scope.filters[parentindex].isEvent = false;
+              $scope.filters[parentindex].btntext = $scope.attributes[
+                index].name;
+              $scope.filters[parentindex].method = 'attr';
+              $scope.filters[parentindex].name = $scope.attributes[
+                index].name;
+              $scope.filters[parentindex].type = '';
+              $scope.filters[parentindex].timeRange = '';
+              $scope.filters[parentindex].optext = 'greater than';
+              $scope.filters[parentindex].val = $moment(new Date()).unix()*1000;
+              $scope.filters[parentindex].op = 'gt';
+              console.log("$scope.filters error attributes: ", $scope.filters);
+            } else {
+              $scope.showDatePicker = false;
+              $scope.filters[parentindex].checkMethod = true;
+              $scope.filters[parentindex].isEvent = false;
+              $scope.filters[parentindex].btntext = $scope.attributes[
+                index].name;
+              $scope.filters[parentindex].method = 'attr';
+              $scope.filters[parentindex].name = $scope.attributes[
+                index].name;
+              $scope.filters[parentindex].type = '';
+              $scope.filters[parentindex].timeRange = '';
+              $scope.filters[parentindex].optext = 'equal';
+            }
           }
 
           $scope.changeFilterHasDone = function (parentindex,
             index, evt) {
+            $scope.showDatePicker = false;
             $scope.method = 'hasdone';
             $scope.filters[parentindex].checkMethod =
               false;
@@ -523,6 +545,7 @@ angular.module('do.users', [])
           $scope.changeFilterHasNotDone = function (
             parentindex, index,
             evt) {
+            $scope.showDatePicker = false;
             $scope.method = 'hasnotdone';
             $scope.filters[parentindex].checkMethod =
               false;
@@ -547,6 +570,7 @@ angular.module('do.users', [])
 
           $scope.changeFilterCountOf = function (parentindex,
             index, evt) {
+            $scope.showDatePicker = false;
             $scope.method = 'count';
             $scope.filters[parentindex].checkMethod = true;
             $scope.filters[parentindex].isEvent = true;
@@ -585,6 +609,31 @@ angular.module('do.users', [])
             })
           };
 
+          // $scope.opened = true;
+
+          $scope.openDatePicker = function ($event) {
+            console.log("opening datepicker: ", $scope.opened);
+            $event.preventDefault();
+            $event.stopPropagation();
+
+            $scope.opened = true;
+            console.log("is datepicker opened: ", $scope.opened);
+          };
+
+
+          $scope.dateOptions = {
+            formatYear: 'yy',
+            startingDay: 1
+          };
+
+          $scope.maxDate = new Date();
+
+          // $scope.initDate = new Date('2016-15-20');
+          $scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy',
+            'shortDate'
+          ];
+          $scope.format = $scope.formats[0];
+
 
           $scope.queries = queryMatching.get.all();
           $scope.query = [];
@@ -598,6 +647,13 @@ angular.module('do.users', [])
             })
           };
 
+          $scope.datePickerQueries = [{
+            name: 'greater than',
+            key: 'gt'
+          }, {
+            name: 'less than',
+            key: 'lt'
+          }]
 
           $scope.chngquery = function (parentindex, index) {
             console.log("parentindex: ", parentindex);
@@ -608,6 +664,15 @@ angular.module('do.users', [])
               index].key;
             console.log($scope.filters[parentindex].op);
             console.log($scope.filters);
+          }
+
+          $scope.chngDatePickerQuery = function (parentindex, index) {
+            $scope.filters[parentindex].optext = $scope.datePickerQueries[
+              index]
+              .name;
+            $scope.filters[parentindex].op = $scope.datePickerQueries[
+              index].key;
+            console.log("DatePickerQuery: ", $scope.filters);
           }
 
           $scope.chngrange = function (parentindex, index) {
@@ -644,7 +709,7 @@ angular.module('do.users', [])
               type: ''
             });
             console.log("$scope.filters[0]: ", $scope.filters[0]);
-            if($scope.filters.length > 0) {
+            if ($scope.filters.length > 0) {
               console.log("getting inside filters length > 0");
               for (var i = 1; i < $scope.filters.length; i++) {
                 $scope.filters[i].timeRange = $scope.filters[0].timeRange;
@@ -823,7 +888,7 @@ angular.module('do.users', [])
                 // $scope.isErr = '';
               }
             };
-            if($scope.filters.length > 0) {
+            if ($scope.filters.length > 0) {
               $scope.fromTime = $scope.filters[0].timeRangeValue;
             } else {
               $scope.fromTime = '';
@@ -991,19 +1056,24 @@ angular.module('do.users', [])
             $scope.filters = [];
             console.log("$scope.queries: ", $scope.queries);
             console.log("segment: ", segmentService.getSingleSegment());
-            if(segmentService.getSingleSegment().fromAgo) {
-              $scope.fromTimeBackend = segmentService.getSingleSegment().fromAgo;
+            if (segmentService.getSingleSegment()
+              .fromAgo) {
+              $scope.fromTimeBackend = segmentService.getSingleSegment()
+                .fromAgo;
             } else {
               $scope.fromTimeBackend = '';
             }
-            console.log("$scope.fromTimeBackend: ", $scope.fromTimeBackend, $scope.timeSpan.length);
+            console.log("$scope.fromTimeBackend: ", $scope.fromTimeBackend,
+              $scope.timeSpan.length);
             for (var i = 0; i < $scope.timeSpan.length; i++) {
-              console.log("$scope.timeSpan[i]: $scope.fromTimeBackend: ", $scope.timeSpan[i].value);
-              if($scope.fromTimeBackend === $scope.timeSpan[i].value) {
-                console.log("$scope.fromTimeBackend: ", $scope.timeSpan[i].value);
+              console.log("$scope.timeSpan[i]: $scope.fromTimeBackend: ",
+                $scope.timeSpan[i].value);
+              if ($scope.fromTimeBackend === $scope.timeSpan[i].value) {
+                console.log("$scope.fromTimeBackend: ", $scope.timeSpan[i]
+                  .value);
                 $scope.fromTimeFrontEnd = $scope.timeSpan[i].name;
                 $scope.fromTimeFrontEndValue = $scope.timeSpan[i].value;
-                break; 
+                break;
               }
             };
             console.log("$scope.fromTimeFrontEnd: ", $scope.fromTimeFrontEnd);
@@ -1047,7 +1117,7 @@ angular.module('do.users', [])
                 chkMethod = false;
                 isEvent = true;
                 timeRange = $scope.fromTimeFrontEnd;
-                timeRangeValue = $scope.fromTimeFrontEndValue; 
+                timeRangeValue = $scope.fromTimeFrontEndValue;
               }
               if (getFilters[i].method == 'count') {
                 buttonText = "Count of " + getFilters[

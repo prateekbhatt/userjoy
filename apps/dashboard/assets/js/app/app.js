@@ -376,22 +376,14 @@ var app = angular.module('dodatado', [
       key: 'eq'
     }, {
       id: "1",
-      name: "does not equal",
-      key: 'any'
+      name: "contains",
+      key: 'contains'
     }, {
       id: "2",
-      name: "contains",
-      key: 'cn'
-    }, {
-      id: "3",
-      name: "does not contain",
-      key: 'ncn'
-    }, {
-      id: "4",
       name: 'greater than',
       key: 'gt'
     }, {
-      id: "5",
+      id: "4",
       name: 'less than',
       key: 'lt'
     }];
