@@ -138,8 +138,6 @@ var ConversationSchema = new Schema({
   },
 
 
-  // TODO: tid
-
   // true if the conversation has got an unread message from the user
   toRead: {
     type: Boolean,

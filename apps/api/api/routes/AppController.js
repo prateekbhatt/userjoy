@@ -205,7 +205,7 @@ router
 
 
 /**
- * PUT /apps/:aid/send-code-to-developer
+ * POST /apps/:aid/send-code-to-developer
  *
  * Sends installation code to developer
  */
