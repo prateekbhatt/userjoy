@@ -263,6 +263,7 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
  - list (to unix timestamp for count queries)
  - name
  - op
+ - predefined (boolean, true if defined at the start of the app)
  - toAgo (optional, number of days till when count queries should be run)
  - ut
 
