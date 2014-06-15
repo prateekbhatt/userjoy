@@ -241,21 +241,14 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 - x meta (object containing additonal info about users)
 - ct (should be passed by js snippet)
 - ut
+- plan
+- revenue
+- status
 - x tags [] just like user tags
-- billing {
-    status,
-    plan,
-    currency,
-    amount,
-    licenses,
-    usage,
-    unit
-  }
 
 ##### Notes:
 
-- Billing data is stored both in Company and User models
-- Billing status must be one of [trial, free, paying, cancelled]
+- status must be one of [trial, free, paying, cancelled]
 - ct property should not be automatically added on company creation
 
 
