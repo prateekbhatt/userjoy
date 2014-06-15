@@ -47,9 +47,10 @@ angular
         $http
           .post(config.apiUrl + '/apps', data)
           .success(function (savedApp) {
-            $state.transitionTo('addcode');
+            // $state.transitionTo('addcode');
             AppService.new(savedApp);
             AppService.setCurrentApp(savedApp);
+            $location.path('/apps/' + AppService.getCurrentApp()._id + '/addcode')
             console.log("apps created: ", AppService.getLoggedInApps(),
               savedApp);
           })
@@ -100,6 +101,15 @@ angular
           .error(function () {
             console.log("error");
           })
+      }
+
+      this.checkIfActive = function (appId, cb) {
+        $http.put(config.apiUrl + '/apps/' + appId + '/activate')
+          .success(function (data) {
+            console.log("success: ", data);
+            cb(null, data);
+          })
+          .error(cb);
       }
     }
   ])
