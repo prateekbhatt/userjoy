@@ -158,6 +158,13 @@ var SegmentSchema = new Schema({
   },
 
 
+  // whether the segment was pre defined (default health, lifecycle segments)
+  predefined: {
+    type: Boolean,
+    default: false
+  },
+
+
   // number of days till when the count queries would be run
   toAgo: {
     type: Number,

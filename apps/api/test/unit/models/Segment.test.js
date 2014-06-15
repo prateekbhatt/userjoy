@@ -1,4 +1,4 @@
-describe('Model Segment', function () {
+describe.only('Model Segment', function () {
 
 
   /**
@@ -373,6 +373,15 @@ describe('Model Segment', function () {
       function () {
         expect(savedSegment)
           .to.have.property('ut');
+      });
+
+
+
+    it('should add predefined status to false',
+      function () {
+        expect(savedSegment)
+          .to.have.property('predefined')
+          .that.is.false;
       });
 
     it('should add filters array to new segment',
