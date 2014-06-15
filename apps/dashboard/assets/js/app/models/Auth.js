@@ -38,11 +38,14 @@ angular.module('models.auth', ['services'])
 
               if (AppService.getLoggedInApps()
                 .length > 0) {
-                console.log(
-                  "AppService data Auth.js",
-                  AppService.getLoggedInApps());
-                $location.path('/apps/' + AppService.getLoggedInApps()[0]
-                  ._id + '/users/list');
+                console.log("AppService data Auth.js", AppService.getLoggedInApps());
+                if (AppService.getLoggedInApps()[0].isActive) {
+                  $location.path('/apps/' + AppService.getLoggedInApps()[
+                    0]._id + '/users/list');
+                } else {
+                  $location.path('/apps/' + AppService.getLoggedInApps()[
+                    0] + '/addcode');
+                }
                 AppService.setCurrentApp(AppService.getLoggedInApps()[0]);
               } else {
                 $state.go('onboarding');
