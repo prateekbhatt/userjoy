@@ -60,16 +60,17 @@
                 <div class="panel panel-default" style="height: 250px;">
                     <div class="panel-body">
                         <div class="col-md-6">
-                            <p> Pulse: {{user.healthScore}}/100</p>
+                            <p ng-repeat="firstList in userDataFirstList"><b>{{firstList.data}}</b>: {{firstList.value}}</p>
+                            <!-- <p> Pulse: {{user.healthScore}}/100</p>
                             <p> Plan: {{user.plan}}</p>
                             <p> Plan Value: {{user.currency}} {{user.planValue}}</p>
-                            <p> First Seen: {{user.firstSeen}}</p>
+                            <p> First Seen: {{user.firstSeen}}</p> -->
                         </div>
                         <div class="col-md-6">
-                            <p> Last Seen: {{user.lastSeen}}</p>
-                            <p> Country: {{country}}</p>
+                            <p ng-repeat="secondList in userDataSecondList"> <b>{{secondList.data}}</b>: {{secondList.value}}</p>
+                            <!-- <p> Country: {{country}}</p>
                             <p> Platform: {{os}}</p>
-                            <p> Browser: {{browser}}</p>
+                            <p> Browser: {{browser}}</p> -->
                         </div>
                         <!-- <p> Renewal: {{renewal}}</p> -->
                     </div>
