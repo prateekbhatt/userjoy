@@ -223,7 +223,8 @@ var companies = {
 
   first: {
     aid: null,
-    company_id: ObjectId()
+    company_id: ObjectId(),
+    name: 'MyFirstCompany'
   }
 };
 

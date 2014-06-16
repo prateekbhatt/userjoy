@@ -16,6 +16,10 @@ describe('Model Segment', function () {
   var savedSegment;
 
 
+  before(function (done) {
+    setupTestDb(done);
+  });
+
 
   describe('#create', function () {
 
@@ -155,7 +159,8 @@ describe('Model Segment', function () {
             .to.eql(1);
 
           expect(err.errors['filters.0.type'].message)
-            .to.eql("Event type must be one of 'auto/form/link/page/track'");
+            .to.eql(
+              "Event type must be one of 'auto/form/link/page/track'");
 
           expect(seg)
             .not.to.exist;
@@ -375,6 +380,15 @@ describe('Model Segment', function () {
           .to.have.property('ut');
       });
 
+
+
+    it('should add predefined status to false',
+      function () {
+        expect(savedSegment)
+          .to.have.property('predefined')
+          .that.is.false;
+      });
+
     it('should add filters array to new segment',
       function () {
 
@@ -492,6 +506,218 @@ describe('Model Segment', function () {
           done();
         });
       });
+
+
+    it(
+      'should return error if for predefined health segment, health is not one of good/average/poor',
+      function (done) {
+
+        var newSegment = {
+          aid: randomId,
+          creator: randomId,
+          health: 'randomHealthValShouldReturnError',
+          list: 'users',
+          name: 'New Segment',
+          op: 'and',
+          predefined: true,
+          fromAgo: 3,
+          toAgo: 1,
+          filters: [
+
+            {
+              method: 'hasdone',
+              type: 'track',
+              name: 'Create Notification'
+            }
+
+          ]
+        };
+
+        Segment.create(newSegment, function (err, seg) {
+
+          expect(err)
+            .to.exist;
+
+          expect(seg)
+            .to.not.exist;
+
+          expect(err.errors)
+            .to.have.property('health')
+            .that.is.an('object')
+            .and.has.property('message')
+            .that.is.a('string')
+            .that.eqls(
+              'Health status must be one of \'good\', \'average\' or \'poor\''
+          );
+
+          done();
+        });
+
+      });
+
+
+
+    it('should create predefined health segment', function (done) {
+
+      var newSegment = {
+        aid: randomId,
+        creator: randomId,
+        health: 'good',
+        list: 'users',
+        name: 'New Segment',
+        op: 'and',
+        predefined: true,
+        fromAgo: 3,
+        toAgo: 1,
+        filters: [
+
+          {
+            method: 'hasdone',
+            type: 'track',
+            name: 'Create Notification'
+          }
+
+        ]
+      };
+
+      Segment.create(newSegment, function (err, seg) {
+
+        expect(err)
+          .to.not.exist;
+
+        expect(seg)
+          .to.be.an('object');
+
+        expect(seg.fromAgo)
+          .to.eql(newSegment.fromAgo);
+
+        expect(seg.toAgo)
+          .to.eql(newSegment.toAgo);
+
+        expect(seg)
+          .to.have.property('predefined')
+          .that.is.a('boolean')
+          .and.is.true;
+
+        expect(seg)
+          .to.have.property('health')
+          .that.is.a('string')
+          .and.eqls('good');
+
+        done();
+      });
+
+    });
+
+
+  });
+
+
+  describe('#createPredefined', function () {
+
+    var app;
+    var aid;
+    var adminUid;
+
+    before(function () {
+      app = saved.apps.first;
+      aid = app._id;
+      adminUid = app.team[0].accid;
+    });
+
+    it('should create predefined segments', function (done) {
+
+      Segment.createPredefined(aid, adminUid,
+        function (err, good, average, poor) {
+
+          expect(err)
+            .to.not.exist;
+
+          good = good.toJSON();
+          average = average.toJSON();
+          poor = poor.toJSON();
+
+          expect(good)
+            .to.have.property('filters')
+            .that.is.an('array')
+            .and.deep.equals([{
+              method: 'attr',
+              name: 'score',
+              op: 'gt',
+              val: 67
+            }]);
+
+
+
+          expect(average)
+            .to.have.property('filters')
+            .that.is.an('array')
+            .and.deep.equals([{
+              method: 'attr',
+              name: 'score',
+              op: 'gt',
+              val: 33
+            }, {
+              method: 'attr',
+              name: 'score',
+              op: 'lt',
+              val: 68
+            }]);
+
+
+          expect(poor)
+            .to.have.property('filters')
+            .that.is.an('array')
+            .and.deep.equals([{
+              method: 'attr',
+              name: 'score',
+              op: 'lt',
+              val: 34
+            }]);
+
+
+          var hmap = {
+            'good': good,
+            'average': average,
+            'poor': poor
+          };
+
+
+          function capitaliseFirstLetter(string) {
+            return string.charAt(0)
+              .toUpperCase() + string.slice(1);
+          }
+
+
+          _.each(['good', 'average', 'poor'], function (h) {
+
+            var type = hmap[h];
+
+            expect(type)
+              .to.have.property('health')
+              .that.is.a('string')
+              .and.eqls(h);
+
+            expect(type)
+              .to.have.property('predefined')
+              .that.is.a('boolean')
+              .and.eqls(true);
+
+            expect(type.aid.toString())
+              .to.eql(aid.toString());
+
+            expect(type)
+              .to.have.property('name')
+              .that.is.a('string')
+              .and.eqls(capitaliseFirstLetter(h) + ' Health');
+
+          });
+
+
+          done();
+        })
+
+    });
 
   });
 
