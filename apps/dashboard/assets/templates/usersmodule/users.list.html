@@ -56,8 +56,8 @@
                                                         <li ng-repeat="attribute in attributes" ><a style="cursor: default;" ng-click="changeFilterAttribute($parent.$index, $index, $event)">{{attribute.name}}</a></li>
                                                     </ul>
                                                 </div>
-                                                <div ng-if="filter.checkMethod && !showDatePicker && !showOtherAttributesQuery && 
-                                                !showScore && !showHealthStatus && !showPayingStatus" style="float: left; padding-left: 24px;">
+                                                <div ng-if="filter.checkMethod && !filter.showDatePicker && !filter.showOtherAttributesQuery && 
+                                                !filter.showScore && !filter.showHealthStatus && !filter.showPayingStatus" style="float: left; padding-left: 24px;">
                                                     <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto">
                                                         <li ng-repeat="query in selectedqueries">
@@ -66,7 +66,7 @@
                                                         </li>
                                                     </ul>
                                                 </div>
-                                                <div ng-if="filter.checkMethod && showOtherAttributesQuery" style="float: left; padding-left: 24px;">
+                                                <div ng-if="filter.checkMethod && filter.showOtherAttributesQuery" style="float: left; padding-left: 24px;">
                                                     <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto">
                                                         <li ng-repeat="query in otherAttributesQuery">
@@ -84,7 +84,7 @@
                                                         </li>
                                                     </ul>
                                                 </div>
-                                                <div ng-if="filter.checkMethod && showDatePicker" style="float:left; padding-left: 24px;">
+                                                <div ng-if="filter.checkMethod && filter.showDatePicker" style="float:left; padding-left: 24px;">
                                                     <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto; margin-top: -10px;">
                                                         <li ng-repeat="query in datePickerQueries">
@@ -93,10 +93,10 @@
                                                         </li>
                                                     </ul>
                                                 </div>
-                                                <div ng-if="filter.checkMethod && (showHealthStatus || showPayingStatus)" style="float:left; padding-left: 24px;">
+                                                <div ng-if="filter.checkMethod && (filter.showHealthStatus || filter.showPayingStatus)" style="float:left; padding-left: 24px;">
                                                     <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span></button>
                                                 </div>
-                                                <div ng-if="filter.checkMethod && showScore" style="float:left; padding-left: 24px;">
+                                                <div ng-if="filter.checkMethod && filter.showScore" style="float:left; padding-left: 24px;">
                                                     <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto;">
                                                         <li ng-repeat="query in scoreQueries">
@@ -108,10 +108,10 @@
                                                 <div ng-if="filter.checkMethod && filter.isEvent" style="float: left; padding-left: 24px;">
                                                     <input type="text" placeholder="Value" ng-model="filter.val" ng-class="{'form-control': true, 'error': filter.val.length == 0 && usersListForm.$dirty}" style="width: 70px;">
                                                 </div>
-                                                <div ng-if="filter.checkMethod && !filter.isEvent && !showDatePicker && !showHealthStatus && !showPayingStatus" style="float: left; padding-left: 24px;">
+                                                <div ng-if="filter.checkMethod && !filter.isEvent && !filter.showDatePicker && !filter.showHealthStatus && !filter.showPayingStatus" style="float: left; padding-left: 24px;">
                                                     <input type="text" placeholder="Value" ng-model="filter.val" ng-class="{'form-control': true, 'error': filter.val.length == 0 && usersListForm.$dirty}">
                                                 </div>
-                                                <div ng-if="filter.checkMethod && !filter.isEvent && showDatePicker" style="float: left; padding-left: 24px;">
+                                                <div ng-if="filter.checkMethod && !filter.isEvent && filter.showDatePicker" style="float: left; padding-left: 24px;">
                                                     <p class="input-group" style="width: 200px;">
                                                     <input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="filter.val" is-open="opened" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" show-weeks="false" max="maxDate" show-button-bar="false"/>
                                                     <span class="input-group-btn">
@@ -119,7 +119,7 @@
                                                     </span>
                                                     </p>
                                                 </div>
-                                                <div ng-if="filter.checkMethod && !filter.isEvent && showHealthStatus" style="float: left; padding-left: 24px;" ng-show="$first">
+                                                <div ng-if="filter.checkMethod && !filter.isEvent && filter.showHealthStatus" style="float: left; padding-left: 24px;" ng-show="$first">
                                                     <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.valuetext}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto">
                                                         <li ng-repeat="healthStatus in healthStatusValuesname">
@@ -128,7 +128,7 @@
                                                         </li>
                                                     </ul>
                                                 </div>
-                                                <div ng-if="filter.checkMethod && !filter.isEvent && showPayingStatus" style="float: left; padding-left: 24px;" ng-show="$first">
+                                                <div ng-if="filter.checkMethod && !filter.isEvent && filter.showPayingStatus" style="float: left; padding-left: 24px;" ng-show="$first">
                                                     <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.valuetext}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto">
                                                         <li ng-repeat="payingStatus in payingStatusValues">
