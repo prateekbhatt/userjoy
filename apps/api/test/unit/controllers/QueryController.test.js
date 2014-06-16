@@ -320,13 +320,11 @@ describe('Resource /query', function () {
 
 
             expect(res.body.userAttributes)
-              .to.contain("user_id");
-            expect(res.body.userAttributes)
-              .to.contain("email");
-            expect(res.body.userAttributes)
-              .to.contain("joined");
-            expect(res.body.userAttributes)
-              .to.contain("country");
+              .to.be.an('array')
+              .that.deep.equals(['user_id', 'email',
+                'country', 'joined', 'health', 'score'
+              ]);
+
           })
           .end(done);
 
