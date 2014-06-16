@@ -167,47 +167,122 @@ router
 
     var aid = req.app._id;
     var filter = req.query.filter || 'open';
+    var health = req.query.health || null;
 
-    var condition = {
+    // match conversation by filter condition
+    var convMatch = {
       aid: aid
     };
 
+
+
+
+    // filter convMatch
     switch (filter) {
 
     case 'open':
-      condition.closed = false;
+      convMatch.closed = false;
       break;
 
     case 'closed':
-      condition.closed = true;
+      convMatch.closed = true;
       break;
 
     case 'unread':
-      condition.toRead = true;
+      convMatch.toRead = true;
       break;
 
     default:
       // show open conversations by default
-      condition.closed = false;
+      convMatch.closed = false;
     }
+
 
     logger.debug({
       at: 'GET /conversations',
-      condition: condition,
-      filter: filter
+      convMatch: convMatch,
+      filter: filter,
+      health: health
     });
 
-    Conversation
-      .find(condition)
-      .populate('assignee', 'name email')
-      .populate('uid', 'email')
-      .sort({
-        ct: -1
-      })
-      .exec(function (err, conversations) {
+
+    async.waterfall(
+
+      [
+
+        function findConversations(cb) {
+
+          Conversation
+            .find(convMatch)
+            .populate('assignee', 'name email')
+            .populate('uid', 'email')
+            .sort({
+              ct: -1
+            })
+            .lean()
+            .exec(cb);
+
+        },
+
+
+        // if health filter also there, then run the userMatch
+        function filterByHealth(cons, cb) {
+
+          // if no health filter, move on
+          if (!health) return cb(null, cons);
+
+
+          // find unique user ids from all conversations
+          var uids = _.chain(cons)
+            .map(function (c) {
+              return c.uid._id;
+            })
+            .uniq()
+            .value();
+
+
+          User
+            .find({
+              _id: {
+                $in: uids
+              },
+              aid: aid,
+              health: health
+            })
+            .select('_id')
+            .lean()
+            .exec(function (err, usrs) {
+
+              if (err) return cb(err);
+
+              // pluck out the _id vals and convert them to strings
+              var selectUids = _.chain(usrs)
+                .pluck('_id')
+                .map(function (id) {
+                  return id.toString();
+                })
+                .value();
+
+              var filteredCons = _.filter(cons, function (c) {
+                return _.contains(selectUids, c.uid._id.toString());
+              });
+
+              cb(null, filteredCons);
+
+            });
+
+        }
+
+      ],
+
+
+      function callback(err, conversations) {
         if (err) return next(err);
         res.json(conversations || []);
-      });
+      }
+    )
+
+
 
   });
 

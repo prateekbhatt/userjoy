@@ -17,6 +17,37 @@ describe('Model Company', function () {
 
 
   describe('#create', function () {
+
+    it('should return error if aid/company_id/name not present',
+      function (done) {
+        var newCompany = {};
+
+        Company.create(newCompany, function (err, com) {
+
+          expect(err)
+            .to.exist;
+
+          expect(Object.keys(err.errors))
+            .to.have.length(3);
+
+          expect(com)
+            .to.not.exist;
+
+          expect(err.errors.name.message)
+            .to.eql('INVALID_COMPANY_NAME');
+
+          expect(err.errors.company_id.message)
+            .to.eql('Invalid company id');
+
+          expect(err.errors.aid.message)
+            .to.eql('Path `aid` is required.');
+
+          done();
+        });
+
+      });
+
+
     it('should create company', function (done) {
 
       var newCompany = {
@@ -130,8 +161,7 @@ describe('Model Company', function () {
       done();
     });
 
-    it(
-      'should return error if company_id is missing from company',
+    it('should return error if company_id is missing from company',
       function (done) {
 
         var testCompany = {
@@ -143,6 +173,26 @@ describe('Model Company', function () {
             .to.exist;
           expect(err.message)
             .to.eql('NO_COMPANY_ID');
+          done();
+        });
+      });
+
+
+
+    it(
+      'should return error if name is missing from company, company_id is present',
+      function (done) {
+
+        var testCompany = {
+          status: 'trial',
+          company_id: randomId
+        };
+
+        Company.findOrCreate(randomId, testCompany, function (err, com) {
+          expect(err)
+            .to.exist;
+          expect(err.message)
+            .to.eql('INVALID_COMPANY_NAME');
           done();
         });
       });

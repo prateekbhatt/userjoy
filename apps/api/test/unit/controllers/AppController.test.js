@@ -12,6 +12,7 @@ describe('Resource /apps', function () {
    */
 
   var App = require('../../../api/models/App');
+  var Segment = require('../../../api/models/Segment');
 
 
   var randomId = mongoose.Types.ObjectId;
@@ -568,6 +569,28 @@ describe('Resource /apps', function () {
               cb();
             })
 
+          },
+
+
+          function shouldHaveCreatedPredefinedSegments(cb) {
+            Segment.find({
+              aid: aid
+            })
+              .exec(function (err, segs) {
+
+                expect(err)
+                  .to.not.exist;
+
+                var preSegs = _.filter(segs, {
+                  predefined: true
+                });
+
+                // expecting three health filters
+                expect(preSegs.length)
+                  .to.eql(3);
+
+                cb();
+              })
           }
 
 

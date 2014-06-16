@@ -25,7 +25,8 @@ var randomId = mongoose.Types.ObjectId;
  * allowed billing status values
  */
 
-var statuses = ['trial', 'free', 'paying', 'cancelled'];
+var billingStatuses = ['trial', 'free', 'paying', 'cancelled'];
+var healthStatuses = ['good', 'average', 'poor'];
 
 
 /**
@@ -77,27 +78,24 @@ function genFakeUser(aid) {
 
     lastSessionAt: faker.Date.recent(10),
 
-    healthScore: faker.Helpers.randomNumber(100),
+    score: faker.Helpers.randomNumber(100),
 
-    // billing data is stored in both company and user models
-    billing: {
-      status: randomFromArray(statuses),
+    // billing status
+    status: randomFromArray(billingStatuses),
 
-      plan: randomFromArray(plans),
+    // health status
+    health: randomFromArray(healthStatuses),
 
-      currency: 'USD',
+    plan: randomFromArray(plans),
 
-      amount: faker.Helpers.randomNumber(1000)
-    },
+    revenue: faker.Helpers.randomNumber(1000),
 
     companies: [],
 
-    meta: [
-      {
-        k: 'name',
-        v: faker.Name.firstName() + ' ' + faker.Name.lastName()
-      }
-    ]
+    meta: [{
+      k: 'name',
+      v: faker.Name.firstName() + ' ' + faker.Name.lastName()
+    }]
 
   };
 
@@ -154,7 +152,7 @@ module.exports = function (aid, no, cb) {
     function (err) {
 
       if (cb) return cb(err, uids);
-      process.exit(!!err);
+      process.exit( !! err);
     }
   );
 };

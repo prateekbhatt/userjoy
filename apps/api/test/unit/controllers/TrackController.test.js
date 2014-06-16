@@ -340,6 +340,7 @@ describe('Resource /track', function () {
   describe('GET /track/company', function () {
 
     var url;
+    var uid;
 
     before(function (done) {
       logoutUser(done);
@@ -347,6 +348,7 @@ describe('Resource /track', function () {
 
     beforeEach(function () {
       url = '/track/company';
+      uid = saved.users.first._id.toString();
     });
 
     it('should return error if there is no app_id', function (done) {
@@ -362,11 +364,35 @@ describe('Resource /track', function () {
         .end(done);
     });
 
-    it('should return error if there is no company object',
+
+    it('should return error if there is no uid',
       function (done) {
 
         var query = qs.stringify({
           app_id: appId
+        });
+
+        var testUrl = url + '?' + query;
+
+        request
+          .get(testUrl)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            status: 400,
+            error: 'Please send uid with the params'
+          })
+          .end(done);
+
+      });
+
+
+    it('should return error if there is no company object',
+      function (done) {
+
+        var query = qs.stringify({
+          app_id: appId,
+          u: uid
         });
 
         var testUrl = url + '?' + query;
@@ -388,6 +414,7 @@ describe('Resource /track', function () {
 
         var query = qs.stringify({
           app_id: appId,
+          u: uid,
           company: {
             name: 'Prate'
           }
@@ -407,12 +434,41 @@ describe('Resource /track', function () {
 
       });
 
-    it('should create company if user does not exist', function (done) {
+
+    it(
+      'should return error if company name not provided and company does not exist',
+      function (done) {
+
+        var query = qs.stringify({
+          app_id: appId.toString(),
+          u: uid,
+          company: {
+            company_id: 'randomUserTrackController@example.com'
+          }
+        });
+
+        var testUrl = url + '?' + query;
+
+        request
+          .get(testUrl)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            error: 'Please send company name',
+            status: 400
+          })
+          .end(done);
+
+      });
+
+    it('should create company if company does not exist', function (done) {
 
       var query = qs.stringify({
         app_id: appId.toString(),
+        u: uid,
         company: {
-          company_id: 'randomUserTrackController@example.com'
+          company_id: 'randomUserTrackController@example.com',
+          name: 'WOWCOMPANY'
         }
       });
 
@@ -425,8 +481,6 @@ describe('Resource /track', function () {
         .end(function (err, res) {
           if (err) return done(err);
 
-
-          console.log('randOMMMM', res.body, testUrl);
           expect(res.body)
             .to.have.property("aid");
 
@@ -445,8 +499,10 @@ describe('Resource /track', function () {
 
       var query = qs.stringify({
         app_id: appId.toString(),
+        u: uid,
         company: {
-          company_id: existingCom.company_id
+          company_id: existingCom.company_id,
+          name: 'NEWCOMPANYONCE AGAIN'
         }
       });
 

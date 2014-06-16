@@ -299,6 +299,29 @@ describe('Resource /apps/:aid/conversations', function () {
 
       });
 
+
+    // FIXME: only testing for average health case users are of average health
+    // by default
+    it('should return all average health cons if query "?health=average"',
+      function (done) {
+
+        request
+          .get(basePath + '?health=average')
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(function (res) {
+
+            expect(res.body)
+              .to.be.an("array");
+
+            expect(res.body)
+              .to.not.be.empty;
+
+          })
+          .end(done);
+
+      });
+
   });
 
 

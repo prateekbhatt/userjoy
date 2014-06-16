@@ -30,7 +30,6 @@ This app contains an expressjs api which exposes a rest interface for the db.
 | sname | sender name (message) |
 | sub   | email subject         |
 | t     | type (event)          |
-| tId   | templateId            |
 | uid   | user id               |
 | ut    | updated at timestamp  |
 
@@ -103,7 +102,6 @@ Event         | meta (metadata)         | events belonging to a user
 Invite        |                         | tokens of team members that have been invited to use an app
 Notification  |                         | notifications to be shown to the user (only auto)
 Segment       | filters                 | all the segments defined for an app
-Trigger       |                         | triggers for sending auto emails / notifications
 User          | companies               | users of a specific app. create a new user for every new unique identifier for an app
 UserNote      |                         | notes created by team members about a specific user
 
@@ -160,15 +158,16 @@ UserNote      |                         | notes created by team members about a 
 - unsubscribedThrough (messageId, subject)
 - ct
 - ut
+- health (latest health status of the user, defaults to average for new user)
 - joined (when did the user join the service)
 - plan
 - revenue
+- score (latest engagement score of user, defaults to 50 for new user)
 - status
 - totalSessions
 - lastContactedAt
 - lastSessionAt
 - lastHeardAt
-- healthScore (latest value from User Health)
 - ip
 - x tags [] Stores tags for categorizing users
 - companies [{cid, companyName, billing{}, healthScore, totalSessions}]
@@ -235,8 +234,8 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 ##### Columns:
 
 - aid
-- company_id (similar to user_id)
-- name
+- company_id (required, similar to user_id)
+- name (required)
 - totalSessions
 - x meta (object containing additonal info about users)
 - ct (should be passed by js snippet)
@@ -262,9 +261,11 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
  - ct
  - filters (embedded documents)
  - fromAgo (optional, number of days since when count queries should be run)
+ - health (good/average/bad, for predefined health segments)
  - list (to unix timestamp for count queries)
  - name
  - op
+ - predefined (boolean, true if defined at the start of the app)
  - toAgo (optional, number of days till when count queries should be run)
  - ut
 
@@ -349,7 +350,6 @@ as meta properties)
 - closed (boolean)
 - ct
 - sub
-- x tId
 - toRead (boolean)
 - uid
 - ut
@@ -377,20 +377,6 @@ as meta properties)
 > ##### Notes:
 >
 > - accid is required only when the message is created by an account. If a user has sent the message, then it is not required for the message to have an accid
-
-
-
-### Triggers
-
-##### Columns:
-
-- active (boolean)
-- aid
-- creator (accid)
-- ct
-- sid
-- tId
-- ut
 
 
 ### Invite
