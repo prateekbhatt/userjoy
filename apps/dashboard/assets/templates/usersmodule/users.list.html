@@ -32,7 +32,6 @@
                                             <div>
                                                 <div style="padding-left: 24px; float: left;">
                                                     <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.btntext}}</span>&nbsp;<span class="caret"></span></button>
-                                                    <!-- <button type="button" ng-class="{'btn': true, 'btn-default': true, 'dropdown-toggle': true, 'form-control': true, 'selectwidthauto': true}" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.btntext}}</span>&nbsp;<span class="caret"></span></button> -->
                                                     <ul class="select dropdown-menu" role="select" style="left: auto;">
                                                         <li class="dropdown dropdown-submenu">
                                                             <a style="cursor: default">Has done</a>
@@ -57,7 +56,8 @@
                                                         <li ng-repeat="attribute in attributes" ><a style="cursor: default;" ng-click="changeFilterAttribute($parent.$index, $index, $event)">{{attribute.name}}</a></li>
                                                     </ul>
                                                 </div>
-                                                <div ng-if="filter.checkMethod && !showDatePicker && !showOtherAttributesQuery" style="float: left; padding-left: 24px;">
+                                                <div ng-if="filter.checkMethod && !filter.showDatePicker && !filter.showOtherAttributesQuery && 
+                                                !filter.showScore && !filter.showHealthStatus && !filter.showPayingStatus" style="float: left; padding-left: 24px;">
                                                     <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto">
                                                         <li ng-repeat="query in selectedqueries">
@@ -66,7 +66,7 @@
                                                         </li>
                                                     </ul>
                                                 </div>
-                                                <div ng-if="filter.checkMethod && !showDatePicker && showOtherAttributesQuery" style="float: left; padding-left: 24px;">
+                                                <div ng-if="filter.checkMethod && filter.showOtherAttributesQuery" style="float: left; padding-left: 24px;">
                                                     <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto">
                                                         <li ng-repeat="query in otherAttributesQuery">
@@ -84,7 +84,7 @@
                                                         </li>
                                                     </ul>
                                                 </div>
-                                                <div ng-if="filter.checkMethod && showDatePicker" style="float:left; padding-left: 24px;">
+                                                <div ng-if="filter.checkMethod && filter.showDatePicker" style="float:left; padding-left: 24px;">
                                                     <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto; margin-top: -10px;">
                                                         <li ng-repeat="query in datePickerQueries">
@@ -93,19 +93,49 @@
                                                         </li>
                                                     </ul>
                                                 </div>
+                                                <div ng-if="filter.checkMethod && (filter.showHealthStatus || filter.showPayingStatus)" style="float:left; padding-left: 24px;">
+                                                    <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span></button>
+                                                </div>
+                                                <div ng-if="filter.checkMethod && filter.showScore" style="float:left; padding-left: 24px;">
+                                                    <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
+                                                    <ul class="select dropdown-menu" role="select" style="left: auto;">
+                                                        <li ng-repeat="query in scoreQueries">
+                                                            <a style="cursor: default;" ng-click="chngScoreQuery($parent.$index, $index)">{{query.name}}
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                                 <div ng-if="filter.checkMethod && filter.isEvent" style="float: left; padding-left: 24px;">
                                                     <input type="text" placeholder="Value" ng-model="filter.val" ng-class="{'form-control': true, 'error': filter.val.length == 0 && usersListForm.$dirty}" style="width: 70px;">
                                                 </div>
-                                                <div ng-if="filter.checkMethod && !filter.isEvent && !showDatePicker" style="float: left; padding-left: 24px;">
+                                                <div ng-if="filter.checkMethod && !filter.isEvent && !filter.showDatePicker && !filter.showHealthStatus && !filter.showPayingStatus" style="float: left; padding-left: 24px;">
                                                     <input type="text" placeholder="Value" ng-model="filter.val" ng-class="{'form-control': true, 'error': filter.val.length == 0 && usersListForm.$dirty}">
                                                 </div>
-                                                <div ng-if="filter.checkMethod && !filter.isEvent && showDatePicker" style="float: left; padding-left: 24px;">
+                                                <div ng-if="filter.checkMethod && !filter.isEvent && filter.showDatePicker" style="float: left; padding-left: 24px;">
                                                     <p class="input-group" style="width: 200px;">
                                                     <input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="filter.val" is-open="opened" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" show-weeks="false" max="maxDate" show-button-bar="false"/>
                                                     <span class="input-group-btn">
                                                     <button type="button" class="btn btn-default" ng-click="openDatePicker($event)"><i class="fa fa-calendar"></i></button>
                                                     </span>
                                                     </p>
+                                                </div>
+                                                <div ng-if="filter.checkMethod && !filter.isEvent && filter.showHealthStatus" style="float: left; padding-left: 24px;" ng-show="$first">
+                                                    <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.valuetext}}</span>&nbsp;<span class="caret"></span></button>
+                                                    <ul class="select dropdown-menu" role="select" style="left: auto">
+                                                        <li ng-repeat="healthStatus in healthStatusValuesname">
+                                                            <a style="cursor: default;" ng-click="chngHealthStatus($parent.$index, $index)">{{healthStatus.name}}
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div ng-if="filter.checkMethod && !filter.isEvent && filter.showPayingStatus" style="float: left; padding-left: 24px;" ng-show="$first">
+                                                    <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.valuetext}}</span>&nbsp;<span class="caret"></span></button>
+                                                    <ul class="select dropdown-menu" role="select" style="left: auto">
+                                                        <li ng-repeat="payingStatus in payingStatusValues">
+                                                            <a style="cursor: default;" ng-click="chngPayingStatus($parent.$index, $index)">{{healthStatus.name}}
+                                                            </a>
+                                                        </li>
+                                                    </ul>
                                                 </div>
                                                 <div ng-if="filter.isEvent" style="float: left; padding-left: 24px;" ng-show="$first">
                                                     <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.timeRange}}</span>&nbsp;<span class="caret"></span></button>
@@ -199,21 +229,7 @@
                                 <a style="padding: 10px 15px; display: inline-block; cursor: pointer" ng-click="showQuery(segname.id, $index, segname)">{{segname.name}}</a>
                                 <a class="btn btn-sm btn-default pull-right" href="/apps/{{currApp}}/messages/automate/segments/{{segname.id}}/write" style="margin-top: 5px;" ng-show="showAutoMsgBtn">AutoMessage</a>
                             </li>
-                            <!-- <div class="row" ng-repeat="segname in segmentsCreatedName">
-                                                                                                <div class="col-md-6" ng-click="showQuery(segname.id, $index, segname)" >
-                                                                                                            <li style="cursor: pointer; padding-bottom: 2px;" class="list-group-item"  ng-class="{'active': $index === selectedIndex}">
-                                                                                                                        <div class="btn-group">
-                                                                                                                                <a type="button" class="btn btn-default">{{segname.name}}</a>
-                                                                                                                                <a type="button" class="btn btn-default">Auto Message</a>
-                                                                                                                        </div>
-                                                                                                                        <span style="padding: 10px 15px; display: inline-block;">{{segname.name}}</span>
-                                                                                                            </li>
-                                                                                                </div>
-                                                                                                <div class="col-md-6">
-                                                                                                            <a class="btn btn-default pull-right" href="/apps/{{currApp}}/messages/automate/segments/{{segname.id}}/write" ng-show="showAutoMsgBtn">AutoMessage</a>
-                                                                                                </div>
-                                                                                    </div>
-                        -->                        </ul>
+                        </ul>
                     </div>
                     <!-- <a class="btn btn-info btn-block" ng-show="showAutoMsgBtn" href="/apps/{{currApp}}/messages/automate/segments/{{sid}}/write" style="margin-top: 5px;">Auto Message</a> -->
                 </div>
