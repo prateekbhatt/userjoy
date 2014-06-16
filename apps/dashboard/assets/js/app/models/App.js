@@ -111,5 +111,17 @@ angular
           })
           .error(cb);
       }
+
+      this.sendCodeToDeveloper = function (appId, email, cb) {
+        var data = {
+          email: email
+        }
+        $http.post(config.apiUrl + '/apps/' + appId + '/send-code-to-developer', data)
+          .success(function (data) {
+            console.log("success sending code to developer");
+            cb();
+          })
+          .error(cb);
+      }
     }
   ])

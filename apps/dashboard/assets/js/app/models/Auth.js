@@ -44,7 +44,7 @@ angular.module('models.auth', ['services'])
                     0]._id + '/users/list');
                 } else {
                   $location.path('/apps/' + AppService.getLoggedInApps()[
-                    0] + '/addcode');
+                    0]._id + '/addcode');
                 }
                 AppService.setCurrentApp(AppService.getLoggedInApps()[0]);
               } else {

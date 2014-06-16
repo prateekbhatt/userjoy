@@ -23,6 +23,16 @@ angular.module('do.install', [])
         },
         authenticate: true
       })
+      .state('sendemail', {
+        url: '/apps/:id/sendemail',
+        views: {
+          "main": {
+            templateUrl: '/templates/onboardingAppmodule/installation.sendemail.html',
+            controller: 'installSendEmailAppCtrl'
+          }
+        },
+        authenticate: true
+      })
 
   }
 ])
@@ -92,7 +102,7 @@ angular.module('do.install', [])
           }
         }
 
-        $scope.selectText = function(containerid) {
+        $scope.selectText = function (containerid) {
           if (document.selection) {
             var range = document.body.createTextRange();
             range.moveToElementText(document.getElementById(containerid));
@@ -105,6 +115,10 @@ angular.module('do.install', [])
           }
         }
 
+        $scope.sendToDeveloper = function () {
+          $location.path('/apps/' + $scope.appId + '/sendemail');
+        }
+
         console.log("$scope.appId ---->>>>>", $scope.appId);
         $scope.startTracking = function () {
           AppModel.checkIfActive($scope.appId, callback);
@@ -115,5 +129,24 @@ angular.module('do.install', [])
         }
 
       })
+  }
+])
+
+.controller('installSendEmailAppCtrl', ['$scope', '$stateParams', 'AppModel',
+  'AccountService',
+  function ($scope, $stateParams, AppModel, AccountService) {
+    console.log("inside send email ctrl");
+    $scope.appId = $stateParams.id;
+    $scope.accountEmail = AccountService.get().email;
+    $scope.accountname = AccountService.get().name;
+    var callback = function (err) {
+      if(err) {
+        return;
+      }
+      $location.path('/apps/' + $scope.appId + '/addcode');
+    }
+    $scope.sendEmail = function () {
+      AppModel.sendCodeToDeveloper($scope.appId, $scope.toEmail, callback);
+    }
   }
 ])

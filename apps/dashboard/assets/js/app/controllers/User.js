@@ -503,9 +503,9 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
-              $scope.filters[parentindex].optext = 'greater than';
+              $scope.filters[parentindex].optext = 'less than';
               $scope.filters[parentindex].val = $moment(new Date()).unix()*1000;
-              $scope.filters[parentindex].op = 'gt';
+              $scope.filters[parentindex].op = 'lt';
               console.log("$scope.filters error attributes: ", $scope.filters);
             } else {
               $scope.showOtherAttributesQuery = true;
@@ -658,11 +658,11 @@ angular.module('do.users', [])
           };
 
           $scope.datePickerQueries = [{
-            name: 'greater than',
-            key: 'gt'
-          }, {
             name: 'less than',
             key: 'lt'
+          }, {
+            name: 'greater than',
+            key: 'gt'
           }]
 
           $scope.otherAttributesQuery = [{
