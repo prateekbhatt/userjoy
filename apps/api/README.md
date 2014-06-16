@@ -166,7 +166,7 @@ UserNote      |                         | notes created by team members about a 
 - status
 - totalSessions
 - lastContactedAt
-- lastSessionAt
+- lastSess (timestamp of last session of user)
 - lastHeardAt
 - ip
 - x tags [] Stores tags for categorizing users
