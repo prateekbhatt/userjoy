@@ -22,12 +22,17 @@ var randomId = mongoose.Types.ObjectId;
 
 
 /**
- * allowed billing status values
+ * allowed array values
  */
 
 var billingStatuses = ['trial', 'free', 'paying', 'cancelled'];
+var browsers = ['Firefox 25', 'Firefox 26', 'Firefox 27', 'Chrome 25',
+  'Internet Explorer 9'
+];
 var healthStatuses = ['good', 'average', 'poor'];
-
+var osVals = ["Linux x86_64", 'Windows 8', 'Windows 7', 'Windows XP', 'Unix',
+  'Mac OSX'
+];
 
 /**
  * possible plans
@@ -70,6 +75,8 @@ function genFakeUser(aid) {
 
     aid: aid,
 
+    browser: randomFromArray(browsers),
+
     email: faker.Internet.email(),
 
     totalSessions: faker.Helpers.randomNumber(10000),
@@ -85,6 +92,8 @@ function genFakeUser(aid) {
 
     // health status
     health: randomFromArray(healthStatuses),
+
+    os: randomFromArray(osVals),
 
     plan: randomFromArray(plans),
 

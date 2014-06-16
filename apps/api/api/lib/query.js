@@ -335,7 +335,6 @@ Query.prototype.run = function (cb) {
         }
 
         self.runCountQuery.call(self, function (err, uids) {
-
           if (err) return cb(err);
           self.countFilterUserIds = uids;
           return cb();
@@ -446,32 +445,39 @@ Query.prototype.runAttrQuery = function (cb) {
  */
 
 Query.prototype.genAttrMatchCond = function () {
+
   var cond = {
-    aid: this.aid
+    $and: []
   };
+
+  // add app id condition
+  cond.$and.push({
+    aid: this.aid
+  });
+
 
   _.each(this.attrFilters, function (filter) {
     var operation = filter.op;
+    var filterCond = {};
 
-    if (operation === '$eq') {
+    filterCond[filter.name] = {};
 
-      cond[filter.name] = filter['val'];
+    if (operation === '$contains') {
+
+      // REF: http://stackoverflow.com/a/10616781/1463434
+      filterCond[filter.name]['$regex'] = ".*" + filter['val'] + ".*";
+
+    } else if (operation === '$eq') {
+
+      filterCond[filter.name] = filter['val'];
 
     } else {
+      // if operation is $gt, $lt
 
-      cond[filter.name] = {};
-
-      if (operation === '$contains') {
-
-        // REF: http://stackoverflow.com/a/10616781/1463434
-        cond[filter.name]['$regex'] = ".*" + filter['val'] + ".*";
-
-      } else {
-
-        cond[filter.name][filter.op] = filter['val'];
-      }
-
+      filterCond[filter.name][operation] = filter['val'];
     }
+
+    cond.$and.push(filterCond);
 
   });
 
@@ -482,9 +488,13 @@ Query.prototype.genAttrMatchCond = function () {
   // However, if there are no countFilters defined, then the output of the countQuery
   // does not matter
   if (this.countFilters && this.countFilters.length) {
-    cond['_id'] = {
+    var uidCond = {};
+
+    uidCond['_id'] = {
       '$in': this.countFilterUserIds
     };
+
+    cond.$and.push(uidCond);
   }
 
   return cond;

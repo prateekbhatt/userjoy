@@ -386,41 +386,52 @@ describe('Lib query', function () {
 
     it('should return condition with aid', function () {
 
-      expect(cond.aid)
-        .to.eql('BlaBlaID');
+      expect(cond.$and)
+        .to.be.an('array')
+        .and.to.contain({
+          'aid': 'BlaBlaID'
+        });
     });
 
 
     it('should handle $eq operator', function () {
 
-      expect(cond.platform)
-        .to.eql('Android');
+      expect(cond.$and)
+        .to.contain({
+          'platform': 'Android'
+        })
     });
 
 
     it('should handle $lt operator', function () {
 
-      expect(cond.amount)
-        .to.eql({
-          '$lt': 100
+      expect(cond.$and)
+        .to.contain({
+          'amount': {
+            $lt: 100
+          }
         });
     });
 
 
     it('should handle $gt operator', function () {
 
-      expect(cond.totalEvents)
-        .to.eql({
-          '$gt': 999
+      expect(cond.$and)
+        .to.contain({
+          'totalEvents': {
+            $gt: 999
+          }
         });
     });
 
 
     it('should handle "contains" operator', function () {
 
-      expect(cond.email)
-        .to.eql({
-          '$regex': ".*bhatt.*"
+      expect(cond.$and)
+        .to.contain({
+          'email': {
+            '$regex': ".*bhatt.*"
+          }
         });
     });
 
@@ -442,9 +453,11 @@ describe('Lib query', function () {
 
         cond = Query.prototype.genAttrMatchCond();
 
-        expect(cond._id)
-          .to.eql({
-            '$in': countFilterUserIds
+        expect(cond.$and)
+          .to.contain({
+            '_id': {
+              '$in': countFilterUserIds
+            }
           });
 
       });
