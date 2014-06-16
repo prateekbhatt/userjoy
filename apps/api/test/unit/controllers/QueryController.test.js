@@ -323,7 +323,7 @@ describe('Resource /query', function () {
               .to.be.an('array')
               .that.deep.equals(['user_id', 'email', 'browser',
                 'country', 'health', 'joined', 'lastSess', 'os',
-                'score',
+                'score', 'status'
               ]);
 
           })
