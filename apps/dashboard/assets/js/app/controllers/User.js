@@ -527,11 +527,11 @@ angular.module('do.users', [])
 
             if ($scope.attributes[index].name == 'joined' || $scope.attributes[
               index].name == 'last seen') {
-              $scope.showPayingStatus = false;
-              $scope.showHealthStatus = false;
-              $scope.showDatePicker = true;
-              $scope.showScore = false;
-              $scope.showOtherAttributesQuery = false;
+              $scope.filters[parentindex].showPayingStatus = false;
+              $scope.filters[parentindex].showHealthStatus = false;
+              $scope.filters[parentindex].showDatePicker = true;
+              $scope.filters[parentindex].showScore = false;
+              $scope.filters[parentindex].showOtherAttributesQuery = false;
               console.log("inside joined attribute: ", $scope.showDatePicker);
 
               $scope.filters[parentindex].checkMethod = true;
@@ -549,11 +549,11 @@ angular.module('do.users', [])
               $scope.filters[parentindex].op = 'lt';
               console.log("$scope.filters error attributes: ", $scope.filters);
             } else if ($scope.attributes[index].name == 'score') {
-              $scope.showHealthStatus = false;
-              $scope.showPayingStatus = false;
-              $scope.showScore = true;
-              $scope.showDatePicker = false;
-              $scope.showOtherAttributesQuery = false;
+              $scope.filters[parentindex].showHealthStatus = false;
+              $scope.filters[parentindex].showPayingStatus = false;
+              $scope.filters[parentindex].showScore = true;
+              $scope.filters[parentindex].showDatePicker = false;
+              $scope.filters[parentindex].showOtherAttributesQuery = false;
               $scope.filters[parentindex].checkMethod = true;
               $scope.filters[parentindex].isEvent = false;
               $scope.filters[parentindex].btntext = $scope.attributes[
@@ -585,11 +585,11 @@ angular.module('do.users', [])
               $scope.filters[parentindex].valuetext = 'Free';
 
             } else if ($scope.attributes[index].name == 'health') {
-              $scope.showHealthStatus = true;
-              $scope.showPayingStatus = false;
-              $scope.showScore = false;
-              $scope.showDatePicker = false;
-              $scope.showOtherAttributesQuery = false;
+              $scope.filters[parentindex].showHealthStatus = true;
+              $scope.filters[parentindex].showPayingStatus = false;
+              $scope.filters[parentindex].showScore = false;
+              $scope.filters[parentindex].showDatePicker = false;
+              $scope.filters[parentindex].showOtherAttributesQuery = false;
               $scope.filters[parentindex].checkMethod = true;
               $scope.filters[parentindex].isEvent = false;
               $scope.filters[parentindex].btntext = $scope.attributes[
@@ -624,11 +624,11 @@ angular.module('do.users', [])
 
           $scope.changeFilterHasDone = function (parentindex,
             index, evt) {
-            $scope.showHealthStatus = false;
-            $scope.showPayingStatus = false;
-            $scope.showScore = false;
-            $scope.showDatePicker = false;
-            $scope.showOtherAttributesQuery = false
+            $scope.filters[parentindex].showHealthStatus = false;
+            $scope.filters[parentindex].showPayingStatus = false;
+            $scope.filters[parentindex].showScore = false;
+            $scope.filters[parentindex].showDatePicker = false;
+            $scope.filters[parentindex].showOtherAttributesQuery = false
             $scope.method = 'hasdone';
             $scope.filters[parentindex].checkMethod =
               false;
@@ -651,11 +651,11 @@ angular.module('do.users', [])
           $scope.changeFilterHasNotDone = function (
             parentindex, index,
             evt) {
-            $scope.showHealthStatus = false;
-            $scope.showPayingStatus = false;
-            $scope.showScore = false;
-            $scope.showDatePicker = false;
-            $scope.showOtherAttributesQuery = false
+            $scope.filters[parentindex].showHealthStatus = false;
+            $scope.filters[parentindex].showPayingStatus = false;
+            $scope.filters[parentindex].showScore = false;
+            $scope.filters[parentindex].showDatePicker = false;
+            $scope.filters[parentindex].showOtherAttributesQuery = false
             $scope.method = 'hasnotdone';
             $scope.filters[parentindex].checkMethod =
               false;
@@ -681,11 +681,11 @@ angular.module('do.users', [])
 
           $scope.changeFilterCountOf = function (parentindex,
             index, evt) {
-            $scope.showHealthStatus = false;
-            $scope.showPayingStatus = false;
-            $scope.showScore = false;
-            $scope.showDatePicker = false;
-            $scope.showOtherAttributesQuery = false
+            $scope.filters[parentindex].showHealthStatus = false;
+            $scope.filters[parentindex].showPayingStatus = false;
+            $scope.filters[parentindex].showScore = false;
+            $scope.filters[parentindex].showDatePicker = false;
+            $scope.filters[parentindex].showOtherAttributesQuery = false
             $scope.method = 'count';
             $scope.filters[parentindex].checkMethod = true;
             $scope.filters[parentindex].isEvent = true;
@@ -857,7 +857,12 @@ angular.module('do.users', [])
               op: 'eq',
               optext: 'equal',
               val: '',
-              type: ''
+              type: '',
+              showHealthStatus: false,
+              showPayingStatus: false,
+              showScore: false,
+              showDatePicker: false,
+              showOtherAttributesQuery: false
             });
             console.log("$scope.filters[0]: ", $scope.filters[0]);
             if ($scope.filters.length > 0) {
@@ -1240,6 +1245,7 @@ angular.module('do.users', [])
             console.log("getFilters: ", getFilters);
             for (var i = 0; i < getFilters.length; i++) {
               $scope.filterValueText = '';
+              var filterValueText = '';
               for (var j = 0; j < $scope.healthStatusValuesname.length; j++) {
                 if (getFilters[i].val === $scope.healthStatusValuesname[i]
                   .key) {
@@ -1266,11 +1272,11 @@ angular.module('do.users', [])
                 };
               }
               if (getFilters[i].method == 'hasdone') {
-                $scope.showHealthStatus = false;
-                $scope.showPayingStatus = false;
-                $scope.showScore = false;
-                $scope.showDatePicker = false;
-                $scope.showOtherAttributesQuery = false;
+                showHealthStatus = false;
+                showPayingStatus = false;
+                showScore = false;
+                showDatePicker = false;
+                showOtherAttributesQuery = false;
                 buttonText = "Has Done";
                 btnName = getFilters[i].name;
                 chkMethod = false;
@@ -1279,11 +1285,11 @@ angular.module('do.users', [])
                 timeRangeValue = $scope.fromTimeFrontEndValue;
               }
               if (getFilters[i].method == 'hasnotdone') {
-                $scope.showHealthStatus = false;
-                $scope.showPayingStatus = false;
-                $scope.showScore = false;
-                $scope.showDatePicker = false;
-                $scope.showOtherAttributesQuery = false;
+                showHealthStatus = false;
+                showPayingStatus = false;
+                showScore = false;
+                showDatePicker = false;
+                showOtherAttributesQuery = false;
                 buttonText = "Has not Done";
                 btnName = getFilters[i].name;
                 chkMethod = false;
@@ -1292,11 +1298,11 @@ angular.module('do.users', [])
                 timeRangeValue = $scope.fromTimeFrontEndValue;
               }
               if (getFilters[i].method == 'count') {
-                $scope.showHealthStatus = false;
-                $scope.showPayingStatus = false;
-                $scope.showScore = false;
-                $scope.showDatePicker = false;
-                $scope.showOtherAttributesQuery = false;
+                showHealthStatus = false;
+                showPayingStatus = false;
+                showScore = false;
+                showDatePicker = false;
+                showOtherAttributesQuery = false;
                 buttonText = "Count of " + getFilters[
                   i].name;
                 btnName = getFilters[i].name;
@@ -1307,37 +1313,37 @@ angular.module('do.users', [])
               }
               if (getFilters[i].method == 'attr') {
                 if (getFilters[i].name == 'score') {
-                  $scope.showHealthStatus = false;
-                  $scope.showPayingStatus = false;
-                  $scope.showScore = true;
-                  $scope.showDatePicker = false;
-                  $scope.showOtherAttributesQuery = false;
+                  showHealthStatus = false;
+                  showPayingStatus = false;
+                  showScore = true;
+                  showDatePicker = false;
+                  showOtherAttributesQuery = false;
                 } else if (getFilters[i].name == 'health') {
-                  $scope.showHealthStatus = true;
-                  $scope.showPayingStatus = false;
-                  $scope.showScore = false;
-                  $scope.showDatePicker = false;
-                  $scope.showOtherAttributesQuery = false;
+                  showHealthStatus = true;
+                  showPayingStatus = false;
+                  showScore = false;
+                  showDatePicker = false;
+                  showOtherAttributesQuery = false;
                   filterValueText = $scope.filterValueText;
                 } else if (getFilters[i].name == 'status') {
-                  $scope.showHealthStatus = false;
-                  $scope.showPayingStatus = true;
-                  $scope.showScore = false;
-                  $scope.showDatePicker = false;
-                  $scope.showOtherAttributesQuery = false;
+                  showHealthStatus = false;
+                  showPayingStatus = true;
+                  showScore = false;
+                  showDatePicker = false;
+                  showOtherAttributesQuery = false;
                 } else if (getFilters[i].name == 'joined' || getFilters[i]
                   .name == 'last seen') {
-                  $scope.showHealthStatus = false;
-                  $scope.showPayingStatus = false;
-                  $scope.showScore = false;
-                  $scope.showDatePicker = true;
-                  $scope.showOtherAttributesQuery = false;
+                  showHealthStatus = false;
+                  showPayingStatus = false;
+                  showScore = false;
+                  showDatePicker = true;
+                  showOtherAttributesQuery = false;
                 } else {
-                  $scope.showHealthStatus = false;
-                  $scope.showPayingStatus = false;
-                  $scope.showScore = false;
-                  $scope.showDatePicker = false;
-                  $scope.showOtherAttributesQuery = true;
+                  showHealthStatus = false;
+                  showPayingStatus = false;
+                  showScore = false;
+                  showDatePicker = false;
+                  showOtherAttributesQuery = true;
                 }
                 buttonText = getFilters[i].name;
                 btnName = getFilters[i].name;
@@ -1358,7 +1364,12 @@ angular.module('do.users', [])
                 timeRange: timeRange,
                 isEvent: isEvent,
                 timeRangeValue: timeRangeValue,
-                valuetext: filterValueText
+                valuetext: filterValueText,
+                showHealthStatus: showHealthStatus,
+                showPayingStatus: showPayingStatus,
+                showScore: showScore,
+                showDatePicker: showDatePicker,
+                showOtherAttributesQuery: showOtherAttributesQuery
               })
               // if($scope.segmentClicked && i == 0) {
               //     console.log("$scope.filters: ", $scope.filters);
