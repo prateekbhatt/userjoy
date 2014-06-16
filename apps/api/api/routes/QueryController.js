@@ -93,7 +93,9 @@ router
   .get(function (req, res, next) {
 
     var aid = req.params.aid;
-    var userAttributes = ['user_id', 'email', 'country', 'joined', 'health', 'score'];
+    var userAttributes = ['user_id', 'email', 'browser', 'country', 'health',
+      'joined', 'lastSess', 'os', 'score',
+    ];
 
     async.waterfall(
       [
