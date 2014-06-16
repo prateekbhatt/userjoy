@@ -132,7 +132,7 @@
                                                     <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.valuetext}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto">
                                                         <li ng-repeat="payingStatus in payingStatusValues">
-                                                            <a style="cursor: default;" ng-click="chngPayingStatus($parent.$index, $index)">{{healthStatus.name}}
+                                                            <a style="cursor: default;" ng-click="chngPayingStatus($parent.$index, $index)">{{payingStatus.name}}
                                                             </a>
                                                         </li>
                                                     </ul>
@@ -289,7 +289,7 @@
                                 'sortable': !$first
                                 }"
                                 ng-click="tableParams.sorting('userkarma', tableParams.isSortBy('userkarma', 'asc') ? 'desc' : 'asc')">
-                                <div>Userkarma</div>
+                                <div>Engagement Score</div>
                             </th>
                             <th class="text-center" ng-show="columns[3].visible" ng-class="{
                                 'sort-asc': tableParams.isSortBy('datejoined', 'asc'),
@@ -300,6 +300,22 @@
                                 <div>Date Joined</div>
                             </th>
                             <th class="text-center" ng-show="columns[4].visible" ng-class="{
+                                'sort-asc': tableParams.isSortBy('health', 'asc'),
+                                'sort-desc': tableParams.isSortBy('health', 'desc'),
+                                'sortable': !$first
+                                }"
+                                ng-click="tableParams.sorting('health', tableParams.isSortBy('health', 'asc') ? 'desc' : 'asc')">
+                                <div>Health</div>
+                            </th>
+                            <th class="text-center" ng-show="columns[5].visible" ng-class="{
+                                'sort-asc': tableParams.isSortBy('lastsession', 'asc'),
+                                'sort-desc': tableParams.isSortBy('lastsession', 'desc'),
+                                'sortable': !$first
+                                }"
+                                ng-click="tableParams.sorting('lastsession', tableParams.isSortBy('lastsession', 'asc') ? 'desc' : 'asc')">
+                                <div>Last Session</div>
+                            </th>
+                            <th class="text-center" ng-show="columns[6].visible" ng-class="{
                                 'sort-asc': tableParams.isSortBy('unsubscribed', 'asc'),
                                 'sort-desc': tableParams.isSortBy('unsubscribed', 'desc'),
                                 'sortable': !$first
@@ -321,6 +337,12 @@
                         </td>
                         <td data-title="'Date Joined'" class="text-center" sortable="datejoined" ng-show="columns[3].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
                             <span>{{user.datejoined}}</span>
+                        </td>
+                        <td data-title="'Health'" class="text-center" sortable="health" ng-show="columns[4].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
+                            <span>{{user.health}}</span>
+                        </td>
+                        <td data-title="'Last Session'" class="text-center" sortable="lastsession" ng-show="columns[2].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
+                            <span>{{user.lastsession}}</span>
                         </td>
                         <td data-title="'Unsubscribed'" class="text-center" sortable="status" ng-show="columns[4].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
                             <span>{{user.unsubscribed}}</span>
