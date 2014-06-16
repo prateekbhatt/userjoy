@@ -184,6 +184,12 @@ describe('Model User', function () {
         .to.have.property('ct');
     });
 
+    it('should not add lastSess timestamp', function () {
+      expect(savedUser)
+        .to.have.property('lastSess')
+        .that.is.a('date');
+    });
+
     it('should add default health as average', function () {
       expect(savedUser)
         .to.have.property('health')
