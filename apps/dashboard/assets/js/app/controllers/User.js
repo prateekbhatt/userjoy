@@ -485,12 +485,52 @@ angular.module('do.users', [])
 
           $scope.otherTimeRange = 'at any time';
 
+          $scope.scoreQueries = [{
+            name: 'equal',
+            key: 'eq'
+          }, {
+            name: 'greater than',
+            key: 'gt'
+          }, {
+            name: 'less than',
+            key: 'lt'
+          }];
+
+          $scope.healthStatusValuesname = [{
+            name: 'Good',
+            key: 'good'
+          }, {
+            name: 'Average',
+            key: 'average'
+          }, {
+            name: 'Poor',
+            key: 'poor'
+          }];
+
+          $scope.payingStatusValues = [{
+            name: 'Free',
+            key: 'free'
+          }, {
+            name: 'Trial',
+            key: 'trial'
+          }, {
+            name: 'Paying',
+            key: 'paying'
+          }, {
+            name: 'Cancelled',
+            key: 'cancelled'
+          }]
+
           $scope.changeFilterAttribute = function (
             parentindex, index,
             evt) {
 
-            if ($scope.attributes[index].name == 'joined') {
+            if ($scope.attributes[index].name == 'joined' || $scope.attributes[
+              index].name == 'last seen') {
+              $scope.showPayingStatus = false;
+              $scope.showHealthStatus = false;
               $scope.showDatePicker = true;
+              $scope.showScore = false;
               $scope.showOtherAttributesQuery = false;
               console.log("inside joined attribute: ", $scope.showDatePicker);
 
@@ -504,12 +544,70 @@ angular.module('do.users', [])
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
               $scope.filters[parentindex].optext = 'less than';
-              $scope.filters[parentindex].val = $moment(new Date()).unix()*1000;
+              $scope.filters[parentindex].val = $moment(new Date())
+                .unix() * 1000;
               $scope.filters[parentindex].op = 'lt';
               console.log("$scope.filters error attributes: ", $scope.filters);
+            } else if ($scope.attributes[index].name == 'score') {
+              $scope.showHealthStatus = false;
+              $scope.showPayingStatus = false;
+              $scope.showScore = true;
+              $scope.showDatePicker = false;
+              $scope.showOtherAttributesQuery = false;
+              $scope.filters[parentindex].checkMethod = true;
+              $scope.filters[parentindex].isEvent = false;
+              $scope.filters[parentindex].btntext = $scope.attributes[
+                index].name;
+              $scope.filters[parentindex].method = 'attr';
+              $scope.filters[parentindex].name = $scope.attributes[
+                index].name;
+              $scope.filters[parentindex].type = '';
+              $scope.filters[parentindex].timeRange = '';
+              $scope.filters[parentindex].optext = 'equal';
+              $scope.filters[parentindex].val = '';
+            } else if ($scope.attributes[index].name == 'status') {
+              $scope.showHealthStatus = false;
+              $scope.showPayingStatus = true;
+              $scope.showScore = false;
+              $scope.showDatePicker = false;
+              $scope.showOtherAttributesQuery = false;
+              $scope.filters[parentindex].checkMethod = true;
+              $scope.filters[parentindex].isEvent = false;
+              $scope.filters[parentindex].btntext = $scope.attributes[
+                index].name;
+              $scope.filters[parentindex].method = 'attr';
+              $scope.filters[parentindex].name = $scope.attributes[
+                index].name;
+              $scope.filters[parentindex].type = '';
+              $scope.filters[parentindex].timeRange = '';
+              $scope.filters[parentindex].optext = 'equal';
+              $scope.filters[parentindex].val = 'free';
+              $scope.filters[parentindex].valuetext = 'Free';
+
+            } else if ($scope.attributes[index].name == 'health') {
+              $scope.showHealthStatus = true;
+              $scope.showPayingStatus = false;
+              $scope.showScore = false;
+              $scope.showDatePicker = false;
+              $scope.showOtherAttributesQuery = false;
+              $scope.filters[parentindex].checkMethod = true;
+              $scope.filters[parentindex].isEvent = false;
+              $scope.filters[parentindex].btntext = $scope.attributes[
+                index].name;
+              $scope.filters[parentindex].method = 'attr';
+              $scope.filters[parentindex].name = $scope.attributes[
+                index].name;
+              $scope.filters[parentindex].type = '';
+              $scope.filters[parentindex].timeRange = '';
+              $scope.filters[parentindex].optext = 'equal';
+              $scope.filters[parentindex].val = 'poor';
+              $scope.filters[parentindex].valuetext = 'Poor';
             } else {
               $scope.showOtherAttributesQuery = true;
+              $scope.showPayingStatus = false;
               $scope.showDatePicker = false;
+              $scope.showHealthStatus = false;
+              $scope.showScore = false;
               $scope.filters[parentindex].checkMethod = true;
               $scope.filters[parentindex].isEvent = false;
               $scope.filters[parentindex].btntext = $scope.attributes[
@@ -526,6 +624,9 @@ angular.module('do.users', [])
 
           $scope.changeFilterHasDone = function (parentindex,
             index, evt) {
+            $scope.showHealthStatus = false;
+            $scope.showPayingStatus = false;
+            $scope.showScore = false;
             $scope.showDatePicker = false;
             $scope.showOtherAttributesQuery = false
             $scope.method = 'hasdone';
@@ -550,6 +651,9 @@ angular.module('do.users', [])
           $scope.changeFilterHasNotDone = function (
             parentindex, index,
             evt) {
+            $scope.showHealthStatus = false;
+            $scope.showPayingStatus = false;
+            $scope.showScore = false;
             $scope.showDatePicker = false;
             $scope.showOtherAttributesQuery = false
             $scope.method = 'hasnotdone';
@@ -577,6 +681,9 @@ angular.module('do.users', [])
 
           $scope.changeFilterCountOf = function (parentindex,
             index, evt) {
+            $scope.showHealthStatus = false;
+            $scope.showPayingStatus = false;
+            $scope.showScore = false;
             $scope.showDatePicker = false;
             $scope.showOtherAttributesQuery = false
             $scope.method = 'count';
@@ -673,6 +780,20 @@ angular.module('do.users', [])
             key: 'contains'
           }]
 
+          $scope.chngHealthStatus = function (parentindex, index) {
+            $scope.filters[parentindex].val = $scope.healthStatusValuesname[
+              index].key;
+            $scope.filters[parentindex].valuetext = $scope.healthStatusValuesname[
+              index].name;
+          }
+
+          $scope.chngPayingStatus = function (parentindex, index) {
+            $scope.filters[parentindex].val = $scope.payingStatusValuesname[
+              index].key;
+            $scope.filters[parentindex].valuetext = $scopre.payingStatusValuesname[
+              index].name;
+          }
+
           $scope.chngquery = function (parentindex, index) {
             console.log("parentindex: ", parentindex);
             $scope.filters[parentindex].optext = $scope.queries[
@@ -682,6 +803,14 @@ angular.module('do.users', [])
               index].key;
             console.log($scope.filters[parentindex].op);
             console.log($scope.filters);
+          }
+
+          $scope.chngScoreQuery = function (parentindex, index) {
+            $scope.filters[parentindex].optext = $scope.scoreQueries[
+              index]
+              .name;
+            $scope.filters[parentindex].op = $scope.scoreQueries[
+              index].key;
           }
 
           $scope.changeOtherAttributesQuery = function (parentindex, index) {
@@ -706,10 +835,6 @@ angular.module('do.users', [])
               .name;
             $scope.otherTimeRange = $scope.filters[0].timeRange;
             $scope.filters[0].timeRangeValue = $scope.timeSpan[index].value;
-            // for (var i = 0; i < $scope.filters.length; i++) {
-            //   $scope.filters[i].timeRange = $scope.timeSpan[index].name;
-            //   $scope.filters[i].timeRangeValue = $scope.timeSpan[index].value;
-            // };
           }
 
 
@@ -1102,6 +1227,8 @@ angular.module('do.users', [])
                 break;
               }
             };
+
+
             console.log("$scope.fromTimeFrontEnd: ", $scope.fromTimeFrontEnd);
             // if($scope.fromTimeBackend === 1) {
             //   $scope.fromTimeFrontEnd = 'within a day';
@@ -1112,6 +1239,15 @@ angular.module('do.users', [])
             $scope.segmentLength = getFilters.length;
             console.log("getFilters: ", getFilters);
             for (var i = 0; i < getFilters.length; i++) {
+              $scope.filterValueText = '';
+              for (var j = 0; j < $scope.healthStatusValuesname.length; j++) {
+                if (getFilters[i].val === $scope.healthStatusValuesname[i]
+                  .key) {
+                  $scope.filterValueText = $scope.healthStatusValuesname[i]
+                    .name;
+                }
+                break;
+              };
               var buttonText = '';
               var btnName = '';
               var chkMethod = false;
@@ -1130,6 +1266,11 @@ angular.module('do.users', [])
                 };
               }
               if (getFilters[i].method == 'hasdone') {
+                $scope.showHealthStatus = false;
+                $scope.showPayingStatus = false;
+                $scope.showScore = false;
+                $scope.showDatePicker = false;
+                $scope.showOtherAttributesQuery = false;
                 buttonText = "Has Done";
                 btnName = getFilters[i].name;
                 chkMethod = false;
@@ -1138,6 +1279,11 @@ angular.module('do.users', [])
                 timeRangeValue = $scope.fromTimeFrontEndValue;
               }
               if (getFilters[i].method == 'hasnotdone') {
+                $scope.showHealthStatus = false;
+                $scope.showPayingStatus = false;
+                $scope.showScore = false;
+                $scope.showDatePicker = false;
+                $scope.showOtherAttributesQuery = false;
                 buttonText = "Has not Done";
                 btnName = getFilters[i].name;
                 chkMethod = false;
@@ -1146,6 +1292,11 @@ angular.module('do.users', [])
                 timeRangeValue = $scope.fromTimeFrontEndValue;
               }
               if (getFilters[i].method == 'count') {
+                $scope.showHealthStatus = false;
+                $scope.showPayingStatus = false;
+                $scope.showScore = false;
+                $scope.showDatePicker = false;
+                $scope.showOtherAttributesQuery = false;
                 buttonText = "Count of " + getFilters[
                   i].name;
                 btnName = getFilters[i].name;
@@ -1155,6 +1306,39 @@ angular.module('do.users', [])
                 timeRangeValue = $scope.fromTimeFrontEndValue;
               }
               if (getFilters[i].method == 'attr') {
+                if (getFilters[i].name == 'score') {
+                  $scope.showHealthStatus = false;
+                  $scope.showPayingStatus = false;
+                  $scope.showScore = true;
+                  $scope.showDatePicker = false;
+                  $scope.showOtherAttributesQuery = false;
+                } else if (getFilters[i].name == 'health') {
+                  $scope.showHealthStatus = true;
+                  $scope.showPayingStatus = false;
+                  $scope.showScore = false;
+                  $scope.showDatePicker = false;
+                  $scope.showOtherAttributesQuery = false;
+                  filterValueText = $scope.filterValueText;
+                } else if (getFilters[i].name == 'status') {
+                  $scope.showHealthStatus = false;
+                  $scope.showPayingStatus = true;
+                  $scope.showScore = false;
+                  $scope.showDatePicker = false;
+                  $scope.showOtherAttributesQuery = false;
+                } else if (getFilters[i].name == 'joined' || getFilters[i]
+                  .name == 'last seen') {
+                  $scope.showHealthStatus = false;
+                  $scope.showPayingStatus = false;
+                  $scope.showScore = false;
+                  $scope.showDatePicker = true;
+                  $scope.showOtherAttributesQuery = false;
+                } else {
+                  $scope.showHealthStatus = false;
+                  $scope.showPayingStatus = false;
+                  $scope.showScore = false;
+                  $scope.showDatePicker = false;
+                  $scope.showOtherAttributesQuery = true;
+                }
                 buttonText = getFilters[i].name;
                 btnName = getFilters[i].name;
                 chkMethod = true;
@@ -1173,7 +1357,8 @@ angular.module('do.users', [])
                 type: getFilters[i].type,
                 timeRange: timeRange,
                 isEvent: isEvent,
-                timeRangeValue: timeRangeValue
+                timeRangeValue: timeRangeValue,
+                valuetext: filterValueText
               })
               // if($scope.segmentClicked && i == 0) {
               //     console.log("$scope.filters: ", $scope.filters);
