@@ -57,11 +57,20 @@
                                                         <li ng-repeat="attribute in attributes" ><a style="cursor: default;" ng-click="changeFilterAttribute($parent.$index, $index, $event)">{{attribute.name}}</a></li>
                                                     </ul>
                                                 </div>
-                                                <div ng-if="filter.checkMethod" style="float: left; padding-left: 24px;">
+                                                <div ng-if="filter.checkMethod && !showDatePicker && !showOtherAttributesQuery" style="float: left; padding-left: 24px;">
                                                     <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto">
                                                         <li ng-repeat="query in selectedqueries">
                                                             <a style="cursor: default;" ng-click="chngquery($parent.$index, $index)">{{query.value}}
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div ng-if="filter.checkMethod && !showDatePicker && showOtherAttributesQuery" style="float: left; padding-left: 24px;">
+                                                    <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
+                                                    <ul class="select dropdown-menu" role="select" style="left: auto">
+                                                        <li ng-repeat="query in otherAttributesQuery">
+                                                            <a style="cursor: default;" ng-click="changeOtherAttributesQuery($parent.$index, $index)">{{query.name}}
                                                             </a>
                                                         </li>
                                                     </ul>
@@ -75,11 +84,28 @@
                                                         </li>
                                                     </ul>
                                                 </div>
+                                                <div ng-if="filter.checkMethod && showDatePicker" style="float:left; padding-left: 24px;">
+                                                    <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
+                                                    <ul class="select dropdown-menu" role="select" style="left: auto; margin-top: -10px;">
+                                                        <li ng-repeat="query in datePickerQueries">
+                                                            <a style="cursor: default;" ng-click="chngDatePickerQuery($parent.$index, $index)">{{query.name}}
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                                 <div ng-if="filter.checkMethod && filter.isEvent" style="float: left; padding-left: 24px;">
                                                     <input type="text" placeholder="Value" ng-model="filter.val" ng-class="{'form-control': true, 'error': filter.val.length == 0 && usersListForm.$dirty}" style="width: 70px;">
                                                 </div>
-                                                <div ng-if="filter.checkMethod && !filter.isEvent" style="float: left; padding-left: 24px;">
+                                                <div ng-if="filter.checkMethod && !filter.isEvent && !showDatePicker" style="float: left; padding-left: 24px;">
                                                     <input type="text" placeholder="Value" ng-model="filter.val" ng-class="{'form-control': true, 'error': filter.val.length == 0 && usersListForm.$dirty}">
+                                                </div>
+                                                <div ng-if="filter.checkMethod && !filter.isEvent && showDatePicker" style="float: left; padding-left: 24px;">
+                                                    <p class="input-group" style="width: 200px;">
+                                                    <input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="filter.val" is-open="opened" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" show-weeks="false" max="maxDate" show-button-bar="false"/>
+                                                    <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-default" ng-click="openDatePicker($event)"><i class="fa fa-calendar"></i></button>
+                                                    </span>
+                                                    </p>
                                                 </div>
                                                 <div ng-if="filter.isEvent" style="float: left; padding-left: 24px;" ng-show="$first">
                                                     <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.timeRange}}</span>&nbsp;<span class="caret"></span></button>
@@ -92,12 +118,6 @@
                                                 </div>
                                                 <div ng-if="filter.isEvent" style="float: left; padding-left: 24px;" ng-show="!$first">
                                                     <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto disabled" data-toggle="dropdown"> <span data-bind="label" id="Users">{{otherTimeRange}}</span>&nbsp;<span class="caret"></span></button>
-                                                    <!-- <ul class="select dropdown-menu" role="select" style="left: auto">
-                                                        <li ng-repeat="range in timeSpan">
-                                                            <a style="cursor: default;" ng-click="chngrange($parent.$index, $index)">{{range.name}}
-                                                            </a>
-                                                        </li>
-                                                    </ul> -->
                                                 </div>
                                                 <div style="float: left; padding-left: 24px;">
                                                     <a class="btn btn-default fa fa-times" ng-click="removeFilter(filter)" ng-hide="segmentClicked && $first"></a>
@@ -180,19 +200,19 @@
                                 <a class="btn btn-sm btn-default pull-right" href="/apps/{{currApp}}/messages/automate/segments/{{segname.id}}/write" style="margin-top: 5px;" ng-show="showAutoMsgBtn">AutoMessage</a>
                             </li>
                             <!-- <div class="row" ng-repeat="segname in segmentsCreatedName">
-                                                                <div class="col-md-6" ng-click="showQuery(segname.id, $index, segname)" >
-                                                                        <li style="cursor: pointer; padding-bottom: 2px;" class="list-group-item"  ng-class="{'active': $index === selectedIndex}">
-                                                                                <div class="btn-group">
-                                                                                    <a type="button" class="btn btn-default">{{segname.name}}</a>
-                                                                                    <a type="button" class="btn btn-default">Auto Message</a>
-                                                                                </div>
-                                                                                <span style="padding: 10px 15px; display: inline-block;">{{segname.name}}</span>
-                                                                        </li>
-                                                                </div>
-                                                                <div class="col-md-6">
-                                                                        <a class="btn btn-default pull-right" href="/apps/{{currApp}}/messages/automate/segments/{{segname.id}}/write" ng-show="showAutoMsgBtn">AutoMessage</a>
-                                                                </div>
-                                                        </div>
+                                                                                                <div class="col-md-6" ng-click="showQuery(segname.id, $index, segname)" >
+                                                                                                            <li style="cursor: pointer; padding-bottom: 2px;" class="list-group-item"  ng-class="{'active': $index === selectedIndex}">
+                                                                                                                        <div class="btn-group">
+                                                                                                                                <a type="button" class="btn btn-default">{{segname.name}}</a>
+                                                                                                                                <a type="button" class="btn btn-default">Auto Message</a>
+                                                                                                                        </div>
+                                                                                                                        <span style="padding: 10px 15px; display: inline-block;">{{segname.name}}</span>
+                                                                                                            </li>
+                                                                                                </div>
+                                                                                                <div class="col-md-6">
+                                                                                                            <a class="btn btn-default pull-right" href="/apps/{{currApp}}/messages/automate/segments/{{segname.id}}/write" ng-show="showAutoMsgBtn">AutoMessage</a>
+                                                                                                </div>
+                                                                                    </div>
                         -->                        </ul>
                     </div>
                     <!-- <a class="btn btn-info btn-block" ng-show="showAutoMsgBtn" href="/apps/{{currApp}}/messages/automate/segments/{{sid}}/write" style="margin-top: 5px;">Auto Message</a> -->
