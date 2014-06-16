@@ -2,6 +2,7 @@
  * Module dependencies
  */
 
+var _ = require('lodash');
 var async = require('async');
 var path = require('path');
 var router = require('express')
