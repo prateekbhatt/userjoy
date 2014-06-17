@@ -543,6 +543,7 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
+              $scope.otherTimeRange = '';
               $scope.filters[parentindex].optext = 'less than';
               $scope.filters[parentindex].val = $moment(new Date())
                 .unix() * 1000;
@@ -563,6 +564,7 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
+              $scope.otherTimeRange = '';
               $scope.filters[parentindex].optext = 'equal';
               $scope.filters[parentindex].val = '';
             } else if ($scope.attributes[index].name == 'status') {
@@ -580,6 +582,7 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
+              $scope.otherTimeRange = '';
               $scope.filters[parentindex].optext = 'equal';
               $scope.filters[parentindex].val = 'free';
               $scope.filters[parentindex].valuetext = 'Free';
@@ -599,6 +602,7 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
+              $scope.otherTimeRange = '';
               $scope.filters[parentindex].optext = 'equal';
               $scope.filters[parentindex].val = 'poor';
               $scope.filters[parentindex].valuetext = 'Poor';
@@ -617,6 +621,7 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
+              $scope.otherTimeRange = '';
               $scope.filters[parentindex].optext = 'equal';
               $scope.filters[parentindex].val = '';
             }
@@ -1395,6 +1400,7 @@ angular.module('do.users', [])
               .list;
             $scope.queryObject.op = segmentService.getSingleSegment()
               .op;
+            $scope.text = $scope.queryObject.op.toUpperCase();
             $scope.queryObject.filters = getFilters;
             console.log("queryobject: ", $scope.queryObject);
 
