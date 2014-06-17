@@ -526,7 +526,7 @@ angular.module('do.users', [])
             evt) {
 
             if ($scope.attributes[index].name == 'joined' || $scope.attributes[
-              index].name == 'last seen') {
+              index].name == 'lastSess') {
               $scope.filters[parentindex].showPayingStatus = false;
               $scope.filters[parentindex].showHealthStatus = false;
               $scope.filters[parentindex].showDatePicker = true;

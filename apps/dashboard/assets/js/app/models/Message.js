@@ -128,5 +128,29 @@ angular.module('models.message', ['services'])
         })
         .error(cb)
     }
+
+    this.getGoodHealthConversations = function (appId, callback) {
+      $http.get(config.apiUrl + '/apps/' + appId + '/conversations?health=good')
+        .success(function(data){
+          callback(null, data);
+        })
+        .error(callback)
+    }
+
+    this.getAvgHealthConversations = function (appId, callback) {
+      $http.get(config.apiUrl + '/apps/' + appId + '/conversations?health=average')
+        .success(function(data){
+          callback(null, data);
+        })
+        .error(callback)
+    }
+
+    this.getPoorHealthConversations = function (appId, callback) {
+      $http.get(config.apiUrl + '/apps/' + appId + '/conversations?health=poor')
+        .success(function(data){
+          callback(null, data);
+        })
+        .error(callback)
+    }
   }
 ])
