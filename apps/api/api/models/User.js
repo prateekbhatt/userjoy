@@ -138,7 +138,7 @@ var UserSchema = new Schema({
 
 
   // last session of user
-  lastSess: {
+  lastSeen: {
     type: Date,
     default: Date.now
   },

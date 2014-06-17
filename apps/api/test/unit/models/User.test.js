@@ -184,9 +184,9 @@ describe('Model User', function () {
         .to.have.property('ct');
     });
 
-    it('should not add lastSess timestamp', function () {
+    it('should not add lastSeen timestamp', function () {
       expect(savedUser)
-        .to.have.property('lastSess')
+        .to.have.property('lastSeen')
         .that.is.a('date');
     });
 
