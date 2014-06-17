@@ -566,11 +566,11 @@ angular.module('do.users', [])
               $scope.filters[parentindex].optext = 'equal';
               $scope.filters[parentindex].val = '';
             } else if ($scope.attributes[index].name == 'status') {
-              $scope.showHealthStatus = false;
-              $scope.showPayingStatus = true;
-              $scope.showScore = false;
-              $scope.showDatePicker = false;
-              $scope.showOtherAttributesQuery = false;
+              $scope.filters[parentindex].showHealthStatus = false;
+              $scope.filters[parentindex].showPayingStatus = true;
+              $scope.filters[parentindex].showScore = false;
+              $scope.filters[parentindex].showDatePicker = false;
+              $scope.filters[parentindex].showOtherAttributesQuery = false;
               $scope.filters[parentindex].checkMethod = true;
               $scope.filters[parentindex].isEvent = false;
               $scope.filters[parentindex].btntext = $scope.attributes[
@@ -603,11 +603,11 @@ angular.module('do.users', [])
               $scope.filters[parentindex].val = 'poor';
               $scope.filters[parentindex].valuetext = 'Poor';
             } else {
-              $scope.showOtherAttributesQuery = true;
-              $scope.showPayingStatus = false;
-              $scope.showDatePicker = false;
-              $scope.showHealthStatus = false;
-              $scope.showScore = false;
+              $scope.filters[parentindex].showOtherAttributesQuery = true;
+              $scope.filters[parentindex].showPayingStatus = false;
+              $scope.filters[parentindex].showDatePicker = false;
+              $scope.filters[parentindex].showHealthStatus = false;
+              $scope.filters[parentindex].showScore = false;
               $scope.filters[parentindex].checkMethod = true;
               $scope.filters[parentindex].isEvent = false;
               $scope.filters[parentindex].btntext = $scope.attributes[
@@ -788,9 +788,9 @@ angular.module('do.users', [])
           }
 
           $scope.chngPayingStatus = function (parentindex, index) {
-            $scope.filters[parentindex].val = $scope.payingStatusValuesname[
+            $scope.filters[parentindex].val = $scope.payingStatusValues[
               index].key;
-            $scope.filters[parentindex].valuetext = $scopre.payingStatusValuesname[
+            $scope.filters[parentindex].valuetext = $scope.payingStatusValues[
               index].name;
           }
 
@@ -935,9 +935,12 @@ angular.module('do.users', [])
               $scope.users.push({
                 id: UserList.getUsers()[i]._id,
                 email: UserList.getUsers()[i].email,
-                userkarma: UserList.getUsers()[i].healthScore,
+                userkarma: UserList.getUsers()[i].score,
                 datejoined: moment(UserList.getUsers()[
                   i].firstSessionAt)
+                  .format("MMMM Do YYYY"),
+                health: UserList.getUsers()[i].health,
+                lastsession: moment(UserList.getUsers()[i].lastSess)
                   .format("MMMM Do YYYY"),
                 unsubscribed: UserList.getUsers()[
                   i].unsubscribed
@@ -953,12 +956,20 @@ angular.module('do.users', [])
               field: 'email',
               visible: true
             }, {
-              title: 'User Karma',
+              title: 'Engagement Score',
               field: 'userkarma',
               visible: true
             }, {
               title: 'Date Joined',
               field: 'datejoined',
+              visible: true
+            }, {
+              title: 'Health',
+              field: 'health',
+              visible: true
+            }, {
+              title: 'Last Session',
+              field: 'lastsession',
               visible: true
             }, {
               title: 'Unsubscribed',
@@ -1544,9 +1555,13 @@ angular.module('do.users', [])
         });
 
         $scope.$watch('checkboxes.items', function (value) {
+          // if($scope.checkboxes.items.length > 0) {
+          //   $scope.mailLength = false;
+          // }
           console.log("$watch checkboxes: ", $scope.checkboxes
             .items);
         })
+
 
         $scope.openModal = function () {
           $scope.mail = [];
@@ -1670,6 +1685,40 @@ angular.module('do.users', [])
 
         var populatePage = function (err, data, uid) {
           function getRandomColor() {
+            console.log("data: ", data);
+            var keys = _.keys(data);
+            $scope.userdata = [];
+
+            function capitaliseFirstLetter(string) {
+              return string.charAt(0)
+                .toUpperCase() + string.slice(1);
+            }
+            for (var i = 0; i < keys.length; i++) {
+              prop = keys[i];
+              console.log("id: ", prop);
+              value = data[prop];
+              // console.log("value prop: ", value, prop);
+              if (prop != 'companies' && prop != 'ct' && prop != 'meta' &&
+                prop != 'ut' && prop != '__v' && prop != 'aid' && prop !=
+                '_id') {
+                if (prop == 'lastSess') {
+                  prop = 'Last Session';
+                  value = $moment(value)
+                    .fromNow()
+                }
+                if (prop == 'joined') {
+                  value = $moment(value)
+                    .fromNow()
+                }
+                prop = capitaliseFirstLetter(prop);
+                $scope.userdata.push({
+                  value: value,
+                  data: prop
+                })
+              }
+            };
+
+            console.log("userdata: ", $scope.userdata);
             var letters = '0123456789ABCDEF'.split('');
             var color = '';
             // var imgsrc = '';
@@ -1919,27 +1968,33 @@ angular.module('do.users', [])
           src = 'http://placehold.it/150/' + getRandomColor() +
             '/FFF&text=' +
             data.email.charAt(0);
+
+
           $scope.user = {
             _id: uid,
             email: data.email,
-            healthScore: data.healthScore,
-            lastSeen: $moment(data.lastSessionAt)
-              .fromNow(),
-            lastSession: data.lastSessionAt,
-            firstSeen: $moment(data.firstSessionAt)
-              .fromNow(),
-            plan: data.billing.plan,
-            planValue: data.billing.amount,
-            currency: data.billing.currency.toUpperCase(),
-            unsubscribed: data.unbubscribed,
-            location: data.location,
-            country: data.country,
-            platform: data.platform,
-            browser: data.browser,
             name: data.name,
             profilegravatar: gravatar,
-            profilesrc: src
+            profilesrc: src,
+            lastSession: data.lastSess
           }
+
+          $scope.userDataFirstList = [];
+          $scope.userDataSecondList = [];
+
+          for (var i = 0; i < 7; i++) {
+            $scope.userDataFirstList.push({
+              value: $scope.userdata[i].value,
+              data: $scope.userdata[i].data
+            })
+          };
+
+          for (var i = 7; i < $scope.userdata.length; i++) {
+            $scope.userDataSecondList.push({
+              value: $scope.userdata[i].value,
+              data: $scope.userdata[i].data
+            })
+          };
 
           $scope.title = "Create Note";
           $scope.country = 'India';
