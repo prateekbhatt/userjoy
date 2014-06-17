@@ -106,10 +106,11 @@
                                                     </ul>
                                                 </div>
                                                 <div ng-if="filter.checkMethod && filter.isEvent" style="float: left; padding-left: 24px;">
-                                                    <input type="text" placeholder="Value" ng-model="filter.val" ng-class="{'form-control': true, 'error': filter.val.length == 0 && usersListForm.$dirty}" style="width: 70px;">
+                                                    <input type="text" placeholder="Value" ng-model="filter.val" class="form-control" style="width: 70px;">
+                                                    <!-- <input type="text" placeholder="Value" ng-model="filter.val" ng-class="{'form-control': true, 'error': filter.val.length == 0 && usersListForm.$dirty}" style="width: 70px;"> -->
                                                 </div>
                                                 <div ng-if="filter.checkMethod && !filter.isEvent && !filter.showDatePicker && !filter.showHealthStatus && !filter.showPayingStatus" style="float: left; padding-left: 24px;">
-                                                    <input type="text" placeholder="Value" ng-model="filter.val" ng-class="{'form-control': true, 'error': filter.val.length == 0 && usersListForm.$dirty}">
+                                                    <input type="text" placeholder="Value" ng-model="filter.val" class="form-control">
                                                 </div>
                                                 <div ng-if="filter.checkMethod && !filter.isEvent && filter.showDatePicker" style="float: left; padding-left: 24px;">
                                                     <p class="input-group" style="width: 200px;">
