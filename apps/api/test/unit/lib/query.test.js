@@ -1,4 +1,4 @@
-describe('Lib query', function () {
+describe.only('Lib query', function () {
 
   /**
    * npm dependencies
@@ -120,15 +120,15 @@ describe('Lib query', function () {
     });
 
 
-    it('should set default countFilterUserIds', function () {
+    it('should set default countFilteredUids', function () {
 
-      expect(newQuery.countFilterUserIds)
+      expect(newQuery.countFilteredUids)
         .to.exist;
 
-      expect(newQuery.countFilterUserIds)
+      expect(newQuery.countFilteredUids)
         .to.be.an('array');
 
-      expect(newQuery.countFilterUserIds.length)
+      expect(newQuery.countFilteredUids.length)
         .to.eql(0);
     });
 
@@ -343,9 +343,11 @@ describe('Lib query', function () {
   describe('#genAttrMatchCond', function () {
 
     var cond;
+    var queryObj;
 
     beforeEach(function () {
-      var queryObj = {
+
+      queryObj = {
         aid: 'BlaBlaID',
         list: 'users',
         op: 'and',
@@ -379,88 +381,159 @@ describe('Lib query', function () {
         ]
       }
 
-      var query = new Query(queryObj.aid, queryObj);
-      cond = query.genAttrMatchCond();
     });
 
 
     it('should return condition with aid', function () {
+      var query = new Query(queryObj.aid, queryObj);
+      cond = query.genAttrMatchCond();
 
       expect(cond.$and)
         .to.be.an('array')
         .and.to.contain({
           'aid': 'BlaBlaID'
         });
+
     });
 
 
-    it('should handle $eq operator', function () {
+    it('should handle eq/lt/gt/contains on "and" root operator', function () {
+      var query = new Query(queryObj.aid, queryObj);
+      cond = query.genAttrMatchCond();
 
       expect(cond.$and)
-        .to.contain({
-          'platform': 'Android'
-        })
-    });
-
-
-    it('should handle $lt operator', function () {
-
-      expect(cond.$and)
-        .to.contain({
-          'amount': {
-            $lt: 100
-          }
+        .to.be.an('array')
+        .and.to.contain({
+          'aid': 'BlaBlaID'
         });
-    });
 
-
-    it('should handle $gt operator', function () {
 
       expect(cond.$and)
         .to.contain({
-          'totalEvents': {
-            $gt: 999
-          }
-        });
-    });
+          "$and": [
 
+            {
+              "platform": "Android"
+            },
 
-    it('should handle "contains" operator', function () {
+            {
+              "amount": {
+                "$lt": 100
+              }
+            },
 
-      expect(cond.$and)
-        .to.contain({
-          'email': {
-            '$regex': ".*bhatt.*"
-          }
-        });
-    });
+            {
+              "totalEvents": {
+                "$gt": 999
+              }
+            },
 
-
-    it('should set $in filter on _id if there are countFilters',
-      function () {
-        var countFilters = [{
-          method: 'count',
-          type: 'page',
-          name: '/login'
-        }];
-        var countFilterUserIds = [
-          randomId(),
-          '5313123131'
-        ];
-
-        Query.prototype.countFilters = countFilters;
-        Query.prototype.countFilterUserIds = countFilterUserIds;
-
-        cond = Query.prototype.genAttrMatchCond();
-
-        expect(cond.$and)
-          .to.contain({
-            '_id': {
-              '$in': countFilterUserIds
+            {
+              "email": {
+                "$regex": ".*bhatt.*"
+              }
             }
-          });
+          ]
+        });
 
+    });
+
+
+    it('should handle eq/lt/gt/contains on "or" root operator', function () {
+
+      queryObj.op = "or";
+      var query = new Query(queryObj.aid, queryObj);
+      cond = query.genAttrMatchCond();
+
+      expect(cond.$and)
+        .to.be.an('array')
+        .and.to.contain({
+          'aid': 'BlaBlaID'
+        });
+
+
+      expect(cond.$and)
+        .to.contain({
+          "$or": [
+
+            {
+              "platform": "Android"
+            },
+
+            {
+              "amount": {
+                "$lt": 100
+              }
+            },
+
+            {
+              "totalEvents": {
+                "$gt": 999
+              }
+            },
+
+            {
+              "email": {
+                "$regex": ".*bhatt.*"
+              }
+            }
+          ]
+        });
+
+    });
+
+
+    it('should add countFilteredUids if countFilters are there', function () {
+
+      queryObj.filters.push({
+        method: 'count',
+        name: 'Clicked login btn',
+        op: 'gt',
+        val: 10
       });
+
+      queryObj.op = 'or';
+
+      var query = new Query(queryObj.aid, queryObj);
+      query.countFilteredUids = ['randomId', 'randomId1'];
+      cond = query.genAttrMatchCond();
+
+      expect(cond.$and)
+        .to.be.an('array')
+        .and.to.contain({
+          'aid': 'BlaBlaID'
+        });
+
+
+      expect(cond)
+        .to.deep.equal({
+          "$and": [{
+            "aid": "BlaBlaID"
+          }, {
+            "$or": [{
+              "platform": "Android"
+            }, {
+              "amount": {
+                "$lt": 100
+              }
+            }, {
+              "totalEvents": {
+                "$gt": 999
+              }
+            }, {
+              "email": {
+                "$regex": ".*bhatt.*"
+              }
+            }, {
+              "_id": {
+                "$in": ["randomId", "randomId1"]
+              }
+            }]
+          }]
+        });
+
+    });
+
 
   });
 
@@ -475,7 +548,7 @@ describe('Lib query', function () {
 
       Query.prototype.aid = saved.apps.first._id;
       Query.prototype.countFilters = [];
-      Query.prototype.countFilterUserIds = [];
+      Query.prototype.countFilteredUids = [];
       Query.prototype.attrFilters = [];
 
       Query.prototype.runAttrQuery(function (err, users) {
@@ -506,9 +579,9 @@ describe('Lib query', function () {
         }]
       };
       Query.prototype.rootOperator = ['$and'];
-      Query.prototype.countFilters = ['notEmpty'];
-      Query.prototype.attrFilters = ['notEmpty'];
-      Query.prototype.countFilterUserIds = ['notEmpty'];
+      Query.prototype.countFilters = ['cfnotEmpty'];
+      Query.prototype.attrFilters = ['afnotEmpty'];
+      Query.prototype.countFilteredUids = ['cfuinotEmpty'];
     });
 
     it('should reset all query params', function () {
@@ -533,7 +606,7 @@ describe('Lib query', function () {
       expect(Query.prototype.attrFilters)
         .to.be.empty;
 
-      expect(Query.prototype.countFilterUserIds)
+      expect(Query.prototype.countFilteredUids)
         .to.be.empty;
     });
 
@@ -564,32 +637,6 @@ describe('Lib query', function () {
 
       expect(cond.aid)
         .to.eql(aid);
-
-
-      function getDateUnix(actual, daysAgo) {
-        return moment(actual)
-          .subtract('days', daysAgo)
-          .startOf('day')
-          .unix();
-      }
-
-      expect(moment(cond.ct.$gt)
-        .startOf('day')
-        .unix())
-        .to.eql(getDateUnix(moment()
-          .format(), q.fromAgo));
-
-      expect(cond.ct.$gt)
-        .to.be.a('date');
-
-      expect(cond.ct.$lt)
-        .to.be.a('date');
-
-      expect(moment(cond.ct.$lt)
-        .startOf('day')
-        .unix())
-        .to.eql(getDateUnix(moment()
-          .format(), q.toAgo));
 
     });
 
@@ -776,6 +823,75 @@ describe('Lib query', function () {
 
       });
 
+    it('should add gt/lt timestamps for fromAgo, toAgo', function () {
+
+      var filter = {
+        method: 'count',
+        type: 'track',
+        module: 'Authentication',
+        name: 'Clicked login btn',
+        op: 'gt',
+        val: 10
+      };
+
+
+      Query.prototype.fromAgo = 3;
+      Query.prototype.toAgo = 2;
+      var cond = Query.prototype.getCountFilterCond(filter);
+
+      // cond output::
+      // {
+      //   "$and": [
+
+      //     {
+      //       "$eq": ["$type", "track"]
+      //     },
+
+      //     {
+      //       "$eq": ["$name", "Clicked login btn"]
+      //     },
+
+      //     {
+      //       "$eq": ["$module", "Authentication"]
+      //     },
+
+      //     {
+      //       "$gt": ["$ct", "2014-06-14T18:57:41.091Z"]
+      //     },
+
+      //     {
+      //       "$lt": ["$ct", "2014-06-15T18:57:41.091Z"]
+      //     }
+      //   ]
+      // }
+
+      function getDateUnix(actual, daysAgo) {
+        return moment(actual)
+          .subtract('days', daysAgo)
+          .startOf('day')
+          .unix();
+      }
+
+      expect(moment(cond.$and[3].$gt[1])
+        .startOf('day')
+        .unix())
+        .to.eql(getDateUnix(moment()
+          .format(), Query.prototype.fromAgo));
+
+      expect(cond.$and[3].$gt[1])
+        .to.be.a('date');
+
+      expect(cond.$and[4].$lt[1])
+        .to.be.a('date');
+
+      expect(moment(cond.$and[4].$lt[1])
+        .startOf('day')
+        .unix())
+        .to.eql(getDateUnix(moment()
+          .format(), Query.prototype.toAgo));
+
+    });
+
   });
 
 
@@ -920,6 +1036,7 @@ describe('Lib query', function () {
       Query.prototype.aid = saved.apps.first._id;
       Query.prototype.countFilters = countFilters;
       Query.prototype.rootOperator = '$and';
+      Query.prototype.countFilteredUids = uids;
     });
 
 
@@ -966,7 +1083,7 @@ describe('Lib query', function () {
           .to.be.an('array');
 
         expect(userIds)
-          .to.have.length(uids.length);
+          .to.have.length.above(0);
 
         done();
       });
@@ -1089,7 +1206,7 @@ describe('Lib query', function () {
       Query.prototype.attrFilters = attrFilters;
       Query.prototype.aid = aid;
       Query.prototype.rootOperator = '$and';
-      Query.prototype.countFilterUserIds = [];
+      Query.prototype.countFilteredUids = [];
       Query.prototype.filteredUsers = [];
     });
 
@@ -1148,12 +1265,12 @@ describe('Lib query', function () {
       });
 
 
-    it('should set countFilterUserIds',
+    it('should set countFilteredUids',
       function (done) {
 
         Query.prototype.run(function (err) {
 
-          expect(Query.prototype.countFilterUserIds)
+          expect(Query.prototype.countFilteredUids)
             .to.have.length.above(0);
           done();
         });
