@@ -81,6 +81,16 @@ We allow the apps to pass custom attributes related to users, companies and even
 >
 
 
+###### Query
+
+- Run count query and attr query separately. This it to ensure 'AND/OR' work as expected across count and attr queries
+- hasnotdone: query events by time
+cases:
+- Edge cases
+1. sometimes hasdone event + hasnotdone event =/= total users
+
+
+
 ###### Email Types
 
 - behavioral (segments, interval-hourly/daily, initially  just daily): for each segment, a user can get this message only once
