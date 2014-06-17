@@ -526,7 +526,7 @@ angular.module('do.users', [])
             evt) {
 
             if ($scope.attributes[index].name == 'joined' || $scope.attributes[
-              index].name == 'lastSess') {
+              index].name == 'lastSeen') {
               $scope.filters[parentindex].showPayingStatus = false;
               $scope.filters[parentindex].showHealthStatus = false;
               $scope.filters[parentindex].showDatePicker = true;
@@ -940,7 +940,7 @@ angular.module('do.users', [])
                   i].firstSessionAt)
                   .format("MMMM Do YYYY"),
                 health: UserList.getUsers()[i].health,
-                lastsession: moment(UserList.getUsers()[i].lastSess)
+                lastsession: moment(UserList.getUsers()[i].lastSeen)
                   .format("MMMM Do YYYY"),
                 unsubscribed: UserList.getUsers()[
                   i].unsubscribed
@@ -1701,8 +1701,8 @@ angular.module('do.users', [])
               if (prop != 'companies' && prop != 'ct' && prop != 'meta' &&
                 prop != 'ut' && prop != '__v' && prop != 'aid' && prop !=
                 '_id') {
-                if (prop == 'lastSess') {
-                  prop = 'Last Session';
+                if (prop == 'lastSeen') {
+                  prop = 'Last Seen';
                   value = $moment(value)
                     .fromNow()
                 }
@@ -1976,7 +1976,7 @@ angular.module('do.users', [])
             name: data.name,
             profilegravatar: gravatar,
             profilesrc: src,
-            lastSession: data.lastSess
+            lastSession: data.lastSeen
           }
 
           $scope.userDataFirstList = [];
