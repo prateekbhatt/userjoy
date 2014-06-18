@@ -1,4 +1,4 @@
-describe.only('Lib query', function () {
+describe('Lib query', function () {
 
   /**
    * npm dependencies
@@ -534,6 +534,26 @@ describe.only('Lib query', function () {
 
     });
 
+    it(
+      'should not add any filter queries if no countFilteredUids / attrFilters are there',
+      function () {
+        queryObj.filters = [];
+
+        queryObj.op = 'or';
+
+        var query = new Query(queryObj.aid, queryObj);
+        query.countFilteredUids = [];
+        cond = query.genAttrMatchCond();
+
+        expect(cond)
+          .to.deep.equal({
+            '$and': [{
+              aid: 'BlaBlaID'
+            }]
+          });
+
+      });
+
 
   });
 
@@ -578,6 +598,9 @@ describe.only('Lib query', function () {
           key: 'val'
         }]
       };
+
+      Query.prototype.fromAgo = 10;
+      Query.prototype.toAgo = 5;
       Query.prototype.rootOperator = ['$and'];
       Query.prototype.countFilters = ['cfnotEmpty'];
       Query.prototype.attrFilters = ['afnotEmpty'];
@@ -608,6 +631,12 @@ describe.only('Lib query', function () {
 
       expect(Query.prototype.countFilteredUids)
         .to.be.empty;
+
+      expect(Query.prototype.fromAgo)
+        .not.to.exist;
+
+      expect(Query.prototype.toAgo)
+        .not.to.exist;
     });
 
   });
@@ -1035,7 +1064,7 @@ describe.only('Lib query', function () {
       Query.prototype.reset();
       Query.prototype.aid = saved.apps.first._id;
       Query.prototype.countFilters = countFilters;
-      Query.prototype.rootOperator = '$and';
+      Query.prototype.rootOperator = '$or';
       Query.prototype.countFilteredUids = uids;
     });
 
@@ -1174,6 +1203,14 @@ describe.only('Lib query', function () {
 
       async.series({
 
+        cleanupUsers: function (cb) {
+          User.remove({}, cb);
+        },
+
+        cleanupEvents: function (cb) {
+          Event.remove({}, cb);
+        },
+
         createUser: function (cb) {
 
           User.create({
@@ -1185,6 +1222,7 @@ describe.only('Lib query', function () {
 
               if (err) return cb(err);
               uid = usr._id;
+
               cb();
             });
 
@@ -1192,8 +1230,17 @@ describe.only('Lib query', function () {
 
 
         createEvent: function (cb) {
-          var uids = [uid];
-          createEventFixtures(aid, uids, 100, cb);
+          // var uids = [uid];
+          Event.create({
+            aid: aid,
+            uid: uid,
+            type: 'page',
+            name: '/account/login'
+          }, function (err, evn) {
+            cb()
+          });
+
+          // createEventFixtures(aid, uids, 100, cb);
 
         }
 
@@ -1247,7 +1294,7 @@ describe.only('Lib query', function () {
       });
 
 
-    it('should call #runCountAttrQuery',
+    it('should call #runAttrQuery',
       function (done) {
 
         var spy = sinon.spy(Query.prototype, 'runAttrQuery');
@@ -1270,6 +1317,9 @@ describe.only('Lib query', function () {
 
         Query.prototype.run(function (err) {
 
+          expect(err)
+            .to.not.exist;
+
           expect(Query.prototype.countFilteredUids)
             .to.have.length.above(0);
           done();
@@ -1281,6 +1331,9 @@ describe.only('Lib query', function () {
     it('should set filteredUsers', function (done) {
 
       Query.prototype.run(function (err, users) {
+
+        expect(err)
+          .to.not.exist;
 
         expect(Query.prototype.filteredUsers)
           .to.have.length.above(0);
