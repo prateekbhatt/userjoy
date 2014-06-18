@@ -47,6 +47,7 @@ angular.module('do.login', [])
     console.log('LoginProvider:', login.getLoggedIn());
     $scope.errMsg = '';
     $scope.showError = false;
+    $scope.disableLogin = false;
     console.log("$rootScope loggedIn: ", $rootScope.loggedIn);
     if ($rootScope.loggedIn && AppService.getCurrentApp()
       ._id != null) {
@@ -66,10 +67,19 @@ angular.module('do.login', [])
       $scope.showError = false;
     }
 
+    var callback = function (err) {
+      $scope.disableLogin = false;
+      if(err) {
+        console.log("error in signing in");
+        console.log(err.error);
+        $rootScope.errMsgRootScope = err.error;
+      }
+    }
+
     // attempt login to your api
     $scope.attemptLogin = function () {
-
-      AuthService.attemptLogin($scope.email, $scope.password);
+      $scope.disableLogin = true;
+      AuthService.attemptLogin($scope.email, $scope.password, callback);
       $scope.$watch(ErrMsgService.getErrorMessage, function () {
         if (ErrMsgService.getErrorMessage()) {
           console.log("err msg: ", ErrMsgService.getErrorMessage());
