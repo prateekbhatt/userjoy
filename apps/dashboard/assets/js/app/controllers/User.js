@@ -310,12 +310,25 @@ angular.module('do.users', [])
             .length > 0) {
             for (var i = 0; i < segmentService.getSegments()
               .length; i++) {
-              $scope.segmentsCreatedName.push({
-                id: segmentService.getSegments()[i]
-                  ._id,
-                name: segmentService.getSegments()[
-                  i].name
-              })
+              if (segmentService.getSegments()[i].name == 'Good Health' ||
+                segmentService.getSegments()[i].name == 'Average Health' ||
+                segmentService.getSegments()[i].name == 'Poor Health') {
+                $scope.segmentsCreatedName.push({
+                  predefined: true,
+                  id: segmentService.getSegments()[i]
+                    ._id,
+                  name: segmentService.getSegments()[
+                    i].name
+                })
+              } else {
+                $scope.segmentsCreatedName.push({
+                  predefined: false,
+                  id: segmentService.getSegments()[i]
+                    ._id,
+                  name: segmentService.getSegments()[
+                    i].name
+                })
+              }
             };
             $scope.segmentsCreated = true;
             console.log("$scope.segmentName: ", $scope.segmentsCreatedName);
@@ -526,7 +539,7 @@ angular.module('do.users', [])
             evt) {
 
             if ($scope.attributes[index].name == 'joined' || $scope.attributes[
-              index].name == 'last seen') {
+              index].name == 'lastSeen') {
               $scope.filters[parentindex].showPayingStatus = false;
               $scope.filters[parentindex].showHealthStatus = false;
               $scope.filters[parentindex].showDatePicker = true;
@@ -543,6 +556,7 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
+              $scope.otherTimeRange = '';
               $scope.filters[parentindex].optext = 'less than';
               $scope.filters[parentindex].val = $moment(new Date())
                 .unix() * 1000;
@@ -563,6 +577,7 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
+              $scope.otherTimeRange = '';
               $scope.filters[parentindex].optext = 'equal';
               $scope.filters[parentindex].val = '';
             } else if ($scope.attributes[index].name == 'status') {
@@ -580,6 +595,7 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
+              $scope.otherTimeRange = '';
               $scope.filters[parentindex].optext = 'equal';
               $scope.filters[parentindex].val = 'free';
               $scope.filters[parentindex].valuetext = 'Free';
@@ -599,6 +615,7 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
+              $scope.otherTimeRange = '';
               $scope.filters[parentindex].optext = 'equal';
               $scope.filters[parentindex].val = 'poor';
               $scope.filters[parentindex].valuetext = 'Poor';
@@ -617,6 +634,7 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
+              $scope.otherTimeRange = '';
               $scope.filters[parentindex].optext = 'equal';
               $scope.filters[parentindex].val = '';
             }
@@ -884,8 +902,13 @@ angular.module('do.users', [])
 
             if ($scope.segmentClicked == true) {
               $scope.showSaveButton = false;
-              $scope.shmsgowUpdateButton = true;
+              $scope.showUpdateButton = true;
             }
+
+            // if($scope.segmentClicked == true && $scope.isHealth == true) {
+            //   $scope.showSaveButton = false;
+            //   $scope.showUpdateButton = false;
+            // }
             console.log("$scope.filters: ", $scope.filters);
           }
 
@@ -940,7 +963,7 @@ angular.module('do.users', [])
                   i].firstSessionAt)
                   .format("MMMM Do YYYY"),
                 health: UserList.getUsers()[i].health,
-                lastsession: moment(UserList.getUsers()[i].lastSess)
+                lastsession: moment(UserList.getUsers()[i].lastSeen)
                   .format("MMMM Do YYYY"),
                 unsubscribed: UserList.getUsers()[
                   i].unsubscribed
@@ -1395,6 +1418,7 @@ angular.module('do.users', [])
               .list;
             $scope.queryObject.op = segmentService.getSingleSegment()
               .op;
+            $scope.text = $scope.queryObject.op.toUpperCase();
             $scope.queryObject.filters = getFilters;
             console.log("queryobject: ", $scope.queryObject);
 
@@ -1414,6 +1438,13 @@ angular.module('do.users', [])
           $scope.showQuery = function (segId, index, segname) {
             $scope.segmentClicked = true;
             $scope.showUpdateButton = true;
+            if (segname.name == 'Good Health' || segname.name ==
+              'Average Health' || segname.name == 'Poor Health') {
+              // $scope.showUpdateButton = false;
+              $scope.isHealth = true;
+            } else {
+              $scope.isHealth = false;
+            }
             this.showAutoMsgBtn = true;
             $scope.selectedIndex = index;
             $scope.showSaveButton = false;
@@ -1701,8 +1732,8 @@ angular.module('do.users', [])
               if (prop != 'companies' && prop != 'ct' && prop != 'meta' &&
                 prop != 'ut' && prop != '__v' && prop != 'aid' && prop !=
                 '_id') {
-                if (prop == 'lastSess') {
-                  prop = 'Last Session';
+                if (prop == 'lastSeen') {
+                  prop = 'Last Seen';
                   value = $moment(value)
                     .fromNow()
                 }
@@ -1976,7 +2007,7 @@ angular.module('do.users', [])
             name: data.name,
             profilegravatar: gravatar,
             profilesrc: src,
-            lastSession: data.lastSess
+            lastSession: data.lastSeen
           }
 
           $scope.userDataFirstList = [];
