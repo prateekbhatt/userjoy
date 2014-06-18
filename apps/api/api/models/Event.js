@@ -265,7 +265,7 @@ EventSchema.statics.automessage = function (ids, state, title, cb) {
     upsert: true
   };
 
-  Event.findOneAndUpdate(conditions, update, options, cb);
+  Event.update(conditions, update, options, cb);
 };
 
 
