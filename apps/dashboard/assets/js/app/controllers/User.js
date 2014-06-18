@@ -310,12 +310,25 @@ angular.module('do.users', [])
             .length > 0) {
             for (var i = 0; i < segmentService.getSegments()
               .length; i++) {
-              $scope.segmentsCreatedName.push({
-                id: segmentService.getSegments()[i]
-                  ._id,
-                name: segmentService.getSegments()[
-                  i].name
-              })
+              if (segmentService.getSegments()[i].name == 'Good Health' ||
+                segmentService.getSegments()[i].name == 'Average Health' ||
+                segmentService.getSegments()[i].name == 'Poor Health') {
+                $scope.segmentsCreatedName.push({
+                  predefined: true,
+                  id: segmentService.getSegments()[i]
+                    ._id,
+                  name: segmentService.getSegments()[
+                    i].name
+                })
+              } else {
+                $scope.segmentsCreatedName.push({
+                  predefined: false,
+                  id: segmentService.getSegments()[i]
+                    ._id,
+                  name: segmentService.getSegments()[
+                    i].name
+                })
+              }
             };
             $scope.segmentsCreated = true;
             console.log("$scope.segmentName: ", $scope.segmentsCreatedName);
@@ -889,8 +902,13 @@ angular.module('do.users', [])
 
             if ($scope.segmentClicked == true) {
               $scope.showSaveButton = false;
-              $scope.shmsgowUpdateButton = true;
+              $scope.showUpdateButton = true;
             }
+
+            // if($scope.segmentClicked == true && $scope.isHealth == true) {
+            //   $scope.showSaveButton = false;
+            //   $scope.showUpdateButton = false;
+            // }
             console.log("$scope.filters: ", $scope.filters);
           }
 
@@ -1420,6 +1438,13 @@ angular.module('do.users', [])
           $scope.showQuery = function (segId, index, segname) {
             $scope.segmentClicked = true;
             $scope.showUpdateButton = true;
+            if (segname.name == 'Good Health' || segname.name ==
+              'Average Health' || segname.name == 'Poor Health') {
+              // $scope.showUpdateButton = false;
+              $scope.isHealth = true;
+            } else {
+              $scope.isHealth = false;
+            }
             this.showAutoMsgBtn = true;
             $scope.selectedIndex = index;
             $scope.showSaveButton = false;
