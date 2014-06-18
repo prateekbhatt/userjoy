@@ -641,8 +641,24 @@ angular.module('do.settings', [])
 ])
 
 .controller('appSettingsInstallationCtrl', ['$scope', '$log', '$state',
-  function ($scope, $log, $state) {
-
+  '$stateParams', '$location',
+  function ($scope, $log, $state, $stateParams, $location) {
+    $scope.apiKey = $stateParams.id;
+    $scope.sendToDeveloper = function () {
+      $location.path('/apps/' + $scope.apiKey + '/sendemail');
+    }
+    $scope.selectText = function (containerid) {
+      if (document.selection) {
+        var range = document.body.createTextRange();
+        range.moveToElementText(document.getElementById(containerid));
+        range.select();
+      } else if (window.getSelection) {
+        var range = document.createRange();
+        range.selectNode(document.getElementById(containerid));
+        window.getSelection()
+          .addRange(range);
+      }
+    }
   }
 ])
 

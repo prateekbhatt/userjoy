@@ -17,7 +17,7 @@
                 <div class="row" style="padding-left: 15px;">
                     <br>
                     <br>
-                    <p ng-repeat="firstList in userDataList" ng-if="firstList.data == 'Health' && firstList.value == 'average'"><b>{{firstList.data}}</b> : {{firstList.value}} <i class="fa fa-meh-o"></i></p>
+                    <p ng-repeat="firstList in userDataList" ng-if="firstList.data == 'Health' && firstList.value == 'average'" style="color: #428bca;"><b>{{firstList.data}}</b> : {{firstList.value}} <i class="fa fa-meh-o"></i></p>
                     <p ng-repeat="firstList in userDataList" ng-if="firstList.data == 'Health' && firstList.value == 'good'" style="color: #2ecc71;"><b>{{firstList.data}}</b> : {{firstList.value}} <i class="fa fa-smile-o"></i></p>
                     <p ng-repeat="firstList in userDataList" ng-if="firstList.data == 'Health' && firstList.value == 'poor'" style="color: #e74c3c;"><b>{{firstList.data}}</b> : {{firstList.value}} <i class="fa fa-frown-o"></i></p>
                     <p ng-repeat="firstList in userDataList" ng-if="!(firstList.data == 'Health')"><b>{{firstList.data}}</b> : {{firstList.value}}</p>
