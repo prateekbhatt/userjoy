@@ -85,7 +85,7 @@ exports.sendConfirmation = function (options, cb) {
 exports.sendInvite = function (options, cb) {
   var mailer = new Mailer(options);
   mailer.subject = 'Invite to join UserJoy';
-  mailer.template = 'invite.ejs';
+  mailer.template = 'invite-email.ejs';
   mailer.send(cb);
 };
 
