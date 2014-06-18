@@ -238,7 +238,34 @@ EventSchema.statics.automessage = function (ids, state, title, cb) {
     }
   ];
 
-  Event.create(newEvent, cb);
+
+  var conditions = {
+    aid: ids.aid,
+    meta: {
+
+      $all: [
+
+        {
+          $elemMatch: newEvent.meta[0]
+        },
+
+        {
+          $elemMatch: newEvent.meta[1]
+        }
+
+      ]
+    }
+  };
+
+  var update = {
+    $setOnInsert: newEvent
+  };
+
+  var options = {
+    upsert: true
+  };
+
+  Event.findOneAndUpdate(conditions, update, options, cb);
 };
 
 

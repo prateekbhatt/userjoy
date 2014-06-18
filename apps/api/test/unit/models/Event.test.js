@@ -231,6 +231,8 @@ describe('Model Event', function () {
 
   describe('#automessage', function () {
 
+    var savedEvent;
+
     it('should create a new automessage event', function (done) {
 
       var ids = {
@@ -247,6 +249,10 @@ describe('Model Event', function () {
           .to.not.exist;
 
         evn = evn.toJSON();
+
+        // persist event to check that the same automessage event is not created
+        // twice
+        savedEvent = evn;
 
         expect(evn)
           .to.have.property("type", "auto");
@@ -269,6 +275,94 @@ describe('Model Event', function () {
         done();
 
       });
+    });
+
+
+    // MUST RUN AFTER THE ABOVE TEST
+    it('should not create same automessage event twice', function (done) {
+
+      var ids = {
+        uid: savedEvent.uid,
+        aid: savedEvent.aid,
+        amId: savedEvent.meta[0].v
+      };
+
+      var title = savedEvent.name;
+      var state = savedEvent.meta[1].v;
+
+      async.series({
+
+        oneEventShouldExist: function (cb) {
+
+          Event
+            .find({
+              aid: ids.aid,
+              uid: ids.uid,
+              meta: {
+                $all: [
+
+                  {
+                    $elemMatch: savedEvent.meta[0]
+                  },
+
+                  {
+                    $elemMatch: savedEvent.meta[1]
+                  }
+                ]
+              }
+
+            })
+            .exec(function (err, evns) {
+              expect(err)
+                .to.not.exist;
+
+              expect(evns)
+                .to.have.length(1);
+
+              cb()
+            })
+
+        },
+
+        tryCreatingAgain: function (cb) {
+          Event.automessage(ids, state, title, cb);
+        },
+
+        stillOnlyOneSuchEvent: function (cb) {
+
+          Event
+            .find({
+              aid: ids.aid,
+              uid: ids.uid,
+              meta: {
+                $all: [
+
+                  {
+                    $elemMatch: savedEvent.meta[0]
+                  },
+
+                  {
+                    $elemMatch: savedEvent.meta[1]
+                  }
+                ]
+              }
+
+            })
+            .exec(function (err, evns) {
+              expect(err)
+                .to.not.exist;
+
+              expect(evns)
+                .to.have.length(1);
+
+              cb()
+            })
+
+        }
+
+
+      }, done)
+
     });
 
 
