@@ -298,6 +298,7 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 ##### Columns:
 
 - aid (required)
+- amId (required for automessage events)
 - cid
 - ct
 - module
@@ -308,8 +309,8 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 
 ##### Notes:
 
-- 'amId' and 'state' must be required for 'automessage' events (they are stored
-as meta properties)
+- 'amId' and 'state' must be required for 'automessage' events ('state' is stored
+as meta property)
 
 
 ### AutoMessage

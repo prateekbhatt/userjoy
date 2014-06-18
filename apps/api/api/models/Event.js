@@ -65,6 +65,14 @@ var EventSchema = new Schema({
   },
 
 
+  // automessage Id
+  // this should not be part of the meta array because this is a db id
+  amId: {
+    type: Schema.Types.ObjectId,
+    ref: 'AutoMessage'
+  },
+
+
   // company Id
   cid: {
     type: Schema.Types.ObjectId,
@@ -214,6 +222,7 @@ EventSchema.statics.automessage = function (ids, state, title, cb) {
 
   var newEvent = {
     aid: ids.aid,
+    amId: ids.amId,
     name: title,
     type: 'auto',
     uid: ids.uid
@@ -222,15 +231,15 @@ EventSchema.statics.automessage = function (ids, state, title, cb) {
 
   newEvent.meta = [
 
-    {
-      k: 'amId',
+    // {
+    //   k: 'amId',
 
-      // we need to convert it from BSON to String type, since the val field is
-      // of Mixed schema type
-      //
-      // Otherwise querying back the data with a stringified id does not work
-      v: ids.amId.toString()
-    },
+    //   // we need to convert it from BSON to String type, since the val field is
+    //   // of Mixed schema type
+    //   //
+    //   // Otherwise querying back the data with a stringified id does not work
+    //   v: ids.amId.toString()
+    // },
 
     {
       k: 'state',
@@ -242,18 +251,7 @@ EventSchema.statics.automessage = function (ids, state, title, cb) {
   var conditions = {
     aid: ids.aid,
     meta: {
-
-      $all: [
-
-        {
-          $elemMatch: newEvent.meta[0]
-        },
-
-        {
-          $elemMatch: newEvent.meta[1]
-        }
-
-      ]
+      $elemMatch: newEvent.meta[0]
     }
   };
 

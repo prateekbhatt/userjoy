@@ -281,13 +281,11 @@ describe('Model Event', function () {
               expect(evn)
                 .to.have.property("name", "In App Welcome Message");
 
-              expect(evn.meta[0])
-                .to.eql({
-                  k: 'amId',
-                  v: ids.amId.toString()
-                });
+              expect(evn.amId.toString())
+                .to.eql(ids.amId.toString());
 
-              expect(evn.meta[1])
+
+              expect(evn.meta[0])
                 .to.eql({
                   k: 'state',
                   v: state
