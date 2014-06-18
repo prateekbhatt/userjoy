@@ -229,6 +229,8 @@ Query.prototype.reset = function () {
 
   this.countFilters = [];
   this.attrFilters = [];
+  this.fromAgo = null;
+  this.toAgo = null;
   this.countFilteredUids = [];
   this.rootOperator = null;
 
@@ -366,7 +368,6 @@ Query.prototype.run = function (cb) {
             return id.toString();
           });
 
-          console.log('\n\n\n runCountQueryUU', self.countFilteredUids);
 
           return cb();
         });
@@ -542,7 +543,7 @@ Query.prototype.genAttrMatchCond = function () {
   }
 
 
-  cond['$and'].push(filterQueries);
+  if (!_.isEmpty(filterQueries[root])) cond['$and'].push(filterQueries);
 
   return cond;
 };
@@ -578,7 +579,7 @@ Query.prototype.genCountGroupCond = function () {
     };
 
   });
-  console.log('\n\n\n genCountGroupCond', JSON.stringify(pipe));
+
   return pipe;
 };
 
@@ -635,7 +636,7 @@ Query.prototype.genCountBaseMatchCond = function () {
   //   };
   // }
 
-  console.log('\n\n\n genCountBaseMatchCond', JSON.stringify(matchConds));
+
   return matchConds;
 
 };
@@ -674,7 +675,6 @@ Query.prototype.genCountGroupMatchCond = function () {
 
   });
 
-  console.log('\n\n\n genCountGroupMatchCond', JSON.stringify(pipe));
   return pipe;
 
 };
