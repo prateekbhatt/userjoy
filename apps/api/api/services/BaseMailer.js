@@ -22,8 +22,8 @@ var templatesDir = path.resolve(__dirname, '../..', 'email_templates');
 
 var MAILGUN_USER = 'postmaster@mail.userjoy.co';
 var MAILGUN_PASS = '5k0o37dg6od7';
-var UJ_SUPPORT_EMAIL = 'support@userjoy.co';
-var UJ_SUPPORT_NAME = 'UserJoy';
+
+var X_MAILER = 'UserJoy Mailer';
 
 
 /**
@@ -98,7 +98,8 @@ BaseMailer.prototype.transport = nodemailer.createTransport("SMTP", {
   auth: {
     user: MAILGUN_USER,
     pass: MAILGUN_PASS
-  }
+  },
+  xMailer: X_MAILER
 });
 
 
