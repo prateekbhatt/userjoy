@@ -29,7 +29,7 @@ var isAuthenticated = require('../policies/isAuthenticated');
  * Services
  */
 
-var mailer = require('../services/mailer');
+var userMailer = require('../services/user-mailer');
 
 
 /**
@@ -512,7 +512,7 @@ router
 
             };
 
-            mailer.sendManualMessage(opts, cb);
+            userMailer.sendManualMessage(opts, cb);
           };
 
           async.map(cons, iterator, function (err) {
@@ -648,7 +648,7 @@ router
               };
 
 
-              mailer.sendManualMessage(opts, function (err) {
+              userMailer.sendManualMessage(opts, function (err) {
                 cb(err, conv);
               });
 

@@ -36,7 +36,7 @@ var render = require('../../helpers/render-message');
  * Services
  */
 
-var mailer = require('../services/mailer');
+var userMailer = require('../services/user-mailer');
 
 
 /**
@@ -219,7 +219,7 @@ router
             },
           };
 
-          mailer.sendAutoMessage(options, function (err, responseStatus) {
+          userMailer.sendAutoMessage(options, function (err, responseStatus) {
 
             if (err) {
 
