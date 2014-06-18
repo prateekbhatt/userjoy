@@ -66,7 +66,7 @@ var options = {
 };
 mailer.sendToUser(options);
 
-* /
+*/
 
 
 
@@ -117,53 +117,6 @@ BaseMailer.prototype.createAddress = function (email, name) {
   }
   return email;
 };
-
-
-// BaseMailer.prototype.options = function () {
-
-//   var opts = {
-//     from: this.createAddress(this.fromEmail, this.fromName),
-//     to: this.createAddress(this.toEmail, this.toName),
-//     subject: this.subject,
-//     html: this.html,
-//     generateTextFromHTML: true,
-//   };
-
-//   if (this.replyToEmail) {
-//     opts.replyTo = this.createAddress(this.replyToEmail, this.replyToName);
-//   }
-
-
-//   if (this.metadata) {
-//     opts.headers = {
-
-//       // REF: http://documentation.mailgun.com/user_manual.html#sending-via-smtp
-//       'X-Mailgun-Track': 'yes',
-//       'X-Mailgun-Track-Clicks': 'yes',
-//       'X-Mailgun-Track-Opens': 'yes',
-
-
-//       // REF: http://documentation.mailgun.com/user_manual.html#attaching-data-to-messages
-//       'X-Mailgun-Variables': this.metadata
-//     };
-//   }
-
-//   // in test env, do not send emails
-//   // REF 1: http://documentation.mailgun.com/user_manual.html#sending-via-smtp
-//   // REF 2: http://documentation.mailgun.com/user_manual.html#sending-in-test-mode
-//   if (!_.contains(['production', 'development'], process.env.NODE_ENV)) {
-//     opts.headers = opts.headers || {};
-//     opts.headers['X-Mailgun-Drop-Message'] = 'yes';
-//     logger.trace({
-//       at: 'mailer',
-//       key: 'Using Mailgun Test Mode'
-//     });
-//   }
-
-
-//   return opts;
-
-// };
 
 
 BaseMailer.prototype.options = function () {
