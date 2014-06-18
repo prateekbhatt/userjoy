@@ -1187,6 +1187,10 @@ angular.module('do.message', [])
 
           var lengthReply = $scope.replytext.length;
 
+          $scope.disableReply = false;
+
+          $scope.disableClose = false;
+
           $scope.changeButtonText = function () {
             if (!ThreadService.getThread()
               .closed) {
@@ -1209,6 +1213,7 @@ angular.module('do.message', [])
           }
 
           var replyCallBack = function (err) {
+            $scope.disableReply = false;
             if (err) {
               console.log("error");
               return;
@@ -1225,6 +1230,7 @@ angular.module('do.message', [])
           }
 
           var closeOrReopenReplyCallBack = function (err) {
+            $scope.disableClose = false;
             if (err) {
               console.log("error");
               return;
@@ -1270,10 +1276,12 @@ angular.module('do.message', [])
           $scope.validateAndAddReply = function () {
             var coId = '';
             // var msglength = InboxMsgService.getInboxMessage().length;
+            $scope.disableReply = true;
             coId = pathArray[4];
             console.log('reply text length is:', $scope.replytext.length);
             if (!$scope.replytext.length) {
               console.log('error in reply');
+              $scope.disableReply = false;
               $scope.showerror = true;
               return;
             }
@@ -1291,6 +1299,7 @@ angular.module('do.message', [])
 
           $scope.closeTicket = function () {
             closeButtonClicked = true;
+            $scope.disableClose = true;
 
             if (!ThreadService.getThread()
               .closed) {
@@ -1305,6 +1314,7 @@ angular.module('do.message', [])
               } else {
                 MsgService.closeConversationRequest($scope.appId, $scope
                   .coId, function (err, user) {
+                    $scope.disableClose = false;
                     if (err) {
                       console.log("error");
                       return;
@@ -1325,6 +1335,7 @@ angular.module('do.message', [])
               } else {
                 MsgService.reopenConversation($scope.appId, $scope.coId,
                   function (err, user) {
+                    $scope.disableClose = false;
                     if (err) {
                       console.log("error");
                       return;

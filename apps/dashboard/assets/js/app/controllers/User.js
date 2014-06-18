@@ -635,7 +635,8 @@ angular.module('do.users', [])
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
               $scope.otherTimeRange = '';
-              $scope.filters[parentindex].optext = 'equal';
+              $scope.filters[parentindex].optext = 'contains';
+              $scope.filters[parentindex].op = 'contains';
               $scope.filters[parentindex].val = '';
             }
           }
@@ -791,11 +792,11 @@ angular.module('do.users', [])
           }]
 
           $scope.otherAttributesQuery = [{
-            name: 'equal',
-            key: 'eq'
-          }, {
             name: 'contains',
             key: 'contains'
+          }, {
+            name: 'equal',
+            key: 'eq'
           }]
 
           $scope.chngHealthStatus = function (parentindex, index) {
@@ -2010,22 +2011,21 @@ angular.module('do.users', [])
             lastSession: data.lastSeen
           }
 
-          $scope.userDataFirstList = [];
-          $scope.userDataSecondList = [];
+          $scope.userDataList = [];
 
-          for (var i = 0; i < 7; i++) {
-            $scope.userDataFirstList.push({
+          for (var i = 0; i < $scope.userdata.length; i++) {
+            $scope.userDataList.push({
               value: $scope.userdata[i].value,
               data: $scope.userdata[i].data
             })
           };
 
-          for (var i = 7; i < $scope.userdata.length; i++) {
-            $scope.userDataSecondList.push({
-              value: $scope.userdata[i].value,
-              data: $scope.userdata[i].data
-            })
-          };
+          // for (var i = 7; i < $scope.userdata.length; i++) {
+          //   $scope.userDataSecondList.push({
+          //     value: $scope.userdata[i].value,
+          //     data: $scope.userdata[i].data
+          //   })
+          // };
 
           $scope.title = "Create Note";
           $scope.country = 'India';
@@ -2225,6 +2225,17 @@ angular.module('do.users', [])
               value.push(val);
             };
             console.log("value: ", value);
+
+            var color = '#95a5a6';
+            var colorCategory = d3.scale.category20b()
+            $scope.colorFunction = function () {
+              return function (d, i) {
+                console.log("color: ", colorCategory(i));
+                var color = '#16a085';
+                return color;
+              };
+            }
+
             $scope.graphData = [{
               "key": "Series 1",
               "values": value

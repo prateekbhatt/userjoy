@@ -1,174 +1,128 @@
 <div ng-include src="'/templates/navbar/navbar.html'"></div>
-<div class="panel panel-default">
+<div class="panel">
     <div class="panel-body">
         <div class="row">
-            <div class="col-md-6">
-                <!-- <div id="affixMe" affix="" ng-class="{affix: affixed}" ng-style="offset" relative-to="affix-demo"> -->
+            <div class="col-md-3 well">
                 <div class="row">
-                    <div class="col-sm-4 col-md-4">
-                        <img ng-src="{{user.profilegravatar}}" alt="" class="img-rounded img-responsive" style="height: 150px;" fallback-src={{user.profilesrc}}>
+                    <div class="col-md-4">
+                        <img ng-src="{{user.profilegravatar}}" alt="" class="img-rounded img-responsive" style="height: 80px;" fallback-src={{user.profilesrc}}>
                     </div>
-                    <div class="col-sm-8 col-md-8">
-                        <br>
-                        <blockquote>
-                            <p>{{user.name}}</p> <small><cite title="Source Title">Ahmedabad, India  <i class="glyphicon glyphicon-map-marker"></i></cite></small>
-                            <small><cite title="Source Title">{{user.email}} <i class="glyphicon glyphicon-envelope"></i></cite></small>
-                        </blockquote>
-                        <br>
-                        <br>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <br>
-                        <div class="btn-group" style="margin-top: 45px;">
+                    <div class="col-md-8">
+                        <div class="btn-group">
                             <button type="button" class="btn btn-info" ng-click="openMessageModal()">Message</button>
                             <button type="button" class="btn btn-info" ng-click="openNoteModal()">Note</button>
-                            <button type="button" class="btn btn-info">Tag</button>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-6">
-                <h3 class="col-md-push-3 col-md-8"><b>Recent Activity</b></h3>
-                <div class="col-md-push-3 col-md-8" id="affix-demo">
+                <div class="row" style="padding-left: 15px;">
                     <br>
-                    <p><em>{{eventDate}}</em></p>
-                    <p ng-show="!showEvents">There was no activity for {{eventDate}}</p>
-                    <ul class="list-group" ng-show="showEvents">
-                        <li class="list-group-item list-group-item-success" ng-repeat="event in events">
-                            <span>{{event.name}}</span>
-                            <em class="pull-right">{{event.when}}</em>
-                        </li>
-                    </ul>
-                    <div class="text-center">
-                        <button class="btn btn-default btn-sm text-center" ng-click="showEventNextDate()" ng-show="!showPreviousBtn">Next</button>
-                        <div class="btn-group" ng-show="showPreviousBtn">
-                            <button class="btn btn-default btn-sm text-center" ng-click="showEventPreviousDate()">Previous</button>
-                            <button class="btn btn-default btn-sm text-center" ng-click="showEventNextDate()">Next</button>
-                        </div>
+                    <br>
+                    <p ng-repeat="firstList in userDataList" ng-if="firstList.data == 'Health' && firstList.value == 'average'"><b>{{firstList.data}}</b> : {{firstList.value}} <i class="fa fa-meh-o"></i></p>
+                    <p ng-repeat="firstList in userDataList" ng-if="firstList.data == 'Health' && firstList.value == 'good'" style="color: #2ecc71;"><b>{{firstList.data}}</b> : {{firstList.value}} <i class="fa fa-smile-o"></i></p>
+                    <p ng-repeat="firstList in userDataList" ng-if="firstList.data == 'Health' && firstList.value == 'poor'" style="color: #e74c3c;"><b>{{firstList.data}}</b> : {{firstList.value}} <i class="fa fa-frown-o"></i></p>
+                    <p ng-repeat="firstList in userDataList" ng-if="!(firstList.data == 'Health')"><b>{{firstList.data}}</b> : {{firstList.value}}</p>
+                </div>
+
+            </div>
+            <div class="col-md-4 col-md-push-1">
+                <tabset justified="true">
+                <tab heading="Conversations">
+                <div class="row text-center" ng-show="msgs.length == 0">
+                    <br>
+                    <em><p>&nbsp;You have no conversations with {{user.email}}</p></em>
+                    <button type="button" class="btn btn-info" ng-click="openMessageModal()">Create Message</button>
+                </div>
+                <div class="row" ng-show="msgs.length">
+
+                    <br>
+                    <div class="col-md-12" style="margin-left: 15px">
+                        <table class="table table-striped table-condensed">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Sub</th>
+                                    <th class="text-center">When</th>
+                                    <th class="text-center">Opened</th>
+                                    <th class="text-center">Replied</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="text-center" ng-repeat="msg in msgs">
+                                    <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer;">{{msg.sub}}</td>
+                                    <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer;">{{msg.when}}</td>
+                                    <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer;">
+                                        <span class="glyphicon glyphicon-ok" ng-show="{{msg.opened}}"></span>
+                                        <span class="glyphicon glyphicon-remove" ng-show="{{!msg.opened}}"></span>
+                                    </td>
+                                    <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer;">
+                                        <span class="glyphicon glyphicon-ok" ng-show="{{msg.replied}}"></span>
+                                        <span class="glyphicon glyphicon-remove" ng-show="{{!msg.replied}}"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                </tab>
+                <tab heading="Notes">
+                <div class="row text-center" ng-show="notes.length == 0">&nbsp;
+                    <br>
+                    <em><p>No notes have been created about {{user.email}}</p></em>
+                    <button type="button" class="btn btn-info" ng-click="openNoteModal()">Create a Note</button>
+                </div>
+                <div class="row" ng-show="notes.length">&nbsp;
+                    <br>
+                    <div class="col-md-12" style="margin-left: 15px">
+                        <table class="table table-striped table-condensed">
+                            <thead>
+                                <tr>
+                                    <th width="50%" class="text-center">Text</th>
+                                    <th width="50%" class="text-center">When</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="note in notes">
+                                    <td class="text-center">{{note.text}}</td>
+                                    <td class="text-center">{{note.when}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                </tab>
+                <tab heading="Score">
+                <div class="row">
+                    <div>
+                        <nvd3-discrete-bar-chart data="graphData"  id="showXAxisExample" width="450" height="230" xAxisTickFormat="xAxisTickFormatFunction()" showYAxis="true" showXAxis="false" tooltips="true" tooltipcontent="toolTipContentFunction()" color="colorFunction()"><svg></svg>
+                        </nvd3-discrete-bar-chart>
+                    </div>
+                </div>
+                </tab>
+                </tabset>
+            </div>
+            <div class="col-md-3 col-md-push-2">
+                <h4><b>Recent Activity</b></h4>
+                <div class="text-center">
+                    <button class="btn btn-default btn-sm text-center" ng-click="showEventNextDate()" ng-show="!showPreviousBtn">Next</button>
+                    <div class="btn-group" ng-show="showPreviousBtn">
+                        <button class="btn btn-default btn-sm text-center" ng-click="showEventPreviousDate()">Previous</button>
+                        <button class="btn btn-default btn-sm text-center" ng-click="showEventNextDate()">Next</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12" id="affix-demo">
+                        <br>
+                        <p><em>{{eventDate}}</em></p>
+                        <p ng-show="!showEvents">There was no activity for {{eventDate}}</p>
+                        <ul class="list-group" ng-show="showEvents">
+                            <li class="list-group-item list-group-item-success" ng-repeat="event in events">
+                                <span>{{event.name}}</span>
+                                <em class="pull-right">{{event.when}}</em>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
         </div>
-        <br>
-        <div><hr>
-        </div>
-        <br>
-        <div class="row">
-            <div class="col-sm-6 col-md-6">
-                <div class="panel panel-default" style="height: 250px;">
-                    <div class="panel-body">
-                        <div class="col-md-6">
-                            <p ng-repeat="firstList in userDataFirstList"><b>{{firstList.data}}</b>: {{firstList.value}}</p>
-                            <!-- <p> Pulse: {{user.healthScore}}/100</p>
-                            <p> Plan: {{user.plan}}</p>
-                            <p> Plan Value: {{user.currency}} {{user.planValue}}</p>
-                            <p> First Seen: {{user.firstSeen}}</p> -->
-                        </div>
-                        <div class="col-md-6">
-                            <p ng-repeat="secondList in userDataSecondList"> <b>{{secondList.data}}</b>: {{secondList.value}}</p>
-                            <!-- <p> Country: {{country}}</p>
-                            <p> Platform: {{os}}</p>
-                            <p> Browser: {{browser}}</p> -->
-                        </div>
-                        <!-- <p> Renewal: {{renewal}}</p> -->
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-md-6">
-                <div class="panel panel-default" style="height: 250px;">
-                    <div class="panel-body">
-                        <div class="row" ng-show="msgs.length == 0">
-                            <em><h4><strong>&nbsp;Latest Conversations</strong></h4></em>
-                            <br>
-                            <br>
-                            <br>
-                            <em><h4>&nbsp;No conversations with {{user.email}}</h4></em>
-                        </div>
-                        <div class="row" ng-show="msgs.length">
-                            <em><h4><strong>Latest Conversations</strong></h4></em>
-                            <br>
-                            <div class="col-md-8" style="margin-left: 15px">
-                                <table class="table table-striped table-condensed" style="display: block; height: 150px; overflow-y: scroll;">
-                                    <thead>
-                                        <tr>
-                                            <th class="text-center">Sub</th>
-                                            <th class="text-center">When</th>
-                                            <th class="text-center">Opened</th>
-                                            <th class="text-center">Replied</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr class="text-center" ng-repeat="msg in msgs">
-                                            <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer;">{{msg.sub}}</td>
-                                            <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer;">{{msg.when}}</td>
-                                            <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer;">
-                                                <span class="glyphicon glyphicon-ok" ng-show="{{msg.opened}}"></span>
-                                                <span class="glyphicon glyphicon-remove" ng-show="{{!msg.opened}}"></span>
-                                            </td>
-                                            <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer;">
-                                                <span class="glyphicon glyphicon-ok" ng-show="{{msg.replied}}"></span>
-                                                <span class="glyphicon glyphicon-remove" ng-show="{{!msg.replied}}"></span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <br>
-        <br>
-        <div class="row">
-            <div class="col-sm-6 col-md-6">
-                <div class="panel panel-default" style="height: 250px;">
-                    <div class="panel-body">
-                            <div class="row" ng-show="notes.length == 0">&nbsp;
-                                <em><h4><strong>Notes for {{user.email}}</strong></h4></em>
-                                <br>
-                                <br>
-                                <br>
-                                <em><h4>No notes created</h4></em>
-                            </div>
-                            <div class="row" ng-show="notes.length">&nbsp;
-                                <em><h4><strong>Notes created for Savinay</strong></h4></em>
-                                <br>
-                                <div class="col-md-8" style="margin-left: 15px">
-                                    <table class="table table-striped table-condensed" style="display: block; height: 150px; overflow-y: scroll;">
-                                        <thead>
-                                            <tr>
-                                                <th width="50%" class="text-center">Text</th>
-                                                <th width="50%" class="text-center">When</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr ng-repeat="note in notes">
-                                                <td class="text-center">{{note.text}}</td>
-                                                <td class="text-center">{{note.when}}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-md-6">
-                <div class="panel panel-default" style="height: 250px;">
-                    <div class="panel-body">
-                        <div class="row">
-                            <em><h4><strong>Pulse</strong></h4></em>
-                            <div>
-                                <nvd3-discrete-bar-chart data="graphData"  id="showXAxisExample" width="450" height="230" xAxisTickFormat="xAxisTickFormatFunction()" showYAxis="true" showXAxis="false" tooltips="true" tooltipcontent="toolTipContentFunction()"><svg></svg>
-                                </nvd3-discrete-bar-chart>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
     </div>
 </div>
