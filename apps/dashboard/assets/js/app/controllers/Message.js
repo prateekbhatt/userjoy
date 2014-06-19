@@ -757,17 +757,23 @@ angular.module('do.message', [])
               var isSeen = false;
               var mObj = {
                 messagebody: m.body,
-                createdby: m.sName,
                 createdat: $moment(m.ct)
                   .fromNow(),
                 seen: isSeen
               };
+
               if (m.from === 'user') {
                 mObj.email = userEmail;
               }
               if (m.from === 'account') {
                 console.log("accoid.email: ", m.accid.email);
                 mObj.email = m.accid.email;
+              }
+
+              if(m.sName) {
+                mObj.createdby = m.sName;
+              } else {
+                mObj.createdby = mObj.email;
               }
 
               mObj.seen = (m.from === 'account') && m.seen;
@@ -1026,7 +1032,11 @@ angular.module('do.message', [])
               var storedimgsrc = '';
               console.log("message object: ", $scope.messages[i]);
               var name = $scope.messages[i].createdby;
-              var initials = name.charAt(0);
+              if(name) {
+                var initials = name.charAt(0);
+              } else {
+                var initials = $scope.messages[i].email.charAt(0);
+              }
               var color = getRandomColor();
               for (var j = 0; j < i; j++) {
                 console.log("i: ", i);
