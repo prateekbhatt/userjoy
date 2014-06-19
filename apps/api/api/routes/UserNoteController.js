@@ -24,13 +24,6 @@ var hasAccess = require('../policies/hasAccess');
 
 
 /**
- * Services
- */
-
-var mailer = require('../services/mailer');
-
-
-/**
  * Helpers
  */
 

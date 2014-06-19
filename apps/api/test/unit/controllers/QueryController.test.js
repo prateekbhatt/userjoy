@@ -29,6 +29,7 @@ describe('Resource /query', function () {
    */
 
   var User = require('../../../api/models/User');
+  var Event = require('../../../api/models/Event');
 
 
   before(function (done) {
@@ -68,8 +69,42 @@ describe('Resource /query', function () {
 
     var aid;
     var url;
+    var uid;
 
     var obj = {};
+
+    before(function (done) {
+
+      aid = saved.apps.first._id;
+
+      async.waterfall(
+
+        [
+
+          function createUser(cb) {
+            User
+              .create({
+                aid: aid,
+                score: 20
+              }, cb)
+          },
+
+          function createEvent(user, cb) {
+
+            Event
+              .create({
+                aid: aid,
+                uid: user._id,
+                type: 'track',
+                name: 'Create Message'
+              }, cb)
+
+          }
+        ],
+        done
+      );
+
+    });
 
 
     beforeEach(function () {
@@ -86,7 +121,7 @@ describe('Resource /query', function () {
 
           {
             method: 'attr',
-            name: 'healthScore',
+            name: 'score',
             op: 'gt',
             val: 10
           }

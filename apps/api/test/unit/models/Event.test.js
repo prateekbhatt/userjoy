@@ -231,44 +231,95 @@ describe('Model Event', function () {
 
   describe('#automessage', function () {
 
+    var ids = {
+      uid: randomId(),
+      aid: randomId(),
+      amId: randomId()
+    };
+    var title = 'In App Welcome Message';
+    var state = 'queued';
     it('should create a new automessage event', function (done) {
 
-      var ids = {
-        uid: randomId(),
-        aid: randomId(),
-        amId: randomId()
-      };
+      var savedEventId;
 
-      var title = 'In App Welcome Message';
-      var state = 'queued';
-      Event.automessage(ids, state, title, function (err, evn) {
+      async.series({
+
+        shouldCreateEvent: function (cb) {
+
+          Event.automessage(ids, state, title, function (err, n, raw) {
+
+            expect(err)
+              .to.not.exist;
+
+            expect(n)
+              .to.eql(1);
+
+            expect(raw.updatedExisting)
+              .to.be.false;
+
+            savedEventId = raw.upserted[0]._id;
+
+            cb();
+
+          });
+        },
+
+
+        checkTheEvent: function (cb) {
+
+          Event
+            .findById(savedEventId)
+            .exec(function (err, evn) {
+              expect(err)
+                .to.not.exist;
+
+              evn = evn.toJSON();
+
+              expect(evn)
+                .to.have.property("type", "auto");
+
+              expect(evn)
+                .to.have.property("name", "In App Welcome Message");
+
+              expect(evn.amId.toString())
+                .to.eql(ids.amId.toString());
+
+
+              expect(evn.meta[0])
+                .to.eql({
+                  k: 'state',
+                  v: state
+                });
+
+              cb()
+            })
+        }
+
+      }, done)
+
+    });
+
+
+    // MUST RUN AFTER THE ABOVE TEST
+    it('should not create same automessage event twice', function (done) {
+
+      Event.automessage(ids, state, title, function (err, n, raw) {
 
         expect(err)
           .to.not.exist;
 
-        evn = evn.toJSON();
+        expect(n)
+          .to.eql(1);
 
-        expect(evn)
-          .to.have.property("type", "auto");
+        expect(raw.updatedExisting)
+          .to.be.true;
 
-        expect(evn)
-          .to.have.property("name", "In App Welcome Message");
+        expect(raw.upserted)
+          .to.not.exist;
 
-        expect(evn.meta[0])
-          .to.eql({
-            k: 'amId',
-            v: ids.amId.toString()
-          });
-
-        expect(evn.meta[1])
-          .to.eql({
-            k: 'state',
-            v: state
-          });
-
-        done();
-
+        done()
       });
+
     });
 
 
