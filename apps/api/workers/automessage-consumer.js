@@ -44,7 +44,7 @@ var Segment = require('../api/models/Segment');
  * Services
  */
 
-var mailer = require('../api/services/mailer');
+var userMailer = require('../api/services/user-mailer');
 
 
 /**
@@ -380,7 +380,7 @@ function amConsumer(cb) {
             };
 
 
-            mailer.sendAutoMessage(options, function (err) {
+            userMailer.sendAutoMessage(options, function (err) {
               if (err) return cb(err);
 
               var ids = {

@@ -81,6 +81,16 @@ We allow the apps to pass custom attributes related to users, companies and even
 >
 
 
+###### Query
+
+- Run count query and attr query separately. This it to ensure 'AND/OR' work as expected across count and attr queries
+- hasnotdone: query events by time
+cases:
+- Edge cases
+1. sometimes hasdone event + hasnotdone event =/= total users
+
+
+
 ###### Email Types
 
 - behavioral (segments, interval-hourly/daily, initially  just daily): for each segment, a user can get this message only once
@@ -288,6 +298,7 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 ##### Columns:
 
 - aid (required)
+- amId (required for automessage events)
 - cid
 - ct
 - module
@@ -298,8 +309,8 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 
 ##### Notes:
 
-- 'amId' and 'state' must be required for 'automessage' events (they are stored
-as meta properties)
+- 'amId' and 'state' must be required for 'automessage' events ('state' is stored
+as meta property)
 
 
 ### AutoMessage

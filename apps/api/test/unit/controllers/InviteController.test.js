@@ -132,6 +132,9 @@ describe('Resource /apps/:aid/invites', function () {
           .expect(201)
           .end(function (err, res) {
 
+            expect(err)
+              .to.not.exist;
+
             expect(res.body)
               .to.be.an("object");
 

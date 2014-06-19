@@ -29,7 +29,7 @@ var isAuthenticated = require('../policies/isAuthenticated');
  * Services
  */
 
-var mailer = require('../services/mailer');
+var accountMailer = require('../services/account-mailer');
 
 
 function signupWithInvite(account, inviteId, cb) {
@@ -120,7 +120,7 @@ function signupWithoutInvite(account, cb) {
           }
         };
 
-        mailer.sendConfirmation(mailOptions, function (err) {
+        accountMailer.sendConfirmation(mailOptions, function (err) {
           cb(err, acc);
         });
 
