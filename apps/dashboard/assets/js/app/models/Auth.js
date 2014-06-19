@@ -24,7 +24,6 @@ angular.module('models.auth', ['services'])
           ipCookie('loggedin', "true", {
             path: '/'
           });
-
           LoginService.setUserAuthenticated(true);
           login.setLoggedIn(true);
           $rootScope.loggedIn = true;

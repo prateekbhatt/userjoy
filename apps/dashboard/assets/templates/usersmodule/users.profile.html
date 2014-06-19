@@ -22,10 +22,17 @@
                     <p ng-repeat="firstList in userDataList" ng-if="firstList.data == 'Health' && firstList.value == 'poor'" style="color: #e74c3c;"><b>{{firstList.data}}</b> : {{firstList.value}} <i class="fa fa-frown-o"></i></p>
                     <p ng-repeat="firstList in userDataList" ng-if="!(firstList.data == 'Health')"><b>{{firstList.data}}</b> : {{firstList.value}}</p>
                 </div>
-
             </div>
             <div class="col-md-4 col-md-push-1">
                 <tabset justified="true">
+                <tab heading="Score">
+                <div class="row">
+                    <div>
+                        <nvd3-discrete-bar-chart data="graphData"  id="showXAxisExample" width="450" height="230" xAxisTickFormat="xAxisTickFormatFunction()" showYAxis="true" showXAxis="false" tooltips="true" tooltipcontent="toolTipContentFunction()" color="colorFunction()"><svg></svg>
+                        </nvd3-discrete-bar-chart>
+                    </div>
+                </div>
+                </tab>
                 <tab heading="Conversations">
                 <div class="row text-center" ng-show="msgs.length == 0">
                     <br>
@@ -33,7 +40,6 @@
                     <button type="button" class="btn btn-info" ng-click="openMessageModal()">Create Message</button>
                 </div>
                 <div class="row" ng-show="msgs.length">
-
                     <br>
                     <div class="col-md-12" style="margin-left: 15px">
                         <table class="table table-striped table-condensed">
@@ -89,14 +95,7 @@
                     </div>
                 </div>
                 </tab>
-                <tab heading="Score">
-                <div class="row">
-                    <div>
-                        <nvd3-discrete-bar-chart data="graphData"  id="showXAxisExample" width="450" height="230" xAxisTickFormat="xAxisTickFormatFunction()" showYAxis="true" showXAxis="false" tooltips="true" tooltipcontent="toolTipContentFunction()" color="colorFunction()"><svg></svg>
-                        </nvd3-discrete-bar-chart>
-                    </div>
-                </div>
-                </tab>
+
                 </tabset>
             </div>
             <div class="col-md-3 col-md-push-2">
@@ -123,6 +122,6 @@
                 </div>
             </div>
         </div>
-        
+
     </div>
 </div>

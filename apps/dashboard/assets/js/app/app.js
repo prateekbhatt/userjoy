@@ -201,7 +201,8 @@ var app = angular.module('dodatado', [
             $rootScope.error = false;
           }, 5000);
         }
-        if (rejection.status === 401 && $location.path() === '/login' && rejection.config.method === 'POST') {
+        if (rejection.status === 401 && $location.path() === '/login' &&
+          rejection.config.method === 'POST') {
           console.log("rejection loggin in : ", rejection);
           $rootScope.errMsgRootScope = rejection.data.error;
           $rootScope.error = true;
@@ -211,10 +212,13 @@ var app = angular.module('dodatado', [
             $rootScope.error = false;
           }, 5000);
         }
-
+        var url = $location.path().split('/');
+        console.log("url: ", url);
+        var checkUrl = url[1];
+        console.log("url 1: ", url[1]);
         // if we're not logged-in to the web service, redirect to login page
-        if (rejection.status === 401 && $location.path() !=
-          '/login') {
+        if (rejection.status === 401 && checkUrl !=
+          'login' && checkUrl != 'forgot-password') {
           console.log("401 status logout");
           loginProvider.setLoggedIn = false;
           $rootScope.loggedIn = false;
@@ -293,15 +297,13 @@ var app = angular.module('dodatado', [
 
 .run(['AccountService', 'AccountModel', '$log', '$rootScope',
   function (AccountService, AccountModel, $log, $rootScope) {
-    if ($rootScope.loggedIn) {
-      AccountModel.get(function (err, acc) {
-        if (err) {
-          return;
-        }
-        console.log("accounts", acc);
-        AccountService.set(acc);
-      });
-    }
+    AccountModel.get(function (err, acc) {
+      if (err) {
+        return;
+      }
+      console.log("accounts", acc);
+      AccountService.set(acc);
+    });
   }
 ])
 

@@ -14,11 +14,21 @@ angular.module('do.login', [])
         authenticate: false
       })
       .state('forgotPassword', {
-        url: '/forgotPassword',
+        url: '/forgot-password',
         views: {
           "main": {
             templateUrl: '/templates/LoginSignup/forgotPassword.html',
             controller: 'forgotPasswordCtrl',
+          }
+        },
+        authenticate: false
+      })
+      .state('setNewPassword', {
+        url: '/forgot-password/:id',
+        views: {
+          "main": {
+            templateUrl: '/templates/LoginSignup/setNewPassword.html',
+            controller: 'setNewPasswordCtrl',
           }
         },
         authenticate: false
@@ -39,10 +49,10 @@ angular.module('do.login', [])
 
 .controller('LoginCtrl', ['$scope', 'LoginService', 'AuthService', '$state',
   '$log', 'ErrMsgService', 'login', '$location', '$rootScope', 'AppService',
-  'CurrentAppService',
+  'CurrentAppService', '$timeout',
   function ($scope, LoginService, AuthService, $state, $log,
     ErrMsgService, login, $location, $rootScope, AppService,
-    CurrentAppService) {
+    CurrentAppService, $timeout) {
 
     console.log('LoginProvider:', login.getLoggedIn());
     $scope.errMsg = '';
@@ -69,10 +79,14 @@ angular.module('do.login', [])
 
     var callback = function (err) {
       $scope.disableLogin = false;
-      if(err) {
+      if (err) {
         console.log("error in signing in");
         console.log(err.error);
+        $rootScope.error = true;
         $rootScope.errMsgRootScope = err.error;
+        $timeout(function () {
+          $rootScope.error = false;
+        }, 5000);
       }
     }
 
@@ -92,14 +106,44 @@ angular.module('do.login', [])
   }
 ])
 
-.controller('forgotPasswordCtrl', ['$scope',
-  function ($scope) {
+.controller('forgotPasswordCtrl', ['$scope', 'AccountModel', '$rootScope',
+  '$timeout',
+  function ($scope, AccountModel, $rootScope, $timeout) {
+    var callback = function (err) {
+      if (err) {
+        console.log("error");
+        return;
+      } else {
+        $rootScope.success = true;
+        $rootScope.successMsgRootScope =
+          'An email has been sent to reset your password';
+        $timeout(function () {
+          $rootScope.error = false;
+        }, 5000);
+      }
 
+    }
+    $scope.forgotPassword = function () {
+      AccountModel.forgotPassword($scope.email, callback);
+    }
+  }
+])
+
+.controller('setNewPasswordCtrl', ['$scope', '$stateParams', 'AccountModel',
+  '$rootScope', '$timeout',
+  function ($scope, $stateParams, AccountModel, $rootScope, $timeout) {
+
+    var tokenId = $stateParams.id;
+    $scope.resetPasswordNew = function () {
+      if ($scope.newPassword === $scope.repeatPassword) {
+        AccountModel.resetPasswordNew(tokenId, $scope.repeatPassword);
+      } else {
+        $rootScope.error = true;
+        $rootScope.errMsgRootScope = 'The passwords do not match';
+        $timeout(function () {
+          $rootScope.error = false;
+        }, 5000);
+      }
+    }
   }
 ]);
-
-// .controller('signupCtrl', ['$scope',
-//     function ($scope) {
-
-//     }
-// ]);

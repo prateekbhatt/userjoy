@@ -148,8 +148,8 @@ angular.module('do.automate', [])
 
         $scope.showAutoMsg = function (index) {
           $location.path('/apps/' + $scope.currApp +
-            '/messages/automate/status/' + $scope.automessages[
-              index].id);
+            '/messages/automate/' + $scope.automessages[
+              index].id + '/update');
         }
 
         $scope.changeMsgStatus = function (id, text, index) {
@@ -303,7 +303,8 @@ angular.module('do.automate', [])
   'AccountService', 'modelsSegment',
   function ($scope, saveMsgService, $location, modelsAutomate,
     AppService, segmentService, ErrMsgService, $stateParams,
-    AutoMsgService, CurrentAppService, AppModel, AccountService, modelsSegment) {
+    AutoMsgService, CurrentAppService, AppModel, AccountService,
+    modelsSegment) {
 
 
     CurrentAppService.getCurrentApp()
@@ -321,13 +322,14 @@ angular.module('do.automate', [])
 
         var populatePage = function () {
           // $scope.email = "savinay@dodatado.com";
-          
+
           var cb = function (err) {
-            if(err) {
+            if (err) {
               return err;
             }
             console.log("success in getting a segment");
-            $scope.segment = segmentService.getSingleSegment().name;
+            $scope.segment = segmentService.getSingleSegment()
+              .name;
           }
           modelsSegment.getSegment($scope.currApp, $scope.segid, cb);
           $scope.selectedMessageType = {
@@ -471,6 +473,10 @@ angular.module('do.automate', [])
     $scope.showNotification = false;
     $scope.showEmail = false;
     $scope.showAutoMsgError = false;
+
+    $scope.doTheBack = function () {
+      window.history.back();
+    }
 
     var populateAutoMsg = function () {
       console.log("AutoMsgService getSingleAutoMsg: ",
@@ -672,9 +678,9 @@ angular.module('do.automate', [])
 ])
 
 .controller('statusMsgCtrl', ['$scope', 'saveMsgService', 'modelsAutomate',
-  'AppService', 'AutoMsgService', '$stateParams',
+  'AppService', 'AutoMsgService', '$stateParams', '$location',
   function ($scope, saveMsgService, modelsAutomate, AppService,
-    AutoMsgService, $stateParams) {
+    AutoMsgService, $stateParams, $location) {
     $scope.currApp = $stateParams.id;
     $scope.msgId = $stateParams.mid;
     var showAutoMsgCallback = function (err) {
@@ -734,9 +740,11 @@ angular.module('do.automate', [])
         modelsAutomate.deActivateMsg($scope.currApp,
           $scope.msgId);
         $scope.msgStatus = 'Make it Live';
+        $location.path('/apps/' + $scope.currApp + '/messages/automate');
       } else {
         modelsAutomate.makeMsgLive($scope.currApp, $scope.msgId);
         $scope.msgStatus = 'Deactivate this Message';
+        $location.path('/apps/' + $scope.currApp + '/messages/automate');
       }
     }
 
