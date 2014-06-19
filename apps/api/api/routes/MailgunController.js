@@ -43,8 +43,11 @@ function mailgunCallback(req, res, next) {
 
     } else {
 
-      logger.debug('Mailgun Output');
-
+      logger.trace({
+        at: 'Mailgun Output',
+        body: req.body
+      });
+      
       res.json();
     }
 
@@ -272,7 +275,7 @@ router
 
     } else if (type === 'manual') {
 
-      Conversation.sent(messageId, cb);
+      Conversation.opened(messageId, cb);
 
     } else {
       // tracking must have been disabled
