@@ -63,7 +63,7 @@ router
 
     logger.trace({
       at: 'MailgunController new',
-      body: req.body,
+      // body: req.body['stripped-text'],
       param: req.params
     })
 
@@ -133,7 +133,7 @@ router
 
     logger.trace({
       at: 'MailgunController reply',
-      body: req.body,
+      // body: req.body['stripped-text'],
       param: req.params
     })
 
@@ -222,7 +222,7 @@ router
 
     } else {
 
-      cb(new Error('neither manual not automessage'));
+      callback(new Error('neither manual not automessage'));
     }
 
   });
