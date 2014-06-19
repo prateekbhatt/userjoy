@@ -7,7 +7,7 @@ angular.module('models.auth', ['services'])
     $location, AppService, ErrMsgService, authService, login,
     $rootScope) {
 
-    this.attemptLogin = function (email, password) {
+    this.attemptLogin = function (email, password, callback) {
 
       var loginSuccessful;
 
@@ -55,12 +55,9 @@ angular.module('models.auth', ['services'])
               $log.error("error in fetching /apps");
               // TODO
             })
+            callback(null);
         })
-        .error(function (err) {
-          console.log("error in signing in");
-          console.log(err.error);
-          $rootScope.errMsgRootScope = err.error;
-        })
+        .error(callback);
     };
 
     this.logout = function () {
