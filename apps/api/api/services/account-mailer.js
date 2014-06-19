@@ -103,6 +103,21 @@ exports.sendInstallCode = function (options, cb) {
   mailer.send(cb);
 };
 
+
+/**
+ * Sends forgot password url
+ *
+ * @param {object} options
+ * @param {function} cb callback
+ */
+
+exports.sendForgotPassword = function (options, cb) {
+  var mailer = new Mailer(options);
+  mailer.subject = 'Forgot Password: UserJoy';
+  mailer.template = 'forgot-password.ejs';
+  mailer.send(cb);
+};
+
 /**
  * FOR TESTING PURPOSE
  *
