@@ -41,19 +41,19 @@ var logger = require('../../helpers/logger');
 var render = require('../../helpers/render-message');
 
 
-/**
- * Creates the Reply-To email to track conversation threads
- *
- * e.g. '532d6bf862d673ba7131812e+535d131c67d02dc60b2b1764@mail.userjoy.co'
- */
+// /**
+//  * Creates the Reply-To email to track conversation threads
+//  *
+//  * e.g. '532d6bf862d673ba7131812e+535d131c67d02dc60b2b1764@mail.userjoy.co'
+//  */
 
-function replyToEmailManual(fromEmail, conversationId) {
-  var emailSplit = fromEmail.split('@');
-  var emailLocal = emailSplit[0];
-  var emailDomain = emailSplit[1];
-  var email = emailLocal + '+' + conversationId + '@' + emailDomain;
-  return email;
-}
+// function replyToEmailManual(fromEmail, conversationId) {
+//   var emailSplit = fromEmail.split('@');
+//   var emailLocal = emailSplit[0];
+//   var emailDomain = emailSplit[1];
+//   var email = emailLocal + '+' + conversationId + '@' + emailDomain;
+//   return email;
+// }
 
 
 // add templateDate property to each message in the conversation for
@@ -479,7 +479,11 @@ router
 
             var fromEmail = appEmail(aid);
             var fromName = req.user.name;
-            var replyToEmail = replyToEmailManual(fromEmail, conv._id);
+            var replyToEmail = appEmail.reply.create({
+              aid: conv.aid.toString(),
+              type: 'manual',
+              messageId: conv._id
+            });
 
             var opts = {
 
@@ -495,7 +499,8 @@ router
               // pass the message id of the reply
               // this would be used to track if the message was opened
               metadata: {
-                'mId': msgId
+                'uj_type': 'manual',
+                'uj_mid': msgId
               },
 
               replyTo: {
@@ -609,7 +614,11 @@ router
 
               var fromEmail = appEmail(aid);
               var fromName = req.user.name;
-              var replyToEmail = replyToEmailManual(fromEmail, conv._id);
+              var replyToEmail = appEmail.reply.create({
+                aid: conv.aid.toString(),
+                type: 'manual',
+                messageId: conv._id
+              });
 
 
               // clone the conversation, in order to avoid the messages array
@@ -630,7 +639,8 @@ router
                 // pass the message id of the reply
                 // this would be used to track if the message was opened
                 metadata: {
-                  'mId': msgId
+                  'uj_type': 'manual',
+                  'uj_mid': msgId
                 },
 
                 replyTo: {

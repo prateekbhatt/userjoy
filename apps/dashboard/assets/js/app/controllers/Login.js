@@ -106,10 +106,25 @@ angular.module('do.login', [])
   }
 ])
 
-.controller('forgotPasswordCtrl', ['$scope', 'AccountModel',
-  function ($scope, AccountModel) {
+.controller('forgotPasswordCtrl', ['$scope', 'AccountModel', '$rootScope',
+  '$timeout',
+  function ($scope, AccountModel, $rootScope, $timeout) {
+    var callback = function (err) {
+      if (err) {
+        console.log("error");
+        return;
+      } else {
+        $rootScope.success = true;
+        $rootScope.successMsgRootScope =
+          'An email has been sent to reset your password';
+        $timeout(function () {
+          $rootScope.error = false;
+        }, 5000);
+      }
+
+    }
     $scope.forgotPassword = function () {
-      AccountModel.forgotPassword($scope.email);
+      AccountModel.forgotPassword($scope.email, callback);
     }
   }
 ])

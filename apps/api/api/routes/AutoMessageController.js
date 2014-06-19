@@ -204,12 +204,22 @@ router
               email: fromEmail,
               name: fromName
             },
-            metadata: {
-              'type': 'automessage',
-              'amId': amsg._id
-            },
+
+            // NOTE: tracking should be disabled for test mail
+            // metadata: {
+            //   'uj_aid': amsg.aid,
+            //   'uj_title': amsg.title,
+            //   'uj_mid': amsg._id,
+            //   'uj_uid': req.user,
+            //   'uj_type': 'auto',
+            // },
+
             replyTo: {
-              email: fromEmail,
+              email: appEmail.reply.create({
+                aid: amsg.aid,
+                type: 'auto',
+                messageId: amsg._id
+              }),
               name: 'Reply to ' + fromName
             },
             subject: subject,

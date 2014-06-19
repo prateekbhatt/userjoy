@@ -143,6 +143,14 @@ BaseMailer.prototype.options = function () {
     });
   }
 
+  // DISABLE TRACKING BY DEFAULT (FOR ACCOUNT MAILER)
+  // ENABLE TRACKING IN USER MAILER
+  // REF: http://documentation.mailgun.com/user_manual.html#sending-via-smtp
+  opts.headers['X-Mailgun-Track'] = 'no';
+  opts.headers['X-Mailgun-Track-Clicks'] = 'no';
+  opts.headers['X-Mailgun-Track-Opens'] = 'no';
+
+
   return opts;
 
 };
