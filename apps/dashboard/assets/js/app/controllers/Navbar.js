@@ -108,9 +108,13 @@ angular.module('do.navbar', [])
         }
 
         $scope.goToSettings = function (app) {
-          AppService.setCurrentApp(app);
-          $location.path('/apps/' + AppService.getCurrentApp()
-            ._id + '/settings/general');
+          if(app.isActive) {
+            AppService.setCurrentApp(app);
+            $location.path('/apps/' + AppService.getCurrentApp()
+              ._id + '/settings/general');
+          } else {
+            $location.path('/apps/' + app._id + '/addcode');
+          }
         }
 
         $scope.changeUrl = function () {
@@ -215,9 +219,13 @@ angular.module('do.navbar', [])
         }
 
         $scope.goToSettings = function (app) {
-          AppService.setCurrentApp(app);
-          $location.path('/apps/' + AppService.getCurrentApp()
-            ._id + '/settings/general');
+          if(app.isActive) {
+            AppService.setCurrentApp(app);
+            $location.path('/apps/' + AppService.getCurrentApp()
+              ._id + '/settings/general');
+          } else {
+            $location.path('/apps/' + app._id + '/addcode');
+          }
         }
 
         $scope.redirectToApp = function () {
