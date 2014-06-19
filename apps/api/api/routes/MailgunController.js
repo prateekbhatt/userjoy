@@ -103,6 +103,7 @@ router
                 ct: ct,
                 from: 'user',
                 sent: true,
+                sName: user.name || user.email,
                 type: 'email',
 
               }
@@ -154,17 +155,38 @@ router
 
       // if manual message, create new reply
 
-      var reply = {
+      async.waterfall(
 
-        body: body,
-        ct: ct,
-        from: 'user',
-        sent: true,
-        type: 'email',
+        [
 
-      };
+          function getOrCreateUser(cb) {
+            var user = {
+              email: sender
+            };
 
-      Conversation.reply(aid, messageId, reply, callback);
+            User.findOrCreate(aid, user, cb)
+          },
+
+
+          function saveReply(user, cb) {
+
+            var reply = {
+
+              body: body,
+              ct: ct,
+              from: 'user',
+              sent: true,
+              sName: user.name || user.email,
+              type: 'email'
+
+            };
+
+            Conversation.reply(aid, messageId, reply, cb);
+          }
+
+
+        ], callback);
+
 
 
     } else if (type === 'auto') {
@@ -188,6 +210,7 @@ router
 
             var newConv = {
               aid: aid,
+              amId: messageId,
               ct: ct,
               messages: [
 
