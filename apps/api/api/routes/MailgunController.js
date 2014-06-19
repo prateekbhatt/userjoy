@@ -125,7 +125,7 @@ router
 
 
 router
-  .route('/reply/apps/:aid/conversation/:identifier')
+  .route('/reply/apps/:aid/conversations/:identifier')
   .post(function (req, res, next) {
 
     logger.trace({
@@ -134,12 +134,94 @@ router
       param: req.params
     })
 
-    var parsedEmail = appEmail.reply.parse(req.body.recipient);
+    var parsedId = appEmail.parseIdentifier(req.params.identifier);
+    var type = parsedId.type;
+    var messageId = parsedId.messageId;
 
-    console.log('\n\n\n\n req.body', parsedEmail);
+    var aid = req.params.aid;
+
+    // REF: http://documentation.mailgun.com/user_manual.html#routes
+    var body = req.body['stripped-text'];
+
+    var ct = req.body.timestamp * 1000;
+    var sender = req.body.sender;
+    var subject = req.body.subject;
+
+    var callback = mailgunCallback(req, res, next);
 
 
-    res.json();
+    if (type === 'manual') {
+
+      // if manual message, create new reply
+
+      var reply = {
+
+        body: body,
+        ct: ct,
+        from: 'user',
+        sent: true,
+        type: 'email',
+
+      };
+
+      Conversation.reply(aid, messageId, reply, callback);
+
+
+    } else if (type === 'auto') {
+
+      // if automessage, create new conversation
+
+      async.waterfall(
+
+        [
+
+          function getOrCreateUser(cb) {
+            var user = {
+              email: sender
+            };
+
+            User.findOrCreate(aid, user, cb);
+          },
+
+
+          function createConversation(user, cb) {
+
+            var newConv = {
+              aid: aid,
+              ct: ct,
+              messages: [
+
+                {
+
+                  // TODO: remove previous messages from body before saving
+                  // body: removeQuotedText(toEmail, message.msg.body),
+                  body: body,
+                  ct: ct,
+                  from: 'user',
+                  sent: true,
+                  type: 'email',
+
+                }
+
+              ],
+              sub: subject,
+              toRead: true,
+              uid: user._id
+            };
+
+            Conversation.create(newConv, cb);
+          }
+
+        ],
+
+        callback);
+
+
+    } else {
+
+      cb(new Error('neither manual not automessage'));
+    }
+
   });
 
 
