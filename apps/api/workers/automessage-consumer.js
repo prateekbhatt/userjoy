@@ -17,13 +17,6 @@ var moment = require('moment');
 
 
 /**
- * Helpers
- */
-
-var logger = require('../helpers/logger');
-
-
-/**
  * Lib
  */
 
@@ -53,6 +46,7 @@ var userMailer = require('../api/services/user-mailer');
 
 var appEmail = require('../helpers/app-email');
 var getRenderData = require('../helpers/get-render-data');
+var logger = require('../helpers/logger');
 var render = require('../helpers/render-message');
 
 
@@ -365,11 +359,18 @@ function amConsumer(cb) {
                 name: fromName
               },
               metadata: {
-                'type': 'automessage',
-                'amId': automessage._id
+                'uj_aid': automessage.aid,
+                'uj_title': automessage.title,
+                'uj_mid': automessage._id,
+                'uj_uid': u._id,
+                'uj_type': 'auto',
               },
               replyTo: {
-                email: fromEmail,
+                email: appEmail.reply.create({
+                  aid: automessage.aid,
+                  type: 'auto',
+                  messageId: automessage._id
+                }),
                 name: 'Reply to ' + fromName
               },
               subject: subject,

@@ -44,7 +44,7 @@ angular
           .error(cb)
       }
 
-      this.forgotPassword = function (email) {
+      this.forgotPassword = function (email, cb) {
         var data = {
           email: email
         };
@@ -52,10 +52,9 @@ angular
         $http.put(config.apiUrl + '/account/forgot-password', data)
           .success(function (data) {
             console.log("success sending email forgot password");
+            cb(null, data);
           })
-          .error(function (err) {
-            console.log("Error in sending email forgot password");
-          })
+          .error(cb);
       }
 
       this.resetPasswordNew = function (tokenId, password) {

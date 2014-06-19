@@ -75,7 +75,7 @@ module.exports.dashboard = function loadDashboardRoutes(app) {
   app.use('/apps', routes.UserNoteController);
 
   app.use('/auth', routes.AuthController);
-  app.use('/mandrill', routes.MandrillController);
+  app.use('/mailgun', routes.MailgunController);
 
 
 

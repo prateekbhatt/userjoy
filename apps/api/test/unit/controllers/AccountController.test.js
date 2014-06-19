@@ -1,4 +1,4 @@
-describe.only('Resource /account', function () {
+describe('Resource /account', function () {
 
   /**
    * npm dependencies
@@ -512,7 +512,7 @@ describe.only('Resource /account', function () {
 
 
 
-  describe('GET /account/forgot-password/new', function () {
+  describe('PUT /account/forgot-password/new', function () {
 
 
     var token = 'thisismyrandomtoken';

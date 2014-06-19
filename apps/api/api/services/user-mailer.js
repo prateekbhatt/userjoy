@@ -94,11 +94,12 @@ Mailer.prototype.options = function () {
   opts.headers['X-Mailgun-Track-Clicks'] = 'yes';
   opts.headers['X-Mailgun-Track-Opens'] = 'yes';
 
+  // // set the Message-Id header for tracking conversation replies and threading
+  // // REF: http://blog.mailgun.com/post/tracking-replies-in-mailgun-or-any-other-email/
+  // if (this.inReplyTo) opts.messageId = this.inReplyTo;
 
-  if (this.metadata) {
-    // REF: http://documentation.mailgun.com/user_manual.html#attaching-data-to-messages
-    opts.headers['X-Mailgun-Variables'] = this.metadata;
-  }
+  // REF: http://documentation.mailgun.com/user_manual.html#attaching-data-to-messages
+  opts.headers['X-Mailgun-Variables'] = this.metadata;
 
   return opts;
 
