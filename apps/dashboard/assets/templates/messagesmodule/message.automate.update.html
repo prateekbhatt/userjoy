@@ -17,6 +17,9 @@
     <br>
     <br>
 </div> -->
+<button class="fa fa-backward btn btn-danger" style="width: 200px;" ng-click="doTheBack()"><span>&nbsp;&nbsp;Back</span></button>
+<br>
+<br>
 <div class="panel panel-default">
     <div class="row" style="padding-top: 50px;">
         <div class="col-md-6">
@@ -98,7 +101,7 @@
                 <!-- TODO: Replace template color with the color entered by the user -->
                 <div class="col-md-10 col-md-offset-1" ng-show="showEmail" style="margin-top: 40px;">
                     <label style="font-size: 18px;">Subject: </label>&nbsp;<span ng-bind-html="subject" class="emailPreview"></span>
-                    <div class="message-template" style="min-height: 300px; overflow: auto; max-height: 300px;" ng-style="{'border-color': emailBorderColor, 'border-right': emailBorderRight, 'border-top': emailBorderTop, 'border-bottom': borderBottom, 'border-radius': borderRadius}">
+                    <div style="min-height: 300px; overflow: auto; max-height: 300px; margin-top: 30px;">
                         <p ng-bind-html="emailBody"></p>
                     </div>
                 </div>

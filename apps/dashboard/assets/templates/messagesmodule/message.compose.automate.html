@@ -112,7 +112,7 @@
                                                         <th class="text-center">Seen</th>
                                                         <th class="text-center">Clicked</th>
                                                         <th></th>
-                                                        <th></th>
+                                                        <!-- <th></th> -->
                                                     </thead>
                                                     <tbody>
                                                         <tr ng-repeat="automessage in automessages">
@@ -127,11 +127,11 @@
                                                             <td class="text-center" style="cursor: pointer" ng-click="showAutoMsg($index)">{{automessage.seen}}</td>
                                                             <td class="text-center" style="cursor: pointer" ng-click="showAutoMsg($index)">{{automessage.clicked}}</td>
                                                             <td class="text-center">
-                                                                <a style="cursor: pointer" ng-click="changeMsgStatus(automessage.id, automessage.message, $index)">{{automessage.message}}</a>
+                                                                <a style="cursor: pointer" class="btn btn-sm btn-info" ng-click="changeMsgStatus(automessage.id, automessage.message, $index)">{{automessage.message}}</a>
                                                             </td>
-                                                            <td class="text-center">
-                                                                <a style="cursor: pointer;" ng-click="editAutoMessage(automessage.id, $index)">Edit</a>
-                                                            </td>
+                                                            <!-- <td class="text-center">
+                                                                <a style="cursor: pointer;" class="btn btn-sm btn-default" ng-click="editAutoMessage(automessage.id, $index)"><i class="fa fa-edit"></i> Edit</a>
+                                                            </td> -->
                                                         </tr>
                                                     </tbody>
                                                 </table>
