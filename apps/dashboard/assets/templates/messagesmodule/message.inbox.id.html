@@ -133,8 +133,8 @@
                     <br>
                     <div class="col-md-12" style="padding-top: 45px;">
                         <div class="btn-toolbar" style="padding-right: 20px;">
-                            <button class="btn btn-success col-md-2 pull-right" ng-click="closeTicket()">{{buttontext}}</button>&nbsp;&nbsp;
-                            <button type="submit" class="btn btn-success col-md-2 pull-right" ng-click="validateAndAddReply()">Reply</button>
+                            <button class="btn btn-success col-md-2 pull-right" ng-click="closeTicket()" ng-disabled="disableClose">{{buttontext}}</button>&nbsp;&nbsp;
+                            <button type="submit" class="btn btn-success col-md-2 pull-right" ng-click="validateAndAddReply()" ng-disabled="disableReply">Reply</button>
                         </div>
                     </div>
                 </div>
