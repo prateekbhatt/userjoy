@@ -87,15 +87,13 @@ module.exports.reply = {
     var type;
     var messageId;
     var identifier;
-    var identifierSplit;
+    var parsed;
 
     if (beforeAtSplit.length > 1) {
       identifier = beforeAtSplit[1];
-      identifierSplit = identifier.split('_');
-
-      type = (identifierSplit[0] === 'm') ? 'manual' : 'auto';
-
-      if (identifierSplit.length > 1) messageId = identifierSplit[1];
+      parsed = parseIdentifier(identifier);
+      type = parsed.type;
+      messageId = parsed.messageId;
     }
 
     var obj = {
@@ -108,3 +106,29 @@ module.exports.reply = {
   }
 
 }
+
+/**
+ * Parses the identifier of a replyTo
+ *
+ * INPUT: a_12345
+ * OUTPUT: {
+ *   type: 'auto',
+ *   messageId: 12345
+ * }
+ */
+
+function parseIdentifier(identifier) {
+
+  var messageId;
+  var identifierSplit = identifier.split('_');
+  var type = (identifierSplit[0] === 'm') ? 'manual' : 'auto';
+
+  if (identifierSplit.length > 1) messageId = identifierSplit[1];
+
+  return {
+    type: type,
+    messageId: messageId
+  };
+}
+
+module.exports.parseIdentifier = parseIdentifier;

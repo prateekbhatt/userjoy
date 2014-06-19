@@ -1,4 +1,4 @@
-describe.only('Resource /mailgun', function () {
+describe('Resource /mailgun', function () {
 
   var MailgunCtrl = require('../../../api/routes/MailgunController');
 
@@ -21,7 +21,6 @@ describe.only('Resource /mailgun', function () {
   var clickEvent;
   var manualMessageId;
   var automessageId;
-  var conversationId;
   var aid;
   var uid;
 
@@ -40,59 +39,20 @@ describe.only('Resource /mailgun', function () {
     aid = saved.conversations.first.aid;
     uid = saved.users.first._id;
     automessageId = saved.automessages.first._id;
-    conversationId = saved.conversations.first._id;
     manualMessageId = saved.conversations.first.messages[0]._id;
 
-    var replyToEmailManual = aid +
-      '+m_' +
-      conversationId +
-      '@mail.userjoy.co';
 
 
     var newMessageToEmail = aid + '@mail.userjoy.co';
 
 
-    // create reply event
-    replyEvent = {
-      recipient: replyToEmailManual,
-      sender: 'prattbhatt@gmail.com',
-      subject: 'Re: hello',
-      from: 'Prateek Bhatt <prattbhatt@gmail.com>',
-      'X-Envelope-From': '<prattbhatt@gmail.com>',
-      Received: [
-        'from mail-vc0-f175.google.com (mail-vc0-f175.google.com [209.85.220.175]) by mxa.mailgun.org with ESMTP id 53a1e782.7fdf56827770-in3; Wed, 18 Jun 2014 19:24:50 -0000 (UTC)',
-        'by mail-vc0-f175.google.com with SMTP id hy4so1257720vcb.6 for <539dd58b5278319f3fc6bbce+m_53a1e6a9ecc26ee1312b4fe5@mail.userjoy.co>; Wed, 18 Jun 2014 12:24:48 -0700 (PDT)',
-        'by 10.220.220.15 with HTTP; Wed, 18 Jun 2014 12:24:48 -0700 (PDT)'
-      ],
-      'Dkim-Signature': 'v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20120113; h=mime-version:in-reply-to:references:date:message-id:subject:from:to :content-type; bh=mkPbjGJ5QNE8/UjGFkulM+FK6SjCO9QE8MlsUdY225s=; b=Ap0tZC2vWxeYiZrQXvwFKL+N77LVoBXEMpCdietBwZf+yRudotfeih/BFBOXL2gbbF AC4jittfMtWRg9UI0bQ8coW812d2adoM1JuVMe9PF51QFoFElvpmoSjfkg4F99y6nrKe 70ALKCiAAW1pZS8Mn2DGzBrkzK2MjnfbG6MJAWMgHJ0eXqQ9ZpNWTIItDP494NNae0VY ceLui9IqI1dnKDPIVYXV54GNqAGxOjYGsO2zEThLuoWLEX8DuqBLSgO6fleW7WVTzUhl e+YDR+nTdeHOq/npQqOJqxOpUoSCdsHrWxl2SNRmNz5P54AVgQieNGp4uJVqlHTWK+/V l2pw==',
-      'Mime-Version': '1.0',
-      'X-Received': 'by 10.58.122.196 with SMTP id lu4mr94612veb.52.1403119488279; Wed, 18 Jun 2014 12:24:48 -0700 (PDT)',
-      'In-Reply-To': '<3465d93faa3870d007e54fc1625612@prateek>',
-      References: '<3465d93faa3870d007e54fc1625612@prateek>',
-      Date: 'Thu, 19 Jun 2014 00:54:48 +0530',
-      'Message-Id': '<CANxoqd841GbOz3xHkKGyBZ=3OiCwuF-cQhgxf6Qwx8Q4NzhHoQ@mail.gmail.com>',
-      Subject: 'Re: hello',
-      From: 'Prateek Bhatt <prattbhatt@gmail.com>',
-      To: 'Reply to prateek <539dd58b5278319f3fc6bbce+m_53a1e6a9ecc26ee1312b4fe5@mail.userjoy.co>',
-      'Content-Type': 'multipart/alternative; boundary="047d7b2ed201ad2a9404fc213647"',
-      'X-Mailgun-Incoming': 'Yes',
-      'message-headers': '[["X-Envelope-From", "<prattbhatt@gmail.com>"], ["Received", "from mail-vc0-f175.google.com (mail-vc0-f175.google.com [209.85.220.175]) by mxa.mailgun.org with ESMTP id 53a1e782.7fdf56827770-in3; Wed, 18 Jun 2014 19:24:50 -0000 (UTC)"], ["Received", "by mail-vc0-f175.google.com with SMTP id hy4so1257720vcb.6 for <539dd58b5278319f3fc6bbce+m_53a1e6a9ecc26ee1312b4fe5@mail.userjoy.co>; Wed, 18 Jun 2014 12:24:48 -0700 (PDT)"], ["Dkim-Signature", "v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20120113; h=mime-version:in-reply-to:references:date:message-id:subject:from:to :content-type; bh=mkPbjGJ5QNE8/UjGFkulM+FK6SjCO9QE8MlsUdY225s=; b=Ap0tZC2vWxeYiZrQXvwFKL+N77LVoBXEMpCdietBwZf+yRudotfeih/BFBOXL2gbbF AC4jittfMtWRg9UI0bQ8coW812d2adoM1JuVMe9PF51QFoFElvpmoSjfkg4F99y6nrKe 70ALKCiAAW1pZS8Mn2DGzBrkzK2MjnfbG6MJAWMgHJ0eXqQ9ZpNWTIItDP494NNae0VY ceLui9IqI1dnKDPIVYXV54GNqAGxOjYGsO2zEThLuoWLEX8DuqBLSgO6fleW7WVTzUhl e+YDR+nTdeHOq/npQqOJqxOpUoSCdsHrWxl2SNRmNz5P54AVgQieNGp4uJVqlHTWK+/V l2pw=="], ["Mime-Version", "1.0"], ["X-Received", "by 10.58.122.196 with SMTP id lu4mr94612veb.52.1403119488279; Wed, 18 Jun 2014 12:24:48 -0700 (PDT)"], ["Received", "by 10.220.220.15 with HTTP; Wed, 18 Jun 2014 12:24:48 -0700 (PDT)"], ["In-Reply-To", "<3465d93faa3870d007e54fc1625612@prateek>"], ["References", "<3465d93faa3870d007e54fc1625612@prateek>"], ["Date", "Thu, 19 Jun 2014 00:54:48 +0530"], ["Message-Id", "<CANxoqd841GbOz3xHkKGyBZ=3OiCwuF-cQhgxf6Qwx8Q4NzhHoQ@mail.gmail.com>"], ["Subject", "Re: hello"], ["From", "Prateek Bhatt <prattbhatt@gmail.com>"], ["To", "Reply to prateek <539dd58b5278319f3fc6bbce+m_53a1e6a9ecc26ee1312b4fe5@mail.userjoy.co>"], ["Content-Type", "multipart/alternative; boundary=\\"047d7b2ed201ad2a9404fc213647\\""], ["X-Mailgun-Incoming", "Yes"]]',
-      timestamp: '1403119495',
-      token: '2yknsyfhs0y7gw3tnbc53hb112l7emr-7tpyobxal8004ga858',
-      signature: 'c508d46a5c27df10de33861bf3a89df5d77172e227447e976f6b250642732589',
-      'body-plain': 'reply body\r\n\r\nPrateek Bhatt\r\n\r\n\r\nOn Thu, Jun 19, 2014 at 12:51 AM, prateek <\r\n539dd58b5278319f3fc6bbce@mail.userjoy.co> wrote:\r\n\r\n> ###-----------------###\r\n>\r\n> eorld\r\n>\r\n',
-      'body-html': '<div dir="ltr"><div class="gmail_default" style="font-family:tahoma,sans-serif">reply body</div></div><div class="gmail_extra"><br clear="all"><div><div dir="ltr"><font face="tahoma, sans-serif" color="#444444">Prateek Bhatt</font></div>\r\n</div>\r\n<br><br><div class="gmail_quote">On Thu, Jun 19, 2014 at 12:51 AM, prateek <span dir="ltr">&lt;<a href="mailto:539dd58b5278319f3fc6bbce@mail.userjoy.co" target="_blank">539dd58b5278319f3fc6bbce@mail.userjoy.co</a>&gt;</span> wrote:<br>\r\n<blockquote class="gmail_quote" style="margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><div><div style="overflow:hidden"> \r\n  <span style="display:none!important">###-----------------###</span>\r\n</div>\r\n<br>\r\n\r\n\r\n  \r\n    eorld\r\n  \r\n  <br>\r\n  <div style="border-left:1px solid #999;margin-left:20px">\r\n    \r\n  </div>\r\n\r\n<img width="1px" height="1px" alt="" src="http://email.mail.userjoy.co/o/ZD0xMmE0YjUmdWpfbWlkPTUzYTFlNmE5ZWNjMjZlZTEzMTJiNGZlNiZoPWNjYTVjYzc2YThmNzkyN2NhNTc2N2E3YTA3NzExYWQyJmk9MzQ2NWQ5M2ZhYTM4NzBkMDA3ZTU0ZmMxNjI1NjEyJTQwcHJhdGVlayZyPXByYXR0YmhhdHQlNDBnbWFpbC5jb20mdWpfdHlwZT1tYW51YWw"></div>\r\n</blockquote></div><br></div>\r\n',
-      'stripped-html': '<html><body><div dir="ltr"><div class="gmail_default" style="font-family:tahoma,sans-serif">reply body</div></div><div class="gmail_extra"><br clear="all"><div><div dir="ltr"><font face="tahoma, sans-serif" color="#444444">Prateek Bhatt</font></div>\r\n</div>\r\n<br><br><br></div></body></html>',
-      'stripped-text': 'reply body\r\n',
-      'stripped-signature': 'Prateek Bhatt'
-    };
 
 
   });
 
 
 
-  describe('/mailgun/opens', function () {
+  describe('POST /mailgun/opens', function () {
 
     it('should handle open events for manual message', function (done) {
 
@@ -251,7 +211,7 @@ describe.only('Resource /mailgun', function () {
   });
 
 
-  describe('/mailgun/delivers', function () {
+  describe('POST /mailgun/delivers', function () {
 
     it('should handle deliver events for manual message', function (done) {
 
@@ -310,7 +270,7 @@ describe.only('Resource /mailgun', function () {
 
   });
 
-  describe('/mailgun/new/apps/:aid', function () {
+  describe('POST /mailgun/new/apps/:aid', function () {
 
     var aid;
     var url;
@@ -363,5 +323,129 @@ describe.only('Resource /mailgun', function () {
     });
 
   });
+
+
+
+  describe('POST /mailgun/reply/apps/:aid/conversations/:identifier',
+    function () {
+
+      var aid;
+
+      beforeEach(function () {
+        aid = saved.apps.first._id;
+      });
+
+
+      it('should handle replies to manual messages', function (done) {
+
+        var conversationId = saved.conversations.first._id;
+        var identifier = 'm_' + conversationId;
+        var replyToEmailManual = aid + '+' + identifier +
+          '@mail.userjoy.co';
+        var url = '/mailgun/reply/apps/' + aid + '/conversations/' +
+          identifier;
+
+        var postData = {
+          recipient: replyToEmailManual,
+          sender: 'prattbhatt@gmail.com',
+          subject: 'Re: hello',
+          from: 'Prateek Bhatt <prattbhatt@gmail.com>',
+          'X-Envelope-From': '<prattbhatt@gmail.com>',
+          Received: [
+            'from mail-vc0-f175.google.com (mail-vc0-f175.google.com [209.85.220.175]) by mxa.mailgun.org with ESMTP id 53a1e782.7fdf56827770-in3; Wed, 18 Jun 2014 19:24:50 -0000 (UTC)',
+            'by mail-vc0-f175.google.com with SMTP id hy4so1257720vcb.6 for <539dd58b5278319f3fc6bbce+m_53a1e6a9ecc26ee1312b4fe5@mail.userjoy.co>; Wed, 18 Jun 2014 12:24:48 -0700 (PDT)',
+            'by 10.220.220.15 with HTTP; Wed, 18 Jun 2014 12:24:48 -0700 (PDT)'
+          ],
+          'Dkim-Signature': 'v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20120113; h=mime-version:in-reply-to:references:date:message-id:subject:from:to :content-type; bh=mkPbjGJ5QNE8/UjGFkulM+FK6SjCO9QE8MlsUdY225s=; b=Ap0tZC2vWxeYiZrQXvwFKL+N77LVoBXEMpCdietBwZf+yRudotfeih/BFBOXL2gbbF AC4jittfMtWRg9UI0bQ8coW812d2adoM1JuVMe9PF51QFoFElvpmoSjfkg4F99y6nrKe 70ALKCiAAW1pZS8Mn2DGzBrkzK2MjnfbG6MJAWMgHJ0eXqQ9ZpNWTIItDP494NNae0VY ceLui9IqI1dnKDPIVYXV54GNqAGxOjYGsO2zEThLuoWLEX8DuqBLSgO6fleW7WVTzUhl e+YDR+nTdeHOq/npQqOJqxOpUoSCdsHrWxl2SNRmNz5P54AVgQieNGp4uJVqlHTWK+/V l2pw==',
+          'Mime-Version': '1.0',
+          'X-Received': 'by 10.58.122.196 with SMTP id lu4mr94612veb.52.1403119488279; Wed, 18 Jun 2014 12:24:48 -0700 (PDT)',
+          'In-Reply-To': '<3465d93faa3870d007e54fc1625612@prateek>',
+          References: '<3465d93faa3870d007e54fc1625612@prateek>',
+          Date: 'Thu, 19 Jun 2014 00:54:48 +0530',
+          'Message-Id': '<CANxoqd841GbOz3xHkKGyBZ=3OiCwuF-cQhgxf6Qwx8Q4NzhHoQ@mail.gmail.com>',
+          Subject: 'Re: hello',
+          From: 'Prateek Bhatt <prattbhatt@gmail.com>',
+          To: 'Reply to prateek <539dd58b5278319f3fc6bbce+m_53a1e6a9ecc26ee1312b4fe5@mail.userjoy.co>',
+          'Content-Type': 'multipart/alternative; boundary="047d7b2ed201ad2a9404fc213647"',
+          'X-Mailgun-Incoming': 'Yes',
+          'message-headers': '[["X-Envelope-From", "<prattbhatt@gmail.com>"], ["Received", "from mail-vc0-f175.google.com (mail-vc0-f175.google.com [209.85.220.175]) by mxa.mailgun.org with ESMTP id 53a1e782.7fdf56827770-in3; Wed, 18 Jun 2014 19:24:50 -0000 (UTC)"], ["Received", "by mail-vc0-f175.google.com with SMTP id hy4so1257720vcb.6 for <539dd58b5278319f3fc6bbce+m_53a1e6a9ecc26ee1312b4fe5@mail.userjoy.co>; Wed, 18 Jun 2014 12:24:48 -0700 (PDT)"], ["Dkim-Signature", "v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20120113; h=mime-version:in-reply-to:references:date:message-id:subject:from:to :content-type; bh=mkPbjGJ5QNE8/UjGFkulM+FK6SjCO9QE8MlsUdY225s=; b=Ap0tZC2vWxeYiZrQXvwFKL+N77LVoBXEMpCdietBwZf+yRudotfeih/BFBOXL2gbbF AC4jittfMtWRg9UI0bQ8coW812d2adoM1JuVMe9PF51QFoFElvpmoSjfkg4F99y6nrKe 70ALKCiAAW1pZS8Mn2DGzBrkzK2MjnfbG6MJAWMgHJ0eXqQ9ZpNWTIItDP494NNae0VY ceLui9IqI1dnKDPIVYXV54GNqAGxOjYGsO2zEThLuoWLEX8DuqBLSgO6fleW7WVTzUhl e+YDR+nTdeHOq/npQqOJqxOpUoSCdsHrWxl2SNRmNz5P54AVgQieNGp4uJVqlHTWK+/V l2pw=="], ["Mime-Version", "1.0"], ["X-Received", "by 10.58.122.196 with SMTP id lu4mr94612veb.52.1403119488279; Wed, 18 Jun 2014 12:24:48 -0700 (PDT)"], ["Received", "by 10.220.220.15 with HTTP; Wed, 18 Jun 2014 12:24:48 -0700 (PDT)"], ["In-Reply-To", "<3465d93faa3870d007e54fc1625612@prateek>"], ["References", "<3465d93faa3870d007e54fc1625612@prateek>"], ["Date", "Thu, 19 Jun 2014 00:54:48 +0530"], ["Message-Id", "<CANxoqd841GbOz3xHkKGyBZ=3OiCwuF-cQhgxf6Qwx8Q4NzhHoQ@mail.gmail.com>"], ["Subject", "Re: hello"], ["From", "Prateek Bhatt <prattbhatt@gmail.com>"], ["To", "Reply to prateek <539dd58b5278319f3fc6bbce+m_53a1e6a9ecc26ee1312b4fe5@mail.userjoy.co>"], ["Content-Type", "multipart/alternative; boundary=\\"047d7b2ed201ad2a9404fc213647\\""], ["X-Mailgun-Incoming", "Yes"]]',
+          timestamp: '1403119495',
+          token: '2yknsyfhs0y7gw3tnbc53hb112l7emr-7tpyobxal8004ga858',
+          signature: 'c508d46a5c27df10de33861bf3a89df5d77172e227447e976f6b250642732589',
+          'body-plain': 'reply body\r\n\r\nPrateek Bhatt\r\n\r\n\r\nOn Thu, Jun 19, 2014 at 12:51 AM, prateek <\r\n539dd58b5278319f3fc6bbce@mail.userjoy.co> wrote:\r\n\r\n> ###-----------------###\r\n>\r\n> eorld\r\n>\r\n',
+          'body-html': '<div dir="ltr"><div class="gmail_default" style="font-family:tahoma,sans-serif">reply body</div></div><div class="gmail_extra"><br clear="all"><div><div dir="ltr"><font face="tahoma, sans-serif" color="#444444">Prateek Bhatt</font></div>\r\n</div>\r\n<br><br><div class="gmail_quote">On Thu, Jun 19, 2014 at 12:51 AM, prateek <span dir="ltr">&lt;<a href="mailto:539dd58b5278319f3fc6bbce@mail.userjoy.co" target="_blank">539dd58b5278319f3fc6bbce@mail.userjoy.co</a>&gt;</span> wrote:<br>\r\n<blockquote class="gmail_quote" style="margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><div><div style="overflow:hidden"> \r\n  <span style="display:none!important">###-----------------###</span>\r\n</div>\r\n<br>\r\n\r\n\r\n  \r\n    eorld\r\n  \r\n  <br>\r\n  <div style="border-left:1px solid #999;margin-left:20px">\r\n    \r\n  </div>\r\n\r\n<img width="1px" height="1px" alt="" src="http://email.mail.userjoy.co/o/ZD0xMmE0YjUmdWpfbWlkPTUzYTFlNmE5ZWNjMjZlZTEzMTJiNGZlNiZoPWNjYTVjYzc2YThmNzkyN2NhNTc2N2E3YTA3NzExYWQyJmk9MzQ2NWQ5M2ZhYTM4NzBkMDA3ZTU0ZmMxNjI1NjEyJTQwcHJhdGVlayZyPXByYXR0YmhhdHQlNDBnbWFpbC5jb20mdWpfdHlwZT1tYW51YWw"></div>\r\n</blockquote></div><br></div>\r\n',
+          'stripped-html': '<html><body><div dir="ltr"><div class="gmail_default" style="font-family:tahoma,sans-serif">reply body</div></div><div class="gmail_extra"><br clear="all"><div><div dir="ltr"><font face="tahoma, sans-serif" color="#444444">Prateek Bhatt</font></div>\r\n</div>\r\n<br><br><br></div></body></html>',
+          'stripped-text': 'reply body\r\n',
+          'stripped-signature': 'Prateek Bhatt'
+        };
+
+        request
+          .post(url)
+          .send(postData)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(done);
+
+      });
+
+
+      it('should handle replies to automessages', function (done) {
+
+        var messageId = saved.automessages.first._id;
+        var identifier = 'u_' + messageId;
+
+        var replyToEmailAuto = aid + '+' + identifier +
+          '@mail.userjoy.co';
+
+        var url = '/mailgun/reply/apps/' + aid + '/conversations/' +
+          identifier;
+
+        var postData = {
+          recipient: replyToEmailAuto,
+          sender: 'prattbhatt@gmail.com',
+          subject: 'Re: hello',
+          from: 'Prateek Bhatt <prattbhatt@gmail.com>',
+          'X-Envelope-From': '<prattbhatt@gmail.com>',
+          Received: [
+            'from mail-vc0-f175.google.com (mail-vc0-f175.google.com [209.85.220.175]) by mxa.mailgun.org with ESMTP id 53a1e782.7fdf56827770-in3; Wed, 18 Jun 2014 19:24:50 -0000 (UTC)',
+            'by mail-vc0-f175.google.com with SMTP id hy4so1257720vcb.6 for <539dd58b5278319f3fc6bbce+m_53a1e6a9ecc26ee1312b4fe5@mail.userjoy.co>; Wed, 18 Jun 2014 12:24:48 -0700 (PDT)',
+            'by 10.220.220.15 with HTTP; Wed, 18 Jun 2014 12:24:48 -0700 (PDT)'
+          ],
+          'Dkim-Signature': 'v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20120113; h=mime-version:in-reply-to:references:date:message-id:subject:from:to :content-type; bh=mkPbjGJ5QNE8/UjGFkulM+FK6SjCO9QE8MlsUdY225s=; b=Ap0tZC2vWxeYiZrQXvwFKL+N77LVoBXEMpCdietBwZf+yRudotfeih/BFBOXL2gbbF AC4jittfMtWRg9UI0bQ8coW812d2adoM1JuVMe9PF51QFoFElvpmoSjfkg4F99y6nrKe 70ALKCiAAW1pZS8Mn2DGzBrkzK2MjnfbG6MJAWMgHJ0eXqQ9ZpNWTIItDP494NNae0VY ceLui9IqI1dnKDPIVYXV54GNqAGxOjYGsO2zEThLuoWLEX8DuqBLSgO6fleW7WVTzUhl e+YDR+nTdeHOq/npQqOJqxOpUoSCdsHrWxl2SNRmNz5P54AVgQieNGp4uJVqlHTWK+/V l2pw==',
+          'Mime-Version': '1.0',
+          'X-Received': 'by 10.58.122.196 with SMTP id lu4mr94612veb.52.1403119488279; Wed, 18 Jun 2014 12:24:48 -0700 (PDT)',
+          'In-Reply-To': '<3465d93faa3870d007e54fc1625612@prateek>',
+          References: '<3465d93faa3870d007e54fc1625612@prateek>',
+          Date: 'Thu, 19 Jun 2014 00:54:48 +0530',
+          'Message-Id': '<CANxoqd841GbOz3xHkKGyBZ=3OiCwuF-cQhgxf6Qwx8Q4NzhHoQ@mail.gmail.com>',
+          Subject: 'Re: hello',
+          From: 'Prateek Bhatt <prattbhatt@gmail.com>',
+          To: 'Reply to prateek <539dd58b5278319f3fc6bbce+m_53a1e6a9ecc26ee1312b4fe5@mail.userjoy.co>',
+          'Content-Type': 'multipart/alternative; boundary="047d7b2ed201ad2a9404fc213647"',
+          'X-Mailgun-Incoming': 'Yes',
+          'message-headers': '[["X-Envelope-From", "<prattbhatt@gmail.com>"], ["Received", "from mail-vc0-f175.google.com (mail-vc0-f175.google.com [209.85.220.175]) by mxa.mailgun.org with ESMTP id 53a1e782.7fdf56827770-in3; Wed, 18 Jun 2014 19:24:50 -0000 (UTC)"], ["Received", "by mail-vc0-f175.google.com with SMTP id hy4so1257720vcb.6 for <539dd58b5278319f3fc6bbce+m_53a1e6a9ecc26ee1312b4fe5@mail.userjoy.co>; Wed, 18 Jun 2014 12:24:48 -0700 (PDT)"], ["Dkim-Signature", "v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20120113; h=mime-version:in-reply-to:references:date:message-id:subject:from:to :content-type; bh=mkPbjGJ5QNE8/UjGFkulM+FK6SjCO9QE8MlsUdY225s=; b=Ap0tZC2vWxeYiZrQXvwFKL+N77LVoBXEMpCdietBwZf+yRudotfeih/BFBOXL2gbbF AC4jittfMtWRg9UI0bQ8coW812d2adoM1JuVMe9PF51QFoFElvpmoSjfkg4F99y6nrKe 70ALKCiAAW1pZS8Mn2DGzBrkzK2MjnfbG6MJAWMgHJ0eXqQ9ZpNWTIItDP494NNae0VY ceLui9IqI1dnKDPIVYXV54GNqAGxOjYGsO2zEThLuoWLEX8DuqBLSgO6fleW7WVTzUhl e+YDR+nTdeHOq/npQqOJqxOpUoSCdsHrWxl2SNRmNz5P54AVgQieNGp4uJVqlHTWK+/V l2pw=="], ["Mime-Version", "1.0"], ["X-Received", "by 10.58.122.196 with SMTP id lu4mr94612veb.52.1403119488279; Wed, 18 Jun 2014 12:24:48 -0700 (PDT)"], ["Received", "by 10.220.220.15 with HTTP; Wed, 18 Jun 2014 12:24:48 -0700 (PDT)"], ["In-Reply-To", "<3465d93faa3870d007e54fc1625612@prateek>"], ["References", "<3465d93faa3870d007e54fc1625612@prateek>"], ["Date", "Thu, 19 Jun 2014 00:54:48 +0530"], ["Message-Id", "<CANxoqd841GbOz3xHkKGyBZ=3OiCwuF-cQhgxf6Qwx8Q4NzhHoQ@mail.gmail.com>"], ["Subject", "Re: hello"], ["From", "Prateek Bhatt <prattbhatt@gmail.com>"], ["To", "Reply to prateek <539dd58b5278319f3fc6bbce+m_53a1e6a9ecc26ee1312b4fe5@mail.userjoy.co>"], ["Content-Type", "multipart/alternative; boundary=\\"047d7b2ed201ad2a9404fc213647\\""], ["X-Mailgun-Incoming", "Yes"]]',
+          timestamp: '1403119495',
+          token: '2yknsyfhs0y7gw3tnbc53hb112l7emr-7tpyobxal8004ga858',
+          signature: 'c508d46a5c27df10de33861bf3a89df5d77172e227447e976f6b250642732589',
+          'body-plain': 'reply body\r\n\r\nPrateek Bhatt\r\n\r\n\r\nOn Thu, Jun 19, 2014 at 12:51 AM, prateek <\r\n539dd58b5278319f3fc6bbce@mail.userjoy.co> wrote:\r\n\r\n> ###-----------------###\r\n>\r\n> eorld\r\n>\r\n',
+          'body-html': '<div dir="ltr"><div class="gmail_default" style="font-family:tahoma,sans-serif">reply body</div></div><div class="gmail_extra"><br clear="all"><div><div dir="ltr"><font face="tahoma, sans-serif" color="#444444">Prateek Bhatt</font></div>\r\n</div>\r\n<br><br><div class="gmail_quote">On Thu, Jun 19, 2014 at 12:51 AM, prateek <span dir="ltr">&lt;<a href="mailto:539dd58b5278319f3fc6bbce@mail.userjoy.co" target="_blank">539dd58b5278319f3fc6bbce@mail.userjoy.co</a>&gt;</span> wrote:<br>\r\n<blockquote class="gmail_quote" style="margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><div><div style="overflow:hidden"> \r\n  <span style="display:none!important">###-----------------###</span>\r\n</div>\r\n<br>\r\n\r\n\r\n  \r\n    eorld\r\n  \r\n  <br>\r\n  <div style="border-left:1px solid #999;margin-left:20px">\r\n    \r\n  </div>\r\n\r\n<img width="1px" height="1px" alt="" src="http://email.mail.userjoy.co/o/ZD0xMmE0YjUmdWpfbWlkPTUzYTFlNmE5ZWNjMjZlZTEzMTJiNGZlNiZoPWNjYTVjYzc2YThmNzkyN2NhNTc2N2E3YTA3NzExYWQyJmk9MzQ2NWQ5M2ZhYTM4NzBkMDA3ZTU0ZmMxNjI1NjEyJTQwcHJhdGVlayZyPXByYXR0YmhhdHQlNDBnbWFpbC5jb20mdWpfdHlwZT1tYW51YWw"></div>\r\n</blockquote></div><br></div>\r\n',
+          'stripped-html': '<html><body><div dir="ltr"><div class="gmail_default" style="font-family:tahoma,sans-serif">reply body</div></div><div class="gmail_extra"><br clear="all"><div><div dir="ltr"><font face="tahoma, sans-serif" color="#444444">Prateek Bhatt</font></div>\r\n</div>\r\n<br><br><br></div></body></html>',
+          'stripped-text': 'reply body\r\n',
+          'stripped-signature': 'Prateek Bhatt'
+        };
+
+        console.log('\n\n\n url', url);
+        request
+          .post(url)
+          .send(postData)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(done);
+
+      });
+
+
+    });
+
 
 });
