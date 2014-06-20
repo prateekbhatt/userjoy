@@ -343,7 +343,7 @@ router
 
 
 /**
- * PUT /account/reset-password
+ * PUT /account/forgot-password
  *
  * TODO: add the respective get request
  * which will check the token and redirect

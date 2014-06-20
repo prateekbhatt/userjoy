@@ -105,6 +105,10 @@ router
         path: 'sender',
         select: 'name email'
       })
+      .populate({
+        path: 'sid',
+        select: 'name'
+      })
       .exec(function (err, automsg) {
         if (err) return next(err);
         res
