@@ -251,16 +251,21 @@ describe('Resource /apps/:aid/automessages', function () {
           .expect('Content-Type', /json/)
           .expect(200)
           .expect(function (res) {
+
             expect(res.body)
               .to.not.be.empty;
 
             // it should populate the automessage sender name and email
-            expect(res.body.sender)
-              .to.be.an('object');
-
             expect(res.body)
               .to.have.property("sender")
-              .that.has.keys(['_id', 'email', 'name']);
+              .that.is.an('object')
+              .and.has.keys(['_id', 'email', 'name']);
+
+            // it should populate the automessage segment name
+            expect(res.body)
+              .to.have.property("sid")
+              .that.is.an('object')
+              .and.has.keys(['_id', 'name']);
 
             expect(res.body.title)
               .to.eql('Welcome Message');
