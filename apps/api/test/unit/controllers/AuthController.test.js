@@ -37,9 +37,9 @@ describe('Resource /auth', function () {
             password: 'randomPass'
           })
           .expect('Content-Type', /json/)
-          .expect(401)
+          .expect(400)
           .expect({
-            status: 401,
+            status: 400,
             error: "Invalid Email/Password"
           })
           .end(done);
@@ -54,9 +54,9 @@ describe('Resource /auth', function () {
             password: 'randomPass'
           })
           .expect('Content-Type', /json/)
-          .expect(401)
+          .expect(400)
           .expect({
-            status: 401,
+            status: 400,
             error: "Invalid Email/Password"
           })
           .end(done);
