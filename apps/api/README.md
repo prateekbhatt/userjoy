@@ -58,7 +58,7 @@ Types of queries:
 
 A account on Userjoy can have multiple apps.
 
-###### Mandrill and Mailer
+###### Mailgun and Mailer
 
 Every app has a default inbound email address which is "aid@mail.userjoy.co", where aid is primary key of the app on mongodb. e.g. "UserJoy <1234@mail.userjoy.co>", where aid = 1234
 
@@ -412,7 +412,7 @@ as meta property)
 - How to store plan, license, amount info?
 - How to store customer journey info?
 - How to handle conversations and messages?
-- Using Mandrill, it is possible to assign unique readable email ids for each team member of an app, e.g. "prateek@dodatado.mail.userjoy.co"
+- Using Mailgun, it is possible to assign unique readable email ids for each team member of an app, e.g. "prateek@dodatado.mail.userjoy.co"
 
 
 ## API (To be updated)
