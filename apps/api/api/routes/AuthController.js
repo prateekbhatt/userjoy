@@ -31,14 +31,14 @@ router.post('/login', function (req, res, next) {
   passport.authenticate('local', function (err, user, info) {
 
     if ((err) || (!user)) {
-      return res.unauthorized(info && info.message ? info.message :
+      return res.badRequest(info && info.message ? info.message :
         'Forbidden');
     }
 
     req.login(user, function (err) {
 
       if (err) {
-        return res.unauthorized(err);
+        return res.badRequest(err);
       }
 
       return res.json({

@@ -40,10 +40,16 @@ module.exports = UserJoy;
 
 function UserJoy() {
   this.debug = debug;
+
+  // FIXME before going live
   this._timeout = 20000;
-  this.TRACK_URL = 'http://api.do.localhost/track';
-  this.IDENTIFY_URL = 'http://api.do.localhost/track/identify';
-  this.COMPANY_URL = 'http://api.do.localhost/track/company';
+
+  // FIXME before going live
+  var API_URL = 'http://api.do.localhost';
+
+  this.TRACK_URL = API_URL + '/track';
+  this.IDENTIFY_URL = API_URL + '/track/identify';
+  this.COMPANY_URL = API_URL + '/track/company';
 
   bind.all(this);
 }
@@ -78,9 +84,6 @@ UserJoy.prototype.initialize = function () {
     apiUrl: self.TRACK_URL
   });
 
-  setTimeout(function () {
-
-  }, 500)
 
   // FIXME: THIS CODE IS NOT TESTED
   notification.load(function (err) {
@@ -237,7 +240,7 @@ UserJoy.prototype.track = function (event, properties, fn) {
 
   // FIXME: add additional event types on the server: form, click
 
-  this._sendEvent('feature', event, null, properties);
+  this._sendEvent('track', event, null, properties);
 
   this._callback(fn);
   return this;
@@ -266,7 +269,8 @@ UserJoy.prototype.track_link = function (links, event, properties) {
     on(el, 'click', function (e) {
       var ev = is.fn(event) ? event(el) : event;
       var props = is.fn(properties) ? properties(el) : properties;
-      self.track(ev, props);
+      // self.track(ev, props);
+      self._sendEvent('link', ev, null, props);
 
       if (el.href && el.target !== '_blank' && !isMeta(e)) {
         prevent(e);
@@ -304,7 +308,8 @@ UserJoy.prototype.track_form = function (forms, event, properties) {
 
       var ev = is.fn(event) ? event(el) : event;
       var props = is.fn(properties) ? properties(el) : properties;
-      self.track(ev, props);
+      // self.track(ev, props);
+      self._sendEvent('form', ev, null, props);
 
       self._callback(function () {
         el.submit();
@@ -363,7 +368,7 @@ UserJoy.prototype.page = function (category, name, properties, fn) {
   properties = clone(properties) || {};
   defaults(properties, defs);
 
-  this._sendEvent('pageview', name, category, properties);
+  this._sendEvent('page', name, category, properties);
 
   this._callback(fn);
   return this;
@@ -424,7 +429,7 @@ UserJoy.prototype._sendEvent = function (type, name, module, properties) {
 
   if (cid) data.c = cid;
 
-  if (module) data.e.feature = module;
+  if (module) data.e.module = module;
   if (properties) data.e.meta = properties;
 
 
