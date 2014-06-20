@@ -87,6 +87,36 @@ router
 
 
 /**
+ * GET /apps/:aid/automessages/attributes
+ *
+ * NOTE:
+ * 1. This route must be defined before /apps/:aid/automessages/:amId
+ * 2. TODO: dynamically generate list based on custom attributes passed on by
+ * users. Add 'app' and 'author' attributes as well
+ *
+ * Provides attributes for automessages
+ */
+
+router
+  .route('/:aid/automessages/attributes')
+  .get(function (req, res, next) {
+
+    logger.trace('Fetching automessage attributes');
+
+    var userAttributes = ['user.name', 'user.email', 'user.plan',
+      'user.revenue', 'user.joined', 'user.status'
+    ];
+
+    res
+      .status(200)
+      .json({
+        userAttributes: userAttributes
+      });
+
+  });
+
+
+/**
  * GET /apps/:aid/automessages/:amId
  *
  * Returns a automessage
