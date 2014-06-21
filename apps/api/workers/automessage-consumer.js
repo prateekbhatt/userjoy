@@ -261,13 +261,19 @@ function amConsumer(cb) {
         // segment object should be converted from BSON to JSON
         segment = segment.toJSON();
 
-        var query = {
+        var qObj = {
           list: segment.list,
           op: segment.op,
           filters: segment.filters
         };
 
-        var query = new Query(segment.aid, query);
+        var query;
+
+        try {
+          query = new Query(segment.aid, qObj);
+        } catch (err) {
+          return cb(err);
+        }
 
         query.run(function (err, users) {
           cb(err, users);
