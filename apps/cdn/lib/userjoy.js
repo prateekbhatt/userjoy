@@ -42,7 +42,7 @@ function UserJoy() {
   this.debug = debug;
 
   // FIXME before going live
-  this._timeout = 20000;
+  this._timeout = 200;
 
   // FIXME before going live
   var API_URL = 'http://api.do.localhost';
@@ -194,9 +194,10 @@ UserJoy.prototype.company = function (traits, fn) {
   }
 
   company.identify(traits);
-
+  var uid = cookie.uid();
   var data = {
     app_id: self.aid,
+    u: uid,
     company: company.traits()
   };
 
@@ -225,22 +226,22 @@ UserJoy.prototype.company = function (traits, fn) {
  * Track an `event` that a user has triggered with optional `properties`.
  *
  * @param {String} event
+ * @param {String} module (optional)
  * @param {Object} properties (optional)
  * @param {Function} fn (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.track = function (event, properties, fn) {
+UserJoy.prototype.track = function (name, module, properties, fn) {
 
 
-  this.debug('track', event, properties);
+  this.debug('track', name, properties);
 
   if (is.fn(properties)) fn = properties, properties = null;
+  if (is.fn(module)) fn = module, module = properties = null;
 
 
-  // FIXME: add additional event types on the server: form, click
-
-  this._sendEvent('track', event, null, properties);
+  this._sendEvent('track', name, module, properties);
 
   this._callback(fn);
   return this;
@@ -252,23 +253,32 @@ UserJoy.prototype.track = function (event, properties, fn) {
  * from the page before the analytics calls were sent.
  *
  * @param {Element or Array} links
- * @param {String or Function} event
+ * @param {String or Function} name
+ * @param {String or Function} module (optional)
  * @param {Object or Function} properties (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.track_link = function (links, event, properties) {
+UserJoy.prototype.track_link = function (links, name, module, properties) {
   if (!links) return this;
-  if (is.element(links)) links = [links]; // always arrays, handles jquery
+  if (is.string(links)) links = [links]; // always arrays, handles jquery
+  if (is.object(module)) properties = module, module = null;
 
-  // if no name attached to event, do not track
-  if (!event) return this;
 
   var self = this;
-  each(links, function (el) {
+  each(links, function (el_id) {
+
+    // get the dom element
+    var el = window.document.getElementById(el_id);
+
     on(el, 'click', function (e) {
-      var ev = is.fn(event) ? event(el) : event;
+
+      // TODO: test the next lines
+      var ev = is.fn(name) ? name(el) : name;
+      var module = is.fn(module) ? module(el) : module;
       var props = is.fn(properties) ? properties(el) : properties;
+
+
       // self.track(ev, props);
       self._sendEvent('link', ev, null, props);
 
@@ -290,31 +300,41 @@ UserJoy.prototype.track_link = function (links, event, properties) {
  * from the page before the analytics calls were sent.
  *
  * @param {Element or Array} forms
- * @param {String or Function} event
+ * @param {String or Function} name
+ * @param {String or Object or Function} module
  * @param {Object or Function} properties (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.track_form = function (forms, event, properties) {
+UserJoy.prototype.track_form = function (forms, name, module, properties) {
 
 
   if (!forms) return this;
-  if (is.element(forms)) forms = [forms]; // always arrays, handles jquery
+  if (is.string(forms)) forms = [forms]; // always arrays, handles jquery
+  if (is.object(module)) properties = module, module = null;
 
   var self = this;
-  each(forms, function (el) {
+  each(forms, function (el_id) {
+
+    // get the dom element
+    var el = window.document.getElementById(el_id);
+
     function handler(e) {
       prevent(e);
 
-      var ev = is.fn(event) ? event(el) : event;
+      // TODO: check the next lines
+      var ev = is.fn(name) ? name(el) : name;
+      var module = is.fn(module) ? module(el) : module;
       var props = is.fn(properties) ? properties(el) : properties;
+
       // self.track(ev, props);
-      self._sendEvent('form', ev, null, props);
+      self._sendEvent('form', ev, module, props);
 
       self._callback(function () {
         el.submit();
       });
     }
+
 
     // support the events happening through jQuery or Zepto instead of through
     // the normal DOM API, since `el.submit` doesn't bubble up events...
@@ -332,43 +352,40 @@ UserJoy.prototype.track_form = function (forms, event, properties) {
 
 
 /**
- * Trigger a pageview, labeling the current page with an optional `category`,
+ * Trigger a pageview, labeling the current page with an optional `module`,
  * `name` and `properties`.
  *
- * @param {String} category (optional)
  * @param {String} name (optional)
+ * @param {String} module (optional)
  * @param {Object or String} properties (or path) (optional)
  * @param {Function} fn (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.page = function (category, name, properties, fn) {
+UserJoy.prototype.page = function (name, module, properties, fn) {
 
-  if (category && !is.string(category)) return this; // SHOW ERROR
+  name = name || canonicalPath();
 
   if (is.fn(properties)) fn = properties, properties = null;
-  if (is.fn(name)) fn = name, properties = name = null;
-  if (is.object(name)) properties = name, name = null;
-  if (is.string(category) && !is.string(name)) name = category, category =
-    null;
+  if (is.fn(module)) fn = module, properties = module = null;
+  if (is.object(module)) properties = module, module = null;
 
-  var defs = {
-    path: canonicalPath(),
-    referrer: document.referrer,
-    title: document.title,
-    url: canonicalUrl(),
-    search: location.search
-  };
+  // var defs = {
+  //   path: canonicalPath(),
+  //   referrer: document.referrer,
+  //   title: document.title,
+  //   url: canonicalUrl(),
+  //   search: location.search
+  // };
 
-  if (name) defs.name = name;
+  // if (name) defs.name = name;
 
-  name = defs.path;
-  if (category) defs.category = category;
+  // if (category) defs.category = category;
 
-  properties = clone(properties) || {};
-  defaults(properties, defs);
+  // properties = clone(properties) || {};
+  // defaults(properties, defs);
 
-  this._sendEvent('page', name, category, properties);
+  this._sendEvent('page', name, module, properties);
 
   this._callback(fn);
   return this;
