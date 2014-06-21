@@ -370,7 +370,8 @@ router
     // input validations upfront
     // uids, body, subject, type
     if (!(uids && aid && sub && newMsg.body && newMsg.type)) {
-      return res.badRequest('Missing body/sub/type/uids');
+      // return res.badRequest('Missing body/sub/type/uids');
+      return res.badRequest('Please write a body and a subject');
     }
 
     // NOTE: only emails can be sent through manual messages now
