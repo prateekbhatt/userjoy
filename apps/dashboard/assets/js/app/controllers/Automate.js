@@ -512,7 +512,7 @@ angular.module('do.automate', [])
       console.log("selectedIcon: ", $scope.selectedMessageType);
       $scope.title = AutoMsgService.getSingleAutoMsg()
         .title;
-
+      $scope.segment = AutoMsgService.getSingleAutoMsg().sid.name;
       $scope.colorTheme = AppService.getCurrentApp()
         .color;
       $scope.borderColor = $scope.colorTheme;

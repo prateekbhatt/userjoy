@@ -16,9 +16,7 @@
                 <h3>{{customername}}</h3>
             </div>
         </div>
-        <br>
-        <br>
-        <div class="row">
+        <!-- <div class="row">
             <div class="col-md-12">
                 <blockquote>
                     <small><cite title="Source Title">Ahmedabad, India  <i class="glyphicon glyphicon-map-marker"></i></cite></small>
@@ -27,16 +25,14 @@
             </div>
             <br>
             <br>
-        </div>
+        </div> -->
         <br>
         <div class="row">
             <div class="col-md-12">
-                <p> Pulse: {{healthScore}}/100</p>
-                <p> Plan: {{plan}}</p>
-                <p> Plan Value: {{planValue}}</p>
-                <p> Renewal: {{renewal}}</p>
-                <p> Open Conversations: 3</p>
-                <p> Health: 70 (Good)</p>
+                <p ng-repeat="firstList in userdata" ng-if="firstList.data == 'Health' && firstList.value == 'average'" style="color: #428bca;"><b>{{firstList.data}}</b> : {{firstList.value}} <i class="fa fa-meh-o"></i></p>
+                    <p ng-repeat="firstList in userdata" ng-if="firstList.data == 'Health' && firstList.value == 'good'" style="color: #2ecc71;"><b>{{firstList.data}}</b> : {{firstList.value}} <i class="fa fa-smile-o"></i></p>
+                    <p ng-repeat="firstList in userdata" ng-if="firstList.data == 'Health' && firstList.value == 'poor'" style="color: #e74c3c;"><b>{{firstList.data}}</b> : {{firstList.value}} <i class="fa fa-frown-o"></i></p>
+                    <p ng-repeat="firstList in userdata" ng-if="!(firstList.data == 'Health')"><b>{{firstList.data}}</b> : {{firstList.value}}</p>
             </div>
         </div>
     </div>
@@ -54,19 +50,21 @@
                             <img ng-src={{message.gravatar}} alt="" class="" fallback-src={{message.src}} width="60" height="60" />
                             <!-- <img gravatar-src="'a@b.com'" gravatar-size="80" default={{message.src}}> -->
                         </div>
-                        <div class="col-md-3">
-                            <h4>
-                            <strong>{{message.createdby}}</strong></h4>
+                        <div class="col-md-5">
+                            <span style="font-size: 19px;">
+                            <strong>{{message.createdby}}</strong></span>&nbsp;&nbsp;
+                            <span class="label label-default" ng-show={{message.admin}}>Admin</span>
                         </div>
-                        <div class="col-md-push-3 col-md-3">
+                        <div class="col-md-push-1 col-md-1">
                             <span class="label label-success" ng-show={{message.seen}}>Seen</span>
                         </div>
                         <div class="col-md-push-1 col-md-3">
                             <em>
                             <small>messaged {{message.createdat}}</small> &nbsp;
+                            </em>
                             <!-- <a class="glyphicon glyphicon-pencil"></a>
                             <a class="glyphicon glyphicon-remove"></a> -->
-                            </em>
+
                         </div>
                         <div class="col-md-9">
                             <p ng-bind-html="message.messagebody | newlines">
@@ -85,12 +83,11 @@
                                 <img ng-src={{replygravatar}} alt="" class="" fallback-src={{replysrc}} width="60" height="60" />
                             </div>
                             <div class="col-md-3">
-                                <h4>
-                                <strong>{{user}}</strong></h4>
+                                <span style="font-size: 19px;">
+                                <strong>{{user}}</strong></span>&nbsp;&nbsp;
+                                <span class="label label-default">Admin</span>
                             </div>
-                            <!-- <div class="col-md-push-3 col-md-3">
-                                                                <span class="label label-success">Seen</span>
-                            </div> -->
+                           
                             <div class="col-md-push-4 col-md-3">
                                 <em>
                                 <small>messaged {{today}}</small> &nbsp;
@@ -106,7 +103,7 @@
                     </div>
                 </div>
                 <!-- <div ng-show="!insideReplyBox">
-                                        <textarea class="form-control" placeholder="Click here to Reply or Forward" ng-click="showReplyButton()"></textarea>
+                                                            <textarea class="form-control" placeholder="Click here to Reply or Forward" ng-click="showReplyButton()"></textarea>
                 </div> -->
                 <div>
                     <div class="col-md-5" style="padding-top: 30px;" ng-show="showerror">
@@ -133,8 +130,8 @@
                     <br>
                     <div class="col-md-12" style="padding-top: 45px;">
                         <div class="btn-toolbar" style="padding-right: 20px;">
-                            <button class="btn btn-success col-md-2 pull-right" ng-click="closeTicket()" ng-disabled="disableClose">{{buttontext}}</button>&nbsp;&nbsp;
                             <button type="submit" class="btn btn-success col-md-2 pull-right" ng-click="validateAndAddReply()" ng-disabled="disableReply">Reply</button>
+                            <button class="btn btn-default col-md-2 pull-right" ng-click="closeTicket()" ng-disabled="disableClose">{{buttontext}}</button>&nbsp;&nbsp;
                         </div>
                     </div>
                 </div>

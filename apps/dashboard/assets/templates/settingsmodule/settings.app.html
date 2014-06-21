@@ -12,17 +12,17 @@
                         <ul class="sidebar-nav">
                             <li class="sidebar-brand"><strong>{{App}} Settings </strong>
                             </li>
-                            <li><a ui-sref="appsettings.general">General</a>
+                            <li ng-class="{'active': isActive('general')}"><a ui-sref="appsettings.general">General</a>
                             </li>
-                            <li><a ui-sref="appsettings.team">Team</a>
+                            <li ng-class="{'active': isActive('team')}"><a ui-sref="appsettings.team">Team</a>
                             </li>
-                            <li><a ui-sref="appsettings.messages">Color Themes</a>
+                            <li ng-class="{'active': isActive('colorthemes')}"><a ui-sref="appsettings.messages">Color Themes</a>
                             </li>
                             <!-- <li><a ui-sref="appsettings.environment">Environment</a>
                             </li> -->
-                            <li><a ui-sref="appsettings.billing">Billing</a>
+                            <li ng-class="{'active': isActive('billing')}"><a ui-sref="appsettings.billing">Billing</a>
                             </li>
-                            <li><a ui-sref="appsettings.installation">Installation</a>
+                            <li ng-class="{'active': isActive('installation')}"><a ui-sref="appsettings.installation">Installation</a>
                             </li>
                         </ul>
                     </div>

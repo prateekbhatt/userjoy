@@ -133,19 +133,29 @@ angular.module('do.install', [])
 ])
 
 .controller('installSendEmailAppCtrl', ['$scope', '$stateParams', 'AppModel',
-  'AccountService',
-  function ($scope, $stateParams, AppModel, AccountService) {
+  'AccountService', '$location', '$rootScope', '$timeout',
+  function ($scope, $stateParams, AppModel, AccountService, $location, $rootScope, $timeout) {
     console.log("inside send email ctrl");
+    $scope.enableSendEmail = true;
     $scope.appId = $stateParams.id;
     $scope.accountEmail = AccountService.get().email;
     $scope.accountname = AccountService.get().name;
+    $scope.userjoyEmail = 'support@userjoy.co';
     var callback = function (err) {
+      $scope.enableSendEmail = true;
       if(err) {
         return;
       }
-      $location.path('/apps/' + $scope.appId + '/addcode');
+      $rootScope.showSuccess = true;
+      $rootScope.showSuccessMsgRootScope = 'An email has been sent to your developer';
+      $timeout(function(){
+        $rootScope.showSuccess = false;
+        $rootScope.showSuccessMsgRootScope = '';
+      }, 5000);
+      // $location.path('/apps/' + $scope.appId + '/addcode');
     }
     $scope.sendEmail = function () {
+      $scope.enableSendEmail = false;
       AppModel.sendCodeToDeveloper($scope.appId, $scope.toEmail, callback);
     }
   }

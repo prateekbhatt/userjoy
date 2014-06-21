@@ -817,4 +817,12 @@ li.list-group-item-segment.active, li.list-group-item-segment.active:hover, li.l
     color: #777;
 }
 
+#sidebar-wrapper-settings > .sidebar-nav > .active {
+    background-color: #e0e0e0;
+}
+
+/*.active-smart-filters {
+    background-color: #e0e0e0;   
+}
+*/
 }
