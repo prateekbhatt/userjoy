@@ -164,6 +164,12 @@ angular.module('do.message', [])
           $scope.currApp = currentApp[0]._id
         }
 
+        $scope.isActive = function (path) {
+          var location = $location.path()
+            .split('/')[4];
+          return path == location;
+        }
+
         var populatePage = function () {
           $scope.showTableInbox = function () {
             console.log("inside showTableInbox");
@@ -764,10 +770,12 @@ angular.module('do.message', [])
 
               if (m.from === 'user') {
                 mObj.email = userEmail;
+                mObj.admin = false;
               }
               if (m.from === 'account') {
                 console.log("accoid.email: ", m.accid.email);
                 mObj.email = m.accid.email;
+                mObj.admin = true;
               }
 
               if(m.sName) {
@@ -1071,7 +1079,8 @@ angular.module('do.message', [])
                   src: imgsrc,
                   gravatar: imggravatar,
                   seen: $scope.messages[i].seen,
-                  email: $scope.messages[i].email
+                  email: $scope.messages[i].email,
+                  admin: $scope.messages[i].admin
                 })
               } else {
                 $scope.messagesWithSrc.push({
@@ -1081,7 +1090,8 @@ angular.module('do.message', [])
                   src: storedimgsrc,
                   gravatar: imggravatar,
                   seen: $scope.messages[i].seen,
-                  email: $scope.messages[i].email
+                  email: $scope.messages[i].email,
+                  admin: $scope.messages[i].admin
                 })
               }
 
@@ -1121,6 +1131,39 @@ angular.module('do.message', [])
             }
             console.log("data: ", data);
             $scope.customerEmail = data.email;
+            var keys = _.keys(data);
+            $scope.userdata = [];
+
+            function capitaliseFirstLetter(string) {
+              return string.charAt(0)
+                .toUpperCase() + string.slice(1);
+            }
+            for (var i = 0; i < keys.length; i++) {
+              prop = keys[i];
+              console.log("id: ", prop);
+              value = data[prop];
+              // console.log("value prop: ", value, prop);
+              if (prop != 'companies' && prop != 'ct' && prop != 'meta' &&
+                prop != 'ut' && prop != '__v' && prop != 'aid' && prop !=
+                '_id') {
+                if (prop == 'lastSeen') {
+                  prop = 'Last Seen';
+                  value = $moment(value)
+                    .fromNow()
+                }
+                if (prop == 'joined') {
+                  value = $moment(value)
+                    .fromNow()
+                }
+                prop = capitaliseFirstLetter(prop);
+                $scope.userdata.push({
+                  value: value,
+                  data: prop
+                })
+              }
+            };
+
+            console.log("userdata: ", $scope.userdata);
             $scope.customergravatar = get_gravatar(data.email, 80);
             $scope.customersrc = 'http://placehold.it/60/' +
               getRandomColor() +

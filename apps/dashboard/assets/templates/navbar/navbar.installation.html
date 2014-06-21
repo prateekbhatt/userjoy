@@ -16,71 +16,73 @@
                 <a style="font-size:19px; cursor: pointer" class="navbar-brand" ng-click="redirectToApp()">UserJoy
                 </a>
             </div>
-            <div class="col-md-4 col-md-push-3" style="margin-top: 5px;">
-                <div class="alert alert-info text-center" style="padding: 3px; border-color: #bce8f1; margin-bottom: 0px; position: absolute; width: 400px;" ng-show="info">{{infoMsgRootScope}}</div>
+            <div class="col-md-6 col-md-push-2" style="margin-top: 15px;" ng-show="info">
+                <div class="alert alert-danger text-center" style="padding: 3px; border-color: #c0392b; margin-bottom: 0px; position: absolute;" >{{infoMsgRootScope}}</div>
             </div>
-            <div class="col-md-4 col-md-push-3" style="margin-top: 15px;">
-                <div class="alert alert-danger text-center" style="padding: 3px; border-color: #c0392b; margin-bottom: 0px; position: absolute; width: 400px;" ng-show="error">{{errMsgRootScope}}</div>
-            </div>
-            <div role="navigation" class="collapse navbar-collapse navbar-right navbar-ex1-collapse">
-                <ul class="nav navbar-nav">
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" ng-click="showDropdownApp()">
-                        <i class="fa fa-folder-open-o">
-                        </i>
-                        Apps
-                        <i class="fa fa-caret-down">
-                        </i>
-                        </a>
-                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" ng-show="visibleDropdownApp">
-                            <li role="presentation" ng-show="!apps">
-                                <a role="menuitem" tabindex="-1"  href="/onboarding">
-                                <span>No Apps are connected</span>
-                                <br>
-                                <span>Click here to connect an app</span></a>
-                            </li>
-                            <li role="presentation" ng-repeat="app in apps">
-                                <a role="menuitem" tabindex="-1" href="#" ng-show="apps" ng-click="changeApp(app)">
-                                &nbsp;&nbsp;&nbsp;&nbsp;{{app.name}}
-                                </a>
-                                &nbsp;
-                                <a href="#" style="padding-top: 0px; font-size: 14px" ng-show="apps" ng-click="goToSettings(app)" class="glyphicon glyphicon-cog">&nbsp;Settings for {{app.name}}</a>
-                                <hr ng-show="!$last">
-                                <!-- <button class="gylphicon glyphicon"></button> -->
-                            </li>
-                            <hr>
-                            <a ui-sref="onboarding" class="btn btn-sm btn-info btn-block fa fa-plus" style="margin-right: 18px; margin-left: 18px; margin-bottom: 15px; width: 85%;">&nbsp;New App</a>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" ng-click="showDropdown()">
-                        <i class="fa fa-cogs">
-                        </i>
-                        Account
-                        <i class="fa fa-caret-down">
-                        </i>
-                        </a>
-                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" ng-show="visibleDropdown">
-                            <li role="presentation">
-                                <a role="menuitem" tabindex="-1" href="/account/settings">
-                                <span class="glyphicon glyphicon-cog"></span>&nbsp;&nbsp;&nbsp;&nbsp;Settings
-                                </a>
-                            </li>
-                            <li role="presentation">
-                                <a role="menuitem" tabindex="-1" href="#">
-                                <i class="fa fa-book"></i>&nbsp;&nbsp;&nbsp;&nbsp;Docs
-                                </a>
-                            </li>
-                            <li role="presentation" class="divider"></li>
-                            <li role="presentation">
-                                <a role="menuitem" tabindex="-1" href="#" ng-click="logout()">
-                                <span class="glyphicon glyphicon-off"></span>&nbsp;&nbsp;&nbsp;&nbsp;Logout
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
+            <div class="col-md-4 col-md-push-3" style="margin-top: 15px;" ng-show="showSuccess">
+                <div class="alert alert-success text-center" style="padding: 3px; border-color: #30b661; margin-bottom: 0px; position: absolute; width: 400px;">{{showSuccessMsgRootScope}}</div>
             </div>
         </div>
-    </nav>
+        <!-- <div class="col-md-4 col-md-push-3">
+        </div> -->
+        <div role="navigation" class="collapse navbar-collapse navbar-right navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" ng-click="showDropdownApp()">
+                    <i class="fa fa-folder-open-o">
+                    </i>
+                    Apps
+                    <i class="fa fa-caret-down">
+                    </i>
+                    </a>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" ng-show="visibleDropdownApp">
+                        <li role="presentation" ng-show="!apps">
+                            <a role="menuitem" tabindex="-1"  href="/onboarding">
+                            <span>No Apps are connected</span>
+                            <br>
+                            <span>Click here to connect an app</span></a>
+                        </li>
+                        <li role="presentation" ng-repeat="app in apps">
+                            <a role="menuitem" tabindex="-1" href="#" ng-show="apps" ng-click="changeApp(app)">
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{app.name}}
+                            </a>
+                            <a href="#" style="padding-top: 0px; font-size: 14px" ng-show="apps" ng-click="goToSettings(app)" class="glyphicon glyphicon-cog">&nbsp;Settings for {{app.name}}</a>
+                            <hr ng-show="!$last">
+                            <!-- <button class="gylphicon glyphicon"></button> -->
+                        </li>
+                        <hr>
+                        <a ui-sref="onboarding" class="btn btn-sm btn-info btn-block fa fa-plus" style="margin-right: 18px; margin-left: 18px; margin-bottom: 15px; width: 85%;">&nbsp;New App</a>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" ng-click="showDropdown()">
+                    <i class="fa fa-cogs">
+                    </i>
+                    Account
+                    <i class="fa fa-caret-down">
+                    </i>
+                    </a>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" ng-show="visibleDropdown">
+                        <li role="presentation">
+                            <a role="menuitem" tabindex="-1" href="/account/settings">
+                            <span class="glyphicon glyphicon-cog"></span>&nbsp;&nbsp;&nbsp;&nbsp;Settings
+                            </a>
+                        </li>
+                        <li role="presentation">
+                            <a role="menuitem" tabindex="-1" href="#">
+                            <i class="fa fa-book"></i>&nbsp;&nbsp;&nbsp;&nbsp;Docs
+                            </a>
+                        </li>
+                        <li role="presentation" class="divider"></li>
+                        <li role="presentation">
+                            <a role="menuitem" tabindex="-1" href="#" ng-click="logout()">
+                            <span class="glyphicon glyphicon-off"></span>&nbsp;&nbsp;&nbsp;&nbsp;Logout
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
 </div>

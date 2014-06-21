@@ -212,7 +212,8 @@ var app = angular.module('dodatado', [
             $rootScope.error = false;
           }, 5000);
         }
-        var url = $location.path().split('/');
+        var url = $location.path()
+          .split('/');
         console.log("url: ", url);
         var checkUrl = url[1];
         console.log("url 1: ", url[1]);
@@ -230,10 +231,43 @@ var app = angular.module('dodatado', [
   });
 
   // adding custom tool to textAngular
-  $provide.decorator('taOptions', ['taRegisterTool', '$delegate',
-    function (taRegisterTool, taOptions) {
+  $provide.decorator('taOptions', ['taRegisterTool', '$delegate', 'config',
+    '$http', 'AppService', 'CurrentAppService', '$location',
+    function (taRegisterTool, taOptions, config, $http, AppService,
+      CurrentAppService, $location) {
       // $delegate is the taOptions we are decorating
       // register the tool with textAngular
+      console.log("$location.path(): in app.js: ", $location.path());
+      var appId = $location.path()
+        .split('/')[2];
+        var attributes = [];
+      $http.get(config.apiUrl + '/apps/' + appId +
+        '/automessages/attributes')
+        .success(function (data) {
+          console.log("success in getting automsg attributes", _.keys(data.userAttributes));
+          var keys = _.keys(data.userAttributes);
+          for (var i = 0; i < keys.length; i++) {
+            var prop = keys[i]
+            value = data.userAttributes[prop];
+            console.log("user attributes value: ", value);
+            attributes.push({
+              name: value,
+              value: '{{= ' + value + '|| "there"}}'
+            })
+          };
+          console.log("user attributes: ", attributes);
+          // for (var i = 0; i < data.userAttributes.length; i++) {
+          //   options.push({
+          //     name: _.key
+          //   })
+          // };
+          // options.push({
+          //   name: 
+          // })
+        })
+        .error(function () {
+          console.log("error in getting automsg attributes");
+        })
       taRegisterTool('dropdown', {
         display: "<span class='dropdown'>" +
           "<button class='btn btn-sm btn-default dropdown-toggle' type='button' ng-disabled='showHtml()'><i class='fa fa-caret-down'></i></button>" +
@@ -246,29 +280,30 @@ var app = angular.module('dodatado', [
               .wrapSelection('insertText', size);
           }
         },
+        options: attributes
         // TODO: Get data from backend
-        options: [{
-            name: 'Email',
-            value: '{{= email || "there"}}'
-          }
-          // ,
-          /*{
-                    name: 'App Name',
-                    value: '{{app_name}}'
-                }, {
-                    name: 'Last Name',
-                    value: '{{last_name}}'
-                }, {
-                    name: 'Email',
-                    value: '{{email}}'
-                }, {
-                    name: 'User Id',
-                    value: '{{user_id}}'
-                }, {
-                    name: 'status',
-                    value: '{{status}}'
-                }*/
-        ]
+        // options: [{
+        //     name: 'Email',
+        //     value: '{{= email || "there"}}'
+        //   }
+        //   // ,
+        //   {
+        //             name: 'App Name',
+        //             value: '{{app_name}}'
+        //         }, {
+        //             name: 'Last Name',
+        //             value: '{{last_name}}'
+        //         }, {
+        //             name: 'Email',
+        //             value: '{{email}}'
+        //         }, {
+        //             name: 'User Id',
+        //             value: '{{user_id}}'
+        //         }, {
+        //             name: 'status',
+        //             value: '{{status}}'
+        //         }
+        // ]
       });
 
       // add the button to the default toolbar definition
