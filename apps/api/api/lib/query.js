@@ -777,7 +777,15 @@ Query.prototype.getCountFilterCond = function (filter) {
 
 function sanitize(q) {
 
+
+
   _.each(q.filters, function (f) {
+
+    // throw error if query filter is not one of ['hasdone', 'hasnotdone', 'count', 'attr']
+    if (!_.contains(['hasdone', 'hasnotdone', 'count', 'attr'], f.method)) {
+      throw new Error(
+        'Query filter must be one of hasdone/hasnotdone/count/attr');
+    }
 
     if (_.contains(['hasdone', 'hasnotdone'], f.method)) {
       delete f.op;

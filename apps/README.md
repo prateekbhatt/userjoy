@@ -10,5 +10,6 @@ Notes
   - **api** - `api.dodatado.com` : 8002
   - **dashboard** - `app.dodatado.com` : 8001
   - **website** - `dodatado.com` : 8000
+  - **workers** - `This does not have a public url` : 8003
 
 The `config.js` file contains settings which are common across all apps.

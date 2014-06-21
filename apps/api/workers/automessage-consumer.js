@@ -12,8 +12,9 @@ var _ = require('lodash');
 var async = require('async');
 var cronJob = require('cron')
   .CronJob;
-var iron_mq = require('iron_mq');
 var moment = require('moment');
+var q = require('./queues')
+  .automessage;
 
 
 /**
@@ -51,16 +52,6 @@ var render = require('../helpers/render-message');
 
 
 /**
- * Config settings
- *
- * TODO: move these to central config settings file
- */
-
-var TOKEN = 'Rfh192ozhicrSZ2R9bDX8uRvOu0';
-var PROJECT_ID_DEV = '536e5455bba6150009000090';
-
-
-/**
  * Hourly Cron Job
  */
 
@@ -79,25 +70,6 @@ var SCHEDULE = MINUTE_SCHEDULE;
 if (process.env.NODE_ENV === 'production') {
   SCHEDULE = HOURLY_SCHEDULE;
 }
-
-
-/**
- * Create iron mq client instance
- */
-
-var imq = new iron_mq.Client({
-  token: TOKEN,
-  project_id: PROJECT_ID_DEV,
-  queue_name: 'automessage'
-});
-
-
-/**
- * use 'automessge' queue on iron mq
- */
-
-var q = imq.queue("automessage");
-
 
 
 function saveNotifications(users, amsg, cb) {
@@ -289,13 +261,19 @@ function amConsumer(cb) {
         // segment object should be converted from BSON to JSON
         segment = segment.toJSON();
 
-        var query = {
+        var qObj = {
           list: segment.list,
           op: segment.op,
           filters: segment.filters
         };
 
-        var query = new Query(segment.aid, query);
+        var query;
+
+        try {
+          query = new Query(segment.aid, qObj);
+        } catch (err) {
+          return cb(err);
+        }
 
         query.run(function (err, users) {
           cb(err, users);

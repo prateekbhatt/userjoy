@@ -16,7 +16,8 @@ var BASE_URLS = {
 var PORTS = {
   website: 8000,
   dashboard: 8001,
-  api: 8002
+  api: 8002,
+  workers: 8003
 };
 
 var DATABASES = {
