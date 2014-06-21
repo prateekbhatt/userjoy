@@ -42,6 +42,7 @@ angular.module('models.auth', ['services'])
                   $location.path('/apps/' + AppService.getLoggedInApps()[
                     0]._id + '/users/list');
                 } else {
+                  console.log("Auth.js redirecting to addcode url");
                   $location.path('/apps/' + AppService.getLoggedInApps()[
                     0]._id + '/addcode');
                 }
