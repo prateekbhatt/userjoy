@@ -108,6 +108,7 @@ describe('Resource /query', function () {
 
 
     beforeEach(function () {
+      aid = saved.apps.first._id.toString();
       obj = {
         list: 'users',
         op: 'and',
@@ -127,7 +128,6 @@ describe('Resource /query', function () {
           }
         ]
       };
-      aid = saved.apps.first._id.toString();
       url = '/apps/' + aid + '/query?' + qs.stringify(obj);
     });
 
@@ -149,6 +149,47 @@ describe('Resource /query', function () {
     it('logging in user', function (done) {
       loginUser(done);
     });
+
+
+    it(
+      'should return error if filter method not in hasdone/hasnotdone/count/attr',
+      function (done) {
+
+        var obj = {
+          list: 'users',
+          op: 'and',
+          filters: [
+
+            {
+              method: 'hasdone',
+              type: 'track',
+              name: 'Create Message'
+            },
+
+            {
+              method: 'INVALID_METHOD_TYPE',
+              name: 'score',
+              op: 'gt',
+              val: 10
+            }
+          ]
+        };
+
+        var url = '/apps/' + aid + '/query?' + qs.stringify(obj);
+
+
+        request
+          .get(url)
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            "error": "Query filter must be one of hasdone/hasnotdone/count/attr",
+            "status": 400
+          })
+          .end(done);
+
+      });
 
 
     it('should fetch users matching given filters', function (done) {

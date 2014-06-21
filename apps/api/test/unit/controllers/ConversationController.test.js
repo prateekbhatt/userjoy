@@ -514,7 +514,8 @@ describe('Resource /apps/:aid/conversations', function () {
           .expect(400)
           .expect({
             status: 400,
-            error: 'Missing body/sub/type/uids'
+            // error: 'Missing body/sub/type/uids'
+            error: 'Please write a body and a subject'
           })
           .end(done);
 

@@ -9,8 +9,24 @@ var path = require('path');
 
 
 var db = require('./db');
-var loadMiddleware = require('./middleware');
-var loadRoutes = require('../config/routes');
+
+
+/**
+ * directory path var
+ */
+
+var workersDir = '../../api/workers/';
+
+
+/**
+ * Jobs
+ */
+
+var automessagePublisher = require(path.join(workersDir,
+  '/automessage-publisher'));
+
+var automessageConsumer = require(path.join(workersDir,
+  '/automessage-consumer'));
 
 
 /**
@@ -39,7 +55,7 @@ exports.start = function startServer(done) {
 
   var app = express();
 
-  app.set('port', process.env.PORT || 8002);
+  app.set('port', process.env.PORT || 8003);
   setEnv();
 
 
@@ -50,31 +66,6 @@ exports.start = function startServer(done) {
   if (process.env.NODE_ENV !== 'test') {
     require('newrelic');
   }
-
-
-  // common middleware for all routes
-  loadMiddleware.common(app);
-
-
-  // track routes which do not need session
-  loadRoutes.track(app);
-
-
-  // session middleware required for dashboard routes
-  loadMiddleware.session(app);
-
-
-  // cors middlware to allow requests from app.dodatado.com and dodatado.com
-  // to api routes
-  loadMiddleware.cors(app);
-
-
-  // dashboard routes
-  loadRoutes.dashboard(app);
-
-
-  // error handling routes
-  loadRoutes.error(app);
 
 
   async.waterfall(
@@ -95,6 +86,14 @@ exports.start = function startServer(done) {
           cb(null, db, server);
         });
 
+      },
+
+      function startCronJobs(db, server, cb) {
+
+        automessagePublisher();
+        automessageConsumer();
+
+        cb(null, db, server);
       }
 
     ],
@@ -104,7 +103,7 @@ exports.start = function startServer(done) {
       if (err) {
 
         logger.crit({
-          at: 'load/index',
+          at: 'workers load/index',
           err: err
         });
 
