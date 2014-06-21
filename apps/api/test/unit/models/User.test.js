@@ -66,11 +66,24 @@ describe('Model User', function () {
 
     it('should return user if user exists', function (done) {
 
+      var lastSeenBefore = new Date(existingUser.lastSeen)
+        .getTime();
+
+      expect(lastSeenBefore)
+        .to.be.a('number');
+
       User.findOrCreate(existingUser.aid, existingUser, function (err,
         usr) {
 
         expect(err)
           .to.not.exist;
+
+        var lastSeenAfter = new Date(usr.lastSeen)
+          .getTime();
+
+        expect(lastSeenAfter)
+          .to.be.a('number')
+          .and.to.be.above(lastSeenBefore);
 
         expect(usr._id)
           .to.eql(existingUser._id);
