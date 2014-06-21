@@ -28,15 +28,21 @@ var PROJECT_ID_DEV = '536e5455bba6150009000090';
 
 var imq = new iron_mq.Client({
   token: TOKEN,
-  project_id: PROJECT_ID_DEV,
-  queue_name: 'automessage'
+  project_id: PROJECT_ID_DEV
 });
 
 
 /**
- * use 'automessge' queue on iron mq
+ * setup 'automessge' queue on iron mq
  */
 
 module.exports.automessage = imq.queue("automessage");
+
+
+/**
+ * setup 'usage' queue on iron mq
+ */
+
+module.exports.usage = imq.queue("usage");
 
 
