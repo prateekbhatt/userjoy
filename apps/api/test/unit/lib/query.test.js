@@ -1390,6 +1390,31 @@ describe('Lib query', function () {
   describe('#sanitize', function () {
 
 
+    it(
+      'should throw error if filter method not in hasdone./hasnotdone/count/attr',
+      function () {
+
+        var before = {
+          list: 'users',
+          op: 'and',
+          filters: [{
+            method: 'invalidFilterMethod',
+            type: 'track',
+            name: 'Define Segment',
+            op: '',
+            val: ''
+          }]
+        };
+
+        expect(function () {
+          Query.sanitize(before);
+        })
+          .to.
+        throw ('Query filter must be one of hasdone/hasnotdone/count/attr');
+
+      });
+
+
     it('should remove empty op/val values in hasdone/hasnotdone filters',
       function () {
 
