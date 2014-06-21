@@ -231,6 +231,8 @@ UserSchema.pre('save', function (next) {
 /**
  * If the user exists, fetch the user, else create a new user
  *
+ * If the user exists, update the lastSeen timestamp to now
+ *
  * @param {String} app id
  * @param {Object} user object
  * @param {Function} callback function
@@ -295,7 +297,10 @@ UserSchema.statics.findOrCreate = function (aid, user, cb) {
   }
 
   var update = {
-    $setOnInsert: user
+    $setOnInsert: user,
+    $set: {
+      lastSeen: Date.now()
+    }
   };
 
   var options = {
