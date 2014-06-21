@@ -556,7 +556,7 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
-              $scope.otherTimeRange = '';
+              $scope.otherTimeRange = 'at any time';
               $scope.filters[parentindex].optext = 'less than';
               $scope.filters[parentindex].val = $moment(new Date())
                 .unix() * 1000;
@@ -577,7 +577,7 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
-              $scope.otherTimeRange = '';
+              $scope.otherTimeRange = 'at any time';
               $scope.filters[parentindex].optext = 'equal';
               $scope.filters[parentindex].val = '';
             } else if ($scope.attributes[index].name == 'status') {
@@ -595,7 +595,7 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
-              $scope.otherTimeRange = '';
+              $scope.otherTimeRange = 'at any time';
               $scope.filters[parentindex].optext = 'equal';
               $scope.filters[parentindex].val = 'free';
               $scope.filters[parentindex].valuetext = 'Free';
@@ -615,7 +615,7 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
-              $scope.otherTimeRange = '';
+              $scope.otherTimeRange = 'at any time';
               $scope.filters[parentindex].optext = 'equal';
               $scope.filters[parentindex].val = 'poor';
               $scope.filters[parentindex].valuetext = 'Poor';
@@ -634,7 +634,7 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
-              $scope.otherTimeRange = '';
+              $scope.otherTimeRange = 'at any time';
               $scope.filters[parentindex].optext = 'contains';
               $scope.filters[parentindex].op = 'contains';
               $scope.filters[parentindex].val = '';
@@ -867,7 +867,7 @@ angular.module('do.users', [])
           $scope.addAnotherFilter = function addAnotherFilter() {
             $scope.checkMethod = true;
             $scope.filters.push({
-              method: 'count',
+              method: '',
               btntext: 'Choose',
               checkMethod: true,
               isEvent: false,
@@ -1059,7 +1059,7 @@ angular.module('do.users', [])
               if ($scope.filters[i].val == '' && ($scope
                 .filters[i].method ==
                 'count' || $scope.filters[i].method ==
-                'attr')) {
+                'attr' || $scope.filters[i].method == '')) {
                 console.log("val: ", $scope.filters[i]
                   .val);
                 $scope.showErrorOnInput = true;
@@ -1074,6 +1074,15 @@ angular.module('do.users', [])
                 return;
                 // $scope.isErr = 'error';
                 // console.log("error class", $scope.isErr);
+              } else if ($scope.filters[i].method == '') {
+                $rootScope.error = true;
+                $rootScope.errMsgRootScope =
+                  'Provide a value in segment filter';
+                $scope.showSpinner = false;
+                $timeout(function () {
+                  $rootScope.error = false;
+                }, 5000);
+                return;
               } else {
                 $scope.showErr = false;
                 // $scope.isErr = '';
@@ -1153,6 +1162,25 @@ angular.module('do.users', [])
           $scope.updateQuery = function () {
             $scope.showUpdatePopover = !$scope.showUpdatePopover;
           }
+
+
+          $scope.showSpinner = true;
+          $scope.showErrorOnInput = true;
+          $scope.filtersBackend = [];
+          $scope.fromTime = '';
+          $scope.queryObj.list = $scope.selectedIcon.toLowerCase();
+          $scope.queryObj.op = $scope.text.toLowerCase();
+          $scope.queryObj.filters = $scope.filtersBackend;
+          $scope.queryObj.fromAgo = $scope.fromTime;
+
+          var stringifiedQuery = stringify($scope.queryObj);
+          console.log('queryObj', $scope.queryObj);
+          console.log('stringifiedQuery',
+            stringifiedQuery);
+
+
+          modelsQuery.runQueryAndGetUsers(currentAppId,
+            stringifiedQuery, populateTable);
 
           var populateUpdatedSegment = function (err, data) {
             if (err) {
@@ -1601,6 +1629,16 @@ angular.module('do.users', [])
               $scope.checkboxes
               .items)
             .length);
+          if (_.keys($scope.checkboxes.items)
+            .length == 0) {
+            $rootScope.error = true;
+            $rootScope.errMsgRootScope = 'Please select at least one user';
+            $timeout(function () {
+              $rootScope.errMsgRootScope = '';
+              $rootScope.error = false;
+            }, 5000);
+            return;
+          }
           console.log("checkboxes items: ",
             $scope.checkboxes
             .items);
@@ -1620,6 +1658,15 @@ angular.module('do.users', [])
             console.log("value: ", value);
             if (value == true) {
               $scope.mail.push(prop);
+            } else {
+              $rootScope.error = true;
+              $rootScope.errMsgRootScope =
+                'Please select at least one user';
+              $timeout(function () {
+                $rootScope.errMsgRootScope = '';
+                $rootScope.error = false;
+              }, 5000);
+              return;
             }
           };
           UidService.set($scope.mail);

@@ -63,18 +63,18 @@ angular.module('do.settings', [])
         },
         authenticate: true
       })
-      .state('appsettings.health', {
-        url: '/health',
-        views: {
-          "tab": {
-            templateUrl: '/templates/settingsmodule/settings.app.health.html',
-            controller: 'appSettingsHealthCtrl',
-          }
-        },
-        authenticate: true
-      })
+      // .state('appsettings.health', {
+      //   url: '/health',
+      //   views: {
+      //     "tab": {
+      //       templateUrl: '/templates/settingsmodule/settings.app.health.html',
+      //       controller: 'appSettingsHealthCtrl',
+      //     }
+      //   },
+      //   authenticate: true
+      // })
       .state('appsettings.messages', {
-        url: '/messages',
+        url: '/colorthemes',
         views: {
           "tab": {
             templateUrl: '/templates/settingsmodule/settings.app.messages.html',
@@ -83,16 +83,16 @@ angular.module('do.settings', [])
         },
         authenticate: true
       })
-      .state('appsettings.environment', {
-        url: '/environment',
-        views: {
-          "tab": {
-            templateUrl: '/templates/settingsmodule/settings.app.environment.html',
-            controller: 'appSettingsEnvironmentCtrl',
-          }
-        },
-        authenticate: true
-      })
+      // .state('appsettings.environment', {
+      //   url: '/environment',
+      //   views: {
+      //     "tab": {
+      //       templateUrl: '/templates/settingsmodule/settings.app.environment.html',
+      //       controller: 'appSettingsEnvironmentCtrl',
+      //     }
+      //   },
+      //   authenticate: true
+      // })
       .state('appsettings.billing', {
         url: '/billing',
         views: {
@@ -215,15 +215,36 @@ angular.module('do.settings', [])
 ])
 
 .controller('appSettingsCtrl', ['$scope', '$log', '$state', '$location',
-  function ($scope, $log, $state, $location) {
+  'AppService', 'CurrentAppService', 'AppModel', '$stateParams',
+  function ($scope, $log, $state, $location, AppService, CurrentAppService,
+    AppModel, $stateParams) {
 
-    // TODO: get data from backend
-    $scope.App = 'Userjoy';
-    // TODO: Change this code. Change window.location.href everywhere to $location.path()
-    if (window.location.href ===
-      'http://app.do.localhost/app/settings') {
-      $location.path('/app/settings/general');
+    var url = $location.path().split('/');
+    if(url.length == 4){
+      $location.path('/apps/' + $stateParams.id + '/settings/general')
     }
+
+    CurrentAppService.getCurrentApp()
+      .then(function (currentApp) {
+        $scope.appId = $stateParams.id;
+
+        $scope.isActive = function (path) {
+          var location = $location.path()
+            .split('/')[4];
+          return path === location;
+        } 
+
+        var populatePage = function () {
+          $scope.App = AppService.getCurrentApp()
+            .name;
+        }
+        AppModel.getSingleApp($scope.appId, populatePage);
+      })
+
+    // if (window.location.href ===
+    //   'http://app.do.localhost/app/settings') {
+    //   $location.path('/app/settings/general');
+    // }
 
   }
 ])
@@ -344,61 +365,61 @@ angular.module('do.settings', [])
   }
 ])
 
-.controller('appSettingsHealthCtrl', ['$scope', '$log', '$state',
-  function ($scope, $log, $state) {
-    $scope.activitydropdown = [{
-      text: 'Daily'
-    }, {
-      text: 'Weekly'
-    }, {
-      text: 'Monthly'
-    }, {
-      text: 'Inactive'
-    }];
+// .controller('appSettingsHealthCtrl', ['$scope', '$log', '$state',
+//   function ($scope, $log, $state) {
+//     $scope.activitydropdown = [{
+//       text: 'Daily'
+//     }, {
+//       text: 'Weekly'
+//     }, {
+//       text: 'Monthly'
+//     }, {
+//       text: 'Inactive'
+//     }];
 
-    $scope.spenttimedropdown = [{
-      text: '10 mins'
-    }, {
-      text: '30 mins'
-    }, {
-      text: '1 hr'
-    }, {
-      text: '2 hrs'
-    }, {
-      text: '5 hrs'
-    }];
+//     $scope.spenttimedropdown = [{
+//       text: '10 mins'
+//     }, {
+//       text: '30 mins'
+//     }, {
+//       text: '1 hr'
+//     }, {
+//       text: '2 hrs'
+//     }, {
+//       text: '5 hrs'
+//     }];
 
-    $scope.pulsedropdown = [{
-      text: '20%'
-    }, {
-      text: '30%'
-    }, {
-      text: '40%'
-    }, {
-      text: '50%'
-    }, {
-      text: '60%'
-    }, {
-      text: '70%'
-    }, {
-      text: '80%'
-    }, {
-      text: '90%'
-    }, {
-      text: '100%'
-    }];
+//     $scope.pulsedropdown = [{
+//       text: '20%'
+//     }, {
+//       text: '30%'
+//     }, {
+//       text: '40%'
+//     }, {
+//       text: '50%'
+//     }, {
+//       text: '60%'
+//     }, {
+//       text: '70%'
+//     }, {
+//       text: '80%'
+//     }, {
+//       text: '90%'
+//     }, {
+//       text: '100%'
+//     }];
 
-    $scope.purchasedlicensesdropdown = [{
-      text: '20%'
-    }, {
-      text: '40%'
-    }, {
-      text: '60%'
-    }, {
-      text: '80%'
-    }];
-  }
-])
+//     $scope.purchasedlicensesdropdown = [{
+//       text: '20%'
+//     }, {
+//       text: '40%'
+//     }, {
+//       text: '60%'
+//     }, {
+//       text: '80%'
+//     }];
+//   }
+// ])
 
 .controller('appSettingsMessagesCtrl', ['$scope', '$log', '$state',
   '$stateParams', 'AppModel', 'AppService', 'CurrentAppService',
@@ -625,14 +646,14 @@ angular.module('do.settings', [])
   }
 ])
 
-.controller('appSettingsEnvironmentCtrl', ['$scope', '$log', '$state',
-  'AppService',
-  function ($scope, $log, $state, AppService) {
-    $scope.numLimit = 10;
-    $scope.appsEnvironment = [];
-    $scope.appsEnvironment = AppService.getLoggedInApps();
-  }
-])
+// .controller('appSettingsEnvironmentCtrl', ['$scope', '$log', '$state',
+//   'AppService',
+//   function ($scope, $log, $state, AppService) {
+//     $scope.numLimit = 10;
+//     $scope.appsEnvironment = [];
+//     $scope.appsEnvironment = AppService.getLoggedInApps();
+//   }
+// ])
 
 .controller('appSettingsBillingCtrl', ['$scope', '$log', '$state',
   function ($scope, $log, $state) {

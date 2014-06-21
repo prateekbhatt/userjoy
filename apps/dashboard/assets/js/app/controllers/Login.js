@@ -57,7 +57,7 @@ angular.module('do.login', [])
     console.log('LoginProvider:', login.getLoggedIn());
     $scope.errMsg = '';
     $scope.showError = false;
-    $scope.disableLogin = false;
+    $scope.enableLogin = true;
     console.log("$rootScope loggedIn: ", $rootScope.loggedIn);
     if ($rootScope.loggedIn && AppService.getCurrentApp()
       ._id != null) {
@@ -77,23 +77,24 @@ angular.module('do.login', [])
       $scope.showError = false;
     }
 
-    var callback = function (err) {
-      $scope.disableLogin = false;
-      if (err) {
-        console.log("error in signing in");
-        console.log(err.error);
-        $rootScope.error = true;
-        $rootScope.errMsgRootScope = err.error;
-        $timeout(function () {
-          $rootScope.error = false;
-        }, 5000);
-      }
-    }
+
 
     // attempt login to your api
     $scope.attemptLogin = function () {
-      $scope.disableLogin = true;
-      AuthService.attemptLogin($scope.email, $scope.password, callback);
+      $scope.enableLogin = false;
+      AuthService.attemptLogin($scope.email, $scope.password, function (err) {
+        $scope.enableLogin = true;
+        console.log("enableLogin: ", $scope.enableLogin);
+        if (err) {
+          console.log("error in signing in");
+          console.log(err.error);
+          $rootScope.error = true;
+          $rootScope.errMsgRootScope = err.error;
+          $timeout(function () {
+            $rootScope.error = false;
+          }, 5000);
+        }
+      });
       $scope.$watch(ErrMsgService.getErrorMessage, function () {
         if (ErrMsgService.getErrorMessage()) {
           console.log("err msg: ", ErrMsgService.getErrorMessage());
@@ -109,7 +110,9 @@ angular.module('do.login', [])
 .controller('forgotPasswordCtrl', ['$scope', 'AccountModel', '$rootScope',
   '$timeout',
   function ($scope, AccountModel, $rootScope, $timeout) {
+    $scope.enableForgotPassword = true;
     var callback = function (err) {
+      $scope.enableForgotPassword = true;
       if (err) {
         console.log("error");
         return;
@@ -124,6 +127,7 @@ angular.module('do.login', [])
 
     }
     $scope.forgotPassword = function () {
+      $scope.enableForgotPassword = false;
       AccountModel.forgotPassword($scope.email, callback);
     }
   }
