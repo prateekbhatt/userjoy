@@ -137,14 +137,47 @@ describe('Model Event', function () {
 
   describe('#track', function () {
 
-    it('should return error if less than 5 arguments are passed',
+    it('should return error if less than 6 arguments are passed',
       function () {
 
         expect(Event.track)
           .to.
-        throw ('Event.track: Expected five arguments');
+        throw ('Event.track: Expected six arguments');
 
       });
+
+
+    it('should return error if invalid event type', function (done) {
+
+      var ids = {
+        uid: randomId(),
+        aid: randomId()
+      };
+
+      var name = 'Open chat';
+      var module = 'Group';
+
+      var meta = {
+        members: 99
+      };
+
+      var type = 'randomEventTypeThatIsNotValid';
+
+      Event.track(type, ids, name, module, meta, function (err, evn) {
+
+        expect(err)
+          .to.exist
+          .and.to.have.property('errors')
+          .that.is.an('object')
+          .and.has.keys(['type']);
+
+        expect(evn)
+          .to.not.exist;
+
+        done();
+      });
+    });
+
 
     it('should create a new track event', function (done) {
 
@@ -160,12 +193,14 @@ describe('Model Event', function () {
         members: 99
       };
 
-      Event.track(ids, name, module, meta, function (err, evn) {
+      var type = 'track';
 
-        evn = evn.toJSON();
+      Event.track(type, ids, name, module, meta, function (err, evn) {
 
         expect(err)
           .to.not.exist;
+
+        evn = evn.toJSON();
 
         expect(evn.meta)
           .to.be.an("array");

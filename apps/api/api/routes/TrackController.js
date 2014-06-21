@@ -130,13 +130,14 @@ router
       var name = event.name;
       return Event.page(ids, name, callback);
 
-    } else if (event.type === 'track') {
+    } else if (_.contains(['form', 'link', 'track'], event.type)) {
 
       var name = event.name;
       var module = event.module;
       var meta = event.meta;
+      var type = event.type;
 
-      return Event.track(ids, name, module, meta, callback);
+      return Event.track(type, ids, name, module, meta, callback);
 
     } else {
 
@@ -388,7 +389,8 @@ router
 
     // if user identifier is not present, respond with an error
     if (!email && !user_id) {
-      return res.badRequest('Please send user_id or email to identify user');
+      return res.badRequest(
+        'Please send user_id or email to identify user');
     }
 
 
@@ -527,7 +529,8 @@ router
 
     // if user identifier is not present, respond with an error
     if (!email && !user_id) {
-      return res.badRequest('Please send user_id or email to identify user');
+      return res.badRequest(
+        'Please send user_id or email to identify user');
     }
 
     // is message body is not present, send bad request error

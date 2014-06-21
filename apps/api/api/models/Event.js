@@ -121,8 +121,9 @@ var EventSchema = new Schema({
 
 
 /**
- * Create a new track event
+ * Create a new track/form/link event
  *
+ * @param {string} type form/link/track
  * @param {object} ids (should contain aid, uid, cid)
  * @param {string} action
  * @param {string} module
@@ -130,10 +131,10 @@ var EventSchema = new Schema({
  * @param {function} cb callback
  */
 
-EventSchema.statics.track = function (ids, name, module, meta, cb) {
+EventSchema.statics.track = function (type, ids, name, module, meta, cb) {
 
-  if (arguments.length !== 5) {
-    throw new Error('Event.track: Expected five arguments');
+  if (arguments.length !== 6) {
+    throw new Error('Event.track: Expected six arguments');
   }
 
   var newEvent = {
@@ -142,7 +143,7 @@ EventSchema.statics.track = function (ids, name, module, meta, cb) {
     module: module,
     meta: metadata.toArray(meta),
     name: name,
-    type: 'track',
+    type: type,
     uid: ids.uid
   };
 
