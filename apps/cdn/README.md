@@ -74,7 +74,7 @@ status     | yes       | String    | trial / free / paying / cancelled
 ### Page
 
 ```js
-userjoy.page(module, name, properties, callback)
+userjoy.page(name, module, properties, callback)
 ```
 
 Track a pageview.
@@ -83,8 +83,8 @@ Track a pageview.
 
 name       | required  | type      | description
 -----      | ------    | -----     | ------
-module     | no        | String    | Name of the product module, i.e. 'Team', 'Tasks', 'Billing' etc.
 name       | yes       | String    | Name of the event, i.e. 'Added New Member', 'Created New Task', 'Upgraded Plan' etc
+module     | no        | String    | Name of the product module, i.e. 'Team', 'Tasks', 'Billing' etc.
 properties | no        | Object    | Additional properties for the event, i.e. { total_members: 11 } etc
 callback   | no        | Function  | Optional function to be called after the `userjoy.track` call
 
@@ -101,7 +101,7 @@ module     | already being sent as the first param
 ### Track
 
 ```js
-userjoy.track(module, name, properties, callback)
+userjoy.track(name, module, properties, callback)
 ```
 
 Track an event performed by the user.
@@ -110,8 +110,8 @@ Track an event performed by the user.
 
 name       | required  | type      | description
 -----      | ------    | -----     | ------
-module     | no        | String    | Name of the product module, i.e. 'Team', 'Tasks', 'Billing' etc.
 name       | yes       | String    | Name of the event, i.e. 'Added New Member', 'Created New Task', 'Upgraded Plan' etc
+module     | no        | String    | Name of the product module, i.e. 'Team', 'Tasks', 'Billing' etc.
 properties | no        | Object    | Additional properties for the event, i.e. { total_members: 11 } etc
 callback   | no        | Function  | Optional function to be called after the `userjoy.track` call
 
@@ -119,7 +119,7 @@ callback   | no        | Function  | Optional function to be called after the `u
 ### Track_Link
 
 ```js
-userjoy.track_link(links, name, callback)
+userjoy.track_link(links, name, module, properties)
 ```
 
 `track_link` is a helper method to help you track url clicks.
@@ -128,15 +128,16 @@ userjoy.track_link(links, name, callback)
 
 name       | required  | type       | description
 -----      | ------    | -----      | ------
-links      | yes       | DOM Element| DOM Element representing the link(s), i.e. `document.getElementById('new_link')`
+links      | yes       | String     | id of the link, e.g. 'userjoy_blog_link'
 name       | yes       | String     | Name of the event, i.e. 'Clicked Billing Link' etc
-callback   | no        | Function   | Optional function to be called after the `userjoy.track_link` call
+module     | no        | String    | Name of the product module, i.e. 'Team', 'Tasks', 'Billing' etc.
+properties | no        | Object    | Additional properties for the event, i.e. { total_members: 11 } etc
 
 
 ### Track_Form
 
 ```js
-userjoy.track_form(forms, callback)
+userjoy.track_form(forms, name, module, properties)
 ```
 
 `track_form` is a helper method to help you track form submissions.
@@ -145,6 +146,7 @@ userjoy.track_form(forms, callback)
 
 name       | required  | type       | description
 -----      | ------    | -----      | ------
-forms      | yes       | DOM Element| DOM Element representing the link(s), i.e. `document.getElementById('new_form')`
+forms      | yes       | String     | Id of the form, e.g. 'signup_form'
 name       | yes       | String     | Name of the event, i.e. 'Submitted Billing Form' etc
-callback   | no        | Function   | Optional function to be called after the `userjoy.track_link
+module     | no        | String     | Name of the product module, i.e. 'Team', 'Tasks', 'Billing' etc.
+properties | no        | Object    | Additional properties for the event, i.e. { total_members: 11 } etc
