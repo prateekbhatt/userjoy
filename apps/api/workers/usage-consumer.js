@@ -157,15 +157,12 @@ function saveUsage(aid, timestamp, dailyUsage, cb) {
 /**
  * Updates the usage of each user-company
  *
- * @param {date} timestamp day for which to update usage
  * @param {function} cb callback
  */
 
-function usageConsumerWorker(timestamp, cb) {
+function usageConsumerWorker(cb) {
 
   var queueMsgId;
-  var time = moment(timestamp)
-    .format();
 
   async.waterfall(
 
@@ -191,35 +188,37 @@ function usageConsumerWorker(timestamp, cb) {
           // store the queue msg id, used to delete the msg from the queue
           queueMsgId = res.id;
 
+          var msgBody = res.body ? JSON.parse(res.body) : {};
+          var aid = msgBody.aid;
+          var time = msgBody.time;
+
           // the message body contains the app id
-          if (!res.body) {
-            return cb(new Error('App id not found in queue'));
-          }
+          if (!aid) return cb(new Error('App id not found in queue'));
+          if (!time) return cb(new Error('Time not found in queue'));
 
-          cb(null, res.body);
+          cb(null, aid, time);
         });
       },
 
 
-      function calculateUsage(aid, cb) {
+      function calculateUsage(aid, time, cb) {
         usageMinutes(aid, time, function (err, users) {
-          console.log('\n\n\n calculating usage minutes', err, users.length);
-          cb(err, users, aid);
+          cb(err, users, aid, time);
         });
       },
 
 
-      function saveUsageData(users, aid, cb) {
+      function saveUsageData(users, aid, time, cb) {
 
         if (_.isEmpty(users)) return cb();
 
         saveUsage(aid, time, users, function (err) {
-          cb(err, aid);
+          cb(err, aid, time);
         });
       },
 
 
-      function deleteFromQueue(aid, cb) {
+      function deleteFromQueue(aid, time, cb) {
 
         usageQueue.del(queueMsgId, function (err, body) {
 
@@ -230,30 +229,39 @@ function usageConsumerWorker(timestamp, cb) {
             body: body
           });
 
-          cb(err, aid);
+          cb(err, aid, time);
 
         });
       },
 
 
       // queue app id to calculate user engagement scores
-      function postToScoreQueue(aid, cb) {
-        scoreQueue.post(aid, function (err) {
-          cb(err, aid);
+      function postToScoreQueue(aid, time, cb) {
+
+        var appData = {
+          aid: aid,
+          time: time
+        };
+
+        // ironmq accepts only strings
+        appData = JSON.stringify(appData);
+
+        scoreQueue.post(appData, function (err) {
+          cb(err, aid, time);
         });
       }
 
     ],
 
 
-    function callback(err, aid) {
+    function callback(err, aid, time) {
 
       if (err) {
         logger.crit({
           at: 'workers/usage-consumer callback',
           err: err,
           aid: aid,
-          ts: Date.now()
+          time: time
         });
       }
 
