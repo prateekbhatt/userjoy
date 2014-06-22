@@ -324,14 +324,14 @@
                                 ng-click="tableParams.sorting('lastsession', tableParams.isSortBy('lastsession', 'asc') ? 'desc' : 'asc')">
                                 <div>Last Session</div>
                             </th>
-                            <th class="text-center" ng-show="columns[6].visible" ng-class="{
+                            <!-- <th class="text-center" ng-show="columns[6].visible" ng-class="{
                                 'sort-asc': tableParams.isSortBy('unsubscribed', 'asc'),
                                 'sort-desc': tableParams.isSortBy('unsubscribed', 'desc'),
                                 'sortable': !$first
                                 }"
                                 ng-click="tableParams.sorting('unsubscribed', tableParams.isSortBy('unsubscribed', 'asc') ? 'desc' : 'asc')">
                                 <div>Unsubscribed</div>
-                            </th>
+                            </th> -->
                         </tr>
                     </thead>
                     <tr ng-repeat="user in $data">
@@ -353,9 +353,9 @@
                         <td data-title="'Last Session'" class="text-center" sortable="lastsession" ng-show="columns[2].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
                             <span>{{user.lastsession}}</span>
                         </td>
-                        <td data-title="'Unsubscribed'" class="text-center" sortable="status" ng-show="columns[4].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
+                        <!-- <td data-title="'Unsubscribed'" class="text-center" sortable="status" ng-show="columns[4].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
                             <span>{{user.unsubscribed}}</span>
-                        </td>
+                        </td> -->
                     </tr>
                 </table>
             </div>
