@@ -22,6 +22,14 @@ var logger = require('../helpers/logger');
 
 
 /**
+ * Queues
+ */
+
+var q = require('./queues');
+var scoreQueue = q.score;
+
+
+/**
  * Constants
  */
 
@@ -218,32 +226,95 @@ function saveScores(aid, cid, timestamp, scores, cb) {
 }
 
 
-function scoreConsumerWorker(aid, cid, timestamp, cb) {
+function scoreConsumerWorker(cb) {
+
+  var queueMsgId;
+
+  // TODO: cid is always being taken as null as of now
+  var cid = null;
+
+
   async.waterfall(
 
     [
 
-      function runMapReduce(cb) {
-        mapReduce(aid, cid, timestamp, function (err, scores) {
-          cb(err, scores);
+
+      function getFromQueue(cb) {
+
+        // get one message at a time
+        var opts = {
+          n: 1
+        };
+
+        scoreQueue.get(opts, function (err, res) {
+
+          logger.trace({
+            at: 'workers/score-consumer getFromQueue',
+            err: err,
+            res: res
+          });
+
+          if (err) return cb(err);
+
+          // store the queue msg id, used to delete the msg from the queue
+          queueMsgId = res.id;
+
+          var msgBody = res.body ? JSON.parse(res.body) : {};
+          var aid = msgBody.aid;
+          var time = msgBody.time;
+
+          // the message body contains the app id
+          if (!aid) return cb(new Error('App id not found in queue'));
+          if (!time) return cb(new Error('Time not found in queue'));
+
+          cb(null, aid, time);
         });
       },
 
 
-      function saveData(scores, cb) {
-        saveScores(aid, cid, timestamp, scores, cb);
-      }
+      function runMapReduce(aid, time, cb) {
+
+        // TODO: cid is hardcoded as null
+        mapReduce(aid, null, time, function (err, scores) {
+          cb(err, scores, aid, time);
+        });
+      },
+
+
+      function saveData(scores, aid, time, cb) {
+        // TODO: cid is hardcoded as null
+        saveScores(aid, null, time, scores, function (err) {
+          cb(err, aid, time);
+        });
+      },
+
+
+      function deleteFromQueue(aid, time, cb) {
+
+        scoreQueue.del(queueMsgId, function (err, body) {
+
+          logger.trace({
+            at: 'workers/score-consumer deleteFromQueue',
+            queueMsgId: queueMsgId,
+            err: err,
+            body: body
+          });
+
+          cb(err, aid, time);
+
+        });
+      },
     ],
 
 
-    function callback(err) {
+    function callback(err, aid, time) {
 
       if (err) {
         logger.crit({
           at: 'workers/score-consumer callback',
           err: err,
           aid: aid,
-          ts: Date.now()
+          time: time
         });
       }
 
@@ -255,9 +326,37 @@ function scoreConsumerWorker(aid, cid, timestamp, cb) {
 }
 
 
+module.exports = function run() {
+
+  logger.trace('run scoreConsumerWorker');
+
+  async.forever(
+
+    function foreverFunc(next) {
+
+      scoreConsumerWorker(function (err) {
+        setImmediate(next);
+      });
+    },
+
+    function foreverCallback(err) {
+
+      logger.crit({
+        at: 'scoreConsumerWorker async.forever',
+        err: err,
+        time: Date.now()
+      });
+
+    }
+  );
+
+}
+
+
 /**
  * Expose functions for testing
  */
 
 module.exports._mapReduce = mapReduce;
 module.exports._scoreConsumerWorker = scoreConsumerWorker;
+module.exports._scoreQueue = scoreQueue;

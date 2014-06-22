@@ -34,7 +34,7 @@ describe('Worker score-consumer', function () {
    * Iron mq Queue
    */
 
-  var queue = worker._queue;
+  var scoreQueue = worker._scoreQueue;
 
 
   /**
@@ -54,7 +54,7 @@ describe('Worker score-consumer', function () {
   before(function (done) {
     usr1 = saved.users.first;
     usr2 = saved.users.second;
-    aid = usr1.aid;
+    aid = usr1.aid.toString();
     uid1 = usr1._id;
     uid2 = usr2._id;
 
@@ -115,6 +115,21 @@ describe('Worker score-consumer', function () {
 
         [
 
+          function clearScoreQueue(cb) {
+            scoreQueue.clear(cb);
+          },
+
+          function postToUsageQueue(cb) {
+            scoreQueue.post(
+
+              JSON.stringify({
+                aid: aid,
+                time: time
+              }),
+
+              cb);
+          },
+
           function checkBeforeScore(cb) {
 
             DailyReport
@@ -136,15 +151,13 @@ describe('Worker score-consumer', function () {
 
             var cid;
 
-            worker._scoreConsumerWorker(aid, cid, time.format(),
-              function (
-                err) {
+            worker._scoreConsumerWorker(function (err) {
 
-                expect(err)
-                  .to.not.exist;
+              expect(err)
+                .to.not.exist;
 
-                cb();
-              })
+              cb();
+            })
 
           },
 
@@ -184,7 +197,23 @@ describe('Worker score-consumer', function () {
 
               cb();
             });
-          }
+          },
+
+          // should have deleted message from score queue
+          function checkScoreQueue(cb) {
+            scoreQueue.get({
+              n: 1
+            }, function (err, response) {
+
+              expect(err)
+                .to.not.exist;
+
+              expect(response)
+                .to.not.exist;
+
+              cb(err);
+            })
+          },
 
         ],
 
