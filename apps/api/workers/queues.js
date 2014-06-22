@@ -52,3 +52,9 @@ module.exports.usage = imq.queue("usage");
 
 module.exports.score = imq.queue("score");
 
+
+/**
+ * setup 'health' queue on iron mq
+ */
+
+module.exports.health = imq.queue("health");

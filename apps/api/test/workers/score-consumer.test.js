@@ -34,6 +34,7 @@ describe('Worker score-consumer', function () {
    * Iron mq Queue
    */
 
+  var healthQueue = worker._healthQueue;
   var scoreQueue = worker._scoreQueue;
 
 
@@ -119,7 +120,11 @@ describe('Worker score-consumer', function () {
             scoreQueue.clear(cb);
           },
 
-          function postToUsageQueue(cb) {
+          function clearHealthQueue(cb) {
+            healthQueue.clear(cb);
+          },
+
+          function postToScoreQueue(cb) {
             scoreQueue.post(
 
               JSON.stringify({
@@ -214,6 +219,27 @@ describe('Worker score-consumer', function () {
               cb(err);
             })
           },
+
+
+
+          // should have added the aid to the health queue
+          function checkHealthQueue(cb) {
+            healthQueue.get({
+              n: 1
+            }, function (err, response) {
+
+              expect(err)
+                .to.not.exist;
+
+              var appData = JSON.parse(response.body);
+
+              expect(appData)
+                .to.have.property('aid')
+                .that.eqls(aid);
+
+              cb(err);
+            })
+          }
 
         ],
 

@@ -26,6 +26,7 @@ var logger = require('../helpers/logger');
  */
 
 var q = require('./queues');
+var healthQueue = q.health;
 var scoreQueue = q.score;
 
 
@@ -304,6 +305,22 @@ function scoreConsumerWorker(cb) {
 
         });
       },
+
+
+      // queue app id to calculate user health attribute
+      function postToHealthQueue(aid, time, cb) {
+
+        var appData = {
+          aid: aid
+        };
+
+        // ironmq accepts only strings
+        appData = JSON.stringify(appData);
+
+        healthQueue.post(appData, function (err) {
+          cb(err, aid, time);
+        });
+      }
     ],
 
 
@@ -357,6 +374,7 @@ module.exports = function run() {
  * Expose functions for testing
  */
 
+module.exports._healthQueue = healthQueue;
 module.exports._mapReduce = mapReduce;
 module.exports._scoreConsumerWorker = scoreConsumerWorker;
 module.exports._scoreQueue = scoreQueue;
