@@ -995,10 +995,6 @@ angular.module('do.users', [])
               title: 'Last Session',
               field: 'lastsession',
               visible: true
-            }, {
-              title: 'Unsubscribed',
-              field: 'unsubscribed',
-              visible: true
             }];
 
             /**
@@ -1658,17 +1654,19 @@ angular.module('do.users', [])
             console.log("value: ", value);
             if (value == true) {
               $scope.mail.push(prop);
-            } else {
-              $rootScope.error = true;
-              $rootScope.errMsgRootScope =
-                'Please select at least one user';
-              $timeout(function () {
-                $rootScope.errMsgRootScope = '';
-                $rootScope.error = false;
-              }, 5000);
-              return;
             }
           };
+
+          if ($scope.mail.length == 0) {
+            $rootScope.error = true;
+            $rootScope.errMsgRootScope =
+              'Please select at least one user';
+            $timeout(function () {
+              $rootScope.errMsgRootScope = '';
+              $rootScope.error = false;
+            }, 5000);
+            return;
+          }
           UidService.set($scope.mail);
 
 
@@ -1764,9 +1762,10 @@ angular.module('do.users', [])
 
         var populatePage = function (err, data, uid) {
           function getRandomColor() {
-            console.log("data: ", data);
             var keys = _.keys(data);
             $scope.userdata = [];
+            $scope.showCompanies = false;
+            $scope.showCompany = false;
 
             function capitaliseFirstLetter(string) {
               return string.charAt(0)
@@ -1774,12 +1773,27 @@ angular.module('do.users', [])
             }
             for (var i = 0; i < keys.length; i++) {
               prop = keys[i];
-              console.log("id: ", prop);
               value = data[prop];
+              $scope.companies = [];
+              if (prop == 'companies') {
+                // $scope.companies = value;
+                value.forEach(function (company) {
+                  $scope.companies.push({
+                    name: company.name
+                  });
+                })
+                if ($scope.companies.length == 1) {
+                  $scope.showCompany = true;
+                }
+
+                if ($scope.companies.length > 1) {
+                  $scope.showCompanies = true;
+                }
+              }
               // console.log("value prop: ", value, prop);
               if (prop != 'companies' && prop != 'ct' && prop != 'meta' &&
                 prop != 'ut' && prop != '__v' && prop != 'aid' && prop !=
-                '_id') {
+                '_id' && prop != 'unsubscribed') {
                 if (prop == 'lastSeen') {
                   prop = 'Last Seen';
                   value = $moment(value)
@@ -1789,6 +1803,7 @@ angular.module('do.users', [])
                   value = $moment(value)
                     .fromNow()
                 }
+
                 prop = capitaliseFirstLetter(prop);
                 $scope.userdata.push({
                   value: value,
@@ -2081,16 +2096,13 @@ angular.module('do.users', [])
           $scope.events = [];
           console.log("$scope.user.lastSeen: ", $scope.user.lastSession);
           $scope.toTime = $moment($scope.user.lastSession)
-            .startOf('day')
+            .endOf('day')
             .unix();
           $scope.showPreviousBtn = false;
 
           console.log($moment($scope.user.lastSession)
             .unix() * 1000, $scope.user.lastSession);
-          $scope.fromTime = $moment($moment($scope.user.lastSession)
-            .unix() * 1000 - 24 *
-            60 * 60 *
-            1000)
+          $scope.fromTime = $moment($scope.user.lastSession)
             .startOf('day')
             .unix();
 
@@ -2158,13 +2170,14 @@ angular.module('do.users', [])
                   1000)
                   .format('MMMM Do');
                 $scope.lastEventDate = keys[0] * 1000;
+                console.log("value: ", value);
                 for (var i = 0; i < value.length; i++) {
                   // value = events[keys[i]];
-                  console.log("value: ", value);
                   $scope.events.push({
                     name: value[i].name,
                     when: $moment(value[i].ct)
-                      .fromNow()
+                      .fromNow(),
+                    type: value[i].type
                   })
                 };
               }
@@ -2183,17 +2196,15 @@ angular.module('do.users', [])
               1000 +
               24 * 60 *
               60 * 1000)
-              .startOf('day')
               .unix();
             $scope.toTime = $moment($scope.toTime *
               1000 +
               24 *
               60 * 60 *
               1000)
-              .startOf('day')
               .unix();
             if ($scope.toTime === $moment($scope.user.lastSession)
-              .startOf('day')
+              .endOf('day')
               .unix()) {
               $scope.showPreviousBtn = false;
             } else {
@@ -2233,14 +2244,12 @@ angular.module('do.users', [])
               1000 -
               24 * 60 *
               60 * 1000)
-              .startOf('day')
               .unix();
             $scope.toTime = $moment($scope.toTime *
               1000 -
               24 *
               60 * 60 *
               1000)
-              .startOf('day')
               .unix();
             console.log("new fromTime: ", $scope.fromTime,
               $moment($scope.fromTime *
@@ -2277,7 +2286,7 @@ angular.module('do.users', [])
             var colorCategory = d3.scale.category20b()
             $scope.colorFunction = function () {
               return function (d, i) {
-                console.log("color: ", colorCategory(i));
+                // console.log("color: ", colorCategory(i));
                 var color = '#16a085';
                 return color;
               };
@@ -2643,167 +2652,3 @@ angular.module('do.users', [])
 
   }
 ])
-
-// .controller('notesCtrl', ['$scope', 'UserModel', 'CurrentAppService',
-//     function ($scope, UserModel, CurrentAppService) {
-
-//         CurrentAppService.getCurrentApp()
-//             .then(function (currentApp) {
-//                 var url = window.location.href;
-//                 var uid = url.split("/")[5];
-//                 $scope.createNote = function () {
-//                     var data = {
-//                         note: $scope.notetext
-//                     };
-//                     UserModel.createNote(currentApp._id, uid, data);
-//                 }
-//             })
-
-//     }
-// ])
-
-// .controller('TableCtrl', ['$scope', '$filter', 'ngTableParams', '$modal',
-//     'UidService', '$moment', 'UserList', '$timeout',
-
-//     function ($scope, $filter, ngTableParams, $modal, UidService, $moment,
-//         UserList, $timeout) {
-
-//         $scope.title = "Write Message";
-
-//         var popupModal = $modal({
-//             scope: $scope,
-//             template: '/templates/usersmodule/message.modal.html',
-//             show: false
-//         });
-
-//         $scope.mail = [];
-//         $scope.openModal = function () {
-//             popupModal.show();
-//             console.log("checkboxes items: ", $scope.checkboxes.items);
-//             /*Object.keys(obj)
-//                 .forEach(function (key) {
-//                     f(key, obj[key])
-//                 });*/
-//             var prop, value;
-//             var keys = Object.keys($scope.checkboxes.items);
-//             for (var i = 0; i < Object.keys($scope.checkboxes.items)
-//                 .length; i++) {
-//                 prop = keys[i];
-//                 console.log("id: ", prop);
-//                 value = $scope.checkboxes.items[prop];
-//                 console.log("value: ", value);
-//                 if (value) {
-//                     $scope.mail[i] = prop;
-//                 }
-//             };
-//             console.log("email objects: ", $scope.mail);
-//             UidService.set($scope.mail);
-
-//         };
-
-
-//         var data = [];
-//         $scope.users = []
-
-//         $scope.checkboxes = {
-//             'checked': false,
-//             items: {}
-//         };
-
-//         console.log("checkboxes: ", $scope.checkboxes);
-
-//         $scope.$watch('checkboxes.items', function (value) {
-//             console.log("$watch checkboxes: ", $scope.checkboxes.items);
-//         })
-
-//         $scope.$watch(UserList.getUsers, function () {
-//             if (UserList.getUsers().length > 0) {
-//                 $scope.showUsers = true;
-//             }
-//             for (var i = 0; i < UserList.getUsers()
-//                 .length; i++) {
-//                 $scope.users.push({
-//                     id: UserList.getUsers()[i]._id,
-//                     email: UserList.getUsers()[i].email,
-//                     userkarma: UserList.getUsers()[i].healthScore,
-//                     datejoined: moment(UserList.getUsers()[i].firstSessionAt)
-//                         .format("MMMM Do YYYY"),
-//                     unsubscribed: UserList.getUsers()[i].unsubscribed
-//                 })
-//             };
-
-//             $scope.columns = [{
-//                 title: '',
-//                 field: 'checkbox',
-//                 visible: true
-//             }, {
-//                 title: 'Email',
-//                 field: 'email',
-//                 visible: true
-//             }, {
-//                 title: 'User Karma',
-//                 field: 'userkarma',
-//                 visible: true
-//             }, {
-//                 title: 'Date Joined',
-//                 field: 'datejoined',
-//                 visible: true
-//             }, {
-//                 title: 'Unsubscribed',
-//                 field: 'unsubscribed',
-//                 visible: true
-//             }];
-
-//             /**
-//              * Reference: http://plnkr.co/edit/dtlKAHwy99jdnWVU0pc8?p=preview
-//              *
-//              */
-
-//             $scope.refreshTable = function () {
-//                 $scope['tableParams'] = {
-//                     reload: function () {},
-//                     settings: function () {
-//                         return {}
-//                     }
-//                 };
-//                 $timeout(setTable, 100)
-//             };
-//             $scope.refreshTable();
-
-//             function setTable(arguments) {
-
-//                 $scope.tableParams = new ngTableParams({
-//                     page: 1, // show first page
-//                     count: 10, // count per page
-//                     filter: {
-//                         name: '' // initial filter
-//                     },
-//                     sorting: {
-//                         name: 'asc'
-//                     }
-//                 }, {
-//                     filterSwitch: true,
-//                     total: $scope.users.length, // length of data
-//                     getData: function ($defer, params) {
-//                         var orderedData = params.sorting() ?
-//                             $filter('orderBy')($scope.users,
-//                                 params.orderBy()) :
-//                             $scope.users;
-//                         params.total(orderedData.length);
-//                         $defer.resolve(orderedData.slice((params.page() -
-//                                 1) * params.count(), params.page() *
-//                             params.count()));
-//                     }
-//                 });
-//             }
-//         })
-
-
-
-
-//         // $scope.tabledropdown = {
-
-//         // }
-
-//     }
-// ])

@@ -290,6 +290,7 @@ angular.module('do.settings', [])
     CurrentAppService.getCurrentApp()
       .then(function (currentApp) {
 
+        $scope.enableInvite = true;
         $scope.currApp = $stateParams.id;
         $scope.invTeamMember = false;
         $scope.showMsgSuccess = false;
@@ -337,6 +338,7 @@ angular.module('do.settings', [])
           }
 
           var showSuccessMsg = function (err) {
+            $scope.enableInvite = true;
             if (err) {
               return err;
             }
@@ -349,6 +351,7 @@ angular.module('do.settings', [])
           }
 
           $scope.addTeamMember = function () {
+            $scope.enableInvite = false;
             var data = {
               email: $scope.teamMember,
               name: $scope.nameMember
@@ -684,13 +687,15 @@ angular.module('do.settings', [])
 ])
 
 .controller('appSettingsInviteCtrl', ['$scope', '$rootScope', 'AppModel',
-  'InviteIdService',
-  function ($scope, $rootScope, AppModel, InviteIdService) {
+  'InviteIdService', '$rootScope',
+  function ($scope, $rootScope, AppModel, InviteIdService, $rootScope) {
     $scope.noError = true;
     $scope.error = false;
     var url = window.location.href;
     var appId = url.split("/")[4];
     var inviteId = url.split("/")[6];
+    // $rootScope.isInvited = true;
+    // $rootScope.invitedAppId = appId;
     InviteIdService.setInviteId(inviteId);
     var showMsg = function (err) {
       if (err) {

@@ -21,6 +21,8 @@
                     <p ng-repeat="firstList in userDataList" ng-if="firstList.data == 'Health' && firstList.value == 'good'" style="color: #2ecc71;"><b>{{firstList.data}}</b> : {{firstList.value}} <i class="fa fa-smile-o"></i></p>
                     <p ng-repeat="firstList in userDataList" ng-if="firstList.data == 'Health' && firstList.value == 'poor'" style="color: #e74c3c;"><b>{{firstList.data}}</b> : {{firstList.value}} <i class="fa fa-frown-o"></i></p>
                     <p ng-repeat="firstList in userDataList" ng-if="!(firstList.data == 'Health')"><b>{{firstList.data}}</b> : {{firstList.value}}</p>
+                    <p ng-show="showCompany" ng-repeat="company in companies"><b>Company: </b>{{company.name}}</p>
+                    <p ng-show="showCompanies"><b>Companies: </b><span ng-repeat="company in companies"><span ng-show="$last"> and</span> {{company.name}} <span ng-show="!$last">,</span></span></p>
                 </div>
             </div>
             <div class="col-md-4 col-md-push-1">
@@ -28,7 +30,7 @@
                 <tab heading="Score">
                 <div class="row">
                     <div>
-                        <nvd3-discrete-bar-chart data="graphData"  id="showXAxisExample" width="450" height="230" xAxisTickFormat="xAxisTickFormatFunction()" showYAxis="true" showXAxis="false" tooltips="true" tooltipcontent="toolTipContentFunction()" color="colorFunction()"><svg></svg>
+                        <nvd3-discrete-bar-chart data="graphData"  id="showXAxisExample" width="450" height="230" xAxisTickFormat="xAxisTickFormatFunction()" showYAxis="true" showXAxis="false" tooltips="true" tooltipcontent="toolTipContentFunction()" color="colorFunction()" noData="New user! Scores will be available in few days"><svg></svg>
                         </nvd3-discrete-bar-chart>
                     </div>
                 </div>
@@ -113,9 +115,30 @@
                         <p><em>{{eventDate}}</em></p>
                         <p ng-show="!showEvents">There was no activity for {{eventDate}}</p>
                         <ul class="list-group" ng-show="showEvents">
-                            <li class="list-group-item list-group-item-success" ng-repeat="event in events">
-                                <span>{{event.name}}</span>
-                                <em class="pull-right">{{event.when}}</em>
+                            <li class="list-group-item list-group-item-danger" ng-if="event.type == 'auto'" ng-repeat="event in events">
+                                <span class = "fa fa-comments" title="AutoMessage"> {{event.name}}</span>
+                                <em class="pull-right" style="font-size: 11px;">{{event.when}}</em>
+                            </li>
+                            <li class="list-group-item list-group-item-success" ng-if="event.type == 'form'" ng-repeat="event in events">
+                                <span class = "fa fa-comments" title="Submitted form"> {{event.name}}</span>
+                                <em class="pull-right" style="font-size: 11px;">{{event.when}}</em>
+                            </li>
+                            <li class="list-group-item list-group-item-info" ng-if="event.type == 'page'" ng-repeat="event in events">
+                                <span class = "fa fa-globe" title="Viewed {{event.name}}"> {{event.name}}</span>
+                                <em class="pull-right" style="font-size: 11px;">{{event.when}}</em>
+                            </li>
+                            <li class="list-group-item list-group-item-default" ng-if="event.type == 'link'" ng-repeat="event in events" style="border-left: 4px solid #7f8c8d;">
+                                <span class = "fa fa-link" title="Link"> {{event.name}}</span>
+                                <em class="pull-right" style="font-size: 11px;">{{event.when}}</em>
+                            </li>
+                            <li class="list-group-item list-group-item-warning" ng-if="event.type == 'track'" ng-repeat="event in events">
+                                <span class = "fa fa-road" title="Track"> {{event.name}}</span>
+                                <em class="pull-right" style="font-size: 11px;">{{event.when}}</em>
+                            </li>
+                                <!-- <span ng-class="{'fa fa-flash': event.type == 'form'}"> {{event.name}}</span>
+                                <span ng-class="{'fa fa-link': event.type == 'link'}"> {{event.name}}</span>
+                                <span ng-class="{'fa fa-globe': event.type == 'page'}"> {{event.name}}</span>
+                                <span ng-class="{'fa fa-road': event.type == 'track'}"> {{event.name}}</span> -->
                             </li>
                         </ul>
                     </div>
