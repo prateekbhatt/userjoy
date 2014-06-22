@@ -137,7 +137,15 @@ describe('Worker usage-consumer', function () {
             },
 
             function postToUsageQueue(cb) {
-              usageQueue.post(aid, cb);
+              usageQueue.post(
+
+                JSON.stringify({
+                  aid: aid,
+                  time: moment()
+                    .valueOf()
+                }),
+
+                cb);
             },
 
 
@@ -160,7 +168,7 @@ describe('Worker usage-consumer', function () {
 
             function runUsageWorker(cb) {
 
-              worker._usageConsumerWorker(time.format(), function (
+              worker._usageConsumerWorker(function (
                 err) {
 
                 expect(err)
@@ -225,8 +233,15 @@ describe('Worker usage-consumer', function () {
                 expect(err)
                   .to.not.exist;
 
-                expect(response.body)
-                  .to.eql(aid);
+                var appData = JSON.parse(response.body);
+
+                expect(appData)
+                  .to.have.property('aid')
+                  .that.eqls(aid);
+
+                expect(appData)
+                  .to.have.property('time')
+                  .that.is.a('number');
 
                 cb(err);
               })
