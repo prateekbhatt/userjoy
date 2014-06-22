@@ -5,7 +5,8 @@
 var _ = require('lodash');
 var async = require('async');
 var moment = require('moment');
-
+var ObjectId = require('mongoose')
+  .Types.ObjectId;
 
 /**
  * models
@@ -30,6 +31,15 @@ var MINUTES = 5;
 
 
 /**
+ * Queues
+ */
+
+var q = require('./queues');
+var usageQueue = q.usage;
+var scoreQueue = q.score;
+
+
+/**
  * Calculates total usage in minutes / day
  *
  * @param {string} aid app-id
@@ -38,6 +48,9 @@ var MINUTES = 5;
  */
 
 function usageMinutes(aid, timestamp, cb) {
+
+  // cast app id into objectid
+  aid = new ObjectId(aid);
 
   // FIXME : CHANGE THIS
   var startOfDay = moment(timestamp)
@@ -52,6 +65,7 @@ function usageMinutes(aid, timestamp, cb) {
 
   logger.trace({
     at: 'workers/usage-consumer usageMinutes',
+    aid: aid,
     startOfDay: startOfDay,
     endOfDay: endOfDay
   });
@@ -143,13 +157,13 @@ function saveUsage(aid, timestamp, dailyUsage, cb) {
 /**
  * Updates the usage of each user-company
  *
- * @param {string} aid app-id
  * @param {date} timestamp day for which to update usage
  * @param {function} cb callback
  */
 
-function usageConsumerWorker(aid, timestamp, cb) {
+function usageConsumerWorker(timestamp, cb) {
 
+  var queueMsgId;
   var time = moment(timestamp)
     .format();
 
@@ -157,24 +171,82 @@ function usageConsumerWorker(aid, timestamp, cb) {
 
     [
 
-      function calculateUsage(cb) {
-        usageMinutes(aid, time, function (err, users) {
-          cb(err, users);
+      function getFromQueue(cb) {
+
+        // get one message at a time
+        var opts = {
+          n: 1
+        };
+
+        usageQueue.get(opts, function (err, res) {
+
+          logger.trace({
+            at: 'workers/usage-consumer getFromQueue',
+            err: err,
+            res: res
+          });
+
+          if (err) return cb(err);
+
+          // store the queue msg id, used to delete the msg from the queue
+          queueMsgId = res.id;
+
+          // the message body contains the app id
+          if (!res.body) {
+            return cb(new Error('App id not found in queue'));
+          }
+
+          cb(null, res.body);
         });
       },
 
 
-      function saveUsageData(users, cb) {
+      function calculateUsage(aid, cb) {
+        usageMinutes(aid, time, function (err, users) {
+          console.log('\n\n\n calculating usage minutes', err, users.length);
+          cb(err, users, aid);
+        });
+      },
+
+
+      function saveUsageData(users, aid, cb) {
 
         if (_.isEmpty(users)) return cb();
 
-        saveUsage(aid, time, users, cb);
+        saveUsage(aid, time, users, function (err) {
+          cb(err, aid);
+        });
+      },
+
+
+      function deleteFromQueue(aid, cb) {
+
+        usageQueue.del(queueMsgId, function (err, body) {
+
+          logger.trace({
+            at: 'workers/usage-consumer deleteFromQueue',
+            queueMsgId: queueMsgId,
+            err: err,
+            body: body
+          });
+
+          cb(err, aid);
+
+        });
+      },
+
+
+      // queue app id to calculate user engagement scores
+      function postToScoreQueue(aid, cb) {
+        scoreQueue.post(aid, function (err) {
+          cb(err, aid);
+        });
       }
 
     ],
 
 
-    function callback(err) {
+    function callback(err, aid) {
 
       if (err) {
         logger.crit({
@@ -190,10 +262,38 @@ function usageConsumerWorker(aid, timestamp, cb) {
 
   )
 
+}
+
+
+module.exports = function run() {
+
+  logger.trace('run usageConsumerWorker');
+
+  async.forever(
+
+    function foreverFunc(next) {
+
+      usageConsumerWorker(function (err) {
+        setImmediate(next);
+      });
+    },
+
+    function foreverCallback(err) {
+
+      logger.crit({
+        at: 'usageConsumerWorker async.forever',
+        err: err,
+        time: Date.now()
+      });
+
+    }
+  );
 
 }
 
 
-module.exports._usageMinutes = usageMinutes;
 module.exports._saveUsage = saveUsage;
+module.exports._scoreQueue = scoreQueue;
 module.exports._usageConsumerWorker = usageConsumerWorker;
+module.exports._usageMinutes = usageMinutes;
+module.exports._usageQueue = usageQueue;

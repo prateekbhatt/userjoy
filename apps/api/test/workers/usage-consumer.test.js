@@ -35,7 +35,8 @@ describe('Worker usage-consumer', function () {
    * Iron mq Queue
    */
 
-  var queue = worker._queue;
+  var usageQueue = worker._usageQueue;
+  var scoreQueue = worker._scoreQueue;
 
 
   /**
@@ -55,7 +56,7 @@ describe('Worker usage-consumer', function () {
   before(function (done) {
     usr1 = saved.users.first;
     usr2 = saved.users.second;
-    aid = usr1.aid;
+    aid = usr1.aid.toString();
     uid1 = usr1._id;
     uid2 = usr2._id;
 
@@ -89,6 +90,9 @@ describe('Worker usage-consumer', function () {
 
       worker._usageMinutes(aid, yesterday, function (err, res) {
 
+        expect(res)
+          .to.not.be.empty;
+
         _.each(res, function (u) {
           expect(u)
             .to.be.an("object")
@@ -100,7 +104,7 @@ describe('Worker usage-consumer', function () {
 
         done();
 
-      })
+      });
 
     });
 
@@ -112,80 +116,128 @@ describe('Worker usage-consumer', function () {
   describe('#usageConsumerWorker', function () {
 
 
-    it('should aggregate and save usage', function (done) {
+    it(
+      'should get aid from usageQueue, aggregate and save usage, and publish aid to scoreQueue',
+      function (done) {
 
 
-      var time = moment();
-      var date = time.date();
+        var time = moment();
+        var date = time.date();
 
-      async.series(
+        async.series(
 
-        [
+          [
 
-          function checkBeforeUsage(cb) {
+            function clearUsageQueue(cb) {
+              usageQueue.clear(cb);
+            },
 
-            DailyReport
-              .find({}, function (err, usageBefore) {
+            function clearScoreQueue(cb) {
+              scoreQueue.clear(cb);
+            },
+
+            function postToUsageQueue(cb) {
+              usageQueue.post(aid, cb);
+            },
+
+
+            function checkBeforeUsage(cb) {
+
+              DailyReport
+                .find({}, function (err, usageBefore) {
+
+                  expect(err)
+                    .to.not.exist;
+
+                  expect(usageBefore)
+                    .to.be.an("array")
+                    .that.is.empty;
+
+                  cb();
+                });
+            },
+
+
+            function runUsageWorker(cb) {
+
+              worker._usageConsumerWorker(time.format(), function (
+                err) {
 
                 expect(err)
                   .to.not.exist;
 
-                expect(usageBefore)
+                cb();
+              })
+
+            },
+
+
+            function checkAfterUsage(cb) {
+
+              DailyReport.find({}, function (err, usageAfter) {
+
+                expect(err)
+                  .to.not.exist;
+
+                expect(usageAfter)
                   .to.be.an("array")
-                  .that.is.empty;
+                  .that.is.not.empty;
+
+
+                _.each(usageAfter, function (h) {
+
+                  h = h.toJSON();
+
+                  expect(h)
+                    .to.be.an("object")
+                    .that.has.property("du_" + date)
+                    .that.is.a("number")
+                    .that.is.within(0, 1440);
+                });
 
                 cb();
               });
-          },
+            },
+
+            // should have deleted message from usage queue
+            function checkUsageQueue(cb) {
+              usageQueue.get({
+                n: 1
+              }, function (err, response) {
+
+                expect(err)
+                  .to.not.exist;
+
+                expect(response)
+                  .to.not.exist;
+
+                cb(err);
+              })
+            },
 
 
-          function runUsageWorker(cb) {
+            // should have added the aid to the score queue
+            function checkScoreQueue(cb) {
+              scoreQueue.get({
+                n: 1
+              }, function (err, response) {
 
-            worker._usageConsumerWorker(aid, time.format(), function (
-              err) {
+                expect(err)
+                  .to.not.exist;
 
-              expect(err)
-                .to.not.exist;
+                expect(response.body)
+                  .to.eql(aid);
 
-              cb();
-            })
+                cb(err);
+              })
+            }
 
-          },
+          ],
 
-
-          function checkAfterUsage(cb) {
-
-            DailyReport.find({}, function (err, usageAfter) {
-
-              expect(err)
-                .to.not.exist;
-
-              expect(usageAfter)
-                .to.be.an("array")
-                .that.is.not.empty;
+          done)
 
 
-              _.each(usageAfter, function (h) {
-
-                h = h.toJSON();
-
-                expect(h)
-                  .to.be.an("object")
-                  .that.has.property("du_" + date)
-                  .that.is.a("number")
-                  .that.is.within(0, 1440);
-              });
-
-              cb();
-            });
-          }
-
-        ],
-
-        done)
-
-
-    });
+      });
 
 
   });
