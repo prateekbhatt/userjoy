@@ -290,6 +290,7 @@ angular.module('do.settings', [])
     CurrentAppService.getCurrentApp()
       .then(function (currentApp) {
 
+        $scope.enableInvite = true;
         $scope.currApp = $stateParams.id;
         $scope.invTeamMember = false;
         $scope.showMsgSuccess = false;
@@ -337,6 +338,7 @@ angular.module('do.settings', [])
           }
 
           var showSuccessMsg = function (err) {
+            $scope.enableInvite = true;
             if (err) {
               return err;
             }
@@ -349,6 +351,7 @@ angular.module('do.settings', [])
           }
 
           $scope.addTeamMember = function () {
+            $scope.enableInvite = false;
             var data = {
               email: $scope.teamMember,
               name: $scope.nameMember
