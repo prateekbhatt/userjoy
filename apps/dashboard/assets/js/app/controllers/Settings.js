@@ -687,13 +687,15 @@ angular.module('do.settings', [])
 ])
 
 .controller('appSettingsInviteCtrl', ['$scope', '$rootScope', 'AppModel',
-  'InviteIdService',
-  function ($scope, $rootScope, AppModel, InviteIdService) {
+  'InviteIdService', '$rootScope',
+  function ($scope, $rootScope, AppModel, InviteIdService, $rootScope) {
     $scope.noError = true;
     $scope.error = false;
     var url = window.location.href;
     var appId = url.split("/")[4];
     var inviteId = url.split("/")[6];
+    // $rootScope.isInvited = true;
+    // $rootScope.invitedAppId = appId;
     InviteIdService.setInviteId(inviteId);
     var showMsg = function (err) {
       if (err) {
