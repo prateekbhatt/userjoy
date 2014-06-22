@@ -82,20 +82,33 @@ describe('Worker usagePublisher', function () {
 
     it('should find and queue active apps', function (done) {
 
-      worker._cronFunc(function (err, queueIds, ids, numberAffected) {
+      worker._cronFunc(function (err, queueIds, appData, numberAffected) {
 
         expect(err)
           .to.not.exist;
 
         expect(queueIds)
-          .to.be.an("string");
+          .to.be.a("string");
 
-        expect(ids)
+        expect(appData)
           .to.be.an("array")
           .that.has.length(1);
 
-        expect(ids)
-          .to.deep.equal(queuedAppIds);
+
+        _.each(appData, function (d, i) {
+          d = JSON.parse(d);
+
+          expect(d)
+            .to.have.property('aid')
+            .that.is.a('string')
+            .and.deep.equals(queuedAppIds[i]);
+
+          expect(d)
+            .to.have.property('time')
+            .that.is.a('number');
+
+        })
+
 
         done();
       });
