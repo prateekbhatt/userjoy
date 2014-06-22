@@ -49,7 +49,7 @@ var MINUTE_SCHEDULE = '*/1 * * * *';
  * Daily cron
  */
 
-var DAILY_SCHEDULE =  '0 0 * * *';
+var DAILY_SCHEDULE = '0 0 * * *';
 
 
 // TODO: THIS CODE NEEDS TO BE MANAGED IN INSIDE THE APPS CONFIG FILE
@@ -97,15 +97,26 @@ function cronFunc(cb) {
 
       function queue(apps, cb) {
 
-        var ids = _.chain(apps)
+        var timestamp = moment()
+          .valueOf();
+
+        var appsData = _.chain(apps)
           .pluck('_id')
           .map(function (id) {
-            return id.toString();
+
+            // add timestamp to app data
+            var a = {
+              aid: id.toString(),
+              time: timestamp
+            };
+
+            // iron mq only accepts strings
+            return JSON.stringify(a);
           })
           .value();
 
-        q.post(ids, function (err, queueIds) {
-          cb(err, queueIds, ids);
+        q.post(appsData, function (err, queueIds) {
+          cb(err, queueIds, appsData);
         });
       }
 
