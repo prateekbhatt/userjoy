@@ -217,9 +217,11 @@ var app = angular.module('dodatado', [
         console.log("url: ", url);
         var checkUrl = url[1];
         console.log("url 1: ", url[1]);
+        var inviteUrl = url[3] ? url[3] : '';
+        console.log("invite Url: ", inviteUrl);
         // if we're not logged-in to the web service, redirect to login page
         if (rejection.status === 401 && checkUrl !=
-          'login' && checkUrl != 'forgot-password') {
+          'login' && checkUrl != 'forgot-password' && checkUrl != 'signup' && inviteUrl != 'invite') {
           console.log("401 status logout");
           loginProvider.setLoggedIn = false;
           $rootScope.loggedIn = false;

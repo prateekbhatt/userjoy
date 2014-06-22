@@ -786,7 +786,7 @@ span.emailPreview > p {
 .arrow-feedback:before {
     content: "";
     position: absolute;
-    left: 350px;
+    left: 375px;
     border-style: solid;
     border-width: 17px 17px 0;
     border-color: #ddd transparent;
