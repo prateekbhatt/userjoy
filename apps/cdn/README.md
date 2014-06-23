@@ -44,6 +44,18 @@ status     | yes       | String    | trial / free / paying / cancelled
 joined     | yes       | Number    | unix timestamp (milliseconds after epoch) (if not provided, it will default to the time the user was first seen by UserJoy)
 custom     | no        | Object    | key-value pairs of additional properties
 
+
+##### Reserved Properties (Do Not Send)
+
+These properties are automatically added by UserJoy. You should not send them, because they will be overwritten.
+
+name       | description
+-----      | ------
+browser    | browser of the user, e.g. 'Chrome 35'
+device     | the device the user is on, e.g. 'Apple iPad'
+os         | the operating system the user is on, e.g. 'Windows 8'
+
+
 ##### Example
 
 Please update this and pass values to identify the current logged in user.
