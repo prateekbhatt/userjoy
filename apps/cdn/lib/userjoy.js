@@ -18,8 +18,8 @@ var newDate = require('new-date');
 var notification = require('./notification');
 var on = require('event')
   .bind;
+var platform = require('platform.js');
 var prevent = require('prevent');
-var querystring = require('querystring');
 var queue = require('./queue');
 var size = require('object')
   .length;
@@ -141,6 +141,21 @@ UserJoy.prototype.identify = function (traits, fn) {
     return;
   }
 
+  // add special context to user traits browser, os
+
+  // add device type "Apple iPad"
+  var device = (platform.manufacturer ? platform.manufacturer + ' ' : '') +
+    (platform.product ? platform.product : '');
+  device && (traits.device = device);
+
+  // add browser type, "Chrome 35"
+  traits.browser = (platform.name ? platform.name + ' ' : '') +
+    (platform.version ? platform.version : '');
+
+  // add browser os, "Linux 64-bit"
+  traits.os = platform.os.toString();
+
+  // set user traits
   user.identify(traits);
 
   var data = {

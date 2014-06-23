@@ -450,6 +450,26 @@ router
 
           Notification.findOneAndRemove(conditions, options, function (err,
             notf) {
+            cb(err, notf, user, app);
+          });
+
+        },
+
+
+        function createAutoMessageSentEvent(notf, user, app, cb) {
+
+          if (!notf) return cb(null, notf, app);
+
+          var ids = {
+            aid: app._id,
+            amId: notf.amId,
+            uid: user._id
+          };
+
+          var state = 'opened';
+          var title = notf.title;
+
+          Event.automessage(ids, state, title, function (err) {
             cb(err, notf, app);
           });
 

@@ -40,29 +40,7 @@ describe('Worker automessageConsumer', function () {
 
 
   before(function (done) {
-
-    async.series([
-
-      function (cb) {
-        setupTestDb(cb);
-      },
-
-      function createEvent(cb) {
-        var aid = saved.automessages.first.aid;
-        var uid = saved.users.first._id;
-
-        var newEvent = {
-          aid: aid,
-          uid: uid,
-          type: 'track',
-          name: 'Create Notification'
-        };
-
-        Event.create(newEvent, cb);
-      }
-
-    ], done);
-
+    setupTestDb(done);
   });
 
   describe('#amConsumer type:email', function () {
@@ -82,6 +60,24 @@ describe('Worker automessageConsumer', function () {
         function postToQueue(cb) {
           // queue auto message
           queue.post(amId, cb);
+        },
+
+        function clearEvents(cb) {
+          Event.remove({}, cb);
+        },
+
+        function createEvent(cb) {
+          var aid = saved.automessages.first.aid;
+          var uid = saved.users.first._id;
+
+          var newEvent = {
+            aid: aid,
+            uid: uid,
+            type: 'track',
+            name: 'Create Notification'
+          };
+
+          Event.create(newEvent, cb);
         }
 
 
@@ -115,25 +111,14 @@ describe('Worker automessageConsumer', function () {
 
       var query = {
         type: 'auto',
+        amId: amId.toString(),
         meta: {
-          $all: [
-
-            {
-              $elemMatch: {
-                k: 'amId',
-                v: amId.toString()
-              }
-            },
-
-            {
-              $elemMatch: {
-                k: 'state',
-                v: 'queued'
-              }
-            }
-
-          ]
+          $elemMatch: {
+            k: 'state',
+            v: 'queued'
+          }
         }
+
       };
 
       Event
@@ -165,7 +150,7 @@ describe('Worker automessageConsumer', function () {
 
     var amId;
 
-    before(function (cb) {
+    before(function (done) {
 
       amId = saved.automessages.second._id.toString();
 
@@ -179,9 +164,28 @@ describe('Worker automessageConsumer', function () {
         function postToQueue(cb) {
           // queue auto message
           queue.post(amId, cb);
+        },
+
+        function clearEvents(cb) {
+          Event.remove({}, cb);
+        },
+
+        // create event to meet automessage segment
+        function createEvent(cb) {
+          var aid = saved.automessages.second.aid;
+          var uid = saved.users.first._id;
+
+          var newEvent = {
+            aid: aid,
+            uid: uid,
+            type: 'track',
+            name: 'Create Notification'
+          };
+
+          Event.create(newEvent, cb);
         }
 
-      ], cb);
+      ], done);
 
     });
 
@@ -210,25 +214,14 @@ describe('Worker automessageConsumer', function () {
 
       var query = {
         type: 'auto',
+        amId: amId.toString(),
         meta: {
-          $all: [
-
-            {
-              $elemMatch: {
-                k: 'amId',
-                v: amId.toString()
-              }
-            },
-
-            {
-              $elemMatch: {
-                k: 'state',
-                v: 'queued'
-              }
-            }
-
-          ]
+          $elemMatch: {
+            k: 'state',
+            v: 'queued'
+          }
         }
+
       };
 
       Event
@@ -292,20 +285,50 @@ describe('Worker automessageConsumer', function () {
       usr1 = saved.users.first;
       usr2 = saved.users.second;
 
-      Event.automessage(
+      async.series(
 
-        {
-          aid: amsg.aid,
-          amId: amsg._id,
-          uid: usr1._id
-        },
+        [
 
-        'queued',
-        'Create Notification',
+          function deleteAutoMessageEvents(cb) {
+            Event.remove({}, cb);
+          },
 
-        function (err, evn) {
-          done(err);
-        });
+          function zeroEvents(cb) {
+            Event.find({}, function (err, evns) {
+              expect(err)
+                .to.not.exist;
+
+              expect(evns)
+                .to.be.an('array')
+                .that.is.empty;
+
+              cb();
+            })
+          },
+
+          function createAutoMessageEvent(cb) {
+
+            Event.automessage(
+
+              {
+                aid: amsg.aid,
+                amId: amsg._id,
+                uid: usr1._id
+              },
+
+              'queued',
+              'Create Notification',
+
+              function (err, evn) {
+                cb(err);
+              });
+
+          }
+
+        ],
+
+        done
+      );
 
     });
 
