@@ -8,6 +8,13 @@ describe('Resource /track', function () {
   var qs = require('qs');
 
 
+  /**
+   * models
+   */
+
+  var Event = require('../../../api/models/Event');
+
+
   var TrackController = require('../../../api/routes/TrackController');
 
   // define test variables
@@ -602,7 +609,7 @@ describe('Resource /track', function () {
       });
 
     it(
-      'should return most recent queued notification, alongwith the theme color',
+      'should return most recent queued notification, alongwith the theme color, and should create new automessage seen event',
       function (done) {
 
         var email = saved.users.first.email;
@@ -641,8 +648,26 @@ describe('Resource /track', function () {
             expect(notf)
               .to.have.property("color");
 
+            Event.findOne({
+              aid: appId,
+              amId: notf.amId,
+              meta: {
+                $elemMatch: {
+                  k: 'state',
+                  v: 'opened'
+                }
+              }
+            }, function (err, evn) {
 
-            done();
+              expect(err)
+                .to.not.exist;
+
+              expect(evn.amId.toString())
+                .to.eql(notf.amId.toString());
+
+              done();
+            })
+
           });
 
       });

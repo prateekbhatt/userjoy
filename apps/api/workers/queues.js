@@ -46,3 +46,15 @@ module.exports.automessage = imq.queue("automessage");
 module.exports.usage = imq.queue("usage");
 
 
+/**
+ * setup 'score' queue on iron mq
+ */
+
+module.exports.score = imq.queue("score");
+
+
+/**
+ * setup 'health' queue on iron mq
+ */
+
+module.exports.health = imq.queue("health");

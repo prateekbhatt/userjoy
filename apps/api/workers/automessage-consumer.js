@@ -94,12 +94,12 @@ function saveNotifications(users, amsg, cb) {
       amId: amId,
       body: renderedBody,
       sender: sender,
+      title: title,
       uid: uid
     };
 
     // save the new notification
     Notification.create(n, function (err) {
-
       if (err) return cb(err);
 
       // ids object (required to create an 'automessage' event)
@@ -135,12 +135,7 @@ function removeUsersAlreadySent(users, amId, cb) {
   Event
     .find({
       type: 'auto',
-      meta: {
-        $elemMatch: {
-          k: 'amId',
-          v: amId.toString()
-        }
-      }
+      amId: amId.toString()
     })
     .select({
       uid: 1,
@@ -296,7 +291,11 @@ function amConsumer(cb) {
       //
       // Remove all users who have been sent the automessage before
       function sentUsers(users, cb) {
-        removeUsersAlreadySent(users, automessage._id, cb);
+        removeUsersAlreadySent(users, automessage._id, function (err, usrs) {
+          if (err) return cb(err);
+          if (_.isEmpty(usrs)) return cb(new Error('No users matched'));
+          cb(null, usrs);
+        });
       },
 
 

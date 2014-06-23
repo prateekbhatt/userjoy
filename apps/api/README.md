@@ -159,7 +159,9 @@ UserNote      |                         | notes created by team members about a 
 - aid
 - user_id (to allow the app to recognize a user even if the user changes email/username)
 - email (required)
+- browser ("Chrome 35" etc.)
 - country (2 letter ISO-3166-1 country code, [REF](https://github.com/bluesmoon/node-geoip#looking-up-an-ip-address)
+- device ('Apple iPad')
 - x name
 - x username
 - x meta (object containing additonal info about users)
@@ -170,6 +172,7 @@ UserNote      |                         | notes created by team members about a 
 - ut
 - health (latest health status of the user, defaults to average for new user)
 - joined (when did the user join the service)
+- os ('iOS 5.0')
 - plan
 - revenue
 - score (latest engagement score of user, defaults to 50 for new user)
@@ -344,6 +347,7 @@ as meta property)
 - ct
 - seen (boolean)
 - sender
+- title (Required, automessage title)
 - uid
 
 ##### Notes:

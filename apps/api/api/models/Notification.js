@@ -33,17 +33,17 @@ var NotificationSchema = new Schema({
   },
 
 
-  // created at timestamp
-  ct: {
-    type: Date,
-    default: Date.now
-  },
-
-
   // notification body
   body: {
     type: String,
     required: [true, 'Provide notification body']
+  },
+
+
+  // created at timestamp
+  ct: {
+    type: Date,
+    default: Date.now
   },
 
 
@@ -57,6 +57,13 @@ var NotificationSchema = new Schema({
   // sender name (account)
   sender: {
     type: String
+  },
+
+
+  // the automessage title
+  title: {
+    type: String,
+    required: [true, 'Provide notification title']
   },
 
 
