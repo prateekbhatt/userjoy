@@ -254,7 +254,7 @@ var app = angular.module('dodatado', [
             console.log("user attributes value: ", value);
             attributes.push({
               name: value,
-              value: '{{= ' + value + '|| "there"}}'
+              value: '{{= ' + value + ' || "there"}}'
             })
           };
           console.log("user attributes: ", attributes);
