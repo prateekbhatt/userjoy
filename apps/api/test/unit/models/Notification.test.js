@@ -42,7 +42,7 @@ describe('Model Notification', function () {
 
           expect(Object.keys(err.errors)
             .length)
-            .to.eql(3);
+            .to.eql(4);
 
           expect(err.errors.amId.message)
             .to.eql('Invalid automessage id');
@@ -52,6 +52,9 @@ describe('Model Notification', function () {
 
           expect(err.errors.uid.message)
             .to.eql('Invalid uid');
+
+          expect(err.errors.title.message)
+            .to.eql('Provide notification title');
 
           expect(notf)
             .to.not.exist;
@@ -68,6 +71,7 @@ describe('Model Notification', function () {
         amId: ObjectId(),
         body: 'Hello World',
         sender: 'Prateek Bhatt',
+        title: 'In-App welcome',
         uid: ObjectId(),
       };
 
@@ -89,6 +93,9 @@ describe('Model Notification', function () {
 
         expect(notf)
           .to.have.property('sender', newNotification.sender);
+
+        expect(notf)
+          .to.have.property('title', newNotification.title);
 
         expect(notf.uid.toString())
           .to.eql(newNotification.uid.toString());
