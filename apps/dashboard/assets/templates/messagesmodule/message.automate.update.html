@@ -112,8 +112,8 @@
                 <!-- TODO: Replace template color with the color entered by the user -->
                 <div class="col-md-10 col-md-offset-1" ng-show="showEmail" style="margin-top: 40px;">
                     <label style="font-size: 18px;">Subject: </label>&nbsp;<span ng-bind-html="subject" class="emailPreview"></span>
-                    <div style="min-height: 300px; overflow: auto; max-height: 300px; margin-top: 30px;">
-                        <p ng-bind-html="emailBody"></p>
+                    <div style="min-height: 300px; overflow: auto; max-height: 300px; margin-top: 30px; border: 1px solid #ecf0f1; border-radius: 4px;">
+                        <p ng-bind-html="emailBody" style="padding: 10px;"></p>
                     </div>
                 </div>
             </div>

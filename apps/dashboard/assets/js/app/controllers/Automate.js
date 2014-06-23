@@ -399,7 +399,8 @@ angular.module('do.automate', [])
             }
 
             if ($scope.showEmail) {
-              saveMsgService.setMsg($scope.emailBody);
+              saveMsgService.setMsg($scope.emailBody.replace(/\n/g,
+                '<br/>'));
               if ($scope.subject != null) {
                 saveMsgService.setSub($scope.subject.replace(
                   /<(?:.|\n)*?>/gm, ''));
@@ -512,7 +513,8 @@ angular.module('do.automate', [])
       console.log("selectedIcon: ", $scope.selectedMessageType);
       $scope.title = AutoMsgService.getSingleAutoMsg()
         .title;
-      $scope.segment = AutoMsgService.getSingleAutoMsg().sid.name;
+      $scope.segment = AutoMsgService.getSingleAutoMsg()
+        .sid.name;
       $scope.colorTheme = AppService.getCurrentApp()
         .color;
       $scope.borderColor = $scope.colorTheme;
@@ -535,7 +537,7 @@ angular.module('do.automate', [])
         }
 
         if ($scope.showEmail) {
-          saveMsgService.setMsg($scope.emailBody);
+          saveMsgService.setMsg($scope.emailBody.replace(/\n/g, '<br/>'));
           if ($scope.subject != null) {
             saveMsgService.setSub($scope.subject.replace(
               /<(?:.|\n)*?>/gm, ''));
@@ -584,9 +586,10 @@ angular.module('do.automate', [])
 ])
 
 .controller('testEmailCtrl', ['$scope', 'saveMsgService', 'modelsAutomate',
-  'AppService', 'AutoMsgService', '$stateParams',
+  'AppService', 'AutoMsgService', '$stateParams', '$location',
   function ($scope, saveMsgService, modelsAutomate, AppService,
-    AutoMsgService, $stateParams) {
+    AutoMsgService, $stateParams, $location) {
+    $scope.enableSendTest = true;
     $scope.currApp = $stateParams.id;
     $scope.previewText = saveMsgService.getMsg();
     console.log(saveMsgService.getMsg());
@@ -610,17 +613,29 @@ angular.module('do.automate', [])
     if ($scope.msgType === "Notification") {
       $scope.showNotificationPreview = true;
     }
+
+    var callback = function (err) {
+      if(err){
+        console.log("err");
+        return;
+      }
+      $scope.enableSendTest = true;
+      $location.path('/apps/' + $scope.currApp +
+        '/messages/automate/live');
+    }
+
     $scope.sendTestEmail = function () {
+      $scope.enableSendTest = false;
       modelsAutomate.sendTestEmail($scope.currApp, AutoMsgService.getSingleAutoMsg()
-        ._id);
+        ._id, callback);
     }
   }
 ])
 
 .controller('liveEmailCtrl', ['$scope', 'saveMsgService', 'modelsAutomate',
-  'AppService', 'AutoMsgService', '$stateParams',
+  'AppService', 'AutoMsgService', '$stateParams', '$location',
   function ($scope, saveMsgService, modelsAutomate, AppService,
-    AutoMsgService, $stateParams) {
+    AutoMsgService, $stateParams, $location) {
     $scope.currApp = $stateParams.id;
     console.log("$scope.currApp ------>>>>>>", $scope.currApp,
       $stateParams.id);
@@ -646,6 +661,10 @@ angular.module('do.automate', [])
       $scope.msgStatus = 'Deactivate this Message';
     } else {
       $scope.msgStatus = 'Make it Live';
+    }
+
+    $scope.goToAutoMessages = function () {
+      $location.path('/apps/' + $scope.currApp + '/messages/automate');
     }
 
     $scope.colorTheme = AppService.getCurrentApp()
