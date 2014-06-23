@@ -94,6 +94,7 @@ function saveNotifications(users, amsg, cb) {
       amId: amId,
       body: renderedBody,
       sender: sender,
+      title: title,
       uid: uid
     };
 

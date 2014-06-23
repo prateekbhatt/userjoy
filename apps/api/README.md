@@ -347,6 +347,7 @@ as meta property)
 - ct
 - seen (boolean)
 - sender
+- title (Required, automessage title)
 - uid
 
 ##### Notes:
