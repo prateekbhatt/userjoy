@@ -745,17 +745,24 @@ angular.module('do.users', [])
             })
           };
 
-          // $scope.opened = true;
+          // $scope.opened = false;
+          // $scope.dt = new Date();
 
-          $scope.openDatePicker = function ($event) {
-            console.log("opening datepicker: ", $scope.opened);
-            $event.preventDefault();
-            $event.stopPropagation();
+          $scope.$watch('isOpen', function () {
+            console.log("inside datepicker watch");
+          })
 
-            $scope.opened = true;
-            console.log("is datepicker opened: ", $scope.opened);
+          $scope.openDatePicker = function (event) {
+            console.log("opening datepicker: ", $scope.dateOpened);
+            event.preventDefault();
+            event.stopPropagation();
+
+            $scope.dateOpened = true;
+            // $timeout(function () {
+            //   $scope.dateOpened = true;
+            // });
+            console.log("is datepicker opened: ", $scope.dateOpened);
           };
-
 
           $scope.dateOptions = {
             formatYear: 'yy',
@@ -929,8 +936,37 @@ angular.module('do.users', [])
               $scope.segmentClicked = false;
               $scope.showUpdatePopover = false;
               $scope.showPopover = false;
-              $scope.showUsers = false;
+              // $scope.showUsers = false;
             }
+          }
+
+          $scope.clearAllFilters = function () {
+            $scope.filters = [];
+            $scope.showSaveButton = false;
+            $scope.showUpdateButton = false;
+            $scope.segmentClicked = false;
+            $scope.showUpdatePopover = false;
+            $scope.selectedIndex = '';
+            $scope.showPopover = false;
+            $scope.showSpinner = true;
+            $scope.showErrorOnInput = true;
+            $scope.filtersBackend = [];
+            $scope.fromTime = '';
+            $scope.queryObj.list = $scope.selectedIcon.toLowerCase();
+            $scope.queryObj.op = $scope.text.toLowerCase();
+            $scope.queryObj.filters = $scope.filtersBackend;
+            $scope.queryObj.fromAgo = $scope.fromTime;
+
+            var stringifiedQuery = stringify($scope.queryObj);
+            console.log('queryObj', $scope.queryObj);
+            console.log('stringifiedQuery',
+              stringifiedQuery);
+
+
+            modelsQuery.runQueryAndGetUsers(currentAppId,
+              stringifiedQuery, populateTable);
+            // populateFilterAndRunQuery();
+            // $scope.showUsers = false;
           }
 
           $scope.switchAndOr = function switchAndOr() {

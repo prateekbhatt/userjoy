@@ -23,7 +23,7 @@
                             <div class="row" style="padding-left: 40px;">
                                 <br>
                                 <label class="col-md-1 control-label" style="font-size:20px" ng-show="$first">Filter: </label>
-                                <a style="font-size:20px; cursor:pointer; cursor:hand" ng-show="!$first" ng-click="switchAndOr()" class="col-md-1">{{text}}</a>
+                                <a style="font-size:17px; cursor:pointer; cursor:hand" ng-show="!$first" ng-click="switchAndOr()" class="col-md-1">{{text}}</a>
                                 <div>
                                     <div class="col-md-11">
                                         <div class="row">
@@ -84,7 +84,7 @@
                                                 </div>
                                                 <div ng-if="filter.checkMethod && filter.showDatePicker" style="float:left; padding-left: 24px;">
                                                     <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
-                                                    <ul class="select dropdown-menu" role="select" style="left: auto; margin-top: -10px;">
+                                                    <ul class="select dropdown-menu" role="select" style="left: auto;">
                                                         <li ng-repeat="query in datePickerQueries">
                                                             <a style="cursor: default;" ng-click="chngDatePickerQuery($parent.$index, $index)">{{query.name}}
                                                             </a>
@@ -110,12 +110,12 @@
                                                     <input type="text" placeholder="Value" ng-model="filter.val" class="form-control input-sm">
                                                 </div>
                                                 <div ng-if="filter.checkMethod && !filter.isEvent && filter.showDatePicker" style="float: left; padding-left: 24px;">
-                                                    <p class="input-group" style="width: 200px;">
-                                                    <input type="text" class="form-control input-sm" datepicker-popup="{{format}}" ng-model="filter.val" is-open="opened" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" show-weeks="false" max="maxDate" show-button-bar="false"/>
-                                                    <span class="input-group-btn">
+                                                    <!-- <p class="input-group" style="width: 200px;"> -->
+                                                    <input type="text" class="form-control input-sm" datepicker-popup="{{format}}" ng-model="filter.val" is-open="$parent.dateOpened" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" show-weeks="false" max="maxDate" show-button-bar="false"/>
+                                                    <!-- <span class="input-group-btn">
                                                     <button type="button" class="btn btn-default btn-sm" ng-click="openDatePicker($event)"><i class="fa fa-calendar"></i></button>
                                                     </span>
-                                                    </p>
+                                                    </p> -->
                                                 </div>
                                                 <div ng-if="filter.checkMethod && !filter.isEvent && filter.showHealthStatus" style="float: left; padding-left: 24px;">
                                                     <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.valuetext}}</span>&nbsp;<span class="caret"></span></button>
@@ -205,6 +205,8 @@
                                         </form>
                                     </div>
                                 </div>
+                                <button class="btn btn-default fa fa-trash-o btn-sm pull-right" ng-click="clearAllFilters()" ng-show="showUpdateButton || showSaveButton">
+                                </button>
                                 <!-- <span us-spinner></span> -->
                             </div>
                         </div>
@@ -317,7 +319,7 @@
                                                     <td data-title="'Health'" class="text-center" sortable="health" ng-show="columns[4].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
                                                         <span>{{user.health}}</span>
                                                     </td>
-                                                    <td data-title="'Last Session'" class="text-center" sortable="lastsession" ng-show="columns[2].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
+                                                    <td data-title="'Last Session'" class="text-center" sortable="lastsession" ng-show="columns[5].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
                                                         <span>{{user.lastsession}}</span>
                                                     </td>
                                                     <!-- <td data-title="'Unsubscribed'" class="text-center" sortable="status" ng-show="columns[4].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">

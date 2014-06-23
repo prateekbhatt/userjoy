@@ -821,6 +821,11 @@ li.list-group-item-segment.active, li.list-group-item-segment.active:hover, li.l
     background-color: #e0e0e0;
 }
 
+.nvd3.nv-noData {
+    font-size: 15px;
+    font-weight: bold;
+}
+
 /*.active-smart-filters {
     background-color: #e0e0e0;   
 }
