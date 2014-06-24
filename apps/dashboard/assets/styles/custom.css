@@ -765,7 +765,7 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
 }
 #affix-demo {
     -margin-top: 30px;
-    height: 250px;
+    height: 350px;
     overflow-y: scroll;
     /*overflow-x: scroll;*/
     /*background: lightblue;*/
@@ -786,7 +786,7 @@ span.emailPreview > p {
 .arrow-feedback:before {
     content: "";
     position: absolute;
-    left: 350px;
+    left: 375px;
     border-style: solid;
     border-width: 17px 17px 0;
     border-color: #ddd transparent;
@@ -817,4 +817,17 @@ li.list-group-item-segment.active, li.list-group-item-segment.active:hover, li.l
     color: #777;
 }
 
+#sidebar-wrapper-settings > .sidebar-nav > .active {
+    background-color: #e0e0e0;
+}
+
+.nvd3.nv-noData {
+    font-size: 15px;
+    font-weight: bold;
+}
+
+/*.active-smart-filters {
+    background-color: #e0e0e0;   
+}
+*/
 }

@@ -246,9 +246,9 @@ describe('Resource /account', function () {
       request
         .get(url)
         .expect('Content-Type', /json/)
-        .expect(401)
+        .expect(400)
         .expect({
-          status: 401,
+          status: 400,
           error: 'Invalid Attempt'
         })
         .end(done);
@@ -265,9 +265,9 @@ describe('Resource /account', function () {
       request
         .get(url)
         .expect('Content-Type', /json/)
-        .expect(401)
+        .expect(400)
         .expect({
-          status: 401,
+          status: 400,
           error: 'Invalid Attempt'
         })
         .end(done);
@@ -420,8 +420,7 @@ describe('Resource /account', function () {
   });
 
 
-
-  describe('PUT /account/reset-password', function () {
+  describe('PUT /account/forgot-password', function () {
 
     var spy;
 
@@ -438,7 +437,7 @@ describe('Resource /account', function () {
     it('should return success message', function (done) {
 
       request
-        .put('/account/reset-password')
+        .put('/account/forgot-password')
         .send({
           email: saved.accounts.first.email
         })
@@ -454,7 +453,7 @@ describe('Resource /account', function () {
     it('should call Account#createResetPasswordToken', function (done) {
 
       request
-        .put('/account/reset-password')
+        .put('/account/forgot-password')
         .send({
           email: saved.accounts.first.email
         })
@@ -471,7 +470,7 @@ describe('Resource /account', function () {
     it('should return error if email is not provided', function (done) {
 
       request
-        .put('/account/reset-password')
+        .put('/account/forgot-password')
         .expect('Content-Type', /json/)
         .expect(400)
         .expect({
@@ -490,7 +489,7 @@ describe('Resource /account', function () {
       function (done) {
 
         request
-          .put('/account/reset-password')
+          .put('/account/forgot-password')
           .send({
             email: randomEmail
           })
@@ -508,6 +507,113 @@ describe('Resource /account', function () {
 
       });
 
+
+  });
+
+
+
+  describe('PUT /account/forgot-password/new', function () {
+
+
+    var token = 'thisismyrandomtoken';
+    var newPass = 'helloworld';
+    var url = '/account/forgot-password/new';
+
+
+    it('should return error for invalid token', function (done) {
+
+      async.series({
+
+        createResetPasswordToken: function (cb) {
+
+          Account
+            .findById(saved.accounts.first._id)
+            .exec(function (err, acc) {
+              expect(err)
+                .to.not.exist;
+
+              acc.passwordResetToken = 'thisismyrandomtoken';
+              acc.save(cb)
+            })
+
+        },
+
+        errorOnInvalidToken: function (cb) {
+
+          request
+            .put(url)
+            .send({
+              token: 'randomTOKEN',
+              password: newPass
+            })
+            .expect('Content-Type', /json/)
+            .expect(400)
+            .expect({
+              status: 400,
+              error: 'Invalid Attempt. Please try again.'
+            })
+            .end(cb);
+        }
+
+
+      }, done);
+
+
+    });
+
+
+    it('should delete passwordResetToken and return account',
+      function (done) {
+
+        var accountId;
+
+        async.series({
+
+          shouldReturnAccountInfo: function (cb) {
+
+            request
+              .put(url)
+              .send({
+                token: token,
+                password: newPass
+              })
+              .expect('Content-Type', /json/)
+              .expect(200)
+              .expect(function (res) {
+
+                accountId = res.body.account._id;
+
+                expect(res.body.account)
+                  .to.be.an('object')
+                  .that.not.has.property('password');
+
+              })
+              .end(cb);
+          },
+
+
+          deletedPasswordResetToken: function (cb) {
+
+            Account
+              .findById(accountId)
+              .select('passwordResetToken')
+              .exec(function (err, acc) {
+                expect(err)
+                  .to.not.exist;
+
+                expect(acc.passwordResetToken)
+                  .not.to.exist;
+
+                cb()
+              })
+
+          }
+
+
+        }, done)
+
+
+      });
 
   });
 

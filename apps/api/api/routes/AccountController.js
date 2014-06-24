@@ -29,7 +29,14 @@ var isAuthenticated = require('../policies/isAuthenticated');
  * Services
  */
 
-var mailer = require('../services/mailer');
+var accountMailer = require('../services/account-mailer');
+
+
+/**
+ * Helpers
+ */
+
+var logger = require('../../helpers/logger');
 
 
 function signupWithInvite(account, inviteId, cb) {
@@ -88,6 +95,7 @@ function signupWithoutInvite(account, cb) {
    */
 
   var config = require('../../../config')('api');
+  var dashboardUrl = config.hosts.dashboard;
 
   async.waterfall(
 
@@ -106,8 +114,8 @@ function signupWithoutInvite(account, cb) {
 
       function sendConfirmationMail(acc, verifyToken, cb) {
 
-        var confirmUrl = path.join(config.baseUrl, 'account',
-          acc._id.toString(), 'verify-email', verifyToken);
+        var confirmUrl = dashboardUrl + '/account/' + acc._id.toString() +
+          '/verify-email/' + verifyToken;
 
         var mailOptions = {
           locals: {
@@ -120,7 +128,7 @@ function signupWithoutInvite(account, cb) {
           }
         };
 
-        mailer.sendConfirmation(mailOptions, function (err) {
+        accountMailer.sendConfirmation(mailOptions, function (err) {
           cb(err, acc);
         });
 
@@ -211,8 +219,8 @@ router
   .route('/:id/verify-email/:token')
   .get(function (req, res, next) {
 
-    var accountId = req.params.id,
-      token = req.params.token;
+    var accountId = req.params.id;
+    var token = req.params.token;
 
     Account
       .verify(accountId, token, function (err, account) {
@@ -220,13 +228,91 @@ router
         if (err) {
 
           if (_.contains(['Invalid Token', 'Account Not Found'], err.message)) {
-            return res.unauthorized('Invalid Attempt');
+            return res.badRequest('Invalid Attempt');
           }
 
           return next(err);
         }
 
         res.json(account);
+
+      });
+
+  });
+
+
+/**
+ * PUT /account/forgot-password/new
+ *
+ *
+ * @param {string} token reset-password-token
+ * @param {string} password new-password
+ *
+ * Verfies reset password token and updates password
+ *
+ * TODO: Make this more secure by prepending the account id to the token
+ */
+
+router
+  .route('/forgot-password/new')
+  .put(function (req, res, next) {
+
+    var token = req.body.token;
+    var newPass = req.body.password;
+
+    if (!token || !newPass) {
+      return res.badRequest('Please provide token and new password');
+    }
+
+    logger.trace({
+      at: 'AccountController forgot-password/new',
+      body: req.body
+    })
+
+    async.waterfall([
+
+        function verify(cb) {
+
+          Account
+            .findOne({
+              passwordResetToken: token,
+            })
+            .exec(function (err, account) {
+              if (err) return cb(err);
+              if (!account) return cb(new Error('INVALID_TOKEN'));
+              cb(null, account);
+            });
+        },
+
+        function updatePasswordAndRemoveToken(account, cb) {
+
+          account.passwordResetToken = undefined;
+          account.password = newPass
+          account.save(cb);
+
+        }
+      ],
+
+      function (err, account) {
+
+        if (err) {
+
+          if (err.message === 'INVALID_TOKEN') {
+            return res.badRequest('Invalid Attempt. Please try again.');
+          }
+
+          return next(err);
+        }
+
+
+        // remove password from response
+        if (account.toJSON) account = account.toJSON();
+        delete account.password;
+
+        res.json({
+          message: 'Password token verified',
+          account: account
+        });
 
       });
 
@@ -258,7 +344,7 @@ router
 
 
 /**
- * PUT /account/reset-password
+ * PUT /account/forgot-password
  *
  * TODO: add the respective get request
  * which will check the token and redirect
@@ -266,8 +352,9 @@ router
  */
 
 router
-  .route('/reset-password')
+  .route('/forgot-password')
   .put(function (req, res, next) {
+
 
     Account.createResetPasswordToken(req.body.email, function (err, account) {
 
@@ -284,11 +371,35 @@ router
         return next(err);
       }
 
-      // TODO : Send reset password mail here
 
-      res.json({
-        message: 'Reset password email sent'
+
+      /**
+       * Apps config
+       */
+
+      var config = require('../../../config')('api');
+      var dashboardUrl = config.hosts.dashboard;
+
+      accountMailer.sendForgotPassword({
+        locals: {
+          url: dashboardUrl + '/forgot-password/' + account.passwordResetToken,
+          name: account.name
+        },
+
+        to: {
+          email: account.email,
+          name: account.name
+        },
+
+      }, function (err) {
+
+        if (err) return next(err);
+
+        res.json({
+          message: 'Reset password email sent'
+        });
       });
+
 
     });
 

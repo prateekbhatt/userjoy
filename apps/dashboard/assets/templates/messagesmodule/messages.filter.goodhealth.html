@@ -6,7 +6,7 @@
     <div class="panel-body">
         <div class="row">
             <div class="col-md-3">
-                <div id="wrapper-settings" style="margin-top: 22px">
+                <div id="wrapper-settings">
                     <!-- Sidebar -->
                     <div id="sidebar-wrapper-settings">
                         <ul class="sidebar-nav">
@@ -15,6 +15,9 @@
                             </li>
                             <li>
                                 <a href="/apps/{{currApp}}/messages/unread"><i class="fa fa-exclamation"></i>&nbsp; Unread Conversations</a>
+                            </li>
+                            <li>
+                                <a href="/apps/{{currApp}}/messages/closed"><i class="fa fa-check"></i>&nbsp; Closed Conversations</a>
                             </li>
                             <li>
                                 <a href="/apps/{{currApp}}/messages/automate"><i class="fa fa-edit"></i> Automate Messages </a>
@@ -26,7 +29,7 @@
                                 <a style="cursor: default"><i class="fa fa-paperclip"></i> Smart Filters
                                 <ul style="list-style: none;">
                                     <li>
-                                        <div class="progress" style="margin-left: 30px;">
+                                        <div class="progress" style="margin-left: 10px;">
                                             <a href="/apps/{{currApp}}/messages/goodhealth" style="cursor: pointer">
                                             <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #5cb85c;">
                                                 <span class="progress-type pull-left"><strong>Good Health</strong></span>
@@ -35,7 +38,7 @@
                                         </div>
                                     </li>
                                     <li>
-                                        <div class="progress" style="margin-left: 30px;">
+                                        <div class="progress" style="margin-left: 10px;">
                                             <a href="/apps/{{currApp}}/messages/avghealth" style="cursor: pointer">
                                             <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #428bca;">
                                                 <span class="progress-type pull-left"><strong>Average Health</strong></span>
@@ -44,7 +47,7 @@
                                         </div>
                                     </li>
                                     <li>
-                                        <div class="progress" style="margin-left: 30px;">
+                                        <div class="progress" style="margin-left: 10px;">
                                             <a href="/apps/{{currApp}}/messages/poorhealth" style="cursor: pointer">
                                             <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #d9534f;">
                                                 <span class="progress-type pull-left"><strong>Poor Health</strong></span>
@@ -61,7 +64,7 @@
                                             </a>
                                         </div>
                                     </li> -->
-                                    <li>
+                                    <!-- <li>
                                         <div class="progress" style="margin-left: 30px;">
                                             <a href="/apps/{{currApp}}/messages/closed" style="cursor: pointer">
                                             <div class="progress-bar progress-bar-default" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #999;">
@@ -69,7 +72,7 @@
                                             </div>
                                             </a>
                                         </div>
-                                    </li>
+                                    </li> -->
                                     <!-- <li>
                                         <div class="progress" style="margin-left: 30px;">
                                             <a ui-sref="#goodhealth" style="cursor: pointer">
@@ -93,15 +96,14 @@
                     <!-- /.row -->
                     <div class="row">
                         <div class="col-lg-12">
-                            <br>
                             <div class="panel panel-default">
                                 <div class="panel-heading">
                                     <i class="fa fa-comments"></i> Conversations with users in Good Health state
                                 </div>
                                 <!-- /.panel-heading -->
-                                <div class="panel-body">
+                                <div>
                                     <div class="row">
-                                        <div ng-show="!showGoodHealthConversations" class="text-center"><span> There are no conversations for this filter</span></div>
+                                        <div ng-show="!showGoodHealthConversations" class="text-center"><br><span> There are no conversations for this filter</span><br><br></div>
                                         <div class="col-lg-12" ng-show="showGoodHealthConversations">
                                             <div class="table-responsive">
                                                 <table ng-table="tableParamsClosed" show-filter="true" class="table table-bordered table-hover table-striped">
@@ -118,8 +120,6 @@
                                                                 </th>
                                                             </tr>
                                                         </thead>
-                                                        <br>
-                                                        <br>
                                                         <tbody>
                                                             <tr ng-repeat="user in $data" >
                                                                 <td data-title="'User'" style="text-align:center; cursor:pointer" ng-click="showGoodHealthThread(user.id)">

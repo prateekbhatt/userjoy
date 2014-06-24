@@ -89,6 +89,12 @@ var UserSchema = new Schema({
   },
 
 
+  // browser "Chrome 35", "Firefox 30" etc.
+  browser: {
+    type: String
+  },
+
+
   companies: [UserCompanySchema],
 
 
@@ -100,6 +106,12 @@ var UserSchema = new Schema({
   ct: {
     type: Date,
     default: Date.now
+  },
+
+
+  // "Apple iPad" etc.
+  device: {
+    type: String
   },
 
 
@@ -145,6 +157,12 @@ var UserSchema = new Schema({
 
 
   meta: [MetaDataSchema],
+
+
+  // "iOS 5.0" etc.
+  os: {
+    type: String
+  },
 
 
   // name of plan
@@ -218,6 +236,18 @@ var UserSchema = new Schema({
 
 
 /**
+ * Add indexes
+ */
+
+UserSchema.index({
+  aid: 1,
+  'companies.cid': 1,
+  email: 1,
+  user_id: 1
+});
+
+
+/**
  * Adds ut timestamps
  * Created timestamp (ct) is added by default
  */
@@ -230,6 +260,8 @@ UserSchema.pre('save', function (next) {
 
 /**
  * If the user exists, fetch the user, else create a new user
+ *
+ * If the user exists, update the lastSeen timestamp to now
  *
  * @param {String} app id
  * @param {Object} user object
@@ -295,7 +327,10 @@ UserSchema.statics.findOrCreate = function (aid, user, cb) {
   }
 
   var update = {
-    $setOnInsert: user
+    $setOnInsert: user,
+    $set: {
+      lastSeen: Date.now()
+    }
   };
 
   var options = {

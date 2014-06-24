@@ -14,14 +14,6 @@ var loadRoutes = require('../config/routes');
 
 
 /**
- * Jobs
- */
-
-var automessagePublisher = require('../workers/automessage-publisher');
-var automessageConsumer = require('../workers/automessage-consumer');
-
-
-/**
  * Helpers
  */
 
@@ -103,21 +95,6 @@ exports.start = function startServer(done) {
           cb(null, db, server);
         });
 
-      },
-
-      function startCronJobs(db, server, cb) {
-
-
-        // in the test / development environment, do not run the workers
-
-        if (!_.contains(['test', 'development'], process.env.NODE_ENV)) {
-
-          automessagePublisher();
-          automessageConsumer();
-
-        }
-
-        cb(null, db, server);
       }
 
     ],

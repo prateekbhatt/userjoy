@@ -7,7 +7,7 @@ angular.module('models.auth', ['services'])
     $location, AppService, ErrMsgService, authService, login,
     $rootScope) {
 
-    this.attemptLogin = function (email, password) {
+    this.attemptLogin = function (email, password, callback) {
 
       var loginSuccessful;
 
@@ -24,7 +24,6 @@ angular.module('models.auth', ['services'])
           ipCookie('loggedin', "true", {
             path: '/'
           });
-
           LoginService.setUserAuthenticated(true);
           login.setLoggedIn(true);
           $rootScope.loggedIn = true;
@@ -43,6 +42,7 @@ angular.module('models.auth', ['services'])
                   $location.path('/apps/' + AppService.getLoggedInApps()[
                     0]._id + '/users/list');
                 } else {
+                  console.log("Auth.js redirecting to addcode url");
                   $location.path('/apps/' + AppService.getLoggedInApps()[
                     0]._id + '/addcode');
                 }
@@ -55,12 +55,9 @@ angular.module('models.auth', ['services'])
               $log.error("error in fetching /apps");
               // TODO
             })
+            callback(null);
         })
-        .error(function (err) {
-          console.log("error in signing in");
-          console.log(err.error);
-          $rootScope.errMsgRootScope = err.error;
-        })
+        .error(callback);
     };
 
     this.logout = function () {

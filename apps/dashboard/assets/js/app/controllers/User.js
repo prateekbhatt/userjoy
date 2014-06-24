@@ -310,12 +310,25 @@ angular.module('do.users', [])
             .length > 0) {
             for (var i = 0; i < segmentService.getSegments()
               .length; i++) {
-              $scope.segmentsCreatedName.push({
-                id: segmentService.getSegments()[i]
-                  ._id,
-                name: segmentService.getSegments()[
-                  i].name
-              })
+              if (segmentService.getSegments()[i].name == 'Good Health' ||
+                segmentService.getSegments()[i].name == 'Average Health' ||
+                segmentService.getSegments()[i].name == 'Poor Health') {
+                $scope.segmentsCreatedName.push({
+                  predefined: true,
+                  id: segmentService.getSegments()[i]
+                    ._id,
+                  name: segmentService.getSegments()[
+                    i].name
+                })
+              } else {
+                $scope.segmentsCreatedName.push({
+                  predefined: false,
+                  id: segmentService.getSegments()[i]
+                    ._id,
+                  name: segmentService.getSegments()[
+                    i].name
+                })
+              }
             };
             $scope.segmentsCreated = true;
             console.log("$scope.segmentName: ", $scope.segmentsCreatedName);
@@ -543,6 +556,7 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
+              $scope.otherTimeRange = 'at any time';
               $scope.filters[parentindex].optext = 'less than';
               $scope.filters[parentindex].val = $moment(new Date())
                 .unix() * 1000;
@@ -563,6 +577,7 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
+              $scope.otherTimeRange = 'at any time';
               $scope.filters[parentindex].optext = 'equal';
               $scope.filters[parentindex].val = '';
             } else if ($scope.attributes[index].name == 'status') {
@@ -580,6 +595,7 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
+              $scope.otherTimeRange = 'at any time';
               $scope.filters[parentindex].optext = 'equal';
               $scope.filters[parentindex].val = 'free';
               $scope.filters[parentindex].valuetext = 'Free';
@@ -599,6 +615,7 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
+              $scope.otherTimeRange = 'at any time';
               $scope.filters[parentindex].optext = 'equal';
               $scope.filters[parentindex].val = 'poor';
               $scope.filters[parentindex].valuetext = 'Poor';
@@ -617,7 +634,9 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
-              $scope.filters[parentindex].optext = 'equal';
+              $scope.otherTimeRange = 'at any time';
+              $scope.filters[parentindex].optext = 'contains';
+              $scope.filters[parentindex].op = 'contains';
               $scope.filters[parentindex].val = '';
             }
           }
@@ -726,17 +745,24 @@ angular.module('do.users', [])
             })
           };
 
-          // $scope.opened = true;
+          // $scope.opened = false;
+          // $scope.dt = new Date();
 
-          $scope.openDatePicker = function ($event) {
-            console.log("opening datepicker: ", $scope.opened);
-            $event.preventDefault();
-            $event.stopPropagation();
+          $scope.$watch('isOpen', function () {
+            console.log("inside datepicker watch");
+          })
 
-            $scope.opened = true;
-            console.log("is datepicker opened: ", $scope.opened);
+          $scope.openDatePicker = function (event) {
+            console.log("opening datepicker: ", $scope.dateOpened);
+            event.preventDefault();
+            event.stopPropagation();
+
+            $scope.dateOpened = true;
+            // $timeout(function () {
+            //   $scope.dateOpened = true;
+            // });
+            console.log("is datepicker opened: ", $scope.dateOpened);
           };
-
 
           $scope.dateOptions = {
             formatYear: 'yy',
@@ -773,11 +799,11 @@ angular.module('do.users', [])
           }]
 
           $scope.otherAttributesQuery = [{
-            name: 'equal',
-            key: 'eq'
-          }, {
             name: 'contains',
             key: 'contains'
+          }, {
+            name: 'equal',
+            key: 'eq'
           }]
 
           $scope.chngHealthStatus = function (parentindex, index) {
@@ -848,7 +874,7 @@ angular.module('do.users', [])
           $scope.addAnotherFilter = function addAnotherFilter() {
             $scope.checkMethod = true;
             $scope.filters.push({
-              method: 'count',
+              method: '',
               btntext: 'Choose',
               checkMethod: true,
               isEvent: false,
@@ -884,8 +910,13 @@ angular.module('do.users', [])
 
             if ($scope.segmentClicked == true) {
               $scope.showSaveButton = false;
-              $scope.shmsgowUpdateButton = true;
+              $scope.showUpdateButton = true;
             }
+
+            // if($scope.segmentClicked == true && $scope.isHealth == true) {
+            //   $scope.showSaveButton = false;
+            //   $scope.showUpdateButton = false;
+            // }
             console.log("$scope.filters: ", $scope.filters);
           }
 
@@ -905,8 +936,37 @@ angular.module('do.users', [])
               $scope.segmentClicked = false;
               $scope.showUpdatePopover = false;
               $scope.showPopover = false;
-              $scope.showUsers = false;
+              // $scope.showUsers = false;
             }
+          }
+
+          $scope.clearAllFilters = function () {
+            $scope.filters = [];
+            $scope.showSaveButton = false;
+            $scope.showUpdateButton = false;
+            $scope.segmentClicked = false;
+            $scope.showUpdatePopover = false;
+            $scope.selectedIndex = '';
+            $scope.showPopover = false;
+            $scope.showSpinner = true;
+            $scope.showErrorOnInput = true;
+            $scope.filtersBackend = [];
+            $scope.fromTime = '';
+            $scope.queryObj.list = $scope.selectedIcon.toLowerCase();
+            $scope.queryObj.op = $scope.text.toLowerCase();
+            $scope.queryObj.filters = $scope.filtersBackend;
+            $scope.queryObj.fromAgo = $scope.fromTime;
+
+            var stringifiedQuery = stringify($scope.queryObj);
+            console.log('queryObj', $scope.queryObj);
+            console.log('stringifiedQuery',
+              stringifiedQuery);
+
+
+            modelsQuery.runQueryAndGetUsers(currentAppId,
+              stringifiedQuery, populateTable);
+            // populateFilterAndRunQuery();
+            // $scope.showUsers = false;
           }
 
           $scope.switchAndOr = function switchAndOr() {
@@ -971,10 +1031,6 @@ angular.module('do.users', [])
               title: 'Last Session',
               field: 'lastsession',
               visible: true
-            }, {
-              title: 'Unsubscribed',
-              field: 'unsubscribed',
-              visible: true
             }];
 
             /**
@@ -1035,7 +1091,7 @@ angular.module('do.users', [])
               if ($scope.filters[i].val == '' && ($scope
                 .filters[i].method ==
                 'count' || $scope.filters[i].method ==
-                'attr')) {
+                'attr' || $scope.filters[i].method == '')) {
                 console.log("val: ", $scope.filters[i]
                   .val);
                 $scope.showErrorOnInput = true;
@@ -1050,6 +1106,15 @@ angular.module('do.users', [])
                 return;
                 // $scope.isErr = 'error';
                 // console.log("error class", $scope.isErr);
+              } else if ($scope.filters[i].method == '') {
+                $rootScope.error = true;
+                $rootScope.errMsgRootScope =
+                  'Provide a value in segment filter';
+                $scope.showSpinner = false;
+                $timeout(function () {
+                  $rootScope.error = false;
+                }, 5000);
+                return;
               } else {
                 $scope.showErr = false;
                 // $scope.isErr = '';
@@ -1129,6 +1194,25 @@ angular.module('do.users', [])
           $scope.updateQuery = function () {
             $scope.showUpdatePopover = !$scope.showUpdatePopover;
           }
+
+
+          $scope.showSpinner = true;
+          $scope.showErrorOnInput = true;
+          $scope.filtersBackend = [];
+          $scope.fromTime = '';
+          $scope.queryObj.list = $scope.selectedIcon.toLowerCase();
+          $scope.queryObj.op = $scope.text.toLowerCase();
+          $scope.queryObj.filters = $scope.filtersBackend;
+          $scope.queryObj.fromAgo = $scope.fromTime;
+
+          var stringifiedQuery = stringify($scope.queryObj);
+          console.log('queryObj', $scope.queryObj);
+          console.log('stringifiedQuery',
+            stringifiedQuery);
+
+
+          modelsQuery.runQueryAndGetUsers(currentAppId,
+            stringifiedQuery, populateTable);
 
           var populateUpdatedSegment = function (err, data) {
             if (err) {
@@ -1395,6 +1479,7 @@ angular.module('do.users', [])
               .list;
             $scope.queryObject.op = segmentService.getSingleSegment()
               .op;
+            $scope.text = $scope.queryObject.op.toUpperCase();
             $scope.queryObject.filters = getFilters;
             console.log("queryobject: ", $scope.queryObject);
 
@@ -1414,6 +1499,13 @@ angular.module('do.users', [])
           $scope.showQuery = function (segId, index, segname) {
             $scope.segmentClicked = true;
             $scope.showUpdateButton = true;
+            if (segname.name == 'Good Health' || segname.name ==
+              'Average Health' || segname.name == 'Poor Health') {
+              // $scope.showUpdateButton = false;
+              $scope.isHealth = true;
+            } else {
+              $scope.isHealth = false;
+            }
             this.showAutoMsgBtn = true;
             $scope.selectedIndex = index;
             $scope.showSaveButton = false;
@@ -1569,6 +1661,16 @@ angular.module('do.users', [])
               $scope.checkboxes
               .items)
             .length);
+          if (_.keys($scope.checkboxes.items)
+            .length == 0) {
+            $rootScope.error = true;
+            $rootScope.errMsgRootScope = 'Please select at least one user';
+            $timeout(function () {
+              $rootScope.errMsgRootScope = '';
+              $rootScope.error = false;
+            }, 5000);
+            return;
+          }
           console.log("checkboxes items: ",
             $scope.checkboxes
             .items);
@@ -1590,6 +1692,17 @@ angular.module('do.users', [])
               $scope.mail.push(prop);
             }
           };
+
+          if ($scope.mail.length == 0) {
+            $rootScope.error = true;
+            $rootScope.errMsgRootScope =
+              'Please select at least one user';
+            $timeout(function () {
+              $rootScope.errMsgRootScope = '';
+              $rootScope.error = false;
+            }, 5000);
+            return;
+          }
           UidService.set($scope.mail);
 
 
@@ -1685,9 +1798,10 @@ angular.module('do.users', [])
 
         var populatePage = function (err, data, uid) {
           function getRandomColor() {
-            console.log("data: ", data);
             var keys = _.keys(data);
             $scope.userdata = [];
+            $scope.showCompanies = false;
+            $scope.showCompany = false;
 
             function capitaliseFirstLetter(string) {
               return string.charAt(0)
@@ -1695,12 +1809,27 @@ angular.module('do.users', [])
             }
             for (var i = 0; i < keys.length; i++) {
               prop = keys[i];
-              console.log("id: ", prop);
               value = data[prop];
+              $scope.companies = [];
+              if (prop == 'companies') {
+                // $scope.companies = value;
+                value.forEach(function (company) {
+                  $scope.companies.push({
+                    name: company.name
+                  });
+                })
+                if ($scope.companies.length == 1) {
+                  $scope.showCompany = true;
+                }
+
+                if ($scope.companies.length > 1) {
+                  $scope.showCompanies = true;
+                }
+              }
               // console.log("value prop: ", value, prop);
               if (prop != 'companies' && prop != 'ct' && prop != 'meta' &&
                 prop != 'ut' && prop != '__v' && prop != 'aid' && prop !=
-                '_id') {
+                '_id' && prop != 'unsubscribed') {
                 if (prop == 'lastSeen') {
                   prop = 'Last Seen';
                   value = $moment(value)
@@ -1710,6 +1839,7 @@ angular.module('do.users', [])
                   value = $moment(value)
                     .fromNow()
                 }
+
                 prop = capitaliseFirstLetter(prop);
                 $scope.userdata.push({
                   value: value,
@@ -1979,22 +2109,21 @@ angular.module('do.users', [])
             lastSession: data.lastSeen
           }
 
-          $scope.userDataFirstList = [];
-          $scope.userDataSecondList = [];
+          $scope.userDataList = [];
 
-          for (var i = 0; i < 7; i++) {
-            $scope.userDataFirstList.push({
+          for (var i = 0; i < $scope.userdata.length; i++) {
+            $scope.userDataList.push({
               value: $scope.userdata[i].value,
               data: $scope.userdata[i].data
             })
           };
 
-          for (var i = 7; i < $scope.userdata.length; i++) {
-            $scope.userDataSecondList.push({
-              value: $scope.userdata[i].value,
-              data: $scope.userdata[i].data
-            })
-          };
+          // for (var i = 7; i < $scope.userdata.length; i++) {
+          //   $scope.userDataSecondList.push({
+          //     value: $scope.userdata[i].value,
+          //     data: $scope.userdata[i].data
+          //   })
+          // };
 
           $scope.title = "Create Note";
           $scope.country = 'India';
@@ -2003,16 +2132,13 @@ angular.module('do.users', [])
           $scope.events = [];
           console.log("$scope.user.lastSeen: ", $scope.user.lastSession);
           $scope.toTime = $moment($scope.user.lastSession)
-            .startOf('day')
+            .endOf('day')
             .unix();
           $scope.showPreviousBtn = false;
 
           console.log($moment($scope.user.lastSession)
             .unix() * 1000, $scope.user.lastSession);
-          $scope.fromTime = $moment($moment($scope.user.lastSession)
-            .unix() * 1000 - 24 *
-            60 * 60 *
-            1000)
+          $scope.fromTime = $moment($scope.user.lastSession)
             .startOf('day')
             .unix();
 
@@ -2080,13 +2206,14 @@ angular.module('do.users', [])
                   1000)
                   .format('MMMM Do');
                 $scope.lastEventDate = keys[0] * 1000;
+                console.log("value: ", value);
                 for (var i = 0; i < value.length; i++) {
                   // value = events[keys[i]];
-                  console.log("value: ", value);
                   $scope.events.push({
                     name: value[i].name,
                     when: $moment(value[i].ct)
-                      .fromNow()
+                      .fromNow(),
+                    type: value[i].type
                   })
                 };
               }
@@ -2105,17 +2232,15 @@ angular.module('do.users', [])
               1000 +
               24 * 60 *
               60 * 1000)
-              .startOf('day')
               .unix();
             $scope.toTime = $moment($scope.toTime *
               1000 +
               24 *
               60 * 60 *
               1000)
-              .startOf('day')
               .unix();
             if ($scope.toTime === $moment($scope.user.lastSession)
-              .startOf('day')
+              .endOf('day')
               .unix()) {
               $scope.showPreviousBtn = false;
             } else {
@@ -2155,14 +2280,12 @@ angular.module('do.users', [])
               1000 -
               24 * 60 *
               60 * 1000)
-              .startOf('day')
               .unix();
             $scope.toTime = $moment($scope.toTime *
               1000 -
               24 *
               60 * 60 *
               1000)
-              .startOf('day')
               .unix();
             console.log("new fromTime: ", $scope.fromTime,
               $moment($scope.fromTime *
@@ -2194,6 +2317,17 @@ angular.module('do.users', [])
               value.push(val);
             };
             console.log("value: ", value);
+
+            var color = '#95a5a6';
+            var colorCategory = d3.scale.category20b()
+            $scope.colorFunction = function () {
+              return function (d, i) {
+                // console.log("color: ", colorCategory(i));
+                var color = '#16a085';
+                return color;
+              };
+            }
+
             $scope.graphData = [{
               "key": "Series 1",
               "values": value
@@ -2554,167 +2688,3 @@ angular.module('do.users', [])
 
   }
 ])
-
-// .controller('notesCtrl', ['$scope', 'UserModel', 'CurrentAppService',
-//     function ($scope, UserModel, CurrentAppService) {
-
-//         CurrentAppService.getCurrentApp()
-//             .then(function (currentApp) {
-//                 var url = window.location.href;
-//                 var uid = url.split("/")[5];
-//                 $scope.createNote = function () {
-//                     var data = {
-//                         note: $scope.notetext
-//                     };
-//                     UserModel.createNote(currentApp._id, uid, data);
-//                 }
-//             })
-
-//     }
-// ])
-
-// .controller('TableCtrl', ['$scope', '$filter', 'ngTableParams', '$modal',
-//     'UidService', '$moment', 'UserList', '$timeout',
-
-//     function ($scope, $filter, ngTableParams, $modal, UidService, $moment,
-//         UserList, $timeout) {
-
-//         $scope.title = "Write Message";
-
-//         var popupModal = $modal({
-//             scope: $scope,
-//             template: '/templates/usersmodule/message.modal.html',
-//             show: false
-//         });
-
-//         $scope.mail = [];
-//         $scope.openModal = function () {
-//             popupModal.show();
-//             console.log("checkboxes items: ", $scope.checkboxes.items);
-//             /*Object.keys(obj)
-//                 .forEach(function (key) {
-//                     f(key, obj[key])
-//                 });*/
-//             var prop, value;
-//             var keys = Object.keys($scope.checkboxes.items);
-//             for (var i = 0; i < Object.keys($scope.checkboxes.items)
-//                 .length; i++) {
-//                 prop = keys[i];
-//                 console.log("id: ", prop);
-//                 value = $scope.checkboxes.items[prop];
-//                 console.log("value: ", value);
-//                 if (value) {
-//                     $scope.mail[i] = prop;
-//                 }
-//             };
-//             console.log("email objects: ", $scope.mail);
-//             UidService.set($scope.mail);
-
-//         };
-
-
-//         var data = [];
-//         $scope.users = []
-
-//         $scope.checkboxes = {
-//             'checked': false,
-//             items: {}
-//         };
-
-//         console.log("checkboxes: ", $scope.checkboxes);
-
-//         $scope.$watch('checkboxes.items', function (value) {
-//             console.log("$watch checkboxes: ", $scope.checkboxes.items);
-//         })
-
-//         $scope.$watch(UserList.getUsers, function () {
-//             if (UserList.getUsers().length > 0) {
-//                 $scope.showUsers = true;
-//             }
-//             for (var i = 0; i < UserList.getUsers()
-//                 .length; i++) {
-//                 $scope.users.push({
-//                     id: UserList.getUsers()[i]._id,
-//                     email: UserList.getUsers()[i].email,
-//                     userkarma: UserList.getUsers()[i].healthScore,
-//                     datejoined: moment(UserList.getUsers()[i].firstSessionAt)
-//                         .format("MMMM Do YYYY"),
-//                     unsubscribed: UserList.getUsers()[i].unsubscribed
-//                 })
-//             };
-
-//             $scope.columns = [{
-//                 title: '',
-//                 field: 'checkbox',
-//                 visible: true
-//             }, {
-//                 title: 'Email',
-//                 field: 'email',
-//                 visible: true
-//             }, {
-//                 title: 'User Karma',
-//                 field: 'userkarma',
-//                 visible: true
-//             }, {
-//                 title: 'Date Joined',
-//                 field: 'datejoined',
-//                 visible: true
-//             }, {
-//                 title: 'Unsubscribed',
-//                 field: 'unsubscribed',
-//                 visible: true
-//             }];
-
-//             /**
-//              * Reference: http://plnkr.co/edit/dtlKAHwy99jdnWVU0pc8?p=preview
-//              *
-//              */
-
-//             $scope.refreshTable = function () {
-//                 $scope['tableParams'] = {
-//                     reload: function () {},
-//                     settings: function () {
-//                         return {}
-//                     }
-//                 };
-//                 $timeout(setTable, 100)
-//             };
-//             $scope.refreshTable();
-
-//             function setTable(arguments) {
-
-//                 $scope.tableParams = new ngTableParams({
-//                     page: 1, // show first page
-//                     count: 10, // count per page
-//                     filter: {
-//                         name: '' // initial filter
-//                     },
-//                     sorting: {
-//                         name: 'asc'
-//                     }
-//                 }, {
-//                     filterSwitch: true,
-//                     total: $scope.users.length, // length of data
-//                     getData: function ($defer, params) {
-//                         var orderedData = params.sorting() ?
-//                             $filter('orderBy')($scope.users,
-//                                 params.orderBy()) :
-//                             $scope.users;
-//                         params.total(orderedData.length);
-//                         $defer.resolve(orderedData.slice((params.page() -
-//                                 1) * params.count(), params.page() *
-//                             params.count()));
-//                     }
-//                 });
-//             }
-//         })
-
-
-
-
-//         // $scope.tabledropdown = {
-
-//         // }
-
-//     }
-// ])

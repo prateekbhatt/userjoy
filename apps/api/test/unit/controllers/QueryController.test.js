@@ -29,6 +29,7 @@ describe('Resource /query', function () {
    */
 
   var User = require('../../../api/models/User');
+  var Event = require('../../../api/models/Event');
 
 
   before(function (done) {
@@ -68,11 +69,46 @@ describe('Resource /query', function () {
 
     var aid;
     var url;
+    var uid;
 
     var obj = {};
 
+    before(function (done) {
+
+      aid = saved.apps.first._id;
+
+      async.waterfall(
+
+        [
+
+          function createUser(cb) {
+            User
+              .create({
+                aid: aid,
+                score: 20
+              }, cb)
+          },
+
+          function createEvent(user, cb) {
+
+            Event
+              .create({
+                aid: aid,
+                uid: user._id,
+                type: 'track',
+                name: 'Create Message'
+              }, cb)
+
+          }
+        ],
+        done
+      );
+
+    });
+
 
     beforeEach(function () {
+      aid = saved.apps.first._id.toString();
       obj = {
         list: 'users',
         op: 'and',
@@ -86,13 +122,12 @@ describe('Resource /query', function () {
 
           {
             method: 'attr',
-            name: 'healthScore',
+            name: 'score',
             op: 'gt',
             val: 10
           }
         ]
       };
-      aid = saved.apps.first._id.toString();
       url = '/apps/' + aid + '/query?' + qs.stringify(obj);
     });
 
@@ -114,6 +149,47 @@ describe('Resource /query', function () {
     it('logging in user', function (done) {
       loginUser(done);
     });
+
+
+    it(
+      'should return error if filter method not in hasdone/hasnotdone/count/attr',
+      function (done) {
+
+        var obj = {
+          list: 'users',
+          op: 'and',
+          filters: [
+
+            {
+              method: 'hasdone',
+              type: 'track',
+              name: 'Create Message'
+            },
+
+            {
+              method: 'INVALID_METHOD_TYPE',
+              name: 'score',
+              op: 'gt',
+              val: 10
+            }
+          ]
+        };
+
+        var url = '/apps/' + aid + '/query?' + qs.stringify(obj);
+
+
+        request
+          .get(url)
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            "error": "Query filter must be one of hasdone/hasnotdone/count/attr",
+            "status": 400
+          })
+          .end(done);
+
+      });
 
 
     it('should fetch users matching given filters', function (done) {

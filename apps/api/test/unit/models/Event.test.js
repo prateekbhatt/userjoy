@@ -137,14 +137,47 @@ describe('Model Event', function () {
 
   describe('#track', function () {
 
-    it('should return error if less than 5 arguments are passed',
+    it('should return error if less than 6 arguments are passed',
       function () {
 
         expect(Event.track)
           .to.
-        throw ('Event.track: Expected five arguments');
+        throw ('Event.track: Expected six arguments');
 
       });
+
+
+    it('should return error if invalid event type', function (done) {
+
+      var ids = {
+        uid: randomId(),
+        aid: randomId()
+      };
+
+      var name = 'Open chat';
+      var module = 'Group';
+
+      var meta = {
+        members: 99
+      };
+
+      var type = 'randomEventTypeThatIsNotValid';
+
+      Event.track(type, ids, name, module, meta, function (err, evn) {
+
+        expect(err)
+          .to.exist
+          .and.to.have.property('errors')
+          .that.is.an('object')
+          .and.has.keys(['type']);
+
+        expect(evn)
+          .to.not.exist;
+
+        done();
+      });
+    });
+
 
     it('should create a new track event', function (done) {
 
@@ -160,12 +193,14 @@ describe('Model Event', function () {
         members: 99
       };
 
-      Event.track(ids, name, module, meta, function (err, evn) {
+      var type = 'track';
 
-        evn = evn.toJSON();
+      Event.track(type, ids, name, module, meta, function (err, evn) {
 
         expect(err)
           .to.not.exist;
+
+        evn = evn.toJSON();
 
         expect(evn.meta)
           .to.be.an("array");
@@ -231,44 +266,95 @@ describe('Model Event', function () {
 
   describe('#automessage', function () {
 
+    var ids = {
+      uid: randomId(),
+      aid: randomId(),
+      amId: randomId()
+    };
+    var title = 'In App Welcome Message';
+    var state = 'queued';
     it('should create a new automessage event', function (done) {
 
-      var ids = {
-        uid: randomId(),
-        aid: randomId(),
-        amId: randomId()
-      };
+      var savedEventId;
 
-      var title = 'In App Welcome Message';
-      var state = 'queued';
-      Event.automessage(ids, state, title, function (err, evn) {
+      async.series({
+
+        shouldCreateEvent: function (cb) {
+
+          Event.automessage(ids, state, title, function (err, n, raw) {
+
+            expect(err)
+              .to.not.exist;
+
+            expect(n)
+              .to.eql(1);
+
+            expect(raw.updatedExisting)
+              .to.be.false;
+
+            savedEventId = raw.upserted[0]._id;
+
+            cb();
+
+          });
+        },
+
+
+        checkTheEvent: function (cb) {
+
+          Event
+            .findById(savedEventId)
+            .exec(function (err, evn) {
+              expect(err)
+                .to.not.exist;
+
+              evn = evn.toJSON();
+
+              expect(evn)
+                .to.have.property("type", "auto");
+
+              expect(evn)
+                .to.have.property("name", "In App Welcome Message");
+
+              expect(evn.amId.toString())
+                .to.eql(ids.amId.toString());
+
+
+              expect(evn.meta[0])
+                .to.eql({
+                  k: 'state',
+                  v: state
+                });
+
+              cb()
+            })
+        }
+
+      }, done)
+
+    });
+
+
+    // MUST RUN AFTER THE ABOVE TEST
+    it('should not create same automessage event twice', function (done) {
+
+      Event.automessage(ids, state, title, function (err, n, raw) {
 
         expect(err)
           .to.not.exist;
 
-        evn = evn.toJSON();
+        expect(n)
+          .to.eql(1);
 
-        expect(evn)
-          .to.have.property("type", "auto");
+        expect(raw.updatedExisting)
+          .to.be.true;
 
-        expect(evn)
-          .to.have.property("name", "In App Welcome Message");
+        expect(raw.upserted)
+          .to.not.exist;
 
-        expect(evn.meta[0])
-          .to.eql({
-            k: 'amId',
-            v: ids.amId.toString()
-          });
-
-        expect(evn.meta[1])
-          .to.eql({
-            k: 'state',
-            v: state
-          });
-
-        done();
-
+        done()
       });
+
     });
 
 

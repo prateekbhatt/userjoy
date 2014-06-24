@@ -58,7 +58,7 @@ Types of queries:
 
 A account on Userjoy can have multiple apps.
 
-###### Mandrill and Mailer
+###### Mailgun and Mailer
 
 Every app has a default inbound email address which is "aid@mail.userjoy.co", where aid is primary key of the app on mongodb. e.g. "UserJoy <1234@mail.userjoy.co>", where aid = 1234
 
@@ -79,6 +79,16 @@ We allow the apps to pass custom attributes related to users, companies and even
 >
 > - Disabled creating an id for each subdocument
 >
+
+
+###### Query
+
+- Run count query and attr query separately. This it to ensure 'AND/OR' work as expected across count and attr queries
+- hasnotdone: query events by time
+cases:
+- Edge cases
+1. sometimes hasdone event + hasnotdone event =/= total users
+
 
 
 ###### Email Types
@@ -120,6 +130,12 @@ UserNote      |                         | notes created by team members about a 
 - ct
 - ut
 
+
+##### Indexes:
+
+- email
+
+
 ##### Notes:
 
 - No need to store the reporting hour
@@ -137,6 +153,12 @@ UserNote      |                         | notes created by team members about a 
 - url (domain url)
 - ut
 
+
+##### Indexes:
+
+- team.accid
+
+
 ##### Notes:
 
 - Admin can add / remove access to team members. On adding / removing access both Accounts and Apps collections have to be updated. The Account should also be notified by email.
@@ -149,7 +171,9 @@ UserNote      |                         | notes created by team members about a 
 - aid
 - user_id (to allow the app to recognize a user even if the user changes email/username)
 - email (required)
+- browser ("Chrome 35" etc.)
 - country (2 letter ISO-3166-1 country code, [REF](https://github.com/bluesmoon/node-geoip#looking-up-an-ip-address)
+- device ('Apple iPad')
 - x name
 - x username
 - x meta (object containing additonal info about users)
@@ -160,6 +184,7 @@ UserNote      |                         | notes created by team members about a 
 - ut
 - health (latest health status of the user, defaults to average for new user)
 - joined (when did the user join the service)
+- os ('iOS 5.0')
 - plan
 - revenue
 - score (latest engagement score of user, defaults to 50 for new user)
@@ -171,6 +196,15 @@ UserNote      |                         | notes created by team members about a 
 - ip
 - x tags [] Stores tags for categorizing users
 - companies [{cid, companyName, billing{}, healthScore, totalSessions}]
+
+
+##### Indexes:
+
+- aid
+- companies.cid
+- email
+- user_id
+
 
 ##### Notes:
 
@@ -209,6 +243,12 @@ UserNote      |                         | notes created by team members about a 
 - ut
 
 
+##### Indexes:
+
+- aid
+- uid
+
+
 ### DailyReport
 
 ##### Columns:
@@ -245,6 +285,12 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 - status
 - x tags [] just like user tags
 
+##### Indexes:
+
+- aid
+- company_id
+- name
+
 ##### Notes:
 
 - status must be one of [trial, free, paying, cancelled]
@@ -269,6 +315,10 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
  - toAgo (optional, number of days till when count queries should be run)
  - ut
 
+##### Indexes:
+
+- aid
+
 ##### Embedded Documents:
 
 > ### Filter
@@ -288,6 +338,7 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 ##### Columns:
 
 - aid (required)
+- amId (required for automessage events)
 - cid
 - ct
 - module
@@ -296,10 +347,18 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 - type (required)
 - uid (required)
 
+
+##### Indexes:
+
+- aid
+- cid
+- type
+- uid
+
 ##### Notes:
 
-- 'amId' and 'state' must be required for 'automessage' events (they are stored
-as meta properties)
+- 'amId' and 'state' must be required for 'automessage' events ('state' is stored
+as meta property)
 
 
 ### AutoMessage
@@ -323,6 +382,9 @@ as meta properties)
 - type (email / notification) (required)
 - ut
 
+##### Indexes:
+
+- aid
 
 ### Notification
 
@@ -333,6 +395,11 @@ as meta properties)
 - ct
 - seen (boolean)
 - sender
+- title (Required, automessage title)
+- uid
+
+##### Indexes:
+
 - uid
 
 ##### Notes:
@@ -353,6 +420,12 @@ as meta properties)
 - toRead (boolean)
 - uid
 - ut
+
+##### Indexes:
+
+- aid
+- uid
+- closed
 
 ##### Notes:
 
@@ -401,7 +474,7 @@ as meta properties)
 - How to store plan, license, amount info?
 - How to store customer journey info?
 - How to handle conversations and messages?
-- Using Mandrill, it is possible to assign unique readable email ids for each team member of an app, e.g. "prateek@dodatado.mail.userjoy.co"
+- Using Mailgun, it is possible to assign unique readable email ids for each team member of an app, e.g. "prateek@dodatado.mail.userjoy.co"
 
 
 ## API (To be updated)

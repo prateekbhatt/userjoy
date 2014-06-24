@@ -4,5 +4,5 @@
 --growl
 --slow 30
 --check-leaks
---timeout 20000
+--timeout 60000
 --globals CookieAccessInfo,Cookie,CookieJar,request,_,async,loginUser,logoutUser,saved,setupTestDb,expect,sinon,loginCookie
