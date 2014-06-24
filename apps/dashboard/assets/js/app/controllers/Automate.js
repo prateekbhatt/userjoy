@@ -394,13 +394,15 @@ angular.module('do.automate', [])
 
           $scope.saveMessage = function () {
             if ($scope.showNotification) {
-              saveMsgService.setMsg($scope.notificationBody);
+              saveMsgService.setMsg($scope.notificationBody.replace(/\n/g,
+                '<br/>').replace(/&#34;/g, '"').replace(/&#160/g, ' '));
               saveMsgService.setTitle($scope.title);
             }
 
             if ($scope.showEmail) {
               saveMsgService.setMsg($scope.emailBody.replace(/\n/g,
-                '<br/>'));
+                '<br/>').replace(/&#34;/g, '"').replace(/&#160/g, ' '));
+              console.log("Msg: ", saveMsgService.getMsg());
               if ($scope.subject != null) {
                 saveMsgService.setSub($scope.subject.replace(
                   /<(?:.|\n)*?>/gm, ''));

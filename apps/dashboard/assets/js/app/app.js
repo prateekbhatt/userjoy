@@ -254,7 +254,7 @@ var app = angular.module('dodatado', [
             console.log("user attributes value: ", value);
             attributes.push({
               name: value,
-              value: '{{= ' + value + ' || "there"}}'
+              value: '{{= ' + value + ' || "there" }}'
             })
           };
           console.log("user attributes: ", attributes);
@@ -277,7 +277,7 @@ var app = angular.module('dodatado', [
           "</span>",
         action: function (size) {
           if (size !== '' && typeof (size) === "string") {
-            size = size + " ";
+            size = size;
             return this.$editor()
               .wrapSelection('insertText', size);
           }
