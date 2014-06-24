@@ -1,19 +1,21 @@
 angular.module('do.home', [])
 
-.config(function config($stateProvider) {
-  $stateProvider.state('home', {
-    url: '/',
-    views: {
-      "main": {
-        controller: 'HomeCtrl',
-        templateUrl: 'templates/home.tpl.html'
+.config(['$stateProvider',
+  function config($stateProvider) {
+    $stateProvider.state('home', {
+      url: '/',
+      views: {
+        "main": {
+          controller: 'HomeCtrl',
+          templateUrl: 'templates/home.tpl.html'
+        }
+      },
+      data: {
+        pageTitle: 'Home'
       }
-    },
-    data: {
-      pageTitle: 'Home'
-    }
-  });
-})
+    });
+  }
+])
 
 .controller('HomeCtrl', ['$scope', '$state',
   function HomeController($scope, $state) {
