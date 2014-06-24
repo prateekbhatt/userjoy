@@ -405,7 +405,7 @@ angular.module('do.automate', [])
               console.log("Msg: ", saveMsgService.getMsg());
               if ($scope.subject != null) {
                 saveMsgService.setSub($scope.subject.replace(
-                  /<(?:.|\n)*?>/gm, ''));
+                  /<(?:.|\n)*?>/gm, '').replace(/&#34;/g, '"'));
               }
               saveMsgService.setTitle($scope.title);
               console.log("email body: ", saveMsgService

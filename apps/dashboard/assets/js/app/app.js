@@ -121,201 +121,211 @@ var app = angular.module('dodatado', [
   }
 })
 
-.config(function ($stateProvider, $urlRouterProvider,
-  $locationProvider, $httpProvider, $provide, $momentProvider,
-  loginProvider) {
+.config(['$stateProvider', '$urlRouterProvider',
+  '$locationProvider', '$httpProvider', '$provide', '$momentProvider',
+  'loginProvider',
+  function ($stateProvider, $urlRouterProvider,
+    $locationProvider, $httpProvider, $provide, $momentProvider,
+    loginProvider) {
 
-  // errorProvider.setError(false);
-  // $rootScope.error = false;
-  $momentProvider.asyncLoading(false)
-    .scriptUrl(
-      '//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js'
-  );
+    // errorProvider.setError(false);
+    // $rootScope.error = false;
+    $momentProvider.asyncLoading(false)
+      .scriptUrl(
+        '//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js'
+    );
 
-  $urlRouterProvider.otherwise('/404');
-  $locationProvider.html5Mode(true);
-  console.log('\n\n setting authcredentials');
-  // for making cross domain authentication requests
-  $httpProvider.defaults.useXDomain = true;
-  $httpProvider.defaults.withCredentials = true;
-  delete $httpProvider.defaults.headers.common['X-Requested-With'];
+    $urlRouterProvider.otherwise('/404');
+    $locationProvider.html5Mode(true);
+    console.log('\n\n setting authcredentials');
+    // for making cross domain authentication requests
+    $httpProvider.defaults.useXDomain = true;
+    $httpProvider.defaults.withCredentials = true;
+    delete $httpProvider.defaults.headers.common['X-Requested-With'];
 
-  $httpProvider.interceptors.push(function ($rootScope, $location, $q,
-    $timeout) {
-    $rootScope.error = false;
-    $rootScope.success = false;
-    $rootScope.errMsgRootScope = '';
-    $rootScope.successMsgRootScope = '';
-    console.log("$rootScope.errMsgRootScope: app.js: ", $rootScope
-      .errMsgRootScope);
-    return {
-      'request': function (config, response) {
-        // do something on success
-        console.log("success config: ", config, response);
-        return config;
-      },
-      'response': function (response) {
-        console.log("response: ", response);
-        if (response.status === 200 && response.config.method != 'PUT') {
-          $rootScope.error = false;
-          $rootScope.success = false;
-          $rootScope.errMsgRootScope = '';
-          $rootScope.successMsgRootScope = '';
-        }
-        if (response.status === 200 && response.config.method === 'PUT') {
-          $rootScope.successMsgRootScope = 'Success';
-          $rootScope.errorMsgRootScope = '';
-          $rootScope.error = false;
-          $rootScope.success = true;
-          $timeout(function () {
-            $rootScope.success = false;
-          }, 3000);
-        }
-        if (response.status === 201) {
-          console.log("success: ", response);
-          $rootScope.successMsgRootScope = 'Success';
-          $rootScope.errorMssRootScope = '';
-          $rootScope.error = false;
-          $rootScope.success = true;
-          $timeout(function () {
-            $rootScope.success = false;
-          }, 3000);
-        }
-        return response;
-      },
-      'responseError': function (rejection) {
-        if (rejection.status === 400 || rejection.status ===
-          500) {
-          console.log("error: ", rejection.data.error);
-          $rootScope.error = true;
-          if (_.isArray(rejection.data.error)) {
-            $rootScope.errMsgRootScope = rejection.data.error[
-              0];
-          } else {
-            $rootScope.errMsgRootScope = rejection.data.error;
+    $httpProvider.interceptors.push(['$rootScope', '$location', '$q',
+      '$timeout',
+      function ($rootScope, $location, $q,
+        $timeout) {
+        $rootScope.error = false;
+        $rootScope.success = false;
+        $rootScope.errMsgRootScope = '';
+        $rootScope.successMsgRootScope = '';
+        console.log("$rootScope.errMsgRootScope: app.js: ", $rootScope
+          .errMsgRootScope);
+        return {
+          'request': function (config, response) {
+            // do something on success
+            console.log("success config: ", config, response);
+            return config;
+          },
+          'response': function (response) {
+            console.log("response: ", response);
+            if (response.status === 200 && response.config.method != 'PUT') {
+              $rootScope.error = false;
+              $rootScope.success = false;
+              $rootScope.errMsgRootScope = '';
+              $rootScope.successMsgRootScope = '';
+            }
+            if (response.status === 200 && response.config.method ===
+              'PUT') {
+              $rootScope.successMsgRootScope = 'Success';
+              $rootScope.errorMsgRootScope = '';
+              $rootScope.error = false;
+              $rootScope.success = true;
+              $timeout(function () {
+                $rootScope.success = false;
+              }, 3000);
+            }
+            if (response.status === 201) {
+              console.log("success: ", response);
+              $rootScope.successMsgRootScope = 'Success';
+              $rootScope.errorMssRootScope = '';
+              $rootScope.error = false;
+              $rootScope.success = true;
+              $timeout(function () {
+                $rootScope.success = false;
+              }, 3000);
+            }
+            return response;
+          },
+          'responseError': function (rejection) {
+            if (rejection.status === 400 || rejection.status ===
+              500) {
+              console.log("error: ", rejection.data.error);
+              $rootScope.error = true;
+              if (_.isArray(rejection.data.error)) {
+                $rootScope.errMsgRootScope = rejection.data.error[
+                  0];
+              } else {
+                $rootScope.errMsgRootScope = rejection.data.error;
+              }
+              $rootScope.successMsgRootScope = '';
+              $rootScope.success = false;
+              console.log("$rootScope errMSg: ", $rootScope.errMsgRootScope);
+              $timeout(function () {
+                $rootScope.error = false;
+              }, 5000);
+            }
+            if (rejection.status === 401 && $location.path() === '/login' &&
+              rejection.config.method === 'POST') {
+              console.log("rejection loggin in : ", rejection);
+              $rootScope.errMsgRootScope = rejection.data.error;
+              $rootScope.error = true;
+              $rootScope.success = false;
+              $rootScope.successMsgRootScope = '';
+              $timeout(function () {
+                $rootScope.error = false;
+              }, 5000);
+            }
+            var url = $location.path()
+              .split('/');
+            console.log("url: ", url);
+            var checkUrl = url[1];
+            console.log("url 1: ", url[1]);
+            var inviteUrl = url[3] ? url[3] : '';
+            console.log("invite Url: ", inviteUrl);
+            // if we're not logged-in to the web service, redirect to login page
+            if (rejection.status === 401 && checkUrl !=
+              'login' && checkUrl != 'forgot-password' && checkUrl !=
+              'signup' && inviteUrl != 'invite') {
+              console.log("401 status logout");
+              loginProvider.setLoggedIn = false;
+              $rootScope.loggedIn = false;
+              $location.path('/login');
+            }
+            return $q.reject(rejection);
           }
-          $rootScope.successMsgRootScope = '';
-          $rootScope.success = false;
-          console.log("$rootScope errMSg: ", $rootScope.errMsgRootScope);
-          $timeout(function () {
-            $rootScope.error = false;
-          }, 5000);
-        }
-        if (rejection.status === 401 && $location.path() === '/login' &&
-          rejection.config.method === 'POST') {
-          console.log("rejection loggin in : ", rejection);
-          $rootScope.errMsgRootScope = rejection.data.error;
-          $rootScope.error = true;
-          $rootScope.success = false;
-          $rootScope.successMsgRootScope = '';
-          $timeout(function () {
-            $rootScope.error = false;
-          }, 5000);
-        }
-        var url = $location.path()
-          .split('/');
-        console.log("url: ", url);
-        var checkUrl = url[1];
-        console.log("url 1: ", url[1]);
-        var inviteUrl = url[3] ? url[3] : '';
-        console.log("invite Url: ", inviteUrl);
-        // if we're not logged-in to the web service, redirect to login page
-        if (rejection.status === 401 && checkUrl !=
-          'login' && checkUrl != 'forgot-password' && checkUrl != 'signup' && inviteUrl != 'invite') {
-          console.log("401 status logout");
-          loginProvider.setLoggedIn = false;
-          $rootScope.loggedIn = false;
-          $location.path('/login');
-        }
-        return $q.reject(rejection);
+        };
       }
-    };
-  });
+    ]);
 
-  // adding custom tool to textAngular
-  $provide.decorator('taOptions', ['taRegisterTool', '$delegate', 'config',
-    '$http', 'AppService', 'CurrentAppService', '$location',
-    function (taRegisterTool, taOptions, config, $http, AppService,
-      CurrentAppService, $location) {
-      // $delegate is the taOptions we are decorating
-      // register the tool with textAngular
-      console.log("$location.path(): in app.js: ", $location.path());
-      var appId = $location.path()
-        .split('/')[2];
+    // adding custom tool to textAngular
+    $provide.decorator('taOptions', ['taRegisterTool', '$delegate', 'config',
+      '$http', 'AppService', 'CurrentAppService', '$location',
+      function (taRegisterTool, taOptions, config, $http, AppService,
+        CurrentAppService, $location) {
+        // $delegate is the taOptions we are decorating
+        // register the tool with textAngular
+        console.log("$location.path(): in app.js: ", $location.path());
+        var appId = $location.path()
+          .split('/')[2];
         var attributes = [];
-      $http.get(config.apiUrl + '/apps/' + appId +
-        '/automessages/attributes')
-        .success(function (data) {
-          console.log("success in getting automsg attributes", _.keys(data.userAttributes));
-          var keys = _.keys(data.userAttributes);
-          for (var i = 0; i < keys.length; i++) {
-            var prop = keys[i]
-            value = data.userAttributes[prop];
-            console.log("user attributes value: ", value);
-            attributes.push({
-              name: value,
-              value: '{{= ' + value + ' || "there" }}'
-            })
-          };
-          console.log("user attributes: ", attributes);
-          // for (var i = 0; i < data.userAttributes.length; i++) {
-          //   options.push({
-          //     name: _.key
-          //   })
-          // };
-          // options.push({
-          //   name: 
-          // })
-        })
-        .error(function () {
-          console.log("error in getting automsg attributes");
-        })
-      taRegisterTool('dropdown', {
-        display: "<span class='dropdown'>" +
-          "<button class='btn btn-sm btn-default dropdown-toggle' type='button' ng-disabled='showHtml()'><i class='fa fa-caret-down'></i></button>" +
-          "<ul class='dropdown-menu'><li ng-repeat='o in options' ng-model='o.value' ng-click='action(o.value)'>{{o.name}}</li></ul>" +
-          "</span>",
-        action: function (size) {
-          if (size !== '' && typeof (size) === "string") {
-            size = size;
-            return this.$editor()
-              .wrapSelection('insertText', size);
-          }
-        },
-        options: attributes
-        // TODO: Get data from backend
-        // options: [{
-        //     name: 'Email',
-        //     value: '{{= email || "there"}}'
-        //   }
-        //   // ,
-        //   {
-        //             name: 'App Name',
-        //             value: '{{app_name}}'
-        //         }, {
-        //             name: 'Last Name',
-        //             value: '{{last_name}}'
-        //         }, {
-        //             name: 'Email',
-        //             value: '{{email}}'
-        //         }, {
-        //             name: 'User Id',
-        //             value: '{{user_id}}'
-        //         }, {
-        //             name: 'status',
-        //             value: '{{status}}'
-        //         }
-        // ]
-      });
+        $http.get(config.apiUrl + '/apps/' + appId +
+          '/automessages/attributes')
+          .success(function (data) {
+            console.log("success in getting automsg attributes", _.keys(
+              data.userAttributes));
+            var keys = _.keys(data.userAttributes);
+            for (var i = 0; i < keys.length; i++) {
+              var prop = keys[i]
+              value = data.userAttributes[prop];
+              console.log("user attributes value: ", value);
+              attributes.push({
+                name: value,
+                value: '{{= ' + value + ' || "there" }}'
+              })
+            };
+            console.log("user attributes: ", attributes);
+            // for (var i = 0; i < data.userAttributes.length; i++) {
+            //   options.push({
+            //     name: _.key
+            //   })
+            // };
+            // options.push({
+            //   name: 
+            // })
+          })
+          .error(function () {
+            console.log("error in getting automsg attributes");
+          })
+        taRegisterTool('dropdown', {
+          display: "<span class='dropdown'>" +
+            "<button class='btn btn-sm btn-default dropdown-toggle' type='button' ng-disabled='showHtml()'><i class='fa fa-caret-down'></i></button>" +
+            "<ul class='dropdown-menu'><li ng-repeat='o in options' ng-model='o.value' ng-click='action(o.value)'>{{o.name}}</li></ul>" +
+            "</span>",
+          action: function (size) {
+            if (size !== '' && typeof (size) === "string") {
+              size = size;
+              return this.$editor()
+                .wrapSelection('insertText', size);
+            }
+          },
+          options: attributes
+          // TODO: Get data from backend
+          // options: [{
+          //     name: 'Email',
+          //     value: '{{= email || "there"}}'
+          //   }
+          //   // ,
+          //   {
+          //             name: 'App Name',
+          //             value: '{{app_name}}'
+          //         }, {
+          //             name: 'Last Name',
+          //             value: '{{last_name}}'
+          //         }, {
+          //             name: 'Email',
+          //             value: '{{email}}'
+          //         }, {
+          //             name: 'User Id',
+          //             value: '{{user_id}}'
+          //         }, {
+          //             name: 'status',
+          //             value: '{{status}}'
+          //         }
+          // ]
+        });
 
-      // add the button to the default toolbar definition
-      taOptions.toolbar[1].push('dropdown');
-      return taOptions;
-    }
-  ]);
+        // add the button to the default toolbar definition
+        taOptions.toolbar[1].push('dropdown');
+        return taOptions;
+      }
+    ]);
 
 
-})
+  }
+])
 
 
 

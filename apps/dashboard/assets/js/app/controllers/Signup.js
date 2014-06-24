@@ -38,9 +38,10 @@ angular.module('do.signup', [])
     }
   }
 ])
-  .controller('verifyEmailCtrl', ['$scope', '$location', 'AccountModel',
-    '$stateParams',
-    function ($scope, $location, AccountModel, $stateParams) {
-      AccountModel.verifyEmail($stateParams.id, $stateParams.tid);
-    }
-  ]);
+
+.controller('verifyEmailCtrl', ['$scope', '$location', 'AccountModel',
+  '$stateParams',
+  function ($scope, $location, AccountModel, $stateParams) {
+    AccountModel.verifyEmail($stateParams.id, $stateParams.tid);
+  }
+]);

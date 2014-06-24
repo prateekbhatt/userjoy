@@ -108,7 +108,7 @@ angular.module('do.navbar', [])
         }
 
         $scope.goToSettings = function (app) {
-          if(app.isActive) {
+          if (app.isActive) {
             AppService.setCurrentApp(app);
             $location.path('/apps/' + AppService.getCurrentApp()
               ._id + '/settings/general');
@@ -219,7 +219,7 @@ angular.module('do.navbar', [])
         }
 
         $scope.goToSettings = function (app) {
-          if(app.isActive) {
+          if (app.isActive) {
             AppService.setCurrentApp(app);
             $location.path('/apps/' + AppService.getCurrentApp()
               ._id + '/settings/general');
@@ -238,28 +238,33 @@ angular.module('do.navbar', [])
               }
               if (AppService.getCurrentApp()
                 .isActive) {
-                $location.path('/apps/' + AppService.getCurrentApp()._id + '/users/list');
+                $location.path('/apps/' + AppService.getCurrentApp()
+                  ._id + '/users/list');
               } else {
-                $location.path('/apps/' + AppService.getCurrentApp()._id + '/addcode');
+                $location.path('/apps/' + AppService.getCurrentApp()
+                  ._id + '/addcode');
               }
             }
             AppModel.getSingleApp($scope.appId, cb);
           } else {
             if (AppService.getCurrentApp()
               .isActive) {
-              $location.path('/apps/' + AppService.getCurrentApp()._id + '/users/list');
+              $location.path('/apps/' + AppService.getCurrentApp()
+                ._id + '/users/list');
             } else {
-              $location.path('/apps/' + AppService.getCurrentApp()._id + '/addcode');
+              $location.path('/apps/' + AppService.getCurrentApp()
+                ._id + '/addcode');
             }
           }
         }
       })
   }
 ])
-  .controller('serverErrSuccessCtrl', ['$scope',
-    function ($scope) {
+
+.controller('serverErrSuccessCtrl', ['$scope',
+  function ($scope) {
 
 
 
-    }
-  ]);
+  }
+]);
