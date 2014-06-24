@@ -95,6 +95,7 @@ function signupWithoutInvite(account, cb) {
    */
 
   var config = require('../../../config')('api');
+  var dashboardUrl = config.hosts.dashboard;
 
   async.waterfall(
 
@@ -113,8 +114,8 @@ function signupWithoutInvite(account, cb) {
 
       function sendConfirmationMail(acc, verifyToken, cb) {
 
-        var confirmUrl = path.join(config.baseUrl, 'account',
-          acc._id.toString(), 'verify-email', verifyToken);
+        var confirmUrl = dashboardUrl + '/account/' + acc._id.toString() +
+          '/verify-email/' + verifyToken;
 
         var mailOptions = {
           locals: {
@@ -227,7 +228,7 @@ router
         if (err) {
 
           if (_.contains(['Invalid Token', 'Account Not Found'], err.message)) {
-            return res.unauthorized('Invalid Attempt');
+            return res.badRequest('Invalid Attempt');
           }
 
           return next(err);
