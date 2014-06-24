@@ -12,6 +12,16 @@ angular.module('do.signup', [])
             authenticate: false
           }
         }
+      })
+      .state('verfiy-email', {
+        url: '/account/:id/verify-email/:tid',
+        views: {
+          "main": {
+            templateUrl: '/templates/LoginSignup/verify-email.html',
+            controller: 'verifyEmailCtrl',
+            authenticate: false
+          }
+        }
       });
 
   }
@@ -27,4 +37,10 @@ angular.module('do.signup', [])
         $scope.name, InviteIdService.getInviteId());
     }
   }
-]);
+])
+  .controller('verifyEmailCtrl', ['$scope', '$location', 'AccountModel',
+    '$stateParams',
+    function ($scope, $location, AccountModel, $stateParams) {
+      AccountModel.verifyEmail($stateParams.id, $stateParams.tid);
+    }
+  ]);
