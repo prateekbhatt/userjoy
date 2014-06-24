@@ -1142,6 +1142,22 @@ angular.module('do.message', [])
               prop = keys[i];
               console.log("id: ", prop);
               value = data[prop];
+              $scope.companies = [];
+              if (prop == 'companies') {
+                // $scope.companies = value;
+                value.forEach(function (company) {
+                  $scope.companies.push({
+                    name: company.name
+                  });
+                })
+                if ($scope.companies.length == 1) {
+                  $scope.showCompany = true;
+                }
+
+                if ($scope.companies.length > 1) {
+                  $scope.showCompanies = true;
+                }
+              }
               // console.log("value prop: ", value, prop);
               if (prop != 'companies' && prop != 'ct' && prop != 'meta' &&
                 prop != 'ut' && prop != '__v' && prop != 'aid' && prop !=
