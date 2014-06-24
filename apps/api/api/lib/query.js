@@ -55,6 +55,19 @@ module.exports = Query;
 
 
 /**
+ * helper to convert from days ago to timestamp
+ * i.e. 3 days ago, to timestamp in milliseconds
+ */
+
+function dateFromDaysAgo(days) {
+  var date = new Date(new Date()
+    .getTime() - 86400000 * days);
+
+  return date;
+}
+
+
+/**
  * Query constructor
  *
  *
@@ -162,7 +175,10 @@ function Query(aid, query) {
   this.fromAgo = query.fromAgo;
   this.toAgo = query.toAgo;
 
-  this.countFilterUserIds = [];
+  // store users filtered
+  this.filteredUsers = [];
+
+  this.countFilteredUids = [];
 
   // set root level operator as $and/$or
   this.rootOperator = null;
@@ -213,7 +229,9 @@ Query.prototype.reset = function () {
 
   this.countFilters = [];
   this.attrFilters = [];
-  this.countFilterUserIds = [];
+  this.fromAgo = null;
+  this.toAgo = null;
+  this.countFilteredUids = [];
   this.rootOperator = null;
 
   return this;
@@ -325,24 +343,42 @@ Query.prototype.run = function (cb) {
   var self = this;
 
 
-  async.series({
+  async.series(
+
+    {
 
       countQuery: function (cb) {
 
+        // count query needs to run before attribute query because the counts
+        // anyways need to run on ALL events belonging to app
+        //
+        // This is because if we do not do that, we would not be able to
+        // effectively run 'hasnotdone' or 'count=0' events. We need to have an
+        // event for each user getting into the pipeline
+
+
         // if there are no count queries to be made, move on
-        if (!self.countFilters.length) {
-          return cb();
-        }
+        if (!self.countFilters.length) return cb();
 
         self.runCountQuery.call(self, function (err, uids) {
           if (err) return cb(err);
-          self.countFilterUserIds = uids;
+
+          // reset the countFilteredUids to the updated list of users
+          self.countFilteredUids = _.map(uids, function (id) {
+            return id.toString();
+          });
+
+
           return cb();
         });
 
       },
 
       attrQuery: function (cb) {
+
+        // the attr query must run after the count query. read comments above
+        // thecountFilteredUids are taken as an input while running the
+        // attribute queries
 
         self.runAttrQuery.call(self, function (err, users) {
           if (err) return cb(err);
@@ -357,7 +393,7 @@ Query.prototype.run = function (cb) {
         if (!self.filteredUsers.length) return cb();
 
         var users = _.map(self.filteredUsers, function (u) {
-          u = u.toJSON();
+          if (u.toJSON) u = u.toJSON();
           u.meta = metadata.toObject(u.meta);
           return u;
         });
@@ -430,6 +466,7 @@ Query.prototype.runAttrQuery = function (cb) {
 
   User
     .find(self.genAttrMatchCond())
+    .lean()
     .exec(function (err, users) {
       cb(err, users);
     })
@@ -446,40 +483,49 @@ Query.prototype.runAttrQuery = function (cb) {
 
 Query.prototype.genAttrMatchCond = function () {
 
+  var self = this;
+  var root = self.rootOperator;
+
   var cond = {
     $and: []
   };
 
   // add app id condition
-  cond.$and.push({
+  cond['$and'].push({
     aid: this.aid
   });
 
 
-  _.each(this.attrFilters, function (filter) {
-    var operation = filter.op;
-    var filterCond = {};
+  var filterQueries = {};
+  filterQueries[root] = [];
 
-    filterCond[filter.name] = {};
+  _.each(this.attrFilters, function (f) {
+    var op = f.op;
 
-    if (operation === '$contains') {
+    // new condition specific to filter
+    var c = {};
+
+    c[f.name] = {};
+
+    if (op === '$contains') {
 
       // REF: http://stackoverflow.com/a/10616781/1463434
-      filterCond[filter.name]['$regex'] = ".*" + filter['val'] + ".*";
+      c[f.name]['$regex'] = ".*" + f['val'] + ".*";
 
-    } else if (operation === '$eq') {
+    } else if (op === '$eq') {
 
-      filterCond[filter.name] = filter['val'];
+      c[f.name] = f['val'];
 
     } else {
-      // if operation is $gt, $lt
+      // if op is $gt, $lt
 
-      filterCond[filter.name][operation] = filter['val'];
+      c[f.name][op] = f['val'];
     }
 
-    cond.$and.push(filterCond);
+    filterQueries[root].push(c);
 
   });
+
 
 
   // if there are countFilters, then the countFilter query must have been run.
@@ -487,18 +533,21 @@ Query.prototype.genAttrMatchCond = function () {
   //
   // However, if there are no countFilters defined, then the output of the countQuery
   // does not matter
-  if (this.countFilters && this.countFilters.length) {
-    var uidCond = {};
 
-    uidCond['_id'] = {
-      '$in': this.countFilterUserIds
-    };
-
-    cond.$and.push(uidCond);
+  if (self.countFilters && self.countFilters.length) {
+    filterQueries[root].push({
+      '_id': {
+        '$in': self.countFilteredUids
+      }
+    });
   }
+
+
+  if (!_.isEmpty(filterQueries[root])) cond['$and'].push(filterQueries);
 
   return cond;
 };
+
 
 
 /**
@@ -550,27 +599,43 @@ Query.prototype.genCountBaseMatchCond = function () {
   };
 
 
-  function dateDaysAgo(days) {
-    var date = new Date(new Date()
-      .getTime() - 86400000 * days);
+  // function dateDaysAgo(days) {
+  //   var date = new Date(new Date()
+  //     .getTime() - 86400000 * days);
 
-    return date;
-  }
+  //   return date;
+  // }
 
 
   // if fromAgo and/or toAgo are present, add created time condions
 
-  if (self.fromAgo || self.toAgo) {
-    matchConds.ct = {};
+  // if (self.fromAgo || self.toAgo) {
+  //   matchConds.ct = {};
 
-    if (self.fromAgo) {
-      matchConds.ct.$gt = dateDaysAgo(self.fromAgo)
-    }
+  //   if (self.fromAgo) {
+  //     matchConds.ct.$gt = dateDaysAgo(self.fromAgo)
+  //   }
 
-    if (self.toAgo) {
-      matchConds.ct.$lt = dateDaysAgo(self.toAgo)
-    }
-  }
+  //   if (self.toAgo) {
+  //     matchConds.ct.$lt = dateDaysAgo(self.toAgo)
+  //   }
+  // }
+
+  // FIXME : this documentation just below
+  // if there are countFilters, then the countFilter query must have been run.
+  // in that case, the uids output by the countQuery must be taken into account
+  //
+  // However, if there are no countFilters defined, then the output of the countQuery
+  // does not matter
+  //
+  // if the root operator is and, then we could take the output of the attribute
+  // query as another input to the count query
+  // if (self.rootOperator === '$and') {
+  //   matchConds['uid'] = {
+  //     '$in': self.attrFilteredUids
+  //   };
+  // }
+
 
   return matchConds;
 
@@ -625,6 +690,7 @@ Query.prototype.genCountGroupMatchCond = function () {
 
 Query.prototype.getCountFilterCond = function (filter) {
 
+  var self = this;
   var cond = {};
   filter = filter || {};
 
@@ -644,6 +710,22 @@ Query.prototype.getCountFilterCond = function (filter) {
   if (filter.module) {
     cond['$and'].push({
       $eq: ['$module', filter.module]
+    });
+  }
+
+  // if fromAgo and/or toAgo are present, add created time condions
+
+  if (self.fromAgo) {
+
+    cond['$and'].push({
+      $gt: ['$ct', dateFromDaysAgo(self.fromAgo)]
+    });
+
+  }
+
+  if (self.toAgo) {
+    cond['$and'].push({
+      $lt: ['$ct', dateFromDaysAgo(self.toAgo)]
     });
   }
 
@@ -695,7 +777,15 @@ Query.prototype.getCountFilterCond = function (filter) {
 
 function sanitize(q) {
 
+
+
   _.each(q.filters, function (f) {
+
+    // throw error if query filter is not one of ['hasdone', 'hasnotdone', 'count', 'attr']
+    if (!_.contains(['hasdone', 'hasnotdone', 'count', 'attr'], f.method)) {
+      throw new Error(
+        'Query filter must be one of hasdone/hasnotdone/count/attr');
+    }
 
     if (_.contains(['hasdone', 'hasnotdone'], f.method)) {
       delete f.op;

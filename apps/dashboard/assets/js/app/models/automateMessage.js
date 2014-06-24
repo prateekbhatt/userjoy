@@ -47,17 +47,14 @@ angular.module('models.automate', ['services'])
         })
     }
 
-    this.sendTestEmail = function (appId, autoMsgId) {
+    this.sendTestEmail = function (appId, autoMsgId, cb) {
       $http.put(config.apiUrl + '/apps/' + appId + '/automessages/' +
         autoMsgId + '/send-test')
         .success(function (data) {
           console.log("success");
-          $location.path('/apps/' + appId +
-            '/messages/automate/live');
+          cb();
         })
-        .error(function () {
-          console.log("error");
-        })
+        .error(cb);
     }
 
     this.makeMsgLive = function (appId, autoMsgId) {

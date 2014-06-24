@@ -208,6 +208,66 @@ describe('Resource /apps/:aid/automessages', function () {
 
   });
 
+
+  describe('GET /apps/:aid/automessages/attributes', function () {
+
+    var testUrl;
+
+    before(function (done) {
+      logoutUser(function (err) {
+        testUrl = url + '/attributes';
+        done(err);
+      });
+    });
+
+
+    it('should return error if not logged in',
+
+      function (done) {
+
+        request
+          .get(testUrl)
+          .expect('Content-Type', /json/)
+          .expect(401)
+          .end(done);
+      });
+
+
+    it('logging in user',
+
+      function (done) {
+        loginUser(done);
+      });
+
+
+    it('should fetch automessage attributes',
+
+      function (done) {
+
+        request
+          .get(testUrl)
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .expect(function (res) {
+
+            expect(res.body)
+              .to.not.be.empty;
+
+            expect(res.body)
+              .to.have.property("userAttributes")
+              .that.is.an('array')
+              .that.eqls(['user.name', 'user.email', 'user.plan',
+                'user.revenue', 'user.joined', 'user.status'
+              ]);
+
+          })
+          .end(done);
+
+      });
+
+  });
+
   describe('GET /apps/:aid/automessages/:amId', function () {
 
     var savedAutoMessageId;
@@ -251,16 +311,21 @@ describe('Resource /apps/:aid/automessages', function () {
           .expect('Content-Type', /json/)
           .expect(200)
           .expect(function (res) {
+
             expect(res.body)
               .to.not.be.empty;
 
             // it should populate the automessage sender name and email
-            expect(res.body.sender)
-              .to.be.an('object');
-
             expect(res.body)
               .to.have.property("sender")
-              .that.has.keys(['_id', 'email', 'name']);
+              .that.is.an('object')
+              .and.has.keys(['_id', 'email', 'name']);
+
+            // it should populate the automessage segment name
+            expect(res.body)
+              .to.have.property("sid")
+              .that.is.an('object')
+              .and.has.keys(['_id', 'name']);
 
             expect(res.body.title)
               .to.eql('Welcome Message');
@@ -385,7 +450,8 @@ describe('Resource /apps/:aid/automessages', function () {
     });
 
 
-    it('should return error is active status is neither true nor false',
+    it(
+      'should return error is active status is neither true nor false',
       function (done) {
 
         var statusTestUrl = testUrl + '/randomStatus';

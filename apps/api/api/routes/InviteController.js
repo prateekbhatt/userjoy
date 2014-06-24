@@ -29,7 +29,7 @@ var hasAccess = require('../policies/hasAccess');
  * Services
  */
 
-var mailer = require('../services/mailer');
+var accountMailer = require('../services/account-mailer');
 
 
 /**
@@ -265,7 +265,7 @@ router
           var mailOptions = {
             locals: {
               inviteUrl: inviteUrl,
-              userName: invite.toName,
+              name: invite.toName,
               appName: req.app.name
             },
             to: {
@@ -274,7 +274,9 @@ router
             }
           };
 
-          mailer.sendInvite(mailOptions, function (err) {
+          accountMailer.sendInvite(mailOptions, function (err) {
+
+            console.log('\n\n\n sending invite', err, invite);
             cb(err, invite);
           });
         }

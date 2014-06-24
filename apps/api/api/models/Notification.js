@@ -33,17 +33,17 @@ var NotificationSchema = new Schema({
   },
 
 
-  // created at timestamp
-  ct: {
-    type: Date,
-    default: Date.now
-  },
-
-
   // notification body
   body: {
     type: String,
     required: [true, 'Provide notification body']
+  },
+
+
+  // created at timestamp
+  ct: {
+    type: Date,
+    default: Date.now
   },
 
 
@@ -60,6 +60,13 @@ var NotificationSchema = new Schema({
   },
 
 
+  // the automessage title
+  title: {
+    type: String,
+    required: [true, 'Provide notification title']
+  },
+
+
   // user Id
   uid: {
     type: Schema.Types.ObjectId,
@@ -67,6 +74,15 @@ var NotificationSchema = new Schema({
     required: [true, 'Invalid uid']
   }
 
+});
+
+
+/**
+ * Add indexes
+ */
+
+NotificationSchema.index({
+  uid: 1
 });
 
 

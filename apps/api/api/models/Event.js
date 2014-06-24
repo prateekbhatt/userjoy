@@ -65,6 +65,14 @@ var EventSchema = new Schema({
   },
 
 
+  // automessage Id
+  // this should not be part of the meta array because this is a db id
+  amId: {
+    type: Schema.Types.ObjectId,
+    ref: 'AutoMessage'
+  },
+
+
   // company Id
   cid: {
     type: Schema.Types.ObjectId,
@@ -113,8 +121,21 @@ var EventSchema = new Schema({
 
 
 /**
- * Create a new track event
+ * Add indexes
+ */
+
+EventSchema.index({
+  aid: 1,
+  cid: 1,
+  type: 1,
+  uid: 1
+});
+
+
+/**
+ * Create a new track/form/link event
  *
+ * @param {string} type form/link/track
  * @param {object} ids (should contain aid, uid, cid)
  * @param {string} action
  * @param {string} module
@@ -122,10 +143,10 @@ var EventSchema = new Schema({
  * @param {function} cb callback
  */
 
-EventSchema.statics.track = function (ids, name, module, meta, cb) {
+EventSchema.statics.track = function (type, ids, name, module, meta, cb) {
 
-  if (arguments.length !== 5) {
-    throw new Error('Event.track: Expected five arguments');
+  if (arguments.length !== 6) {
+    throw new Error('Event.track: Expected six arguments');
   }
 
   var newEvent = {
@@ -134,7 +155,7 @@ EventSchema.statics.track = function (ids, name, module, meta, cb) {
     module: module,
     meta: metadata.toArray(meta),
     name: name,
-    type: 'track',
+    type: type,
     uid: ids.uid
   };
 
@@ -214,6 +235,7 @@ EventSchema.statics.automessage = function (ids, state, title, cb) {
 
   var newEvent = {
     aid: ids.aid,
+    amId: ids.amId,
     name: title,
     type: 'auto',
     uid: ids.uid
@@ -222,15 +244,15 @@ EventSchema.statics.automessage = function (ids, state, title, cb) {
 
   newEvent.meta = [
 
-    {
-      k: 'amId',
+    // {
+    //   k: 'amId',
 
-      // we need to convert it from BSON to String type, since the val field is
-      // of Mixed schema type
-      //
-      // Otherwise querying back the data with a stringified id does not work
-      v: ids.amId.toString()
-    },
+    //   // we need to convert it from BSON to String type, since the val field is
+    //   // of Mixed schema type
+    //   //
+    //   // Otherwise querying back the data with a stringified id does not work
+    //   v: ids.amId.toString()
+    // },
 
     {
       k: 'state',
@@ -238,7 +260,23 @@ EventSchema.statics.automessage = function (ids, state, title, cb) {
     }
   ];
 
-  Event.create(newEvent, cb);
+
+  var conditions = {
+    aid: ids.aid,
+    meta: {
+      $elemMatch: newEvent.meta[0]
+    }
+  };
+
+  var update = {
+    $setOnInsert: newEvent
+  };
+
+  var options = {
+    upsert: true
+  };
+
+  Event.update(conditions, update, options, cb);
 };
 
 

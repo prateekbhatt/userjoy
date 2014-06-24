@@ -1,6 +1,7 @@
 angular.module('do.register', [])
 
-  .config(function config($stateProvider) {
+.config(['$stateProvider',
+  function config($stateProvider) {
     $stateProvider.state('register', {
       url: '/register',
       views: {
@@ -13,9 +14,11 @@ angular.module('do.register', [])
         pageTitle: 'Register'
       }
     });
-  })
+  }
+])
 
-  .controller('RegisterCtrl', function RegisterController($scope, config,
+.controller('RegisterCtrl', ['$scope', 'config',
+  function RegisterController($scope, config,
     UserModel) {
     $scope.newUser = {};
 
@@ -28,4 +31,5 @@ angular.module('do.register', [])
           // TODO: client-side redirect to /messages
         });
     };
-  });
+  }
+]);

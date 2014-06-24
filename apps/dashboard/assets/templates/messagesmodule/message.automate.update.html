@@ -17,17 +17,33 @@
     <br>
     <br>
 </div> -->
+<button class="fa fa-backward btn btn-danger" style="width: 200px;" ng-click="doTheBack()"><span>&nbsp;&nbsp;Back</span></button>
+<br>
+<br>
 <div class="panel panel-default">
     <div class="row" style="padding-top: 50px;">
         <div class="col-md-6">
             <label class="col-md-2 col-md-offset-2 control-label" style="font-size: 20px; padding-left: 0px">Type: </label>
             <div class="col-md-6">
                 <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto disabled" data-toggle="dropdown"> <span data-bind="label" id="Users" class="{{selectedMessageType.icon}}">&nbsp;{{selectedMessageType.value}}</span>&nbsp;<span class="caret"></span></button>
-               <!--  <ul class="select dropdown-menu" role="select" style="left: 15px; top:100%;">
+                <ul class="select dropdown-menu" role="select" style="left: 15px; top:100%;">
                     <li ng-repeat="icon in icons">
                         <a style="cursor: default" ng-click="changeBtnText($index)"><i class="{{icon.label}}"></i>&nbsp;{{icon.value}}
                         </a>
                     </li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label class="col-md-2 col-md-offset-2 control-label" style="font-size: 20px; padding-left: 0px">To: </label>
+            <div class="col-md-6">
+                <input class="form-control" ng-model="segment" disabled>
+                <!-- <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users" class="{{selectedMessageType.icon}}">&nbsp;{{selectedMessageType.value}}</span>&nbsp;<span class="caret"></span></button>
+                    <ul class="select dropdown-menu" role="select" style="left: 15px; top:100%;">
+                        <li ng-repeat="icon in icons">
+                            <a style="cursor: default" ng-click="changeBtnText($index)"><i class="{{icon.label}}"></i>&nbsp;{{icon.value}}
+                            </a>
+                        </li>
                 </ul> -->
             </div>
         </div>
@@ -38,16 +54,14 @@
             <div class="col-md-6">
                 <!-- <input class="form-control disabled" ng-model="email"> -->
                 <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto disabled" data-toggle="dropdown"> <span data-bind="label" id="Users">&nbsp;{{sender}}</span>&nbsp;<span class="caret"></span></button>
-               <!--  <ul class="select dropdown-menu" role="select" style="left: 15px; top:100%;">
+                <ul class="select dropdown-menu" role="select" style="left: 15px; top:100%;">
                     <li ng-repeat="member in team">
                         <a style="cursor: default" ng-click="changeFromEmailText($index)">{{member.accid.name}}
                         </a>
                     </li>
-                </ul> -->
+                </ul>
             </div>
         </div>
-    </div>
-    <div class="row" style="padding-top: 20px;">
         <div class="col-md-6">
             <label style="font-size: 20px; padding-left: 0px;" class="col-md-2 col-md-offset-2 control-label">Title: </label>
             <div class="col-md-6">
@@ -81,7 +95,7 @@
             <!-- TODO: Replace template color with the color entered by the user -->
             <div style="padding-top: 55px;">
                 <div class="col-md-8 col-md-offset-2" ng-show="showNotification">
-                    <div class="message-template" style="max-height: 200px; min-height: 200px; overflow: auto;" ng-style="{'border-color': borderColor, 'border-right': borderRight, 'border-top': borderTop, 'border-bottom': borderBottom, 'border-radius': borderRadius}">
+                    <div class="message-template" style="max-height: 200px; min-height: 200px; overflow: auto; border-left: 1px solid #eee;" ng-style="{'border-color': borderColor, 'border-right': borderRight, 'border-top': borderTop, 'border-bottom': borderBottom, 'border-radius': borderRadius}">
                         <p ng-bind-html="notificationBody"></p>
                     </div>
                     <div class="panel-footer" style="margin-top: -21px;">
@@ -98,8 +112,8 @@
                 <!-- TODO: Replace template color with the color entered by the user -->
                 <div class="col-md-10 col-md-offset-1" ng-show="showEmail" style="margin-top: 40px;">
                     <label style="font-size: 18px;">Subject: </label>&nbsp;<span ng-bind-html="subject" class="emailPreview"></span>
-                    <div class="message-template" style="min-height: 300px; overflow: auto; max-height: 300px;" ng-style="{'border-color': emailBorderColor, 'border-right': emailBorderRight, 'border-top': emailBorderTop, 'border-bottom': borderBottom, 'border-radius': borderRadius}">
-                        <p ng-bind-html="emailBody"></p>
+                    <div style="min-height: 300px; overflow: auto; max-height: 300px; margin-top: 30px; border: 1px solid #ecf0f1; border-radius: 4px;">
+                        <p ng-bind-html="emailBody" style="padding: 10px;"></p>
                     </div>
                 </div>
             </div>

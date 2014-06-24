@@ -108,9 +108,13 @@ angular.module('do.navbar', [])
         }
 
         $scope.goToSettings = function (app) {
-          AppService.setCurrentApp(app);
-          $location.path('/apps/' + AppService.getCurrentApp()
-            ._id + '/settings/general');
+          if (app.isActive) {
+            AppService.setCurrentApp(app);
+            $location.path('/apps/' + AppService.getCurrentApp()
+              ._id + '/settings/general');
+          } else {
+            $location.path('/apps/' + app._id + '/addcode');
+          }
         }
 
         $scope.changeUrl = function () {
@@ -215,9 +219,13 @@ angular.module('do.navbar', [])
         }
 
         $scope.goToSettings = function (app) {
-          AppService.setCurrentApp(app);
-          $location.path('/apps/' + AppService.getCurrentApp()
-            ._id + '/settings/general');
+          if (app.isActive) {
+            AppService.setCurrentApp(app);
+            $location.path('/apps/' + AppService.getCurrentApp()
+              ._id + '/settings/general');
+          } else {
+            $location.path('/apps/' + app._id + '/addcode');
+          }
         }
 
         $scope.redirectToApp = function () {
@@ -230,28 +238,33 @@ angular.module('do.navbar', [])
               }
               if (AppService.getCurrentApp()
                 .isActive) {
-                $location.path('/apps/' + AppService.getCurrentApp()._id + '/users/list');
+                $location.path('/apps/' + AppService.getCurrentApp()
+                  ._id + '/users/list');
               } else {
-                $location.path('/apps/' + AppService.getCurrentApp()._id + '/addcode');
+                $location.path('/apps/' + AppService.getCurrentApp()
+                  ._id + '/addcode');
               }
             }
             AppModel.getSingleApp($scope.appId, cb);
           } else {
             if (AppService.getCurrentApp()
               .isActive) {
-              $location.path('/apps/' + AppService.getCurrentApp()._id + '/users/list');
+              $location.path('/apps/' + AppService.getCurrentApp()
+                ._id + '/users/list');
             } else {
-              $location.path('/apps/' + AppService.getCurrentApp()._id + '/addcode');
+              $location.path('/apps/' + AppService.getCurrentApp()
+                ._id + '/addcode');
             }
           }
         }
       })
   }
 ])
-  .controller('serverErrSuccessCtrl', ['$scope',
-    function ($scope) {
+
+.controller('serverErrSuccessCtrl', ['$scope',
+  function ($scope) {
 
 
 
-    }
-  ]);
+  }
+]);

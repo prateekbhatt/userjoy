@@ -37,7 +37,7 @@ var logger = require('../../helpers/logger');
  * Services
  */
 
-var mailer = require('../services/mailer');
+var accountMailer = require('../services/account-mailer');
 
 
 /**
@@ -236,7 +236,7 @@ router
       }
     };
 
-    mailer.sendInstallCode(mailerOpts, function (err) {
+    accountMailer.sendInstallCode(mailerOpts, function (err) {
       if (err) return next(err);
       res
         .status(200)
@@ -299,7 +299,8 @@ router
 
           var adminUid = _.find(req.app.team, {
             admin: true
-          }).accid;
+          })
+            .accid;
 
           Segment.createPredefined(aid, adminUid, function (err) {
             cb(err, isActive);

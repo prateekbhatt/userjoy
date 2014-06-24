@@ -66,11 +66,24 @@ describe('Model User', function () {
 
     it('should return user if user exists', function (done) {
 
+      var lastSeenBefore = new Date(existingUser.lastSeen)
+        .getTime();
+
+      expect(lastSeenBefore)
+        .to.be.a('number');
+
       User.findOrCreate(existingUser.aid, existingUser, function (err,
         usr) {
 
         expect(err)
           .to.not.exist;
+
+        var lastSeenAfter = new Date(usr.lastSeen)
+          .getTime();
+
+        expect(lastSeenAfter)
+          .to.be.a('number')
+          .and.to.be.above(lastSeenBefore);
 
         expect(usr._id)
           .to.eql(existingUser._id);
@@ -88,7 +101,9 @@ describe('Model User', function () {
 
       var newUser = {
         email: id + '@dodatado.com',
+        browser: 'Chrome 35',
         country: 'IN',
+        device: 'Apple iPad',
         ip: '115.118.149.224',
         joined: moment()
           .unix() * 1000,
@@ -96,6 +111,7 @@ describe('Model User', function () {
           plan: 'Free Tier',
           amount: 40
         },
+        os: 'iOS 5.0',
         plan: 'enterprise',
         revenue: 499,
         status: 'trial',
@@ -133,9 +149,19 @@ describe('Model User', function () {
           .that.equals(newUser.ip);
 
         expect(usr)
+          .to.have.property("browser")
+          .that.is.a("string")
+          .that.equals(newUser.browser);
+
+        expect(usr)
           .to.have.property("country")
           .that.is.a("string")
           .that.equals(newUser.country);
+
+        expect(usr)
+          .to.have.property("device")
+          .that.is.a("string")
+          .that.equals(newUser.device);
 
         expect(usr)
           .to.have.property("joined")
@@ -146,6 +172,11 @@ describe('Model User', function () {
           .to.eql(moment(newUser.joined)
             .startOf('day')
             .unix());
+
+        expect(usr)
+          .to.have.property("os")
+          .that.is.a("string")
+          .that.equals(newUser.os);
 
         expect(usr)
           .to.have.property("plan")

@@ -69,7 +69,13 @@ router
 
     var q = req.query;
     var aid = req.params.aid;
-    var query = new Query(aid, q);
+    var query;
+
+    try {
+      query = new Query(aid, q);
+    } catch (err) {
+      return res.badRequest(err.message);
+    }
 
     query.run(function (err, users) {
       if (err) return next(err);

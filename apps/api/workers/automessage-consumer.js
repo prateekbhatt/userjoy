@@ -12,15 +12,9 @@ var _ = require('lodash');
 var async = require('async');
 var cronJob = require('cron')
   .CronJob;
-var iron_mq = require('iron_mq');
 var moment = require('moment');
-
-
-/**
- * Helpers
- */
-
-var logger = require('../helpers/logger');
+var q = require('./queues')
+  .automessage;
 
 
 /**
@@ -44,7 +38,7 @@ var Segment = require('../api/models/Segment');
  * Services
  */
 
-var mailer = require('../api/services/mailer');
+var userMailer = require('../api/services/user-mailer');
 
 
 /**
@@ -53,17 +47,8 @@ var mailer = require('../api/services/mailer');
 
 var appEmail = require('../helpers/app-email');
 var getRenderData = require('../helpers/get-render-data');
+var logger = require('../helpers/logger');
 var render = require('../helpers/render-message');
-
-
-/**
- * Config settings
- *
- * TODO: move these to central config settings file
- */
-
-var TOKEN = 'Rfh192ozhicrSZ2R9bDX8uRvOu0';
-var PROJECT_ID_DEV = '536e5455bba6150009000090';
 
 
 /**
@@ -85,25 +70,6 @@ var SCHEDULE = MINUTE_SCHEDULE;
 if (process.env.NODE_ENV === 'production') {
   SCHEDULE = HOURLY_SCHEDULE;
 }
-
-
-/**
- * Create iron mq client instance
- */
-
-var imq = new iron_mq.Client({
-  token: TOKEN,
-  project_id: PROJECT_ID_DEV,
-  queue_name: 'automessage'
-});
-
-
-/**
- * use 'automessge' queue on iron mq
- */
-
-var q = imq.queue("automessage");
-
 
 
 function saveNotifications(users, amsg, cb) {
@@ -128,12 +94,12 @@ function saveNotifications(users, amsg, cb) {
       amId: amId,
       body: renderedBody,
       sender: sender,
+      title: title,
       uid: uid
     };
 
     // save the new notification
     Notification.create(n, function (err) {
-
       if (err) return cb(err);
 
       // ids object (required to create an 'automessage' event)
@@ -169,12 +135,7 @@ function removeUsersAlreadySent(users, amId, cb) {
   Event
     .find({
       type: 'auto',
-      meta: {
-        $elemMatch: {
-          k: 'amId',
-          v: amId.toString()
-        }
-      }
+      amId: amId.toString()
     })
     .select({
       uid: 1,
@@ -295,13 +256,19 @@ function amConsumer(cb) {
         // segment object should be converted from BSON to JSON
         segment = segment.toJSON();
 
-        var query = {
+        var qObj = {
           list: segment.list,
           op: segment.op,
           filters: segment.filters
         };
 
-        var query = new Query(segment.aid, query);
+        var query;
+
+        try {
+          query = new Query(segment.aid, qObj);
+        } catch (err) {
+          return cb(err);
+        }
 
         query.run(function (err, users) {
           cb(err, users);
@@ -324,7 +291,11 @@ function amConsumer(cb) {
       //
       // Remove all users who have been sent the automessage before
       function sentUsers(users, cb) {
-        removeUsersAlreadySent(users, automessage._id, cb);
+        removeUsersAlreadySent(users, automessage._id, function (err, usrs) {
+          if (err) return cb(err);
+          if (_.isEmpty(usrs)) return cb(new Error('No users matched'));
+          cb(null, usrs);
+        });
       },
 
 
@@ -365,11 +336,18 @@ function amConsumer(cb) {
                 name: fromName
               },
               metadata: {
-                'type': 'automessage',
-                'amId': automessage._id
+                'uj_aid': automessage.aid,
+                'uj_title': automessage.title,
+                'uj_mid': automessage._id,
+                'uj_uid': u._id,
+                'uj_type': 'auto',
               },
               replyTo: {
-                email: fromEmail,
+                email: appEmail.reply.create({
+                  aid: automessage.aid,
+                  type: 'auto',
+                  messageId: automessage._id
+                }),
                 name: 'Reply to ' + fromName
               },
               subject: subject,
@@ -380,7 +358,7 @@ function amConsumer(cb) {
             };
 
 
-            mailer.sendAutoMessage(options, function (err) {
+            userMailer.sendAutoMessage(options, function (err) {
               if (err) return cb(err);
 
               var ids = {

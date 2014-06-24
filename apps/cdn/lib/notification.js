@@ -15,7 +15,7 @@ var user = require('./user');
 function get_gravatar(email, size) {
 
   // MD5 (Message-Digest Algorithm) by WebToolkit
-  // 
+  //
 
   var MD5 = function (s) {
     function L(k, d) {
@@ -372,7 +372,6 @@ Notification.prototype.hide = function () {
   var id = this.NOTIFICATION_TEMPLATE_ID;
 
   this.debug('hide', dom(id));
-  console.log("inside hide notification", id);
   document.getElementById(id)
     .style.display = 'none';
 
@@ -386,9 +385,7 @@ Notification.prototype.reply = function () {
   var msg = dom('#' + self.REPLY_TEMPLATE_ID)
     .val();
 
-  console.log("msg: ", msg, "ABCD", msg.length);
   if (!msg.length) {
-    console.log("msg length is zero", self.ERROR_ID);
     document.getElementById(self.ERROR_ID)
       .style.display = 'block';
     return;

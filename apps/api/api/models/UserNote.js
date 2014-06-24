@@ -64,6 +64,16 @@ var UserNoteSchema = new Schema({
 
 
 /**
+ * Add indexes
+ */
+
+UserNoteSchema.index({
+  aid: 1,
+  uid: 1
+});
+
+
+/**
  * Adds updated (ut) timestamps
  * Created timestamp (ct) is added by default
  */

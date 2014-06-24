@@ -1,5 +1,5 @@
 {{ include header }}
-<!-- <p>Hi {{= user_name || 'there'}},</p> -->
+<p>Hi {{= name || 'there'}},</p>
 <p>Hi, </p>
 <br>
 <p>Thank you for signing up for UserJoy. Click on the link below to confirm your email.
@@ -18,7 +18,7 @@
                 <tr>
                     <td>
                         <!-- <a href="{{= confirmUrl }}">Confirm Email</a> -->
-                        <a href="#">Confirm Email</a>
+                        <a href="{{= confirmUrl }}">Confirm Email</a>
                     </td>
                 </tr>
             </table>

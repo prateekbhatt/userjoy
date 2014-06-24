@@ -36,7 +36,7 @@ var render = require('../../helpers/render-message');
  * Services
  */
 
-var mailer = require('../services/mailer');
+var userMailer = require('../services/user-mailer');
 
 
 /**
@@ -87,6 +87,36 @@ router
 
 
 /**
+ * GET /apps/:aid/automessages/attributes
+ *
+ * NOTE:
+ * 1. This route must be defined before /apps/:aid/automessages/:amId
+ * 2. TODO: dynamically generate list based on custom attributes passed on by
+ * users. Add 'app' and 'author' attributes as well
+ *
+ * Provides attributes for automessages
+ */
+
+router
+  .route('/:aid/automessages/attributes')
+  .get(function (req, res, next) {
+
+    logger.trace('Fetching automessage attributes');
+
+    var userAttributes = ['user.name', 'user.email', 'user.plan',
+      'user.revenue', 'user.joined', 'user.status'
+    ];
+
+    res
+      .status(200)
+      .json({
+        userAttributes: userAttributes
+      });
+
+  });
+
+
+/**
  * GET /apps/:aid/automessages/:amId
  *
  * Returns a automessage
@@ -104,6 +134,10 @@ router
       .populate({
         path: 'sender',
         select: 'name email'
+      })
+      .populate({
+        path: 'sid',
+        select: 'name'
       })
       .exec(function (err, automsg) {
         if (err) return next(err);
@@ -204,12 +238,22 @@ router
               email: fromEmail,
               name: fromName
             },
-            metadata: {
-              'type': 'automessage',
-              'amId': amsg._id
-            },
+
+            // NOTE: tracking should be disabled for test mail
+            // metadata: {
+            //   'uj_aid': amsg.aid,
+            //   'uj_title': amsg.title,
+            //   'uj_mid': amsg._id,
+            //   'uj_uid': req.user,
+            //   'uj_type': 'auto',
+            // },
+
             replyTo: {
-              email: fromEmail,
+              email: appEmail.reply.create({
+                aid: amsg.aid,
+                type: 'auto',
+                messageId: amsg._id
+              }),
               name: 'Reply to ' + fromName
             },
             subject: subject,
@@ -219,7 +263,7 @@ router
             },
           };
 
-          mailer.sendAutoMessage(options, function (err, responseStatus) {
+          userMailer.sendAutoMessage(options, function (err, responseStatus) {
 
             if (err) {
 

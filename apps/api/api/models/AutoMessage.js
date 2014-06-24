@@ -140,6 +140,15 @@ var AutoMessageSchema = new Schema({
 
 
 /**
+ * Add indexes
+ */
+
+AutoMessageSchema.index({
+  aid: 1
+});
+
+
+/**
  * Adds updated (ut) timestamps
  * Created timestamp (ct) is added by default
  */

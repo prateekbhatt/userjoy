@@ -164,6 +164,12 @@ angular.module('do.message', [])
           $scope.currApp = currentApp[0]._id
         }
 
+        $scope.isActive = function (path) {
+          var location = $location.path()
+            .split('/')[4];
+          return path == location;
+        }
+
         var populatePage = function () {
           $scope.showTableInbox = function () {
             console.log("inside showTableInbox");
@@ -757,17 +763,25 @@ angular.module('do.message', [])
               var isSeen = false;
               var mObj = {
                 messagebody: m.body,
-                createdby: m.sName,
                 createdat: $moment(m.ct)
                   .fromNow(),
                 seen: isSeen
               };
+
               if (m.from === 'user') {
                 mObj.email = userEmail;
+                mObj.admin = false;
               }
               if (m.from === 'account') {
                 console.log("accoid.email: ", m.accid.email);
                 mObj.email = m.accid.email;
+                mObj.admin = true;
+              }
+
+              if (m.sName) {
+                mObj.createdby = m.sName;
+              } else {
+                mObj.createdby = mObj.email;
               }
 
               mObj.seen = (m.from === 'account') && m.seen;
@@ -1026,7 +1040,11 @@ angular.module('do.message', [])
               var storedimgsrc = '';
               console.log("message object: ", $scope.messages[i]);
               var name = $scope.messages[i].createdby;
-              var initials = name.charAt(0);
+              if (name) {
+                var initials = name.charAt(0);
+              } else {
+                var initials = $scope.messages[i].email.charAt(0);
+              }
               var color = getRandomColor();
               for (var j = 0; j < i; j++) {
                 console.log("i: ", i);
@@ -1061,7 +1079,8 @@ angular.module('do.message', [])
                   src: imgsrc,
                   gravatar: imggravatar,
                   seen: $scope.messages[i].seen,
-                  email: $scope.messages[i].email
+                  email: $scope.messages[i].email,
+                  admin: $scope.messages[i].admin
                 })
               } else {
                 $scope.messagesWithSrc.push({
@@ -1071,7 +1090,8 @@ angular.module('do.message', [])
                   src: storedimgsrc,
                   gravatar: imggravatar,
                   seen: $scope.messages[i].seen,
-                  email: $scope.messages[i].email
+                  email: $scope.messages[i].email,
+                  admin: $scope.messages[i].admin
                 })
               }
 
@@ -1111,6 +1131,55 @@ angular.module('do.message', [])
             }
             console.log("data: ", data);
             $scope.customerEmail = data.email;
+            var keys = _.keys(data);
+            $scope.userdata = [];
+
+            function capitaliseFirstLetter(string) {
+              return string.charAt(0)
+                .toUpperCase() + string.slice(1);
+            }
+            for (var i = 0; i < keys.length; i++) {
+              prop = keys[i];
+              console.log("id: ", prop);
+              value = data[prop];
+              $scope.companies = [];
+              if (prop == 'companies') {
+                // $scope.companies = value;
+                value.forEach(function (company) {
+                  $scope.companies.push({
+                    name: company.name
+                  });
+                })
+                if ($scope.companies.length == 1) {
+                  $scope.showCompany = true;
+                }
+
+                if ($scope.companies.length > 1) {
+                  $scope.showCompanies = true;
+                }
+              }
+              // console.log("value prop: ", value, prop);
+              if (prop != 'companies' && prop != 'ct' && prop != 'meta' &&
+                prop != 'ut' && prop != '__v' && prop != 'aid' && prop !=
+                '_id') {
+                if (prop == 'lastSeen') {
+                  prop = 'Last Seen';
+                  value = $moment(value)
+                    .fromNow()
+                }
+                if (prop == 'joined') {
+                  value = $moment(value)
+                    .fromNow()
+                }
+                prop = capitaliseFirstLetter(prop);
+                $scope.userdata.push({
+                  value: value,
+                  data: prop
+                })
+              }
+            };
+
+            console.log("userdata: ", $scope.userdata);
             $scope.customergravatar = get_gravatar(data.email, 80);
             $scope.customersrc = 'http://placehold.it/60/' +
               getRandomColor() +
@@ -1187,6 +1256,10 @@ angular.module('do.message', [])
 
           var lengthReply = $scope.replytext.length;
 
+          $scope.disableReply = false;
+
+          $scope.disableClose = false;
+
           $scope.changeButtonText = function () {
             if (!ThreadService.getThread()
               .closed) {
@@ -1209,6 +1282,7 @@ angular.module('do.message', [])
           }
 
           var replyCallBack = function (err) {
+            $scope.disableReply = false;
             if (err) {
               console.log("error");
               return;
@@ -1225,6 +1299,7 @@ angular.module('do.message', [])
           }
 
           var closeOrReopenReplyCallBack = function (err) {
+            $scope.disableClose = false;
             if (err) {
               console.log("error");
               return;
@@ -1270,10 +1345,12 @@ angular.module('do.message', [])
           $scope.validateAndAddReply = function () {
             var coId = '';
             // var msglength = InboxMsgService.getInboxMessage().length;
+            $scope.disableReply = true;
             coId = pathArray[4];
             console.log('reply text length is:', $scope.replytext.length);
             if (!$scope.replytext.length) {
               console.log('error in reply');
+              $scope.disableReply = false;
               $scope.showerror = true;
               return;
             }
@@ -1291,6 +1368,7 @@ angular.module('do.message', [])
 
           $scope.closeTicket = function () {
             closeButtonClicked = true;
+            $scope.disableClose = true;
 
             if (!ThreadService.getThread()
               .closed) {
@@ -1305,6 +1383,7 @@ angular.module('do.message', [])
               } else {
                 MsgService.closeConversationRequest($scope.appId, $scope
                   .coId, function (err, user) {
+                    $scope.disableClose = false;
                     if (err) {
                       console.log("error");
                       return;
@@ -1325,6 +1404,7 @@ angular.module('do.message', [])
               } else {
                 MsgService.reopenConversation($scope.appId, $scope.coId,
                   function (err, user) {
+                    $scope.disableClose = false;
                     if (err) {
                       console.log("error");
                       return;
@@ -1470,360 +1550,363 @@ angular.module('do.message', [])
       })
   }
 ])
-  .controller('goodHealthConversationCtrl', ['$scope', 'MsgService',
-    'AppService',
-    'InboxMsgService', '$moment', '$filter', 'ngTableParams',
-    '$log',
-    '$location', '$timeout', 'CurrentAppService', '$stateParams', 'AppModel',
-    function ($scope, MsgService, AppService, InboxMsgService,
-      $moment,
-      $filter, ngTableParams, $log, $location, $timeout,
-      CurrentAppService, $stateParams, AppModel) {
 
-      CurrentAppService.getCurrentApp()
-        .then(function (currentApp) {
-          console.log("Promise Resolved: ", currentApp);
-          $scope.currApp = $stateParams.id;
-          console.log("inside closedConversationCtrl");
-          $scope.showGoodHealthConversations = true;
-          var msg = [];
+.controller('goodHealthConversationCtrl', ['$scope', 'MsgService',
+  'AppService',
+  'InboxMsgService', '$moment', '$filter', 'ngTableParams',
+  '$log',
+  '$location', '$timeout', 'CurrentAppService', '$stateParams', 'AppModel',
+  function ($scope, MsgService, AppService, InboxMsgService,
+    $moment,
+    $filter, ngTableParams, $log, $location, $timeout,
+    CurrentAppService, $stateParams, AppModel) {
 
-          var populatePage = function () {
-            function showGoodHealthMsg(msg) {
-              $scope.goodhealthmsg = [];
-              // msg = InboxMsgService.getClosedMessage();
-              if (!msg.length) {
-                $scope.showGoodHealthConversations = false;
+    CurrentAppService.getCurrentApp()
+      .then(function (currentApp) {
+        console.log("Promise Resolved: ", currentApp);
+        $scope.currApp = $stateParams.id;
+        console.log("inside closedConversationCtrl");
+        $scope.showGoodHealthConversations = true;
+        var msg = [];
+
+        var populatePage = function () {
+          function showGoodHealthMsg(msg) {
+            $scope.goodhealthmsg = [];
+            // msg = InboxMsgService.getClosedMessage();
+            if (!msg.length) {
+              $scope.showGoodHealthConversations = false;
+            }
+            console.log("msg show good health Msg -> -> ", msg);
+            for (var i = 0; i < msg.length; i++) {
+              $scope.goodhealthmsg.push({
+                id: msg[i]._id,
+                name: msg[i].uid.email,
+                subject: msg[i].sub,
+                time: $moment(msg[i].ct)
+                  .fromNow()
+              })
+            }
+            console.log("$scope.data: ", $scope.goodhealthmsg);
+            $scope.columnsClosed = [{
+              title: 'User',
+              field: 'name',
+              visible: true,
+              filter: {
+                'name': 'text'
               }
-              console.log("msg show good health Msg -> -> ", msg);
-              for (var i = 0; i < msg.length; i++) {
-                $scope.goodhealthmsg.push({
-                  id: msg[i]._id,
-                  name: msg[i].uid.email,
-                  subject: msg[i].sub,
-                  time: $moment(msg[i].ct)
-                    .fromNow()
-                })
-              }
-              console.log("$scope.data: ", $scope.goodhealthmsg);
-              $scope.columnsClosed = [{
-                title: 'User',
-                field: 'name',
-                visible: true,
+            }, {
+              title: 'Subject',
+              field: 'subject',
+              visible: true
+            }, {
+              title: 'When',
+              field: 'time',
+              visible: true
+            }];
+
+            $scope.refreshTable = function () {
+              $scope['tableParams'] = {
+                reload: function () {},
+                settings: function () {
+                  return {}
+                }
+              };
+              $timeout(setTable, 100)
+            };
+            $scope.refreshTable();
+
+            function setTable(arguments) {
+
+              $scope.tableParamsClosed = new ngTableParams({
+                page: 1, // show first page
+                count: 10, // count per page
                 filter: {
-                  'name': 'text'
+                  name: '' // initial filter
+                },
+                sorting: {
+                  name: 'asc'
                 }
               }, {
-                title: 'Subject',
-                field: 'subject',
-                visible: true
-              }, {
-                title: 'When',
-                field: 'time',
-                visible: true
-              }];
-
-              $scope.refreshTable = function () {
-                $scope['tableParams'] = {
-                  reload: function () {},
-                  settings: function () {
-                    return {}
-                  }
-                };
-                $timeout(setTable, 100)
-              };
-              $scope.refreshTable();
-
-              function setTable(arguments) {
-
-                $scope.tableParamsClosed = new ngTableParams({
-                  page: 1, // show first page
-                  count: 10, // count per page
-                  filter: {
-                    name: '' // initial filter
-                  },
-                  sorting: {
-                    name: 'asc'
-                  }
-                }, {
-                  filterSwitch: true,
-                  total: $scope.goodhealthmsg.length, // length of data
-                  getData: function ($defer, params) {
-                    var orderedData = params.sorting() ?
-                      $filter('orderBy')($scope.goodhealthmsg,
-                        params.orderBy()) :
-                      $scope.goodhealthmsg;
-                    params.total(orderedData.length);
-                    $defer.resolve(orderedData.slice(
-                      (
-                        params.page() -
-                        1) * params.count(),
-                      params.page() *
-                      params.count()));
-                  }
-                });
-              }
-            }
-
-            var showGoodHealthMsgCallback = function (err, data) {
-              if (err) {
-                return;
-              }
-              showGoodHealthMsg(data);
-            }
-
-            MsgService.getGoodHealthConversations($scope.currApp,
-              showGoodHealthMsgCallback);
-
-            $scope.showGoodHealthThread = function (id) {
-              $location.path('/apps/' + $scope.currApp +
-                '/messages/conversations/' + id);
-
-
+                filterSwitch: true,
+                total: $scope.goodhealthmsg.length, // length of data
+                getData: function ($defer, params) {
+                  var orderedData = params.sorting() ?
+                    $filter('orderBy')($scope.goodhealthmsg,
+                      params.orderBy()) :
+                    $scope.goodhealthmsg;
+                  params.total(orderedData.length);
+                  $defer.resolve(orderedData.slice(
+                    (
+                      params.page() -
+                      1) * params.count(),
+                    params.page() *
+                    params.count()));
+                }
+              });
             }
           }
 
-          AppModel.getSingleApp($scope.currApp, populatePage);
+          var showGoodHealthMsgCallback = function (err, data) {
+            if (err) {
+              return;
+            }
+            showGoodHealthMsg(data);
+          }
+
+          MsgService.getGoodHealthConversations($scope.currApp,
+            showGoodHealthMsgCallback);
+
+          $scope.showGoodHealthThread = function (id) {
+            $location.path('/apps/' + $scope.currApp +
+              '/messages/conversations/' + id);
 
 
-        })
-    }
-  ])
-  .controller('avgHealthConversationCtrl', ['$scope', 'MsgService',
-    'AppService',
-    'InboxMsgService', '$moment', '$filter', 'ngTableParams',
-    '$log',
-    '$location', '$timeout', 'CurrentAppService', '$stateParams', 'AppModel',
-    function ($scope, MsgService, AppService, InboxMsgService,
-      $moment,
-      $filter, ngTableParams, $log, $location, $timeout,
-      CurrentAppService, $stateParams, AppModel) {
+          }
+        }
 
-      CurrentAppService.getCurrentApp()
-        .then(function (currentApp) {
-          console.log("Promise Resolved: ", currentApp);
-          $scope.currApp = $stateParams.id;
-          console.log("inside closedConversationCtrl");
-          $scope.showAvgHealthConversations = true;
-          var msg = [];
+        AppModel.getSingleApp($scope.currApp, populatePage);
 
-          var populatePage = function () {
-            function showAvgHealthMsg(msg) {
-              $scope.avghealthmsg = [];
-              // msg = InboxMsgService.getClosedMessage();
-              if (!msg.length) {
-                $scope.showAvgHealthConversations = false;
+
+      })
+  }
+])
+
+.controller('avgHealthConversationCtrl', ['$scope', 'MsgService',
+  'AppService',
+  'InboxMsgService', '$moment', '$filter', 'ngTableParams',
+  '$log',
+  '$location', '$timeout', 'CurrentAppService', '$stateParams', 'AppModel',
+  function ($scope, MsgService, AppService, InboxMsgService,
+    $moment,
+    $filter, ngTableParams, $log, $location, $timeout,
+    CurrentAppService, $stateParams, AppModel) {
+
+    CurrentAppService.getCurrentApp()
+      .then(function (currentApp) {
+        console.log("Promise Resolved: ", currentApp);
+        $scope.currApp = $stateParams.id;
+        console.log("inside closedConversationCtrl");
+        $scope.showAvgHealthConversations = true;
+        var msg = [];
+
+        var populatePage = function () {
+          function showAvgHealthMsg(msg) {
+            $scope.avghealthmsg = [];
+            // msg = InboxMsgService.getClosedMessage();
+            if (!msg.length) {
+              $scope.showAvgHealthConversations = false;
+            }
+            console.log("msg show good health Msg -> -> ", msg);
+            for (var i = 0; i < msg.length; i++) {
+              $scope.avghealthmsg.push({
+                id: msg[i]._id,
+                name: msg[i].uid.email,
+                subject: msg[i].sub,
+                time: $moment(msg[i].ct)
+                  .fromNow()
+              })
+            }
+            console.log("$scope.data: ", $scope.avghealthmsg);
+            $scope.columnsClosed = [{
+              title: 'User',
+              field: 'name',
+              visible: true,
+              filter: {
+                'name': 'text'
               }
-              console.log("msg show good health Msg -> -> ", msg);
-              for (var i = 0; i < msg.length; i++) {
-                $scope.avghealthmsg.push({
-                  id: msg[i]._id,
-                  name: msg[i].uid.email,
-                  subject: msg[i].sub,
-                  time: $moment(msg[i].ct)
-                    .fromNow()
-                })
-              }
-              console.log("$scope.data: ", $scope.avghealthmsg);
-              $scope.columnsClosed = [{
-                title: 'User',
-                field: 'name',
-                visible: true,
+            }, {
+              title: 'Subject',
+              field: 'subject',
+              visible: true
+            }, {
+              title: 'When',
+              field: 'time',
+              visible: true
+            }];
+
+            $scope.refreshTable = function () {
+              $scope['tableParams'] = {
+                reload: function () {},
+                settings: function () {
+                  return {}
+                }
+              };
+              $timeout(setTable, 100)
+            };
+            $scope.refreshTable();
+
+            function setTable(arguments) {
+
+              $scope.tableParamsClosed = new ngTableParams({
+                page: 1, // show first page
+                count: 10, // count per page
                 filter: {
-                  'name': 'text'
+                  name: '' // initial filter
+                },
+                sorting: {
+                  name: 'asc'
                 }
               }, {
-                title: 'Subject',
-                field: 'subject',
-                visible: true
-              }, {
-                title: 'When',
-                field: 'time',
-                visible: true
-              }];
-
-              $scope.refreshTable = function () {
-                $scope['tableParams'] = {
-                  reload: function () {},
-                  settings: function () {
-                    return {}
-                  }
-                };
-                $timeout(setTable, 100)
-              };
-              $scope.refreshTable();
-
-              function setTable(arguments) {
-
-                $scope.tableParamsClosed = new ngTableParams({
-                  page: 1, // show first page
-                  count: 10, // count per page
-                  filter: {
-                    name: '' // initial filter
-                  },
-                  sorting: {
-                    name: 'asc'
-                  }
-                }, {
-                  filterSwitch: true,
-                  total: $scope.avghealthmsg.length, // length of data
-                  getData: function ($defer, params) {
-                    var orderedData = params.sorting() ?
-                      $filter('orderBy')($scope.avghealthmsg,
-                        params.orderBy()) :
-                      $scope.avghealthmsg;
-                    params.total(orderedData.length);
-                    $defer.resolve(orderedData.slice(
-                      (
-                        params.page() -
-                        1) * params.count(),
-                      params.page() *
-                      params.count()));
-                  }
-                });
-              }
-            }
-
-            var showAvgHealthMsgCallback = function (err, data) {
-              if (err) {
-                return;
-              }
-              showAvgHealthMsg(data);
-            }
-
-            MsgService.getAvgHealthConversations($scope.currApp,
-              showAvgHealthMsgCallback);
-
-            $scope.showAvgHealthThread = function (id) {
-              $location.path('/apps/' + $scope.currApp +
-                '/messages/conversations/' + id);
-
-
+                filterSwitch: true,
+                total: $scope.avghealthmsg.length, // length of data
+                getData: function ($defer, params) {
+                  var orderedData = params.sorting() ?
+                    $filter('orderBy')($scope.avghealthmsg,
+                      params.orderBy()) :
+                    $scope.avghealthmsg;
+                  params.total(orderedData.length);
+                  $defer.resolve(orderedData.slice(
+                    (
+                      params.page() -
+                      1) * params.count(),
+                    params.page() *
+                    params.count()));
+                }
+              });
             }
           }
 
-          AppModel.getSingleApp($scope.currApp, populatePage);
+          var showAvgHealthMsgCallback = function (err, data) {
+            if (err) {
+              return;
+            }
+            showAvgHealthMsg(data);
+          }
+
+          MsgService.getAvgHealthConversations($scope.currApp,
+            showAvgHealthMsgCallback);
+
+          $scope.showAvgHealthThread = function (id) {
+            $location.path('/apps/' + $scope.currApp +
+              '/messages/conversations/' + id);
 
 
-        })
-    }
-  ])
-  .controller('poorHealthConversationCtrl', ['$scope', 'MsgService',
-    'AppService',
-    'InboxMsgService', '$moment', '$filter', 'ngTableParams',
-    '$log',
-    '$location', '$timeout', 'CurrentAppService', '$stateParams', 'AppModel',
-    function ($scope, MsgService, AppService, InboxMsgService,
-      $moment,
-      $filter, ngTableParams, $log, $location, $timeout,
-      CurrentAppService, $stateParams, AppModel) {
+          }
+        }
 
-      CurrentAppService.getCurrentApp()
-        .then(function (currentApp) {
-          console.log("Promise Resolved: ", currentApp);
-          $scope.currApp = $stateParams.id;
-          console.log("inside closedConversationCtrl");
-          $scope.showPoorHealthConversations = true;
-          var msg = [];
+        AppModel.getSingleApp($scope.currApp, populatePage);
 
-          var populatePage = function () {
-            function showPoorHealthMsg(msg) {
-              $scope.poorhealthmsg = [];
-              // msg = InboxMsgService.getClosedMessage();
-              if (!msg.length) {
-                $scope.showPoorHealthConversations = false;
+
+      })
+  }
+])
+
+.controller('poorHealthConversationCtrl', ['$scope', 'MsgService',
+  'AppService',
+  'InboxMsgService', '$moment', '$filter', 'ngTableParams',
+  '$log',
+  '$location', '$timeout', 'CurrentAppService', '$stateParams', 'AppModel',
+  function ($scope, MsgService, AppService, InboxMsgService,
+    $moment,
+    $filter, ngTableParams, $log, $location, $timeout,
+    CurrentAppService, $stateParams, AppModel) {
+
+    CurrentAppService.getCurrentApp()
+      .then(function (currentApp) {
+        console.log("Promise Resolved: ", currentApp);
+        $scope.currApp = $stateParams.id;
+        console.log("inside closedConversationCtrl");
+        $scope.showPoorHealthConversations = true;
+        var msg = [];
+
+        var populatePage = function () {
+          function showPoorHealthMsg(msg) {
+            $scope.poorhealthmsg = [];
+            // msg = InboxMsgService.getClosedMessage();
+            if (!msg.length) {
+              $scope.showPoorHealthConversations = false;
+            }
+            console.log("msg show poor health Msg -> -> ", msg);
+            for (var i = 0; i < msg.length; i++) {
+              $scope.poorhealthmsg.push({
+                id: msg[i]._id,
+                name: msg[i].uid.email,
+                subject: msg[i].sub,
+                time: $moment(msg[i].ct)
+                  .fromNow()
+              })
+            }
+            console.log("$scope.data: ", $scope.poorhealthmsg);
+            $scope.columnsClosed = [{
+              title: 'User',
+              field: 'name',
+              visible: true,
+              filter: {
+                'name': 'text'
               }
-              console.log("msg show poor health Msg -> -> ", msg);
-              for (var i = 0; i < msg.length; i++) {
-                $scope.poorhealthmsg.push({
-                  id: msg[i]._id,
-                  name: msg[i].uid.email,
-                  subject: msg[i].sub,
-                  time: $moment(msg[i].ct)
-                    .fromNow()
-                })
-              }
-              console.log("$scope.data: ", $scope.poorhealthmsg);
-              $scope.columnsClosed = [{
-                title: 'User',
-                field: 'name',
-                visible: true,
+            }, {
+              title: 'Subject',
+              field: 'subject',
+              visible: true
+            }, {
+              title: 'When',
+              field: 'time',
+              visible: true
+            }];
+
+            $scope.refreshTable = function () {
+              $scope['tableParams'] = {
+                reload: function () {},
+                settings: function () {
+                  return {}
+                }
+              };
+              $timeout(setTable, 100)
+            };
+            $scope.refreshTable();
+
+            function setTable(arguments) {
+
+              $scope.tableParamsClosed = new ngTableParams({
+                page: 1, // show first page
+                count: 10, // count per page
                 filter: {
-                  'name': 'text'
+                  name: '' // initial filter
+                },
+                sorting: {
+                  name: 'asc'
                 }
               }, {
-                title: 'Subject',
-                field: 'subject',
-                visible: true
-              }, {
-                title: 'When',
-                field: 'time',
-                visible: true
-              }];
-
-              $scope.refreshTable = function () {
-                $scope['tableParams'] = {
-                  reload: function () {},
-                  settings: function () {
-                    return {}
-                  }
-                };
-                $timeout(setTable, 100)
-              };
-              $scope.refreshTable();
-
-              function setTable(arguments) {
-
-                $scope.tableParamsClosed = new ngTableParams({
-                  page: 1, // show first page
-                  count: 10, // count per page
-                  filter: {
-                    name: '' // initial filter
-                  },
-                  sorting: {
-                    name: 'asc'
-                  }
-                }, {
-                  filterSwitch: true,
-                  total: $scope.poorhealthmsg.length, // length of data
-                  getData: function ($defer, params) {
-                    var orderedData = params.sorting() ?
-                      $filter('orderBy')($scope.poorhealthmsg,
-                        params.orderBy()) :
-                      $scope.poorhealthmsg;
-                    params.total(orderedData.length);
-                    $defer.resolve(orderedData.slice(
-                      (
-                        params.page() -
-                        1) * params.count(),
-                      params.page() *
-                      params.count()));
-                  }
-                });
-              }
-            }
-
-            var showPoorHealthMsgCallback = function (err, data) {
-              if (err) {
-                return;
-              }
-              showPoorHealthMsg(data);
-            }
-
-            MsgService.getPoorHealthConversations($scope.currApp,
-              showPoorHealthMsgCallback);
-
-            $scope.showPoorHealthThread = function (id) {
-              $location.path('/apps/' + $scope.currApp +
-                '/messages/conversations/' + id);
-
-
+                filterSwitch: true,
+                total: $scope.poorhealthmsg.length, // length of data
+                getData: function ($defer, params) {
+                  var orderedData = params.sorting() ?
+                    $filter('orderBy')($scope.poorhealthmsg,
+                      params.orderBy()) :
+                    $scope.poorhealthmsg;
+                  params.total(orderedData.length);
+                  $defer.resolve(orderedData.slice(
+                    (
+                      params.page() -
+                      1) * params.count(),
+                    params.page() *
+                    params.count()));
+                }
+              });
             }
           }
 
-          AppModel.getSingleApp($scope.currApp, populatePage);
+          var showPoorHealthMsgCallback = function (err, data) {
+            if (err) {
+              return;
+            }
+            showPoorHealthMsg(data);
+          }
+
+          MsgService.getPoorHealthConversations($scope.currApp,
+            showPoorHealthMsgCallback);
+
+          $scope.showPoorHealthThread = function (id) {
+            $location.path('/apps/' + $scope.currApp +
+              '/messages/conversations/' + id);
 
 
-        })
-    }
-  ]);
+          }
+        }
+
+        AppModel.getSingleApp($scope.currApp, populatePage);
+
+
+      })
+  }
+]);

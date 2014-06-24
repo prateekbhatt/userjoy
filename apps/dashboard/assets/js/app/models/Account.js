@@ -1,7 +1,7 @@
 angular
   .module('models.account', ['services'])
-  .service('AccountModel', ['$http', 'config',
-    function ($http, config) {
+  .service('AccountModel', ['$http', 'config', '$location',
+    function ($http, config, $location) {
 
       this.get = function (cb) {
 
@@ -42,6 +42,46 @@ angular
             cb(null, data);
           })
           .error(cb)
+      }
+
+      this.forgotPassword = function (email, cb) {
+        var data = {
+          email: email
+        };
+        console.log("data: ", data);
+        $http.put(config.apiUrl + '/account/forgot-password', data)
+          .success(function (data) {
+            console.log("success sending email forgot password");
+            cb(null, data);
+          })
+          .error(cb);
+      }
+
+      this.resetPasswordNew = function (tokenId, password) {
+        var data = {
+          token: tokenId,
+          password: password
+        };
+        $http.put(config.apiUrl + '/account/forgot-password/new', data)
+          .success(function (data) {
+            console.log("password successfully changed");
+            $location.path('/login');
+          })
+          .error(function () {
+            console.log("error in setting new pwd");
+          })
+      }
+
+      this.verifyEmail = function () {
+        $http.get('/account/' + id + '/verify-email/' + tokenId)
+          .success(function () {
+            $location.path('/login');
+          })
+          .error(function () {
+            console.log("redirect to signup");
+            // TODO: Change in production
+            window.location.href = "http://do.localhost/signup";
+          })
       }
     }
   ])
