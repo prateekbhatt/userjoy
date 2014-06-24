@@ -246,9 +246,9 @@ describe('Resource /account', function () {
       request
         .get(url)
         .expect('Content-Type', /json/)
-        .expect(401)
+        .expect(400)
         .expect({
-          status: 401,
+          status: 400,
           error: 'Invalid Attempt'
         })
         .end(done);
@@ -265,9 +265,9 @@ describe('Resource /account', function () {
       request
         .get(url)
         .expect('Content-Type', /json/)
-        .expect(401)
+        .expect(400)
         .expect({
-          status: 401,
+          status: 400,
           error: 'Invalid Attempt'
         })
         .end(done);
