@@ -33,6 +33,8 @@
                     <p ng-repeat="firstList in userdata" ng-if="firstList.data == 'Health' && firstList.value == 'good'" style="color: #2ecc71;"><b>{{firstList.data}}</b> : {{firstList.value}} <i class="fa fa-smile-o"></i></p>
                     <p ng-repeat="firstList in userdata" ng-if="firstList.data == 'Health' && firstList.value == 'poor'" style="color: #e74c3c;"><b>{{firstList.data}}</b> : {{firstList.value}} <i class="fa fa-frown-o"></i></p>
                     <p ng-repeat="firstList in userdata" ng-if="!(firstList.data == 'Health')"><b>{{firstList.data}}</b> : {{firstList.value}}</p>
+                    <p ng-show="showCompany" ng-repeat="company in companies"><b>Company: </b>{{company.name}}</p>
+                    <p ng-show="showCompanies"><b>Companies: </b><span ng-repeat="company in companies"><span ng-show="$last"> and</span> {{company.name}} <span ng-show="!$last">,</span></span></p>
             </div>
         </div>
     </div>

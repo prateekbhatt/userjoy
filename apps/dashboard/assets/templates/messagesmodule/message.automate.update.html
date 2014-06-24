@@ -95,7 +95,7 @@
             <!-- TODO: Replace template color with the color entered by the user -->
             <div style="padding-top: 55px;">
                 <div class="col-md-8 col-md-offset-2" ng-show="showNotification">
-                    <div class="message-template" style="max-height: 200px; min-height: 200px; overflow: auto;" ng-style="{'border-color': borderColor, 'border-right': borderRight, 'border-top': borderTop, 'border-bottom': borderBottom, 'border-radius': borderRadius}">
+                    <div class="message-template" style="max-height: 200px; min-height: 200px; overflow: auto; border-left: 1px solid #eee;" ng-style="{'border-color': borderColor, 'border-right': borderRight, 'border-top': borderTop, 'border-bottom': borderBottom, 'border-radius': borderRadius}">
                         <p ng-bind-html="notificationBody"></p>
                     </div>
                     <div class="panel-footer" style="margin-top: -21px;">
@@ -112,8 +112,8 @@
                 <!-- TODO: Replace template color with the color entered by the user -->
                 <div class="col-md-10 col-md-offset-1" ng-show="showEmail" style="margin-top: 40px;">
                     <label style="font-size: 18px;">Subject: </label>&nbsp;<span ng-bind-html="subject" class="emailPreview"></span>
-                    <div style="min-height: 300px; overflow: auto; max-height: 300px; margin-top: 30px;">
-                        <p ng-bind-html="emailBody"></p>
+                    <div style="min-height: 300px; overflow: auto; max-height: 300px; margin-top: 30px; border: 1px solid #ecf0f1; border-radius: 4px;">
+                        <p ng-bind-html="emailBody" style="padding: 10px;"></p>
                     </div>
                 </div>
             </div>

@@ -63,13 +63,25 @@ angular
           password: password
         };
         $http.put(config.apiUrl + '/account/forgot-password/new', data)
-          .success(function(data){
+          .success(function (data) {
             console.log("password successfully changed");
             $location.path('/login');
           })
-          .error(function(){
+          .error(function () {
             console.log("error in setting new pwd");
           })
       }
-     }
+
+      this.verifyEmail = function () {
+        $http.get('/account/' + id + '/verify-email/' + tokenId)
+          .success(function () {
+            $location.path('/login');
+          })
+          .error(function () {
+            console.log("redirect to signup");
+            // TODO: Change in production
+            window.location.href = "http://do.localhost/signup";
+          })
+      }
+    }
   ])
