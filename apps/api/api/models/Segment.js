@@ -189,6 +189,15 @@ var SegmentSchema = new Schema({
 
 
 /**
+ * Add indexes
+ */
+
+SegmentSchema.index({
+  aid: 1
+});
+
+
+/**
  * Validation to check if there is atleast one filter
  * Adds updated (ut) timestamps
  * Created timestamp (ct) is added by default

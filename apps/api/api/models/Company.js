@@ -115,6 +115,17 @@ var CompanySchema = new Schema({
 
 
 /**
+ * Add indexes
+ */
+
+CompanySchema.index({
+  aid: 1,
+  company_id: 1,
+  name: 1
+});
+
+
+/**
  * Adds ut timestamps
  */
 

@@ -130,6 +130,12 @@ UserNote      |                         | notes created by team members about a 
 - ct
 - ut
 
+
+##### Indexes:
+
+- email
+
+
 ##### Notes:
 
 - No need to store the reporting hour
@@ -146,6 +152,12 @@ UserNote      |                         | notes created by team members about a 
 - x tags [] stores all tags that the app has used for its users
 - url (domain url)
 - ut
+
+
+##### Indexes:
+
+- team.accid
+
 
 ##### Notes:
 
@@ -185,6 +197,15 @@ UserNote      |                         | notes created by team members about a 
 - x tags [] Stores tags for categorizing users
 - companies [{cid, companyName, billing{}, healthScore, totalSessions}]
 
+
+##### Indexes:
+
+- aid
+- companies.cid
+- email
+- user_id
+
+
 ##### Notes:
 
 - User can belong to multiple companies (In Userjoy's case, a user can belong to multiple apps)
@@ -220,6 +241,12 @@ UserNote      |                         | notes created by team members about a 
 - note
 - uid (user id)
 - ut
+
+
+##### Indexes:
+
+- aid
+- uid
 
 
 ### DailyReport
@@ -258,6 +285,12 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 - status
 - x tags [] just like user tags
 
+##### Indexes:
+
+- aid
+- company_id
+- name
+
 ##### Notes:
 
 - status must be one of [trial, free, paying, cancelled]
@@ -281,6 +314,10 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
  - predefined (boolean, true if defined at the start of the app)
  - toAgo (optional, number of days till when count queries should be run)
  - ut
+
+##### Indexes:
+
+- aid
 
 ##### Embedded Documents:
 
@@ -310,6 +347,14 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 - type (required)
 - uid (required)
 
+
+##### Indexes:
+
+- aid
+- cid
+- type
+- uid
+
 ##### Notes:
 
 - 'amId' and 'state' must be required for 'automessage' events ('state' is stored
@@ -337,6 +382,9 @@ as meta property)
 - type (email / notification) (required)
 - ut
 
+##### Indexes:
+
+- aid
 
 ### Notification
 
@@ -348,6 +396,10 @@ as meta property)
 - seen (boolean)
 - sender
 - title (Required, automessage title)
+- uid
+
+##### Indexes:
+
 - uid
 
 ##### Notes:
@@ -368,6 +420,12 @@ as meta property)
 - toRead (boolean)
 - uid
 - ut
+
+##### Indexes:
+
+- aid
+- uid
+- closed
 
 ##### Notes:
 
