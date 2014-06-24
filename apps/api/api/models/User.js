@@ -236,6 +236,18 @@ var UserSchema = new Schema({
 
 
 /**
+ * Add indexes
+ */
+
+UserSchema.index({
+  aid: 1,
+  'companies.cid': 1,
+  email: 1,
+  user_id: 1
+});
+
+
+/**
  * Adds ut timestamps
  * Created timestamp (ct) is added by default
  */

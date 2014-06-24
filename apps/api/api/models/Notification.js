@@ -78,6 +78,15 @@ var NotificationSchema = new Schema({
 
 
 /**
+ * Add indexes
+ */
+
+NotificationSchema.index({
+  uid: 1
+});
+
+
+/**
  * Updates seen status to true
  *
  * @param {string} id notification-id

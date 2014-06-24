@@ -121,6 +121,18 @@ var EventSchema = new Schema({
 
 
 /**
+ * Add indexes
+ */
+
+EventSchema.index({
+  aid: 1,
+  cid: 1,
+  type: 1,
+  uid: 1
+});
+
+
+/**
  * Create a new track/form/link event
  *
  * @param {string} type form/link/track
