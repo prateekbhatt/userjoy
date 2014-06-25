@@ -13,32 +13,19 @@ var user = require('./user');
 
 function Message() {
 
-  var userTraits = user.traits();
-  var appTraits = app.traits();
-  var apiUrl = appTraits.apiUrl;
-
-  this.app_id = appTraits.app_id;
   this.debug = debug;
 
-  // email of user
-  this.email = userTraits.email;
-
-  // unique user id as given by app
-  this.user_id = userTraits.user_id;
-
-  this.MSG_POST_URL = apiUrl + '/conversations';
   this.MSG_TEMPLATE_ID = 'uj_message';
   this.MSG_BODY_TEMPLATE_ID = 'uj_message_body';
   this.MSG_SENT_TEMPLATE_ID = 'uj_message_sent';
   this.MSG_ERROR_ID = 'uj_message_error';
+
 }
 
 
-Message.prototype.load = function (userId) {
+Message.prototype.load = function () {
 
   var self = this;
-
-  self.userId = userId;
 
   var locals = {
     MSG_TEMPLATE_ID: self.MSG_TEMPLATE_ID,
@@ -99,25 +86,31 @@ Message.prototype.send = function () {
 
   var self = this;
 
+  var appTraits = app.traits();
+  var userTraits = user.traits();
+  var apiUrl = appTraits.apiUrl;
+  var app_id = appTraits.app_id;
+  var MSG_POST_URL = apiUrl + '/conversations';
+  var user_id = userTraits.user_id;
+  var email = userTraits.email;
+
   var msgBody = dom('#' + self.MSG_BODY_TEMPLATE_ID)
     .val();
 
-
   if (!msgBody) {
-    // FIXME SHOW ERROR MESSAGE HERE
     document.getElementById(self.MSG_ERROR_ID).style.display = 'block';
     return;
   }
 
   var msg = {
-    app_id: self.app_id,
+    app_id: app_id,
     body: msgBody
   };
 
-  if (self.user_id) {
-    msg.user_id = self.user_id;
-  } else if (self.email) {
-    msg.email = self.email;
+  if (user_id) {
+    msg.user_id = user_id;
+  } else if (email) {
+    msg.email = email;
   } else {
     return;
   }
@@ -125,7 +118,7 @@ Message.prototype.send = function () {
 
   ajax({
     type: "POST",
-    url: self.MSG_POST_URL,
+    url: MSG_POST_URL,
     data: msg,
     dataType: 'json',
 
