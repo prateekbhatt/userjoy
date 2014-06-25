@@ -58,6 +58,12 @@ angular.module('do.login', [])
     $scope.errMsg = '';
     $scope.showError = false;
     $scope.enableLogin = true;
+    $scope.signupHref = 'http://userjoy.co/signup';
+    if(window.location.href.split('/')[2] == 'app.do.localhost') {
+      $scope.signupHref = 'http://do.localhost/signup';
+    } else {
+      $scope.signupHref = 'http://userjoy.co/signup';
+    }
     console.log("$rootScope loggedIn: ", $rootScope.loggedIn);
     if ($rootScope.loggedIn && AppService.getCurrentApp()
       ._id != null) {
