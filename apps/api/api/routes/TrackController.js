@@ -601,6 +601,8 @@ router
 
         function createConversation(user, cb) {
 
+          if (!user) return cb(new Error('USER_NOT_FOUND'));
+
           var newCon = {
             aid: user.aid,
             messages: [],
@@ -646,6 +648,10 @@ router
 
           if (err.message === 'APP_NOT_FOUND') {
             return res.badRequest('Provide valid app id');
+          }
+
+          if (err.message === 'USER_NOT_FOUND') {
+            return res.badRequest('User not found');
           }
 
           return next(err);
