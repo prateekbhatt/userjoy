@@ -45,7 +45,10 @@ function UserJoy() {
   this._timeout = 200;
 
   // FIXME before going live
-  var API_URL = 'http://api.do.localhost';
+  // var API_URL = 'http://api.do.localhost';
+  
+  // Change while testing in localhost
+  var API_URL = 'http://api.userjoy.co';
 
   this.TRACK_URL = API_URL + '/track';
   this.IDENTIFY_URL = API_URL + '/track/identify';
