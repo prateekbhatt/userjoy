@@ -530,6 +530,7 @@ angular.module('do.settings', [])
           $scope.borderRight = '1px solid' + $scope.color;
           $scope.borderTop = '1px solid' + $scope.color;
           $scope.borderBottom = '1px solid' + $scope.color;
+          $scope.borderLeft = '1px solid' + $scope.color;
           $scope.btnBackgrndColor = $scope.color;
           $scope.btnBorderColor = $scope.color;
           $scope.btnColor = '#ffffff';
@@ -629,6 +630,7 @@ angular.module('do.settings', [])
             $scope.borderRight = '1px solid' + color;
             $scope.borderTop = '1px solid' + color;
             $scope.borderBottom = '1px solid' + color;
+            $scope.borderLeft = '1px solid' + color;
             $scope.btnBackgrndColor = color;
             $scope.btnBorderColor = color;
             $scope.btnColor = '#ffffff';
