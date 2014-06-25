@@ -70,6 +70,15 @@ var AccountSchema = new Schema({
 
 
 /**
+ * Add indexes
+ */
+
+AccountSchema.index({
+  email: 1
+});
+
+
+/**
  * Adds ct and ut timestamps
  */
 
