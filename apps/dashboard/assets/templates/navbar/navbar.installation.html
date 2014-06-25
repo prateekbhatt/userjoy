@@ -36,14 +36,15 @@
                     </i>
                     </a>
                     <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" ng-show="visibleDropdownApp">
-                        <li role="presentation" ng-show="!apps">
+                        <li role="presentation" ng-if="!apps.length">
                             <a role="menuitem" tabindex="-1"  href="/onboarding">
                             <span>No Apps are connected</span>
-                            <br>
-                            <span>Click here to connect an app</span></a>
+                            <!-- <br>
+                            <span>Click here to connect an app</span></a> -->
+                            </a>
                         </li>
-                        <li role="presentation" ng-repeat="app in apps">
-                            <a role="menuitem" tabindex="-1" href="#" ng-show="apps" ng-click="changeApp(app)">
+                        <li role="presentation" ng-repeat="app in apps" ng-if="apps.length > 0">
+                            <a role="menuitem" tabindex="-1" href="#" ng-click="changeApp(app)">
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{app.name}}
                             </a>
                             <a href="#" style="padding-top: 0px; font-size: 14px" ng-show="apps" ng-click="goToSettings(app)" class="glyphicon glyphicon-cog">&nbsp;Settings for {{app.name}}</a>
