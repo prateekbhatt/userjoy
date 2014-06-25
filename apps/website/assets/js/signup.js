@@ -1,6 +1,25 @@
+$('#signupalert')
+  .addClass('hide');
+$('#signupsuccess')
+  .addClass('hide');
+$("#spin")
+  .css({
+    display: "block"
+  });
+var opts = {
+  top: '50%', // Top position relative to parent
+  radius: 8,
+  left: '33%' // Left position relative to parent
+};
+
+
 $('#signup_form_submit')
   .click(function (e) {
     e.preventDefault();
+    $("#spin").css({display:"block"})
+    var div = document.getElementById('spin');
+    var spinner = new Spinner(opts)
+      .spin(div);
     $('#signup_form_submit')
       .attr("disabled", true);
     // TODO: change url for production
@@ -11,11 +30,18 @@ $('#signup_form_submit')
         .serialize(),
       dataType: 'json',
       success: function (data) {
+        spinner.stop();
+        $("#spin")
+          .css({
+            display: "none"
+          })
         console.log('signup success', arguments);
         $('#signup_form_submit')
           .attr("disabled", false);
-        $("#signupsuccess")
-          .css("display", "block");
+        // $("#signupsuccess")
+        //   .css("display", "block");
+        $('#signupsuccess')
+          .removeClass('hide');
         $('#successtext')
           .text(
             "Signup successful! A verfication email has been sent to your email id."
@@ -23,6 +49,11 @@ $('#signup_form_submit')
         //redirect to login
       },
       error: function (error) {
+        spinner.stop();
+        $("#spin")
+          .css({
+            display: "none"
+          })
         console.log('signup error', arguments, '\n', JSON.parse(
             error.responseText)
           .error);
@@ -83,18 +114,36 @@ $(function () {
 });
 
 function displayError(err) {
-  $("#signupalert")
-    .css("display", "block");
+  console.log("inside display error");
+  // $("#signupalert")
+  //   .css("display", "block !important");
+  // $('#signupalert').show();
+  $('#signupalert')
+    .removeClass('hide');
   $('#errortext')
     .text(err);
 }
 
 function closeSuccessMsg() {
+  // $('#signupsuccess')
+  //   .css("display", "none");
   $('#signupsuccess')
-    .css("display", "none");
+    .addClass('hide');
 }
 
 function closeErrMsg() {
+  console.log("closing error msg");
+  // $('#signupalert')
+  //   .css("display", "none");
+  // $('#signupalert').hide();
   $('#signupalert')
-    .css("display", "none");
+    .addClass('hide');
+}
+
+function redirectToLogin() {
+  if (window.location.href.split("/")[2] == 'do.localhost') {
+    window.location.href = "http://app.do.localhost/login";
+  } else {
+    window.location.href = "http://app.userjoy.co/login"
+  }
 }
