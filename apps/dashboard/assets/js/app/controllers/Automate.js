@@ -856,17 +856,33 @@ angular.module('do.automate', [])
           .body;
       }
 
+      $scope.goToAutoMessages = function () {
+        $location.path('/apps/' + $scope.currApp + '/messages/automate');
+      }
+
       modelsAutomate.getSingleAutoMsg($scope.currApp, $scope.msgId,
         showAutoMsgCallback);
 
       var callback = function (err) {
         if (err) {
+          $rootScope.error = true;
+          $rootScope.errMsgRootScope = err;
+          $timeout(function () {
+            $rootScope.error = false;
+            $rootScope.errMsgRootScope = '';
+          }, 5000);
           console.log("err");
           return;
         }
         $scope.enableSendTest = true;
-        $location.path('/apps/' + $scope.currApp +
-          '/messages/automate');
+        // $location.path('/apps/' + $scope.currApp +
+        //   '/messages/automate');
+        $rootScope.success = true;
+        $rootScope.successMsgRootScope = 'A test email has been sent to you';
+        $timeout(function () {
+          $rootScope.success = false;
+          $rootScope.successMsgRootScope = '';
+        }, 5000);
       }
 
       $scope.sendTestEmail = function () {

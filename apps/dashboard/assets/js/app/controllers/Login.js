@@ -87,6 +87,7 @@ angular.module('do.login', [])
 
     // attempt login to your api
     $scope.attemptLogin = function () {
+      console.log("inside attemptLogin");
       $scope.enableLogin = false;
       AuthService.attemptLogin($scope.email, $scope.password, function (err) {
         $scope.enableLogin = true;
