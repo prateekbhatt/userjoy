@@ -47,7 +47,7 @@ angular.module('do.automate', [])
 
       })
       .state('automateTest', {
-        url: '/apps/:id/messages/automate/test',
+        url: '/apps/:id/messages/automate/test/:mid',
         views: {
           "main": {
             templateUrl: '/templates/messagesmodule/message.automate.test.email.html',
@@ -58,7 +58,7 @@ angular.module('do.automate', [])
 
       })
       .state('automateLive', {
-        url: '/apps/:id/messages/automate/live',
+        url: '/apps/:id/messages/automate/live/:mid',
         views: {
           "main": {
             templateUrl: '/templates/messagesmodule/message.automate.live.html',
@@ -74,6 +74,17 @@ angular.module('do.automate', [])
           "main": {
             templateUrl: '/templates/messagesmodule/message.automate.status.html',
             controller: 'statusMsgCtrl',
+          }
+        },
+        authenticate: true
+
+      })
+      .state('automateUpdateTest', {
+        url: '/apps/:id/messages/automate/update/test/:mid',
+        views: {
+          "main": {
+            templateUrl: '/templates/messagesmodule/message.automate.update.test.email.html',
+            controller: 'updateTestMsgCtrl',
           }
         },
         authenticate: true
@@ -395,17 +406,24 @@ angular.module('do.automate', [])
           $scope.saveMessage = function () {
             if ($scope.showNotification) {
               saveMsgService.setMsg($scope.notificationBody.replace(/\n/g,
-                '<br/>').replace(/&#34;/g, '"').replace(/&#160/g, ' '));
+                  '<br/>')
+                .replace(/&#34;/g, '"')
+                .replace(/&#160/g, ' '));
               saveMsgService.setTitle($scope.title);
+              saveMsgService.setSub('');
             }
 
             if ($scope.showEmail) {
               saveMsgService.setMsg($scope.emailBody.replace(/\n/g,
-                '<br/>').replace(/&#34;/g, '"').replace(/&#160/g, ' '));
+                  '<br/>')
+                .replace(/&#34;/g, '"')
+                .replace(/&#160/g, ' '));
               console.log("Msg: ", saveMsgService.getMsg());
               if ($scope.subject != null) {
                 saveMsgService.setSub($scope.subject.replace(
-                  /<(?:.|\n)*?>/gm, '').replace(/&#34;/g, '"'));
+                    /<(?:.|\n)*?>/gm, '')
+                  .replace(/&#34;/g, '"')
+                  .replace(/&#160/g, ' '));
               }
               saveMsgService.setTitle($scope.title);
               console.log("email body: ", saveMsgService
@@ -432,13 +450,6 @@ angular.module('do.automate', [])
             console.log("data: ", data);
             modelsAutomate.saveAutoMsg($scope.currApp,
               data);
-            /*                        $scope.$watch(ErrMsgService.getErrorMessage,
-                            function () {
-                                if (ErrMsgService.getErrorMessage()) {
-                                    $scope.showAutoMsgError = true;
-                                    $scope.errMsg = ErrMsgService.getErrorMessage();
-                                }
-                            })*/
           }
 
           $scope.showText = function (htmlVariable) {
@@ -534,15 +545,23 @@ angular.module('do.automate', [])
 
       $scope.updateMessage = function () {
         if ($scope.showNotification) {
-          saveMsgService.setMsg($scope.notificationBody);
+          saveMsgService.setMsg($scope.notificationBody.replace(/\n/g,
+              '<br/>')
+            .replace(/&#34;/g, '"')
+            .replace(/&#160/g, ' '));
           saveMsgService.setTitle($scope.title);
+          saveMsgService.setSub('');
         }
 
         if ($scope.showEmail) {
-          saveMsgService.setMsg($scope.emailBody.replace(/\n/g, '<br/>'));
+          saveMsgService.setMsg($scope.emailBody.replace(/\n/g, '<br/>')
+            .replace(/&#34;/g, '"')
+            .replace(/&#160/g, ' '));
           if ($scope.subject != null) {
             saveMsgService.setSub($scope.subject.replace(
-              /<(?:.|\n)*?>/gm, ''));
+                /<(?:.|\n)*?>/gm, '')
+              .replace(/&#34;/g, '"')
+              .replace(/&#160/g, ' '));
           }
           saveMsgService.setTitle($scope.title);
           console.log("email body: ", saveMsgService
@@ -588,113 +607,151 @@ angular.module('do.automate', [])
 ])
 
 .controller('testEmailCtrl', ['$scope', 'saveMsgService', 'modelsAutomate',
-  'AppService', 'AutoMsgService', '$stateParams', '$location',
+  'AppService', 'AutoMsgService', '$stateParams', '$location', 'AppModel',
   function ($scope, saveMsgService, modelsAutomate, AppService,
-    AutoMsgService, $stateParams, $location) {
+    AutoMsgService, $stateParams, $location, AppModel) {
     $scope.enableSendTest = true;
     $scope.currApp = $stateParams.id;
-    $scope.previewText = saveMsgService.getMsg();
-    console.log(saveMsgService.getMsg());
-    $scope.subject = saveMsgService.getSub();
-    console.log("auto test email subject ----->>>>>>: ",
-      saveMsgService.getSub());
-    $scope.colorTheme = AppService.getCurrentApp()
-      .color;
-    $scope.emailBorderColor = $scope.colorTheme;
-    $scope.emailBorderRight = '1px solid' + $scope.colorTheme;
-    $scope.emailBorderTop = '1px solid' + $scope.colorTheme;
-    $scope.emailBorderBottom = '1px solid' + $scope.colorTheme;
-    $scope.borderRadius = '4px';
-    $scope.borderBottom = '1px solid' + $scope.colorTheme;
+    $scope.msgId = $stateParams.mid;
 
-    $scope.msgType = AutoMsgService.getAutoMsgType();
-    if ($scope.msgType === "Email") {
-      $scope.showEmailPreview = true;
-    }
+    var populatePage = function () {
+      $scope.colorTheme = AppService.getCurrentApp()
+        .color;
+      $scope.emailBorderColor = $scope.colorTheme;
+      $scope.emailBorderRight = '1px solid' + $scope.colorTheme;
+      $scope.emailBorderTop = '1px solid' + $scope.colorTheme;
+      $scope.emailBorderBottom = '1px solid' + $scope.colorTheme;
+      $scope.borderRadius = '4px';
+      $scope.borderBottom = '1px solid' + $scope.colorTheme;
 
-    if ($scope.msgType === "Notification") {
-      $scope.showNotificationPreview = true;
-    }
-
-    var callback = function (err) {
-      if(err){
-        console.log("err");
-        return;
+      // $scope.msgType = AutoMsgService.getAutoMsgType();
+      if ($scope.msgType === "Email") {
+        $scope.showEmailPreview = true;
       }
-      $scope.enableSendTest = true;
-      $location.path('/apps/' + $scope.currApp +
-        '/messages/automate/live');
+
+      if ($scope.msgType === "Notification") {
+        $scope.showNotificationPreview = true;
+      }
+
+      var showAutoMsgCallback = function (err) {
+        if (err) {
+          console.log("err");
+          return;
+        }
+        console.log("inside showAutoMsgCallback");
+        console.log("single automsg ------>>>>>>>: ", AutoMsgService.getSingleAutoMsg());
+        $scope.msgType = AutoMsgService.getSingleAutoMsg()
+          .type;
+        $scope.subject = AutoMsgService.getSingleAutoMsg()
+          .sub;
+        $scope.previewText = AutoMsgService.getSingleAutoMsg()
+          .body;
+      }
+
+      modelsAutomate.getSingleAutoMsg($scope.currApp, $scope.msgId,
+        showAutoMsgCallback);
+
+      var callback = function (err) {
+        if (err) {
+          console.log("err");
+          return;
+        }
+        $scope.enableSendTest = true;
+        $location.path('/apps/' + $scope.currApp +
+          '/messages/automate/live/' + $scope.msgId);
+      }
+
+      $scope.sendTestEmail = function () {
+        $scope.enableSendTest = false;
+        modelsAutomate.sendTestEmail($scope.currApp, AutoMsgService.getSingleAutoMsg()
+          ._id, callback);
+      }
+
     }
 
-    $scope.sendTestEmail = function () {
-      $scope.enableSendTest = false;
-      modelsAutomate.sendTestEmail($scope.currApp, AutoMsgService.getSingleAutoMsg()
-        ._id, callback);
-    }
+    AppModel.getSingleApp($scope.currApp, populatePage);
   }
 ])
 
 .controller('liveEmailCtrl', ['$scope', 'saveMsgService', 'modelsAutomate',
-  'AppService', 'AutoMsgService', '$stateParams', '$location',
+  'AppService', 'AutoMsgService', '$stateParams', '$location', 'AppModel',
   function ($scope, saveMsgService, modelsAutomate, AppService,
-    AutoMsgService, $stateParams, $location) {
+    AutoMsgService, $stateParams, $location, AppModel) {
     $scope.currApp = $stateParams.id;
     console.log("$scope.currApp ------>>>>>>", $scope.currApp,
       $stateParams.id);
-    // $scope.preview = saveMsgService.getMsg();
-    $scope.previewText = saveMsgService.getMsg();
-    console.log(saveMsgService.getMsg());
-    $scope.subject = saveMsgService.getSub();
-    console.log("auto test email subject ----->>>>>>: ",
-      saveMsgService.getSub());
 
-    $scope.msgType = AutoMsgService.getAutoMsgType();
-    if ($scope.msgType === "Email") {
-      $scope.showEmailPreview = true;
-    }
+    $scope.msgId = $stateParams.mid;
 
-    if ($scope.msgType === "Notification") {
-      $scope.showNotificationPreview = true;
-    }
-    $scope.msgId = AutoMsgService.getSingleAutoMsg()
-      ._id;
-    if (AutoMsgService.getSingleAutoMsg()
-      .active) {
-      $scope.msgStatus = 'Deactivate this Message';
-    } else {
-      $scope.msgStatus = 'Make it Live';
-    }
+    var populatePage = function () {
+      var showAutoMsgCallback = function (err) {
+        if (err) {
+          console.log("err");
+          return err;
+        }
+        console.log("inside showAutoMsgCallback");
+        console.log("single automsg ------>>>>>>>: ", AutoMsgService.getSingleAutoMsg());
+        $scope.msgType = AutoMsgService.getSingleAutoMsg()
+          .type;
+        $scope.subject = AutoMsgService.getSingleAutoMsg()
+          .sub;
+        $scope.previewText = AutoMsgService.getSingleAutoMsg()
+          .body;
 
-    $scope.goToAutoMessages = function () {
-      $location.path('/apps/' + $scope.currApp + '/messages/automate');
-    }
+        $scope.colorTheme = AppService.getCurrentApp()
+          .color;
+        $scope.borderColor = $scope.colorTheme;
+        $scope.borderRight = '1px solid' + $scope.colorTheme;
+        $scope.borderTop = '1px solid' + $scope.colorTheme;
+        $scope.borderBottom = '1px solid' + $scope.colorTheme;
+        $scope.borderRadius = '4px';
+        $scope.backGrndColor = $scope.colorTheme;
+        $scope.borderColor = $scope.colorTheme;
 
-    $scope.colorTheme = AppService.getCurrentApp()
-      .color;
-    $scope.borderColor = $scope.colorTheme;
-    $scope.borderRight = '1px solid' + $scope.colorTheme;
-    $scope.borderTop = '1px solid' + $scope.colorTheme;
-    $scope.borderBottom = '1px solid' + $scope.colorTheme;
-    $scope.borderRadius = '4px';
-    $scope.backGrndColor = $scope.colorTheme;
-    $scope.borderColor = $scope.colorTheme;
+        $scope.emailBorderColor = $scope.colorTheme;
+        $scope.emailBorderRight = '1px solid' + $scope.colorTheme;
+        $scope.emailBorderTop = '1px solid' + $scope.colorTheme;
+        $scope.emailBorderBottom = '1px solid' + $scope.colorTheme;
 
-    $scope.emailBorderColor = $scope.colorTheme;
-    $scope.emailBorderRight = '1px solid' + $scope.colorTheme;
-    $scope.emailBorderTop = '1px solid' + $scope.colorTheme;
-    $scope.emailBorderBottom = '1px solid' + $scope.colorTheme;
+        if ($scope.msgType === "email") {
+          $scope.showEmailPreview = true;
+        }
 
-    $scope.changeMsgStatus = function () {
-      if (AutoMsgService.getSingleAutoMsg()
-        .active) {
-        modelsAutomate.deActivateMsg($scope.currApp,
-          $scope.msgId);
-        $scope.msgStatus = 'Make it Live';
-      } else {
-        modelsAutomate.makeMsgLive($scope.currApp, $scope.msgId);
-        $scope.msgStatus = 'Deactivate this Message';
+        if ($scope.msgType === "notification") {
+          $scope.showNotificationPreview = true;
+        }
+
+        if (AutoMsgService.getSingleAutoMsg()
+          .active) {
+          $scope.msgStatus = 'Deactivate this Message';
+        } else {
+          $scope.msgStatus = 'Make it Live';
+        }
+
       }
+
+      modelsAutomate.getSingleAutoMsg($scope.currApp, $scope.msgId,
+        showAutoMsgCallback);
+
+      $scope.goToAutoMessages = function () {
+        $location.path('/apps/' + $scope.currApp + '/messages/automate');
+      }
+
+      $scope.changeMsgStatus = function () {
+        if (AutoMsgService.getSingleAutoMsg()
+          .active) {
+          modelsAutomate.deActivateMsg($scope.currApp,
+            $scope.msgId);
+          $scope.msgStatus = 'Make it Live';
+        } else {
+          modelsAutomate.makeMsgLive($scope.currApp, $scope.msgId);
+          $scope.msgStatus = 'Deactivate this Message';
+        }
+      }
+
     }
+
+    AppModel.getSingleApp($scope.currApp, populatePage);
   }
 ])
 
@@ -772,5 +829,70 @@ angular.module('do.automate', [])
     console.log("$scope.currApp ------>>>>>>", $scope.currApp,
       $stateParams.id);
 
+  }
+])
+
+.controller('updateTestMsgCtrl', ['$scope', 'saveMsgService', 'modelsAutomate',
+  'AppService', 'AutoMsgService', '$stateParams', '$location', 'AppModel',
+  function ($scope, saveMsgService, modelsAutomate, AppService,
+    AutoMsgService, $stateParams, $location, AppModel) {
+    $scope.enableSendTest = true;
+    $scope.currApp = $stateParams.id;
+    $scope.msgId = $stateParams.mid;
+    var populatePage = function () {
+
+      var showAutoMsgCallback = function (err) {
+        if (err) {
+          console.log("err");
+          return;
+        }
+        console.log("inside showAutoMsgCallback");
+        console.log("single automsg ------>>>>>>>: ", AutoMsgService.getSingleAutoMsg());
+        $scope.msgType = AutoMsgService.getSingleAutoMsg()
+          .type;
+        $scope.subject = AutoMsgService.getSingleAutoMsg()
+          .sub;
+        $scope.previewText = AutoMsgService.getSingleAutoMsg()
+          .body;
+      }
+
+      $scope.goToAutoMessages = function () {
+        $location.path('/apps/' + $scope.currApp + '/messages/automate');
+      }
+
+      modelsAutomate.getSingleAutoMsg($scope.currApp, $scope.msgId,
+        showAutoMsgCallback);
+
+      var callback = function (err) {
+        if (err) {
+          $rootScope.error = true;
+          $rootScope.errMsgRootScope = err;
+          $timeout(function () {
+            $rootScope.error = false;
+            $rootScope.errMsgRootScope = '';
+          }, 5000);
+          console.log("err");
+          return;
+        }
+        $scope.enableSendTest = true;
+        // $location.path('/apps/' + $scope.currApp +
+        //   '/messages/automate');
+        $rootScope.success = true;
+        $rootScope.successMsgRootScope = 'A test email has been sent to you';
+        $timeout(function () {
+          $rootScope.success = false;
+          $rootScope.successMsgRootScope = '';
+        }, 5000);
+      }
+
+      $scope.sendTestEmail = function () {
+        $scope.enableSendTest = false;
+        modelsAutomate.sendTestEmail($scope.currApp, AutoMsgService.getSingleAutoMsg()
+          ._id, callback);
+      }
+
+    }
+
+    AppModel.getSingleApp($scope.currApp, populatePage);
   }
 ])
