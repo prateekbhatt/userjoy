@@ -163,6 +163,17 @@ var ConversationSchema = new Schema({
 
 
 /**
+ * Add indexes
+ */
+
+ConversationSchema.index({
+  aid: 1,
+  uid: 1,
+  closed: 1
+});
+
+
+/**
  * Adds updated (ut) timestamps
  * Created timestamp (ct) is added by default
  */

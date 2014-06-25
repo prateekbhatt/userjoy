@@ -86,6 +86,15 @@ var AppSchema = new Schema({
 
 
 /**
+ * Add indexes
+ */
+
+AppSchema.index({
+  'team.accid': 1
+});
+
+
+/**
  * Adds updated (ut) timestamps
  * Created timestamp (ct) is added by default
  */
