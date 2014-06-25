@@ -187,7 +187,7 @@ function amConsumer(cb) {
           n: 1
         };
 
-        q.get(opts, function (err, res) {
+        q().get(opts, function (err, res) {
 
           logger.trace({
             at: 'workers/automessageConsumer getFromQueue',
@@ -411,7 +411,7 @@ function amConsumer(cb) {
 
       function deleteFromQueue(cb) {
 
-        q.del(queueMsgId, function (err, body) {
+        q().del(queueMsgId, function (err, body) {
 
           logger.trace({
             at: 'workers/automessageConsumer deleteFromQueue',
