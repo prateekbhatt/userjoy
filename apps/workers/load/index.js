@@ -142,7 +142,12 @@ function printMessage(db, app) {
   console.log();
   console.log('   Port              :     ', app.get('port'));
   console.log('   Environment       :     ', process.env.NODE_ENV);
-  console.log('   Database          :     ', db.name);
+  console.log('   DB Name           :     ', db.name);
+  console.log('   DB Host           :     ', db.host);
+  console.log('   DB Port           :     ', db.port);
+  console.log('   DB Hosts          :     ', db.hosts);
+  console.log('   DB User           :     ', db.user);
+  console.log('   DB Pass           :     ', !! db.pass);
   console.log('-------------------------------------------------');
   console.log();
   console.log();
