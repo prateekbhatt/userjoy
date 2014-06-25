@@ -89,10 +89,15 @@ Mailer.prototype.options = function () {
 
   opts.headers = opts.headers || {};
 
-  // REF: http://documentation.mailgun.com/user_manual.html#sending-via-smtp
-  opts.headers['X-Mailgun-Track'] = 'yes';
-  opts.headers['X-Mailgun-Track-Clicks'] = 'yes';
-  opts.headers['X-Mailgun-Track-Opens'] = 'yes';
+  // enable tracking of user mails only in production environment
+  if (process.env.NODE_ENV === 'production') {
+
+    // REF: http://documentation.mailgun.com/user_manual.html#sending-via-smtp
+    opts.headers['X-Mailgun-Track'] = 'yes';
+    opts.headers['X-Mailgun-Track-Clicks'] = 'yes';
+    opts.headers['X-Mailgun-Track-Opens'] = 'yes';
+
+  }
 
   // // set the Message-Id header for tracking conversation replies and threading
   // // REF: http://blog.mailgun.com/post/tracking-replies-in-mailgun-or-any-other-email/
