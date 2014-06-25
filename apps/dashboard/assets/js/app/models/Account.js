@@ -72,7 +72,7 @@ angular
           })
       }
 
-      this.verifyEmail = function () {
+      this.verifyEmail = function (id, tokenId) {
         $http.get('/account/' + id + '/verify-email/' + tokenId)
           .success(function () {
             $location.path('/login');
@@ -80,7 +80,11 @@ angular
           .error(function () {
             console.log("redirect to signup");
             // TODO: Change in production
-            window.location.href = "http://do.localhost/signup";
+            if (window.location.href.split("/")[2] == 'app.do.localhost') {
+              window.location.href = "http://do.localhost/signup";
+            } else {
+              window.location.href = "http://userjoy.co/signup";
+            }
           })
       }
     }
