@@ -193,11 +193,11 @@ describe('Worker health-consumer', function () {
             },
 
             function clearHealthQueue(cb) {
-              healthQueue.clear(cb);
+              healthQueue().clear(cb);
             },
 
             function postToHealthQueue(cb) {
-              healthQueue.post(
+              healthQueue().post(
 
                 JSON.stringify({
                   aid: aid
@@ -254,7 +254,7 @@ describe('Worker health-consumer', function () {
 
             // should have deleted message from health queue
             function checkHealthQueue(cb) {
-              healthQueue.get({
+              healthQueue().get({
                 n: 1
               }, function (err, response) {
 

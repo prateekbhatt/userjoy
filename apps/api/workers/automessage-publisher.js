@@ -136,7 +136,7 @@ function cronFunc(cb) {
           })
           .value();
 
-        q.post(ids, function (err, queueIds) {
+        q().post(ids, function (err, queueIds) {
           cb(err, queueIds, ids);
         });
       },
