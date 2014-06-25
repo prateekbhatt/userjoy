@@ -9,16 +9,16 @@
             <div class="panel-heading" style="background-color: #d9edf7; border-color: #bce8f1">
                 <div class="panel-title" style="color:#31708f">Sign Up</div>
                 <!-- TODO: change href in production -->
-                <div style="float:right; font-size: 85%; position: relative; top:-10px"><a id="signinlink" href="http://app.do.localhost/login">Sign In</a></div>
+                <div style="float:right; font-size: 85%; position: relative; top:-10px"><a id="signinlink" href="javascript:redirectToLogin()">Sign In</a></div>
             </div>
             <div class="panel-body">
                 <form id="signup_form" class="form-horizontal" role="form">
-                    <div id="signupsuccess" style="display:none" class="alert alert-success">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true" onclick="closeSuccessMsg()">&times;</button>
+                    <div id="signupsuccess" class="alert alert-success">
+                        <button type="button" class="close" aria-hidden="true" onclick="closeSuccessMsg()">&times;</button>
                         <span id="successtext"></span>
                     </div>
-                    <div id="signupalert" style="display:none" class="alert alert-danger">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    <div id="signupalert" class="alert alert-danger">
+                        <button type="button" class="close" aria-hidden="true" onclick="closeErrMsg()">&times;</button>
                         <p><strong>Error</strong>:
                         <span id="errortext"></span>
                         </p>
@@ -45,6 +45,8 @@
                         <!-- Button -->
                         <div class="col-md-offset-3 col-md-9">
                             <button id="signup_form_submit" class="btn btn-info" type="submit"><i class="icon-hand-right"></i> &nbsp; Sign Up</button>
+                            <span id="spin">
+                            </span>
                         </div>
                     </div>
                 </form>
