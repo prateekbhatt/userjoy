@@ -4,7 +4,7 @@ var router = require('express')
 /* GET home page. */
 router.get('/', function (req, res) {
   res.json({
-    "message": "Welcome to DoDataDo API"
+    "message": "Welcome to the UserJoy API. Check out the documentation at: docs.userjoy.co"
   });
 });
 

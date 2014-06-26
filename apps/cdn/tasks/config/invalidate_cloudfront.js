@@ -1,9 +1,9 @@
 /**
- * Send files to S3.
+ * Invalidates cloudfront distribution
  *
  * ---------------------------------------------------------------
  *
- * Pushes files to AWS S3
+ * Used to update the userjoy.js client library on cloudfront
  *
  * For usage docs see:
  *    https://github.com/mllrsohn/grunt-invalidate-cloudfront
@@ -19,10 +19,9 @@ module.exports = function (grunt) {
       secret: '+PaocKAwA+gyke4W+/vf8lBCHBoxnX7U7E7Slifk',
       distribution: 'E372W13ZUERWMY'
     },
-    production: {
+    dist: {
       files: [{
-        src: ['**/*'],
-        dest: ''
+        dest: 'js/userjoy.js'
       }]
     }
   });
