@@ -19,7 +19,13 @@ var ENVS = ['dev', 'prod'];
 
 // set node js environment variable
 function setEnv(env) {
-  process.env.NODE_ENV = env;
+
+  if (env === 'prod') {
+    process.env.NODE_ENV = 'production';
+  } else {
+    process.env.NODE_ENV = 'development';
+  }
+
 }
 
 
