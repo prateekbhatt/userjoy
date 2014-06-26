@@ -37,7 +37,7 @@
     "passport-local": "^1.0.0",
     "qs": "^0.6.6",
     "winston": "^0.7.3",
-    "nodejs-gravatar": "~1.0.2"
+    "node-gravatar": "~1.0.0"
   },
   "author": "Prateek Bhatt <prattbhatt@gmail.com>",
   "license": "",
