@@ -3,8 +3,8 @@
 set -e
 
 # First argument is expected to define environment
-# either 'production' or 'development'
-if ! ([[ $1 == 'development' ]] || [[ $1 == 'production' ]]); then
+# either 'prod' or 'dev'
+if ! ([[ $1 == 'dev' ]] || [[ $1 == 'prod' ]]); then
 
   echo
   echo '    Error: <environment> param missing or invalid'
