@@ -4,7 +4,8 @@
 
 var _ = require('lodash');
 var async = require('async');
-var gravatar = require('nodejs-gravatar');
+// var gravatar = require('nodejs-gravatar');
+var gravatar = require('node-gravatar');
 var moment = require('moment');
 var router = require('express')
   .Router();
@@ -742,9 +743,7 @@ router
 
           var email = conversation.assignee.email;
           var name = conversation.assignee.name;
-          var avatar = gravatar.imageUrl(email, {
-            "size": "60"
-          });
+          var avatar = gravatar.get(email, 'R', 60, 'mm' );
           var conversationUrl = dashboardUrl + '/apps/' + aid +
             '/messages/conversations/' + conversation._id;
 

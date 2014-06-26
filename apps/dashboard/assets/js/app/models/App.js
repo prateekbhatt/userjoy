@@ -20,6 +20,7 @@ angular
           .success(function (data) {
             console.log("current App: --> from App Model: ", data);
             AppService.setCurrentApp(data);
+            AppService.setAppName(data.name);
             cb();
           })
           .error(cb);
@@ -50,6 +51,7 @@ angular
             // $state.transitionTo('addcode');
             AppService.new(savedApp);
             AppService.setCurrentApp(savedApp);
+            AppService.setAppName(savedApp.name);
             $location.path('/apps/' + AppService.getCurrentApp()._id + '/addcode')
             console.log("apps created: ", AppService.getLoggedInApps(),
               savedApp);
