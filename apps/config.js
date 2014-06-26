@@ -9,7 +9,7 @@ var ENVIRONMENTS = ['development', 'production', 'test'];
 
 var BASE_URLS = {
   development: 'do.localhost',
-  production: 'dodatado.com',
+  production: 'userjoy.co',
   test: 'do.localhost'
 };
 
@@ -21,39 +21,39 @@ var PORTS = {
 };
 
 var DATABASES = {
-  development: "dodatado-api-dev",
-  production: "dodatado",
-  test: "dodatado-api-test"
+  development: "mongodb://localhost/userjoy-api-dev",
+  production: "mongodb://54.225.236.74/userjoy-api-prod",
+  test: "mongodb://localhost/userjoy-api-test"
 };
 
 var API_CORS_WHITELIST = {
   development: ['http://app.do.localhost', 'http://do.localhost'],
-  production: ['app.dodatado.com', 'dodatado.com'],
+  production: ['http://app.userjoy.co', 'http://userjoy.co'],
   test: ['http://app.do.localhost', 'http://do.localhost']
 };
 
-/**
- * Get top-level domain
- * @param  {String} env
- * @return {String}     domain url
- */
-function getBaseUrl(env) {
-  return BASE_URLS[env];
-}
+var REDIS_HOST = {
+  development: 'localhost',
+  production: 'uj-session.pb8czn.0001.use1.cache.amazonaws.com',
+  test: 'localhost'
+};
 
-/**
- * Get port on which app should be run
- * @param  {String} appName name of the application
- * @return {Number}         port number
- */
-function getPort(appName) {
-  return PORTS[appName];
-}
+var IRON_IO_TOKEN = {
+  development: 'Rfh192ozhicrSZ2R9bDX8uRvOu0',
+  production: 'ViY-q4w45Lv-x1-PbusZcueZfB4',
+  test: 'RTMooY5zVIhTT1Dxyo_6cEHdmaE'
+};
+
+var IRON_IO_PROJECT_ID = {
+  development: '536e5455bba6150009000090',
+  production: '53aa810f96d68f000500004e',
+  test: '53aa82306bfde3000500003c'
+};
 
 /**
  * Get hostnames of all apps
  * e.g., in production environment:
- * dashboard: app.dodatado.com
+ * dashboard: app.userjoy.co
  */
 function getHosts(url) {
   var hosts = {
@@ -66,31 +66,12 @@ function getHosts(url) {
 }
 
 /**
- * Get MongoDB path
- * @param  {string} env environment
- * @return {string}     database path
- */
-function getDbPath(env) {
-  var dbPath = "mongodb://localhost/" + DATABASES[env];
-  return dbPath;
-}
-
-/**
- * Gets array of domains whitelisted by api for cors requests
- * @param {string} env
- * @return {array} whitelist
- */
-function getCorsWhitelist(env) {
-  return API_CORS_WHITELIST[env];
-}
-
-/**
  * Gets base cookie domain
  * @param  {string} env
  * @return {string}     cookie domain
  */
 function getCookieDomain(env) {
-  return '.'.concat(getBaseUrl(env));
+  return '.'.concat(BASE_URLS[env]);
 }
 
 /**
@@ -106,16 +87,19 @@ module.exports = function (appName) {
     throw new Error(env, "environment is not supported");
   }
 
-  var config = {};
+  var config = {
+    baseUrl: BASE_URLS[env],
+    corsWhitelist: API_CORS_WHITELIST[env],
+    dbPath: DATABASES[env],
+    ironioProjectId: IRON_IO_PROJECT_ID[env],
+    ironioToken: IRON_IO_TOKEN[env],
+    port: PORTS[appName],
+    redisHost: REDIS_HOST[env],
+  };
 
-  config.environment = env;
-  config.port = getPort(appName);
-  config.baseUrl = getBaseUrl(env);
+  config.cookieDomain = '.'.concat(config.baseUrl);
   config.hosts = getHosts(config.baseUrl);
   config.appUrl = config.hosts[appName];
-  config.dbPath = getDbPath(env);
-  config.corsWhitelist = getCorsWhitelist(env);
-  config.cookieDomain = getCookieDomain(env);
 
   return config;
 

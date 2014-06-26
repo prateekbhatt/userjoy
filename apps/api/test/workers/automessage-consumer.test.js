@@ -54,12 +54,12 @@ describe('Worker automessageConsumer', function () {
       async.series([
 
         function clearQueue(cb) {
-          queue.clear(cb);
+          queue().clear(cb);
         },
 
         function postToQueue(cb) {
           // queue auto message
-          queue.post(amId, cb);
+          queue().post(amId, cb);
         },
 
         function clearEvents(cb) {
@@ -158,12 +158,12 @@ describe('Worker automessageConsumer', function () {
       async.series([
 
         function clearQueue(cb) {
-          queue.clear(cb);
+          queue().clear(cb);
         },
 
         function postToQueue(cb) {
           // queue auto message
-          queue.post(amId, cb);
+          queue().post(amId, cb);
         },
 
         function clearEvents(cb) {

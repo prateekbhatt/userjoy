@@ -147,7 +147,7 @@ function healthConsumerWorker(cb) {
           n: 1
         };
 
-        healthQueue.get(opts, function (err, res) {
+        healthQueue().get(opts, function (err, res) {
 
           logger.trace({
             at: 'workers/health-consumer getFromQueue',
@@ -203,7 +203,7 @@ function healthConsumerWorker(cb) {
 
       function deleteFromQueue(aid, cb) {
 
-        healthQueue.del(queueMsgId, function (err, body) {
+        healthQueue().del(queueMsgId, function (err, body) {
 
           logger.trace({
             at: 'workers/health-consumer deleteFromQueue',

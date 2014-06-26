@@ -247,7 +247,7 @@ function scoreConsumerWorker(cb) {
           n: 1
         };
 
-        scoreQueue.get(opts, function (err, res) {
+        scoreQueue().get(opts, function (err, res) {
 
           logger.trace({
             at: 'workers/score-consumer getFromQueue',
@@ -292,7 +292,7 @@ function scoreConsumerWorker(cb) {
 
       function deleteFromQueue(aid, time, cb) {
 
-        scoreQueue.del(queueMsgId, function (err, body) {
+        scoreQueue().del(queueMsgId, function (err, body) {
 
           logger.trace({
             at: 'workers/score-consumer deleteFromQueue',
@@ -317,7 +317,7 @@ function scoreConsumerWorker(cb) {
         // ironmq accepts only strings
         appData = JSON.stringify(appData);
 
-        healthQueue.post(appData, function (err) {
+        healthQueue().post(appData, function (err) {
           cb(err, aid, time);
         });
       }

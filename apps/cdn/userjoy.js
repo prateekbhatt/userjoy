@@ -6122,27 +6122,7 @@ require.register("bestiejs-platform.js/platform.js", function(exports, require, 
 
 });
 require.register("userjoy/lib/index.js", function(exports, require, module){
-var debug = require('debug');
 var UserJoy = require('./userjoy');
-
-
-/**
- * Enable or disable debug.
- *
- * @param {String or Boolean} str
- */
-
-var showDebug = function (str) {
-  if (0 == arguments.length || str) {
-    debug.enable('uj:' + (str || '*'));
-  } else {
-    debug.disable();
-  }
-};
-
-
-// FIXME REMOVE ME SHOULD BE ENABLED ONLY IN DEVELOPMENT
-showDebug();
 
 
 /**
@@ -6682,209 +6662,12 @@ Entity.prototype.reset = function () {
 };
 
 });
-require.register("userjoy/lib/message.js", function(exports, require, module){
-var app = require('./app');
-var ajax = require('ajax');
-var bind = require('bind');
-var debug = require('debug')('uj:message');
-var dom = require('dom');
-var template = require('./message-template');
-var user = require('./user');
-
-
-/**
- * Initialize a new `Message` instance.
- */
-
-function Message() {
-
-  var userTraits = user.traits();
-  var appTraits = app.traits();
-  var apiUrl = appTraits.apiUrl;
-
-  this.app_id = appTraits.app_id;
-  this.debug = debug;
-
-  // email of user
-  this.email = userTraits.email;
-
-  // unique user id as given by app
-  this.user_id = userTraits.user_id;
-
-  this.MSG_POST_URL = apiUrl + '/conversations';
-  this.MSG_TEMPLATE_ID = 'uj_message';
-  this.MSG_BODY_TEMPLATE_ID = 'uj_message_body';
-  this.MSG_SENT_TEMPLATE_ID = 'uj_message_sent';
-  this.MSG_ERROR_ID = 'uj_message_error';
-}
-
-
-Message.prototype.load = function (userId) {
-
-  var self = this;
-
-  self.userId = userId;
-
-  var locals = {
-    MSG_TEMPLATE_ID: self.MSG_TEMPLATE_ID,
-    MSG_BODY_TEMPLATE_ID: self.MSG_BODY_TEMPLATE_ID,
-    MSG_SENT_TEMPLATE_ID: self.MSG_SENT_TEMPLATE_ID,
-    MSG_ERROR_ID: self.MSG_ERROR_ID,
-    color: app.traits().color
-  };
-
-  dom('body')
-    .prepend(template(locals));
-
-};
-
-
-Message.prototype.loadCss = function () {
-
-  var self = this;
-  var style = document.createElement('style');
-  style.type = 'text/css';
-  style.innerHTML =
-    '.uj-foot{display:table-row;vertical-align:bottom;height:1px}#uj-wrap{min-height:100%}#uj-main{overflow:auto;padding-bottom:150px}#uj-footer{position:relative;margin-top:-150px;height:150px;clear:both}#uj-page-wrap{width:75%;margin:80px auto}.uj-form-control{height:43px;padding:10px 15px;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);-webkit-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}.uj-message-template{margin:20px 0;padding:20px;border-left:1px solid #eee}.uj-message-template-danger{border-color:#d9534f;border-right:1px solid #d9534f;border-top:1px solid #d9534f;border-bottom:1px solid #d9534f;border-radius:4px}.uj-message-template-warning{background-color:#fcf8f2;border-color:#f0ad4e;border-right:1px solid #fcf8f2;border-top:1px solid #fcf8f2;border-bottom:1px solid #fcf8f2;border-radius:4px}.uj-message-template-info{background-color:#f4f8fa;border-color:#5bc0de;border-right:1px solid #f4f8fa;border-top:1px solid #f4f8fa;border-bottom:1px solid #f4f8fa;border-radius:4px}.uj-message-template-success{background-color:#F4FDF0;border-color:#3C763D;border-right:1px solid #F4FDF0;border-top:1px solid #F4FDF0;border-bottom:1px solid #F4FDF0;border-radius:4px}.uj-message-template-default{background-color:#EEE;border-color:#B4B4B4;border-right:1px solid #EEE;border-top:1px solid #EEE;border-bottom:1px solid #EEE;border-radius:4px}.uj-message-template-notice{background-color:#FCFCDD;border-color:#BDBD89;border-right:1px solid #FCFCDD;border-top:1px solid #FCFCDD;border-bottom:1px solid #FCFCDD;border-radius:4px}.uj-dropdown-menu>li>a{display:block;padding:3px 20px;clear:both;font-weight:400;line-height:1.42857143;color:#7b8a8b;white-space:nowrap}.uj-message-email-success{border-color:#BDBD89;border-right:1px solid #bdc3c7;border-top:1px solid #bdc3c7;border-bottom:1px solid #bdc3c7;border-radius:4px}.uj-input-group{position:relative;display:table;border-collapse:separate}.uj-panel-footer{padding:10px 15px;background-color:#ecf0f1;border-top:1px solid #ecf0f1;border-bottom-right-radius:3px;border-bottom-left-radius:3px}.uj-input-sm{height:18px;padding:6px 9px;font-size:13px;line-height:1.5;border-radius:3px}.uj-form-control:focus{border-color:#66afe9;outline:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6)}.uj-btn{display:inline-block;cursor:pointer;padding:10px 15px;font-size:15px;line-height:1.42857143;border-radius:4px;-moz-user-select:none;-ms-user-select:none;user-select:none}.uj-btn-danger{color:#fff;background-color:#e74c3c;border-color:#e74c3c}.uj-input-group .uj-form-control{position:relative;float:left;width:100%;margin-bottom:0}.uj-input-group-btn{position:relative;font-size:0}.uj-input-group-addon,.uj-input-group-btn{width:1%;white-space:nowrap;vertical-align:middle}.uj-input-group .uj-form-control,.uj-input-group-addon,.uj-input-group-btn{display:table-cell}.uj-input-group-btn>.uj-btn{position:relative}.uj-close{float:right;font-size:21px;font-weight:700;line-height:1;color:#000;text-shadow:0 1px 0 #fff;opacity:.2;filter:alpha(opacity=20)}.uj-close:focus,.uj-close:hover{color:#000;text-decoration:none;cursor:pointer;opacity:.5;filter:alpha(opacity=50)}button.uj-close{padding:0;cursor:pointer;background:0 0;border:0;-webkit-appearance:none}.uj-badge{display:inline-block;min-width:20px;padding:10px 14px;font-size:24px;font-weight:700;color:#fff;line-height:1;vertical-align:baseline;white-space:nowrap;text-align:center;background-color:#5bc0de;border-radius:10px}.uj-panel-default{color:#333;background-color:#bdc3c7}.uj-panel-heading{background-color:#f5f5f5}.uj-col-md-4{width:352px}.uj-row{margin-left:-15px;margin-right:-15px}.uj-arrow:after{content:"";position:absolute;bottom:-25px;left:175px;border-style:solid;border-width:25px 25px 0;border-color:#FFF transparent;display:block;width:0;z-index:1}.uj-arrow:before{content:"";position:absolute;left:296px;border-style:solid;border-width:17px 17px 0;border-color:#ddd transparent;display:block;width:0;z-index:0}*{box-sizing:border-box}.uj-panel-default{border-color:#ddd}.uj-panel{margin-bottom:20px;background-color:#fff;border:1px solid transparent;border-radius:4px;box-shadow:0 1px 1px rgba(0,0,0,.05)}.uj-panel-default>.uj-panel-heading{color:#333;background-color:#f5f5f5;border-color:#ddd}.uj-panel-heading{padding:10px 15px;border-bottom:1px solid transparent;border-top-right-radius:3px;border-top-left-radius:3px}.uj-panel-title{margin-top:0;margin-bottom:0;font-size:16px;color:inherit}.uj-panel-body{padding:15px}.uj-form-control{display:block;width:100%;font-size:14px;line-height:1.42857143;color:#555;background-color:#fff;background-image:none;border:1px solid #ccc;border-radius:4px;box-shadow:inset 0 1px 1px rgba(0,0,0,.075);transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}.uj-btn-block{display:block;width:100%;padding-left:0;padding-right:0}.uj-btn-group-sm>.uj-btn,.uj-btn-sm{padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}.uj-btn-info{color:#fff;background-color:#5bc0de;border-color:#46b8da}.uj-btn{margin-bottom:0;font-weight:400;text-align:center;vertical-align:middle;background-image:none;border:1px solid transparent;white-space:nowrap;-webkit-user-select:none}';
-
-  dom('head')
-    .prepend(style);
-
-};
-
-
-Message.prototype.show = function () {
-
-  var id = this.MSG_TEMPLATE_ID;
-
-  this.debug('show');
-
-  document.getElementById(id)
-    .style.display = (document.getElementById(id)
-      .style.display === 'none') ? 'block' : 'none';
-
-  document.getElementById(this.MSG_SENT_TEMPLATE_ID).style.display = 'none';
-  document.getElementById(this.MSG_ERROR_ID).style.display = 'none';
-  document.getElementById(this.MSG_BODY_TEMPLATE_ID).focus();
-
-};
-
-
-Message.prototype.hide = function () {
-
-  var id = this.MSG_TEMPLATE_ID;
-
-  document.getElementById(id)
-    .style.display = 'none';
-
-};
-
-
-Message.prototype.send = function () {
-
-  var self = this;
-
-  var msgBody = dom('#' + self.MSG_BODY_TEMPLATE_ID)
-    .val();
-
-
-  if (!msgBody) {
-    // FIXME SHOW ERROR MESSAGE HERE
-    document.getElementById(self.MSG_ERROR_ID).style.display = 'block';
-    return;
-  }
-
-  var msg = {
-    app_id: self.app_id,
-    body: msgBody
-  };
-
-  if (self.user_id) {
-    msg.user_id = self.user_id;
-  } else if (self.email) {
-    msg.email = self.email;
-  } else {
-    return;
-  }
-
-
-  ajax({
-    type: "POST",
-    url: self.MSG_POST_URL,
-    data: msg,
-    dataType: 'json',
-
-    success: function (saved) {
-
-      self.debug('saved', saved);
-
-      document.getElementById(self.MSG_SENT_TEMPLATE_ID)
-        .style.display = 'block';
-
-      document.getElementById(self.MSG_TEMPLATE_ID)
-        .value = '';
-
-      document.getElementById(self.MSG_BODY_TEMPLATE_ID)
-        .value = '';
-
-      setTimeout(function () {
-        document.getElementById(self.MSG_TEMPLATE_ID)
-          .style.display = 'none';
-      }, 5000);
-    },
-
-    error: function (err) {
-      self.debug("error", err);
-    }
-  });
-
-};
-
-
-/**
- * Expose `Message` instance.
- */
-
-module.exports = bind.all(new Message());
-});
-require.register("userjoy/lib/message-template.js", function(exports, require, module){
-module.exports = function anonymous(obj) {
-
-  function escape(html) {
-    return String(html)
-      .replace(/&/g, '&amp;')
-      .replace(/"/g, '&quot;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-  };
-
-  function section(obj, prop, negate, str) {
-    var val = obj[prop];
-    if ('function' == typeof val) return val.call(obj, str);
-    if (negate) val = !val;
-    if (val) return str;
-    return '';
-  };
-
-  return "<div>\n    <a style=\"cursor: pointer\" onclick=\"userjoy.showFeedback()\">\n        <div style=\"position: fixed; bottom:30px; right:20px;\">\n            <span style=\"display: inline-block;\n            min-width: 20px;\n            padding: 10px 14px;\n            font-size: 24px;\n            font-weight: 700;\n            color: #fff;\n            line-height: 1;\n            vertical-align: baseline;\n            white-space: nowrap;\n            text-align: center;\n            background-color: " + escape(obj.color) + ";\n            border-radius: 10px;\">&#63;\n            </span>\n        </div>\n    </a>\n    <div style=\"display: none\" id=\"" + escape(obj.MSG_TEMPLATE_ID) + "\">\n        <div style=\"bottom: 80px; position: fixed; right: 9px;\" class=\"uj-col-md-4\">\n            <div class=\"uj-panel uj-panel-default\" style=\"border-color: #ddd;\">\n                <div class=\"uj-panel-heading\">\n                    <h3 class=\"uj-panel-title\" style=\"text-align: center;\">Send us a Message</h3>\n                    <button type=\"button\" class=\"uj-close\" aria-hidden=\"true\" onclick=\"userjoy.hideFeedback()\" id=\"closeFeedback\" style=\"margin-top: -25px;\">&times;</button>\n                </div>\n                <div class=\"uj-panel-body\">\n                    <form role=\"form\">\n                        <textarea id=\"" + escape(obj.MSG_BODY_TEMPLATE_ID) + "\" class=\"uj-form-control\" style=\"padding: 4px; height: 150px;\"></textarea>\n                        <span style=\"display: none; margin-top: 10px;\" id=\"" + escape(obj.MSG_SENT_TEMPLATE_ID) + "\">\n                        Message Sent. Thanks!</span>\n                        <span id=\"" + escape(obj.MSG_ERROR_ID) + "\" style=\" display:none; color: #a94442; margin-top: 10px;\">\n                        Your reply cannot be blank\n                        </span>\n                        <button type=\"button\" class=\"uj-btn uj-btn-sm uj-btn-block\" onclick=\"userjoy.sendConversation()\" style=\"float: right; margin-top: 10px; color: #fff; background-color: " + escape(obj.color) + "; border-color: " + escape(obj.color) + "\">Send Message</button>\n                        <div style=\"text-align: center;\">\n                        <small>Powered by <a style=\"text-decoration:none;\" href=\"http://www.userjoy.co\", target=\"_blank\">UserJoy</a></small>\n                        </div>\n                    </form>\n                </div>\n                <div class=\"uj-arrow\"></div>\n            </div>\n        </div>\n    </div>\n</div>\n"
-}
-});
-require.register("userjoy/lib/notification.js", function(exports, require, module){
-var ajax = require('ajax');
-var app = require('./app');
-var bind = require('bind');
-var debug = require('debug')('uj:notification');
-var dom = require('dom');
-var template = require('./notification-template');
-var user = require('./user');
-
-
-
+require.register("userjoy/lib/get-gravatar.js", function(exports, require, module){
 /**
  * Get Gravatar image while rendering notifications
  */
 
-function get_gravatar(email, size) {
+module.exports = function get_gravatar(email, size) {
 
   // MD5 (Message-Digest Algorithm) by WebToolkit
   //
@@ -7113,6 +6896,199 @@ function get_gravatar(email, size) {
     '.jpg?d=mm';
 }
 
+});
+require.register("userjoy/lib/message.js", function(exports, require, module){
+var app = require('./app');
+var ajax = require('ajax');
+var bind = require('bind');
+var debug = require('debug')('uj:message');
+var dom = require('dom');
+var template = require('./message-template');
+var user = require('./user');
+
+
+/**
+ * Initialize a new `Message` instance.
+ */
+
+function Message() {
+
+  this.debug = debug;
+
+  this.MSG_TEMPLATE_ID = 'uj_message';
+  this.MSG_BODY_TEMPLATE_ID = 'uj_message_body';
+  this.MSG_SENT_TEMPLATE_ID = 'uj_message_sent';
+  this.MSG_ERROR_ID = 'uj_message_error';
+
+}
+
+
+Message.prototype.load = function () {
+
+  var self = this;
+
+  var locals = {
+    MSG_TEMPLATE_ID: self.MSG_TEMPLATE_ID,
+    MSG_BODY_TEMPLATE_ID: self.MSG_BODY_TEMPLATE_ID,
+    MSG_SENT_TEMPLATE_ID: self.MSG_SENT_TEMPLATE_ID,
+    MSG_ERROR_ID: self.MSG_ERROR_ID,
+    color: app.traits().color
+  };
+
+  dom('body')
+    .prepend(template(locals));
+
+};
+
+
+Message.prototype.loadCss = function () {
+
+  var self = this;
+  var style = document.createElement('style');
+  style.type = 'text/css';
+  style.innerHTML =
+    '.uj-foot{display:table-row;vertical-align:bottom;height:1px}#uj-wrap{min-height:100%}#uj-main{overflow:auto;padding-bottom:150px}#uj-footer{position:relative;margin-top:-150px;height:150px;clear:both}#uj-page-wrap{width:75%;margin:80px auto}.uj-form-control{height:43px;padding:10px 15px;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);-webkit-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}.uj-message-template{margin:20px 0;padding:20px;border-left:1px solid #eee}.uj-message-template-danger{border-color:#d9534f;border-right:1px solid #d9534f;border-top:1px solid #d9534f;border-bottom:1px solid #d9534f;border-radius:4px}.uj-message-template-warning{background-color:#fcf8f2;border-color:#f0ad4e;border-right:1px solid #fcf8f2;border-top:1px solid #fcf8f2;border-bottom:1px solid #fcf8f2;border-radius:4px}.uj-message-template-info{background-color:#f4f8fa;border-color:#5bc0de;border-right:1px solid #f4f8fa;border-top:1px solid #f4f8fa;border-bottom:1px solid #f4f8fa;border-radius:4px}.uj-message-template-success{background-color:#F4FDF0;border-color:#3C763D;border-right:1px solid #F4FDF0;border-top:1px solid #F4FDF0;border-bottom:1px solid #F4FDF0;border-radius:4px}.uj-message-template-default{background-color:#EEE;border-color:#B4B4B4;border-right:1px solid #EEE;border-top:1px solid #EEE;border-bottom:1px solid #EEE;border-radius:4px}.uj-message-template-notice{background-color:#FCFCDD;border-color:#BDBD89;border-right:1px solid #FCFCDD;border-top:1px solid #FCFCDD;border-bottom:1px solid #FCFCDD;border-radius:4px}.uj-dropdown-menu>li>a{display:block;padding:3px 20px;clear:both;font-weight:400;line-height:1.42857143;color:#7b8a8b;white-space:nowrap}.uj-message-email-success{border-color:#BDBD89;border-right:1px solid #bdc3c7;border-top:1px solid #bdc3c7;border-bottom:1px solid #bdc3c7;border-radius:4px}.uj-input-group{position:relative;display:table;border-collapse:separate}.uj-panel-footer{padding:10px 15px;background-color:#ecf0f1;border-top:1px solid #ecf0f1;border-bottom-right-radius:3px;border-bottom-left-radius:3px}.uj-input-sm{height:18px;padding:6px 9px;font-size:13px;line-height:1.5;border-radius:3px}.uj-form-control:focus{border-color:#66afe9;outline:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6)}.uj-btn{display:inline-block;cursor:pointer;padding:10px 15px;font-size:15px;line-height:1.42857143;border-radius:4px;-moz-user-select:none;-ms-user-select:none;user-select:none}.uj-btn-danger{color:#fff;background-color:#e74c3c;border-color:#e74c3c}.uj-input-group .uj-form-control{position:relative;float:left;width:100%;margin-bottom:0}.uj-input-group-btn{position:relative;font-size:0}.uj-input-group-addon,.uj-input-group-btn{width:1%;white-space:nowrap;vertical-align:middle}.uj-input-group .uj-form-control,.uj-input-group-addon,.uj-input-group-btn{display:table-cell}.uj-input-group-btn>.uj-btn{position:relative}.uj-close{float:right;font-size:21px;font-weight:700;line-height:1;color:#000;text-shadow:0 1px 0 #fff;opacity:.2;filter:alpha(opacity=20)}.uj-close:focus,.uj-close:hover{color:#000;text-decoration:none;cursor:pointer;opacity:.5;filter:alpha(opacity=50)}button.uj-close{padding:0;cursor:pointer;background:0 0;border:0;-webkit-appearance:none}.uj-badge{display:inline-block;min-width:20px;padding:10px 14px;font-size:24px;font-weight:700;color:#fff;line-height:1;vertical-align:baseline;white-space:nowrap;text-align:center;background-color:#5bc0de;border-radius:10px}.uj-panel-default{color:#333;background-color:#bdc3c7}.uj-panel-heading{background-color:#f5f5f5}.uj-col-md-4{width:352px}.uj-row{margin-left:-15px;margin-right:-15px}.uj-arrow:after{content:"";position:absolute;bottom:-25px;left:175px;border-style:solid;border-width:25px 25px 0;border-color:#FFF transparent;display:block;width:0;z-index:1}.uj-arrow:before{content:"";position:absolute;left:296px;border-style:solid;border-width:17px 17px 0;border-color:#ddd transparent;display:block;width:0;z-index:0}*{box-sizing:border-box}.uj-panel-default{border-color:#ddd}.uj-panel{margin-bottom:20px;background-color:#fff;border:1px solid transparent;border-radius:4px;box-shadow:0 1px 1px rgba(0,0,0,.05)}.uj-panel-default>.uj-panel-heading{color:#333;background-color:#f5f5f5;border-color:#ddd}.uj-panel-heading{padding:10px 15px;border-bottom:1px solid transparent;border-top-right-radius:3px;border-top-left-radius:3px}.uj-panel-title{margin-top:0;margin-bottom:0;font-size:16px;color:inherit}.uj-panel-body{padding:15px}.uj-form-control{display:block;width:100%;font-size:14px;line-height:1.42857143;color:#555;background-color:#fff;background-image:none;border:1px solid #ccc;border-radius:4px;box-shadow:inset 0 1px 1px rgba(0,0,0,.075);transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}.uj-btn-block{display:block;width:100%;padding-left:0;padding-right:0}.uj-btn-group-sm>.uj-btn,.uj-btn-sm{padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}.uj-btn-info{color:#fff;background-color:#5bc0de;border-color:#46b8da}.uj-btn{margin-bottom:0;font-weight:400;text-align:center;vertical-align:middle;background-image:none;border:1px solid transparent;white-space:nowrap;-webkit-user-select:none}';
+
+  dom('head')
+    .prepend(style);
+
+};
+
+
+Message.prototype.show = function () {
+
+  var id = this.MSG_TEMPLATE_ID;
+
+  this.debug('show');
+
+  document.getElementById(id)
+    .style.display = (document.getElementById(id)
+      .style.display === 'none') ? 'block' : 'none';
+
+  document.getElementById(this.MSG_SENT_TEMPLATE_ID).style.display = 'none';
+  document.getElementById(this.MSG_ERROR_ID).style.display = 'none';
+  document.getElementById(this.MSG_BODY_TEMPLATE_ID).focus();
+
+};
+
+
+Message.prototype.hide = function () {
+
+  var id = this.MSG_TEMPLATE_ID;
+
+  document.getElementById(id)
+    .style.display = 'none';
+
+};
+
+
+Message.prototype.send = function () {
+
+  var self = this;
+
+  var appTraits = app.traits();
+  var userTraits = user.traits();
+  var apiUrl = appTraits.apiUrl;
+  var app_id = appTraits.app_id;
+  var MSG_POST_URL = apiUrl + '/conversations';
+  var user_id = userTraits.user_id;
+  var email = userTraits.email;
+
+  var msgBody = dom('#' + self.MSG_BODY_TEMPLATE_ID)
+    .val();
+
+  if (!msgBody) {
+    document.getElementById(self.MSG_ERROR_ID).style.display = 'block';
+    return;
+  }
+
+  var msg = {
+    app_id: app_id,
+    body: msgBody
+  };
+
+  if (user_id) {
+    msg.user_id = user_id;
+  } else if (email) {
+    msg.email = email;
+  } else {
+    return;
+  }
+
+
+  ajax({
+    type: "POST",
+    url: MSG_POST_URL,
+    data: msg,
+    dataType: 'json',
+
+    success: function (saved) {
+
+      self.debug('saved', saved);
+
+      document.getElementById(self.MSG_SENT_TEMPLATE_ID)
+        .style.display = 'block';
+
+      document.getElementById(self.MSG_TEMPLATE_ID)
+        .value = '';
+
+      document.getElementById(self.MSG_BODY_TEMPLATE_ID)
+        .value = '';
+
+      setTimeout(function () {
+        document.getElementById(self.MSG_TEMPLATE_ID)
+          .style.display = 'none';
+      }, 5000);
+    },
+
+    error: function (err) {
+      self.debug("error", err);
+    }
+  });
+
+};
+
+
+/**
+ * Expose `Message` instance.
+ */
+
+module.exports = bind.all(new Message());
+
+});
+require.register("userjoy/lib/message-template.js", function(exports, require, module){
+module.exports = function anonymous(obj) {
+
+  function escape(html) {
+    return String(html)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  };
+
+  function section(obj, prop, negate, str) {
+    var val = obj[prop];
+    if ('function' == typeof val) return val.call(obj, str);
+    if (negate) val = !val;
+    if (val) return str;
+    return '';
+  };
+
+  return "<div>\n    <a style=\"cursor: pointer\" onclick=\"userjoy.showFeedback()\">\n        <div style=\"position: fixed; bottom:30px; right:20px;\">\n            <span style=\"display: inline-block;\n            min-width: 20px;\n            padding: 10px 14px;\n            font-size: 24px;\n            font-weight: 700;\n            color: #fff;\n            line-height: 1;\n            vertical-align: baseline;\n            white-space: nowrap;\n            text-align: center;\n            background-color: " + escape(obj.color) + ";\n            border-radius: 10px;\">&#63;\n            </span>\n        </div>\n    </a>\n    <div style=\"display: none\" id=\"" + escape(obj.MSG_TEMPLATE_ID) + "\">\n        <div style=\"bottom: 80px; position: fixed; right: 9px;\" class=\"uj-col-md-4\">\n            <div class=\"uj-panel uj-panel-default\" style=\"border-color: #ddd;\">\n                <div class=\"uj-panel-heading\">\n                    <h3 class=\"uj-panel-title\" style=\"text-align: center;\">Send us a Message</h3>\n                    <button type=\"button\" class=\"uj-close\" aria-hidden=\"true\" onclick=\"userjoy.hideFeedback()\" id=\"closeFeedback\" style=\"margin-top: -25px;\">&times;</button>\n                </div>\n                <div class=\"uj-panel-body\">\n                    <form role=\"form\">\n                        <textarea id=\"" + escape(obj.MSG_BODY_TEMPLATE_ID) + "\" class=\"uj-form-control\" style=\"padding: 4px; height: 150px;\"></textarea>\n                        <span style=\"display: none; margin-top: 10px;\" id=\"" + escape(obj.MSG_SENT_TEMPLATE_ID) + "\">\n                        Message Sent. Thanks!</span>\n                        <span id=\"" + escape(obj.MSG_ERROR_ID) + "\" style=\" display:none; color: #a94442; margin-top: 10px;\">\n                        Your reply cannot be blank\n                        </span>\n                        <button type=\"button\" class=\"uj-btn uj-btn-sm uj-btn-block\" onclick=\"userjoy.sendConversation()\" style=\"float: right; margin-top: 10px; color: #fff; background-color: " + escape(obj.color) + "; border-color: " + escape(obj.color) + "\">Send Message</button>\n                        <div style=\"text-align: center;\">\n                        <small>Powered by <a style=\"text-decoration:none;\" href=\"http://www.userjoy.co\", target=\"_blank\">UserJoy</a></small>\n                        </div>\n                    </form>\n                </div>\n                <div class=\"uj-arrow\"></div>\n            </div>\n        </div>\n    </div>\n</div>\n"
+}
+});
+require.register("userjoy/lib/notification.js", function(exports, require, module){
+var ajax = require('ajax');
+var app = require('./app');
+var bind = require('bind');
+var debug = require('debug')('uj:notification');
+var dom = require('dom');
+var getGravatar = require('./get-gravatar');
+var template = require('./notification-template');
+var user = require('./user');
+
+
 /**
  * Initialize a new `Notification` instance.
  */
@@ -7133,6 +7109,7 @@ function Notification() {
   this.NOTIFICATION_TEMPLATE_ID = 'uj_notification';
   this.REPLY_TEMPLATE_ID = 'uj_notification_reply';
   this.SENT_TEMPLATE_ID = 'uj_notification_reply_sent';
+
 }
 
 
@@ -7187,7 +7164,7 @@ Notification.prototype.load = function (cb) {
       SENT_TEMPLATE_ID: self.SENT_TEMPLATE_ID,
       ERROR_ID: self.ERROR_ID,
       img_src: self.img_src,
-      gravatar: get_gravatar(userTraits.email, 80)
+      gravatar: getGravatar(userTraits.email, 80)
     };
 
 
@@ -7253,6 +7230,7 @@ Notification.prototype.hide = function () {
 Notification.prototype.reply = function () {
 
   var self = this;
+  var userTraits = user.traits();
 
   var msg = dom('#' + self.REPLY_TEMPLATE_ID)
     .val();
@@ -7269,10 +7247,10 @@ Notification.prototype.reply = function () {
     body: msg
   };
 
-  if (self.user_id) {
-    reply.user_id = self.user_id;
-  } else if (self.email) {
-    reply.email = self.email;
+  if (userTraits.user_id) {
+    reply.user_id = userTraits.user_id;
+  } else if (userTraits.email) {
+    reply.email = userTraits.email;
   } else {
     return;
   }
@@ -7488,7 +7466,8 @@ var canonical = require('canonical');
 var clone = require('clone');
 var company = require('./company');
 var cookie = require('./cookie');
-var debug = require('debug')('uj:userjoy');
+var debug = require('debug');
+var debugUserjoy = debug('uj:userjoy');
 var defaults = require('defaults');
 var each = require('each');
 var is = require('is');
@@ -7521,17 +7500,19 @@ module.exports = UserJoy;
  */
 
 function UserJoy() {
-  this.debug = debug;
+  this.debug = debugUserjoy;
 
-  // FIXME before going live
   this._timeout = 200;
 
-  // FIXME before going live
-  var API_URL = 'http://api.do.localhost';
+  // Change while testing in localhost
+  // Grunt replace is used to change this api url from 'api.do.localhost' to
+  // 'api.userjoy.co' in production and vice-versa
+  // Two grunt tasks have been defined for this: build and buildDev
+  this.API_URL = 'http://api.userjoy.co/track';
 
-  this.TRACK_URL = API_URL + '/track';
-  this.IDENTIFY_URL = API_URL + '/track/identify';
-  this.COMPANY_URL = API_URL + '/track/company';
+  this.TRACK_URL = this.API_URL;
+  this.IDENTIFY_URL = this.API_URL + '/identify';
+  this.COMPANY_URL = this.API_URL + '/company';
 
   bind.all(this);
 }
@@ -7561,13 +7542,10 @@ UserJoy.prototype.initialize = function () {
 
   app.identify({
     app_id: window._userjoy_id,
-
-    // FIXME change before production
-    apiUrl: self.TRACK_URL
+    apiUrl: self.API_URL
   });
 
 
-  // FIXME: THIS CODE IS NOT TESTED
   notification.load(function (err) {
 
     self.debug('loaded', err);
@@ -7976,6 +7954,25 @@ UserJoy.prototype.push = function (args) {
   if (!this[method]) return;
   this[method].apply(this, args);
 };
+
+
+
+/**
+ * Toggle debug mode.
+ */
+
+UserJoy.prototype.toggleDebug = function () {
+  var all = 'uj:*';
+
+  if (debug.enabled(all)) {
+    debug.disable(all);
+  } else {
+    debug.enable(all);
+  }
+
+};
+
+
 
 /**
  * Return the canonical path for the page.
