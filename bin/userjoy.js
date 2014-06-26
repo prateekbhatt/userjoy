@@ -54,7 +54,7 @@ program.on('--help', function() {
 // start
 program
   .command('start [env] [app]')
-  .description('starts all apps (env is either "dev" or "prod")')
+  .description('starts one/all app(s)')
   .action(function () {
     var env = program.env;
     var app = program.app;

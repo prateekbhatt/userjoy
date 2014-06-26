@@ -30,7 +30,7 @@ fi
 
 
 # Create nginx config files in nginx/sites-available
-if [[ $1 == 'development' ]]; then
+if [[ $1 == 'dev' ]]; then
 
   declare -a DO_APPS=( "website" "dashboard" "api" "cdn")
 
@@ -66,7 +66,7 @@ if [[ $1 == 'development' ]]; then
     fi
 
 
-    if [[ $app == 'website' ]] || [[ $app == 'development' ]] || [[ $app == 'api' ]]; then
+    if [[ $app == 'website' ]] || [[ $app == 'dashboard' ]] || [[ $app == 'api' ]]; then
 
       # create nginx config files
       cat > /etc/nginx/sites-available/app-$app << EOF
@@ -132,7 +132,7 @@ EOF
     sudo ln -sf /etc/nginx/sites-available/app-$app /etc/nginx/sites-enabled/app-$app
   done
 
-elif [[ $1 == 'production' ]]; then
+elif [[ $1 == 'prod' ]]; then
 
   declare -a DO_APPS=( "website" "dashboard" "api" )
 
