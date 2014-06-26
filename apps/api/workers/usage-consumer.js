@@ -175,7 +175,7 @@ function usageConsumerWorker(cb) {
           n: 1
         };
 
-        usageQueue.get(opts, function (err, res) {
+        usageQueue().get(opts, function (err, res) {
 
           logger.trace({
             at: 'workers/usage-consumer getFromQueue',
@@ -220,7 +220,7 @@ function usageConsumerWorker(cb) {
 
       function deleteFromQueue(aid, time, cb) {
 
-        usageQueue.del(queueMsgId, function (err, body) {
+        usageQueue().del(queueMsgId, function (err, body) {
 
           logger.trace({
             at: 'workers/usage-consumer deleteFromQueue',
@@ -246,7 +246,7 @@ function usageConsumerWorker(cb) {
         // ironmq accepts only strings
         appData = JSON.stringify(appData);
 
-        scoreQueue.post(appData, function (err) {
+        scoreQueue().post(appData, function (err) {
           cb(err, aid, time);
         });
       }

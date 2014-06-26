@@ -115,7 +115,7 @@ function cronFunc(cb) {
           })
           .value();
 
-        q.post(appsData, function (err, queueIds) {
+        q().post(appsData, function (err, queueIds) {
           cb(err, queueIds, appsData);
         });
       }

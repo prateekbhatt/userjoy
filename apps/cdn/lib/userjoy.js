@@ -6,7 +6,8 @@ var canonical = require('canonical');
 var clone = require('clone');
 var company = require('./company');
 var cookie = require('./cookie');
-var debug = require('debug')('uj:userjoy');
+var debug = require('debug');
+var debugUserjoy = debug('uj:userjoy');
 var defaults = require('defaults');
 var each = require('each');
 var is = require('is');
@@ -39,17 +40,19 @@ module.exports = UserJoy;
  */
 
 function UserJoy() {
-  this.debug = debug;
+  this.debug = debugUserjoy;
 
-  // FIXME before going live
   this._timeout = 200;
 
-  // FIXME before going live
-  var API_URL = 'http://api.do.localhost';
+  // Change while testing in localhost
+  // Grunt replace is used to change this api url from 'api.do.localhost' to
+  // 'api.userjoy.co' in production and vice-versa
+  // Two grunt tasks have been defined for this: build and buildDev
+  this.API_URL = 'http://api.userjoy.co/track';
 
-  this.TRACK_URL = API_URL + '/track';
-  this.IDENTIFY_URL = API_URL + '/track/identify';
-  this.COMPANY_URL = API_URL + '/track/company';
+  this.TRACK_URL = this.API_URL;
+  this.IDENTIFY_URL = this.API_URL + '/identify';
+  this.COMPANY_URL = this.API_URL + '/company';
 
   bind.all(this);
 }
@@ -79,13 +82,10 @@ UserJoy.prototype.initialize = function () {
 
   app.identify({
     app_id: window._userjoy_id,
-
-    // FIXME change before production
-    apiUrl: self.TRACK_URL
+    apiUrl: self.API_URL
   });
 
 
-  // FIXME: THIS CODE IS NOT TESTED
   notification.load(function (err) {
 
     self.debug('loaded', err);
@@ -494,6 +494,25 @@ UserJoy.prototype.push = function (args) {
   if (!this[method]) return;
   this[method].apply(this, args);
 };
+
+
+
+/**
+ * Toggle debug mode.
+ */
+
+UserJoy.prototype.toggleDebug = function () {
+  var all = 'uj:*';
+
+  if (debug.enabled(all)) {
+    debug.disable(all);
+  } else {
+    debug.enable(all);
+  }
+
+};
+
+
 
 /**
  * Return the canonical path for the page.

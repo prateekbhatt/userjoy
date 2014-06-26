@@ -180,11 +180,12 @@ var app = angular.module('dodatado', [
             if (response.status === 201) {
               console.log("success: ", response);
               $rootScope.successMsgRootScope = 'Success';
-              $rootScope.errorMssRootScope = '';
+              $rootScope.errorMsgRootScope = '';
               $rootScope.error = false;
               $rootScope.success = true;
               $timeout(function () {
                 $rootScope.success = false;
+                $rootScope.successMsgRootScope = '';
               }, 3000);
             }
             return response;

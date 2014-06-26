@@ -19,13 +19,6 @@ var restErrorMiddleware = require('../helpers/restErrorMiddleware');
 
 
 /**
- * Session store config
- */
-
-var sessionStore = require('./sessionStore')(session);
-
-
-/**
  * Adds middleware common to all routes
  * @param  {Object} app
  */
@@ -61,20 +54,34 @@ module.exports.session = function loadSessionMiddleware(app) {
 
 
   /**
-   * Cookie domain
+   * config vals
    */
 
   var cookieDomain = config.cookieDomain;
+  var redisHost = config.redisHost;
+  var sessionSecret = config.sessionSecret;
+
+
+  /**
+   * Session store config
+   */
+
+  var RedisStore = require('connect-redis')(session);
+  var sessionStore = new RedisStore({
+    host: redisHost,
+    port: 6379,
+    db: 'userjoy'
+  });
 
 
   // Express Session middleware
   // TODO : ADD SESSION CONFIG TO A DIFFERENT FILE
   app.use(session({
-    secret: 'HAHAHAHA',
-    key: 'dodatado.sid',
+    secret: 'YOUR_SESSION_SECRET',
+    key: 'userjoy.sid',
     cookie: {
       domain: cookieDomain,
-      maxAge: 3600000
+      maxAge: 86400000
     },
     store: sessionStore
   }));

@@ -13,48 +13,62 @@ var iron_mq = require('iron_mq');
 
 
 /**
- * Config settings
+ * returns function which returns queue object
  *
- * TODO: move these to central config settings file
+ * all this currying complexity had to be introduced because the config
+ * file needs the env variable or else throw an error
  */
 
-var TOKEN = 'Rfh192ozhicrSZ2R9bDX8uRvOu0';
-var PROJECT_ID_DEV = '536e5455bba6150009000090';
+function newQueue(name) {
+
+  return function () {
+
+    /**
+     * Config settings
+     */
+
+    var config = require('../../config')('api');
 
 
-/**
- * Create iron mq client instance
- */
+    /**
+     * Create iron mq client instance
+     */
 
-var imq = new iron_mq.Client({
-  token: TOKEN,
-  project_id: PROJECT_ID_DEV
-});
+    var imq = new iron_mq.Client({
+      token: config.ironioToken,
+      project_id: config.ironioProjectId
+    });
+
+
+    return imq.queue(name);
+  }
+
+}
 
 
 /**
  * setup 'automessge' queue on iron mq
  */
 
-module.exports.automessage = imq.queue("automessage");
+module.exports.automessage = newQueue('automessage');
 
 
 /**
  * setup 'usage' queue on iron mq
  */
 
-module.exports.usage = imq.queue("usage");
+module.exports.usage = newQueue('usage');
 
 
 /**
  * setup 'score' queue on iron mq
  */
 
-module.exports.score = imq.queue("score");
+module.exports.score = newQueue('score');
 
 
 /**
  * setup 'health' queue on iron mq
  */
 
-module.exports.health = imq.queue("health");
+module.exports.health = newQueue('health');

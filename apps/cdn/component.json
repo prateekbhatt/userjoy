@@ -36,6 +36,7 @@
     "lib/company.js",
     "lib/cookie.js",
     "lib/entity.js",
+    "lib/get-gravatar.js",
     "lib/message.js",
     "lib/message-template.js",
     "lib/notification.js",

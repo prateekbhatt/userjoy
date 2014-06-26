@@ -16,35 +16,16 @@
                 <h4>Edit code by adding email id, user id ....</h4>
                 <br>
                 <pre id="selectable" ng-click="selectText('selectable')"><code  ng-model="codeSnippet">
-window.userjoy = window.userjoy || [];
-​window.userjoy.methods = ['identify', 'company', 'track', 'page', 'track_link', 'track_form'];
-​window.userjoy.factory = function (method) {
-  return function () {
-    var args = Array.prototype.slice.call(arguments);
-    args.unshift(method);
-    window.userjoy.push(args);
-    return window.userjoy;
-  };
-};
-​for (var i = 0; i < window.userjoy.methods.length; i++) {
-  var key = window.userjoy.methods[i];
-  window.userjoy[key] = window.userjoy.factory(key);
-}
-​window.userjoy.load = function (key) {
-  window._userjoy_id = key;
-  if (document.getElementById('userjoy')) return;
-  // Create an async script element based on your key.​
-  var script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.id = 'userjoy';
-  script.async = true;
-  script.src = '//cdn.userjoy.co/js/userjoy.js';
-  var first = document.getElementsByTagName('script')[0];
-  first.parentNode.insertBefore(script, first);
-};
-​window.userjoy.SNIPPET_VERSION = '1.0.0';
-​window.userjoy.load('{{apiKey}}');
+​window.userjoy=window.userjoy||[],window.userjoy.methods=["identify","company","track","page","track_link","track_form"],window.userjoy.factory=function(a){return function(){var b=Array.prototype.slice.call(arguments);return b.unshift(a),window.userjoy.push(b),window.userjoy}};for(var i=0;i < window.userjoy.methods.length;i++){var key=window.userjoy.methods[i];window.userjoy[key]=window.userjoy.factory(key)}window.userjoy.load=function(a){if(!document.getElementById("userjoy-js")){window._userjoy_id=a;var b=document.createElement("script");b.type="text/javascript",b.id="userjoy-js",b.async=!0,b.src=("https:"===document.location.protocol?"https:":"http:")+"//d1jozu9mugm1h5.cloudfront.net/js/userjoy.js";var c=document.getElementsByTagName("script")[0];c.parentNode.insertBefore(b,c)}};​​
+
+window.userjoy.load('{{apiKey}}');
+
 userjoy.page();
+
+userjoy.identify({
+  // TODO: Replace email below with that of the logged in user
+  email: 'test@userjoy.co'
+});
 </code></pre>
                 <!-- <textarea class="form-control" rows="10">Code to be added here .....</textarea> -->
                 <div style="padding-top:20px">

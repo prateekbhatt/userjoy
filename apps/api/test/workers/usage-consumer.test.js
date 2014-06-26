@@ -129,15 +129,15 @@ describe('Worker usage-consumer', function () {
           [
 
             function clearUsageQueue(cb) {
-              usageQueue.clear(cb);
+              usageQueue().clear(cb);
             },
 
             function clearScoreQueue(cb) {
-              scoreQueue.clear(cb);
+              scoreQueue().clear(cb);
             },
 
             function postToUsageQueue(cb) {
-              usageQueue.post(
+              usageQueue().post(
 
                 JSON.stringify({
                   aid: aid,
@@ -209,7 +209,7 @@ describe('Worker usage-consumer', function () {
 
             // should have deleted message from usage queue
             function checkUsageQueue(cb) {
-              usageQueue.get({
+              usageQueue().get({
                 n: 1
               }, function (err, response) {
 
@@ -226,7 +226,7 @@ describe('Worker usage-consumer', function () {
 
             // should have added the aid to the score queue
             function checkScoreQueue(cb) {
-              scoreQueue.get({
+              scoreQueue().get({
                 n: 1
               }, function (err, response) {
 

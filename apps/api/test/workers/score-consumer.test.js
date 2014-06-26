@@ -117,15 +117,15 @@ describe('Worker score-consumer', function () {
         [
 
           function clearScoreQueue(cb) {
-            scoreQueue.clear(cb);
+            scoreQueue().clear(cb);
           },
 
           function clearHealthQueue(cb) {
-            healthQueue.clear(cb);
+            healthQueue().clear(cb);
           },
 
           function postToScoreQueue(cb) {
-            scoreQueue.post(
+            scoreQueue().post(
 
               JSON.stringify({
                 aid: aid,
@@ -206,7 +206,7 @@ describe('Worker score-consumer', function () {
 
           // should have deleted message from score queue
           function checkScoreQueue(cb) {
-            scoreQueue.get({
+            scoreQueue().get({
               n: 1
             }, function (err, response) {
 
@@ -224,7 +224,7 @@ describe('Worker score-consumer', function () {
 
           // should have added the aid to the health queue
           function checkHealthQueue(cb) {
-            healthQueue.get({
+            healthQueue().get({
               n: 1
             }, function (err, response) {
 
