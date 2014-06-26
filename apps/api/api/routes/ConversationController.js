@@ -4,6 +4,8 @@
 
 var _ = require('lodash');
 var async = require('async');
+// var gravatar = require('nodejs-gravatar');
+var gravatar = require('node-gravatar');
 var moment = require('moment');
 var router = require('express')
   .Router();
@@ -29,6 +31,7 @@ var isAuthenticated = require('../policies/isAuthenticated');
  * Services
  */
 
+var accountMailer = require('../services/account-mailer');
 var userMailer = require('../services/user-mailer');
 
 
@@ -695,34 +698,117 @@ router
 router
   .route('/:aid/conversations/:coId/assign')
   .put(function (req, res, next) {
-
     var assignee = req.body.assignee;
     var aid = req.params.aid;
+    var appName = req.app.name;
     var coId = req.params.coId;
 
-    if (!assignee) return res.badRequest(
-      'Provide valid account id (assignee)')
 
-    Conversation.assign(aid, coId, assignee, function (err, con) {
+    if (!assignee) {
+      return res.badRequest('Provide valid account id (assignee)')
+    }
 
-      if (err) return next(err);
-      if (!con) return res.notFound('Conversation not found');
+    async.waterfall(
+      [
+
+        function assignToTeamMember(cb) {
+
+          Conversation.assign(aid, coId, assignee, function (err, con) {
+            if (err) return cb(err);
+            if (!con) return cb(new Error('CONVERSATION_NOT_FOUND'));
+            cb(null, con);
+          });
+
+        },
+
+        function populateAssigneeNameAndEmail(con, cb) {
+          var populate = {
+            path: 'assignee',
+            select: 'name email'
+          };
+
+          con.populate(populate, function (err, conversation) {
+            cb(err, conversation);
+          });
+        },
+
+        function sendMail(conversation, cb) {
+
+          /**
+           * require config for dashboard url
+           */
+          var config = require('../../../config')('api');
+          var dashboardUrl = config.hosts['dashboard'];
 
 
-      var populate = {
-        path: 'assignee',
-        select: 'name email'
-      };
+          var email = conversation.assignee.email;
+          var name = conversation.assignee.name;
+          var avatar = gravatar.get(email, 'R', 60, 'mm' );
+          var conversationUrl = dashboardUrl + '/apps/' + aid +
+            '/messages/conversations/' + conversation._id;
 
-      con.populate(populate, function (err, conversation) {
-        if (err) return next(err);
+          var mailOptions = {
+            locals: {
+              appName: appName,
+              gravatar: avatar,
+              name: name,
+              subject: conversation.sub,
+              conversationUrl: conversationUrl
+            },
+            to: {
+              email: email,
+              name: name
+            }
+          };
+
+
+          accountMailer.sendAssignConversation(mailOptions, function (err) {
+            cb(err, conversation);
+          });
+        }
+      ],
+
+      function callback(err, conversation) {
+
+        if (err) {
+
+          if (err.message === 'CONVERSATION_NOT_FOUND') {
+            return res.notFound('Conversation not found');
+
+          } else {
+
+            return next(err);
+          }
+
+        }
 
         res
           .status(201)
           .json(conversation);
-      })
 
-    });
+
+      });
+
+    // Conversation.assign(aid, coId, assignee, function (err, con) {
+
+    //   if (err) return next(err);
+    //   if (!con) return res.notFound('Conversation not found');
+
+
+    //   var populate = {
+    //     path: 'assignee',
+    //     select: 'name email'
+    //   };
+
+    //   con.populate(populate, function (err, conversation) {
+    //     if (err) return next(err);
+
+    //     res
+    //       .status(201)
+    //       .json(conversation);
+    //   })
+
+    // });
   });
 
 
