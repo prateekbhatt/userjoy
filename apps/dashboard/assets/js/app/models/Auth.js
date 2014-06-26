@@ -47,8 +47,10 @@ angular.module('models.auth', ['services'])
                     0]._id + '/addcode');
                 }
                 AppService.setCurrentApp(AppService.getLoggedInApps()[0]);
+                AppService.setAppName(AppService.getLoggedInApps()[0].name);
               } else {
                 $state.go('onboarding');
+                AppService.setAppName('Apps');
               }
             })
             .error(function () {

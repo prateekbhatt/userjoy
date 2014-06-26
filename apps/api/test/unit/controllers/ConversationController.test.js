@@ -692,7 +692,7 @@ describe('Resource /apps/:aid/conversations', function () {
   });
 
 
-  describe('PUT /apps/:aid/conversations/:coId/assign', function () {
+  describe.only('PUT /apps/:aid/conversations/:coId/assign', function () {
 
     var savedCon;
     var testUrl;

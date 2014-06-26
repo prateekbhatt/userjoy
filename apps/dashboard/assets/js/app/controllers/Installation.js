@@ -41,6 +41,7 @@ angular.module('do.install', [])
   'AppService', '$log', 'AppModel',
   function ($scope, $http, config, $state, AppService, $log, AppModel) {
 
+    AppService.setAppName('Apps');
 
     $scope.installapp = function () {
 
@@ -80,6 +81,7 @@ angular.module('do.install', [])
           console.log("currentApp: ", AppService.getCurrentApp());
           $scope.apiKey = AppService.getCurrentApp()
             ._id;
+          AppService.setAppName(AppService.getCurrentApp().name);
         }
 
         AppModel.getSingleApp($scope.appId, populateCode)

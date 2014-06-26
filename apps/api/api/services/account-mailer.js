@@ -21,23 +21,23 @@ var UJ_SUPPORT_EMAIL = 'support@userjoy.co';
 var UJ_SUPPORT_NAME = 'UserJoy';
 
 
-/*
-USAGE:
 
-var options = {
-  locals: {
-    user: {
-      name: 'Prateek'
-    }
-  },
-  to: {
-    email: 'prattbhatt@gmail.com',
-    name: 'Prateek Bhatt'
-  }
-};
-mailer.sendToUser(options);
+// USAGE:
 
-*/
+// var options = {
+//   locals: {
+//     user: {
+//       name: 'Savinay'
+//     }
+//   },
+//   to: {
+//     email: 'savinay.90@gmail.com',
+//     name: 'Savinay Narendra'
+//   }
+// };
+// mailer.sendToUser(options);
+
+
 
 /**
  * @constructor Mailer
@@ -118,6 +118,14 @@ exports.sendForgotPassword = function (options, cb) {
   mailer.send(cb);
 };
 
+exports.sendAssignConversation = function (options, cb) {
+  var mailer = new Mailer(options);
+  mailer.subject = options.locals.appName +
+    ': You have been assigned a new conversation';
+  mailer.template = 'email-assign.ejs';
+  mailer.send(cb);
+}
+
 /**
  * FOR TESTING PURPOSE
  *
@@ -127,7 +135,7 @@ exports.sendForgotPassword = function (options, cb) {
 
 exports.sendTestMail = function (options, cb) {
   var mailer = new Mailer(options);
-  mailer.subject = 'Email Confirmation UserJoy';
-  mailer.template = 'email-confirmation.ejs';
+  mailer.subject = 'App Name: ' + options.locals.message_subject;
+  mailer.template = 'email-assign.ejs';
   mailer.send(cb);
 }
