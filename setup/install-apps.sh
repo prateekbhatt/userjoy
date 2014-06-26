@@ -2,7 +2,7 @@
 
 set -e
 
-echo 'Installing applications for DoDataDo ...'
+echo 'Installing applications for UserJoy ...'
 
 cd apps
 
