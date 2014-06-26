@@ -3,7 +3,10 @@
 # Terminate after the first line that fails (returns nonzero exit code)
 set -e
 
-echo 'Installing nginx'
+bash ./setup/check-env-arg.sh $1
+
+echo 'Installing nginx for' $1 'environment for UserJoy ...' $(pwd)
+
 # TODO: Must install nginx > 1.4 for websockets support
 # Install specific nginx version
 # Currently, if the installed nginx version is greater than $NGINX_VERSION,
@@ -27,7 +30,7 @@ fi
 
 
 # Create nginx config files in nginx/sites-available
-if [[ $1 == 'development' ]]; then
+if [[ $1 == 'dev' ]]; then
 
   declare -a DO_APPS=( "website" "dashboard" "api" "cdn")
 
@@ -63,7 +66,7 @@ if [[ $1 == 'development' ]]; then
     fi
 
 
-    if [[ $app == 'website' ]] || [[ $app == 'development' ]] || [[ $app == 'api' ]]; then
+    if [[ $app == 'website' ]] || [[ $app == 'dashboard' ]] || [[ $app == 'api' ]]; then
 
       # create nginx config files
       cat > /etc/nginx/sites-available/app-$app << EOF
@@ -129,7 +132,7 @@ EOF
     sudo ln -sf /etc/nginx/sites-available/app-$app /etc/nginx/sites-enabled/app-$app
   done
 
-elif [[ $1 == 'production' ]]; then
+elif [[ $1 == 'prod' ]]; then
 
   declare -a DO_APPS=( "website" "dashboard" "api" )
 
