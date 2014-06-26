@@ -71,7 +71,7 @@ program
   .command('*')
   .action(function (env) {
     console.log('Enter a Valid command');
-    console.log('Try "dodatado --help"');
+    console.log('Try "userjoy --help"');
   });
 
 program.parse(process.argv);

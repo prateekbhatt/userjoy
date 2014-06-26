@@ -833,6 +833,31 @@ describe('Resource /track', function () {
 
       });
 
+
+    it('should return error if user not found',
+      function (done) {
+        var testUrl = url;
+
+        var newCon = {
+          'app_id': saved.users.first.aid,
+          'email': 'randomEmail',
+          'body': 'Hey man, how are you?'
+        };
+
+        request
+          .post(testUrl)
+          .send(newCon)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            status: 400,
+            error: 'User not found'
+          })
+          .end(done);
+
+      });
+
+
     it('should create new conversation',
       function (done) {
 
