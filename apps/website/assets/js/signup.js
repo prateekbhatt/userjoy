@@ -12,6 +12,17 @@ var opts = {
   left: '33%' // Left position relative to parent
 };
 
+var signupApiUrl;
+switch (document.domain) {
+  case 'www.do.localhost':
+    signupApiUrl = 'http://api.do.localhost/account';
+    break;
+  case 'do.localhost':
+    signupApiUrl = 'http://api.do.localhost/account';
+    break;
+  default:
+    signupApiUrl = 'http://api.userjoy.co/account';
+}
 
 $('#signup_form_submit')
   .click(function (e) {
@@ -24,7 +35,7 @@ $('#signup_form_submit')
       .attr("disabled", true);
     // TODO: change url for production
     $.ajax({
-      url: 'http://api.do.localhost/account',
+      url: signupApiUrl,
       type: 'POST',
       data: $('#signup_form')
         .serialize(),
