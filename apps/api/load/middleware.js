@@ -95,7 +95,7 @@ module.exports.session = function loadSessionMiddleware(app) {
 
 /**
  * Adds CORS middleware for requests from
- * app subdomain and root domain of dodatado.com
+ * app subdomain and root domain of userjoy.co
  * @param {Object} app
  */
 module.exports.cors = function loadCorsMiddleware(app) {

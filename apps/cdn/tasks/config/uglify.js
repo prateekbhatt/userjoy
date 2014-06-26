@@ -17,9 +17,13 @@ module.exports = function (grunt) {
       preserveComments: false,
       report: 'min'
     },
-    dist: {
-      src: ['./userjoy.js'],
-      dest: './build/userjoy.js'
+    prod: {
+      src: ['./build/userjoy-prod.js'],
+      dest: './build/userjoy-prod.js'
+    },
+    dev: {
+      src: ['./build/userjoy-dev.js'],
+      dest: './build/userjoy-dev.js'
     }
   });
 

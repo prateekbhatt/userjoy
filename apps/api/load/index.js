@@ -64,7 +64,7 @@ exports.start = function startServer(done) {
   loadMiddleware.session(app);
 
 
-  // cors middlware to allow requests from app.dodatado.com and dodatado.com
+  // cors middlware to allow requests from app.userjoy.co and userjoy.com
   // to api routes
   loadMiddleware.cors(app);
 

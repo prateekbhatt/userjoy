@@ -23,7 +23,7 @@ module.exports = function (grunt) {
     },
     js: {
       upload: [{
-        src: './build/userjoy.js',
+        src: './build/userjoy-prod.js',
         dest: 'js/userjoy.js'
       }]
     }
