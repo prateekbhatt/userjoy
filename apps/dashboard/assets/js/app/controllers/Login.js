@@ -59,23 +59,37 @@ angular.module('do.login', [])
     $scope.showError = false;
     $scope.enableLogin = true;
     $scope.signupHref = 'http://userjoy.co/signup';
-    if(window.location.href.split('/')[2] == 'app.do.localhost') {
+    if (window.location.href.split('/')[2] == 'app.do.localhost') {
       $scope.signupHref = 'http://do.localhost/signup';
     } else {
       $scope.signupHref = 'http://userjoy.co/signup';
     }
-    console.log("$rootScope loggedIn: ", $rootScope.loggedIn);
+    console.log("$rootScope loggedIn: ", $rootScope.loggedIn, AppService.getCurrentApp());
     if ($rootScope.loggedIn && AppService.getCurrentApp()
-      ._id != null) {
+      ._id != null && AppService.getCurrentApp()
+      .isActive) {
       $location.path('/apps/' + AppService.getCurrentApp()
         ._id + '/users/list');
+    }
+
+    if ($rootScope.loggedIn && AppService.getCurrentApp()
+      ._id != null && !AppService.getCurrentApp()
+      .isActive) {
+      $location.path('/apps/' + AppService.getCurrentApp()
+        ._id + '/addcode');
     }
 
     if ($rootScope.loggedIn && AppService.getCurrentApp()
       ._id == null) {
       CurrentAppService.getCurrentApp()
         .then(function (currentApp) {
-          $location.path('/apps/' + currentApp[0]._id + '/users/list');
+          if(currentApp[0].isActive) {
+            $location.path('/apps/' + currentApp[0]._id + '/users/list');
+          } 
+
+          if(!currentApp[0].isActive) {
+            $location.path('/apps/' + currentApp[0]._id + '/addcode');
+          }
         })
     }
 
