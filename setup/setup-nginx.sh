@@ -3,7 +3,10 @@
 # Terminate after the first line that fails (returns nonzero exit code)
 set -e
 
-echo 'Installing nginx'
+bash ./setup/check-env-arg.sh $1
+
+echo 'Installing nginx for' $1 'environment for UserJoy ...' $(pwd)
+
 # TODO: Must install nginx > 1.4 for websockets support
 # Install specific nginx version
 # Currently, if the installed nginx version is greater than $NGINX_VERSION,
