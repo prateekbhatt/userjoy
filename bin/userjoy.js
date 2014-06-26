@@ -1,22 +1,67 @@
 #!/usr/bin/env node
 
-var program = require('commander'),
-  shell = require('shelljs'),
-  start = require('./start'),
-  cowsay = require('./cowsay'),
-  _ = require('lodash');
+/**
+ * npm dependencies
+ */
 
-program
-  .version('0.0.1');
+var _ = require('lodash');
+var program = require('commander');
+var shell = require('shelljs');
+
+
+var start = require('./start');
+var cowsay = require('./cowsay');
+
+
+program.version('0.0.1')
+  .option('-e, --env <environment>', 'dev/prod environment')
+  .option('-a, --app <app-name>', 'api/dashboard/website/workers');
+
+
+program.on('--help', function() {
+  console.log('  Basic Examples:');
+  console.log('');
+  console.log('    Start apps in dev / prod env :');
+  console.log('    $ userjoy start -e dev');
+  console.log('    OR');
+  console.log('    $ userjoy start -e prod');
+  console.log('');
+  console.log('    Start a single app in dev / prod env (api/dashboard/website/workers) :');
+  console.log('    $ userjoy start -e dev -a api');
+  console.log('');
+  console.log('    Restart the previous app launched, by name :');
+  console.log('    $ userjoy restart api');
+  console.log('');
+  console.log('    Stop the app :');
+  console.log('    $ userjoy stop api');
+  console.log('');
+  console.log('    Restart the app :');
+  console.log('    $ userjoy restart api');
+  console.log('');
+  console.log('    Stop all apps and kill daemon :');
+  console.log('    $ userjoy stop');
+  console.log('');
+  console.log('    List all apps :');
+  console.log('    $ userjoy list');
+  console.log('');
+  console.log('    Say Hi :');
+  console.log('    $ userjoy cowsay MOO');
+  console.log('');
+  console.log('');
+});
+
 
 // start
 program
-  .command('start [env]')
-  .description(
-    'starts all apps (env is either "development" or "production")')
-  .action(function (env) {
-    start(env);
+  .command('start [env] [app]')
+  .description('starts all apps (env is either "dev" or "prod")')
+  .action(function () {
+    var env = program.env;
+    var app = program.app;
+
+    start(env, app);
   });
+
 
 // restart
 program
