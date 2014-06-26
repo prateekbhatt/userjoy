@@ -11,9 +11,9 @@
  */
 module.exports = function (grunt) {
   grunt.config.set('replace', {
-    production: {
+    prod: {
       src: ['./userjoy.js'],
-      dest: './userjoy.js',
+      dest: './build/userjoy-prod.js',
       replacements: [{
         from: 'api.do.localhost',
         to: 'api.userjoy.co'
@@ -21,7 +21,7 @@ module.exports = function (grunt) {
     },
     dev: {
       src: ['./userjoy.js'],
-      dest: './userjoy.js',
+      dest: './build/userjoy-dev.js',
       replacements: [{
         from: 'api.userjoy.co',
         to: 'api.do.localhost'
