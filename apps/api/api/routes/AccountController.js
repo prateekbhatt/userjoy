@@ -159,7 +159,9 @@ router
       return res.notFound();
     }
 
-    res.json(req.user);
+    res
+      .status(200)
+      .json(req.user);
 
   });
 
@@ -234,7 +236,9 @@ router
           return next(err);
         }
 
-        res.json(account);
+        res
+          .status(200)
+          .json(account);
 
       });
 
@@ -309,10 +313,12 @@ router
         if (account.toJSON) account = account.toJSON();
         delete account.password;
 
-        res.json({
-          message: 'Password token verified',
-          account: account
-        });
+        res
+          .status(200)
+          .json({
+            message: 'Password token verified',
+            account: account
+          });
 
       });
 
@@ -336,7 +342,9 @@ router
         return next(err);
       }
 
-      res.json(account);
+      res
+        .status(200)
+        .json(account);
 
     });
 
@@ -395,9 +403,11 @@ router
 
         if (err) return next(err);
 
-        res.json({
-          message: 'Reset password email sent'
-        });
+        res
+          .status(200)
+          .json({
+            message: 'Reset password email sent'
+          });
       });
 
 
@@ -430,9 +440,11 @@ router
         return next(err);
       }
 
-      res.json({
-        message: 'Password updated'
-      });
+      res
+        .status(200)
+        .json({
+          message: 'Password updated'
+        });
     });
 
   });

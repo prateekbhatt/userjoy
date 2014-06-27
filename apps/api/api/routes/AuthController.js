@@ -41,9 +41,11 @@ router.post('/login', function (req, res, next) {
         return res.badRequest(err);
       }
 
-      return res.json({
-        message: 'Logged In Successfully'
-      });
+      return res
+        .status(200)
+        .json({
+          message: 'Logged In Successfully'
+        });
 
     });
 
@@ -59,9 +61,11 @@ router.post('/login', function (req, res, next) {
 router.post('/logout', function (req, res, next) {
 
   req.logout();
-  res.json({
-    message: 'Logged Out Successfully'
-  });
+  res
+    .status(200)
+    .json({
+      message: 'Logged Out Successfully'
+    });
 
 });
 
