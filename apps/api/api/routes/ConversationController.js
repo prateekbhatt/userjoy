@@ -281,7 +281,9 @@ router
 
       function callback(err, conversations) {
         if (err) return next(err);
-        res.json(conversations || []);
+        res
+          .status(200)
+          .json(conversations || []);
       }
     )
 
@@ -336,7 +338,9 @@ router
 
         if (err) return next(err);
 
-        res.json(con);
+        res
+          .status(200)
+          .json(con);
       }
 
     );
@@ -743,7 +747,7 @@ router
 
           var email = conversation.assignee.email;
           var name = conversation.assignee.name;
-          var avatar = gravatar.get(email, 'R', 60, 'mm' );
+          var avatar = gravatar.get(email, 'R', 60, 'mm');
           var conversationUrl = dashboardUrl + '/apps/' + aid +
             '/messages/conversations/' + conversation._id;
 

@@ -53,7 +53,9 @@ module.exports = function (req, res, next) {
       error: message
     };
 
-    res.json(errObj, httpStatus);
+    res
+      .status(httpStatus)
+      .json(errObj);
 
   }
 
@@ -64,7 +66,7 @@ module.exports = function (req, res, next) {
    */
   res.notFound = function notFound(message) {
     sendResponse(404, message || 'Not Found');
-  } ;
+  };
 
 
   /**

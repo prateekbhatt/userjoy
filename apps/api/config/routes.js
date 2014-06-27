@@ -109,7 +109,9 @@ module.exports.error = function loadErrorRoutes(app) {
     });
 
     var badRequestErr = errorHelper(err);
-    res.json(badRequestErr, badRequestErr.status);
+    res
+      .status(badRequestErr.status)
+      .json(badRequestErr);
   });
 
   /// catch 404 and forwarding to error handler
@@ -123,20 +125,24 @@ module.exports.error = function loadErrorRoutes(app) {
   // will print stacktrace
   if (app.get('env') === 'development') {
     app.use(function (err, req, res, next) {
-      res.json({
-        message: err.message,
-        error: err
-      }, 404);
+      res
+        .status(404)
+        .json({
+          message: err.message,
+          error: err
+        });
     });
   }
 
   // production error handler
   // no stacktraces leaked to user
   app.use(function (err, req, res, next) {
-    res.json({
-      message: err.message,
-      error: {}
-    }, 404);
+    res
+      .status(404)
+      .json({
+        message: err.message,
+        error: {}
+      });
   });
 
 };

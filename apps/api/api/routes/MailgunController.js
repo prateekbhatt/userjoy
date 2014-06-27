@@ -47,8 +47,10 @@ function mailgunCallback(req, res, next) {
         at: 'Mailgun Output',
         body: req.body
       });
-      
-      res.json();
+
+      res
+        .status(200)
+        .json();
     }
 
   }
