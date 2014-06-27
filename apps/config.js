@@ -27,9 +27,20 @@ var DATABASES = {
 };
 
 var API_CORS_WHITELIST = {
-  development: ['http://app.do.localhost', 'http://do.localhost'],
-  production: ['http://app.userjoy.co', 'http://userjoy.co'],
-  test: ['http://app.do.localhost', 'http://do.localhost']
+  development: [
+    'http://app.do.localhost',
+    'http://do.localhost'
+  ],
+  production: [
+    'http://app.userjoy.co',
+    'http://userjoy.co',
+    'http://www.app.userjoy.co',
+    'http://www.userjoy.co'
+  ],
+  test: [
+    'http://app.do.localhost',
+    'http://do.localhost'
+  ]
 };
 
 var REDIS_HOST = {
