@@ -83,7 +83,9 @@ router
           return res.notFound();
         }
 
-        res.json(app);
+        res
+          .status(200)
+          .json(app);
 
       });
 
@@ -119,7 +121,9 @@ router
           return next(err);
         }
 
-        res.json(app, 201);
+        res
+          .status(201)
+          .json(app);
       });
 
   });
@@ -174,7 +178,9 @@ router
         return next(new Error('Error in PUT /apps/:aid/name'));
       }
 
-      res.json(app);
+      res
+        .status(200)
+        .json(app);
 
     })
   });
@@ -200,7 +206,9 @@ router
     req.app.color = color;
     req.app.save(function (err, app) {
       if (err) return next(err);
-      res.json(app);
+      res
+        .status(200)
+        .json(app);
     });
   });
 
