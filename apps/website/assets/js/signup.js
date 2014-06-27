@@ -1,11 +1,8 @@
-$('#signupalert')
-  .addClass('hide');
-$('#signupsuccess')
-  .addClass('hide');
 $("#spin")
   .css({
     display: "block"
   });
+
 var opts = {
   top: '50%', // Top position relative to parent
   radius: 8,
@@ -14,20 +11,23 @@ var opts = {
 
 var signupApiUrl;
 switch (document.domain) {
-  case 'www.do.localhost':
-    signupApiUrl = 'http://api.do.localhost/account';
-    break;
-  case 'do.localhost':
-    signupApiUrl = 'http://api.do.localhost/account';
-    break;
-  default:
-    signupApiUrl = 'http://api.userjoy.co/account';
+case 'www.do.localhost':
+  signupApiUrl = 'http://api.do.localhost/account';
+  break;
+case 'do.localhost':
+  signupApiUrl = 'http://api.do.localhost/account';
+  break;
+default:
+  signupApiUrl = 'http://api.userjoy.co/account';
 }
 
 $('#signup_form_submit')
   .click(function (e) {
     e.preventDefault();
-    $("#spin").css({display:"block"})
+    $("#spin")
+      .css({
+        display: "block"
+      })
     var div = document.getElementById('spin');
     var spinner = new Spinner(opts)
       .spin(div);
@@ -49,10 +49,14 @@ $('#signup_form_submit')
         console.log('signup success', arguments);
         $('#signup_form_submit')
           .attr("disabled", false);
-        // $("#signupsuccess")
-        //   .css("display", "block");
-        $('#signupsuccess')
-          .removeClass('hide');
+        $("#signupsuccess")
+          .css("display", "block");
+        $("#signupalert")
+          .css("display", "none");
+        // $('#signupsuccess')
+        //   .removeClass('hide');
+        // $('#signupalert')
+        //   .addClass('hide');
         $('#successtext')
           .text(
             "Signup successful! A verfication email has been sent to your email id."
@@ -126,29 +130,23 @@ $(function () {
 
 function displayError(err) {
   console.log("inside display error");
-  // $("#signupalert")
-  //   .css("display", "block !important");
-  // $('#signupalert').show();
-  $('#signupalert')
-    .removeClass('hide');
+  $("#signupalert")
+    .css("display", "block");
+  $("#signupsuccess")
+    .css("display", "none");
   $('#errortext')
     .text(err);
 }
 
 function closeSuccessMsg() {
-  // $('#signupsuccess')
-  //   .css("display", "none");
   $('#signupsuccess')
-    .addClass('hide');
+    .css("display", "none");
 }
 
 function closeErrMsg() {
   console.log("closing error msg");
-  // $('#signupalert')
-  //   .css("display", "none");
-  // $('#signupalert').hide();
   $('#signupalert')
-    .addClass('hide');
+    .css("display", "none");
 }
 
 function redirectToLogin() {
