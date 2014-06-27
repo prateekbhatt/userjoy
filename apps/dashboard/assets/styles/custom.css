@@ -152,7 +152,7 @@ a:hover, a:focus {
 }
 /* Edit Below to Customize Widths > 768px */
 
-@media (min-width: 768px) {
+@media {
     /* Wrappers */
 
 #navbar-brand-sidenav {
