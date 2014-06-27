@@ -71,8 +71,7 @@ module.exports.session = function loadSessionMiddleware(app) {
   var RedisStore = require('connect-redis')(session);
   var sessionStore = new RedisStore({
     host: redisHost,
-    port: 6379,
-    db: 'userjoy'
+    port: 6379
   });
 
 
