@@ -26,7 +26,6 @@
     "angular-lodash": "~0.1.0",
     "socket.io-client": "~0.9.16",
     "lodash": "~2.4.1",
-    "ng-table": "~0.3.1",
     "font-awesome": "~4.0.3",
     "angular-strap": "2.0.0-rc.3",
     "angular-motion": "~0.3.2",
@@ -41,10 +40,11 @@
     "angular-bootstrap": "0.10.0",
     "textAngular": "1.2.1-pre6",
     "spin.js": "~2.0.1",
-    "angular-jquery": "~0.2.1"
+    "angular-jquery": "~0.2.1",
+    "ng-table": "0.3.1"
   },
   "resolutions": {
-    "angular": "~1.2.x",
+    "angular": "~1.2.15",
     "d3": "3.4.8",
     "nvd3": "~1.1.15-beta"
   }
