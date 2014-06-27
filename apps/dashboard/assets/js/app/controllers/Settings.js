@@ -195,8 +195,8 @@ angular.module('do.settings', [])
 ])
 
 .controller('changePasswordCtrl', ['$scope', 'AccountModel', '$log',
-  '$stateParams',
-  function ($scope, AccountModel, $log, $stateParams) {
+  '$stateParams', '$location',
+  function ($scope, AccountModel, $log, $stateParams, $location) {
 
     // $scope.newPwdLen = true;
     $scope.new_pwd = '';
