@@ -8,6 +8,7 @@ angular.module('services.AppService', [])
     var defaultApp = {};
     var email = '';
     var appName = '';
+    var appId = '';
 
     this.new = function (newApp) {
       apps.push(newApp);
@@ -59,6 +60,14 @@ angular.module('services.AppService', [])
 
     this.getAppName = function () {
       return appName
+    }
+
+    this.setAppId = function (value) {
+      appId = value;
+    }
+
+    this.getAppId = function () {
+      return appId;
     }
 
     return this;
