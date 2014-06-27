@@ -76,6 +76,12 @@ upstream $SERVER_NAME {
     server 127.0.0.1:$PORT;
 }
 
+# REF: http://stackoverflow.com/a/19238614/1463434
+server {
+    server_name www.$SERVER_NAME;
+    return 301 \$scheme://$SERVER_NAME\$request_uri;
+}
+
 # the nginx server instance
 server {
     listen 0.0.0.0:80;
@@ -107,6 +113,12 @@ EOF
       # create nginx config files
       cat > /etc/nginx/sites-available/app-$app << EOF
 
+
+
+server {
+    server_name www.$SERVER_NAME;
+    return 301 \$scheme://$SERVER_NAME\$request_uri;
+}
 
 # the nginx server instance
 server {
@@ -167,6 +179,11 @@ elif [[ $1 == 'prod' ]]; then
 # the IP(s) on which the app node server is running.
 upstream $SERVER_NAME {
     server 127.0.0.1:$PORT;
+}
+
+server {
+    server_name www.$SERVER_NAME;
+    return 301 \$scheme://$SERVER_NAME\$request_uri;
 }
 
 # the nginx server instance
