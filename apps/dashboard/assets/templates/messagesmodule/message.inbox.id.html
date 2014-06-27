@@ -68,7 +68,7 @@
                             <a class="glyphicon glyphicon-remove"></a> -->
 
                         </div>
-                        <div class="col-md-9">
+                        <div class="col-md-9" style="overflow: auto;">
                             <p ng-bind-html="message.messagebody | newlines">
                             </p>
                         </div>
@@ -87,7 +87,7 @@
                             <div class="col-md-3">
                                 <span style="font-size: 19px;">
                                 <strong>{{user}}</strong></span>&nbsp;&nbsp;
-                                <span class="label label-default">Admin</span>
+                                <span class="label label-default">Team</span>
                             </div>
                            
                             <div class="col-md-push-4 col-md-3">
@@ -97,7 +97,7 @@
                                 <a class="glyphicon glyphicon-remove"></a> -->
                                 </em>
                             </div>
-                            <div class="col-md-9">
+                            <div class="col-md-9" style="overflow: auto;">
                                 <p value="reply.body" ng-bind-html="reply.body | newlines">
                                 </p>
                             </div>

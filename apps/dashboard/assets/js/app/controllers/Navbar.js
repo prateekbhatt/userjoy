@@ -215,26 +215,18 @@ angular.module('do.navbar', [])
   function ($scope, AuthService, $location, LoginService, AppService, $log,
     CurrentAppService, AppModel) {
 
+
+
     CurrentAppService.getCurrentApp()
       .then(function (currentApp) {
 
-
+        $scope.firstTimeOnboarding = false;
         $scope.appId = $location.path()
           .split("/")[2];
-        // if ($location.path()
-        //   .split("/")[2] != 'settings') {
-        //   AppService.setAppId($scope.appId);
-        // } else {
-        //   $scope.appId = AppService.getAppId();
-        // }
-
-        // if ($scope.appId == null) {
-        //   console.log("app ID is null")
-        //   $scope.appId = currentApp[0]._id;
-        //   AppService.setAppId(currentApp[0]._id);
-        // }
         if($scope.appId == null || $scope.appId == '') {
-          $scope.appId = currentApp[0]._id;
+          if(currentApp[0] != null) {
+            $scope.appId = currentApp[0]._id;
+          }
         }
         $scope.showDropdown = function () {
           $scope.visibleDropdown = true;
@@ -247,12 +239,13 @@ angular.module('do.navbar', [])
         $scope.showDropdownApp = function () {
           $scope.visibleDropdownApp = true;
         }
+        if($location.path() == '/onboarding' && currentApp.length == 0) {
+          $scope.firstTimeOnboarding = true;
+        }
 
-        // if($location.path == '/onboarding') {
-        //   $scope.displayApp = 'Apps';
-        // } else {
-        //   $scope.displayApp = AppService.getCurrentApp().name;
-        // }
+        $scope.logoutFirstTimeOnboarding = function () {
+          AuthService.logout();
+        }
 
         var callback = function () {
 
@@ -287,13 +280,6 @@ angular.module('do.navbar', [])
             }
             console.log("connectedapps: ", $scope.connectedapps);
           });
-
-          // $scope.appId = AppService.getCurrentApp()
-          //   ._id;
-          // if ($scope.appId == null && currentApp[0] != null) {
-          //   $scope.appId = currentApp[0]._id;
-          //   $scope.displayApp = currentApp[0].name;
-          // }
 
           $scope.changeApp = function (app) {
             $scope.displayApp = app.name;
@@ -356,17 +342,10 @@ angular.module('do.navbar', [])
         }
 
 
+        if(currentApp.length > 0) {
+          AppModel.getSingleApp($scope.appId, callback);
+        }
 
-        AppModel.getSingleApp($scope.appId, callback);
-
-        // if ($location.path()
-        //   .split("/")[2] != 'settings') {
-        //   console.log("appId is not settings: ", $scope.appId);
-        // }
-        // if ($location.path()
-        //   .split("/")[2] == 'settings') {
-        //   AppModel.getSingleApp(AppService.getAppId(), callback);
-        // }
       })
 
 
