@@ -24,14 +24,14 @@
                         </a>
                     </li> -->
                     <li>
-                        <a href="/apps/{{appId}}/users/list" ng-class="{'active': isActive('users')}">
+                        <a ng-click="goToUsers()" ng-class="{'active': isActive('users')}" style="cursor: pointer;">
                         <i class="fa fa-user">
                         </i>
                         Users
                         </a>
                     </li>
                     <li>
-                        <a href="/apps/{{appId}}/messages/open" ng-class="{'active': isActive('messages')}">
+                        <a ng-click="goToConversations()" ng-class="{'active': isActive('messages')}" style="cursor: pointer;">
                         <i class="fa fa-envelope-o">
                         </i>
                         Messages
@@ -82,7 +82,7 @@
                         </a>
                         <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" ng-show="visibleDropdown">
                             <li role="presentation">
-                                <a role="menuitem" tabindex="-1" href="/account/settings" ng-class="{'active': isAccountActive('/account/settings')}">
+                                <a role="menuitem" tabindex="-1" ng-click="goToAccountSettings()" ng-class="{'active': isAccountActive('/account/settings')}" style="cursor: pointer;">
                                 <span class="glyphicon glyphicon-cog"></span>&nbsp;&nbsp;&nbsp;&nbsp;Settings
                                 </a>
                             </li>

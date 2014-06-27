@@ -4,7 +4,7 @@ angular.module('do.settings', [])
   function ($stateProvider) {
     $stateProvider
       .state('settings', {
-        url: '/account',
+        url: '/apps/:id/account',
         views: {
           "main": {
             templateUrl: '/templates/settingsmodule/settings.html',
@@ -14,7 +14,7 @@ angular.module('do.settings', [])
         authenticate: true
       })
       .state('accountsettings', {
-        url: '/account/settings',
+        url: '/apps/:id/account/settings',
         views: {
           "main": {
             templateUrl: '/templates/settingsmodule/settings.profile.html',
@@ -24,7 +24,7 @@ angular.module('do.settings', [])
         authenticate: true
       })
       .state('changePassword', {
-        url: '/account/settings/changePassword',
+        url: '/apps/:id/account/settings/changePassword',
         views: {
           "main": {
             templateUrl: '/templates/settingsmodule/settings.profile.changePassword.html',
@@ -63,46 +63,46 @@ angular.module('do.settings', [])
         },
         authenticate: true
       })
-      // .state('appsettings.health', {
-      //   url: '/health',
-      //   views: {
-      //     "tab": {
-      //       templateUrl: '/templates/settingsmodule/settings.app.health.html',
-      //       controller: 'appSettingsHealthCtrl',
-      //     }
-      //   },
-      //   authenticate: true
-      // })
-      .state('appsettings.messages', {
-        url: '/colorthemes',
-        views: {
-          "tab": {
-            templateUrl: '/templates/settingsmodule/settings.app.messages.html',
-            controller: 'appSettingsMessagesCtrl',
-          }
-        },
-        authenticate: true
-      })
-      // .state('appsettings.environment', {
-      //   url: '/environment',
-      //   views: {
-      //     "tab": {
-      //       templateUrl: '/templates/settingsmodule/settings.app.environment.html',
-      //       controller: 'appSettingsEnvironmentCtrl',
-      //     }
-      //   },
-      //   authenticate: true
-      // })
-      .state('appsettings.billing', {
-        url: '/billing',
-        views: {
-          "tab": {
-            templateUrl: '/templates/settingsmodule/settings.app.billing.html',
-            controller: 'appSettingsBillingCtrl',
-          }
-        },
-        authenticate: true
-      })
+    // .state('appsettings.health', {
+    //   url: '/health',
+    //   views: {
+    //     "tab": {
+    //       templateUrl: '/templates/settingsmodule/settings.app.health.html',
+    //       controller: 'appSettingsHealthCtrl',
+    //     }
+    //   },
+    //   authenticate: true
+    // })
+    .state('appsettings.messages', {
+      url: '/colorthemes',
+      views: {
+        "tab": {
+          templateUrl: '/templates/settingsmodule/settings.app.messages.html',
+          controller: 'appSettingsMessagesCtrl',
+        }
+      },
+      authenticate: true
+    })
+    // .state('appsettings.environment', {
+    //   url: '/environment',
+    //   views: {
+    //     "tab": {
+    //       templateUrl: '/templates/settingsmodule/settings.app.environment.html',
+    //       controller: 'appSettingsEnvironmentCtrl',
+    //     }
+    //   },
+    //   authenticate: true
+    // })
+    .state('appsettings.billing', {
+      url: '/billing',
+      views: {
+        "tab": {
+          templateUrl: '/templates/settingsmodule/settings.app.billing.html',
+          controller: 'appSettingsBillingCtrl',
+        }
+      },
+      authenticate: true
+    })
       .state('appsettings.installation', {
         url: '/installation',
         views: {
@@ -129,9 +129,11 @@ angular.module('do.settings', [])
 
 .controller('profileSettingsCtrl', ['$scope', '$log', '$state', '$location',
   '$http', 'config', 'AccountService', 'AccountModel', 'AppService',
+  '$stateParams',
   function ($scope, $log, $state, $location, $http, config,
-    AccountService, AccountModel, AppService) {
+    AccountService, AccountModel, AppService, $stateParams) {
 
+    $scope.appId = $stateParams.id;
     $scope.profileNameChangeSuccess = false;
     $scope.profileNameChangeError = false;
     $scope.hideSuccessAlert = function () {
@@ -140,6 +142,15 @@ angular.module('do.settings', [])
 
     $scope.hideErrorAlert = function () {
       $scope.profileNameChangeError = false;
+    }
+
+    $scope.goToProfileSettings = function () {
+      $location.path('/apps/' + $scope.appId + '/account/settings');
+    }
+
+    $scope.goToChangePassword = function () {
+      $location.path('/apps/' + $scope.appId +
+        '/account/settings/changePassword');
     }
 
 
@@ -184,15 +195,26 @@ angular.module('do.settings', [])
 ])
 
 .controller('changePasswordCtrl', ['$scope', 'AccountModel', '$log',
-  function ($scope, AccountModel, $log) {
+  '$stateParams',
+  function ($scope, AccountModel, $log, $stateParams) {
 
     // $scope.newPwdLen = true;
     $scope.new_pwd = '';
     $scope.showError = false;
+    $scope.appId = $stateParams.id;
     $scope.pwdChangedSuccess = false;
     $scope.errMsg = '';
     $scope.hideErrorAlert = function () {
       $scope.showError = false;
+    }
+
+    $scope.goToProfileSettings = function () {
+      $location.path('/apps/' + $scope.appId + '/account/settings');
+    }
+
+    $scope.goToChangePassword = function () {
+      $location.path('/apps/' + $scope.appId +
+        '/account/settings/changePassword');
     }
 
     $scope.hideSuccessAlert = function () {
@@ -219,8 +241,9 @@ angular.module('do.settings', [])
   function ($scope, $log, $state, $location, AppService, CurrentAppService,
     AppModel, $stateParams) {
 
-    var url = $location.path().split('/');
-    if(url.length == 4){
+    var url = $location.path()
+      .split('/');
+    if (url.length == 4) {
       $location.path('/apps/' + $stateParams.id + '/settings/general')
     }
 
@@ -232,7 +255,7 @@ angular.module('do.settings', [])
           var location = $location.path()
             .split('/')[4];
           return path === location;
-        } 
+        }
 
         var populatePage = function () {
           $scope.App = AppService.getCurrentApp()

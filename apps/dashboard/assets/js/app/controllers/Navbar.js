@@ -46,7 +46,20 @@ angular.module('do.navbar', [])
           $scope.visibleDropdownApp = true;
         }
 
-        $scope.appId = $location.path().split("/")[2];
+        $scope.appId = $location.path()
+          .split("/")[2];
+        //        if ($location.path()
+        //          .split("/")[2] != 'settings') {
+        //          AppService.setAppId($scope.appId);
+        //        } else {
+        //          $scope.appId = AppService.getAppId();
+        //        }
+        // console.log("app id after refreshing: ", $scope.appId);
+        //        if ($scope.appId == null || $scope.appId == '') {
+        //          console.log("app ID is null")
+        //          $scope.appId = currentApp[0]._id;
+        //          AppService.setAppId(currentApp[0]._id);
+        //        }
 
         var callback = function () {
           var appsconnected;
@@ -62,14 +75,14 @@ angular.module('do.navbar', [])
             $location.path('/login');
           };
 
-          $scope.appId = AppService.getCurrentApp()
-            ._id;
+          // $scope.appId = AppService.getCurrentApp()
+          //   ._id;
           $scope.displayApp = AppService.getCurrentApp()
             .name;
-          if ($scope.appId == null && currentApp[0] != null) {
-            $scope.appId = currentApp[0]._id;
-            $scope.displayApp = currentApp[0].name;
-          }
+          // if ($scope.appId == null && currentApp[0] != null) {
+          //   $scope.appId = currentApp[0]._id;
+          //   $scope.displayApp = currentApp[0].name;
+          // }
           console.log("current App Id ------>>>>>>>..", $scope.appId,
             AppService.getCurrentApp()
             ._id);
@@ -126,13 +139,34 @@ angular.module('do.navbar', [])
             }
           }
 
+          $scope.goToAccountSettings = function () {
+            $location.path('/apps/' + $scope.appId + '/account/settings');
+          }
+
+          $scope.goToUsers = function () {
+            if(AppService.getCurrentApp().isActive) {
+              $location.path('/apps/' + $scope.appId + '/users/list');
+            } else {
+              $location.path('/apps/' + $scope.appId + '/addcode');
+            }
+          }
+
+          $scope.goToConversations = function () {
+            if(AppService.getCurrentApp().isActive) {
+              $location.path('/apps/' + $scope.appId + '/messages/open');
+            } else {
+              $location.path('/apps/' + $scope.appId + '/addcode');
+            }
+          }
+
           $scope.changeUrl = function () {
             $log.info("inside settings changeUrl");
             $location.path('/settings/profile');
           }
 
           $scope.redirectToApp = function () {
-            console.log("currentApp: ", AppService.getCurrentApp(), $scope.appId);
+            console.log("currentApp: ", AppService.getCurrentApp(), $scope
+              .appId);
             if (_.isEmpty(AppService.getCurrentApp())) {
               var cb = function (err) {
                 if (err) {
@@ -160,8 +194,16 @@ angular.module('do.navbar', [])
         }
 
 
-
         AppModel.getSingleApp($scope.appId, callback);
+        // if ($location.path()
+        //   .split("/")[2] != 'settings') {
+        //   console.log("appId is not settings: ", $scope.appId);
+        // }
+        // if ($location.path()
+        //   .split("/")[2] == 'settings') {
+        //   AppModel.getSingleApp(AppService.getAppId(), callback);
+        // }
+
       })
 
     // 
@@ -176,9 +218,24 @@ angular.module('do.navbar', [])
     CurrentAppService.getCurrentApp()
       .then(function (currentApp) {
 
+
         $scope.appId = $location.path()
           .split("/")[2];
+        // if ($location.path()
+        //   .split("/")[2] != 'settings') {
+        //   AppService.setAppId($scope.appId);
+        // } else {
+        //   $scope.appId = AppService.getAppId();
+        // }
 
+        // if ($scope.appId == null) {
+        //   console.log("app ID is null")
+        //   $scope.appId = currentApp[0]._id;
+        //   AppService.setAppId(currentApp[0]._id);
+        // }
+        if($scope.appId == null || $scope.appId == '') {
+          $scope.appId = currentApp[0]._id;
+        }
         $scope.showDropdown = function () {
           $scope.visibleDropdown = true;
         }
@@ -262,6 +319,10 @@ angular.module('do.navbar', [])
             }
           }
 
+          $scope.goToAccountSettings = function () {
+            $location.path('/apps/' + $scope.appId + '/account/settings');
+          }
+
           $scope.redirectToApp = function () {
             console.log("currentApp: ", AppService.getCurrentApp(), $scope
               .appId);
@@ -296,8 +357,16 @@ angular.module('do.navbar', [])
 
 
 
-
         AppModel.getSingleApp($scope.appId, callback);
+
+        // if ($location.path()
+        //   .split("/")[2] != 'settings') {
+        //   console.log("appId is not settings: ", $scope.appId);
+        // }
+        // if ($location.path()
+        //   .split("/")[2] == 'settings') {
+        //   AppModel.getSingleApp(AppService.getAppId(), callback);
+        // }
       })
 
 
