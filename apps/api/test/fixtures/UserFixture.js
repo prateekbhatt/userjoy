@@ -79,8 +79,6 @@ function genFakeUser(aid) {
 
     email: faker.Internet.email(),
 
-    totalSessions: faker.Helpers.randomNumber(10000),
-
     ct: faker.Date.recent(10000),
 
     lastSeen: faker.Date.recent(10),
