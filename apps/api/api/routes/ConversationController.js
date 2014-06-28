@@ -715,28 +715,55 @@ router
     async.waterfall(
       [
 
-        function assignToTeamMember(cb) {
+        function getConversationAndCheckAssignee(cb) {
 
-          Conversation.assign(aid, coId, assignee, function (err, con) {
-            if (err) return cb(err);
-            if (!con) return cb(new Error('CONVERSATION_NOT_FOUND'));
-            cb(null, con);
+          Conversation
+            .findOne({
+              _id: coId,
+              aid: aid
+            })
+            .exec(function (err, con) {
+              if (err) return cb(err);
+              if (!con) return cb(new Error('CONVERSATION_NOT_FOUND'));
+
+              // if the conversation is already assigned to requested account,
+              // then move on without sending a redundant email
+              var alreadyAssigned = false;
+              if (con.assignee.toString() === assignee.toString()) {
+                alreadyAssigned = true;
+              }
+
+              cb(null, alreadyAssigned, con);
+            });
+        },
+
+        function assignToTeamMember(alreadyAssigned, con, cb) {
+
+          // if already assigned move on
+          if (alreadyAssigned) return cb(null, alreadyAssigned, con);
+
+          con.assignee = assignee;
+          con.save(function (err, con) {
+            cb(err, alreadyAssigned, con);
           });
 
         },
 
-        function populateAssigneeNameAndEmail(con, cb) {
+        function populateAssigneeNameAndEmail(alreadyAssigned, con, cb) {
           var populate = {
             path: 'assignee',
             select: 'name email'
           };
 
           con.populate(populate, function (err, conversation) {
-            cb(err, conversation);
+            cb(err, alreadyAssigned, conversation);
           });
         },
 
-        function sendMail(conversation, cb) {
+        function sendMail(alreadyAssigned, con, cb) {
+
+          // if already assigned, dont send mail. move on
+          if (alreadyAssigned) return cb(null, alreadyAssigned, con);
 
           /**
            * require config for dashboard url
@@ -745,18 +772,18 @@ router
           var dashboardUrl = config.hosts['dashboard'];
 
 
-          var email = conversation.assignee.email;
-          var name = conversation.assignee.name;
+          var email = con.assignee.email;
+          var name = con.assignee.name;
           var avatar = gravatar.get(email, 'R', 60, 'mm');
           var conversationUrl = dashboardUrl + '/apps/' + aid +
-            '/messages/conversations/' + conversation._id;
+            '/messages/conversations/' + con._id;
 
           var mailOptions = {
             locals: {
               appName: appName,
               gravatar: avatar,
               name: name,
-              subject: conversation.sub,
+              subject: con.sub,
               conversationUrl: conversationUrl
             },
             to: {
@@ -767,52 +794,28 @@ router
 
 
           accountMailer.sendAssignConversation(mailOptions, function (err) {
-            cb(err, conversation);
+            cb(err, alreadyAssigned, con);
           });
         }
       ],
 
-      function callback(err, conversation) {
+      function callback(err, alreadyAssigned, conversation) {
+
 
         if (err) {
 
           if (err.message === 'CONVERSATION_NOT_FOUND') {
             return res.notFound('Conversation not found');
-
-          } else {
-
-            return next(err);
           }
 
+          return next(err);
         }
 
-        res
-          .status(201)
+        res.status(200)
           .json(conversation);
-
 
       });
 
-    // Conversation.assign(aid, coId, assignee, function (err, con) {
-
-    //   if (err) return next(err);
-    //   if (!con) return res.notFound('Conversation not found');
-
-
-    //   var populate = {
-    //     path: 'assignee',
-    //     select: 'name email'
-    //   };
-
-    //   con.populate(populate, function (err, conversation) {
-    //     if (err) return next(err);
-
-    //     res
-    //       .status(201)
-    //       .json(conversation);
-    //   })
-
-    // });
   });
 
 
