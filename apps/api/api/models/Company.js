@@ -98,11 +98,6 @@ var CompanySchema = new Schema({
   },
 
 
-  totalSessions: {
-    type: Number,
-    default: 0
-  },
-
   lastSessionAt: {
     type: Date
   },

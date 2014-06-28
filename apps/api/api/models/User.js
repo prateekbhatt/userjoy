@@ -193,12 +193,6 @@ var UserSchema = new Schema({
   },
 
 
-  totalSessions: {
-    type: Number,
-    default: 1
-  },
-
-
   // tags [all tags this user belongs to]
   // notes
   // status (Free, Paying, Cancelled)
