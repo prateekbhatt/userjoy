@@ -1,5 +1,5 @@
 <div ng-include src="'/templates/navbar/navbar.html'"></div>
-<button class="fa fa-backward btn btn-danger" style="width: 200px;" ng-click="doTheBack()"><span>&nbsp;&nbsp;Back</span></button>
+<button class="fa fa-backward btn btn-default" style="width: 200px;" ng-click="doTheBack()"><span>&nbsp;&nbsp;Back</span></button>
 <br>
 <br>
 <div>
@@ -7,7 +7,7 @@
         <div class="row">
             <div class="col-md-4">
                 <img ng-src={{customergravatar}}
-                alt="" class="img-rounded img-responsive" style="height:70px" fallback-src={{customersrc}} />
+                alt="" class="img-rounded img-responsive" style="height:70px; cursor: pointer;" fallback-src={{customersrc}} ng-click="goToUserProfile()" />
             </div>
             <div class="col-md-4">
                 <h3>{{customername}}</h3>
@@ -53,9 +53,9 @@
                             <span style="font-size: 19px;">
                             <strong>{{message.createdby}}</strong></span>&nbsp;&nbsp;
                             <span class="label label-default" ng-show={{message.admin}}>Team</span>
+                            <span class="label label-success" ng-show={{message.seen}}>Seen</span>
                         </div>
                         <div class="col-md-push-1 col-md-1">
-                            <span class="label label-success" ng-show={{message.seen}}>Seen</span>
                         </div>
                         <div class="col-md-push-1 col-md-3">
                             <em>
