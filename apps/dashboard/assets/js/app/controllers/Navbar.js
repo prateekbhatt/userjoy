@@ -36,7 +36,8 @@ angular.module('do.navbar', [])
         }
 
         $scope.isAccountActive = function (path) {
-          return path === $location.path();
+          var location = $location.path().split('/')[4];
+          return path === location;
         }
 
         $scope.showDropdown = function () {
@@ -241,6 +242,11 @@ angular.module('do.navbar', [])
         }
         if($location.path() == '/onboarding' && currentApp.length == 0) {
           $scope.firstTimeOnboarding = true;
+        }
+
+        $scope.isAccountActive = function (path) {
+          var location = $location.path().split('/')[4];
+          return path === location;
         }
 
         $scope.logoutFirstTimeOnboarding = function () {

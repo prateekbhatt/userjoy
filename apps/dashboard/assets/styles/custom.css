@@ -843,6 +843,12 @@ li.list-group-item-segment.active, li.list-group-item-segment.active:hover, li.l
     border-color: #ddd;
 }
 
+.btn-back {
+    color: #ffffff;
+    background-color: #95a5a6;
+    border-color: #95a5a6;
+}
+
 /*.active-smart-filters {
     background-color: #e0e0e0;   
 }
