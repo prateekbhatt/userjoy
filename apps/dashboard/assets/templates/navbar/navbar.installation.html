@@ -2,7 +2,7 @@
     <nav role="navigation" style="background-color: #f8f8f8; border-color: #e7e7e7;" class="navbar navbar-inverse navbar-fixed-top" bs-navbar>
         <div>
             <div class="navbar-header">
-                <button type="button" data-toggle="collapse" data-target=".navbar-ex1-collapse" class="navbar-toggle">
+                <button type="button" class="navbar-toggle" ng-init="navCollapsed = true" ng-click="navCollapsed = !navCollapsed">
                 <span class="sr-only">
                 Toggle navigation
                 </span>
@@ -25,8 +25,8 @@
         </div>
         <!-- <div class="col-md-4 col-md-push-3">
         </div> -->
-        <div role="navigation" class="collapse navbar-collapse navbar-right navbar-ex1-collapse" >
-            <ul class="nav navbar-nav">
+        <div role="navigation" class="collapse navbar-collapse" ng-class="!navCollapsed && 'in'" ng-click="navCollapsed=true">
+            <ul class="nav navbar-nav navbar-right" style="padding-right: 10px;">
                 <li class="dropdown" ng-if="!firstTimeOnboarding">
                     <a href="#" class="dropdown-toggle" ng-click="showDropdownApp()">
                     <i class="fa fa-folder-open-o">
