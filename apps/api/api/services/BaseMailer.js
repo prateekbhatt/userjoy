@@ -171,9 +171,6 @@ BaseMailer.prototype.send = function (cb) {
     [
 
       function renderEJSFile(cb) {
-
-        console.log('\n\n\n obj', templatePath);
-
         render.file(templatePath, self.locals, function (err, html, text) {
           cb(err, html);
         });
@@ -200,10 +197,7 @@ BaseMailer.prototype.send = function (cb) {
       function sendEmail(inlinedHtml, cb) {
         var opts = self.options();
 
-        console.log('sendMail');
-
         self.transport.sendMail(opts, function (err, responseStatus) {
-          console.log('sentMail', err, responseStatus);
           cb(err, responseStatus, opts);
         });
 
