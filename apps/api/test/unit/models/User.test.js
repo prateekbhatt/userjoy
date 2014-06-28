@@ -210,12 +210,7 @@ describe('Model User', function () {
         .to.have.property('ut');
     });
 
-    it('should not add ct timestamp', function () {
-      expect(savedUser)
-        .to.have.property('ct');
-    });
-
-    it('should not add lastSeen timestamp', function () {
+    it('should add lastSeen timestamp', function () {
       expect(savedUser)
         .to.have.property('lastSeen')
         .that.is.a('date');
@@ -235,13 +230,6 @@ describe('Model User', function () {
         .that.is.a('number')
         .and.eqls(50);
     });
-
-    it('should have totalSessions as 1 when the user is created',
-      function () {
-        expect(savedUser.totalSessions)
-          .to.eql(1);
-      });
-
 
     it(
       'should return error if billing status is not in [trial, free, paying, cancelled]',

@@ -189,13 +189,12 @@ UserNote      |                         | notes created by team members about a 
 - revenue
 - score (latest engagement score of user, defaults to 50 for new user)
 - status
-- totalSessions
 - lastContactedAt
 - lastSeen (timestamp of last session of user)
 - lastHeardAt
 - ip
 - x tags [] Stores tags for categorizing users
-- companies [{cid, companyName, billing{}, healthScore, totalSessions}]
+- companies [{cid, name}]
 
 
 ##### Indexes:
@@ -211,11 +210,10 @@ UserNote      |                         | notes created by team members about a 
 - User can belong to multiple companies (In Userjoy's case, a user can belong to multiple apps)
   If so, we need to calculate the following attribute of a user on a per company basis:
     - healthScore
-    - totalSessions
     - billing
 
 - status must be one of [trial, free, paying, cancelled]
-- Health score should be calculated based on total sessions in last 30 days, total time spent on site [?]
+- Engagement score is calculated based on total usage in last 14 days, normalized to 100
 
 - Ignoring: user acquisition data like (since we do not have data for non loggedin users):
     - referredBy (document.referrer or $Direct)
@@ -276,7 +274,6 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 - aid
 - company_id (required, similar to user_id)
 - name (required)
-- totalSessions
 - x meta (object containing additonal info about users)
 - ct (should be passed by js snippet)
 - ut

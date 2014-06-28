@@ -33,6 +33,14 @@ var healthStatusValidator = require('../../helpers/health-status-validator');
 
 
 /**
+ * Constants
+ */
+
+var DEFAULT_HEALTH = 'average';
+var DEFAULT_SCORE = 50;
+
+
+/**
  * Define metadata schema (embedded document)
  */
 
@@ -130,7 +138,7 @@ var UserSchema = new Schema({
   health: {
     type: String,
     validate: healthStatusValidator,
-    default: 'average'
+    default: DEFAULT_HEALTH
   },
 
 
@@ -180,7 +188,7 @@ var UserSchema = new Schema({
   // latest engagement score
   score: {
     type: Number,
-    default: 50,
+    default: DEFAULT_SCORE,
     min: 0,
     max: 100
   },
@@ -190,12 +198,6 @@ var UserSchema = new Schema({
   status: {
     type: String,
     validate: billingStatusValidator
-  },
-
-
-  totalSessions: {
-    type: Number,
-    default: 1
   },
 
 
@@ -326,8 +328,15 @@ UserSchema.statics.findOrCreate = function (aid, user, cb) {
     conditions.email = email;
   }
 
+
+  // set default values for a new user
+  var setOnInsert = _.clone(user);
+  setOnInsert.health = DEFAULT_HEALTH;
+  setOnInsert.score = DEFAULT_SCORE;
+
+
   var update = {
-    $setOnInsert: user,
+    $setOnInsert: setOnInsert,
     $set: {
       lastSeen: Date.now()
     }
