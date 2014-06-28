@@ -276,7 +276,14 @@ router
 
       [
 
-        function checkIfActive(cb) {
+        function checkIfAlreadyActive(cb) {
+          if (req.app.isActive) {
+            return cb(new Error('APP_ALREADY_ACTIVE'));
+          }
+          cb();
+        },
+
+        function checkIfAnyUsers(cb) {
           User
             .findOne({
               aid: aid
@@ -317,13 +324,22 @@ router
       ],
 
       function (err, isActive) {
-        if (err) return next(err);
 
-        res
-          .status(200)
-          .json({
-            isActive: isActive
-          });
+        var sendRes = function (status) {
+          return res
+            .status(200)
+            .json({
+              isActive: status
+            });
+        };
+
+        if (err) {
+          if (err.message === 'APP_ALREADY_ACTIVE') return sendRes(true);
+          return next(err);
+        }
+
+        sendRes(isActive);
+
       }
     );
 
