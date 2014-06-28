@@ -849,6 +849,15 @@ li.list-group-item-segment.active, li.list-group-item-segment.active:hover, li.l
     border-color: #95a5a6;
 }
 
+pre code {
+    padding: 0;
+    font-size: inherit;
+    color: inherit;
+    white-space: nowrap;
+    background-color: transparent;
+    border-radius: 0;
+}
+
 /*.active-smart-filters {
     background-color: #e0e0e0;   
 }
