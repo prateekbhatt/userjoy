@@ -2213,6 +2213,7 @@ angular.module('do.users', [])
                     name: value[i].name,
                     when: $moment(value[i].ct)
                       .fromNow(),
+                    timestamp: $moment(value[i].ct).format('LLL'),
                     type: value[i].type
                   })
                 };
