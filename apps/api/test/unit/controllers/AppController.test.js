@@ -598,6 +598,108 @@ describe('Resource /apps', function () {
 
       });
 
+
+    // WARNING: Run this test after the previous test where the app got activated
+    it('should not create predefined segments if app already active',
+
+      function (done) {
+
+
+        async.series([
+
+          function shouldBeActiveBefore(cb) {
+            App.findById(aid, function (err, app) {
+              expect(err)
+                .to.not.exist;
+              expect(app.isActive)
+                .to.be.true;
+
+              cb();
+            })
+          },
+
+
+          function shouldHaveThreePredefinedSegments(cb) {
+            Segment
+              .find({
+                aid: aid
+              })
+              .exec(function (err, segs) {
+
+                expect(err)
+                  .to.not.exist;
+
+                var preSegs = _.filter(segs, {
+                  predefined: true
+                });
+
+                // expecting three health filters
+                expect(preSegs.length)
+                  .to.eql(3);
+
+                cb();
+              });
+          },
+
+
+          function activateApp(cb) {
+
+            request
+              .put(url)
+              .set('cookie', loginCookie)
+              .expect('Content-Type', /json/)
+              .expect(200)
+              .expect(function (res) {
+                expect(res.body.isActive)
+                  .to.be.true;
+              })
+              .end(cb);
+          },
+
+
+          function shouldRemainActiveAfter(cb) {
+
+            App.findById(aid, function (err, app) {
+              expect(err)
+                .to.not.exist;
+
+              expect(app.isActive)
+                .to.be.true;
+
+              cb();
+            })
+
+          },
+
+
+          function shouldStillHaveThreePredefinedSegments(cb) {
+            Segment
+              .find({
+                aid: aid
+              })
+              .exec(function (err, segs) {
+
+                expect(err)
+                  .to.not.exist;
+
+                var preSegs = _.filter(segs, {
+                  predefined: true
+                });
+
+                // expecting three health filters
+                expect(preSegs.length)
+                  .to.eql(3);
+
+                cb();
+              });
+          }
+
+
+        ], done);
+
+      });
+
+
   });
 
 
