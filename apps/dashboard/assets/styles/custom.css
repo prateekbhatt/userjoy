@@ -70,7 +70,12 @@ padding: 0 0 60px;
         margin-right: -20px;
         padding-left: 20px;
         padding-right: 20px;
-   }
+    }
+
+    .navbar-inverse .navbar-nav .open .dropdown-menu > li > a {
+        color: #999;
+    }
+
 }
 /*code for sticky footer ends*/
 
@@ -152,7 +157,7 @@ a:hover, a:focus {
 }
 /* Edit Below to Customize Widths > 768px */
 
-@media (min-width: 768px) {
+@media {
     /* Wrappers */
 
 #navbar-brand-sidenav {
@@ -824,6 +829,33 @@ li.list-group-item-segment.active, li.list-group-item-segment.active:hover, li.l
 .nvd3.nv-noData {
     font-size: 15px;
     font-weight: bold;
+}
+
+.navbar-inverse .navbar-toggle:hover, .navbar-inverse .navbar-toggle:focus {
+    background-color: #f8f8f8;
+}
+
+.navbar-inverse .navbar-toggle {
+    border-color: #ddd;
+}
+
+.navbar-inverse .navbar-collapse, .navbar-inverse .navbar-form {
+    border-color: #ddd;
+}
+
+.btn-back {
+    color: #ffffff;
+    background-color: #95a5a6;
+    border-color: #95a5a6;
+}
+
+pre code {
+    padding: 0;
+    font-size: inherit;
+    color: inherit;
+    white-space: nowrap;
+    background-color: transparent;
+    border-radius: 0;
 }
 
 /*.active-smart-filters {

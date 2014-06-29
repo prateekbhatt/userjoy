@@ -997,7 +997,7 @@ angular.module('do.users', [])
                 email: UserList.getUsers()[i].email,
                 userkarma: UserList.getUsers()[i].score,
                 datejoined: moment(UserList.getUsers()[
-                  i].firstSessionAt)
+                  i].joined)
                   .format("MMMM Do YYYY"),
                 health: UserList.getUsers()[i].health,
                 lastsession: moment(UserList.getUsers()[i].lastSeen)
@@ -2213,6 +2213,7 @@ angular.module('do.users', [])
                     name: value[i].name,
                     when: $moment(value[i].ct)
                       .fromNow(),
+                    timestamp: $moment(value[i].ct).format('LLL'),
                     type: value[i].type
                   })
                 };
