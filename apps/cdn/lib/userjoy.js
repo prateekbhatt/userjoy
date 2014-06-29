@@ -28,6 +28,15 @@ var url = require('url');
 var user = require('./user');
 
 
+
+// Change while testing in localhost
+// Grunt replace is used to change this api url from 'api.do.localhost' to
+// 'api.userjoy.co' in production and vice-versa
+// Two grunt tasks have been defined for this: build and buildDev
+var API_URL = 'http://api.userjoy.co/track';
+
+
+
 /**
  * Expose `UserJoy`.
  */
@@ -43,16 +52,14 @@ function UserJoy() {
   this.debug = debugUserjoy;
 
   this._timeout = 200;
-
-  // Change while testing in localhost
-  // Grunt replace is used to change this api url from 'api.do.localhost' to
-  // 'api.userjoy.co' in production and vice-versa
-  // Two grunt tasks have been defined for this: build and buildDev
-  this.API_URL = 'http://api.userjoy.co/track';
-
-  this.TRACK_URL = this.API_URL;
-  this.IDENTIFY_URL = this.API_URL + '/identify';
-  this.COMPANY_URL = this.API_URL + '/company';
+  app.identify({
+    apiUrl: API_URL,
+    TRACK_URL: API_URL,
+    IDENTIFY_URL: API_URL + '/identify',
+    COMPANY_URL: API_URL + '/company',
+    NOTIFICATION_FETCH_URL: API_URL + '/notifications',
+    CONVERSATION_URL: API_URL + '/conversations'
+  });
 
   bind.all(this);
 }
@@ -65,12 +72,21 @@ function UserJoy() {
  */
 
 UserJoy.prototype.initialize = function () {
+  this.debug('initializing ...');
+
   var self = this;
+  var app_id = window._userjoy_id;
 
-  this.debug('initialize');
+  if (!app_id) {
+    self.debug(
+      'Error: Please provide valid APP_KEY in window.userjoy.load("APP_KEY")');
+    self.debug('Error in initializing');
+    return;
+  }
 
-  // set the app id
-  this.aid = window._userjoy_id;
+  // set app_id trait
+  app.setTrait('app_id', app_id);
+
 
   // set tasks which were queued before initialization
   queue
@@ -80,17 +96,16 @@ UserJoy.prototype.initialize = function () {
   // invoke queued tasks
   this._invokeQueue();
 
-  app.identify({
-    app_id: window._userjoy_id,
-    apiUrl: self.API_URL
-  });
+
 
 
   notification.load(function (err) {
 
-    self.debug('loaded', err);
+    if (err) {
+      self.debug('Error while initializing: %o', err);
+    }
 
-    // load css file for message
+    // load css styles for message
     message.loadCss();
 
     message.load();
@@ -126,9 +141,13 @@ UserJoy.prototype._invokeQueue = function () {
  */
 
 UserJoy.prototype.identify = function (traits, fn) {
-  var self = this;
 
+  var self = this;
   this.debug('identify');
+  var appTraits = app.traits();
+  var app_id = appTraits.app_id;
+  var IDENTIFY_URL = appTraits.IDENTIFY_URL;
+
 
   if (!is.object(traits)) {
     this.debug('err: userjoy.identify must be passed a traits object');
@@ -159,17 +178,18 @@ UserJoy.prototype.identify = function (traits, fn) {
   user.identify(traits);
 
   var data = {
-    app_id: self.aid,
+    app_id: app_id,
     user: user.traits()
   };
 
   ajax({
     type: 'GET',
-    url: self.IDENTIFY_URL,
+    url: IDENTIFY_URL,
     data: data,
     success: function (ids) {
       self.debug("identify success: %o", ids);
       ids || (ids = {});
+      is.string(ids) && (ids = json.parse(ids));
 
       // set uid to cookie
       cookie.uid(ids.uid);
@@ -194,6 +214,9 @@ UserJoy.prototype.identify = function (traits, fn) {
 
 UserJoy.prototype.company = function (traits, fn) {
   var self = this;
+  var appTraits = app.traits();
+  var app_id = appTraits.app_id;
+  var COMPANY_URL = appTraits.COMPANY_URL;
 
   this.debug('company');
 
@@ -209,20 +232,29 @@ UserJoy.prototype.company = function (traits, fn) {
   }
 
   company.identify(traits);
+
   var uid = cookie.uid();
+
+  // if no uid, do not send
+  if (!uid) {
+    self.debug('Cannot identify company without identifying user');
+    return;
+  }
+
   var data = {
-    app_id: self.aid,
+    app_id: app_id,
     u: uid,
     company: company.traits()
   };
 
   ajax({
     type: 'GET',
-    url: self.COMPANY_URL,
+    url: COMPANY_URL,
     data: data,
     success: function (ids) {
       self.debug("company success: %o", ids);
       ids || (ids = {});
+      is.string(ids) && (ids = json.parse(ids));
 
       // set cid to cookie
       cookie.cid(ids.cid);
@@ -436,8 +468,10 @@ UserJoy.prototype._callback = function (fn) {
  *
  * Send event data to UserJoy API
  *
- * @param {String} type of event
- * @param {Object} traits of event
+ * @param {String} type of event (link/form/track)
+ * @param {String} name of event
+ * @param {String} name of module
+ * @param {Object} additional properties of event (optional)
  * @return {UserJoy}
  * @api private
  */
@@ -445,13 +479,26 @@ UserJoy.prototype._callback = function (fn) {
 UserJoy.prototype._sendEvent = function (type, name, module, properties) {
 
   var self = this;
-  // TODO: send data to userjoy api here
 
+  var appTraits = app.traits();
+  var app_id = appTraits.app_id;
+  var TRACK_URL = appTraits.TRACK_URL;
+
+  // fetch from cookies
   var uid = cookie.uid();
   var cid = cookie.cid();
 
+  // Validations
+
+  // if no uid, do not send
+  if (!uid) {
+    self.debug('Cannot send event without identifying user');
+    return;
+  }
+
+
   var data = {
-    app_id: self.aid,
+    app_id: app_id,
     e: {
       type: type,
       name: name,
@@ -464,10 +511,11 @@ UserJoy.prototype._sendEvent = function (type, name, module, properties) {
   if (module) data.e.module = module;
   if (properties) data.e.meta = properties;
 
+  self.debug('Sending new event: %o', data);
 
   ajax({
     type: 'GET',
-    url: self.TRACK_URL,
+    url: TRACK_URL,
     data: data,
     success: function (msg) {
       self.debug("success " + msg);
