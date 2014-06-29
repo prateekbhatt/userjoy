@@ -11,6 +11,13 @@ describe('Resource /apps/:aid/users', function () {
 
 
   /**
+   * models
+   */
+
+  var Event = require('../../../api/models/Event');
+
+
+  /**
    * fixtures
    */
 
@@ -163,17 +170,50 @@ describe('Resource /apps/:aid/users', function () {
 
   describe('GET /apps/:aid/users/:uid/events', function () {
 
-    var aid, uid, testUrl;
+    var aid, uid, testUrl, today, yesterday;
+
+    today = moment()
+      .unix();
+
+    yesterday = moment()
+      .subtract('days', 1)
+      .unix();
 
     before(function (done) {
       aid = saved.apps.first._id;
       uid = saved.users.first._id;
       testUrl = '/apps/' + aid + '/users/' + uid + '/events';
-      logoutUser(function (err) {
-        if (err) return done(err);
 
-        EventFixture(aid, [uid], 20, done);
-      });
+      async.series([
+
+        function logout(cb) {
+          logoutUser(cb);
+        },
+
+        function createEventForToday(cb) {
+
+          Event.create({
+            aid: aid,
+            uid: uid,
+            type: 'track',
+            name: 'Clicked Notification Url',
+            ct: today * 1000
+          }, cb);
+        },
+
+        function createEventForYesterday(cb) {
+
+          Event.create({
+            aid: aid,
+            uid: uid,
+            type: 'track',
+            name: 'Created Segment',
+            ct: yesterday * 1000
+          }, cb);
+        }
+
+      ], done)
+
     });
 
 
@@ -192,7 +232,7 @@ describe('Resource /apps/:aid/users', function () {
     });
 
 
-    it('should return events of last seven days by default',
+    it('should return events of today by default',
       function (done) {
 
         request
@@ -205,19 +245,11 @@ describe('Resource /apps/:aid/users', function () {
             if (err) return done(err);
 
             expect(res.body)
-              .to.be.an("object");
-
-            var startOfDay = Object.keys(res.body)[0];
-
-            expect(res.body[startOfDay])
               .to.be.an("array")
-              .and.to.have.length.above(0);
+              .that.has.length(1);
 
-            // the event meta data should be in the form of an object
-            _.each(res.body[startOfDay], function (e) {
-              expect(e.meta)
-                .to.be.an('object');
-            });
+            expect(res.body[0])
+              .to.have.property('name', 'Clicked Notification Url');
 
             done();
           });
@@ -225,19 +257,11 @@ describe('Resource /apps/:aid/users', function () {
       });
 
 
-    it('should accept from and to timestamps as query params',
+    it('should accept date timestamp as query params',
       function (done) {
 
-        var from = moment()
-          .subtract('minutes', 10)
-          .unix();
-
-        var to = moment()
-          .subtract('minutes', 5)
-          .unix();
-
         request
-          .get(testUrl + '/?from=' + from + '&to=' + to)
+          .get(testUrl + '/?date=' + yesterday)
           .set('cookie', loginCookie)
           .expect('Content-Type', /json/)
           .expect(200)
@@ -246,8 +270,11 @@ describe('Resource /apps/:aid/users', function () {
             if (err) return done(err);
 
             expect(res.body)
-              .to.be.an("object")
-              .that.is.empty;
+              .to.be.an("array")
+              .that.has.length(1);
+
+            expect(res.body[0])
+              .to.have.property('name', 'Created Segment');
 
             done();
           });
