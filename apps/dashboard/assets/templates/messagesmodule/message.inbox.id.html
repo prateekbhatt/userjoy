@@ -1,8 +1,5 @@
 <div ng-include src="'/templates/navbar/navbar.html'"></div>
-<div class="row">
-    <div ng-include src="'/templates/navbar/server-error-success.html'" class="col-md-offset-4 col-md-4"></div>
-</div>
-<button class="fa fa-backward btn btn-danger" style="width: 200px;" ng-click="doTheBack()"><span>&nbsp;&nbsp;Back</span></button>
+<button class="fa fa-backward btn btn-default" style="width: 200px;" ng-click="doTheBack()"><span>&nbsp;&nbsp;Back</span></button>
 <br>
 <br>
 <div>
@@ -10,7 +7,7 @@
         <div class="row">
             <div class="col-md-4">
                 <img ng-src={{customergravatar}}
-                alt="" class="img-rounded img-responsive" style="height:70px" fallback-src={{customersrc}} />
+                alt="" class="img-rounded img-responsive" style="height:70px; cursor: pointer;" fallback-src={{customersrc}} ng-click="goToUserProfile()" />
             </div>
             <div class="col-md-4">
                 <h3>{{customername}}</h3>
@@ -56,9 +53,9 @@
                             <span style="font-size: 19px;">
                             <strong>{{message.createdby}}</strong></span>&nbsp;&nbsp;
                             <span class="label label-default" ng-show={{message.admin}}>Team</span>
+                            <span class="label label-success" ng-show={{message.seen}}>Seen</span>
                         </div>
                         <div class="col-md-push-1 col-md-1">
-                            <span class="label label-success" ng-show={{message.seen}}>Seen</span>
                         </div>
                         <div class="col-md-push-1 col-md-3">
                             <em>
@@ -68,7 +65,7 @@
                             <a class="glyphicon glyphicon-remove"></a> -->
 
                         </div>
-                        <div class="col-md-9">
+                        <div class="col-md-9" style="overflow: auto;">
                             <p ng-bind-html="message.messagebody | newlines">
                             </p>
                         </div>
@@ -87,7 +84,7 @@
                             <div class="col-md-3">
                                 <span style="font-size: 19px;">
                                 <strong>{{user}}</strong></span>&nbsp;&nbsp;
-                                <span class="label label-default">Admin</span>
+                                <span class="label label-default">Team</span>
                             </div>
                            
                             <div class="col-md-push-4 col-md-3">
@@ -97,7 +94,7 @@
                                 <a class="glyphicon glyphicon-remove"></a> -->
                                 </em>
                             </div>
-                            <div class="col-md-9">
+                            <div class="col-md-9" style="overflow: auto;">
                                 <p value="reply.body" ng-bind-html="reply.body | newlines">
                                 </p>
                             </div>
