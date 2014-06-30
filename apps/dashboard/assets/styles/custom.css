@@ -768,6 +768,12 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
     border-left: 4px solid #e74c3c;
     background-color: #ffffff;
 }
+.list-group-item-default {
+    color: #2c3e50;
+    border-left: 4px solid #7f8c8d;
+    background-color: #ffffff;
+}
+
 #affix-demo {
     -margin-top: 30px;
     height: 350px;

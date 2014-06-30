@@ -2176,14 +2176,35 @@ angular.module('do.users', [])
             } else {
               $scope.showEvents = true;
               for (var i = 0; i < events.length; i++) {
-                $scope.events.push({
+                var eventObj = {
                   name: events[i].name,
                   when: $moment.utc(events[i].ct)
                     .fromNow(),
                   timestamp: $moment.utc(events[i].ct)
                     .format('LLL'),
                   type: events[i].type
-                })
+                };
+                if(events[i].type == 'auto') {
+                  eventObj.title = 'AutoMessage';
+                }
+
+                if(events[i].type == 'form') {
+                  eventObj.title = 'Submitted form ' + events[i].name;
+                }
+
+                if(events[i].type == 'page') {
+                  eventObj.title = 'Viewed ' + events[i].name;
+                }
+
+                if(events[i].type == 'link') {
+                  eventObj.title = 'Link';
+                }
+
+                if(events[i].type == 'track') {
+                  eventObj.title = 'Track';
+                }
+
+                $scope.events.push(eventObj);
               };
               console.log("$scope.events: ", $scope.events);
 
