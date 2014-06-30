@@ -7469,6 +7469,7 @@ var callback = require('callback');
 var canonical = require('canonical');
 var clone = require('clone');
 var company = require('./company');
+var contains = require('contains');
 var cookie = require('./cookie');
 var debug = require('debug');
 var debugUserjoy = debug('uj:userjoy');
@@ -7557,7 +7558,11 @@ UserJoy.prototype.initialize = function () {
     .create(window.userjoy)
     .prioritize();
 
-  // invoke queued tasks
+  // enable autotracking forms and links after queue has been created
+  this._autoTrackForms();
+  this._autoTrackLinks();
+
+  // invoke queued tasks after autotracking has been enabled
   this._invokeQueue();
 
 
@@ -8025,35 +8030,6 @@ UserJoy.prototype.toggleDebug = function () {
 };
 
 
-
-/**
- * Return the canonical path for the page.
- *
- * @return {String}
- */
-
-function canonicalPath() {
-  var canon = canonical();
-  if (!canon) return window.location.pathname;
-  var parsed = url.parse(canon);
-  return parsed.pathname;
-}
-
-/**
- * Return the canonical URL for the page, without the hash.
- *
- * @return {String}
- */
-
-function canonicalUrl() {
-  var canon = canonical();
-  if (canon) return canon;
-  var url = window.location.href;
-  var i = url.indexOf('#');
-  return -1 == i ? url : url.slice(0, i);
-}
-
-
 /**
  * Expose function to hide notification
  */
@@ -8087,6 +8063,125 @@ UserJoy.prototype.hideFeedback = message.hide;
  */
 
 UserJoy.prototype.sendConversation = message.send;
+
+
+/**
+ * Return the canonical path for the page.
+ *
+ * @return {String}
+ */
+
+function canonicalPath() {
+  var canon = canonical();
+  if (!canon) return window.location.pathname;
+  var parsed = url.parse(canon);
+  return parsed.pathname;
+}
+
+/**
+ * Return the canonical URL for the page, without the hash.
+ *
+ * @return {String}
+ */
+
+function canonicalUrl() {
+  var canon = canonical();
+  if (canon) return canon;
+  var url = window.location.href;
+  var i = url.indexOf('#');
+  return -1 == i ? url : url.slice(0, i);
+}
+
+
+UserJoy.prototype._autoTrackForms = function () {
+
+  var self = this;
+  var allForms = document.getElementsByTagName('form');
+
+  each(allForms, function (f) {
+    var identifier = f.id;
+    var manuallyTracked = false;
+
+    // if no id, return
+    if (!identifier) return;
+
+    // app should not have enabled manual tracking of id (check from queue)
+    each(queue.tasks, function (t) {
+
+      if (t[0] === 'track_form') {
+
+        // if its an array of form ids, and the array contains this id, then
+        // it is being manually tracked
+        if (is.array(t[1]) && contains(t[1], identifier)) {
+          manuallyTracked = true;
+        }
+
+        // if its a single form id (string), and equals the current form id,
+        // then it is being manually tracked
+        if (is.string(t[1]) && (t[1] === identifier)) {
+          manuallyTracked = true;
+        }
+
+      }
+    });
+
+    // if manually tracked, move on (do not autotrack)
+    if (manuallyTracked) return;
+
+    // else enable auto tracking, and pass name as the identifier
+    self.track_form(identifier, identifier);
+
+
+  });
+
+  return this;
+}
+
+
+UserJoy.prototype._autoTrackLinks = function () {
+
+  var self = this;
+  var allLinks = document.getElementsByTagName('a');
+
+  each(allLinks, function (l) {
+    var identifier = l.id;
+    var manuallyTracked = false;
+
+    // if no id, do not track
+    if (!identifier) return;
+
+    // app should not have enabled manual tracking of id (check from queue)
+    each(queue.tasks, function (t) {
+
+      if (t[0] === 'track_link') {
+
+        // if its an array of link ids, and the array contains this id, then
+        // it is being manually tracked
+        if (is.array(t[1]) && contains(t[1], identifier)) {
+          manuallyTracked = true;
+        }
+
+        // if its a single link id (string), and equals the current link id,
+        // then it is being manually tracked
+        if (is.string(t[1]) && (t[1] === identifier)) {
+          manuallyTracked = true;
+        }
+
+      }
+    });
+
+
+    // if manually tracked, move on (do not autotrack)
+    if (manuallyTracked) return;
+
+    // else enable auto tracking, and pass name as the identifier
+    self.track_link(identifier, identifier);
+
+
+  });
+
+  return this;
+}
 
 });
 
