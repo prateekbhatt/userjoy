@@ -356,9 +356,9 @@
                                     <a style="padding: 10px 15px; display: inline-block; cursor: pointer; width: 150px; text-decoration: none; color: #333;" ng-click="showQuery(segname.id, $index, segname)" ng-if="!segname.predefined">{{segname.name}}</a>
                                 </strong>
                                 <a style="padding: 10px 15px; display: inline-block; cursor: pointer; text-decoration: none; color: inherit;" ng-click="showQuery(segname.id, $index, segname)" ng-if="segname.predefined" >
-                                <span style="font-size: 14px;" class="fa fa-smile-o" ng-if="segname.name == 'Good Health'"><strong><em>&nbsp;&nbsp;{{segname.name}}</em></strong></span>
-                                <span style="font-size: 14px;" class="fa fa-meh-o" ng-if="segname.name == 'Average Health'"><strong><em>&nbsp;&nbsp;{{segname.name}}</em></strong></span>
-                                <span style="font-size: 14px;" class="fa fa-frown-o" ng-if="segname.name == 'Poor Health'"><strong><em>&nbsp;&nbsp;{{segname.name}}</em></strong></span>
+                                <span style="font-size: 14px;" class="fa fa-smile-o" ng-if="segname.name == 'Good Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
+                                <span style="font-size: 14px;" class="fa fa-meh-o" ng-if="segname.name == 'Average Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
+                                <span style="font-size: 14px;" class="fa fa-frown-o" ng-if="segname.name == 'Poor Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
                                 </a>
                                 <!-- <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 140px; background-color: #5cb85c; border-radius: 4px;" ng-if="segname.name == 'Good Health'">
                                     <span class="progress-type"><strong>{{segname.name}}</strong></span>
