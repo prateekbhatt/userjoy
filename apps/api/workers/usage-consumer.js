@@ -175,29 +175,34 @@ function usageConsumerWorker(cb) {
           n: 1
         };
 
-        usageQueue().get(opts, function (err, res) {
+        usageQueue()
+          .get(opts, function (err, res) {
 
-          logger.trace({
-            at: 'workers/usage-consumer getFromQueue',
-            err: err,
-            res: res
+            logger.trace({
+              at: 'workers/usage-consumer getFromQueue',
+              err: err,
+              res: res
+            });
+
+            if (err) return cb(err);
+
+            if (!_.isObject(res) || !res.id) {
+              return cb(new Error('EMPTY_USAGE_QUEUE'));
+            }
+
+            // store the queue msg id, used to delete the msg from the queue
+            queueMsgId = res.id;
+
+            var msgBody = res.body ? JSON.parse(res.body) : {};
+            var aid = msgBody.aid;
+            var time = msgBody.time;
+
+            // the message body contains the app id
+            if (!aid) return cb(new Error('App id not found in queue'));
+            if (!time) return cb(new Error('Time not found in queue'));
+
+            cb(null, aid, time);
           });
-
-          if (err) return cb(err);
-
-          // store the queue msg id, used to delete the msg from the queue
-          queueMsgId = res.id;
-
-          var msgBody = res.body ? JSON.parse(res.body) : {};
-          var aid = msgBody.aid;
-          var time = msgBody.time;
-
-          // the message body contains the app id
-          if (!aid) return cb(new Error('App id not found in queue'));
-          if (!time) return cb(new Error('Time not found in queue'));
-
-          cb(null, aid, time);
-        });
       },
 
 
@@ -220,18 +225,19 @@ function usageConsumerWorker(cb) {
 
       function deleteFromQueue(aid, time, cb) {
 
-        usageQueue().del(queueMsgId, function (err, body) {
+        usageQueue()
+          .del(queueMsgId, function (err, body) {
 
-          logger.trace({
-            at: 'workers/usage-consumer deleteFromQueue',
-            queueMsgId: queueMsgId,
-            err: err,
-            body: body
+            logger.trace({
+              at: 'workers/usage-consumer deleteFromQueue',
+              queueMsgId: queueMsgId,
+              err: err,
+              body: body
+            });
+
+            cb(err, aid, time);
+
           });
-
-          cb(err, aid, time);
-
-        });
       },
 
 
@@ -246,9 +252,10 @@ function usageConsumerWorker(cb) {
         // ironmq accepts only strings
         appData = JSON.stringify(appData);
 
-        scoreQueue().post(appData, function (err) {
-          cb(err, aid, time);
-        });
+        scoreQueue()
+          .post(appData, function (err) {
+            cb(err, aid, time);
+          });
       }
 
     ],
@@ -282,21 +289,38 @@ module.exports = function run() {
     function foreverFunc(next) {
 
       usageConsumerWorker(function (err) {
-        setImmediate(next);
+
+        if (err) logError(err, true);
+
+        // if error is empty queue, then wait for a minute before running the
+        // worker again
+        if (err && (err.message === 'EMPTY_USAGE_QUEUE')) {
+
+          setTimeout(next, 3600000);
+
+        } else {
+
+          setImmediate(next);
+        }
       });
     },
 
     function foreverCallback(err) {
 
-      logger.crit({
-        at: 'usageConsumerWorker async.forever',
-        err: err,
-        time: Date.now()
-      });
+      logError(err, false);
 
     }
   );
 
+}
+
+function logError(err, keepAlive) {
+  logger.crit({
+    at: 'usageConsumerWorker async.forever',
+    err: err,
+    keepAlive: !! keepAlive,
+    time: Date.now()
+  });
 }
 
 

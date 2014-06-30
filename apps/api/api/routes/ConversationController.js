@@ -729,7 +729,7 @@ router
               // if the conversation is already assigned to requested account,
               // then move on without sending a redundant email
               var alreadyAssigned = false;
-              if (con.assignee.toString() === assignee.toString()) {
+              if (con.assignee && (con.assignee.toString() === assignee.toString())) {
                 alreadyAssigned = true;
               }
 
