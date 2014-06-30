@@ -147,27 +147,32 @@ function healthConsumerWorker(cb) {
           n: 1
         };
 
-        healthQueue().get(opts, function (err, res) {
+        healthQueue()
+          .get(opts, function (err, res) {
 
-          logger.trace({
-            at: 'workers/health-consumer getFromQueue',
-            err: err,
-            res: res
+            logger.trace({
+              at: 'workers/health-consumer getFromQueue',
+              err: err,
+              res: res
+            });
+
+            if (err) return cb(err);
+
+            if (!_.isObject(res) || !res.id) {
+              return cb(new Error('EMPTY_HEALTH_QUEUE'));
+            }
+
+            // store the queue msg id, used to delete the msg from the queue
+            queueMsgId = res.id;
+
+            var msgBody = res.body ? JSON.parse(res.body) : {};
+            var aid = msgBody.aid;
+
+            // the message body contains the app id
+            if (!aid) return cb(new Error('App id not found in queue'));
+
+            cb(null, aid);
           });
-
-          if (err) return cb(err);
-
-          // store the queue msg id, used to delete the msg from the queue
-          queueMsgId = res.id;
-
-          var msgBody = res.body ? JSON.parse(res.body) : {};
-          var aid = msgBody.aid;
-
-          // the message body contains the app id
-          if (!aid) return cb(new Error('App id not found in queue'));
-
-          cb(null, aid);
-        });
       },
 
 
@@ -203,18 +208,19 @@ function healthConsumerWorker(cb) {
 
       function deleteFromQueue(aid, cb) {
 
-        healthQueue().del(queueMsgId, function (err, body) {
+        healthQueue()
+          .del(queueMsgId, function (err, body) {
 
-          logger.trace({
-            at: 'workers/health-consumer deleteFromQueue',
-            queueMsgId: queueMsgId,
-            err: err,
-            body: body
+            logger.trace({
+              at: 'workers/health-consumer deleteFromQueue',
+              queueMsgId: queueMsgId,
+              err: err,
+              body: body
+            });
+
+            cb(err, aid);
+
           });
-
-          cb(err, aid);
-
-        });
       },
     ],
 
@@ -247,21 +253,31 @@ module.exports = function run() {
     function foreverFunc(next) {
 
       healthConsumerWorker(function (err) {
+
+        if (err) logError(err, true);
+
         setImmediate(next);
       });
     },
 
     function foreverCallback(err) {
 
-      logger.crit({
-        at: 'healthConsumerWorker async.forever',
-        err: err,
-        time: Date.now()
-      });
+      logError(err, false);
 
     }
   );
 
+}
+
+
+function logError(err, keepAlive) {
+
+  logger.crit({
+    at: 'healthConsumerWorker async.forever',
+    err: err,
+    keepAlive: !! keepAlive,
+    time: Date.now()
+  });
 }
 
 

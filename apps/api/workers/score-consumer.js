@@ -247,29 +247,34 @@ function scoreConsumerWorker(cb) {
           n: 1
         };
 
-        scoreQueue().get(opts, function (err, res) {
+        scoreQueue()
+          .get(opts, function (err, res) {
 
-          logger.trace({
-            at: 'workers/score-consumer getFromQueue',
-            err: err,
-            res: res
+            logger.trace({
+              at: 'workers/score-consumer getFromQueue',
+              err: err,
+              res: res
+            });
+
+            if (err) return cb(err);
+
+            if (!_.isObject(res) || !res.id) {
+              return cb(new Error('EMPTY_SCORE_QUEUE'));
+            }
+
+            // store the queue msg id, used to delete the msg from the queue
+            queueMsgId = res.id;
+
+            var msgBody = res.body ? JSON.parse(res.body) : {};
+            var aid = msgBody.aid;
+            var time = msgBody.time;
+
+            // the message body contains the app id
+            if (!aid) return cb(new Error('App id not found in queue'));
+            if (!time) return cb(new Error('Time not found in queue'));
+
+            cb(null, aid, time);
           });
-
-          if (err) return cb(err);
-
-          // store the queue msg id, used to delete the msg from the queue
-          queueMsgId = res.id;
-
-          var msgBody = res.body ? JSON.parse(res.body) : {};
-          var aid = msgBody.aid;
-          var time = msgBody.time;
-
-          // the message body contains the app id
-          if (!aid) return cb(new Error('App id not found in queue'));
-          if (!time) return cb(new Error('Time not found in queue'));
-
-          cb(null, aid, time);
-        });
       },
 
 
@@ -292,18 +297,19 @@ function scoreConsumerWorker(cb) {
 
       function deleteFromQueue(aid, time, cb) {
 
-        scoreQueue().del(queueMsgId, function (err, body) {
+        scoreQueue()
+          .del(queueMsgId, function (err, body) {
 
-          logger.trace({
-            at: 'workers/score-consumer deleteFromQueue',
-            queueMsgId: queueMsgId,
-            err: err,
-            body: body
+            logger.trace({
+              at: 'workers/score-consumer deleteFromQueue',
+              queueMsgId: queueMsgId,
+              err: err,
+              body: body
+            });
+
+            cb(err, aid, time);
+
           });
-
-          cb(err, aid, time);
-
-        });
       },
 
 
@@ -317,9 +323,10 @@ function scoreConsumerWorker(cb) {
         // ironmq accepts only strings
         appData = JSON.stringify(appData);
 
-        healthQueue().post(appData, function (err) {
-          cb(err, aid, time);
-        });
+        healthQueue()
+          .post(appData, function (err) {
+            cb(err, aid, time);
+          });
       }
     ],
 
@@ -352,20 +359,30 @@ module.exports = function run() {
     function foreverFunc(next) {
 
       scoreConsumerWorker(function (err) {
+
+        if (err) logError(err, true);
+
         setImmediate(next);
       });
     },
 
     function foreverCallback(err) {
 
-      logger.crit({
-        at: 'scoreConsumerWorker async.forever',
-        err: err,
-        time: Date.now()
-      });
+      logError(err, false);
 
     }
   );
+
+}
+
+
+function logError(err, keepAlive) {
+  logger.crit({
+    at: 'scoreConsumerWorker async.forever',
+    err: err,
+    keepAlive: !! keepAlive,
+    time: Date.now()
+  });
 
 }
 
