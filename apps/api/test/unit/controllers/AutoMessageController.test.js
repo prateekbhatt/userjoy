@@ -487,29 +487,63 @@ describe('Resource /apps/:aid/automessages', function () {
 
       });
 
-    it('should update active status of automessage', function (done) {
+    it(
+      'should update active status of automessage, and queue it if automessage is being activated',
+      function (done) {
 
-      expect(saved.automessages.first.active)
-        .to.be.false;
+        expect(saved.automessages.first.active)
+          .to.be.false;
 
-      var statusTestUrl = testUrl + '/true';
+        var statusTestUrl = testUrl + '/true';
 
-      request
-        .put(statusTestUrl)
-        .set('cookie', loginCookie)
-        .expect('Content-Type', /json/)
-        .expect(function (res) {
+        request
+          .put(statusTestUrl)
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(function (res) {
 
-          expect(res.body)
-            .to.be.an("object");
+            expect(res.body.automessage)
+              .to.be.an("object");
 
-          expect(res.body.active)
-            .to.be.true;
-        })
-        .expect(200)
-        .end(done);
+            expect(res.body.queueId)
+              .to.be.a("string")
+              .that.is.not.empty;
 
-    });
+            expect(res.body.automessage.active)
+              .to.be.true;
+          })
+          .expect(200)
+          .end(done);
+
+      });
+
+
+    // WARNING: this test should be run after the previous test where the
+    // automessage was activated
+    it('should not queue it if automessage is being deactivated',
+      function (done) {
+
+        var statusTestUrl = testUrl + '/false';
+
+        request
+          .put(statusTestUrl)
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(function (res) {
+
+            expect(res.body.automessage)
+              .to.be.an("object");
+
+            expect(res.body.queueId)
+              .to.not.exist;
+
+            expect(res.body.automessage.active)
+              .to.be.false;
+          })
+          .expect(200)
+          .end(done);
+
+      });
 
   });
 

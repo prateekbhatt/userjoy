@@ -296,7 +296,7 @@ module.exports = function run() {
         // worker again
         if (err && (err.message === 'EMPTY_USAGE_QUEUE')) {
 
-          setTimeout(next, 60000);
+          setTimeout(next, 3600000);
 
         } else {
 
