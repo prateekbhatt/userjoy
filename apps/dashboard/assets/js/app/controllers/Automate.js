@@ -405,10 +405,12 @@ angular.module('do.automate', [])
 
           $scope.saveMessage = function () {
             if ($scope.showNotification) {
-              saveMsgService.setMsg($scope.notificationBody.replace(/\n/g,
-                  '<br/>')
-                .replace(/&#34;/g, '"')
-                .replace(/&#160/g, ' '));
+              if($scope.notificationBody) {
+                saveMsgService.setMsg($scope.notificationBody.replace(/\n/g,
+                    '<br/>')
+                  .replace(/&#34;/g, '"')
+                  .replace(/&#160/g, ' '));
+              }
               saveMsgService.setTitle($scope.title);
               saveMsgService.setSub('');
             }

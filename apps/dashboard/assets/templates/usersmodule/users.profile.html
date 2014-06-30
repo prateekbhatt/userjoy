@@ -114,11 +114,12 @@
                         <p><em>{{eventDate}}</em></p>
                         <p ng-show="!showEvents">There was no activity for {{eventDate}}</p>
                         <ul class="list-group" ng-show="showEvents">
-                            <li class="list-group-item list-group-item-danger" ng-if="event.type == 'auto'" ng-repeat="event in events">
-                                <span class = "fa fa-comments" title="AutoMessage"> {{event.name}}</span>
+
+                            <li class="list-group-item" ng-repeat="event in events" ng-class="{'list-group-item-danger': event.type == 'auto', 'list-group-item-success': event.type == 'form', 'list-group-item-info': event.type == 'page', 'list-group-item-default': event.type == 'link', 'list-group-item-warning': event.type == 'track'}">
+                                <span ng-class="{'fa fa-comments': event.type == 'auto', 'fa fa-flash': event.type == 'form', 'fa fa-globe': event.type == 'page', 'fa fa-link': event.type == 'link', 'fa fa-road': event.type == 'track'}" title="{{event.title}}" style="font-size: 12px;"> {{event.name}}</span>
                                 <em class="pull-right" style="font-size: 11px;" title="{{event.timestamp}}">{{event.when}}</em>
                             </li>
-                            <li class="list-group-item list-group-item-success" ng-if="event.type == 'form'" ng-repeat="event in events">
+                           <!--  <li class="list-group-item list-group-item-success" ng-if="event.type == 'form'" ng-repeat="event in events">
                                 <span class = "fa fa-comments" title="Submitted form"> {{event.name}}</span>
                                 <em class="pull-right" style="font-size: 11px;" title="{{event.timestamp}}">{{event.when}}</em>
                             </li>
@@ -133,11 +134,8 @@
                             <li class="list-group-item list-group-item-warning" ng-if="event.type == 'track'" ng-repeat="event in events">
                                 <span class = "fa fa-road" title="Track"> {{event.name}}</span>
                                 <em class="pull-right" style="font-size: 11px;" title="{{event.timestamp}}">{{event.when}}</em>
-                            </li>
-                            <!-- <span ng-class="{'fa fa-flash': event.type == 'form'}"> {{event.name}}</span>
-                                                                                        <span ng-class="{'fa fa-link': event.type == 'link'}"> {{event.name}}</span>
-                                                                                        <span ng-class="{'fa fa-globe': event.type == 'page'}"> {{event.name}}</span>
-                            <span ng-class="{'fa fa-road': event.type == 'track'}"> {{event.name}}</span> -->
+                            </li> -->
+                           
                         </li>
                     </ul>
                 </div>
