@@ -1,7 +1,7 @@
 {{ include header }}
 <p>Hi {{= name || 'there' }},</p>
 <br>
-<p style="font-size: 15px; margin-top: 10px;"><b>{{= sentBy }}<b></p>
+<p style="font-size: 15px; margin-top: 10px;"><b>{{= sentBy }} sent you a message: <b></p>
 <br>
 <p>{{- message }}</p>
 </td>
@@ -14,13 +14,15 @@
 <table class="six columns">
     <tr>
         <td class="center">
-            <table class="button">
-                <tr>
-                    <td>
-                        <a href="{{= conversationUrl }}">View Conversation</a>
-                    </td>
-                </tr>
-            </table>
+            <a href="{{= conversationUrl }}">
+                <table class="button">
+                    <tr>
+                        <td>
+                            View Conversation
+                        </td>
+                    </tr>
+                </table>
+            </a>
         </td>
     </tr>
 </table>

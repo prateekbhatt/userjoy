@@ -557,7 +557,7 @@ angular.module('do.users', [])
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
               $scope.otherTimeRange = 'at any time';
-              $scope.filters[parentindex].optext = 'less than';
+              $scope.filters[parentindex].optext = 'before';
               $scope.filters[parentindex].val = $moment(new Date())
                 .unix() * 1000;
               $scope.filters[parentindex].op = 'lt';
@@ -791,10 +791,10 @@ angular.module('do.users', [])
           };
 
           $scope.datePickerQueries = [{
-            name: 'less than',
+            name: 'before',
             key: 'lt'
           }, {
-            name: 'greater than',
+            name: 'after',
             key: 'gt'
           }]
 
