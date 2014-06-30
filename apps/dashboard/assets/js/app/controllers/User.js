@@ -2154,7 +2154,7 @@ angular.module('do.users', [])
           console.log("fromTime: ", fromTime,
             $scope.toTime);
 
-          $scope.eventDate = $moment($scope.user.lastSession)
+          $scope.eventDate = $moment.utc($scope.user.lastSession)
             .format('MMMM Do');
           $scope.lastEventDate = $scope.user.lastSession;
           console.log("$scope.eventDate: ", $scope.eventDate);
@@ -2223,7 +2223,7 @@ angular.module('do.users', [])
               24 * 60 *
               60 * 1000)
               .unix();
-            $scope.eventDate = $moment.unix(fromTime).format('MMMM Do');
+            $scope.eventDate = $moment.utc(fromTime * 1000).format('MMMM Do');
             console.log('ProfileCtrl changed eventDate', $scope.eventDate);
             if (fromTime === $moment($scope.user.lastSession)
               .unix()) {
@@ -2250,7 +2250,7 @@ angular.module('do.users', [])
               24 * 60 *
               60 * 1000)
               .unix();
-            $scope.eventDate = $moment(fromTime * 1000).format('MMMM Do');
+            $scope.eventDate = $moment.utc(fromTime * 1000).format('MMMM Do');
             
             console.log("new fromTime: ", fromTime,
               $moment(fromTime *
