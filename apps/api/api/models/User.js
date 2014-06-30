@@ -201,29 +201,6 @@ var UserSchema = new Schema({
   },
 
 
-  // tags [all tags this user belongs to]
-  // notes
-  // status (Free, Paying, Cancelled)
-
-  unsubscribed: {
-    type: Boolean,
-    default: false
-  },
-
-  unsubscribedAt: {
-    type: Date
-  },
-
-  unsubscribedThrough: {
-    messageId: {
-      type: Schema.Types.ObjectId,
-    },
-    subject: {
-      type: String
-    }
-  },
-
-
   user_id: {
     type: String
   },
