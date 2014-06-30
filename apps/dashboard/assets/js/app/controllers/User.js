@@ -499,7 +499,7 @@ angular.module('do.users', [])
           $scope.otherTimeRange = 'at any time';
 
           $scope.scoreQueries = [{
-            name: 'equal',
+            name: 'equals',
             key: 'eq'
           }, {
             name: 'greater than',
@@ -557,7 +557,7 @@ angular.module('do.users', [])
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
               $scope.otherTimeRange = 'at any time';
-              $scope.filters[parentindex].optext = 'less than';
+              $scope.filters[parentindex].optext = 'before';
               $scope.filters[parentindex].val = $moment(new Date())
                 .unix() * 1000;
               $scope.filters[parentindex].op = 'lt';
@@ -578,7 +578,7 @@ angular.module('do.users', [])
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
               $scope.otherTimeRange = 'at any time';
-              $scope.filters[parentindex].optext = 'equal';
+              $scope.filters[parentindex].optext = 'equals';
               $scope.filters[parentindex].val = '';
             } else if ($scope.attributes[index].name == 'status') {
               $scope.filters[parentindex].showHealthStatus = false;
@@ -596,7 +596,7 @@ angular.module('do.users', [])
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
               $scope.otherTimeRange = 'at any time';
-              $scope.filters[parentindex].optext = 'equal';
+              $scope.filters[parentindex].optext = 'equals';
               $scope.filters[parentindex].val = 'free';
               $scope.filters[parentindex].valuetext = 'Free';
 
@@ -616,7 +616,7 @@ angular.module('do.users', [])
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
               $scope.otherTimeRange = 'at any time';
-              $scope.filters[parentindex].optext = 'equal';
+              $scope.filters[parentindex].optext = 'equals';
               $scope.filters[parentindex].val = 'poor';
               $scope.filters[parentindex].valuetext = 'Poor';
             } else {
@@ -720,7 +720,7 @@ angular.module('do.users', [])
             $scope.filters[parentindex].type = $scope.countOfItems[
               index].type;
             $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
-            $scope.filters[parentindex].optext = 'equal';
+            $scope.filters[parentindex].optext = 'equals';
             $scope.filters[parentindex].op = 'eq';
             $scope.filters[parentindex].val = '';
           }
@@ -791,10 +791,10 @@ angular.module('do.users', [])
           };
 
           $scope.datePickerQueries = [{
-            name: 'less than',
+            name: 'before',
             key: 'lt'
           }, {
-            name: 'greater than',
+            name: 'after',
             key: 'gt'
           }]
 
@@ -802,7 +802,7 @@ angular.module('do.users', [])
             name: 'contains',
             key: 'contains'
           }, {
-            name: 'equal',
+            name: 'equals',
             key: 'eq'
           }]
 
@@ -881,7 +881,7 @@ angular.module('do.users', [])
               days: '',
               name: '',
               op: 'eq',
-              optext: 'equal',
+              optext: 'equals',
               val: '',
               type: '',
               showHealthStatus: false,
@@ -1499,6 +1499,7 @@ angular.module('do.users', [])
           $scope.showQuery = function (segId, index, segname) {
             $scope.segmentClicked = true;
             $scope.showUpdateButton = true;
+            $scope.showSpinner = true;
             if (segname.name == 'Good Health' || segname.name ==
               'Average Health' || segname.name == 'Poor Health') {
               // $scope.showUpdateButton = false;
@@ -2197,7 +2198,7 @@ angular.module('do.users', [])
                 }
 
                 if(events[i].type == 'link') {
-                  eventObj.title = 'Link';
+                  eventObj.title = 'Clicked on ' + events[i].name;
                 }
 
                 if(events[i].type == 'track') {
