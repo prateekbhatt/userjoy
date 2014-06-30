@@ -161,11 +161,11 @@ router
     date = validTimestamp(date * 1000) ? date : today;
 
     // from start of date to end of date
-    var from = moment.unix(date)
+    var from = moment.utc(date * 1000)
       .startOf('day')
       .format();
 
-    var to = moment.unix(date)
+    var to = moment.utc(date * 1000)
       .endOf('day')
       .format();
 
