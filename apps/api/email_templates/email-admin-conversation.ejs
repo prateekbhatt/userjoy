@@ -1,12 +1,9 @@
 {{ include header }}
 <p>Hi {{= name || 'there' }},</p>
 <br>
-<img src="./img/thumbnail.jpeg" style="width: 60px; margin-right: 15px;">
-<!-- <p>You requested a password change for your UserJoy account. Set up a new password by clicking on the link below.</p> -->
-<p style="font-size: 15px; margin-top: 10px;"><b>Savinay<b></p>
-<p style="font-size: 13px;">Assignee: Prateek</p>
+<p style="font-size: 15px; margin-top: 10px;"><b>{{= sentBy }}<b></p>
 <br>
-<p>{{Message}}</p>
+<p>{{= message }}</p>
 </td>
 <td class="expander"></td>
 </tr>
@@ -20,7 +17,7 @@
             <table class="button">
                 <tr>
                     <td>
-                        <a href="#">View Ticket</a>
+                        <a href="{{= conversationUrl }}">View Conversation</a>
                     </td>
                 </tr>
             </table>

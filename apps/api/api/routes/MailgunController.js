@@ -29,6 +29,13 @@ var Conversation = require('../models/Conversation');
 var User = require('../models/User');
 
 
+/**
+ * Services
+ */
+
+var accountMailer = require('../services/account-mailer');
+
+
 function mailgunCallback(req, res, next) {
 
   return function (err) {
@@ -57,6 +64,97 @@ function mailgunCallback(req, res, next) {
 
 };
 
+
+function sendEmail(userEmail, acc, con, cb) {
+
+  /**
+   * get dashboard url from config
+   */
+  var config = require('../../../config')('api');
+  var dashboardUrl = config.hosts['dashboard'];
+  var conversationUrl = dashboardUrl + '/apps/' + con.aid +
+    '/messages/conversations/' + con._id;
+
+
+  var opts = {
+    locals: {
+      conversationUrl: conversationUrl,
+      message: con.messages[0].body,
+      name: acc.name,
+      sentBy: userEmail,
+      subject: con.sub
+    },
+    to: {
+      name: acc.name,
+      email: acc.email
+    }
+  };
+
+  accountMailer.sendAdminConversation(opts, function (err) {
+    cb(err, con);
+  });
+}
+
+
+/**
+ * Get admin of app
+ *
+ * @param {string} aid app-id
+ * @param {function} cb callback
+ *     @param (string) err
+ *     @param {object}
+ *          @property {string} email admin-email
+ *          @property {string} name admin-name
+ */
+
+function getAdmin(aid, cb) {
+
+  async.waterfall(
+
+    [
+
+      function getApp(cb) {
+        App.findById(aid, function (err, app) {
+          if (err) {
+
+            if (err.name === 'CastError') {
+              return cb(new Error('INVALID_APP_KEY'));
+            }
+
+            return cb(err);
+          }
+          if (!app) return cb(new Error('APP_NOT_FOUND'));
+          cb(null, app);
+        });
+      },
+
+
+      function getAccount(app, cb) {
+
+        var admin = _.find(app.team, function (t) {
+          return t.admin === true;
+        });
+
+        if (!_.isObject(admin)) return cb(new Error('ADMIN_NOT_FOUND'));
+
+        Account
+          .findById(admin.accid)
+          .select({
+            _id: -1,
+            name: 1,
+            email: 1
+          })
+          .lean()
+          .exec(function (err, acc) {
+            if (err) return cb(err);
+            if (!acc) return cb(new Error('ADMIN_NOT_FOUND'));
+
+            cb(null, acc);
+          });
+      },
+    ], cb)
+
+}
 
 
 router
@@ -89,7 +187,9 @@ router
       [
 
         function getOrCreateUser(cb) {
-          User.findOrCreate(aid, user, cb);
+          User.findOrCreate(aid, user, function (err, usr) {
+            cb(err, usr);
+          });
         },
 
 
@@ -119,8 +219,21 @@ router
             uid: user._id
           };
 
-          Conversation.create(newConv, cb);
+          Conversation.create(newConv, function (err, con) {
+            cb(err, con, user);
+          });
+        },
+
+        function getAdminAccount(con, user, cb) {
+          getAdmin(con.aid, function (err, acc) {
+            cb(err, acc, con, user);
+          })
+        },
+
+        function sendAdminConversation(acc, con, user, cb) {
+          sendEmail(user.email, acc, con, cb);
         }
+
 
       ],
 
@@ -186,7 +299,30 @@ router
 
             };
 
-            Conversation.reply(aid, messageId, reply, cb);
+            Conversation.reply(aid, messageId, reply, function (err, con) {
+              cb(err, user, con);
+            });
+          },
+
+          function getAccount(user, con, cb) {
+            Account
+              .findById(con.assignee)
+              .select({
+                _id: -1,
+                name: 1,
+                email: 1
+              })
+              .lean()
+              .exec(function (err, acc) {
+                if (err) return cb(err);
+                if (!acc) return cb(new Error('ADMIN_NOT_FOUND'));
+
+                cb(null, acc, user, con);
+              });
+          },
+
+          function sendAdminConversation(acc, user, con, cb) {
+            sendEmail(user.email, acc, con, cb);
           }
 
 
@@ -237,7 +373,19 @@ router
               uid: user._id
             };
 
-            Conversation.create(newConv, cb);
+            Conversation.create(newConv, function (err, con) {
+              cb(err, con, user);
+            });
+          },
+
+          function getAdminAccount(con, user, cb) {
+            getAdmin(con.aid, function (err, acc) {
+              cb(err, acc, con, user);
+            })
+          },
+
+          function sendAdminConversation(acc, con, user, cb) {
+            sendEmail(user.email, acc, con, cb);
           }
 
         ],
