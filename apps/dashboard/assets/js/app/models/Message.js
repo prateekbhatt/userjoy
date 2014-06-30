@@ -123,7 +123,7 @@ angular.module('models.message', ['services'])
       $http.put(config.apiUrl + '/apps/' + appId + '/conversations/' + coId +
         '/assign', data)
         .success(function (data) {
-          console.log("success in assigning: ", data);
+          console.log("success in assigning: ", data, index);
           cb(null, name, index);
         })
         .error(cb)

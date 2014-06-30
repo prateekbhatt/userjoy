@@ -209,7 +209,6 @@ EventSchema.statics.page = function (ids, path, cb) {
         };
 
         Event.find(query, function (err, amsg) {
-          console.log('did we get the damn event?', amsg);
           cb();
         });
  *

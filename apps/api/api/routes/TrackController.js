@@ -111,6 +111,9 @@ router
         return next(err);
       }
 
+      // update user last seen timestamp
+      User.updateLastSeen(event.uid);
+
       var obj = {
         eid: event._id,
         aid: event.aid,
@@ -464,7 +467,7 @@ router
         },
 
 
-        function createAutoMessageSentEvent(notf, user, app, cb) {
+        function createAutoMessageOpenedEvent(notf, user, app, cb) {
 
           if (!notf) return cb(null, notf, app);
 
@@ -686,7 +689,7 @@ router
           var opts = {
             locals: {
               conversationUrl: conversationUrl,
-              message: con.messages[0].body,
+              message: con.messages[con.messages.length - 1].body,
               name: acc.name,
               sentBy: email,
               subject: con.sub

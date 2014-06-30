@@ -177,9 +177,6 @@ UserNote      |                         | notes created by team members about a 
 - x name
 - x username
 - x meta (object containing additonal info about users)
-- unsubscribed (boolean)
-- unsubscribedAt (date)
-- unsubscribedThrough (messageId, subject)
 - ct
 - ut
 - health (latest health status of the user, defaults to average for new user)

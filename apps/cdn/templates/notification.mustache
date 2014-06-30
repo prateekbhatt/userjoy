@@ -1,6 +1,6 @@
 <div id="{{NOTIFICATION_TEMPLATE_ID}}" style="position: relative;">
     <div style="float:right; width: 350px;">
-        <div class="uj-message-template" style="min-height: 175px; overflow: auto; border-color: {{color}}; border-right: 1px solid {{color}};border-top: 1px solid {{color}}; border-bottom: 1px solid {{color}}; border-radius: 4px;">
+        <div class="uj-message-template" style="min-height: 175px; overflow: auto; border-color: {{color}}; border-right: 1px solid {{color}};border-top: 1px solid {{color}}; border-bottom: 1px solid {{color}}; border-radius: 4px; z-index: 99999999">
             <button type="button" class="uj-close" aria-hidden="true" onclick="userjoy.hideNotification()" style="margin-top: -15px;">&times;</button>
             <img src="{{gravatar}}" width="60px">
             <div style="margin-top: -75px; margin-left: 75px;">
@@ -10,7 +10,7 @@
             <span id="{{SENT_TEMPLATE_ID}}" style="bottom: -180px; display:none; color: #7f8c8d; position: absolute;">Message Sent. Thanks!</span>
             <span id="{{ERROR_ID}}" style="bottom: -180px; display:none; color: #a94442; position: absolute;">Your reply cannot be blank</span>
         </div>
-        <div class="uj-panel-footer" style="margin-top: -23px;">
+        <div class="uj-panel-footer" style="margin-top: -23px; z-index: 99999999">
             <div class="uj-input-group">
                 <textarea id="{{REPLY_TEMPLATE_ID}}" type="text" name="msg" class="uj-form-control uj-input-sm" placeholder="Type your message here..." style="margin-top: 3px; height: 34px;"></textarea>
                 <span class="uj-input-group-btn">
