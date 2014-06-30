@@ -187,26 +187,31 @@ function amConsumer(cb) {
           n: 1
         };
 
-        q().get(opts, function (err, res) {
+        q()
+          .get(opts, function (err, res) {
 
-          logger.trace({
-            at: 'workers/automessageConsumer getFromQueue',
-            err: err,
-            res: res
+            logger.trace({
+              at: 'workers/automessageConsumer getFromQueue',
+              err: err,
+              res: res
+            });
+
+            if (err) return cb(err);
+
+            if (!_.isObject(res) || !res.id) {
+              return cb(new Error('EMPTY_AUTOMESSAGE_QUEUE'));
+            }
+
+            // store the queue message id
+            queueMsgId = res.id;
+
+            // the message body contains the automessage id
+            if (!res.body) {
+              return cb(new Error('Automessage id not found in queue'));
+            }
+
+            cb(null, res.body);
           });
-
-          if (err) return cb(err);
-
-          // store the queue message id
-          queueMsgId = res.id;
-
-          // the message body contains the automessage id
-          if (!res.body) {
-            return cb(new Error('Automessage id not found in queue'));
-          }
-
-          cb(null, res.body);
-        });
       },
 
 
@@ -411,18 +416,19 @@ function amConsumer(cb) {
 
       function deleteFromQueue(cb) {
 
-        q().del(queueMsgId, function (err, body) {
+        q()
+          .del(queueMsgId, function (err, body) {
 
-          logger.trace({
-            at: 'workers/automessageConsumer deleteFromQueue',
-            queueMsgId: queueMsgId,
-            err: err,
-            body: body
+            logger.trace({
+              at: 'workers/automessageConsumer deleteFromQueue',
+              queueMsgId: queueMsgId,
+              err: err,
+              body: body
+            });
+
+            cb(err);
+
           });
-
-          cb(err);
-
-        });
       }
 
     ],
@@ -441,24 +447,42 @@ module.exports = function run() {
     function foreverFunc(next) {
 
       amConsumer(function (err) {
-        setImmediate(next);
+
+        if (err) logError(err, true);
+
+        // if error is empty queue, then wait for a minute before running the
+        // worker again
+        if (err && (err.message === 'EMPTY_AUTOMESSAGE_QUEUE')) {
+
+          setTimeout(next, 300000);
+
+        } else {
+
+          setImmediate(next);
+        }
+
       });
-      // setImmediate(function () {})
     },
 
     function foreverCallback(err) {
 
-      logger.crit({
-        at: 'amConsumer async.forever',
-        err: err,
-        time: Date.now()
-      });
+      logError(err, false);
 
     }
   );
 
 }
 
+
+function logError(err, keepAlive) {
+
+  logger.crit({
+    at: 'amConsumer async.forever',
+    err: err,
+    keepAlive: !! keepAlive,
+    time: Date.now()
+  });
+}
 
 
 /**

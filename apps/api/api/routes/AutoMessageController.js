@@ -40,6 +40,14 @@ var userMailer = require('../services/user-mailer');
 
 
 /**
+ * Worker queue
+ */
+
+var amQueue = require('../../workers/queues')
+  .automessage;
+
+
+/**
  * All routes on /apps
  * need to be authenticated
  */
@@ -315,7 +323,8 @@ router
  *
  * status should be either true or false
  *
- * Updates active status of automessage
+ * Updates active status of automessage.
+ * If automessage got activated, then queue it now
  */
 
 router
@@ -347,11 +356,27 @@ router
 
         function updateActiveStatus(amsg, cb) {
           amsg.active = status;
-          amsg.save(cb);
+          amsg.save(function (err, savedAmsg) {
+            cb(err, savedAmsg);
+          });
+        },
+
+        function queueActivatedAutomessage(amsg, cb) {
+
+          // if automessage deactivated, move on
+          if (status === 'false') return cb(null, amsg, null);
+
+          // if automessage just got activated, queue it
+          var ids = [amsg._id.toString()];
+          amQueue()
+            .post(ids, function (err, queueId) {
+              cb(err, amsg, queueId);
+            });
+
         }
       ],
 
-      function (err, amsg) {
+      function (err, amsg, queueId) {
         if (err) {
           if (err.message === 'AutoMessage not found') {
             return res.notFound(err.message);
@@ -361,7 +386,10 @@ router
 
         res
           .status(200)
-          .json(amsg);
+          .json({
+            automessage: amsg,
+            queueId: queueId
+          });
       }
     );
 
