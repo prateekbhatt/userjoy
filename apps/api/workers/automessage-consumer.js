@@ -454,7 +454,7 @@ module.exports = function run() {
         // worker again
         if (err && (err.message === 'EMPTY_AUTOMESSAGE_QUEUE')) {
 
-          setTimeout(next, 3600000);
+          setTimeout(next, 300000);
 
         } else {
 
