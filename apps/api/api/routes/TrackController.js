@@ -14,6 +14,7 @@ var router = require('express')
  * Models
  */
 
+var Account = require('../models/Account');
 var App = require('../models/App');
 var Company = require('../models/Company');
 var Conversation = require('../models/Conversation');
@@ -28,6 +29,13 @@ var User = require('../models/User');
 
 var logger = require('../../helpers/logger');
 var nocache = require('../../helpers/no-cache-headers');
+
+
+/**
+ * Services
+ */
+
+var accountMailer = require('../services/account-mailer');
 
 
 /**
@@ -595,11 +603,13 @@ router
             return cb(new Error('Please send user_id or email'));
           }
 
-          User.findOne(conditions, cb);
+          User.findOne(conditions, function (err, user) {
+            cb(err, app, user);
+          });
         },
 
 
-        function createConversation(user, cb) {
+        function createConversation(app, user, cb) {
 
           if (!user) return cb(new Error('USER_NOT_FOUND'));
 
@@ -632,7 +642,64 @@ router
 
           newCon.messages.push(msg);
 
-          Conversation.create(newCon, cb);
+          Conversation.create(newCon, function (err, con) {
+            cb(err, app, con);
+          });
+        },
+
+        function getAdmin(app, con, cb) {
+
+          var admin = _.find(app.team, function (t) {
+            return t.admin === true;
+          });
+
+          if (!_.isObject(admin)) return cb(new Error('ADMIN_NOT_FOUND'));
+
+          Account
+            .findById(admin.accid)
+            .select({
+              _id: -1,
+              name: 1,
+              email: 1
+            })
+            .lean()
+            .exec(function (err, acc) {
+              if (err) return cb(err);
+              if (!acc) return cb(new Error('ADMIN_NOT_FOUND'));
+
+              cb(null, acc, con);
+            });
+
+        },
+
+        function sendMail(acc, con, cb) {
+
+          /**
+           * require config for dashboard url
+           */
+          var config = require('../../../config')('api');
+          var dashboardUrl = config.hosts['dashboard'];
+          var conversationUrl = dashboardUrl + '/apps/' + con.aid +
+            '/messages/conversations/' + con._id;
+
+
+          var opts = {
+            locals: {
+              conversationUrl: conversationUrl,
+              message: con.messages[0].body,
+              name: acc.name,
+              sentBy: email,
+              subject: con.sub
+            },
+            to: {
+              name: acc.name,
+              email: acc.email
+            }
+          };
+
+          accountMailer.sendAdminConversation(opts, function (err) {
+            cb(err, con);
+          });
         }
 
       ],
