@@ -22,11 +22,16 @@ var workersDir = '../../api/workers/';
  * Jobs
  */
 
+var automessageConsumer = require(path.join(workersDir,
+  '/automessage-consumer'));
+
 var automessagePublisher = require(path.join(workersDir,
   '/automessage-publisher'));
 
-var automessageConsumer = require(path.join(workersDir,
-  '/automessage-consumer'));
+var healthConsumer = require(path.join(workersDir, '/health-consumer'));
+var scoreConsumer = require(path.join(workersDir, '/score-consumer'));
+var usageConsumer = require(path.join(workersDir, '/usage-consumer'));
+var usagePublisher = require(path.join(workersDir, '/usage-publisher'));
 
 
 /**
@@ -88,10 +93,14 @@ exports.start = function startServer(done) {
 
       },
 
-      function startCronJobs(db, server, cb) {
+      function startWorkers(db, server, cb) {
 
-        automessagePublisher();
         automessageConsumer();
+        automessagePublisher();
+        healthConsumer();
+        scoreConsumer();
+        usageConsumer();
+        usagePublisher();
 
         cb(null, db, server);
       }
