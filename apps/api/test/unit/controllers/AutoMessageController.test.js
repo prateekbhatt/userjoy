@@ -494,6 +494,9 @@ describe('Resource /apps/:aid/automessages', function () {
         expect(saved.automessages.first.active)
           .to.be.false;
 
+        expect(saved.automessages.first.lastQueued)
+          .to.not.exist;
+
         var statusTestUrl = testUrl + '/true';
 
         request
@@ -511,6 +514,11 @@ describe('Resource /apps/:aid/automessages', function () {
 
             expect(res.body.automessage.active)
               .to.be.true;
+
+
+            expect(saved.automessages.first.lastQueued)
+              .to.not.exist
+              .and.to.be.a('date');
           })
           .expect(200)
           .end(done);
