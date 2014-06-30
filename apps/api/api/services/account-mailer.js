@@ -118,11 +118,32 @@ exports.sendForgotPassword = function (options, cb) {
   mailer.send(cb);
 };
 
+/**
+ * Sends Conversation url to assignee
+ *
+ * @param {object} options
+ * @param {function} cb callback
+ */
+
 exports.sendAssignConversation = function (options, cb) {
   var mailer = new Mailer(options);
   mailer.subject = options.locals.appName +
     ': You have been assigned a new conversation';
   mailer.template = 'email-assign.ejs';
+  mailer.send(cb);
+}
+
+/**
+ * Sends Email to Admin when a user replies
+ *
+ * @param {object} options
+ * @param {function} cb callback
+ */
+
+exports.sendAdminConversation = function (options, cb) {
+  var mailer = new Mailer(options);
+  mailer.subject = options.locals.subject;
+  mailer.template = 'email-admin-conversation.ejs';
   mailer.send(cb);
 }
 
