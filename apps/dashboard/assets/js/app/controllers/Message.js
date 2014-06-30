@@ -418,6 +418,7 @@ angular.module('do.message', [])
             console.log("$scope.openmsg -->", $scope.openmsg,
               name, index);
             var newIndex = ($scope.pageNo - 1) * $scope.pageCount + index;
+            console.log("new index: ", newIndex);
             $scope.openmsg[newIndex].assign = 'Assigned to ' +
               name;
           }
@@ -695,7 +696,8 @@ angular.module('do.message', [])
 
 .controller('MessageBodyCtrl', ['$scope', 'MsgService', 'AppService',
   'ThreadService', '$moment', 'InboxMsgService', 'AccountService',
-  '$log', '$stateParams', 'CurrentAppService', 'AppModel', 'UserModel', '$location',
+  '$log', '$stateParams', 'CurrentAppService', 'AppModel', 'UserModel',
+  '$location',
   function ($scope, MsgService, AppService, ThreadService, $moment,
     InboxMsgService, AccountService, $log, $stateParams, CurrentAppService,
     AppModel, UserModel, $location) {
@@ -708,12 +710,17 @@ angular.module('do.message', [])
 
         console.log(AccountService.get());
 
-        $scope.doTheBack = function () {
-          window.history.back();
-        }
 
         $scope.coId = $stateParams.messageId;
         $scope.appId = $stateParams.id;
+
+        $scope.doTheBack = function () {
+          if (history.length == 1) {
+            $location.path('/apps/' + $scope.appId + '/messages/open');
+          } else {
+            window.history.back();
+          }
+        }
 
         var populatePage = function () {
           function getRandomColor(initials) {
@@ -1125,7 +1132,9 @@ angular.module('do.message', [])
           }
 
           $scope.goToUserProfile = function () {
-            $location.path('/apps/' + $scope.appId + '/users/profile/' + ThreadService.getThread().uid._id);
+            $location.path('/apps/' + $scope.appId + '/users/profile/' +
+              ThreadService.getThread()
+              .uid._id);
           }
 
           var populateUserProfile = function (err, data, id) {
