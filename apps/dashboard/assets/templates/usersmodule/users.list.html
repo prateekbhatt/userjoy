@@ -52,7 +52,7 @@
                                                     </ul>
                                                 </div>
                                                 <div ng-if="filter.checkMethod && !filter.showDatePicker && !filter.showOtherAttributesQuery &&
-                                                    !filter.showScore && !filter.showHealthStatus && !filter.showPayingStatus" style="float: left; padding-left: 24px;">
+                                                    !filter.showScore && !filter.showHealthStatus && !filter.showPayingStatus && !filter.isEvent" style="float: left; padding-left: 24px;">
                                                     <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto">
                                                         <li ng-repeat="query in selectedqueries">
@@ -90,6 +90,15 @@
                                                 </div>
                                                 <div ng-if="filter.checkMethod && (filter.showHealthStatus || filter.showPayingStatus)" style="float:left; padding-left: 24px;">
                                                     <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span></button>
+                                                </div>
+                                                <div ng-if="filter.checkMethod && filter.isEvent" style="float:left; padding-left: 24px;">
+                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
+                                                    <ul class="select dropdown-menu" role="select" style="left: auto;">
+                                                        <li ng-repeat="query in scoreQueries">
+                                                            <a style="cursor: default;" ng-click="chngScoreQuery($parent.$index, $index)">{{query.name}}
+                                                            </a>
+                                                        </li>
+                                                    </ul>
                                                 </div>
                                                 <div ng-if="filter.checkMethod && filter.showScore" style="float:left; padding-left: 24px;">
                                                     <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
