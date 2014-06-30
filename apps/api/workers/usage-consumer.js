@@ -292,7 +292,16 @@ module.exports = function run() {
 
         if (err) logError(err, true);
 
-        setImmediate(next);
+        // if error is empty queue, then wait for a minute before running the
+        // worker again
+        if (err && (err.message === 'EMPTY_USAGE_QUEUE')) {
+
+          setTimeout(next, 60000);
+
+        } else {
+
+          setImmediate(next);
+        }
       });
     },
 
