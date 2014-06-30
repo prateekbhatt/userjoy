@@ -275,8 +275,6 @@ router
           };
 
           accountMailer.sendInvite(mailOptions, function (err) {
-
-            console.log('\n\n\n sending invite', err, invite);
             cb(err, invite);
           });
         }

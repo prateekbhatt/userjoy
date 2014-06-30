@@ -201,29 +201,6 @@ var UserSchema = new Schema({
   },
 
 
-  // tags [all tags this user belongs to]
-  // notes
-  // status (Free, Paying, Cancelled)
-
-  unsubscribed: {
-    type: Boolean,
-    default: false
-  },
-
-  unsubscribedAt: {
-    type: Date
-  },
-
-  unsubscribedThrough: {
-    messageId: {
-      type: Schema.Types.ObjectId,
-    },
-    subject: {
-      type: String
-    }
-  },
-
-
   user_id: {
     type: String
   },
@@ -445,6 +422,26 @@ UserSchema.statics.setScore = function (uid, score, cb) {
 
     cb
   );
+
+};
+
+
+/**
+ * Updates the lastSeen timestamp of the user to the given or the current time
+ *
+ * @param {string} uid user-id
+ * @param {function} cb callback (optional)
+ */
+
+UserSchema.statics.updateLastSeen = function (uid, cb) {
+
+  var update = {
+    lastSeen: Date.now()
+  };
+
+  User.findByIdAndUpdate(uid, update, function (err) {
+    if (cb) return cb(err);
+  });
 
 };
 
