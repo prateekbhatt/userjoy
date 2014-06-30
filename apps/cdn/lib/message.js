@@ -8,6 +8,16 @@ var user = require('./user');
 
 
 /**
+ * Constants
+ */
+
+var MSG_TEMPLATE_ID = 'uj_message';
+var MSG_BODY_TEMPLATE_ID = 'uj_message_body';
+var MSG_SENT_TEMPLATE_ID = 'uj_message_sent';
+var MSG_ERROR_ID = 'uj_message_error';
+
+
+/**
  * Initialize a new `Message` instance.
  */
 
@@ -15,24 +25,22 @@ function Message() {
 
   this.debug = debug;
 
-  this.MSG_TEMPLATE_ID = 'uj_message';
-  this.MSG_BODY_TEMPLATE_ID = 'uj_message_body';
-  this.MSG_SENT_TEMPLATE_ID = 'uj_message_sent';
-  this.MSG_ERROR_ID = 'uj_message_error';
-
 }
 
 
 Message.prototype.load = function () {
 
+  this.debug('loading ...');
+
   var self = this;
+  var appTraits = app.traits();
 
   var locals = {
-    MSG_TEMPLATE_ID: self.MSG_TEMPLATE_ID,
-    MSG_BODY_TEMPLATE_ID: self.MSG_BODY_TEMPLATE_ID,
-    MSG_SENT_TEMPLATE_ID: self.MSG_SENT_TEMPLATE_ID,
-    MSG_ERROR_ID: self.MSG_ERROR_ID,
-    color: app.traits().color
+    MSG_TEMPLATE_ID: MSG_TEMPLATE_ID,
+    MSG_BODY_TEMPLATE_ID: MSG_BODY_TEMPLATE_ID,
+    MSG_SENT_TEMPLATE_ID: MSG_SENT_TEMPLATE_ID,
+    MSG_ERROR_ID: MSG_ERROR_ID,
+    color: appTraits.color
   };
 
   dom('body')
@@ -44,6 +52,9 @@ Message.prototype.load = function () {
 Message.prototype.loadCss = function () {
 
   var self = this;
+
+  self.debug('loading css ...');
+
   var style = document.createElement('style');
   style.type = 'text/css';
   style.innerHTML =
@@ -57,24 +68,27 @@ Message.prototype.loadCss = function () {
 
 Message.prototype.show = function () {
 
-  var id = this.MSG_TEMPLATE_ID;
+  this.debug('opening ...');
 
-  this.debug('show');
-
-  document.getElementById(id)
-    .style.display = (document.getElementById(id)
+  document.getElementById(MSG_TEMPLATE_ID)
+    .style.display = (document.getElementById(MSG_TEMPLATE_ID)
       .style.display === 'none') ? 'block' : 'none';
 
-  document.getElementById(this.MSG_SENT_TEMPLATE_ID).style.display = 'none';
-  document.getElementById(this.MSG_ERROR_ID).style.display = 'none';
-  document.getElementById(this.MSG_BODY_TEMPLATE_ID).focus();
+  document.getElementById(MSG_SENT_TEMPLATE_ID)
+    .style.display = 'none';
+  document.getElementById(MSG_ERROR_ID)
+    .style.display = 'none';
+  document.getElementById(MSG_BODY_TEMPLATE_ID)
+    .focus();
 
 };
 
 
 Message.prototype.hide = function () {
 
-  var id = this.MSG_TEMPLATE_ID;
+  this.debug('closing ...');
+
+  var id = MSG_TEMPLATE_ID;
 
   document.getElementById(id)
     .style.display = 'none';
@@ -88,17 +102,17 @@ Message.prototype.send = function () {
 
   var appTraits = app.traits();
   var userTraits = user.traits();
-  var apiUrl = appTraits.apiUrl;
   var app_id = appTraits.app_id;
-  var MSG_POST_URL = apiUrl + '/conversations';
+  var MSG_POST_URL = appTraits.CONVERSATION_URL;
   var user_id = userTraits.user_id;
   var email = userTraits.email;
 
-  var msgBody = dom('#' + self.MSG_BODY_TEMPLATE_ID)
+  var msgBody = dom('#' + MSG_BODY_TEMPLATE_ID)
     .val();
 
   if (!msgBody) {
-    document.getElementById(self.MSG_ERROR_ID).style.display = 'block';
+    document.getElementById(MSG_ERROR_ID)
+      .style.display = 'block';
     return;
   }
 
@@ -112,9 +126,12 @@ Message.prototype.send = function () {
   } else if (email) {
     msg.email = email;
   } else {
+
+    self.debug('ERROR while sending: no user_id or email to identify user');
     return;
   }
 
+  self.debug('sending ... %o', msg);
 
   ajax({
     type: "POST",
@@ -124,25 +141,25 @@ Message.prototype.send = function () {
 
     success: function (saved) {
 
-      self.debug('saved', saved);
+      self.debug('sent successfully');
 
-      document.getElementById(self.MSG_SENT_TEMPLATE_ID)
+      document.getElementById(MSG_SENT_TEMPLATE_ID)
         .style.display = 'block';
 
-      document.getElementById(self.MSG_TEMPLATE_ID)
+      document.getElementById(MSG_TEMPLATE_ID)
         .value = '';
 
-      document.getElementById(self.MSG_BODY_TEMPLATE_ID)
+      document.getElementById(MSG_BODY_TEMPLATE_ID)
         .value = '';
 
       setTimeout(function () {
-        document.getElementById(self.MSG_TEMPLATE_ID)
+        document.getElementById(MSG_TEMPLATE_ID)
           .style.display = 'none';
-      }, 5000);
+      }, 2000);
     },
 
     error: function (err) {
-      self.debug("error", err);
+      self.debug("ERROR on sending: %o", err);
     }
   });
 

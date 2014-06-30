@@ -695,10 +695,10 @@ angular.module('do.message', [])
 
 .controller('MessageBodyCtrl', ['$scope', 'MsgService', 'AppService',
   'ThreadService', '$moment', 'InboxMsgService', 'AccountService',
-  '$log', '$stateParams', 'CurrentAppService', 'AppModel', 'UserModel',
+  '$log', '$stateParams', 'CurrentAppService', 'AppModel', 'UserModel', '$location',
   function ($scope, MsgService, AppService, ThreadService, $moment,
     InboxMsgService, AccountService, $log, $stateParams, CurrentAppService,
-    AppModel, UserModel) {
+    AppModel, UserModel, $location) {
 
 
     CurrentAppService.getCurrentApp()
@@ -1124,6 +1124,9 @@ angular.module('do.message', [])
             };
           }
 
+          $scope.goToUserProfile = function () {
+            $location.path('/apps/' + $scope.appId + '/users/profile/' + ThreadService.getThread().uid._id);
+          }
 
           var populateUserProfile = function (err, data, id) {
             if (err) {
