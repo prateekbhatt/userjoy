@@ -72,7 +72,7 @@
                                                 </div>
                                                 <div ng-if="!filter.checkMethod" style="float:left; padding-left: 24px;">
                                                     <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.name}}</span>&nbsp;<span class="caret"></span></button>
-                                                    <ul class="dropdown-menu" style="left: auto;">
+                                                    <ul class="dropdown-menu" style="left: auto; max-height: 356px; overflow-y: scroll;">
                                                         <li ng-repeat="hasDoneItem in hasDoneItems">
                                                             <a style="cursor: default" ng-click="changeFilterHasDone($parent.$index, $index, $event)">{{hasDoneItem.name}}
                                                             </a>
