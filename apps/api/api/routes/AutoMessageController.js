@@ -373,6 +373,17 @@ router
               cb(err, amsg, queueId);
             });
 
+        },
+
+        function updateLastQueuedTimestamp(amsg, queueId, cb) {
+
+          // if automessage deactivated, move on
+          if (status === 'false') return cb(null, amsg, null);
+
+          amsg.lastQueued = Date.now();
+          amsg.save(function (err, savedAmsg) {
+            cb(err, savedAmsg, queueId);
+          })
         }
       ],
 
