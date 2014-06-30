@@ -127,8 +127,7 @@ exports.sendForgotPassword = function (options, cb) {
 
 exports.sendAssignConversation = function (options, cb) {
   var mailer = new Mailer(options);
-  mailer.subject = options.locals.appName +
-    ': You have been assigned a new conversation';
+  mailer.subject = 'You have been assigned a new conversation: ' + options.locals.subject;
   mailer.template = 'email-assign.ejs';
   mailer.send(cb);
 }

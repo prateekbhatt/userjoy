@@ -689,7 +689,7 @@ router
           var opts = {
             locals: {
               conversationUrl: conversationUrl,
-              message: con.messages[0].body,
+              message: con.messages[con.messages.length - 1].body,
               name: acc.name,
               sentBy: email,
               subject: con.sub
