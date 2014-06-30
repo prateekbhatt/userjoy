@@ -22,6 +22,13 @@ describe('Resource /apps/:aid/conversations', function () {
 
 
   /**
+   * services
+   */
+
+  var accountMailer = require('../../../api/services/account-mailer');
+
+
+  /**
    * Test variables
    */
 
@@ -752,7 +759,7 @@ describe('Resource /apps/:aid/conversations', function () {
           assignee: assignee
         })
         .expect('Content-Type', /json/)
-        .expect(201)
+        .expect(200)
         .expect(function (res) {
 
           expect(res.body)
@@ -765,6 +772,42 @@ describe('Resource /apps/:aid/conversations', function () {
         .end(done);
 
     });
+
+
+    // WARNING: This test MUST run after the previous test 'should assign
+    // conversation'
+    it(
+      'should not send mail if requested assignee is already the assignee',
+      function (done) {
+
+        var assignee = saved.accounts.second._id;
+        var spy = sinon.spy(accountMailer, 'sendAssignConversation');
+
+        request
+          .put(testUrl)
+          .set('cookie', loginCookie)
+          .send({
+            assignee: assignee
+          })
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .expect(function (res) {
+
+            // mail should not have been sent
+            expect(spy)
+              .not.to.have.been.called;
+
+            expect(res.body)
+              .to.have.property('assignee')
+              .that.is.an('object')
+              .that.has.keys(['name', 'email', '_id'])
+              .that.has.deep.property('_id', assignee.toString());
+
+            accountMailer.sendAssignConversation.restore();
+
+          })
+          .end(done);
+      });
 
   });
 

@@ -380,41 +380,6 @@ describe('Model Conversation', function () {
   });
 
 
-  describe('#assign', function () {
-
-    it('should assign a team member to the conversation', function (done) {
-
-      var savedCon = saved.conversations.first;
-      var assignee = randomId();
-      var coId = savedCon._id;
-      var aid = savedCon.aid;
-
-
-      Conversation.assign(aid, coId, assignee, function (err, con) {
-
-        expect(err)
-          .to.not.exist;
-
-        expect(con.assignee.toString())
-          .to.eql(assignee.toString())
-          .to.not.eql(savedCon.assignee.toString());
-
-        expect(con.aid.toString())
-          .to.eql(aid.toString());
-
-        expect(con._id.toString())
-          .to.eql(coId.toString());
-
-        done();
-
-      });
-
-
-    });
-
-  });
-
-
   describe('#reply', function () {
 
     it('should return error if reply body not provided', function (done) {

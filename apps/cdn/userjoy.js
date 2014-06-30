@@ -6908,6 +6908,16 @@ var user = require('./user');
 
 
 /**
+ * Constants
+ */
+
+var MSG_TEMPLATE_ID = 'uj_message';
+var MSG_BODY_TEMPLATE_ID = 'uj_message_body';
+var MSG_SENT_TEMPLATE_ID = 'uj_message_sent';
+var MSG_ERROR_ID = 'uj_message_error';
+
+
+/**
  * Initialize a new `Message` instance.
  */
 
@@ -6915,24 +6925,22 @@ function Message() {
 
   this.debug = debug;
 
-  this.MSG_TEMPLATE_ID = 'uj_message';
-  this.MSG_BODY_TEMPLATE_ID = 'uj_message_body';
-  this.MSG_SENT_TEMPLATE_ID = 'uj_message_sent';
-  this.MSG_ERROR_ID = 'uj_message_error';
-
 }
 
 
 Message.prototype.load = function () {
 
+  this.debug('loading ...');
+
   var self = this;
+  var appTraits = app.traits();
 
   var locals = {
-    MSG_TEMPLATE_ID: self.MSG_TEMPLATE_ID,
-    MSG_BODY_TEMPLATE_ID: self.MSG_BODY_TEMPLATE_ID,
-    MSG_SENT_TEMPLATE_ID: self.MSG_SENT_TEMPLATE_ID,
-    MSG_ERROR_ID: self.MSG_ERROR_ID,
-    color: app.traits().color
+    MSG_TEMPLATE_ID: MSG_TEMPLATE_ID,
+    MSG_BODY_TEMPLATE_ID: MSG_BODY_TEMPLATE_ID,
+    MSG_SENT_TEMPLATE_ID: MSG_SENT_TEMPLATE_ID,
+    MSG_ERROR_ID: MSG_ERROR_ID,
+    color: appTraits.color
   };
 
   dom('body')
@@ -6944,6 +6952,9 @@ Message.prototype.load = function () {
 Message.prototype.loadCss = function () {
 
   var self = this;
+
+  self.debug('loading css ...');
+
   var style = document.createElement('style');
   style.type = 'text/css';
   style.innerHTML =
@@ -6957,24 +6968,27 @@ Message.prototype.loadCss = function () {
 
 Message.prototype.show = function () {
 
-  var id = this.MSG_TEMPLATE_ID;
+  this.debug('opening ...');
 
-  this.debug('show');
-
-  document.getElementById(id)
-    .style.display = (document.getElementById(id)
+  document.getElementById(MSG_TEMPLATE_ID)
+    .style.display = (document.getElementById(MSG_TEMPLATE_ID)
       .style.display === 'none') ? 'block' : 'none';
 
-  document.getElementById(this.MSG_SENT_TEMPLATE_ID).style.display = 'none';
-  document.getElementById(this.MSG_ERROR_ID).style.display = 'none';
-  document.getElementById(this.MSG_BODY_TEMPLATE_ID).focus();
+  document.getElementById(MSG_SENT_TEMPLATE_ID)
+    .style.display = 'none';
+  document.getElementById(MSG_ERROR_ID)
+    .style.display = 'none';
+  document.getElementById(MSG_BODY_TEMPLATE_ID)
+    .focus();
 
 };
 
 
 Message.prototype.hide = function () {
 
-  var id = this.MSG_TEMPLATE_ID;
+  this.debug('closing ...');
+
+  var id = MSG_TEMPLATE_ID;
 
   document.getElementById(id)
     .style.display = 'none';
@@ -6988,17 +7002,17 @@ Message.prototype.send = function () {
 
   var appTraits = app.traits();
   var userTraits = user.traits();
-  var apiUrl = appTraits.apiUrl;
   var app_id = appTraits.app_id;
-  var MSG_POST_URL = apiUrl + '/conversations';
+  var MSG_POST_URL = appTraits.CONVERSATION_URL;
   var user_id = userTraits.user_id;
   var email = userTraits.email;
 
-  var msgBody = dom('#' + self.MSG_BODY_TEMPLATE_ID)
+  var msgBody = dom('#' + MSG_BODY_TEMPLATE_ID)
     .val();
 
   if (!msgBody) {
-    document.getElementById(self.MSG_ERROR_ID).style.display = 'block';
+    document.getElementById(MSG_ERROR_ID)
+      .style.display = 'block';
     return;
   }
 
@@ -7012,9 +7026,12 @@ Message.prototype.send = function () {
   } else if (email) {
     msg.email = email;
   } else {
+
+    self.debug('ERROR while sending: no user_id or email to identify user');
     return;
   }
 
+  self.debug('sending ... %o', msg);
 
   ajax({
     type: "POST",
@@ -7024,25 +7041,25 @@ Message.prototype.send = function () {
 
     success: function (saved) {
 
-      self.debug('saved', saved);
+      self.debug('sent successfully');
 
-      document.getElementById(self.MSG_SENT_TEMPLATE_ID)
+      document.getElementById(MSG_SENT_TEMPLATE_ID)
         .style.display = 'block';
 
-      document.getElementById(self.MSG_TEMPLATE_ID)
+      document.getElementById(MSG_TEMPLATE_ID)
         .value = '';
 
-      document.getElementById(self.MSG_BODY_TEMPLATE_ID)
+      document.getElementById(MSG_BODY_TEMPLATE_ID)
         .value = '';
 
       setTimeout(function () {
-        document.getElementById(self.MSG_TEMPLATE_ID)
+        document.getElementById(MSG_TEMPLATE_ID)
           .style.display = 'none';
-      }, 5000);
+      }, 2000);
     },
 
     error: function (err) {
-      self.debug("error", err);
+      self.debug("ERROR on sending: %o", err);
     }
   });
 
@@ -7077,6 +7094,7 @@ module.exports = function anonymous(obj) {
 
   return "<div>\n    <a style=\"cursor: pointer\" onclick=\"userjoy.showFeedback()\">\n        <div style=\"position: fixed; bottom:30px; right:20px;\">\n            <span style=\"display: inline-block;\n            min-width: 20px;\n            padding: 10px 14px;\n            font-size: 24px;\n            font-weight: 700;\n            color: #fff;\n            line-height: 1;\n            vertical-align: baseline;\n            white-space: nowrap;\n            text-align: center;\n            background-color: " + escape(obj.color) + ";\n            border-radius: 10px;\">&#63;\n            </span>\n        </div>\n    </a>\n    <div style=\"display: none\" id=\"" + escape(obj.MSG_TEMPLATE_ID) + "\">\n        <div style=\"bottom: 80px; position: fixed; right: 9px;\" class=\"uj-col-md-4\">\n            <div class=\"uj-panel uj-panel-default\" style=\"border-color: #ddd;\">\n                <div class=\"uj-panel-heading\">\n                    <h3 class=\"uj-panel-title\" style=\"text-align: center;\">Send us a Message</h3>\n                    <button type=\"button\" class=\"uj-close\" aria-hidden=\"true\" onclick=\"userjoy.hideFeedback()\" id=\"closeFeedback\" style=\"margin-top: -25px;\">&times;</button>\n                </div>\n                <div class=\"uj-panel-body\">\n                    <form role=\"form\">\n                        <textarea id=\"" + escape(obj.MSG_BODY_TEMPLATE_ID) + "\" class=\"uj-form-control\" style=\"padding: 4px; height: 150px;\"></textarea>\n                        <span style=\"display: none; margin-top: 10px;\" id=\"" + escape(obj.MSG_SENT_TEMPLATE_ID) + "\">\n                        Message Sent. Thanks!</span>\n                        <span id=\"" + escape(obj.MSG_ERROR_ID) + "\" style=\" display:none; color: #a94442; margin-top: 10px;\">\n                        Your reply cannot be blank\n                        </span>\n                        <button type=\"button\" class=\"uj-btn uj-btn-sm uj-btn-block\" onclick=\"userjoy.sendConversation()\" style=\"float: right; margin-top: 10px; color: #fff; background-color: " + escape(obj.color) + "; border-color: " + escape(obj.color) + "\">Send Message</button>\n                        <div style=\"text-align: center;\">\n                        <small>Powered by <a style=\"text-decoration:none;\" href=\"http://www.userjoy.co\", target=\"_blank\">UserJoy</a></small>\n                        </div>\n                    </form>\n                </div>\n                <div class=\"uj-arrow\"></div>\n            </div>\n        </div>\n    </div>\n</div>\n"
 }
+
 });
 require.register("userjoy/lib/notification.js", function(exports, require, module){
 var ajax = require('ajax');
@@ -7085,8 +7103,20 @@ var bind = require('bind');
 var debug = require('debug')('uj:notification');
 var dom = require('dom');
 var getGravatar = require('./get-gravatar');
+var is = require('is');
+var json = require('json');
 var template = require('./notification-template');
 var user = require('./user');
+
+
+/**
+ * Constants
+ */
+
+var ERROR_ID = 'uj_error';
+var NOTIFICATION_TEMPLATE_ID = 'uj_notification';
+var REPLY_TEMPLATE_ID = 'uj_notification_reply';
+var SENT_TEMPLATE_ID = 'uj_notification_reply_sent';
 
 
 /**
@@ -7094,97 +7124,71 @@ var user = require('./user');
  */
 
 function Notification() {
-
   this.debug = debug;
-
-  // persist the automessage id of the notification and send it over if the
-  // the user replies
-  this.automessageId;
-
-  this.app_id;
-  this.FETCH_URL;
-  this.REPLY_URL;
-
-  this.ERROR_ID = 'uj_error';
-  this.NOTIFICATION_TEMPLATE_ID = 'uj_notification';
-  this.REPLY_TEMPLATE_ID = 'uj_notification_reply';
-  this.SENT_TEMPLATE_ID = 'uj_notification_reply_sent';
-
 }
 
 
 Notification.prototype.load = function (cb) {
 
-  this.debug('load');
-
-  var appTraits = app.traits();
-
-  // set app and route variables
-  this.app_id = appTraits.app_id;
-  this.FETCH_URL = appTraits.apiUrl + '/notifications';
-  this.REPLY_URL = appTraits.apiUrl + '/conversations';
+  this.debug('loading ...');
 
   var self = this;
-  self._fetch(function (err, notf) {
 
-    self.debug('fetch %o : %o', err, notf)
+  var appTraits = app.traits();
+  var userTraits = user.traits();
+
+  var ajaxCB = function (err, notf) {
 
     // If there is an error, it should be logged during debugging
     if (err) {
-      self.debug('err %o', err);
-      return cb();
+      return cb(err);
     }
 
-    // if there was no notification, return
-    if (!notf) return cb();
+    notf = notf || {};
+    is.string(notf) && (notf = json.parse(notf));
+
+    // if there was no notification object in response, return
+    if (is.empty(notf)) {
+      return cb(new Error('no notification object in response'));
+    }
 
     // add color to the app traits
     app.setTrait('color', notf.color);
 
     // If no response, move on
-    if (!notf.body) return cb();
-
+    if (!notf.body) {
+      return cb(new Error('no new notification found'));
+    }
 
     // Persist the automessageId from the notification obj.
     // Would be needed to create a new conversation in case the user
     // replies back
-    self.automessageId = notf.amId;
+    app.setTrait('automessageId', notf.amId);
 
-    var userTraits = user.traits();
+    var gravatar = getGravatar(userTraits.email, 80);
 
     // Create locals object which would be passed to render the template
     var locals = {
       sender: notf.sender,
       body: notf.body,
-      color: app.traits()
-        .color,
+      color: notf.color,
 
-      NOTIFICATION_TEMPLATE_ID: self.NOTIFICATION_TEMPLATE_ID,
-      REPLY_TEMPLATE_ID: self.REPLY_TEMPLATE_ID,
-      SENT_TEMPLATE_ID: self.SENT_TEMPLATE_ID,
-      ERROR_ID: self.ERROR_ID,
-      img_src: self.img_src,
-      gravatar: getGravatar(userTraits.email, 80)
+      NOTIFICATION_TEMPLATE_ID: NOTIFICATION_TEMPLATE_ID,
+      REPLY_TEMPLATE_ID: REPLY_TEMPLATE_ID,
+      SENT_TEMPLATE_ID: SENT_TEMPLATE_ID,
+      ERROR_ID: ERROR_ID,
+      gravatar: gravatar
     };
-
 
     // render the template with the locals, and insert it into the body
     dom('body')
       .prepend(template(locals));
 
     cb();
-  });
-
-};
-
-Notification.prototype._fetch = function (cb) {
-
-
-  var self = this;
-  var userTraits = user.traits();
+  };
 
   var conditions = {
-    app_id: self.app_id
+    app_id: appTraits.app_id
   };
 
   // if no user identifier, there would be no notification
@@ -7193,57 +7197,53 @@ Notification.prototype._fetch = function (cb) {
   } else if (userTraits.email) {
     conditions.email = userTraits.email;
   } else {
-    return cb();
+    return cb(new Error('user_id or email required to fetch notification'));
   }
-
 
   ajax({
     type: 'GET',
-    url: self.FETCH_URL,
+    url: appTraits.NOTIFICATION_FETCH_URL,
     data: conditions,
-    success: function (msg) {
-      self.debug("success: ", msg);
-      cb(null, msg);
+    success: function (notf) {
+      ajaxCB(null, notf);
     },
     error: function (err) {
-      self.debug("error", err);
-      cb(err);
+      ajaxCB(err);
     }
   });
-
-}
+};
 
 
 Notification.prototype.show = function () {};
 
 
 Notification.prototype.hide = function () {
-  var id = this.NOTIFICATION_TEMPLATE_ID;
 
-  this.debug('hide', dom(id));
-  document.getElementById(id)
+  this.debug('hiding ...');
+
+  document.getElementById(NOTIFICATION_TEMPLATE_ID)
     .style.display = 'none';
-
 };
 
 
 Notification.prototype.reply = function () {
 
   var self = this;
+  var appTraits = app.traits();
   var userTraits = user.traits();
-
-  var msg = dom('#' + self.REPLY_TEMPLATE_ID)
+  var REPLY_URL = appTraits.CONVERSATION_URL;
+  var msg = dom('#' + REPLY_TEMPLATE_ID)
     .val();
 
   if (!msg.length) {
-    document.getElementById(self.ERROR_ID)
+    document.getElementById(ERROR_ID)
       .style.display = 'block';
     return;
   }
 
   var reply = {
-    amId: this.automessageId,
-    app_id: self.app_id,
+    amId: appTraits.automessageId,
+    app_id: appTraits.app_id,
     body: msg
   };
 
@@ -7252,28 +7252,32 @@ Notification.prototype.reply = function () {
   } else if (userTraits.email) {
     reply.email = userTraits.email;
   } else {
+    self.debug(new Error('user_id or email required to send reply'));
     return;
   }
 
-  this.debug("reply", reply);
+  this.debug("replying %o", reply);
 
   ajax({
     type: "POST",
-    url: self.REPLY_URL,
+    url: REPLY_URL,
     data: reply,
     success: function () {
-      document.getElementById(self.SENT_TEMPLATE_ID)
+
+      self.debug('reply sent');
+
+      document.getElementById(SENT_TEMPLATE_ID)
         .style.display = 'block';
-      document.getElementById(self.REPLY_TEMPLATE_ID)
+      document.getElementById(REPLY_TEMPLATE_ID)
         .value = '';
 
       setTimeout(function () {
-        document.getElementById(self.NOTIFICATION_TEMPLATE_ID)
+        document.getElementById(NOTIFICATION_TEMPLATE_ID)
           .style.display = 'none';
-      }, 5000);
+      }, 2000);
     },
     error: function (err) {
-      self.debug("error: ", err);
+      self.debug(err);
     },
     dataType: 'json'
   });
@@ -7465,6 +7469,7 @@ var callback = require('callback');
 var canonical = require('canonical');
 var clone = require('clone');
 var company = require('./company');
+var contains = require('contains');
 var cookie = require('./cookie');
 var debug = require('debug');
 var debugUserjoy = debug('uj:userjoy');
@@ -7488,6 +7493,15 @@ var url = require('url');
 var user = require('./user');
 
 
+
+// Change while testing in localhost
+// Grunt replace is used to change this api url from 'api.do.localhost' to
+// 'api.userjoy.co' in production and vice-versa
+// Two grunt tasks have been defined for this: build and buildDev
+var API_URL = 'http://api.userjoy.co/track';
+
+
+
 /**
  * Expose `UserJoy`.
  */
@@ -7503,16 +7517,14 @@ function UserJoy() {
   this.debug = debugUserjoy;
 
   this._timeout = 200;
-
-  // Change while testing in localhost
-  // Grunt replace is used to change this api url from 'api.do.localhost' to
-  // 'api.userjoy.co' in production and vice-versa
-  // Two grunt tasks have been defined for this: build and buildDev
-  this.API_URL = 'http://api.userjoy.co/track';
-
-  this.TRACK_URL = this.API_URL;
-  this.IDENTIFY_URL = this.API_URL + '/identify';
-  this.COMPANY_URL = this.API_URL + '/company';
+  app.identify({
+    apiUrl: API_URL,
+    TRACK_URL: API_URL,
+    IDENTIFY_URL: API_URL + '/identify',
+    COMPANY_URL: API_URL + '/company',
+    NOTIFICATION_FETCH_URL: API_URL + '/notifications',
+    CONVERSATION_URL: API_URL + '/conversations'
+  });
 
   bind.all(this);
 }
@@ -7525,32 +7537,44 @@ function UserJoy() {
  */
 
 UserJoy.prototype.initialize = function () {
+  this.debug('initializing ...');
+
   var self = this;
+  var app_id = window._userjoy_id;
 
-  this.debug('initialize');
+  if (!app_id) {
+    self.debug(
+      'Error: Please provide valid APP_KEY in window.userjoy.load("APP_KEY")');
+    self.debug('Error in initializing');
+    return;
+  }
 
-  // set the app id
-  this.aid = window._userjoy_id;
+  // set app_id trait
+  app.setTrait('app_id', app_id);
+
 
   // set tasks which were queued before initialization
   queue
     .create(window.userjoy)
     .prioritize();
 
-  // invoke queued tasks
+  // enable autotracking forms and links after queue has been created
+  this._autoTrackForms();
+  this._autoTrackLinks();
+
+  // invoke queued tasks after autotracking has been enabled
   this._invokeQueue();
 
-  app.identify({
-    app_id: window._userjoy_id,
-    apiUrl: self.API_URL
-  });
+
 
 
   notification.load(function (err) {
 
-    self.debug('loaded', err);
+    if (err) {
+      self.debug('Error while initializing: %o', err);
+    }
 
-    // load css file for message
+    // load css styles for message
     message.loadCss();
 
     message.load();
@@ -7586,9 +7610,13 @@ UserJoy.prototype._invokeQueue = function () {
  */
 
 UserJoy.prototype.identify = function (traits, fn) {
-  var self = this;
 
+  var self = this;
   this.debug('identify');
+  var appTraits = app.traits();
+  var app_id = appTraits.app_id;
+  var IDENTIFY_URL = appTraits.IDENTIFY_URL;
+
 
   if (!is.object(traits)) {
     this.debug('err: userjoy.identify must be passed a traits object');
@@ -7619,17 +7647,18 @@ UserJoy.prototype.identify = function (traits, fn) {
   user.identify(traits);
 
   var data = {
-    app_id: self.aid,
+    app_id: app_id,
     user: user.traits()
   };
 
   ajax({
     type: 'GET',
-    url: self.IDENTIFY_URL,
+    url: IDENTIFY_URL,
     data: data,
     success: function (ids) {
       self.debug("identify success: %o", ids);
       ids || (ids = {});
+      is.string(ids) && (ids = json.parse(ids));
 
       // set uid to cookie
       cookie.uid(ids.uid);
@@ -7654,6 +7683,9 @@ UserJoy.prototype.identify = function (traits, fn) {
 
 UserJoy.prototype.company = function (traits, fn) {
   var self = this;
+  var appTraits = app.traits();
+  var app_id = appTraits.app_id;
+  var COMPANY_URL = appTraits.COMPANY_URL;
 
   this.debug('company');
 
@@ -7669,20 +7701,29 @@ UserJoy.prototype.company = function (traits, fn) {
   }
 
   company.identify(traits);
+
   var uid = cookie.uid();
+
+  // if no uid, do not send
+  if (!uid) {
+    self.debug('Cannot identify company without identifying user');
+    return;
+  }
+
   var data = {
-    app_id: self.aid,
+    app_id: app_id,
     u: uid,
     company: company.traits()
   };
 
   ajax({
     type: 'GET',
-    url: self.COMPANY_URL,
+    url: COMPANY_URL,
     data: data,
     success: function (ids) {
       self.debug("company success: %o", ids);
       ids || (ids = {});
+      is.string(ids) && (ids = json.parse(ids));
 
       // set cid to cookie
       cookie.cid(ids.cid);
@@ -7896,8 +7937,10 @@ UserJoy.prototype._callback = function (fn) {
  *
  * Send event data to UserJoy API
  *
- * @param {String} type of event
- * @param {Object} traits of event
+ * @param {String} type of event (link/form/track)
+ * @param {String} name of event
+ * @param {String} name of module
+ * @param {Object} additional properties of event (optional)
  * @return {UserJoy}
  * @api private
  */
@@ -7905,13 +7948,26 @@ UserJoy.prototype._callback = function (fn) {
 UserJoy.prototype._sendEvent = function (type, name, module, properties) {
 
   var self = this;
-  // TODO: send data to userjoy api here
 
+  var appTraits = app.traits();
+  var app_id = appTraits.app_id;
+  var TRACK_URL = appTraits.TRACK_URL;
+
+  // fetch from cookies
   var uid = cookie.uid();
   var cid = cookie.cid();
 
+  // Validations
+
+  // if no uid, do not send
+  if (!uid) {
+    self.debug('Cannot send event without identifying user');
+    return;
+  }
+
+
   var data = {
-    app_id: self.aid,
+    app_id: app_id,
     e: {
       type: type,
       name: name,
@@ -7924,10 +7980,11 @@ UserJoy.prototype._sendEvent = function (type, name, module, properties) {
   if (module) data.e.module = module;
   if (properties) data.e.meta = properties;
 
+  self.debug('Sending new event: %o', data);
 
   ajax({
     type: 'GET',
-    url: self.TRACK_URL,
+    url: TRACK_URL,
     data: data,
     success: function (msg) {
       self.debug("success " + msg);
@@ -7973,35 +8030,6 @@ UserJoy.prototype.toggleDebug = function () {
 };
 
 
-
-/**
- * Return the canonical path for the page.
- *
- * @return {String}
- */
-
-function canonicalPath() {
-  var canon = canonical();
-  if (!canon) return window.location.pathname;
-  var parsed = url.parse(canon);
-  return parsed.pathname;
-}
-
-/**
- * Return the canonical URL for the page, without the hash.
- *
- * @return {String}
- */
-
-function canonicalUrl() {
-  var canon = canonical();
-  if (canon) return canon;
-  var url = window.location.href;
-  var i = url.indexOf('#');
-  return -1 == i ? url : url.slice(0, i);
-}
-
-
 /**
  * Expose function to hide notification
  */
@@ -8035,6 +8063,125 @@ UserJoy.prototype.hideFeedback = message.hide;
  */
 
 UserJoy.prototype.sendConversation = message.send;
+
+
+/**
+ * Return the canonical path for the page.
+ *
+ * @return {String}
+ */
+
+function canonicalPath() {
+  var canon = canonical();
+  if (!canon) return window.location.pathname;
+  var parsed = url.parse(canon);
+  return parsed.pathname;
+}
+
+/**
+ * Return the canonical URL for the page, without the hash.
+ *
+ * @return {String}
+ */
+
+function canonicalUrl() {
+  var canon = canonical();
+  if (canon) return canon;
+  var url = window.location.href;
+  var i = url.indexOf('#');
+  return -1 == i ? url : url.slice(0, i);
+}
+
+
+UserJoy.prototype._autoTrackForms = function () {
+
+  var self = this;
+  var allForms = document.getElementsByTagName('form');
+
+  each(allForms, function (f) {
+    var identifier = f.id;
+    var manuallyTracked = false;
+
+    // if no id, return
+    if (!identifier) return;
+
+    // app should not have enabled manual tracking of id (check from queue)
+    each(queue.tasks, function (t) {
+
+      if (t[0] === 'track_form') {
+
+        // if its an array of form ids, and the array contains this id, then
+        // it is being manually tracked
+        if (is.array(t[1]) && contains(t[1], identifier)) {
+          manuallyTracked = true;
+        }
+
+        // if its a single form id (string), and equals the current form id,
+        // then it is being manually tracked
+        if (is.string(t[1]) && (t[1] === identifier)) {
+          manuallyTracked = true;
+        }
+
+      }
+    });
+
+    // if manually tracked, move on (do not autotrack)
+    if (manuallyTracked) return;
+
+    // else enable auto tracking, and pass name as the identifier
+    self.track_form(identifier, identifier);
+
+
+  });
+
+  return this;
+}
+
+
+UserJoy.prototype._autoTrackLinks = function () {
+
+  var self = this;
+  var allLinks = document.getElementsByTagName('a');
+
+  each(allLinks, function (l) {
+    var identifier = l.id;
+    var manuallyTracked = false;
+
+    // if no id, do not track
+    if (!identifier) return;
+
+    // app should not have enabled manual tracking of id (check from queue)
+    each(queue.tasks, function (t) {
+
+      if (t[0] === 'track_link') {
+
+        // if its an array of link ids, and the array contains this id, then
+        // it is being manually tracked
+        if (is.array(t[1]) && contains(t[1], identifier)) {
+          manuallyTracked = true;
+        }
+
+        // if its a single link id (string), and equals the current link id,
+        // then it is being manually tracked
+        if (is.string(t[1]) && (t[1] === identifier)) {
+          manuallyTracked = true;
+        }
+
+      }
+    });
+
+
+    // if manually tracked, move on (do not autotrack)
+    if (manuallyTracked) return;
+
+    // else enable auto tracking, and pass name as the identifier
+    self.track_link(identifier, identifier);
+
+
+  });
+
+  return this;
+}
 
 });
 

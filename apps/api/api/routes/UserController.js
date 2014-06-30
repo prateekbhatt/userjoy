@@ -139,13 +139,12 @@ router
 /**
  * GET /apps/:aid/users/:uid/events
  *
- * @query {date} from from-unix-timestamp
- * @query {date} to to-unix-timestamp
+ * @query {date} date unix-timestamp
  *
- * Returns events grouped by date, from from-timestamp to to-timestamp
+ * Returns events of the user in that day
  *
- * If from and to query params are not provided, then returns all events in the
- * last seven days, grouped by date
+ * If date query param is not provided, then returns all events in the
+ * present day
  */
 
 router
@@ -153,31 +152,29 @@ router
   .get(function (req, res, next) {
 
     // last seven days
-    var sevenDaysAgo = moment()
-      .subtract('days', 7)
+    var today = moment()
       .unix();
 
-    var from = parseInt(req.query.from, 10);
-    var to = parseInt(req.query.to, 10);
 
-    // NOTE: multiplying by 1000 to convert from unix timestamp in seconds
-    // to milliseconds
-    sevenDaysAgo = sevenDaysAgo * 1000;
-    from = from * 1000;
-    to = to * 1000;
+    // default date is today
+    var date = parseInt(req.query.date, 10);
+    date = validTimestamp(date * 1000) ? date : today;
 
-    // default from timestamp is sevenDaysAgo
-    from = validTimestamp(from) ? from : sevenDaysAgo;
+    // from start of date to end of date
+    var from = moment.utc(date * 1000)
+      .startOf('day')
+      .format();
 
-    // default to timestamp is now
-    to = validTimestamp(to) ? to : Date.now();
+    var to = moment.utc(date * 1000)
+      .endOf('day')
+      .format();
 
 
     logger.trace({
       at: 'UserController:getEvents',
       params: req.params,
       query: req.query,
-      valid: validTimestamp(req.query.from),
+      date: date,
       from: from,
       to: to
     });
@@ -199,26 +196,29 @@ router
 
         if (err) return next(err);
 
+
+        // NOTE: not using the code below now because the events are being sent
+        // only for a day. Will think about metadata later
         // 1. convert metadata array to object
         // 2. groupBy date unix timestamp
-        var newEvents = _.chain(events)
-          .map(function (e) {
-            e = e.toJSON();
-            e.meta = metadata.toObject(e.meta);
-            return e;
-          })
-          .groupBy(function (e) {
-            var startOfDay = moment(e.ct)
-              .startOf('day')
-              .unix();
+        // var newEvents = _.chain(events)
+        //   .map(function (e) {
+        //     e = e.toJSON();
+        //     e.meta = metadata.toObject(e.meta);
+        //     return e;
+        //   })
+        //   .groupBy(function (e) {
+        //     var startOfDay = moment(e.ct)
+        //       .startOf('day')
+        //       .unix();
 
-            return startOfDay;
-          })
-          .value();
+        //     return startOfDay;
+        //   })
+        //   .value();
 
         res
           .status(200)
-          .json(newEvents);
+          .json(events);
 
       });
 

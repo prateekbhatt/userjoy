@@ -52,12 +52,12 @@ angular.module('models.user', ['services'])
         .error(cb);
     }
 
-    this.getEvents = function (appId, uid, fromTime, toTime, cb) {
+    this.getEvents = function (appId, uid, fromTime, cb) {
       $http.get(config.apiUrl + '/apps/' + appId + '/users/' + uid +
-        '/events?from=' + fromTime + '&to=' + toTime)
+        '/events?date=' + fromTime)
         .success(function (data) {
-          console.log("success: ", data, fromTime, toTime);
-          cb(null, data);
+          console.log("success: ", data, fromTime);
+          cb(null, data, fromTime);
         })
         .error(cb);
     }

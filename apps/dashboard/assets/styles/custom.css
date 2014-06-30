@@ -768,6 +768,12 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
     border-left: 4px solid #e74c3c;
     background-color: #ffffff;
 }
+.list-group-item-default {
+    color: #2c3e50;
+    border-left: 4px solid #7f8c8d;
+    background-color: #ffffff;
+}
+
 #affix-demo {
     -margin-top: 30px;
     height: 350px;
@@ -841,6 +847,21 @@ li.list-group-item-segment.active, li.list-group-item-segment.active:hover, li.l
 
 .navbar-inverse .navbar-collapse, .navbar-inverse .navbar-form {
     border-color: #ddd;
+}
+
+.btn-back {
+    color: #ffffff;
+    background-color: #95a5a6;
+    border-color: #95a5a6;
+}
+
+pre code {
+    padding: 0;
+    font-size: inherit;
+    color: inherit;
+    white-space: nowrap;
+    background-color: transparent;
+    border-radius: 0;
 }
 
 /*.active-smart-filters {

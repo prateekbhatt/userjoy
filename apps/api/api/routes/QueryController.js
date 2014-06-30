@@ -141,16 +141,54 @@ router
 
               cb(err, trackEvents, pvs);
             });
+        },
+
+        function getFormNames(tracks, pvs, cb) {
+          Event
+            .distinct('name', {
+              type: 'form'
+            })
+            .exec(function (err, names) {
+              var forms = _.map(names, function (n) {
+                var f = {
+                  type: 'form',
+                  name: n
+                };
+                return f;
+              });
+
+              cb(err, forms, tracks, pvs);
+            });
+        },
+
+        function getLinkNames(forms, tracks, pvs, cb) {
+          Event
+            .distinct('name', {
+              type: 'link'
+            })
+            .exec(function (err, names) {
+              var links = _.map(names, function (n) {
+                var f = {
+                  type: 'link',
+                  name: n
+                };
+                return f;
+              });
+
+              cb(err, links, forms, tracks, pvs);
+            });
         }
 
       ],
 
-      function callback(err, features, pageviews) {
+      function callback(err, links, forms, tracks, pageviews) {
         if (err) return next(err);
 
         var attributes = {
           userAttributes: userAttributes,
-          events: features.concat(pageviews)
+          events: links.concat(forms)
+            .concat(tracks)
+            .concat(pageviews)
         };
 
         res
