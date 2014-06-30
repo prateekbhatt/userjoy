@@ -426,6 +426,26 @@ UserSchema.statics.setScore = function (uid, score, cb) {
 };
 
 
+/**
+ * Updates the lastSeen timestamp of the user to the given or the current time
+ *
+ * @param {string} uid user-id
+ * @param {function} cb callback (optional)
+ */
+
+UserSchema.statics.updateLastSeen = function (uid, cb) {
+
+  var update = {
+    lastSeen: Date.now()
+  };
+
+  User.findByIdAndUpdate(uid, update, function (err) {
+    if (cb) return cb(err);
+  });
+
+};
+
+
 
 var User = mongoose.model('User', UserSchema);
 
