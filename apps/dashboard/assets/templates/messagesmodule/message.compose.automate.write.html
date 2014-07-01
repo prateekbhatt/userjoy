@@ -89,7 +89,11 @@
             <div style="padding-top: 55px;">
                 <div class="col-md-8 col-md-offset-2" ng-show="showNotification">
                     <div class="message-template" style="max-height: 200px; min-height: 200px; overflow: auto; border-left: 1px solid #eee;" ng-style="{'border-color': borderColor, 'border-right': borderRight, 'border-top': borderTop, 'border-bottom': borderBottom, 'border-radius': borderRadius}">
-                        <p ng-bind-html="notificationBody"></p>
+                        <img src="{{gravatar}}" width="60px">
+                        <div style="margin-top: -75px; margin-left: 75px;">
+                            <p style="margin-top: 12px;"><b>{{sender}}</b></p>
+                            <p ng-bind-html="notificationBody"></p>
+                        </div>
                     </div>
                     <div class="panel-footer" style="margin-top: -23px;">
                         <div class="input-group">
