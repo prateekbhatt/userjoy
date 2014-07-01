@@ -501,8 +501,8 @@ module.exports = function run() {
         // worker again
         if (err && err.message === 'EMPTY_AUTOMESSAGE_QUEUE') {
 
-          console.log('amConsumer:re-fetch after 15 seconds');
-          setTimeout(next, 15000);
+          console.log('amConsumer:re-fetch after 5 minutes');
+          setTimeout(next, 300000);
 
         } else {
 
