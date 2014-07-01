@@ -405,8 +405,9 @@ angular.module('do.automate', [])
 
           $scope.saveMessage = function () {
             if ($scope.showNotification) {
-              if($scope.notificationBody) {
-                saveMsgService.setMsg($scope.notificationBody.replace(/\n/g,
+              if ($scope.notificationBody) {
+                saveMsgService.setMsg($scope.notificationBody.replace(
+                    /\n/g,
                     '<br/>')
                   .replace(/&#34;/g, '"')
                   .replace(/&#160/g, ' '));
@@ -725,8 +726,10 @@ angular.module('do.automate', [])
 
         if (AutoMsgService.getSingleAutoMsg()
           .active) {
+          console.log("message is active");
           $scope.msgStatus = 'Deactivate this Message';
         } else {
+          console.log("message is inactive");
           $scope.msgStatus = 'Make it Live';
         }
 
@@ -739,15 +742,37 @@ angular.module('do.automate', [])
         $location.path('/apps/' + $scope.currApp + '/messages/automate');
       }
 
+      var callbackMakeLive = function (err) {
+        if (err) {
+          console.log("err");
+          return;
+        }
+        $scope.msgStatus = 'Deactivate this Message';
+        console.log("$scope.msgStatus: ", $scope.msgStatus);
+
+      }
+
+      var callbackDeactivate = function (err) {
+        if (err) {
+          console.log("err");
+          return;
+        }
+        $scope.msgStatus = 'Make it Live';
+        console.log("$scope.msgStatus: ", $scope.msgStatus);
+      }
+
       $scope.changeMsgStatus = function () {
+        console.log("single AutoMsg: ", AutoMsgService.getSingleAutoMsg());
+        console.log(_.keys(AutoMsgService.getSingleAutoMsg()));
         if (AutoMsgService.getSingleAutoMsg()
-          .active) {
+          .active == true) {
+          console.log("message is active");
           modelsAutomate.deActivateMsg($scope.currApp,
-            $scope.msgId);
-          $scope.msgStatus = 'Make it Live';
+            $scope.msgId, callbackDeactivate);
         } else {
-          modelsAutomate.makeMsgLive($scope.currApp, $scope.msgId);
-          $scope.msgStatus = 'Deactivate this Message';
+          console.log("message is inactive");
+          modelsAutomate.makeMsgLive($scope.currApp, $scope.msgId,
+            callbackMakeLive);
         }
       }
 
