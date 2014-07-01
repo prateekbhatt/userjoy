@@ -118,12 +118,12 @@
                                                 <div ng-if="filter.checkMethod && !filter.isEvent && filter.showDatePicker" style="float: left; padding-left: 24px;">
                                                     <!-- <p class="input-group" style="width: 200px;"> -->
                                                     <!-- <input type="text" class="form-control input-sm" datepicker-popup="{{format}}" ng-model="filter.val" is-open="$parent.dateOpened" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" show-weeks="false" max="maxDate" show-button-bar="false"/> -->
-                                                    <p class="input-group">
+                                                    <span class="input-group">
                                                     <input type="text" class="form-control input-sm"  ng-model="filter.val" style="width: 70px; border-top-left-radius: 3px;
                                                     border-bottom-left-radius: 3px;
                                                     border-bottom-right-radius: 3px;
                                                     border-top-right-radius: 3px;" /> &nbsp;
-                                                    days ago</p>
+                                                    days ago</span>
                                                 </div>
                                                 <div ng-if="filter.checkMethod && !filter.isEvent && filter.showHealthStatus" style="float: left; padding-left: 24px;">
                                                     <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.valuetext}}</span>&nbsp;<span class="caret"></span></button>
