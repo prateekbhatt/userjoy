@@ -87,7 +87,7 @@ function mapReduce(aid, cid, timestamp, cb) {
   var to = moment(timestamp);
 
   if (!to.isValid()) {
-    return cb(new Error('Provide valid timestamp'));
+    return cb(new Error('PROVIDE_VALID_TIMESTAMP'));
   }
 
   var from = moment(timestamp)
@@ -227,6 +227,42 @@ function saveScores(aid, cid, timestamp, scores, cb) {
 }
 
 
+function deleteFromQueue(queueMsgId, cb) {
+
+  scoreQueue()
+    .del(queueMsgId, function (err, body) {
+
+      logger.trace({
+        at: 'workers/score-consumer deleteFromQueue',
+        queueMsgId: queueMsgId,
+        err: err,
+        body: body
+      });
+
+      cb(err);
+
+    });
+}
+
+
+// queue app id to calculate user health attribute
+function postToHealthQueue(aid, time, cb) {
+
+  var appData = {
+    aid: aid
+  };
+
+  // ironmq accepts only strings
+  appData = JSON.stringify(appData);
+
+  healthQueue()
+    .post(appData, function (err) {
+      cb(err, aid, time);
+    });
+}
+
+
+
 function scoreConsumerWorker(cb) {
 
   var queueMsgId;
@@ -270,8 +306,8 @@ function scoreConsumerWorker(cb) {
             var time = msgBody.time;
 
             // the message body contains the app id
-            if (!aid) return cb(new Error('App id not found in queue'));
-            if (!time) return cb(new Error('Time not found in queue'));
+            if (!aid) return cb(new Error('APP_ID_NOT_FOUND'));
+            if (!time) return cb(new Error('TIME_NOT_FOUND'));
 
             cb(null, aid, time);
           });
@@ -292,42 +328,8 @@ function scoreConsumerWorker(cb) {
         saveScores(aid, null, time, scores, function (err) {
           cb(err, aid, time);
         });
-      },
-
-
-      function deleteFromQueue(aid, time, cb) {
-
-        scoreQueue()
-          .del(queueMsgId, function (err, body) {
-
-            logger.trace({
-              at: 'workers/score-consumer deleteFromQueue',
-              queueMsgId: queueMsgId,
-              err: err,
-              body: body
-            });
-
-            cb(err, aid, time);
-
-          });
-      },
-
-
-      // queue app id to calculate user health attribute
-      function postToHealthQueue(aid, time, cb) {
-
-        var appData = {
-          aid: aid
-        };
-
-        // ironmq accepts only strings
-        appData = JSON.stringify(appData);
-
-        healthQueue()
-          .post(appData, function (err) {
-            cb(err, aid, time);
-          });
       }
+
     ],
 
 
@@ -342,7 +344,34 @@ function scoreConsumerWorker(cb) {
         });
       }
 
-      cb(err);
+
+      // if empty error, the queue should be fetched from after some time
+      if (err && err.message === 'EMPTY_SCORE_QUEUE') return cb(err);
+
+
+      // if err and err is unknown, return error, and do not delete from queue
+      if (err && !_.contains([
+
+        'APP_ID_NOT_FOUND',
+        'TIME_NOT_FOUND',
+        'PROVIDE_VALID_TIMESTAMP'
+
+      ], err.message)) {
+
+        return cb(err);
+      }
+
+
+      // else if known errors, delete from queue, and post to score queue
+      deleteFromQueue(queueMsgId, function (err) {
+
+        if (err) return cb(err);
+
+        postToHealthQueue(aid, time, function (err) {
+          cb(err);
+        });
+
+      });
     }
 
   );
