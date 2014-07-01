@@ -151,7 +151,9 @@ router
         if (err) return next(err);
         res
           .status(200)
-          .json(automsg);
+          .json({
+            automessage: automsg
+          });
       })
 
 
@@ -187,7 +189,9 @@ router
         if (err) return next(err);
         res
           .status(201)
-          .json(savedAutoMsg);
+          .json({
+            automessage: savedAutoMsg
+          });
       });
 
   });
@@ -373,6 +377,17 @@ router
               cb(err, amsg, queueId);
             });
 
+        },
+
+        function updateLastQueuedTimestamp(amsg, queueId, cb) {
+
+          // if automessage deactivated, move on
+          if (status === 'false') return cb(null, amsg, null);
+
+          amsg.lastQueued = Date.now();
+          amsg.save(function (err, savedAmsg) {
+            cb(err, savedAmsg, queueId);
+          })
         }
       ],
 
@@ -428,7 +443,9 @@ router
 
           res
             .status(201)
-            .json(savedAmsg);
+            .json({
+              automessage: savedAmsg
+            });
         })
 
       });

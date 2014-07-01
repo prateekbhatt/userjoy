@@ -91,7 +91,7 @@ describe('Resource /apps/:aid/automessages', function () {
           .expect('Content-Type', /json/)
           .expect(201)
           .expect(function (res) {
-            savedMsg = res.body;
+            savedMsg = res.body.automessage;
 
             expect(savedMsg)
               .to.have.property("creator", saved.accounts.first._id.toString());
@@ -130,7 +130,7 @@ describe('Resource /apps/:aid/automessages', function () {
           .expect('Content-Type', /json/)
           .expect(201)
           .expect(function (res) {
-            var savedMsg = res.body;
+            var savedMsg = res.body.automessage;
 
             expect(savedMsg)
               .to.have.property("creator", saved.accounts.first._id.toString());
@@ -312,22 +312,24 @@ describe('Resource /apps/:aid/automessages', function () {
           .expect(200)
           .expect(function (res) {
 
-            expect(res.body)
+            var automessage = res.body.automessage;
+
+            expect(automessage)
               .to.not.be.empty;
 
             // it should populate the automessage sender name and email
-            expect(res.body)
+            expect(automessage)
               .to.have.property("sender")
               .that.is.an('object')
               .and.has.keys(['_id', 'email', 'name']);
 
             // it should populate the automessage segment name
-            expect(res.body)
+            expect(automessage)
               .to.have.property("sid")
               .that.is.an('object')
               .and.has.keys(['_id', 'name']);
 
-            expect(res.body.title)
+            expect(automessage.title)
               .to.eql('Welcome Message');
           })
           .end(done);
@@ -450,8 +452,7 @@ describe('Resource /apps/:aid/automessages', function () {
     });
 
 
-    it(
-      'should return error is active status is neither true nor false',
+    it('should return error is active status is neither true nor false',
       function (done) {
 
         var statusTestUrl = testUrl + '/randomStatus';
@@ -494,6 +495,9 @@ describe('Resource /apps/:aid/automessages', function () {
         expect(saved.automessages.first.active)
           .to.be.false;
 
+        expect(saved.automessages.first.lastQueued)
+          .to.not.exist;
+
         var statusTestUrl = testUrl + '/true';
 
         request
@@ -511,6 +515,11 @@ describe('Resource /apps/:aid/automessages', function () {
 
             expect(res.body.automessage.active)
               .to.be.true;
+
+
+            expect(saved.automessages.first.lastQueued)
+              .to.not.exist
+              .and.to.be.a('date');
           })
           .expect(200)
           .end(done);
@@ -601,7 +610,7 @@ describe('Resource /apps/:aid/automessages', function () {
           .expect(201)
           .expect(function (res) {
 
-            savedMsg = res.body;
+            savedMsg = res.body.automessage;
 
             expect(savedMsg)
               .to.have.property("body", updatedMsg.body);
