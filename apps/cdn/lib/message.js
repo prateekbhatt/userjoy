@@ -15,17 +15,18 @@ var MSG_TEMPLATE_ID = 'uj_message';
 var MSG_BODY_TEMPLATE_ID = 'uj_message_body';
 var MSG_SENT_TEMPLATE_ID = 'uj_message_sent';
 var MSG_ERROR_ID = 'uj_message_error';
+var MSG_SEND_FEEDBACK_ID = 'uj_message_send_button'
 
 
 /**
  * Initialize a new `Message` instance.
  */
 
-function Message() {
+  function Message() {
 
-  this.debug = debug;
+    this.debug = debug;
 
-}
+  }
 
 
 Message.prototype.load = function () {
@@ -40,6 +41,7 @@ Message.prototype.load = function () {
     MSG_BODY_TEMPLATE_ID: MSG_BODY_TEMPLATE_ID,
     MSG_SENT_TEMPLATE_ID: MSG_SENT_TEMPLATE_ID,
     MSG_ERROR_ID: MSG_ERROR_ID,
+    MSG_SEND_FEEDBACK_ID: MSG_SEND_FEEDBACK_ID,
     color: appTraits.color
   };
 
@@ -116,6 +118,9 @@ Message.prototype.send = function () {
     return;
   }
 
+  document.getElementById(MSG_SEND_FEEDBACK_ID)
+    .disabled = true;
+
   var msg = {
     app_id: app_id,
     body: msgBody
@@ -152,6 +157,9 @@ Message.prototype.send = function () {
       document.getElementById(MSG_BODY_TEMPLATE_ID)
         .value = '';
 
+      document.getElementById(MSG_SEND_FEEDBACK_ID)
+        .disabled = false;
+
       setTimeout(function () {
         document.getElementById(MSG_TEMPLATE_ID)
           .style.display = 'none';
@@ -160,6 +168,8 @@ Message.prototype.send = function () {
 
     error: function (err) {
       self.debug("ERROR on sending: %o", err);
+      document.getElementById(MSG_SEND_FEEDBACK_ID)
+        .disabled = false;
     }
   });
 

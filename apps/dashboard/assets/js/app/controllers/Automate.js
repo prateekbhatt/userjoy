@@ -1150,6 +1150,7 @@ angular.module('do.automate', [])
       $stateParams.id);
 
     $scope.msgId = $stateParams.mid;
+    $scope.statusButton = false;
 
     var populatePage = function () {
       var showAutoMsgCallback = function (err) {
@@ -1439,6 +1440,7 @@ angular.module('do.automate', [])
       }
 
       var callbackMakeLive = function (err) {
+        $scope.statusButton = false;
         if (err) {
           console.log("err");
           return;
@@ -1449,6 +1451,7 @@ angular.module('do.automate', [])
       }
 
       var callbackDeactivate = function (err) {
+        $scope.statusButton = false;
         if (err) {
           console.log("err");
           return;
@@ -1458,6 +1461,7 @@ angular.module('do.automate', [])
       }
 
       $scope.changeMsgStatus = function () {
+        $scope.statusButton = true;
         console.log("single AutoMsg: ", AutoMsgService.getSingleAutoMsg());
         console.log(_.keys(AutoMsgService.getSingleAutoMsg()));
         if (AutoMsgService.getSingleAutoMsg()
