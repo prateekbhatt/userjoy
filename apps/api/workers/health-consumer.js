@@ -53,7 +53,7 @@ var healthQueue = q.health;
 function runHealthQuery(aid, health, cb) {
 
   if (!_.contains(['good', 'average', 'poor'], health)) {
-    return cb(new Error('Health state must be one of good/average/poor'));
+    return cb(new Error('INVALID_HEALTH_TYPE'));
   }
 
   async.waterfall(
@@ -75,7 +75,7 @@ function runHealthQuery(aid, health, cb) {
 
       function runQuery(segment, cb) {
 
-        if (!segment) return cb(new Error('Segment not found'));
+        if (!segment) return cb(new Error('SEGMENT_NOT_FOUND'));
 
         // segment object should be converted from BSON to JSON
         if (segment.toJSON) segment = segment.toJSON();
@@ -132,6 +132,26 @@ function runHealthQuery(aid, health, cb) {
 }
 
 
+
+function deleteFromQueue(queueMsgId, cb) {
+
+  healthQueue()
+    .del(queueMsgId, function (err, body) {
+
+      logger.trace({
+        at: 'workers/health-consumer deleteFromQueue',
+        queueMsgId: queueMsgId,
+        err: err,
+        body: body
+      });
+
+      cb(err);
+
+    });
+}
+
+
+
 function healthConsumerWorker(cb) {
 
   var queueMsgId;
@@ -169,7 +189,7 @@ function healthConsumerWorker(cb) {
             var aid = msgBody.aid;
 
             // the message body contains the app id
-            if (!aid) return cb(new Error('App id not found in queue'));
+            if (!aid) return cb(new Error('APP_ID_NOT_FOUND'));
 
             cb(null, aid);
           });
@@ -203,25 +223,7 @@ function healthConsumerWorker(cb) {
         runHealthQuery(aid, health, function (err) {
           cb(err, aid);
         });
-      },
-
-
-      function deleteFromQueue(aid, cb) {
-
-        healthQueue()
-          .del(queueMsgId, function (err, body) {
-
-            logger.trace({
-              at: 'workers/health-consumer deleteFromQueue',
-              queueMsgId: queueMsgId,
-              err: err,
-              body: body
-            });
-
-            cb(err, aid);
-
-          });
-      },
+      }
     ],
 
 
@@ -236,9 +238,28 @@ function healthConsumerWorker(cb) {
         });
       }
 
-      cb(err);
-    }
+      // if empty error, the queue should be fetched from after some time
+      if (err && err.message === 'EMPTY_HEALTH_QUEUE') return cb(err);
 
+
+      // if err and err is unknown, return error, and do not delete from queue
+      if (err && !_.contains([
+
+        'APP_ID_NOT_FOUND',
+        'SEGMENT_NOT_FOUND',
+        'INVALID_HEALTH_TYPE'
+
+      ], err.message)) {
+
+        return cb(err);
+      }
+
+
+      // else if known errors, delete from queue, and post to score queue
+      deleteFromQueue(queueMsgId, function (err) {
+        cb(err);
+      });
+    }
   );
 
 }

@@ -154,6 +154,44 @@ function saveUsage(aid, timestamp, dailyUsage, cb) {
 }
 
 
+
+function deleteFromQueue(queueMsgId, cb) {
+
+  usageQueue()
+    .del(queueMsgId, function (err, body) {
+
+      logger.trace({
+        at: 'workers/usage-consumer deleteFromQueue',
+        queueMsgId: queueMsgId,
+        err: err,
+        body: body
+      });
+
+      cb(err);
+
+    });
+}
+
+
+// queue app id to calculate user engagement scores
+function postToScoreQueue(aid, time, cb) {
+
+  var appData = {
+    aid: aid,
+    time: time
+  };
+
+  // ironmq accepts only strings
+  appData = JSON.stringify(appData);
+
+  scoreQueue()
+    .post(appData, function (err) {
+      cb(err, aid, time);
+    });
+}
+
+
+
 /**
  * Updates the usage of each user-company
  *
@@ -198,8 +236,8 @@ function usageConsumerWorker(cb) {
             var time = msgBody.time;
 
             // the message body contains the app id
-            if (!aid) return cb(new Error('App id not found in queue'));
-            if (!time) return cb(new Error('Time not found in queue'));
+            if (!aid) return cb(new Error('APP_ID_NOT_FOUND'));
+            if (!time) return cb(new Error('TIME_NOT_FOUND'));
 
             cb(null, aid, time);
           });
@@ -220,42 +258,6 @@ function usageConsumerWorker(cb) {
         saveUsage(aid, time, users, function (err) {
           cb(err, aid, time);
         });
-      },
-
-
-      function deleteFromQueue(aid, time, cb) {
-
-        usageQueue()
-          .del(queueMsgId, function (err, body) {
-
-            logger.trace({
-              at: 'workers/usage-consumer deleteFromQueue',
-              queueMsgId: queueMsgId,
-              err: err,
-              body: body
-            });
-
-            cb(err, aid, time);
-
-          });
-      },
-
-
-      // queue app id to calculate user engagement scores
-      function postToScoreQueue(aid, time, cb) {
-
-        var appData = {
-          aid: aid,
-          time: time
-        };
-
-        // ironmq accepts only strings
-        appData = JSON.stringify(appData);
-
-        scoreQueue()
-          .post(appData, function (err) {
-            cb(err, aid, time);
-          });
       }
 
     ],
@@ -272,10 +274,37 @@ function usageConsumerWorker(cb) {
         });
       }
 
-      cb(err);
+
+      // if empty error, the queue should be fetched from after some time
+      if (err && err.message === 'EMPTY_USAGE_QUEUE') return cb(err);
+
+
+      // if err and err is unknown, return error, and do not delete from queue
+      if (err && !_.contains([
+
+        'APP_ID_NOT_FOUND',
+        'TIME_NOT_FOUND'
+
+      ], err.message)) {
+
+        return cb(err);
+      }
+
+
+      // else if known errors, delete from queue, and post to score queue
+      deleteFromQueue(queueMsgId, function (err) {
+
+        if (err) return cb(err);
+
+        postToScoreQueue(aid, time, function (err) {
+          cb(err);
+        });
+
+      });
+
     }
 
-  )
+  );
 
 }
 
