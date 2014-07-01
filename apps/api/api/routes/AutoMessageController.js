@@ -151,7 +151,9 @@ router
         if (err) return next(err);
         res
           .status(200)
-          .json(automsg);
+          .json({
+            automessage: automsg
+          });
       })
 
 
@@ -187,7 +189,9 @@ router
         if (err) return next(err);
         res
           .status(201)
-          .json(savedAutoMsg);
+          .json({
+            automessage: savedAutoMsg
+          });
       });
 
   });
@@ -439,7 +443,9 @@ router
 
           res
             .status(201)
-            .json(savedAmsg);
+            .json({
+              automessage: savedAmsg
+            });
         })
 
       });

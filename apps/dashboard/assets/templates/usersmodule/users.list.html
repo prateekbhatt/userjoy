@@ -117,11 +117,13 @@
                                                 </div>
                                                 <div ng-if="filter.checkMethod && !filter.isEvent && filter.showDatePicker" style="float: left; padding-left: 24px;">
                                                     <!-- <p class="input-group" style="width: 200px;"> -->
-                                                    <input type="text" class="form-control input-sm" datepicker-popup="{{format}}" ng-model="filter.val" is-open="$parent.dateOpened" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" show-weeks="false" max="maxDate" show-button-bar="false"/>
-                                                    <!-- <span class="input-group-btn">
-                                                    <button type="button" class="btn btn-default btn-sm" ng-click="openDatePicker($event)"><i class="fa fa-calendar"></i></button>
-                                                    </span>
-                                                    </p> -->
+                                                    <!-- <input type="text" class="form-control input-sm" datepicker-popup="{{format}}" ng-model="filter.val" is-open="$parent.dateOpened" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" show-weeks="false" max="maxDate" show-button-bar="false"/> -->
+                                                    <span class="input-group">
+                                                    <input type="text" class="form-control input-sm"  ng-model="filter.val" style="width: 70px; border-top-left-radius: 3px;
+                                                    border-bottom-left-radius: 3px;
+                                                    border-bottom-right-radius: 3px;
+                                                    border-top-right-radius: 3px;" /> &nbsp;
+                                                    days ago</span>
                                                 </div>
                                                 <div ng-if="filter.checkMethod && !filter.isEvent && filter.showHealthStatus" style="float: left; padding-left: 24px;">
                                                     <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.valuetext}}</span>&nbsp;<span class="caret"></span></button>
@@ -219,126 +221,126 @@
                     </div>
                     <hr>
                     <div class="row">
-                    <div>
-                        <div ng-show="!showUsers" class="col-md-push-2 col-md-8">
-                            <br>
-                            <br>
-                            <h4 class="well text-center">There are no users to be displayed. Run a query!!</h4>
-                        </div>
-                        <div class="row"  ng-show="showUsers">
-                            <div class="col-md-4" style="margin-top: 10px; margin-left: 20px;">
-                                <span class="fa fa-user">&nbsp;&nbsp;{{countUsers}} <b>users</b></span> &nbsp;&nbsp;
-                                <button class="fa fa-envelope-o btn btn-info" ng-click="openModal()">
-                                <span>Message</span></button>
+                        <div>
+                            <div ng-show="!showUsers" class="col-md-push-2 col-md-8">
+                                <br>
+                                <br>
+                                <h4 class="well text-center">There are no users to be displayed. Run a query!!</h4>
                             </div>
-                            <div class="col-md-6">
-                                <!-- <div class="btn-group col-md-5">
-                                    <button class="fa fa-tag btn btn-info">
-                                    <span>Tag</span></button>
-                                </div> -->
-                                <div class="col-md-5 col-md-push-10">
-                                    <button type="button" class="btn btn-default btn-block dropdown-toggle"> Select Data
-                                    <span class="caret" style="border-top-color: #333;"></span>
-                                    </button>
-                                    <ul class="dropdown-menu" role="menu" is-open="opened" style="left: auto; width: 190px;">
-                                        <li ng-repeat="column in columns" ng-click="$event.stopPropagation();" ng-show="!$first">&nbsp;&nbsp;&nbsp;<input type="checkbox" ng-model="column.visible" /> <label><span>{{column.title}}</span></label></li>
-                                    </ul>
+                            <div class="row"  ng-show="showUsers">
+                                <div class="col-md-4" style="margin-top: 10px; margin-left: 20px;">
+                                    <span class="fa fa-user">&nbsp;&nbsp;{{countUsers}} <b>users</b></span> &nbsp;&nbsp;
+                                    <button class="fa fa-envelope-o btn btn-info" ng-click="openModal()">
+                                    <span>Message</span></button>
+                                </div>
+                                <div class="col-md-6">
+                                    <!-- <div class="btn-group col-md-5">
+                                                                            <button class="fa fa-tag btn btn-info">
+                                                                            <span>Tag</span></button>
+                                    </div> -->
+                                    <div class="col-md-5 col-md-push-10">
+                                        <button type="button" class="btn btn-default btn-block dropdown-toggle"> Select Data
+                                        <span class="caret" style="border-top-color: #333;"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu" is-open="opened" style="left: auto; width: 190px;">
+                                            <li ng-repeat="column in columns" ng-click="$event.stopPropagation();" ng-show="!$first">&nbsp;&nbsp;&nbsp;<input type="checkbox" ng-model="column.visible" /> <label><span>{{column.title}}</span></label></li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <br>
-                        <br>
-                        <div class="row">
-                            <div class="panel panel-default" ng-show="showUsers">
-                                <div>
+                            <br>
+                            <br>
+                            <div class="row">
+                                <div class="panel panel-default" ng-show="showUsers">
                                     <div>
                                         <div>
-                                            <table ng-table="tableParams" show-filter="true" class="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="text-center">
-                                                            <div><input type="checkbox" ng-model="checkboxes.all"></div>
-                                                        </th>
-                                                        <th class="text-center" ng-show="columns[1].visible" ng-class="{
-                                                            'sort-asc': tableParams.isSortBy('email', 'asc'),
-                                                            'sort-desc': tableParams.isSortBy('email', 'desc'),
-                                                            'sortable': !$first
-                                                            }"
-                                                            ng-click="tableParams.sorting('email', tableParams.isSortBy('email', 'asc') ? 'desc' : 'asc')">
-                                                            <div>Email</div>
-                                                        </th>
-                                                        <th class="text-center" ng-show="columns[2].visible" ng-class="{
-                                                            'sort-asc': tableParams.isSortBy('userkarma', 'asc'),
-                                                            'sort-desc': tableParams.isSortBy('userkarma', 'desc'),
-                                                            'sortable': !$first
-                                                            }"
-                                                            ng-click="tableParams.sorting('userkarma', tableParams.isSortBy('userkarma', 'asc') ? 'desc' : 'asc')">
-                                                            <div>Engagement Score</div>
-                                                        </th>
-                                                        <th class="text-center" ng-show="columns[3].visible" ng-class="{
-                                                            'sort-asc': tableParams.isSortBy('datejoined', 'asc'),
-                                                            'sort-desc': tableParams.isSortBy('datejoined', 'desc'),
-                                                            'sortable': !$first
-                                                            }"
-                                                            ng-click="tableParams.sorting('datejoined', tableParams.isSortBy('datejoined', 'asc') ? 'desc' : 'asc')">
-                                                            <div>Date Joined</div>
-                                                        </th>
-                                                        <th class="text-center" ng-show="columns[4].visible" ng-class="{
-                                                            'sort-asc': tableParams.isSortBy('health', 'asc'),
-                                                            'sort-desc': tableParams.isSortBy('health', 'desc'),
-                                                            'sortable': !$first
-                                                            }"
-                                                            ng-click="tableParams.sorting('health', tableParams.isSortBy('health', 'asc') ? 'desc' : 'asc')">
-                                                            <div>Health</div>
-                                                        </th>
-                                                        <th class="text-center" ng-show="columns[5].visible" ng-class="{
-                                                            'sort-asc': tableParams.isSortBy('lastsession', 'asc'),
-                                                            'sort-desc': tableParams.isSortBy('lastsession', 'desc'),
-                                                            'sortable': !$first
-                                                            }"
-                                                            ng-click="tableParams.sorting('lastsession', tableParams.isSortBy('lastsession', 'asc') ? 'desc' : 'asc')">
-                                                            <div>Last Session</div>
-                                                        </th>
-                                                        <!-- <th class="text-center" ng-show="columns[6].visible" ng-class="{
-                                                            'sort-asc': tableParams.isSortBy('unsubscribed', 'asc'),
-                                                            'sort-desc': tableParams.isSortBy('unsubscribed', 'desc'),
-                                                            'sortable': !$first
-                                                            }"
-                                                            ng-click="tableParams.sorting('unsubscribed', tableParams.isSortBy('unsubscribed', 'asc') ? 'desc' : 'asc')">
-                                                            <div>Unsubscribed</div>
-                                                        </th> -->
+                                            <div>
+                                                <table ng-table="tableParams" show-filter="true" class="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center">
+                                                                <div><input type="checkbox" ng-model="checkboxes.all"></div>
+                                                            </th>
+                                                            <th class="text-center" ng-show="columns[1].visible" ng-class="{
+                                                                'sort-asc': tableParams.isSortBy('email', 'asc'),
+                                                                'sort-desc': tableParams.isSortBy('email', 'desc'),
+                                                                'sortable': !$first
+                                                                }"
+                                                                ng-click="tableParams.sorting('email', tableParams.isSortBy('email', 'asc') ? 'desc' : 'asc')">
+                                                                <div>Email</div>
+                                                            </th>
+                                                            <th class="text-center" ng-show="columns[2].visible" ng-class="{
+                                                                'sort-asc': tableParams.isSortBy('userkarma', 'asc'),
+                                                                'sort-desc': tableParams.isSortBy('userkarma', 'desc'),
+                                                                'sortable': !$first
+                                                                }"
+                                                                ng-click="tableParams.sorting('userkarma', tableParams.isSortBy('userkarma', 'asc') ? 'desc' : 'asc')">
+                                                                <div>Engagement Score</div>
+                                                            </th>
+                                                            <th class="text-center" ng-show="columns[3].visible" ng-class="{
+                                                                'sort-asc': tableParams.isSortBy('datejoined', 'asc'),
+                                                                'sort-desc': tableParams.isSortBy('datejoined', 'desc'),
+                                                                'sortable': !$first
+                                                                }"
+                                                                ng-click="tableParams.sorting('datejoined', tableParams.isSortBy('datejoined', 'asc') ? 'desc' : 'asc')">
+                                                                <div>Date Joined</div>
+                                                            </th>
+                                                            <th class="text-center" ng-show="columns[4].visible" ng-class="{
+                                                                'sort-asc': tableParams.isSortBy('health', 'asc'),
+                                                                'sort-desc': tableParams.isSortBy('health', 'desc'),
+                                                                'sortable': !$first
+                                                                }"
+                                                                ng-click="tableParams.sorting('health', tableParams.isSortBy('health', 'asc') ? 'desc' : 'asc')">
+                                                                <div>Health</div>
+                                                            </th>
+                                                            <th class="text-center" ng-show="columns[5].visible" ng-class="{
+                                                                'sort-asc': tableParams.isSortBy('lastsession', 'asc'),
+                                                                'sort-desc': tableParams.isSortBy('lastsession', 'desc'),
+                                                                'sortable': !$first
+                                                                }"
+                                                                ng-click="tableParams.sorting('lastsession', tableParams.isSortBy('lastsession', 'asc') ? 'desc' : 'asc')">
+                                                                <div>Last Session</div>
+                                                            </th>
+                                                            <!-- <th class="text-center" ng-show="columns[6].visible" ng-class="{
+                                                                                                                            'sort-asc': tableParams.isSortBy('unsubscribed', 'asc'),
+                                                                                                                            'sort-desc': tableParams.isSortBy('unsubscribed', 'desc'),
+                                                                                                                            'sortable': !$first
+                                                                                                                            }"
+                                                                                                                            ng-click="tableParams.sorting('unsubscribed', tableParams.isSortBy('unsubscribed', 'asc') ? 'desc' : 'asc')">
+                                                                                                                            <div>Unsubscribed</div>
+                                                            </th> -->
+                                                        </tr>
+                                                    </thead>
+                                                    <tr ng-repeat="user in $data">
+                                                        <td width="30" style="text-align: left">
+                                                            <input type="checkbox" ng-model="checkboxes.items[user.id]" />
+                                                        </td>
+                                                        <td data-title="'Email Id'" class="text-center" sortable="email" ng-show="columns[1].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
+                                                            <span>{{user.email}}</span>
+                                                        </td>
+                                                        <td data-title="'User Karma'" class="text-center" sortable="userkarma" ng-show="columns[2].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
+                                                            <span>{{user.userkarma}}</span>
+                                                        </td>
+                                                        <td data-title="'Date Joined'" class="text-center" sortable="datejoined" ng-show="columns[3].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
+                                                            <span>{{user.datejoined}}</span>
+                                                        </td>
+                                                        <td data-title="'Health'" class="text-center" sortable="health" ng-show="columns[4].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
+                                                            <span>{{user.health}}</span>
+                                                        </td>
+                                                        <td data-title="'Last Session'" class="text-center" sortable="lastsession" ng-show="columns[5].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
+                                                            <span>{{user.lastsession}}</span>
+                                                        </td>
+                                                        <!-- <td data-title="'Unsubscribed'" class="text-center" sortable="status" ng-show="columns[4].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
+                                                                                                                    <span>{{user.unsubscribed}}</span>
+                                                        </td> -->
                                                     </tr>
-                                                </thead>
-                                                <tr ng-repeat="user in $data">
-                                                    <td width="30" style="text-align: left">
-                                                        <input type="checkbox" ng-model="checkboxes.items[user.id]" />
-                                                    </td>
-                                                    <td data-title="'Email Id'" class="text-center" sortable="email" ng-show="columns[1].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
-                                                        <span>{{user.email}}</span>
-                                                    </td>
-                                                    <td data-title="'User Karma'" class="text-center" sortable="userkarma" ng-show="columns[2].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
-                                                        <span>{{user.userkarma}}</span>
-                                                    </td>
-                                                    <td data-title="'Date Joined'" class="text-center" sortable="datejoined" ng-show="columns[3].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
-                                                        <span>{{user.datejoined}}</span>
-                                                    </td>
-                                                    <td data-title="'Health'" class="text-center" sortable="health" ng-show="columns[4].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
-                                                        <span>{{user.health}}</span>
-                                                    </td>
-                                                    <td data-title="'Last Session'" class="text-center" sortable="lastsession" ng-show="columns[5].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
-                                                        <span>{{user.lastsession}}</span>
-                                                    </td>
-                                                    <!-- <td data-title="'Unsubscribed'" class="text-center" sortable="status" ng-show="columns[4].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
-                                                        <span>{{user.unsubscribed}}</span>
-                                                    </td> -->
-                                                </tr>
-                                            </table>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                     </div>
                 </div>
                 <div class="col-md-3" style="margin-left: 60px;">
@@ -353,7 +355,7 @@
                         <ul class="list-group" ng-show="segmentsCreated">
                             <li style="padding-bottom: 2px;" class="list-group-item-segment"  ng-class="{'active': $index === selectedIndex}"  ng-repeat="segname in segmentsCreatedName" ng-mouseenter="showAutoMsgButton()" ng-mouseleave="hideAutoMsgButton()">
                                 <strong>
-                                    <a style="padding: 10px 15px; display: inline-block; cursor: pointer; width: 150px; text-decoration: none; color: #333;" ng-click="showQuery(segname.id, $index, segname)" ng-if="!segname.predefined">{{segname.name}}</a>
+                                <a style="padding: 10px 15px; display: inline-block; cursor: pointer; width: 150px; text-decoration: none; color: #333;" ng-click="showQuery(segname.id, $index, segname)" ng-if="!segname.predefined">{{segname.name}}</a>
                                 </strong>
                                 <a style="padding: 10px 15px; display: inline-block; cursor: pointer; text-decoration: none; color: inherit;" ng-click="showQuery(segname.id, $index, segname)" ng-if="segname.predefined" >
                                 <span style="font-size: 14px;" class="fa fa-smile-o" ng-if="segname.name == 'Good Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
@@ -361,13 +363,13 @@
                                 <span style="font-size: 14px;" class="fa fa-frown-o" ng-if="segname.name == 'Poor Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
                                 </a>
                                 <!-- <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 140px; background-color: #5cb85c; border-radius: 4px;" ng-if="segname.name == 'Good Health'">
-                                    <span class="progress-type"><strong>{{segname.name}}</strong></span>
-                                </div>
-                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 140px; background-color: #428bca; border-radius: 4px;" ng-if="segname.name == 'Average Health'">
-                                    <span class="progress-type"><strong>{{segname.name}}</strong></span>
-                                </div>
-                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 140px; background-color: #d9534f; border-radius: 4px;" ng-if="segname.name == 'Poor Health'">
-                                    <span class="progress-type"><strong>{{segname.name}}</strong></span>
+                                                                        <span class="progress-type"><strong>{{segname.name}}</strong></span>
+                                                                </div>
+                                                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 140px; background-color: #428bca; border-radius: 4px;" ng-if="segname.name == 'Average Health'">
+                                                                        <span class="progress-type"><strong>{{segname.name}}</strong></span>
+                                                                </div>
+                                                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 140px; background-color: #d9534f; border-radius: 4px;" ng-if="segname.name == 'Poor Health'">
+                                                                        <span class="progress-type"><strong>{{segname.name}}</strong></span>
                                 </div> -->
                                 <a class="btn btn-sm btn-default pull-right" href="/apps/{{currApp}}/messages/automate/segments/{{segname.id}}/write" style="margin-top: 5px;" ng-show="showAutoMsgBtn">AutoMessage</a>
                             </li>
@@ -378,7 +380,6 @@
         </div>
     </div>
 </div>
-
 <script type="text/ng-template" id="ng-table/headers/checkbox.html">
     <input type="checkbox" ng-model="checkboxes.checked" id="select_all" name="filter-checkbox" value="" />
 </script>

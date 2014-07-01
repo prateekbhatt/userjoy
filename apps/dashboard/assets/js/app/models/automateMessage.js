@@ -30,15 +30,15 @@ angular.module('models.automate', ['services'])
         .success(function (response) {
           console.log("success in creating automsg: ",
             response);
-          AutoMsgService.setSingleAutoMsg(response);
+          AutoMsgService.setSingleAutoMsg(response.automessage);
           if (data.type === "email") {
             $location.path('/apps/' + appId +
-              '/messages/automate/test/' + response._id);
+              '/messages/automate/test/' + response.automessage._id);
           }
 
           if (data.type === 'notification') {
             $location.path('/apps/' + appId +
-              '/messages/automate/live/' + response._id);
+              '/messages/automate/live/' + response.automessage._id);
           }
         })
         .error(function (err) {
@@ -57,28 +57,28 @@ angular.module('models.automate', ['services'])
         .error(cb);
     }
 
-    this.makeMsgLive = function (appId, autoMsgId) {
+    this.makeMsgLive = function (appId, autoMsgId, cb) {
       $http.put(config.apiUrl + '/apps/' + appId + '/automessages/' +
         autoMsgId + '/active/true')
         .success(function (data) {
           console.log("message is live: ", data);
-          AutoMsgService.setSingleAutoMsg(data);
+          AutoMsgService.setSingleAutoMsg(data.automessage);
+          console.log("autoMsg after activating: ", AutoMsgService.getSingleAutoMsg());
+          cb();
         })
-        .error(function () {
-          console.log("error in making message live");
-        })
+        .error(cb);
     }
 
-    this.deActivateMsg = function (appId, autoMsgId) {
+    this.deActivateMsg = function (appId, autoMsgId, cb) {
       $http.put(config.apiUrl + '/apps/' + appId + '/automessages/' +
         autoMsgId + '/active/false')
         .success(function (data) {
           console.log("message is deactive: ", data);
-          AutoMsgService.setSingleAutoMsg(data);
+          AutoMsgService.setSingleAutoMsg(data.automessage);
+          console.log("autoMsg after deactivating: ", AutoMsgService.getSingleAutoMsg());
+          cb();
         })
-        .error(function () {
-          console.log("error in making message deactive");
-        })
+        .error(cb);
     }
 
     this.getSingleAutoMsg = function (appId, msgId, cb) {
@@ -87,7 +87,7 @@ angular.module('models.automate', ['services'])
         .success(function (data) {
           console.log("success in getting a single automsg:",
             data);
-          AutoMsgService.setSingleAutoMsg(data);
+          AutoMsgService.setSingleAutoMsg(data.automessage);
           cb();
         })
         .error(cb);
@@ -98,11 +98,11 @@ angular.module('models.automate', ['services'])
         msgId, data)
         .success(function (data) {
           console.log("success: ", data);
-          if (data.type === "email") {
+          if (data.automessage.type === "email") {
             $location.path('/apps/' + appId +
-              '/messages/automate/update/test/' + data._id);
+              '/messages/automate/update/test/' + data.automessage._id);
           }
-          if (data.type === "notification") {
+          if (data.automessage.type === "notification") {
             $location.path('/apps/' + appId + '/messages/automate');
           }
         })

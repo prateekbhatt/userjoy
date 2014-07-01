@@ -28,6 +28,11 @@ var Query = require('../api/lib/query');
  * Models
  */
 
+// WARNING: include Account model because running it from 'workers' directory which
+// is outside fails. Because, 'sender' account is being populated, and
+// mongoose not able to find Account model
+var Account = require('../api/models/Account');
+
 var AutoMessage = require('../api/models/AutoMessage');
 var Event = require('../api/models/Event');
 var Notification = require('../api/models/Notification');
@@ -175,6 +180,7 @@ function amConsumer(cb) {
   var queueMsgId;
   var automessage;
 
+  logger.trace('amConsumer:start');
 
   async.waterfall(
 
@@ -191,7 +197,7 @@ function amConsumer(cb) {
           .get(opts, function (err, res) {
 
             logger.trace({
-              at: 'workers/automessageConsumer getFromQueue',
+              at: 'amConsumer:getFromQueue',
               err: err,
               res: res
             });
@@ -207,7 +213,7 @@ function amConsumer(cb) {
 
             // the message body contains the automessage id
             if (!res.body) {
-              return cb(new Error('Automessage id not found in queue'));
+              return cb(new Error('AUTOMESSAGE_ID_NOT_FOUND_IN_QUEUE'));
             }
 
             cb(null, res.body);
@@ -216,6 +222,8 @@ function amConsumer(cb) {
 
 
       function findAutoMessage(autoMessageId, cb) {
+
+        logger.trace('amConsumer:findAutoMessage:' + autoMessageId);
 
         AutoMessage
           .findById(autoMessageId)
@@ -229,7 +237,7 @@ function amConsumer(cb) {
             });
 
             if (err) return cb(err);
-            if (!amsg) return cb(new Error('AutoMessage not found'));
+            if (!amsg) return cb(new Error('AUTOMESSAGE_NOT_FOUND'));
 
             // store automessage in a local variable
             automessage = amsg;
@@ -241,11 +249,13 @@ function amConsumer(cb) {
 
       function findSegment(automessage, cb) {
 
+        logger.trace('amConsumer:findSegment:' + automessage.sid);
+
         Segment
           .findById(automessage.sid)
           .exec(function (err, seg) {
             if (err) return cb(err);
-            if (!seg) return cb(new Error('Segment not found'));
+            if (!seg) return cb(new Error('SEGMENT_NOT_FOUND'));
             cb(null, seg);
           });
       },
@@ -296,15 +306,17 @@ function amConsumer(cb) {
       //
       // Remove all users who have been sent the automessage before
       function sentUsers(users, cb) {
+        logger.trace('amConsumer:removeUsersAlreadySent');
         removeUsersAlreadySent(users, automessage._id, function (err, usrs) {
           if (err) return cb(err);
-          if (_.isEmpty(usrs)) return cb(new Error('No users matched'));
+          if (_.isEmpty(usrs)) return cb(new Error('NO_USERS_MATCHED'));
           cb(null, usrs);
         });
       },
 
 
       function sendEmails(users, cb) {
+        logger.trace('amConsumer:sendEmails');
 
         // if message type is not email, skip this
         if (automessage.type !== "email") return cb(null, users);
@@ -400,6 +412,7 @@ function amConsumer(cb) {
 
       function sendNotifications(users, cb) {
 
+        logger.trace('amConsumer:sendNotifications');
 
         // if message type is not notification, skip this
         if (automessage.type !== "notification") return cb();
@@ -411,10 +424,16 @@ function amConsumer(cb) {
 
         saveNotifications(users, automessage, cb);
 
-      },
+      }
+    ],
+
+    function finalCallback(err) {
 
 
-      function deleteFromQueue(cb) {
+      // function to delete message from queue
+      var deleteFromQueue = function (cb) {
+
+        logger.trace('amConsumer:deleteFromQueue');
 
         q()
           .del(queueMsgId, function (err, body) {
@@ -429,12 +448,38 @@ function amConsumer(cb) {
             cb(err);
 
           });
+      };
+
+
+      if (err) logError(err, 'in amConsumer:callback:dontknow');
+
+      // was the queue empty, then we would retry fetching messages from the
+      // queue after some time with a setTimeout
+      // if empty queue error move on, and try to fetch msg again after sometime
+      if (err && err.message === 'EMPTY_AUTOMESSAGE_QUEUE') {
+        return cb(err);
       }
 
-    ],
 
-    function finalCallback(err) {
-      cb(err, queueMsgId, automessage);
+      // in case of not defined / unknown errors, log error and donot delete
+      // from queue
+      if (err && !_.contains([
+
+        'AUTOMESSAGE_ID_NOT_FOUND_IN_QUEUE',
+        'AUTOMESSAGE_NOT_FOUND',
+        'SEGMENT_NOT_FOUND',
+        'NO_USERS_MATCHED'
+
+      ], err.message)) {
+        return cb(err);
+      }
+
+
+      // if known errors, delete from queue
+      return deleteFromQueue(function (err) {
+        cb(err, queueMsgId, automessage);
+      });
+
     }
   )
 }
@@ -448,13 +493,16 @@ module.exports = function run() {
 
       amConsumer(function (err) {
 
-        if (err) logError(err, true);
+
+        // err has already been logged before, so commenting out the next line
+        // if (err) logError(err, true);
 
         // if error is empty queue, then wait for a minute before running the
         // worker again
-        if (err && (err.message === 'EMPTY_AUTOMESSAGE_QUEUE')) {
+        if (err && err.message === 'EMPTY_AUTOMESSAGE_QUEUE') {
 
-          setTimeout(next, 300000);
+          console.log('amConsumer:re-fetch after 15 seconds');
+          setTimeout(next, 15000);
 
         } else {
 
