@@ -557,10 +557,9 @@ angular.module('do.users', [])
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
               $scope.otherTimeRange = 'at any time';
-              $scope.filters[parentindex].optext = 'before';
-              $scope.filters[parentindex].val = $moment(new Date())
-                .unix() * 1000;
-              $scope.filters[parentindex].op = 'lt';
+              $scope.filters[parentindex].optext = 'exactly';
+              $scope.filters[parentindex].val = '';
+              $scope.filters[parentindex].op = 'eq';
               console.log("$scope.filters error attributes: ", $scope.filters);
             } else if ($scope.attributes[index].name == 'score') {
               $scope.filters[parentindex].showHealthStatus = false;
@@ -791,10 +790,13 @@ angular.module('do.users', [])
           };
 
           $scope.datePickerQueries = [{
-            name: 'before',
+            name: 'exactly',
+            key: 'eq'
+          },{
+            name: 'less than',
             key: 'lt'
           }, {
-            name: 'after',
+            name: 'more than',
             key: 'gt'
           }]
 

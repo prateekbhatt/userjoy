@@ -20,8 +20,12 @@
 <div>
     <div class="row" style="padding-top: 50px;">
         <div class="col-md-push-4 col-md-4" ng-show="showNotificationPreview">
-            <div class="message-template" style="max-height: 200px; min-height: 200px; overflow: auto; border-left: 1px solid #eee;" ng-style="{'border-color': borderColor, 'border-right': borderRight, 'border-top': borderTop, 'border-bottom': borderBottom, 'border-radius': borderRadius}">
-                <p ng-bind-html="previewText"></p>
+            <div class="message-template" style="max-height: 175px; min-height: 175px; overflow: auto; border-left: 1px solid #eee;" ng-style="{'border-color': borderColor, 'border-right': borderRight, 'border-top': borderTop, 'border-bottom': borderBottom, 'border-radius': borderRadius}">
+                <img src="{{gravatar}}" width="60px">
+                <div style="margin-top: -75px; margin-left: 75px;">
+                    <p style="margin-top: 12px;"><b>{{sender}}</b></p>
+                    <p ng-bind-html="previewText"></p>
+                </div>
             </div>
             <div class="panel-footer" style="margin-top: -21px;">
                 <div class="input-group">
@@ -45,9 +49,9 @@
     <br>
     <br>
     <div class="row col-md-push-4 col-md-4" style="padding-left: 24px; padding-right: 0px;" ng-show="showNotificationPreview">
-        <button class="btn btn-info btn-block" ng-click="changeMsgStatus()">{{msgStatus}}</button>
+        <button class="btn btn-info btn-block" ng-click="changeMsgStatus()" ng-disabled="statusButton">{{msgStatus}}</button>
     </div>
     <div class="row col-md-push-3 col-md-6" style="padding-left: 24px; padding-right: 0px;" ng-show="showEmailPreview">
-        <button class="btn btn-info btn-block" ng-click="changeMsgStatus()">{{msgStatus}}</button>
+        <button class="btn btn-info btn-block" ng-click="changeMsgStatus()" ng-disabled="statusButton">{{msgStatus}}</button>
     </div>
 </div>

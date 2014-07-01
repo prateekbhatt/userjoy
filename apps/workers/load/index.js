@@ -8,7 +8,10 @@ var express = require('express');
 var path = require('path');
 
 
-var db = require('./db');
+// WARNING: require db connection from the api app. This is because all mongoose
+// models are defined in the connections are defined in the api app. Hence, the
+// db connection can only be referenced from the api app
+var db = require('../../api/load/db');
 
 
 /**
