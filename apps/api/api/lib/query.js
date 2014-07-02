@@ -86,12 +86,13 @@ function dateFromDaysAgo(days) {
  * - This will make sure the user dataset always fetched in the second query
  *
  * - Operations allowed on frontend:
- *  - equals
- *  - does not equal ($ne)
- *  - less than ($lt)
- *  - greater than ($gt)
- *  - contains
- *  - does not contain
+ *  - equals (eq)
+ *  - less than (lt)
+ *  - greater than (gt)
+ *  - contains (contains)
+ *
+ * - User 'joined' and 'lastSeen' are numbers that signify 'x days ago'
+ * so, 'joined' value of 7 means 7 days ago
  *
  *
  * TODO:
@@ -148,7 +149,16 @@ function dateFromDaysAgo(days) {
  *         name: 'platform',
  *         op: 'contains',
  *         val: 'Android'
+ *       },
+ *
+ *       {
+ *         method: 'attr',
+ *         name: 'joined',
+ *         op: 'gt',
+ *         val: 7
  *       }
+ *
+ *
  *     ]
  * }
  *
@@ -507,22 +517,34 @@ Query.prototype.genAttrMatchCond = function () {
 
     c[f.name] = {};
 
+    // if filter name is 'joined' or 'lastSeen', then we need to convert the
+    // val in number-of-days-ago into a timestamp
+    if (_.contains(['joined', 'lastSeen'], f.name)) {
+      f.val = dateFromDaysAgo(f.val);
+    }
+
+
     if (op === '$contains') {
 
       // REF: http://stackoverflow.com/a/10616781/1463434
-      c[f.name]['$regex'] = ".*" + f['val'] + ".*";
+      c[f.name].$regex = ".*" + f.val + ".*";
       // Also, it should do case-insensitive queries
-      c[f.name]['$options'] = 'i';
+      c[f.name].$options = 'i';
 
     } else if (op === '$eq') {
 
-      c[f.name] = f['val'];
+      c[f.name] = f.val;
 
     } else {
       // if op is $gt, $lt
 
-      c[f.name][op] = f['val'];
+      c[f.name][op] = f.val;
     }
+
+
+
+
+
 
     filterQueries[root].push(c);
 
@@ -795,6 +817,12 @@ function sanitize(q) {
     }
 
     if (f.val && f.method === 'count') {
+      f.val = parseInt(f.val, 10);
+    }
+
+
+    // joined and lastSeen attributes represent 'number of days ago'
+    if (f.method === 'attr' && _.contains(['joined', 'lastSeen'], f.name)) {
       f.val = parseInt(f.val, 10);
     }
 
