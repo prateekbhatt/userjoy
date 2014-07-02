@@ -1005,7 +1005,11 @@ angular.module('do.users', [])
                 lastsession: moment(UserList.getUsers()[i].lastSeen)
                   .format("MMMM Do YYYY"),
                 unsubscribed: UserList.getUsers()[
-                  i].unsubscribed
+                  i].unsubscribed,
+                browser: UserList.getUsers()[i].browser,
+                country: UserList.getUsers()[i].country,
+                os: UserList.getUsers()[i].os,
+                status: UserList.getUsers()[i].status
               })
             };
 
@@ -1033,6 +1037,22 @@ angular.module('do.users', [])
               title: 'Last Session',
               field: 'lastsession',
               visible: true
+            }, {
+              title: 'Browser',
+              field: 'browser',
+              visible: false
+            }, {
+              title: 'Country',
+              field: 'country',
+              visible: false
+            }, {
+              title: 'Operating System',
+              field: 'operatingsystem',
+              visible: false
+            }, {
+              title: 'Status',
+              field: 'status',
+              visible: false
             }];
 
             /**
@@ -2184,7 +2204,7 @@ angular.module('do.users', [])
                   when: $moment.utc(events[i].ct)
                     .fromNow(),
                   timestamp: $moment.utc(events[i].ct)
-                    .format('LLL'),
+                    .format('LLL') + ' UTC',
                   type: events[i].type
                 };
                 if(events[i].type == 'auto') {
