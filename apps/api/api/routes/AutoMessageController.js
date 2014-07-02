@@ -335,6 +335,13 @@ router
   .route('/:aid/automessages/:amId/active/:status?')
   .put(function (req, res, next) {
 
+
+    logger.trace({
+      at: 'automessage:updateStatus',
+      params: req.params
+    });
+
+
     var aid = req.params.aid;
     var amId = req.params.amId;
     var status = req.params.status;

@@ -640,7 +640,10 @@ describe('Resource /track', function () {
               .to.have.property("seen");
 
             expect(notf)
-              .to.have.property("sender");
+              .to.have.property("senderEmail");
+
+            expect(notf)
+              .to.have.property("senderName");
 
             expect(notf)
               .to.have.property("uid");

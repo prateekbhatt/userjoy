@@ -82,7 +82,8 @@ function saveNotifications(users, amsg, cb) {
   var aid = amsg.aid;
   var amId = amsg._id;
   var body = amsg.body;
-  var sender = amsg.sender.name;
+  var senderEmail = amsg.sender.email;
+  var senderName = amsg.sender.name;
   var title = amsg.title;
 
   var iterator = function (u, cb) {
@@ -98,7 +99,8 @@ function saveNotifications(users, amsg, cb) {
     var n = {
       amId: amId,
       body: renderedBody,
-      sender: sender,
+      senderEmail: senderEmail,
+      senderName: senderName,
       title: title,
       uid: uid
     };
