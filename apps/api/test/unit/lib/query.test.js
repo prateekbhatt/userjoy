@@ -441,57 +441,89 @@ describe.only('Lib query', function () {
 
       });
 
-    it('should transform joined/lastSeen days ago to timestamps', function () {
+    it(
+      'should transform joined/lastSeen days ago to timestamps, and also switch lt and gt because lessThan 100 days ago essentially means greater than the calculated timestamp',
+      function () {
 
 
-      var queryObj = {
-        aid: 'BlaBlaID',
-        list: 'users',
-        op: 'and',
-        filters: [
+        var queryObj = {
+          aid: 'BlaBlaID',
+          list: 'users',
+          op: 'and',
+          filters: [
 
-          {
-            method: 'attr',
-            name: 'joined',
-            op: 'gt',
-            val: 10
-          },
+            {
+              method: 'attr',
+              name: 'joined',
+              op: 'gt',
+              val: 10
+            },
 
-          {
-            method: 'attr',
-            name: 'lastSeen',
-            op: 'lt',
-            val: 7
-          },
+            {
+              method: 'attr',
+              name: 'lastSeen',
+              op: 'lt',
+              val: 7
+            },
 
-          {
-            method: 'attr',
-            name: 'email',
-            op: 'contains',
-            val: 'bhatt'
-          }
-        ]
-      };
+            {
+              method: 'attr',
+              name: 'lastSeen',
+              op: 'eq',
+              val: 7
+            },
 
-
-      var query = new Query(queryObj.aid, queryObj);
-      cond = query.genAttrMatchCond();
-
-      expect(cond.$and[1].$and[0])
-        .to.be.an('object')
-        .that.has.property('joined')
-        .that.is.an('object')
-        .and.has.property('$gt')
-        .that.is.a('date');
+            {
+              method: 'attr',
+              name: 'email',
+              op: 'contains',
+              val: 'bhatt'
+            }
+          ]
+        };
 
 
-      expect(cond.$and[1].$and[1])
-        .to.be.an('object')
-        .that.has.property('lastSeen')
-        .that.is.an('object')
-        .and.has.property('$lt')
-        .that.is.a('date');
-    });
+        var query = new Query(queryObj.aid, queryObj);
+        cond = query.genAttrMatchCond();
+
+
+        // should have switched gt to lt
+        expect(cond.$and[1].$and[0])
+          .to.be.an('object')
+          .that.has.property('joined')
+          .that.is.an('object')
+          .and.has.property('$lt')
+          .that.is.a('date');
+
+
+        // should have switched lt to gte
+        expect(cond.$and[1].$and[1])
+          .to.be.an('object')
+          .that.has.property('lastSeen')
+          .that.is.an('object')
+          .and.has.property('$gte')
+          .that.is.a('date');
+
+
+
+        // should have switched eq to a date range (gte, lt)
+        expect(cond.$and[1].$and[2])
+          .to.be.an('object')
+          .that.has.property('lastSeen')
+          .that.is.an('object')
+          .and.has.property('$gte')
+          .that.is.a('date');
+
+        expect(cond.$and[1].$and[2])
+          .to.have.property('lastSeen')
+          .that.is.an('object')
+          .and.has.property('$lt')
+          .that.is.a('date');
+
+        // in date range, startOfDay should be less than endOfDay
+        expect(cond.$and[1].$and[2].lastSeen.$lt)
+          .to.be.above(cond.$and[1].$and[2].lastSeen.$gte);
+      });
 
     it('should handle eq/lt/gt/contains on "or" root operator', function () {
 
@@ -952,16 +984,17 @@ describe.only('Lib query', function () {
 
       function getDateUnix(actual, daysAgo) {
         return moment(actual)
+          .utc()
           .subtract('days', daysAgo)
           .startOf('day')
           .unix();
       }
 
       expect(moment(cond.$and[3].$gt[1])
+        .utc()
         .startOf('day')
         .unix())
-        .to.eql(getDateUnix(moment()
-          .format(), Query.prototype.fromAgo));
+        .to.eql(getDateUnix(new Date(), Query.prototype.fromAgo));
 
       expect(cond.$and[3].$gt[1])
         .to.be.a('date');
@@ -970,6 +1003,7 @@ describe.only('Lib query', function () {
         .to.be.a('date');
 
       expect(moment(cond.$and[4].$lt[1])
+        .utc()
         .startOf('day')
         .unix())
         .to.eql(getDateUnix(moment()
