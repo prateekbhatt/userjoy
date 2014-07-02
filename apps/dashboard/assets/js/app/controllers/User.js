@@ -557,9 +557,9 @@ angular.module('do.users', [])
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
               $scope.otherTimeRange = 'at any time';
-              $scope.filters[parentindex].optext = 'exactly';
+              $scope.filters[parentindex].optext = 'more than';
               $scope.filters[parentindex].val = '';
-              $scope.filters[parentindex].op = 'eq';
+              $scope.filters[parentindex].op = 'gt';
               console.log("$scope.filters error attributes: ", $scope.filters);
             } else if ($scope.attributes[index].name == 'score') {
               $scope.filters[parentindex].showHealthStatus = false;
@@ -719,8 +719,8 @@ angular.module('do.users', [])
             $scope.filters[parentindex].type = $scope.countOfItems[
               index].type;
             $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
-            $scope.filters[parentindex].optext = 'equals';
-            $scope.filters[parentindex].op = 'eq';
+            $scope.filters[parentindex].optext = 'greater than';
+            $scope.filters[parentindex].op = 'gt';
             $scope.filters[parentindex].val = '';
           }
 

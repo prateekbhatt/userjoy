@@ -120,7 +120,7 @@
                         <img src="{{gravatar}}" width="60px">
                         <div style="margin-top: -75px; margin-left: 75px;">
                             <p style="margin-top: 12px;"><b>{{sender}}</b></p>
-                            <p ng-bind-html="notificationBody"></p>
+                            <p ng-bind-html="preview(notificationBody)"></p>
                         </div>
                     </div>
                     <div class="panel-footer" style="margin-top: -23px;">
@@ -136,12 +136,12 @@
                 </div>
                 <!-- TODO: Replace template color with the color entered by the user -->
                 <div class="col-md-10 col-md-offset-1" ng-show="showEmail" style="margin-top: 40px;">
-                    <label style="font-size: 18px;">Subject: </label>&nbsp;<span ng-bind-html="subject" class="emailPreview"></span>
+                    <label style="font-size: 18px;">Subject: </label>&nbsp;<span ng-bind-html="preview(subject)" class="emailPreview"></span>
                     <!-- <div class="message-template" ng-style="{'border-color': emailBorderColor, 'border-right': emailBorderRight, 'border-top': emailBorderTop, 'border-bottom': borderBottom, 'border-radius': borderRadius}" style="min-height: 300px; overflow: auto; max-height: 300px;">
                         <p ng-bind-html="emailBody"></p>
                     </div> -->
                     <div style="min-height: 300px; overflow: auto; max-height: 300px; margin-top: 30px; border: 1px solid #ecf0f1; border-radius: 4px;">
-                        <p ng-bind-html="emailBody" style="padding: 10px;"></p>
+                        <p ng-bind-html="preview(emailBody)" style="padding: 10px;"></p>
                     </div>
                 </div>
             </div>

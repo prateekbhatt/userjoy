@@ -44,6 +44,7 @@ var jsFilesToInject = [
   //
   // *->    you might put other dependencies like jQuery or Angular here   <-*
   //
+  'bower_components/ejs/ejs.js',
   'bower_components/angular/angular.js',
   'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
   'bower_components/angular-ui-router/release/angular-ui-router.js',
