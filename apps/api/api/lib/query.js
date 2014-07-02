@@ -511,6 +511,8 @@ Query.prototype.genAttrMatchCond = function () {
 
       // REF: http://stackoverflow.com/a/10616781/1463434
       c[f.name]['$regex'] = ".*" + f['val'] + ".*";
+      // Also, it should do case-insensitive queries
+      c[f.name]['$options'] = 'i';
 
     } else if (op === '$eq') {
 

@@ -397,7 +397,7 @@ describe('Lib query', function () {
     });
 
 
-    it('should handle eq/lt/gt/contains on "and" root operator', function () {
+    it('should handle eq/lt/gt/contains on "and" root operator, and regex should be case insensitive', function () {
       var query = new Query(queryObj.aid, queryObj);
       cond = query.genAttrMatchCond();
 
@@ -430,7 +430,8 @@ describe('Lib query', function () {
 
             {
               "email": {
-                "$regex": ".*bhatt.*"
+                "$regex": ".*bhatt.*",
+                "$options": "i"
               }
             }
           ]
@@ -474,7 +475,8 @@ describe('Lib query', function () {
 
             {
               "email": {
-                "$regex": ".*bhatt.*"
+                "$regex": ".*bhatt.*",
+                "$options": "i"
               }
             }
           ]
@@ -522,7 +524,8 @@ describe('Lib query', function () {
               }
             }, {
               "email": {
-                "$regex": ".*bhatt.*"
+                "$regex": ".*bhatt.*",
+                "$options": "i"
               }
             }, {
               "_id": {
