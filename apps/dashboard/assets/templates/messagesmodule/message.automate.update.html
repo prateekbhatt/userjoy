@@ -20,6 +20,44 @@
 <div class="panel panel-default">
     <div class="row" style="padding-top: 50px;">
         <div class="col-md-6">
+            <label style="font-size: 20px; padding-left: 0px;" class="col-md-2 col-md-offset-2 control-label">Title: </label>
+            <div class="col-md-6">
+                <input class="form-control disabled" ng-model="title" placeholder="Title">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label class="col-md-2 col-md-offset-2 control-label" style="font-size: 20px; padding-left: 0px">From: </label>
+            <div class="col-md-6">
+                <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto disabled" data-toggle="dropdown"> <span data-bind="label" id="Users">&nbsp;{{sender}}</span>&nbsp;<span class="caret"></span></button>
+                <ul class="select dropdown-menu" role="select" style="left: 15px; top:100%;">
+                    <li ng-repeat="member in team">
+                        <a style="cursor: default" ng-click="changeFromEmailText($index)">{{member.accid.name}}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- <div class="col-md-6">
+            <label class="col-md-2 col-md-offset-2 control-label" style="font-size: 20px; padding-left: 0px">Type: </label>
+            <div class="col-md-6">
+                <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto disabled" data-toggle="dropdown"> <span data-bind="label" id="Users" class="{{selectedMessageType.icon}}">&nbsp;{{selectedMessageType.value}}</span>&nbsp;<span class="caret"></span></button>
+                <ul class="select dropdown-menu" role="select" style="left: 15px; top:100%;">
+                    <li ng-repeat="icon in icons">
+                        <a style="cursor: default" ng-click="changeBtnText($index)"><i class="{{icon.label}}"></i>&nbsp;{{icon.value}}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div> -->
+        <!-- <div class="col-md-6">
+            <label class="col-md-2 col-md-offset-2 control-label" style="font-size: 20px; padding-left: 0px">To: </label>
+            <div class="col-md-6">
+                <input class="form-control" ng-model="segment" disabled>
+            </div>
+        </div> -->
+    </div>
+    <div class="row" style="padding-top: 20px;">
+        <div class="col-md-6">
             <label class="col-md-2 col-md-offset-2 control-label" style="font-size: 20px; padding-left: 0px">Type: </label>
             <div class="col-md-6">
                 <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto disabled" data-toggle="dropdown"> <span data-bind="label" id="Users" class="{{selectedMessageType.icon}}">&nbsp;{{selectedMessageType.value}}</span>&nbsp;<span class="caret"></span></button>
@@ -35,21 +73,11 @@
             <label class="col-md-2 col-md-offset-2 control-label" style="font-size: 20px; padding-left: 0px">To: </label>
             <div class="col-md-6">
                 <input class="form-control" ng-model="segment" disabled>
-                <!-- <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users" class="{{selectedMessageType.icon}}">&nbsp;{{selectedMessageType.value}}</span>&nbsp;<span class="caret"></span></button>
-                    <ul class="select dropdown-menu" role="select" style="left: 15px; top:100%;">
-                        <li ng-repeat="icon in icons">
-                            <a style="cursor: default" ng-click="changeBtnText($index)"><i class="{{icon.label}}"></i>&nbsp;{{icon.value}}
-                            </a>
-                        </li>
-                </ul> -->
             </div>
         </div>
-    </div>
-    <div class="row" style="padding-top: 20px;">
-        <div class="col-md-6">
+        <!-- <div class="col-md-6">
             <label class="col-md-2 col-md-offset-2 control-label" style="font-size: 20px; padding-left: 0px">From: </label>
             <div class="col-md-6">
-                <!-- <input class="form-control disabled" ng-model="email"> -->
                 <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto disabled" data-toggle="dropdown"> <span data-bind="label" id="Users">&nbsp;{{sender}}</span>&nbsp;<span class="caret"></span></button>
                 <ul class="select dropdown-menu" role="select" style="left: 15px; top:100%;">
                     <li ng-repeat="member in team">
@@ -58,13 +86,25 @@
                     </li>
                 </ul>
             </div>
-        </div>
-        <div class="col-md-6">
+        </div> -->
+        <!-- <div class="col-md-6">
+            <label class="col-md-2 col-md-offset-2 control-label" style="font-size: 20px; padding-left: 0px">Type: </label>
+            <div class="col-md-6">
+                <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto disabled" data-toggle="dropdown"> <span data-bind="label" id="Users" class="{{selectedMessageType.icon}}">&nbsp;{{selectedMessageType.value}}</span>&nbsp;<span class="caret"></span></button>
+                <ul class="select dropdown-menu" role="select" style="left: 15px; top:100%;">
+                    <li ng-repeat="icon in icons">
+                        <a style="cursor: default" ng-click="changeBtnText($index)"><i class="{{icon.label}}"></i>&nbsp;{{icon.value}}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div> -->
+        <!-- <div class="col-md-6">
             <label style="font-size: 20px; padding-left: 0px;" class="col-md-2 col-md-offset-2 control-label">Title: </label>
             <div class="col-md-6">
                 <input class="form-control disabled" ng-model="title" placeholder="Title">
             </div>
-        </div>
+        </div> -->
     </div>
     <div class="row" style="padding-top:70px">
         <div class="col-md-6">
