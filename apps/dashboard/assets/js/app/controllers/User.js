@@ -435,13 +435,46 @@ angular.module('do.users', [])
           if (err) {
             return;
           }
-
           for (var i = 0; i < eventNames.getEvents()
             .length; i++) {
-            allActions.push({
-              name: eventNames.getEvents()[i].name,
-              type: eventNames.getEvents()[i].type
-            })
+            eObj = {};
+
+            if (eventNames.getEvents()[i].type == 'link') {
+              eObj.query = 'Clicked on ' + eventNames.getEvents()[i].name;
+              eObj.name = eventNames.getEvents()[i].name;
+              eObj.type = eventNames.getEvents()[i].type;
+            }
+
+            if (eventNames.getEvents()[i].type == 'form') {
+              eObj.query = 'Submitted form ' + eventNames.getEvents()[i].name;
+              eObj.name = eventNames.getEvents()[i].name;
+              eObj.type = eventNames.getEvents()[i].type;
+            }
+
+            if (eventNames.getEvents()[i].type == 'page') {
+              eObj.query = 'Viewed ' + eventNames.getEvents()[i].name;
+              eObj.name = eventNames.getEvents()[i].name;
+              eObj.type = eventNames.getEvents()[i].type;
+            }
+
+            if (eventNames.getEvents()[i].type == 'auto') {
+              eObj.query = eventNames.getEvents()[i].name;
+              eObj.name = eventNames.getEvents()[i].name;
+              eObj.type = eventNames.getEvents()[i].type;
+            }
+
+            if (eventNames.getEvents()[i].type == 'track') {
+              eObj.query = eventNames.getEvents()[i].name;
+              eObj.name = eventNames.getEvents()[i].name;
+              eObj.type = eventNames.getEvents()[i].type;
+            }
+
+            allActions.push(eObj);
+
+            // allActions.push({
+            //   name: eventNames.getEvents()[i].name,
+            //   type: eventNames.getEvents()[i].type
+            // })
           };
 
           for (var i = 0; i < userAttributes.getUserAttributes()
@@ -532,7 +565,14 @@ angular.module('do.users', [])
           }, {
             name: 'Cancelled',
             key: 'cancelled'
-          }]
+          }];
+
+          $scope.changeEventFilter = function (parentindex, index,
+            evt) {
+            $scope.filters[parentindex].name = $scope.hasDoneItems[
+              index].name;
+            $scope.filters[parentindex].query = $scope.hasDoneItems[index].query;
+          }
 
           $scope.changeFilterAttribute = function (
             parentindex, index,
@@ -554,6 +594,7 @@ angular.module('do.users', [])
               $scope.filters[parentindex].method = 'attr';
               $scope.filters[parentindex].name = $scope.attributes[
                 index].name;
+              $scope.filters[parentindex].query = '';
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
               $scope.otherTimeRange = 'at any time';
@@ -574,6 +615,7 @@ angular.module('do.users', [])
               $scope.filters[parentindex].method = 'attr';
               $scope.filters[parentindex].name = $scope.attributes[
                 index].name;
+              $scope.filters[parentindex].query = '';
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
               $scope.otherTimeRange = 'at any time';
@@ -592,6 +634,7 @@ angular.module('do.users', [])
               $scope.filters[parentindex].method = 'attr';
               $scope.filters[parentindex].name = $scope.attributes[
                 index].name;
+              $scope.filters[parentindex].query = '';
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
               $scope.otherTimeRange = 'at any time';
@@ -612,6 +655,7 @@ angular.module('do.users', [])
               $scope.filters[parentindex].method = 'attr';
               $scope.filters[parentindex].name = $scope.attributes[
                 index].name;
+              $scope.filters[parentindex].query = '';
               $scope.filters[parentindex].type = '';
               $scope.filters[parentindex].timeRange = '';
               $scope.otherTimeRange = 'at any time';
@@ -628,6 +672,7 @@ angular.module('do.users', [])
               $scope.filters[parentindex].isEvent = false;
               $scope.filters[parentindex].btntext = $scope.attributes[
                 index].name;
+              $scope.filters[parentindex].query = '';
               $scope.filters[parentindex].method = 'attr';
               $scope.filters[parentindex].name = $scope.attributes[
                 index].name;
@@ -657,6 +702,8 @@ angular.module('do.users', [])
             $scope.filters[parentindex].method = 'hasdone';
             $scope.filters[parentindex].name = $scope.hasDoneItems[
               index].name;
+            $scope.filters[parentindex].query = $scope.hasDoneItems[
+              index].query;
             $scope.filters[parentindex].op = '';
             $scope.filters[parentindex].optext = '';
             $scope.filters[parentindex].val = '';
@@ -685,6 +732,8 @@ angular.module('do.users', [])
               'Has Not Done ';
             $scope.filters[parentindex].name = $scope.hasNotDoneItems[
               index].name;
+            $scope.filters[parentindex].query = $scope.hasNotDoneItems[
+              index].query;
             $scope.filters[parentindex].op = '';
             $scope.filters[parentindex].optext = '';
             $scope.filters[parentindex].val = '';
@@ -712,10 +761,12 @@ angular.module('do.users', [])
             $scope.filters[parentindex].btntext =
               'Count Of ' + $scope
               .countOfItems[
-                index].name;
+                index].query;
             $scope.filters[parentindex].name = $scope
               .countOfItems[
                 index].name;
+            $scope.filters[parentindex].query = $scope.countOfItems[
+            index].query;
             $scope.filters[parentindex].type = $scope.countOfItems[
               index].type;
             $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
@@ -792,7 +843,7 @@ angular.module('do.users', [])
           $scope.datePickerQueries = [{
             name: 'exactly',
             key: 'eq'
-          },{
+          }, {
             name: 'less than',
             key: 'lt'
           }, {
@@ -882,6 +933,7 @@ angular.module('do.users', [])
               isEvent: false,
               days: '',
               name: '',
+              query: '',
               op: 'eq',
               optext: 'equals',
               val: '',
@@ -2207,23 +2259,23 @@ angular.module('do.users', [])
                     .format('LLL') + ' UTC',
                   type: events[i].type
                 };
-                if(events[i].type == 'auto') {
+                if (events[i].type == 'auto') {
                   eventObj.title = 'AutoMessage';
                 }
 
-                if(events[i].type == 'form') {
+                if (events[i].type == 'form') {
                   eventObj.title = 'Submitted form ' + events[i].name;
                 }
 
-                if(events[i].type == 'page') {
+                if (events[i].type == 'page') {
                   eventObj.title = 'Viewed ' + events[i].name;
                 }
 
-                if(events[i].type == 'link') {
+                if (events[i].type == 'link') {
                   eventObj.title = 'Clicked on ' + events[i].name;
                 }
 
-                if(events[i].type == 'track') {
+                if (events[i].type == 'track') {
                   eventObj.title = 'Track';
                 }
 
@@ -2245,7 +2297,8 @@ angular.module('do.users', [])
               24 * 60 *
               60 * 1000)
               .unix();
-            $scope.eventDate = $moment.utc(fromTime * 1000).format('MMMM Do');
+            $scope.eventDate = $moment.utc(fromTime * 1000)
+              .format('MMMM Do');
             console.log('ProfileCtrl changed eventDate', $scope.eventDate);
             if (fromTime === $moment($scope.user.lastSession)
               .unix()) {
@@ -2272,8 +2325,9 @@ angular.module('do.users', [])
               24 * 60 *
               60 * 1000)
               .unix();
-            $scope.eventDate = $moment.utc(fromTime * 1000).format('MMMM Do');
-            
+            $scope.eventDate = $moment.utc(fromTime * 1000)
+              .format('MMMM Do');
+
             console.log("new fromTime: ", fromTime,
               $moment(fromTime *
                 1000)
