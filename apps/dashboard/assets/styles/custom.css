@@ -750,27 +750,27 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
 }
 .list-group-item-success {
     color: #2c3e50;
-    border-left: 4px solid #18bc9c;
+    border-left: 6px solid #18bc9c;
     background-color: #ffffff;
 }
 .list-group-item-info {
     color: #2c3e50;
-    border-left: 4px solid #3498db;
+    border-left: 6px solid #3498db;
     background-color: #ffffff;
 }
 .list-group-item-warning {
     color: #2c3e50;
-    border-left: 4px solid #f39c12;
+    border-left: 6px solid #f39c12;
     background-color: #ffffff;
 }
 .list-group-item-danger {
     color: #2c3e50;
-    border-left: 4px solid #e74c3c;
+    border-left: 6px solid #e74c3c;
     background-color: #ffffff;
 }
 .list-group-item-default {
     color: #2c3e50;
-    border-left: 4px solid #7f8c8d;
+    border-left: 6px solid #7f8c8d;
     background-color: #ffffff;
 }
 
