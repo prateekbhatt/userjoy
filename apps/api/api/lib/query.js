@@ -9,6 +9,7 @@
 
 var _ = require('lodash');
 var async = require('async');
+var moment = require('moment');
 var ObjectId = require('mongoose')
   .Types.ObjectId;
 
@@ -60,8 +61,12 @@ module.exports = Query;
  */
 
 function dateFromDaysAgo(days) {
-  var date = new Date(new Date()
-    .getTime() - 86400000 * days);
+
+  var date = moment()
+    .utc()
+    .subtract('days', days)
+    .startOf('day')
+    .toDate();
 
   return date;
 }
@@ -86,12 +91,13 @@ function dateFromDaysAgo(days) {
  * - This will make sure the user dataset always fetched in the second query
  *
  * - Operations allowed on frontend:
- *  - equals
- *  - does not equal ($ne)
- *  - less than ($lt)
- *  - greater than ($gt)
- *  - contains
- *  - does not contain
+ *  - equals (eq)
+ *  - less than (lt)
+ *  - greater than (gt)
+ *  - contains (contains)
+ *
+ * - User 'joined' and 'lastSeen' are numbers that signify 'x days ago'
+ * so, 'joined' value of 7 means 7 days ago
  *
  *
  * TODO:
@@ -148,7 +154,16 @@ function dateFromDaysAgo(days) {
  *         name: 'platform',
  *         op: 'contains',
  *         val: 'Android'
+ *       },
+ *
+ *       {
+ *         method: 'attr',
+ *         name: 'joined',
+ *         op: 'gt',
+ *         val: 7
  *       }
+ *
+ *
  *     ]
  * }
  *
@@ -469,7 +484,7 @@ Query.prototype.runAttrQuery = function (cb) {
     .lean()
     .exec(function (err, users) {
       cb(err, users);
-    })
+    });
 
   return this;
 };
@@ -507,20 +522,66 @@ Query.prototype.genAttrMatchCond = function () {
 
     c[f.name] = {};
 
-    if (op === '$contains') {
 
-      // REF: http://stackoverflow.com/a/10616781/1463434
-      c[f.name]['$regex'] = ".*" + f['val'] + ".*";
+    // joined and lastSeen are special properties. we will handle them separately
+    if (!_.contains(['joined', 'lastSeen'], f.name)) {
 
-    } else if (op === '$eq') {
 
-      c[f.name] = f['val'];
+      if (op === '$contains') {
+
+        // REF: http://stackoverflow.com/a/10616781/1463434
+        c[f.name].$regex = ".*" + f.val + ".*";
+        // Also, it should do case-insensitive queries
+        c[f.name].$options = 'i';
+
+      } else if (op === '$eq') {
+
+        c[f.name] = f.val;
+
+      } else {
+        // if op is $gt, $lt
+
+        c[f.name][op] = f.val;
+      }
+
 
     } else {
-      // if op is $gt, $lt
 
-      c[f.name][op] = f['val'];
+
+      // joined and lastSeen are special properties. their vals are in terms of
+      // number of days ago, which need to converted into timestamp
+
+
+      // Also, we need to switch lessThan (lt) and greaterThan (gt) because
+      // lessThan 100 days ago essentially means greater than the calculated
+      // timestamp
+      var startOfThatDay = dateFromDaysAgo(f.val);
+      var endOfThatDay = dateFromDaysAgo(f.val - 1);
+console.log('\n\n\n sart end', startOfThatDay, endOfThatDay);
+      if (op === '$gt') {
+
+        c[f.name].$lt = startOfThatDay;
+
+      } else if (op === '$lt') {
+
+        c[f.name].$gte = startOfThatDay;
+
+      } else {
+
+        // if joined/lastSeen name and eq op then we need to take a date range from
+        // start to end of day
+
+        c[f.name] = {
+          $gte: startOfThatDay,
+          $lt: endOfThatDay
+        };
+
+      }
+
     }
+
+
+
 
     filterQueries[root].push(c);
 
@@ -544,7 +605,7 @@ Query.prototype.genAttrMatchCond = function () {
 
 
   if (!_.isEmpty(filterQueries[root])) cond['$and'].push(filterQueries);
-
+  console.log('\n\n\n genAttrMatchCond', JSON.stringify(cond));
   return cond;
 };
 
@@ -796,6 +857,12 @@ function sanitize(q) {
       f.val = parseInt(f.val, 10);
     }
 
+
+    // joined and lastSeen attributes represent 'number of days ago'
+    if (f.method === 'attr' && _.contains(['joined', 'lastSeen'], f.name)) {
+      f.val = parseInt(f.val, 10);
+    }
+
   });
 
 
@@ -818,7 +885,7 @@ function sanitize(q) {
 
   logger.trace({
     at: 'lib/query sanitized',
-    q: q,
+    q: q ? JSON.stringify(q) : null,
     f: q.filters
   });
 
