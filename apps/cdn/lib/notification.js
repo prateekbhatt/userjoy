@@ -66,11 +66,11 @@ Notification.prototype.load = function (cb) {
     // replies back
     app.setTrait('automessageId', notf.amId);
 
-    var gravatar = getGravatar(userTraits.email, 80);
+    var gravatar = getGravatar(notf.senderEmail, 80);
 
     // Create locals object which would be passed to render the template
     var locals = {
-      sender: notf.sender,
+      senderName: notf.senderName,
       body: notf.body,
       color: notf.color,
 
