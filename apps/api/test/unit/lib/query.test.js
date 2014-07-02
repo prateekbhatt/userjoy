@@ -1,4 +1,4 @@
-describe('Lib query', function () {
+describe.only('Lib query', function () {
 
   /**
    * npm dependencies
@@ -397,47 +397,133 @@ describe('Lib query', function () {
     });
 
 
-    it('should handle eq/lt/gt/contains on "and" root operator', function () {
-      var query = new Query(queryObj.aid, queryObj);
-      cond = query.genAttrMatchCond();
+    it(
+      'should handle eq/lt/gt/contains on "and" root operator, and regex should be case insensitive',
+      function () {
+        var query = new Query(queryObj.aid, queryObj);
+        cond = query.genAttrMatchCond();
 
-      expect(cond.$and)
-        .to.be.an('array')
-        .and.to.contain({
-          'aid': 'BlaBlaID'
-        });
+        expect(cond.$and)
+          .to.be.an('array')
+          .and.to.contain({
+            'aid': 'BlaBlaID'
+          });
 
 
-      expect(cond.$and)
-        .to.contain({
-          "$and": [
+        expect(cond.$and)
+          .to.contain({
+            "$and": [
+
+              {
+                "platform": "Android"
+              },
+
+              {
+                "amount": {
+                  "$lt": 100
+                }
+              },
+
+              {
+                "totalEvents": {
+                  "$gt": 999
+                }
+              },
+
+              {
+                "email": {
+                  "$regex": ".*bhatt.*",
+                  "$options": "i"
+                }
+              }
+            ]
+          });
+
+      });
+
+    it(
+      'should transform joined/lastSeen days ago to timestamps, and also switch lt and gt because lessThan 100 days ago essentially means greater than the calculated timestamp',
+      function () {
+
+
+        var queryObj = {
+          aid: 'BlaBlaID',
+          list: 'users',
+          op: 'and',
+          filters: [
 
             {
-              "platform": "Android"
+              method: 'attr',
+              name: 'joined',
+              op: 'gt',
+              val: 10
             },
 
             {
-              "amount": {
-                "$lt": 100
-              }
+              method: 'attr',
+              name: 'lastSeen',
+              op: 'lt',
+              val: 7
             },
 
             {
-              "totalEvents": {
-                "$gt": 999
-              }
+              method: 'attr',
+              name: 'lastSeen',
+              op: 'eq',
+              val: 7
             },
 
             {
-              "email": {
-                "$regex": ".*bhatt.*"
-              }
+              method: 'attr',
+              name: 'email',
+              op: 'contains',
+              val: 'bhatt'
             }
           ]
-        });
+        };
 
-    });
 
+        var query = new Query(queryObj.aid, queryObj);
+        cond = query.genAttrMatchCond();
+
+
+        // should have switched gt to lt
+        expect(cond.$and[1].$and[0])
+          .to.be.an('object')
+          .that.has.property('joined')
+          .that.is.an('object')
+          .and.has.property('$lt')
+          .that.is.a('date');
+
+
+        // should have switched lt to gte
+        expect(cond.$and[1].$and[1])
+          .to.be.an('object')
+          .that.has.property('lastSeen')
+          .that.is.an('object')
+          .and.has.property('$gte')
+          .that.is.a('date');
+
+
+
+        // should have switched eq to a date range (gte, lt)
+        expect(cond.$and[1].$and[2])
+          .to.be.an('object')
+          .that.has.property('lastSeen')
+          .that.is.an('object')
+          .and.has.property('$gte')
+          .that.is.a('date');
+
+        expect(cond.$and[1].$and[2])
+          .to.have.property('lastSeen')
+          .that.is.an('object')
+          .and.has.property('$lt')
+          .that.is.a('date');
+
+        // in date range, startOfDay should be less than endOfDay
+        expect(cond.$and[1].$and[2].lastSeen.$lt)
+          .to.be.above(cond.$and[1].$and[2].lastSeen.$gte);
+      });
 
     it('should handle eq/lt/gt/contains on "or" root operator', function () {
 
@@ -474,7 +560,8 @@ describe('Lib query', function () {
 
             {
               "email": {
-                "$regex": ".*bhatt.*"
+                "$regex": ".*bhatt.*",
+                "$options": "i"
               }
             }
           ]
@@ -522,7 +609,8 @@ describe('Lib query', function () {
               }
             }, {
               "email": {
-                "$regex": ".*bhatt.*"
+                "$regex": ".*bhatt.*",
+                "$options": "i"
               }
             }, {
               "_id": {
@@ -896,16 +984,17 @@ describe('Lib query', function () {
 
       function getDateUnix(actual, daysAgo) {
         return moment(actual)
+          .utc()
           .subtract('days', daysAgo)
           .startOf('day')
           .unix();
       }
 
       expect(moment(cond.$and[3].$gt[1])
+        .utc()
         .startOf('day')
         .unix())
-        .to.eql(getDateUnix(moment()
-          .format(), Query.prototype.fromAgo));
+        .to.eql(getDateUnix(new Date(), Query.prototype.fromAgo));
 
       expect(cond.$and[3].$gt[1])
         .to.be.a('date');
@@ -914,6 +1003,7 @@ describe('Lib query', function () {
         .to.be.a('date');
 
       expect(moment(cond.$and[4].$lt[1])
+        .utc()
         .startOf('day')
         .unix())
         .to.eql(getDateUnix(moment()
@@ -1492,6 +1582,73 @@ describe('Lib query', function () {
 
       expect(before.filters[0])
         .to.have.property("method", "count");
+
+      expect(before.filters[0].val)
+        .to.be.a("string");
+
+      expect(before)
+        .to.not.eql(after);
+
+      Query.sanitize(before);
+
+      expect(before.filters[0].val)
+        .to.be.a("number");
+
+      expect(before)
+        .to.eql(after);
+    });
+
+
+    it('should parseInt val in attr with joined/lastSeen names', function () {
+
+      var before = {
+        list: 'users',
+        op: 'and',
+        filters: [
+
+          {
+            method: 'attr',
+            name: 'joined',
+            op: 'gt',
+            val: '10'
+          },
+
+
+          {
+            method: 'attr',
+            name: 'lastSeen',
+            op: 'lt',
+            val: '8'
+          }
+
+        ]
+      };
+
+      var after = {
+        list: 'users',
+        op: 'and',
+        filters: [
+
+          {
+            method: 'attr',
+            name: 'joined',
+            op: 'gt',
+            val: 10
+          },
+
+
+          {
+            method: 'attr',
+            name: 'lastSeen',
+            op: 'lt',
+            val: 8
+          }
+
+        ]
+      };
+
+      expect(before.filters[0])
+        .to.have.property("method", "attr");
 
       expect(before.filters[0].val)
         .to.be.a("string");
