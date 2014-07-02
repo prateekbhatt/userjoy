@@ -257,9 +257,7 @@ describe('Resource /apps/:aid/automessages', function () {
             expect(res.body)
               .to.have.property("userAttributes")
               .that.is.an('array')
-              .that.eqls(['user.name', 'user.email', 'user.plan',
-                'user.revenue', 'user.joined', 'user.status'
-              ]);
+              .that.eqls(['user.name', 'user.email', 'user.plan']);
 
           })
           .end(done);
