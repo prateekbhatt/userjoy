@@ -763,7 +763,7 @@ angular.module('do.message', [])
             var userEmail = msgThread.uid.email;
 
             $scope.individualCustomer = userEmail;
-
+            $scope.subject = msgThread.sub;
 
             for (var i = 0; i < msgThread.messages.length; i++) {
               var m = msgThread.messages[i];
@@ -772,7 +772,7 @@ angular.module('do.message', [])
                 messagebody: m.body,
                 createdat: $moment(m.ct)
                   .fromNow(),
-                seen: isSeen
+                seen: isSeen,
               };
 
               if (m.from === 'user') {
@@ -1087,7 +1087,7 @@ angular.module('do.message', [])
                   gravatar: imggravatar,
                   seen: $scope.messages[i].seen,
                   email: $scope.messages[i].email,
-                  admin: $scope.messages[i].admin
+                  admin: $scope.messages[i].admin,
                 })
               } else {
                 $scope.messagesWithSrc.push({
