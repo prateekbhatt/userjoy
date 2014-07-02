@@ -1,4 +1,4 @@
-describe('Lib query', function () {
+describe.only('Lib query', function () {
 
   /**
    * npm dependencies
@@ -397,48 +397,101 @@ describe('Lib query', function () {
     });
 
 
-    it('should handle eq/lt/gt/contains on "and" root operator, and regex should be case insensitive', function () {
+    it(
+      'should handle eq/lt/gt/contains on "and" root operator, and regex should be case insensitive',
+      function () {
+        var query = new Query(queryObj.aid, queryObj);
+        cond = query.genAttrMatchCond();
+
+        expect(cond.$and)
+          .to.be.an('array')
+          .and.to.contain({
+            'aid': 'BlaBlaID'
+          });
+
+
+        expect(cond.$and)
+          .to.contain({
+            "$and": [
+
+              {
+                "platform": "Android"
+              },
+
+              {
+                "amount": {
+                  "$lt": 100
+                }
+              },
+
+              {
+                "totalEvents": {
+                  "$gt": 999
+                }
+              },
+
+              {
+                "email": {
+                  "$regex": ".*bhatt.*",
+                  "$options": "i"
+                }
+              }
+            ]
+          });
+
+      });
+
+    it('should transform joined/lastSeen days ago to timestamps', function () {
+
+
+      var queryObj = {
+        aid: 'BlaBlaID',
+        list: 'users',
+        op: 'and',
+        filters: [
+
+          {
+            method: 'attr',
+            name: 'joined',
+            op: 'gt',
+            val: 10
+          },
+
+          {
+            method: 'attr',
+            name: 'lastSeen',
+            op: 'lt',
+            val: 7
+          },
+
+          {
+            method: 'attr',
+            name: 'email',
+            op: 'contains',
+            val: 'bhatt'
+          }
+        ]
+      };
+
+
       var query = new Query(queryObj.aid, queryObj);
       cond = query.genAttrMatchCond();
 
-      expect(cond.$and)
-        .to.be.an('array')
-        .and.to.contain({
-          'aid': 'BlaBlaID'
-        });
+      expect(cond.$and[1].$and[0])
+        .to.be.an('object')
+        .that.has.property('joined')
+        .that.is.an('object')
+        .and.has.property('$gt')
+        .that.is.a('date');
 
 
-      expect(cond.$and)
-        .to.contain({
-          "$and": [
-
-            {
-              "platform": "Android"
-            },
-
-            {
-              "amount": {
-                "$lt": 100
-              }
-            },
-
-            {
-              "totalEvents": {
-                "$gt": 999
-              }
-            },
-
-            {
-              "email": {
-                "$regex": ".*bhatt.*",
-                "$options": "i"
-              }
-            }
-          ]
-        });
-
+      expect(cond.$and[1].$and[1])
+        .to.be.an('object')
+        .that.has.property('lastSeen')
+        .that.is.an('object')
+        .and.has.property('$lt')
+        .that.is.a('date');
     });
-
 
     it('should handle eq/lt/gt/contains on "or" root operator', function () {
 
@@ -1495,6 +1548,73 @@ describe('Lib query', function () {
 
       expect(before.filters[0])
         .to.have.property("method", "count");
+
+      expect(before.filters[0].val)
+        .to.be.a("string");
+
+      expect(before)
+        .to.not.eql(after);
+
+      Query.sanitize(before);
+
+      expect(before.filters[0].val)
+        .to.be.a("number");
+
+      expect(before)
+        .to.eql(after);
+    });
+
+
+    it('should parseInt val in attr with joined/lastSeen names', function () {
+
+      var before = {
+        list: 'users',
+        op: 'and',
+        filters: [
+
+          {
+            method: 'attr',
+            name: 'joined',
+            op: 'gt',
+            val: '10'
+          },
+
+
+          {
+            method: 'attr',
+            name: 'lastSeen',
+            op: 'lt',
+            val: '8'
+          }
+
+        ]
+      };
+
+      var after = {
+        list: 'users',
+        op: 'and',
+        filters: [
+
+          {
+            method: 'attr',
+            name: 'joined',
+            op: 'gt',
+            val: 10
+          },
+
+
+          {
+            method: 'attr',
+            name: 'lastSeen',
+            op: 'lt',
+            val: 8
+          }
+
+        ]
+      };
+
+      expect(before.filters[0])
+        .to.have.property("method", "attr");
 
       expect(before.filters[0].val)
         .to.be.a("string");
