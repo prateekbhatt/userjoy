@@ -54,12 +54,14 @@ describe('Worker automessageConsumer', function () {
       async.series([
 
         function clearQueue(cb) {
-          queue().clear(cb);
+          queue()
+            .clear(cb);
         },
 
         function postToQueue(cb) {
           // queue auto message
-          queue().post(amId, cb);
+          queue()
+            .post(amId, cb);
         },
 
         function clearEvents(cb) {
@@ -158,12 +160,14 @@ describe('Worker automessageConsumer', function () {
       async.series([
 
         function clearQueue(cb) {
-          queue().clear(cb);
+          queue()
+            .clear(cb);
         },
 
         function postToQueue(cb) {
           // queue auto message
-          queue().post(amId, cb);
+          queue()
+            .post(amId, cb);
         },
 
         function clearEvents(cb) {
@@ -253,13 +257,23 @@ describe('Worker automessageConsumer', function () {
             amId: amId
           })
           .exec(function (err, notf) {
-
+            console.log('\n\n\n\n savenotfi', err, notf);
             expect(err)
               .to.not.exist;
 
             expect(notf)
               .to.be.an("array")
               .that.has.length(1);
+
+            expect(notf[0])
+              .to.have.property('senderEmail')
+              .that.is.a('string')
+              .and.is.not.empty;
+
+            expect(notf[0])
+              .to.have.property('senderName')
+              .that.is.a('string')
+              .and.is.not.empty;
 
             expect(notf[0].amId.toString())
               .to.equal(amId.toString());

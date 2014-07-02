@@ -281,8 +281,8 @@ var app = angular.module('dodatado', [
             console.log("error in getting automsg attributes");
           })
         taRegisterTool('dropdown', {
-          display: "<span class='dropdown'>" +
-            "<button class='btn btn-sm btn-default dropdown-toggle' type='button' ng-disabled='showHtml()'><i class='fa fa-caret-down'></i></button>" +
+          display: "<span class='dropdown' style='height: 33px;'>" +
+            "<button class='dropdown-toggle' type='button' ng-disabled='showHtml()' style='background-color: #fff; border: 0px solid #fff;'><i class='fa fa-caret-down'></i>&nbsp;User Data</button>" +
             "<ul class='dropdown-menu'><li ng-repeat='o in options' ng-model='o.value' ng-click='action(o.value)'>{{o.name}}</li></ul>" +
             "</span>",
           action: function (size) {

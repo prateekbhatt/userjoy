@@ -35,7 +35,7 @@
                     </div>
                 </div>
                 </tab>
-                <tab heading="Conversations">
+                <tab heading="Messages">
                 <div class="row text-center" ng-show="msgs.length == 0">
                     <br>
                     <em><p>&nbsp;You have no conversations with {{user.email}}</p></em>
@@ -101,22 +101,30 @@
             </div>
             <div class="col-md-3 col-md-push-2">
                 <h4><b>Recent Activity</b></h4>
+                <br>
                 <div class="text-center">
-                    <button class="btn btn-default btn-sm text-center" ng-click="showEventNextDate()" ng-show="!showPreviousBtn">Next</button>
-                    <div class="btn-group" ng-show="showPreviousBtn">
-                        <button class="btn btn-default btn-sm text-center" ng-click="showEventPreviousDate()">Previous</button>
-                        <button class="btn btn-default btn-sm text-center" ng-click="showEventNextDate()">Next</button>
+                    <div class="col-md-4 pull-left">
+                        <div class="btn-group" ng-show="showPreviousBtn">
+                            <button class="btn btn-default btn-sm text-center fa fa-backward " ng-click="showEventPreviousDate()">&nbsp;Prev</button>
+                            <!-- <button class="btn btn-default btn-sm text-center" ng-click="showEventNextDate()">Next</button> -->
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <p><em>{{eventDate}}</em></p>
+                    </div>
+                    <div class="col-md-4 pull-right">
+                        <button class="btn btn-default btn-sm text-center fa fa-forward " ng-click="showEventNextDate()">Next</button>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12" id="affix-demo">
                         <br>
-                        <p><em>{{eventDate}}</em></p>
+                        <!-- <p><em>{{eventDate}}</em></p> -->
                         <p ng-show="!showEvents">There was no activity for {{eventDate}}</p>
                         <ul class="list-group" ng-show="showEvents">
 
                             <li class="list-group-item" ng-repeat="event in events" ng-class="{'list-group-item-danger': event.type == 'auto', 'list-group-item-success': event.type == 'form', 'list-group-item-info': event.type == 'page', 'list-group-item-default': event.type == 'link', 'list-group-item-warning': event.type == 'track'}">
-                                <span ng-class="{'fa fa-comments': event.type == 'auto', 'fa fa-flash': event.type == 'form', 'fa fa-globe': event.type == 'page', 'fa fa-link': event.type == 'link', 'fa fa-road': event.type == 'track'}" title="{{event.title}}" style="font-size: 12px; width: 140px;"> {{event.name}}</span>
+                                <span ng-class="{'fa fa-comments': event.type == 'auto', 'fa fa-flash': event.type == 'form', 'fa fa-globe': event.type == 'page', 'fa fa-link': event.type == 'link', 'fa fa-road': event.type == 'track'}" title="{{event.title}}" style="font-size: 12px; width: 140px; word-wrap: break-word;"> {{event.name}}</span>
                                 <em class="pull-right" style="font-size: 11px;" title="{{event.timestamp}}">{{event.when}}</em>
                             </li>
                            <!--  <li class="list-group-item list-group-item-success" ng-if="event.type == 'form'" ng-repeat="event in events">

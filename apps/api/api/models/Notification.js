@@ -54,9 +54,17 @@ var NotificationSchema = new Schema({
   },
 
 
+  // sender email (account)
+  senderEmail: {
+    type: String,
+    required: [true, 'Provide sender email']
+  },
+
+
   // sender name (account)
-  sender: {
-    type: String
+  senderName: {
+    type: String,
+    required: [true, 'Provide sender name']
   },
 
 

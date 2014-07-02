@@ -111,9 +111,7 @@ router
 
     logger.trace('Fetching automessage attributes');
 
-    var userAttributes = ['user.name', 'user.email', 'user.plan',
-      'user.revenue', 'user.joined', 'user.status'
-    ];
+    var userAttributes = ['user.name', 'user.email', 'user.plan'];
 
     res
       .status(200)
@@ -334,6 +332,13 @@ router
 router
   .route('/:aid/automessages/:amId/active/:status?')
   .put(function (req, res, next) {
+
+
+    logger.trace({
+      at: 'automessage:updateStatus',
+      params: req.params
+    });
+
 
     var aid = req.params.aid;
     var amId = req.params.amId;

@@ -4,11 +4,11 @@
             <button type="button" class="uj-close" aria-hidden="true" onclick="userjoy.hideNotification()" style="margin-top: -15px;">&times;</button>
             <img src="{{gravatar}}" width="60px">
             <div style="margin-top: -75px; margin-left: 75px;">
-                <p style="margin-top: 12px;"><b>{{sender}}</b></p>
+                <p style="margin-top: 12px;"><b>{{senderName}}</b></p>
                 <p>{{!body}}</p>
             </div>
-            <span id="{{SENT_TEMPLATE_ID}}" style="bottom: -180px; display:none; color: #7f8c8d; position: absolute;">Message Sent. Thanks!</span>
-            <span id="{{ERROR_ID}}" style="bottom: -180px; display:none; color: #a94442; position: absolute;">Your reply cannot be blank</span>
+            <span id="{{SENT_TEMPLATE_ID}}" style="margin-top: 40px; display:none; color: #7f8c8d; position: relative;">Message Sent. Thanks!</span>
+            <span id="{{ERROR_ID}}" style="margin-top: 40px; display:none; color: #a94442; position: relative;">Your reply cannot be blank</span>
         </div>
         <div class="uj-panel-footer" style="margin-top: -23px; z-index: 99999999">
             <div class="uj-input-group">
