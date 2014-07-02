@@ -388,7 +388,8 @@ as meta property)
 - body
 - ct
 - seen (boolean)
-- sender
+- senderEmail (required, to show gravatar in notification)
+- senderName (required)
 - title (Required, automessage title)
 - uid
 

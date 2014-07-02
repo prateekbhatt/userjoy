@@ -42,7 +42,7 @@ describe('Model Notification', function () {
 
           expect(Object.keys(err.errors)
             .length)
-            .to.eql(4);
+            .to.eql(6);
 
           expect(err.errors.amId.message)
             .to.eql('Invalid automessage id');
@@ -50,8 +50,11 @@ describe('Model Notification', function () {
           expect(err.errors.body.message)
             .to.eql('Provide notification body');
 
-          expect(err.errors.uid.message)
-            .to.eql('Invalid uid');
+          expect(err.errors.senderName.message)
+            .to.eql('Provide sender name');
+
+          expect(err.errors.senderEmail.message)
+            .to.eql('Provide sender email');
 
           expect(err.errors.title.message)
             .to.eql('Provide notification title');
@@ -70,7 +73,8 @@ describe('Model Notification', function () {
       var newNotification = {
         amId: ObjectId(),
         body: 'Hello World',
-        sender: 'Prateek Bhatt',
+        senderEmail: 'prattbhatt@gmail.com',
+        senderName: 'Prateek Bhatt',
         title: 'In-App welcome',
         uid: ObjectId(),
       };
@@ -92,7 +96,10 @@ describe('Model Notification', function () {
           .to.have.property('body', newNotification.body);
 
         expect(notf)
-          .to.have.property('sender', newNotification.sender);
+          .to.have.property('senderEmail', newNotification.senderEmail);
+
+        expect(notf)
+          .to.have.property('senderName', newNotification.senderName);
 
         expect(notf)
           .to.have.property('title', newNotification.title);

@@ -235,8 +235,8 @@
                                 </div>
                                 <div class="col-md-6">
                                     <!-- <div class="btn-group col-md-5">
-                                                                            <button class="fa fa-tag btn btn-info">
-                                                                            <span>Tag</span></button>
+                                        <button class="fa fa-tag btn btn-info">
+                                        <span>Tag</span></button>
                                     </div> -->
                                     <div class="col-md-5 col-md-push-10">
                                         <button type="button" class="btn btn-default btn-block dropdown-toggle"> Select Data
@@ -254,8 +254,8 @@
                                 <div class="panel panel-default" ng-show="showUsers">
                                     <div>
                                         <div>
-                                            <div>
-                                                <table ng-table="tableParams" show-filter="true" class="table">
+                                            <div style="min-width: 100%; overflow-x: scroll;">
+                                                <table ng-table="tableParams" show-filter="true" class="table table-hover">
                                                     <thead>
                                                         <tr>
                                                             <th class="text-center">
@@ -301,14 +301,38 @@
                                                                 ng-click="tableParams.sorting('lastsession', tableParams.isSortBy('lastsession', 'asc') ? 'desc' : 'asc')">
                                                                 <div>Last Session</div>
                                                             </th>
-                                                            <!-- <th class="text-center" ng-show="columns[6].visible" ng-class="{
-                                                                                                                            'sort-asc': tableParams.isSortBy('unsubscribed', 'asc'),
-                                                                                                                            'sort-desc': tableParams.isSortBy('unsubscribed', 'desc'),
-                                                                                                                            'sortable': !$first
-                                                                                                                            }"
-                                                                                                                            ng-click="tableParams.sorting('unsubscribed', tableParams.isSortBy('unsubscribed', 'asc') ? 'desc' : 'asc')">
-                                                                                                                            <div>Unsubscribed</div>
-                                                            </th> -->
+                                                            <th class="text-center" ng-show="columns[6].visible" ng-class="{
+                                                                'sort-asc': tableParams.isSortBy('browser', 'asc'),
+                                                                'sort-desc': tableParams.isSortBy('browser', 'desc'),
+                                                                'sortable': !$first
+                                                                }"
+                                                                ng-click="tableParams.sorting('browser', tableParams.isSortBy('browser', 'asc') ? 'desc' : 'asc')">
+                                                                <div>Browser</div>
+                                                            </th>
+                                                            <th class="text-center" ng-show="columns[7].visible" ng-class="{
+                                                                'sort-asc': tableParams.isSortBy('country', 'asc'),
+                                                                'sort-desc': tableParams.isSortBy('country', 'desc'),
+                                                                'sortable': !$first
+                                                                }"
+                                                                ng-click="tableParams.sorting('country', tableParams.isSortBy('country', 'asc') ? 'desc' : 'asc')">
+                                                                <div>Country</div>
+                                                            </th>
+                                                            <th class="text-center" ng-show="columns[8].visible" ng-class="{
+                                                                'sort-asc': tableParams.isSortBy('operatingsystem', 'asc'),
+                                                                'sort-desc': tableParams.isSortBy('operatingsystem', 'desc'),
+                                                                'sortable': !$first
+                                                                }"
+                                                                ng-click="tableParams.sorting('operatingsystem', tableParams.isSortBy('operatingsystem', 'asc') ? 'desc' : 'asc')">
+                                                                <div>OS</div>
+                                                            </th>
+                                                            <th class="text-center" ng-show="columns[9].visible" ng-class="{
+                                                                'sort-asc': tableParams.isSortBy('status', 'asc'),
+                                                                'sort-desc': tableParams.isSortBy('status', 'desc'),
+                                                                'sortable': !$first
+                                                                }"
+                                                                ng-click="tableParams.sorting('status', tableParams.isSortBy('status', 'asc') ? 'desc' : 'asc')">
+                                                                <div>Status</div>
+                                                            </th>
                                                         </tr>
                                                     </thead>
                                                     <tr ng-repeat="user in $data">
@@ -329,6 +353,18 @@
                                                         </td>
                                                         <td data-title="'Last Session'" class="text-center" sortable="lastsession" ng-show="columns[5].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
                                                             <span>{{user.lastsession}}</span>
+                                                        </td>
+                                                        <td data-title="'Browser'" class="text-center" sortable="browser" ng-show="columns[6].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
+                                                            <span>{{user.browser}}</span>
+                                                        </td>
+                                                        <td data-title="'Country'" class="text-center" sortable="country" ng-show="columns[7].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
+                                                            <span>{{user.country}}</span>
+                                                        </td>
+                                                        <td data-title="'Operating System'" class="text-center" sortable="operatingsystem" ng-show="columns[8].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
+                                                            <span>{{user.os}}</span>
+                                                        </td>
+                                                        <td data-title="'Status'" class="text-center" sortable="status" ng-show="columns[9].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
+                                                            <span>{{user.status}}</span>
                                                         </td>
                                                         <!-- <td data-title="'Unsubscribed'" class="text-center" sortable="status" ng-show="columns[4].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
                                                                                                                     <span>{{user.unsubscribed}}</span>
@@ -355,7 +391,7 @@
                         <ul class="list-group" ng-show="segmentsCreated">
                             <li style="padding-bottom: 2px;" class="list-group-item-segment"  ng-class="{'active': $index === selectedIndex}"  ng-repeat="segname in segmentsCreatedName" ng-mouseenter="showAutoMsgButton()" ng-mouseleave="hideAutoMsgButton()">
                                 <strong>
-                                <a style="padding: 10px 15px; display: inline-block; cursor: pointer; width: 150px; text-decoration: none; color: #333;" ng-click="showQuery(segname.id, $index, segname)" ng-if="!segname.predefined">{{segname.name}}</a>
+                                <a style="padding: 10px 15px; display: inline-block; cursor: pointer; width: 150px; text-decoration: none; color: #333; word-wrap: break-word;" ng-click="showQuery(segname.id, $index, segname)" ng-if="!segname.predefined">{{segname.name}}</a>
                                 </strong>
                                 <a style="padding: 10px 15px; display: inline-block; cursor: pointer; text-decoration: none; color: inherit;" ng-click="showQuery(segname.id, $index, segname)" ng-if="segname.predefined" >
                                 <span style="font-size: 14px;" class="fa fa-smile-o" ng-if="segname.name == 'Good Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
