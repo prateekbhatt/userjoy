@@ -200,6 +200,16 @@ describe('Resource /apps/:aid/automessages', function () {
 
             expect(res.body)
               .to.not.be.empty;
+
+            _.each(res.body, function (amsg) {
+
+              expect(amsg)
+                .to.be.an('object')
+                .and.has.property('sid')
+                .that.is.an('object')
+                .and.has.keys(['_id', 'name']);
+
+            });
           })
           .expect(200)
           .end(done);
