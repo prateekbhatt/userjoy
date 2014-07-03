@@ -34,6 +34,10 @@ describe('Model App', function () {
         .to.have.property("color", '#39B3D7');
     });
 
+    it('should add default showMessageBox option as true', function () {
+      expect(saved.apps.first)
+        .to.have.property("showMessageBox", true);
+    });
 
     it('should add account to team and as admin', function () {
 
