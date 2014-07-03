@@ -461,6 +461,7 @@ angular.module('do.settings', [])
           $scope.color = AppService.getCurrentApp()
             .color;
           console.log("app color: ", $scope.color);
+          $scope.switchStatus = AppService.getCurrentApp().showMessageBox;
           if ($scope.color.toUpperCase() === '#39b3d7'.toUpperCase()) {
             $scope.btnInfoWidth = '40px';
             $scope.btnInfoHeight = '40px';
@@ -560,6 +561,23 @@ angular.module('do.settings', [])
           $scope.floatRight = 'right';
 
           $scope.borderRadius = '4px';
+
+          var toggleSwitch = function (err) {
+            if (err) {
+              $scope.switchStatus = !$scope.switchStatus;
+              return;
+            }
+          }
+
+          $scope.$watch('switchStatus', function () {
+            console.log("switchState: ", $scope.switchStatus);
+            if ($scope.switchStatus != null && $scope.switchStatus != AppService.getCurrentApp().showMessageBox) {
+              AppModel.showFeedBackMsg($scope.currApp, $scope.switchStatus,
+                toggleSwitch);
+            }
+
+          })
+
           $scope.showPreview = function (color) {
             $scope.color = color;
             if (color === '#39b3d7') {
