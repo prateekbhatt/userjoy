@@ -333,6 +333,7 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 
 - aid (required)
 - amId (required for automessage events)
+- amState (clicked,sent,seen,replied)
 - cid
 - ct
 - module
@@ -352,8 +353,7 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 
 ##### Notes:
 
-- 'amId' and 'state' must be required for 'automessage' events ('state' is stored
-as meta property)
+- 'amId' and 'amState' must be required for 'automessage' events
 
 
 ### AutoMessage
