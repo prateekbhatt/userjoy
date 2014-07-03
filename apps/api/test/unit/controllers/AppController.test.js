@@ -361,6 +361,88 @@ describe('Resource /apps', function () {
   });
 
 
+  describe('PUT /apps/:aid/show-message-box', function () {
+
+    before(function (done) {
+      logoutUser(done);
+    });
+
+    it('should return error if not logged in',
+      function (done) {
+
+        var status = false;
+
+        request
+          .put('/apps/' + saved.apps.first._id + '/show-message-box')
+          .send({
+            status: status
+          })
+          .expect('Content-Type', /json/)
+          .expect(401)
+          .end(done);
+
+      });
+
+
+    it('logging in user', function (done) {
+      loginUser(done);
+    });
+
+
+    it('should return error if status is not boolean',
+      function (done) {
+
+        var status = 'false';
+
+        request
+          .put('/apps/' + saved.apps.first._id + '/show-message-box')
+          .send({
+            status: status
+          })
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            "status": 400,
+            "error": "Message box status should be either true or false"
+          })
+          .end(done);
+
+      });
+
+
+    it('should update app showMessageBox status',
+
+      function (done) {
+
+        expect(saved.apps.first.showMessageBox)
+          .to.be.true;
+
+        var status = false;
+
+        request
+          .put('/apps/' + saved.apps.first._id + '/show-message-box')
+          .send({
+            status: status
+          })
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .expect(function (res) {
+
+            var app = res.body;
+
+            expect(app.showMessageBox)
+              .to.be.false;
+
+          })
+          .end(done);
+
+      });
+
+  });
+
+
   describe('POST /apps/:aid/send-code-to-developer', function () {
 
     var url;

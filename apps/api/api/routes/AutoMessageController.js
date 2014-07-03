@@ -84,6 +84,10 @@ router
       .find({
         aid: aid
       })
+      .populate({
+        path: 'sid',
+        select: 'name'
+      })
       .exec(function (err, automessages) {
         if (err) return next(err);
         res

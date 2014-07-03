@@ -64,36 +64,55 @@ describe('Model User', function () {
       });
 
 
-    it('should return user if user exists', function (done) {
+    it('should return user if user exists, and update user status',
+      function (done) {
 
-      var lastSeenBefore = new Date(existingUser.lastSeen)
-        .getTime();
-
-      expect(lastSeenBefore)
-        .to.be.a('number');
-
-      User.findOrCreate(existingUser.aid, existingUser, function (err,
-        usr) {
-
-        expect(err)
-          .to.not.exist;
-
-        var lastSeenAfter = new Date(usr.lastSeen)
+        var lastSessionBefore = new Date(existingUser.lastSession)
           .getTime();
 
-        expect(lastSeenAfter)
-          .to.be.a('number')
-          .and.to.be.above(lastSeenBefore);
+        var statusBefore = existingUser.status;
+        var newStatus = 'paying';
+        existingUser.status = newStatus;
 
-        expect(usr._id)
-          .to.eql(existingUser._id);
 
-        expect(usr.email)
-          .to.eql(existingUser.email);
+        expect(lastSessionBefore)
+          .to.be.a('number');
 
-        done();
+        expect(statusBefore)
+          .to.be.a('string')
+          .and.not.equal(newStatus);
+
+        User.findOrCreate(existingUser.aid, existingUser, function (err,
+          usr) {
+
+          expect(err)
+            .to.not.exist;
+
+          var lastSessionAfter = new Date(usr.lastSession)
+            .getTime();
+
+          var statusAfter = usr.status;
+
+          expect(lastSessionAfter)
+            .to.be.a('number')
+            .and.to.be.above(0);
+
+          expect(statusAfter)
+            .to.be.a('string')
+            .that.equals(newStatus);
+
+          expect(statusAfter)
+            .to.not.eql(statusBefore);
+
+          expect(usr._id)
+            .to.eql(existingUser._id);
+
+          expect(usr.email)
+            .to.eql(existingUser.email);
+
+          done();
+        });
       });
-    });
 
     it('should create user if user does not exist', function (done) {
 
@@ -102,7 +121,7 @@ describe('Model User', function () {
       var newUser = {
         email: id + '@dodatado.com',
         browser: 'Chrome 35',
-        country: 'IN',
+        country: 'India',
         device: 'Apple iPad',
         ip: '115.118.149.224',
         joined: moment()
@@ -210,9 +229,9 @@ describe('Model User', function () {
         .to.have.property('ut');
     });
 
-    it('should add lastSeen timestamp', function () {
+    it('should add lastSession timestamp', function () {
       expect(savedUser)
-        .to.have.property('lastSeen')
+        .to.have.property('lastSession')
         .that.is.a('date');
     });
 

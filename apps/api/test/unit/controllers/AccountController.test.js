@@ -276,10 +276,12 @@ describe('Resource /account', function () {
 
     it('updates email verified status to true', function (done) {
 
-      var url = '/account/' +
-        saved.accounts.first._id +
-        '/verify-email/' +
-        saved.accounts.first.verifyToken;
+      var acc = saved.accounts.second;
+
+      expect(acc.emailVerified)
+        .to.be.false;
+
+      var url = '/account/' + acc._id + '/verify-email/' + acc.verifyToken;
 
       request
         .get(url)

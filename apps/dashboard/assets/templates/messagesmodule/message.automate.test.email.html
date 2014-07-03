@@ -12,10 +12,10 @@
 <div class="row" style="padding-top: 50px;">
     <div class="col-md-push-3 col-md-6">
         <div class="text-center">
-            <label style="font-size: 18px;">Subject: </label>&nbsp;<span ng-bind-html="subject" class="emailPreview"></span>
+            <label style="font-size: 18px;">Subject: </label>&nbsp;<span ng-bind-html="preview(subject)" class="emailPreview"></span>
         </div>
         <div class="message-template" style="min-height: 300px; overflow: auto; max-height: 300px; border: 1px solid #ecf0f1; border-radius: 4px;" >
-            <p ng-bind-html="previewText"></p>
+            <p ng-bind-html="preview(previewText)"></p>
         </div>
     </div>
     <br>

@@ -1,4 +1,4 @@
-describe.only('Lib query', function () {
+describe('Lib query', function () {
 
   /**
    * npm dependencies
@@ -442,7 +442,7 @@ describe.only('Lib query', function () {
       });
 
     it(
-      'should transform joined/lastSeen days ago to timestamps, and also switch lt and gt because lessThan 100 days ago essentially means greater than the calculated timestamp',
+      'should transform joined/lastSession days ago to timestamps, and also switch lt and gt because lessThan 100 days ago essentially means greater than the calculated timestamp',
       function () {
 
 
@@ -461,14 +461,14 @@ describe.only('Lib query', function () {
 
             {
               method: 'attr',
-              name: 'lastSeen',
+              name: 'lastSession',
               op: 'lt',
               val: 7
             },
 
             {
               method: 'attr',
-              name: 'lastSeen',
+              name: 'lastSession',
               op: 'eq',
               val: 7
             },
@@ -499,7 +499,7 @@ describe.only('Lib query', function () {
         // should have switched lt to gte
         expect(cond.$and[1].$and[1])
           .to.be.an('object')
-          .that.has.property('lastSeen')
+          .that.has.property('lastSession')
           .that.is.an('object')
           .and.has.property('$gte')
           .that.is.a('date');
@@ -509,20 +509,20 @@ describe.only('Lib query', function () {
         // should have switched eq to a date range (gte, lt)
         expect(cond.$and[1].$and[2])
           .to.be.an('object')
-          .that.has.property('lastSeen')
+          .that.has.property('lastSession')
           .that.is.an('object')
           .and.has.property('$gte')
           .that.is.a('date');
 
         expect(cond.$and[1].$and[2])
-          .to.have.property('lastSeen')
+          .to.have.property('lastSession')
           .that.is.an('object')
           .and.has.property('$lt')
           .that.is.a('date');
 
         // in date range, startOfDay should be less than endOfDay
-        expect(cond.$and[1].$and[2].lastSeen.$lt)
-          .to.be.above(cond.$and[1].$and[2].lastSeen.$gte);
+        expect(cond.$and[1].$and[2].lastSession.$lt)
+          .to.be.above(cond.$and[1].$and[2].lastSession.$gte);
       });
 
     it('should handle eq/lt/gt/contains on "or" root operator', function () {
@@ -1599,7 +1599,7 @@ describe.only('Lib query', function () {
     });
 
 
-    it('should parseInt val in attr with joined/lastSeen names', function () {
+    it('should parseInt val in attr with joined/lastSession names', function () {
 
       var before = {
         list: 'users',
@@ -1616,7 +1616,7 @@ describe.only('Lib query', function () {
 
           {
             method: 'attr',
-            name: 'lastSeen',
+            name: 'lastSession',
             op: 'lt',
             val: '8'
           }
@@ -1639,7 +1639,7 @@ describe.only('Lib query', function () {
 
           {
             method: 'attr',
-            name: 'lastSeen',
+            name: 'lastSession',
             op: 'lt',
             val: 8
           }

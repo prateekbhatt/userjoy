@@ -273,9 +273,21 @@ describe('Resource /apps/:aid/conversations', function () {
             expect(res.body)
               .to.not.be.empty;
 
-            _.each(res.body, function (m) {
-              expect(m.toRead)
-                .to.be.true;
+
+            _.each(res.body, function (c) {
+
+              var unread = _.find(c.messages, function (m) {
+
+                if (m.from === 'user' && !m.seen) {
+                  return true;
+                }
+
+              });
+
+              expect(unread)
+                .to.be.an('object')
+                .that.is.not.empty;
+
             });
 
           })
@@ -444,28 +456,6 @@ describe('Resource /apps/:aid/conversations', function () {
                 }
               })
               .value();
-
-            done();
-          });
-
-      });
-
-
-    // this test depends on the output of a previous test, hence it should be
-    // below
-    // TODO: check if this test is right
-    it('should update toRead status of conversation to false',
-      function (done) {
-
-        Conversation
-          .findById(testCon._id)
-          .exec(function (err, con) {
-
-            expect(err)
-              .to.not.exist;
-
-            expect(con)
-              .to.have.property("toRead", false);
 
             done();
           });

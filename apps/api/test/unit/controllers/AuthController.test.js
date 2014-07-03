@@ -1,32 +1,18 @@
 describe('Resource /auth', function () {
 
+  /**
+   * models
+   */
+
+  var Account = require('../../../api/models/Account');
+
+
   before(function (done) {
     setupTestDb(done);
   });
 
 
   describe('POST /auth/login', function () {
-
-    it('authenticates user with correct credentials',
-      function (done) {
-        request
-          .post('/auth/login')
-          .send({
-            email: saved.accounts.first.email,
-            password: saved.accounts.first.password
-          })
-          .expect('Content-Type', /json/)
-          .expect(200)
-          .expect({
-            message: "Logged In Successfully"
-          })
-          .expect(function (res) {
-            if (res.header['set-cookie'].length !== 1) {
-              return 'header should contain with set-cookie array with one element';
-            }
-          })
-          .end(done);
-      });
 
     it('returns error with incorrect email',
       function (done) {
@@ -60,6 +46,84 @@ describe('Resource /auth', function () {
             error: "Invalid Email/Password"
           })
           .end(done);
+      });
+
+    it('should return error if the email is not verified',
+      function (done) {
+
+        var acc = saved.accounts.second;
+
+        expect(acc.emailVerified)
+          .to.be.false;
+
+
+        request
+          .post('/auth/login')
+          .send({
+            email: acc.email,
+            password: acc.password
+          })
+          .expect('Content-Type', /json/)
+          .expect(403)
+          .expect({
+            status: 403,
+            error: "EMAIL_NOT_VERIFIED"
+          })
+          .expect(function (res) {
+            if (res.header['set-cookie'].length !== 1) {
+              return 'header should contain with set-cookie array with one element';
+            }
+          })
+          .end(done);
+      });
+
+
+    it('authenticates user with correct credentials, if email is verified',
+      function (done) {
+
+        var acc = saved.accounts.first;
+
+
+        async.series(
+
+          [
+
+            function verifyEmail(cb) {
+
+              Account.findByIdAndUpdate(acc._id, {
+                emailVerified: true
+              }, cb);
+
+            },
+
+
+            function shouldAuthenticate(cb) {
+
+              request
+                .post('/auth/login')
+                .send({
+                  email: acc.email,
+                  password: acc.password
+                })
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect({
+                  message: "Logged In Successfully"
+                })
+                .expect(function (res) {
+                  if (res.header['set-cookie'].length !== 1) {
+                    return 'header should contain with set-cookie array with one element';
+                  }
+                })
+                .end(cb);
+            }
+
+          ],
+
+          done
+
+        );
+
       });
 
   });

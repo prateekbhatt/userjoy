@@ -192,7 +192,12 @@ router
       break;
 
     case 'unread':
-      convMatch.toRead = true;
+      convMatch.messages = {
+        $elemMatch: {
+          "from": 'user',
+          "seen": false
+        }
+      };
       break;
 
     default:
@@ -322,12 +327,6 @@ router
           // update seen status to true for all messages sent from user, which
           // belong to this thread
           Conversation.openedByTeamMember(con._id, function (err) {
-            cb(err, con);
-          });
-        },
-
-        function conversationIsRead(con, cb) {
-          Conversation.isRead(con._id, function (err) {
             cb(err, con);
           });
         }

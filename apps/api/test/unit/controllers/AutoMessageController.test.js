@@ -75,10 +75,13 @@ describe('Resource /apps/:aid/automessages', function () {
 
       function (done) {
 
+        // WARNING: dont provide a randomId for sid, because in a later test
+        // sid is being populated, and it returns error
+
         var newAutoMsg = {
           body: 'Hey, Welkom to CabanaLand!',
           sender: randomId,
-          sid: randomId,
+          sid: saved.segments.first._id,
           sub: 'Welkom!',
           title: 'Welcome Message',
           type: 'email'
@@ -115,9 +118,11 @@ describe('Resource /apps/:aid/automessages', function () {
 
       function (done) {
 
+        // WARNING: dont provide a randomId for sid, because in a later test
+        // sid is being populated, and it returns error
         var newAutoMsg = {
           body: 'Hey, Welkom to CabanaLand!',
-          sid: randomId,
+          sid: saved.segments.first._id,
           sub: 'Welkom!',
           title: 'Welcome Message',
           type: 'email'
@@ -200,6 +205,16 @@ describe('Resource /apps/:aid/automessages', function () {
 
             expect(res.body)
               .to.not.be.empty;
+
+            _.each(res.body, function (amsg) {
+
+              expect(amsg)
+                .to.be.an('object')
+                .and.has.property('sid')
+                .that.is.an('object')
+                .and.has.keys(['_id', 'name']);
+
+            });
           })
           .expect(200)
           .end(done);

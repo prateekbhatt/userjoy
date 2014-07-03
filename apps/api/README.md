@@ -187,7 +187,7 @@ UserNote      |                         | notes created by team members about a 
 - score (latest engagement score of user, defaults to 50 for new user)
 - status
 - lastContactedAt
-- lastSeen (timestamp of last session of user)
+- lastSession (timestamp of last session of user)
 - lastHeardAt
 - ip
 - x tags [] Stores tags for categorizing users
@@ -348,6 +348,7 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 - cid
 - type
 - uid
+- ct
 
 ##### Notes:
 
@@ -412,7 +413,6 @@ as meta property)
 - closed (boolean)
 - ct
 - sub
-- toRead (boolean)
 - uid
 - ut
 

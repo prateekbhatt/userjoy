@@ -155,9 +155,6 @@ describe('Resource /apps/:aid/users', function () {
             .to.have.property('sub');
 
           expect(res.body[0])
-            .to.have.property('toRead');
-
-          expect(res.body[0])
             .to.have.property('closed');
 
           done();
