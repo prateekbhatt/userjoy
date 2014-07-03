@@ -348,6 +348,7 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 - cid
 - type
 - uid
+- ct
 
 ##### Notes:
 
