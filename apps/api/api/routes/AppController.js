@@ -182,7 +182,45 @@ router
         .status(200)
         .json(app);
 
-    })
+    });
+  });
+
+
+/**
+ * PUT /apps/:aid/message-box
+ *
+ * @param {Boolean} show true/false
+ *
+ * Update showMessageBox status of the app
+ * Whether to show the message box on the website
+ */
+
+router
+  .route('/:aid/show-message-box')
+  .put(function (req, res, next) {
+
+    var status = req.body.status;
+
+    if (!_.isBoolean(status)) {
+      return res.badRequest('Message box status should be either true or false');
+    }
+
+    req.app.showMessageBox = status;
+    req.app.save(function (err, app) {
+
+      if (err) {
+        return next(err);
+      }
+
+      if (!app) {
+        return next(new Error('Error in PUT /apps/:aid/message-box'));
+      }
+
+      res
+        .status(200)
+        .json(app);
+
+    });
   });
 
 
