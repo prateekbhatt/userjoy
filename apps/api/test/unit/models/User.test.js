@@ -66,10 +66,10 @@ describe('Model User', function () {
 
     it('should return user if user exists', function (done) {
 
-      var lastSeenBefore = new Date(existingUser.lastSeen)
+      var lastSessionBefore = new Date(existingUser.lastSession)
         .getTime();
 
-      expect(lastSeenBefore)
+      expect(lastSessionBefore)
         .to.be.a('number');
 
       User.findOrCreate(existingUser.aid, existingUser, function (err,
@@ -78,12 +78,12 @@ describe('Model User', function () {
         expect(err)
           .to.not.exist;
 
-        var lastSeenAfter = new Date(usr.lastSeen)
+        var lastSessionAfter = new Date(usr.lastSession)
           .getTime();
 
-        expect(lastSeenAfter)
+        expect(lastSessionAfter)
           .to.be.a('number')
-          .and.to.be.above(lastSeenBefore);
+          .and.to.be.above(lastSessionBefore);
 
         expect(usr._id)
           .to.eql(existingUser._id);
@@ -210,9 +210,9 @@ describe('Model User', function () {
         .to.have.property('ut');
     });
 
-    it('should add lastSeen timestamp', function () {
+    it('should add lastSession timestamp', function () {
       expect(savedUser)
-        .to.have.property('lastSeen')
+        .to.have.property('lastSession')
         .that.is.a('date');
     });
 

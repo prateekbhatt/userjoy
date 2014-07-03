@@ -96,7 +96,7 @@ function dateFromDaysAgo(days) {
  *  - greater than (gt)
  *  - contains (contains)
  *
- * - User 'joined' and 'lastSeen' are numbers that signify 'x days ago'
+ * - User 'joined' and 'lastSession' are numbers that signify 'x days ago'
  * so, 'joined' value of 7 means 7 days ago
  *
  *
@@ -523,8 +523,8 @@ Query.prototype.genAttrMatchCond = function () {
     c[f.name] = {};
 
 
-    // joined and lastSeen are special properties. we will handle them separately
-    if (!_.contains(['joined', 'lastSeen'], f.name)) {
+    // joined and lastSession are special properties. we will handle them separately
+    if (!_.contains(['joined', 'lastSession'], f.name)) {
 
 
       if (op === '$contains') {
@@ -548,7 +548,7 @@ Query.prototype.genAttrMatchCond = function () {
     } else {
 
 
-      // joined and lastSeen are special properties. their vals are in terms of
+      // joined and lastSession are special properties. their vals are in terms of
       // number of days ago, which need to converted into timestamp
 
 
@@ -557,7 +557,7 @@ Query.prototype.genAttrMatchCond = function () {
       // timestamp
       var startOfThatDay = dateFromDaysAgo(f.val);
       var endOfThatDay = dateFromDaysAgo(f.val - 1);
-console.log('\n\n\n sart end', startOfThatDay, endOfThatDay);
+
       if (op === '$gt') {
 
         c[f.name].$lt = startOfThatDay;
@@ -568,7 +568,7 @@ console.log('\n\n\n sart end', startOfThatDay, endOfThatDay);
 
       } else {
 
-        // if joined/lastSeen name and eq op then we need to take a date range from
+        // if joined/lastSession name and eq op then we need to take a date range from
         // start to end of day
 
         c[f.name] = {
@@ -858,8 +858,8 @@ function sanitize(q) {
     }
 
 
-    // joined and lastSeen attributes represent 'number of days ago'
-    if (f.method === 'attr' && _.contains(['joined', 'lastSeen'], f.name)) {
+    // joined and lastSession attributes represent 'number of days ago'
+    if (f.method === 'attr' && _.contains(['joined', 'lastSession'], f.name)) {
       f.val = parseInt(f.val, 10);
     }
 
