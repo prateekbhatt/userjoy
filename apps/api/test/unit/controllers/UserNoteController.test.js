@@ -1,4 +1,4 @@
-describe('Resource /apps/:aid/usernotes', function () {
+describe('Resource /apps/:aid/users/:uid/notes', function () {
 
   /**
    * npm dependencies
@@ -161,7 +161,9 @@ describe('Resource /apps/:aid/usernotes', function () {
             .to.have.property("aid", aid.toString());
 
           expect(res.body)
-            .to.have.property("creator");
+            .to.have.property("creator")
+            .that.is.an('object')
+            .and.has.keys(['_id', 'name']);
 
           expect(res.body)
             .to.have.property("note", newNote.note);
@@ -178,7 +180,7 @@ describe('Resource /apps/:aid/usernotes', function () {
   });
 
 
-describe('PUT /apps/:aid/users/:uid/notes/:nid', function () {
+  describe('PUT /apps/:aid/users/:uid/notes/:nid', function () {
 
     var testUrl, uid, aid, nid;
     var testUserNote;
