@@ -24,7 +24,7 @@
                 <img src="{{gravatar}}" width="60px">
                 <div style="margin-top: -75px; margin-left: 75px;">
                     <p style="margin-top: 12px;"><b>{{sender}}</b></p>
-                    <p ng-bind-html="previewText"></p>
+                    <p ng-bind-html="preview(previewText)"></p>
                 </div>
             </div>
             <div class="panel-footer" style="margin-top: -21px;">
@@ -39,10 +39,10 @@
         </div>
         <div class="col-md-push-3 col-md-6" ng-show="showEmailPreview">
             <div class="text-center">
-                <label style="font-size: 18px;">Subject: </label>&nbsp;<span ng-bind-html="subject" class="emailPreview"></span>
+                <label style="font-size: 18px;">Subject: </label>&nbsp;<span ng-bind-html="preview(subject)" class="emailPreview"></span>
             </div>
             <div class="message-template" style="min-height: 300px; overflow: auto; max-height: 300px;  border: 1px solid #ecf0f1; border-radius: 4px;">
-                <p ng-bind-html="previewText"></p>
+                <p ng-bind-html="preview(previewText)"></p>
             </div>
         </div>
     </div>

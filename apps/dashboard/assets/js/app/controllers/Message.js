@@ -1581,23 +1581,138 @@ angular.module('do.message', [])
         $scope.showGoodHealthConversations = true;
         var msg = [];
 
+        // var populatePage = function () {
+        //   function showGoodHealthMsg(msg) {
+        //     $scope.goodhealthmsg = [];
+        //     // msg = InboxMsgService.getClosedMessage();
+        //     if (!msg.length) {
+        //       $scope.showGoodHealthConversations = false;
+        //     }
+        //     console.log("msg show good health Msg -> -> ", msg);
+        //     for (var i = 0; i < msg.length; i++) {
+        //       $scope.goodhealthmsg.push({
+        //         id: msg[i]._id,
+        //         name: msg[i].uid.email,
+        //         subject: msg[i].sub,
+        //         time: $moment(msg[i].ct)
+        //           .fromNow()
+        //       })
+        //     }
+        //     console.log("$scope.data: ", $scope.goodhealthmsg);
+        //     $scope.columnsClosed = [{
+        //       title: 'User',
+        //       field: 'name',
+        //       visible: true,
+        //       filter: {
+        //         'name': 'text'
+        //       }
+        //     }, {
+        //       title: 'Subject',
+        //       field: 'subject',
+        //       visible: true
+        //     }, {
+        //       title: 'When',
+        //       field: 'time',
+        //       visible: true
+        //     }];
+
+        //     $scope.refreshTable = function () {
+        //       $scope['tableParams'] = {
+        //         reload: function () {},
+        //         settings: function () {
+        //           return {}
+        //         }
+        //       };
+        //       $timeout(setTable, 100)
+        //     };
+        //     $scope.refreshTable();
+
+        //     function setTable(arguments) {
+
+        //       $scope.tableParamsClosed = new ngTableParams({
+        //         page: 1, // show first page
+        //         count: 10, // count per page
+        //         filter: {
+        //           name: '' // initial filter
+        //         },
+        //         sorting: {
+        //           name: 'asc'
+        //         }
+        //       }, {
+        //         filterSwitch: true,
+        //         total: $scope.goodhealthmsg.length, // length of data
+        //         getData: function ($defer, params) {
+        //           var orderedData = params.sorting() ?
+        //             $filter('orderBy')($scope.goodhealthmsg,
+        //               params.orderBy()) :
+        //             $scope.goodhealthmsg;
+        //           params.total(orderedData.length);
+        //           $defer.resolve(orderedData.slice(
+        //             (
+        //               params.page() -
+        //               1) * params.count(),
+        //             params.page() *
+        //             params.count()));
+        //         }
+        //       });
+        //     }
+        //   }
+
+        //   var showGoodHealthMsgCallback = function (err, data) {
+        //     if (err) {
+        //       return;
+        //     }
+        //     showGoodHealthMsg(data);
+        //   }
+
+        //   MsgService.getGoodHealthConversations($scope.currApp,
+        //     showGoodHealthMsgCallback);
+
+        //   $scope.showGoodHealthThread = function (id) {
+        //     $location.path('/apps/' + $scope.currApp +
+        //       '/messages/conversations/' + id);
+
+
+        //   }
+        // }
+
         var populatePage = function () {
           function showGoodHealthMsg(msg) {
-            $scope.goodhealthmsg = [];
-            // msg = InboxMsgService.getClosedMessage();
-            if (!msg.length) {
+            if (msg.length == 0) {
               $scope.showGoodHealthConversations = false;
             }
+            $scope.goodhealthmsg = [];
+            $scope.goodHealthMessageView = msg;
+            if (!msg.length) {
+              $scope.showAvgHealthConversations = false;
+            }
             console.log("msg show good health Msg -> -> ", msg);
+
             for (var i = 0; i < msg.length; i++) {
-              $scope.goodhealthmsg.push({
+              var m = {
                 id: msg[i]._id,
                 name: msg[i].uid.email,
                 subject: msg[i].sub,
                 time: $moment(msg[i].ct)
-                  .fromNow()
-              })
-            }
+                  .fromNow(),
+                close: 'Close',
+                coid: msg[i].coId
+              };
+
+              var assignee = msg[i].assignee || {};
+
+              if (assignee.name) {
+                m.assign = 'Assigned to ' + assignee.name;
+              } else if (assignee.email) {
+                m.assign = 'Assigned to ' + assignee.email;
+              } else {
+                m.assign = 'Assign';
+              }
+
+              $scope.goodhealthmsg.push(m);
+
+            };
+
             console.log("$scope.data: ", $scope.goodhealthmsg);
             $scope.columnsClosed = [{
               title: 'User',
@@ -1614,48 +1729,34 @@ angular.module('do.message', [])
               title: 'When',
               field: 'time',
               visible: true
+            }, {
+              title: '',
+              field: 'close',
+              visible: 'true'
+            }, {
+              title: '',
+              field: 'assign',
+              visible: 'true'
             }];
 
-            $scope.refreshTable = function () {
-              $scope['tableParams'] = {
-                reload: function () {},
-                settings: function () {
-                  return {}
-                }
-              };
-              $timeout(setTable, 100)
-            };
-            $scope.refreshTable();
-
-            function setTable(arguments) {
-
-              $scope.tableParamsClosed = new ngTableParams({
-                page: 1, // show first page
-                count: 10, // count per page
-                filter: {
-                  name: '' // initial filter
-                },
-                sorting: {
-                  name: 'asc'
-                }
-              }, {
-                filterSwitch: true,
-                total: $scope.goodhealthmsg.length, // length of data
-                getData: function ($defer, params) {
-                  var orderedData = params.sorting() ?
-                    $filter('orderBy')($scope.goodhealthmsg,
-                      params.orderBy()) :
-                    $scope.goodhealthmsg;
-                  params.total(orderedData.length);
-                  $defer.resolve(orderedData.slice(
-                    (
-                      params.page() -
-                      1) * params.count(),
-                    params.page() *
-                    params.count()));
-                }
-              });
-            }
+            $scope.tableParamsClosed = new ngTableParams({
+              page: 1, // show first page
+              count: 10 // count per page
+            }, {
+              total: $scope.goodhealthmsg.length, // length of data
+              getData: function ($defer, params) {
+                $scope.pageNo = params.page();
+                $scope.pageCount = params.count();
+                console.log("page No page Count: ", $scope.pageNo,
+                  $scope.pageCount);
+                $defer.resolve($scope.goodhealthmsg.slice(
+                  (
+                    params.page() -
+                    1) * params.count(),
+                  params.page() *
+                  params.count()));
+              }
+            });
           }
 
           var showGoodHealthMsgCallback = function (err, data) {
@@ -1674,7 +1775,63 @@ angular.module('do.message', [])
 
 
           }
+
+          $scope.closeConversation = function (coId, user,
+            index) {
+            MsgService.closeConversationRequest($scope.currApp,
+              coId, function (err, user) {
+                console.log("coid: ", coId, $scope.goodhealthmsg);
+                if (err) {
+                  console.log("error");
+                  return;
+                }
+                console.log("index: ", index);
+                $scope.goodhealthmsg.splice(index, 1);
+                $scope.tableParamsClosed.reload();
+                console.log(
+                  "closing open conversation: ",
+                  $scope.goodHealthMessageView
+                  .length);
+                if ($scope.goodhealthmsg
+                  .length == 0) {
+                  $scope.showGoodHealthConversations =
+                    false;
+                }
+              });
+          }
+
+          $scope.assignTo = function (id) {
+            $scope.assignSelect = true;
+          }
+
+          $scope.team = AppService.getCurrentApp()
+            .team;
+          console.log("Appservice getCurrentApp: ",
+            AppService.getCurrentApp());
+          var assignedTo = function (err, name, index) {
+            if (err) {
+              return err;
+            }
+            console.log("$scope.goodhealthmsg -->", $scope.goodhealthmsg,
+              name, index);
+            var newIndex = ($scope.pageNo - 1) * $scope.pageCount + index;
+            console.log("new index: ", newIndex);
+            $scope.goodhealthmsg[newIndex].assign = 'Assigned to ' +
+              name;
+          }
+
+          $scope.assignToMember = function (accId, coId,
+            name,
+            index) {
+            console.log("index: name: ", index, name);
+            var data = {
+              assignee: accId
+            };
+            MsgService.assignTo($scope.currApp, coId, data,
+              index, name, assignedTo);
+          }
         }
+
 
         AppModel.getSingleApp($scope.currApp, populatePage);
 
@@ -1704,20 +1861,37 @@ angular.module('do.message', [])
         var populatePage = function () {
           function showAvgHealthMsg(msg) {
             $scope.avghealthmsg = [];
-            // msg = InboxMsgService.getClosedMessage();
+            $scope.averageHealthMsg = msg
             if (!msg.length) {
               $scope.showAvgHealthConversations = false;
             }
             console.log("msg show good health Msg -> -> ", msg);
+
             for (var i = 0; i < msg.length; i++) {
-              $scope.avghealthmsg.push({
+              var m = {
                 id: msg[i]._id,
                 name: msg[i].uid.email,
                 subject: msg[i].sub,
                 time: $moment(msg[i].ct)
-                  .fromNow()
-              })
-            }
+                  .fromNow(),
+                close: 'Close',
+                coid: msg[i].coId
+              };
+
+              var assignee = msg[i].assignee || {};
+
+              if (assignee.name) {
+                m.assign = 'Assigned to ' + assignee.name;
+              } else if (assignee.email) {
+                m.assign = 'Assigned to ' + assignee.email;
+              } else {
+                m.assign = 'Assign';
+              }
+
+              $scope.avghealthmsg.push(m);
+
+            };
+
             console.log("$scope.data: ", $scope.avghealthmsg);
             $scope.columnsClosed = [{
               title: 'User',
@@ -1734,48 +1908,34 @@ angular.module('do.message', [])
               title: 'When',
               field: 'time',
               visible: true
+            }, {
+              title: '',
+              field: 'close',
+              visible: 'true'
+            }, {
+              title: '',
+              field: 'assign',
+              visible: 'true'
             }];
 
-            $scope.refreshTable = function () {
-              $scope['tableParams'] = {
-                reload: function () {},
-                settings: function () {
-                  return {}
-                }
-              };
-              $timeout(setTable, 100)
-            };
-            $scope.refreshTable();
-
-            function setTable(arguments) {
-
-              $scope.tableParamsClosed = new ngTableParams({
-                page: 1, // show first page
-                count: 10, // count per page
-                filter: {
-                  name: '' // initial filter
-                },
-                sorting: {
-                  name: 'asc'
-                }
-              }, {
-                filterSwitch: true,
-                total: $scope.avghealthmsg.length, // length of data
-                getData: function ($defer, params) {
-                  var orderedData = params.sorting() ?
-                    $filter('orderBy')($scope.avghealthmsg,
-                      params.orderBy()) :
-                    $scope.avghealthmsg;
-                  params.total(orderedData.length);
-                  $defer.resolve(orderedData.slice(
-                    (
-                      params.page() -
-                      1) * params.count(),
-                    params.page() *
-                    params.count()));
-                }
-              });
-            }
+            $scope.tableParamsClosed = new ngTableParams({
+              page: 1, // show first page
+              count: 10 // count per page
+            }, {
+              total: $scope.avghealthmsg.length, // length of data
+              getData: function ($defer, params) {
+                $scope.pageNo = params.page();
+                $scope.pageCount = params.count();
+                console.log("page No page Count: ", $scope.pageNo,
+                  $scope.pageCount);
+                $defer.resolve($scope.avghealthmsg.slice(
+                  (
+                    params.page() -
+                    1) * params.count(),
+                  params.page() *
+                  params.count()));
+              }
+            });
           }
 
           var showAvgHealthMsgCallback = function (err, data) {
@@ -1793,6 +1953,61 @@ angular.module('do.message', [])
               '/messages/conversations/' + id);
 
 
+          }
+
+          $scope.closeConversation = function (coId, user,
+            index) {
+            MsgService.closeConversationRequest($scope.currApp,
+              coId, function (err, user) {
+                console.log("coid: ", coId, $scope.avghealthmsg);
+                if (err) {
+                  console.log("error");
+                  return;
+                }
+                console.log("index: ", index);
+                $scope.avghealthmsg.splice(index, 1);
+                $scope.tableParamsClosed.reload();
+                console.log(
+                  "closing open conversation: ",
+                  $scope.averageHealthMsg
+                  .length);
+                if ($scope.avghealthmsg
+                  .length == 0) {
+                  $scope.showAvgHealthConversations =
+                    false;
+                }
+              });
+          }
+
+          $scope.assignTo = function (id) {
+            $scope.assignSelect = true;
+          }
+
+          $scope.team = AppService.getCurrentApp()
+            .team;
+          console.log("Appservice getCurrentApp: ",
+            AppService.getCurrentApp());
+          var assignedTo = function (err, name, index) {
+            if (err) {
+              return err;
+            }
+            console.log("$scope.avghealthmsg -->", $scope.avghealthmsg,
+              name, index);
+            var newIndex = ($scope.pageNo - 1) * $scope.pageCount + index;
+            console.log("new index: ", newIndex);
+            $scope.avghealthmsg[newIndex].assign = 'Assigned to ' +
+              name;
+          }
+
+          $scope.assignToMember = function (accId, coId,
+            name,
+            index) {
+            console.log("index: name: ", index, name);
+            var data = {
+              assignee: accId
+            };
+            MsgService.assignTo($scope.currApp, coId, data,
+              index, name, assignedTo);
           }
         }
 
@@ -1821,23 +2036,135 @@ angular.module('do.message', [])
         $scope.showPoorHealthConversations = true;
         var msg = [];
 
+        // var populatePage = function () {
+        //   function showPoorHealthMsg(msg) {
+        //     $scope.poorhealthmsg = [];
+        //     // msg = InboxMsgService.getClosedMessage();
+        //     if (!msg.length) {
+        //       $scope.showPoorHealthConversations = false;
+        //     }
+        //     console.log("msg show poor health Msg -> -> ", msg);
+        //     for (var i = 0; i < msg.length; i++) {
+        //       $scope.poorhealthmsg.push({
+        //         id: msg[i]._id,
+        //         name: msg[i].uid.email,
+        //         subject: msg[i].sub,
+        //         time: $moment(msg[i].ct)
+        //           .fromNow()
+        //       })
+        //     }
+        //     console.log("$scope.data: ", $scope.poorhealthmsg);
+        //     $scope.columnsClosed = [{
+        //       title: 'User',
+        //       field: 'name',
+        //       visible: true,
+        //       filter: {
+        //         'name': 'text'
+        //       }
+        //     }, {
+        //       title: 'Subject',
+        //       field: 'subject',
+        //       visible: true
+        //     }, {
+        //       title: 'When',
+        //       field: 'time',
+        //       visible: true
+        //     }];
+
+        //     $scope.refreshTable = function () {
+        //       $scope['tableParams'] = {
+        //         reload: function () {},
+        //         settings: function () {
+        //           return {}
+        //         }
+        //       };
+        //       $timeout(setTable, 100)
+        //     };
+        //     $scope.refreshTable();
+
+        //     function setTable(arguments) {
+
+        //       $scope.tableParamsClosed = new ngTableParams({
+        //         page: 1, // show first page
+        //         count: 10, // count per page
+        //         filter: {
+        //           name: '' // initial filter
+        //         },
+        //         sorting: {
+        //           name: 'asc'
+        //         }
+        //       }, {
+        //         filterSwitch: true,
+        //         total: $scope.poorhealthmsg.length, // length of data
+        //         getData: function ($defer, params) {
+        //           var orderedData = params.sorting() ?
+        //             $filter('orderBy')($scope.poorhealthmsg,
+        //               params.orderBy()) :
+        //             $scope.poorhealthmsg;
+        //           params.total(orderedData.length);
+        //           $defer.resolve(orderedData.slice(
+        //             (
+        //               params.page() -
+        //               1) * params.count(),
+        //             params.page() *
+        //             params.count()));
+        //         }
+        //       });
+        //     }
+        //   }
+
+        //   var showPoorHealthMsgCallback = function (err, data) {
+        //     if (err) {
+        //       return;
+        //     }
+        //     showPoorHealthMsg(data);
+        //   }
+
+        //   MsgService.getPoorHealthConversations($scope.currApp,
+        //     showPoorHealthMsgCallback);
+
+        //   $scope.showPoorHealthThread = function (id) {
+        //     $location.path('/apps/' + $scope.currApp +
+        //       '/messages/conversations/' + id);
+
+
+        //   }
+        // }
+
         var populatePage = function () {
           function showPoorHealthMsg(msg) {
             $scope.poorhealthmsg = [];
-            // msg = InboxMsgService.getClosedMessage();
+            $scope.poorHealthMsgView = msg
             if (!msg.length) {
               $scope.showPoorHealthConversations = false;
             }
             console.log("msg show poor health Msg -> -> ", msg);
+
             for (var i = 0; i < msg.length; i++) {
-              $scope.poorhealthmsg.push({
+              var m = {
                 id: msg[i]._id,
                 name: msg[i].uid.email,
                 subject: msg[i].sub,
                 time: $moment(msg[i].ct)
-                  .fromNow()
-              })
-            }
+                  .fromNow(),
+                close: 'Close',
+                coid: msg[i].coId
+              };
+
+              var assignee = msg[i].assignee || {};
+
+              if (assignee.name) {
+                m.assign = 'Assigned to ' + assignee.name;
+              } else if (assignee.email) {
+                m.assign = 'Assigned to ' + assignee.email;
+              } else {
+                m.assign = 'Assign';
+              }
+
+              $scope.poorhealthmsg.push(m);
+
+            };
+
             console.log("$scope.data: ", $scope.poorhealthmsg);
             $scope.columnsClosed = [{
               title: 'User',
@@ -1854,48 +2181,34 @@ angular.module('do.message', [])
               title: 'When',
               field: 'time',
               visible: true
+            }, {
+              title: '',
+              field: 'close',
+              visible: 'true'
+            }, {
+              title: '',
+              field: 'assign',
+              visible: 'true'
             }];
 
-            $scope.refreshTable = function () {
-              $scope['tableParams'] = {
-                reload: function () {},
-                settings: function () {
-                  return {}
-                }
-              };
-              $timeout(setTable, 100)
-            };
-            $scope.refreshTable();
-
-            function setTable(arguments) {
-
-              $scope.tableParamsClosed = new ngTableParams({
-                page: 1, // show first page
-                count: 10, // count per page
-                filter: {
-                  name: '' // initial filter
-                },
-                sorting: {
-                  name: 'asc'
-                }
-              }, {
-                filterSwitch: true,
-                total: $scope.poorhealthmsg.length, // length of data
-                getData: function ($defer, params) {
-                  var orderedData = params.sorting() ?
-                    $filter('orderBy')($scope.poorhealthmsg,
-                      params.orderBy()) :
-                    $scope.poorhealthmsg;
-                  params.total(orderedData.length);
-                  $defer.resolve(orderedData.slice(
-                    (
-                      params.page() -
-                      1) * params.count(),
-                    params.page() *
-                    params.count()));
-                }
-              });
-            }
+            $scope.tableParamsClosed = new ngTableParams({
+              page: 1, // show first page
+              count: 10 // count per page
+            }, {
+              total: $scope.poorhealthmsg.length, // length of data
+              getData: function ($defer, params) {
+                $scope.pageNo = params.page();
+                $scope.pageCount = params.count();
+                console.log("page No page Count: ", $scope.pageNo,
+                  $scope.pageCount);
+                $defer.resolve($scope.poorhealthmsg.slice(
+                  (
+                    params.page() -
+                    1) * params.count(),
+                  params.page() *
+                  params.count()));
+              }
+            });
           }
 
           var showPoorHealthMsgCallback = function (err, data) {
@@ -1908,11 +2221,66 @@ angular.module('do.message', [])
           MsgService.getPoorHealthConversations($scope.currApp,
             showPoorHealthMsgCallback);
 
-          $scope.showPoorHealthThread = function (id) {
+          $scope.showAvgHealthThread = function (id) {
             $location.path('/apps/' + $scope.currApp +
               '/messages/conversations/' + id);
 
 
+          }
+
+          $scope.closeConversation = function (coId, user,
+            index) {
+            MsgService.closeConversationRequest($scope.currApp,
+              coId, function (err, user) {
+                console.log("coid: ", coId, $scope.poorhealthmsg);
+                if (err) {
+                  console.log("error");
+                  return;
+                }
+                console.log("index: ", index);
+                $scope.poorhealthmsg.splice(index, 1);
+                $scope.tableParamsClosed.reload();
+                console.log(
+                  "closing open conversation: ",
+                  $scope.poorHealthMsgView
+                  .length);
+                if ($scope.poorhealthmsg
+                  .length == 0) {
+                  $scope.showPoorHealthConversations =
+                    false;
+                }
+              });
+          }
+
+          $scope.assignTo = function (id) {
+            $scope.assignSelect = true;
+          }
+
+          $scope.team = AppService.getCurrentApp()
+            .team;
+          console.log("Appservice getCurrentApp: ",
+            AppService.getCurrentApp());
+          var assignedTo = function (err, name, index) {
+            if (err) {
+              return err;
+            }
+            console.log("$scope.poorhealthmsg -->", $scope.poorhealthmsg,
+              name, index);
+            var newIndex = ($scope.pageNo - 1) * $scope.pageCount + index;
+            console.log("new index: ", newIndex);
+            $scope.poorhealthmsg[newIndex].assign = 'Assigned to ' +
+              name;
+          }
+
+          $scope.assignToMember = function (accId, coId,
+            name,
+            index) {
+            console.log("index: name: ", index, name);
+            var data = {
+              assignee: accId
+            };
+            MsgService.assignTo($scope.currApp, coId, data,
+              index, name, assignedTo);
           }
         }
 
