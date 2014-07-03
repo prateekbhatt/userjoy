@@ -147,6 +147,49 @@ exports.sendAdminConversation = function (options, cb) {
 }
 
 /**
+ * Sends Email to Team members except the user who closes the conversation
+ *
+ * @param {object} options
+ * @param {function} cb callback
+ */
+
+exports.sendTeamClosedConversation = function (options, cb) {
+  console.log('\n\n\n sendTeamClosedConversation called with', options, cb);
+  var mailer = new Mailer(options);
+  mailer.subject = options.locals.subject;
+  mailer.template = 'email-close-conversation.ejs';
+  mailer.send(cb);
+}
+
+/**
+ * Sends Email to Team members except the user who reopens the conversation
+ *
+ * @param {object} options
+ * @param {function} cb callback
+ */
+
+exports.sendTeamReopenConversation = function (options, cb) {
+  var mailer = new Mailer(options);
+  mailer.subject = options.locals.subject;
+  mailer.template = 'email-reopen-conversation.ejs';
+  mailer.send(cb);
+}
+
+/**
+ * Sends Email to Admin when a user replies
+ *
+ * @param {object} options
+ * @param {function} cb callback
+ */
+
+exports.sendTeamReplyConversation = function (options, cb) {
+  var mailer = new Mailer(options);
+  mailer.subject = options.locals.subject;
+  mailer.template = 'email-reply.ejs';
+  mailer.send(cb);
+}
+
+/**
  * FOR TESTING PURPOSE
  *
  * @param {object} options
