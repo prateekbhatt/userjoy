@@ -67,6 +67,13 @@ var AppSchema = new Schema({
   },
 
 
+  // to show or not to show message box on website
+  showMessageBox: {
+    type: Boolean,
+    default: true
+  },
+
+
   team: [TeamMemberSchema],
 
 
