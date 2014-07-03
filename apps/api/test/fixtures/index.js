@@ -77,6 +77,7 @@ var accounts = {
     first: {
       aid: null,
       email: 'prattbhatt@gmail.com',
+      status: 'free',
       meta: [{
         k: 'name',
         v: 'Prat'
