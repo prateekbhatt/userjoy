@@ -69,6 +69,10 @@ router
         uid: req.params.uid,
         aid: req.params.aid
       })
+      .populate({
+        path: 'creator',
+        select: 'name'
+      })
       .sort({
         ct: -1
       })

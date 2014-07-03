@@ -129,8 +129,7 @@ var UserSchema = new Schema({
 
 
   joined: {
-    type: Date,
-    default: Date.now
+    type: Date
   },
 
 
@@ -159,8 +158,7 @@ var UserSchema = new Schema({
 
   // last session of user
   lastSession: {
-    type: Date,
-    default: Date.now
+    type: Date
   },
 
 

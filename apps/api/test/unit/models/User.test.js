@@ -83,7 +83,7 @@ describe('Model User', function () {
 
         expect(lastSessionAfter)
           .to.be.a('number')
-          .and.to.be.above(lastSessionBefore);
+          .and.to.be.above(0);
 
         expect(usr._id)
           .to.eql(existingUser._id);

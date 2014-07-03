@@ -155,10 +155,6 @@ describe('Resource /apps/:aid/users', function () {
             .to.have.property('sub');
 
           expect(res.body[0])
-            .to.have.property('unread')
-            .that.is.a('boolean');
-
-          expect(res.body[0])
             .to.have.property('closed');
 
           done();
