@@ -129,7 +129,6 @@ var accounts = {
       }],
       closed: true,
       sub: 'First Conversation!',
-      toRead: true,
       uid: ObjectId()
     }
   };

@@ -412,7 +412,6 @@ as meta property)
 - closed (boolean)
 - ct
 - sub
-- toRead (boolean)
 - uid
 - ut
 

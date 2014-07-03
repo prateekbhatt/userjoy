@@ -123,9 +123,27 @@ router
         ct: -1
       })
       .limit(10)
+      .lean()
       .exec(function (err, conversations) {
 
         if (err) return next(err);
+
+
+        // add unread status to conversations
+        // for conversations with messages from user which are not seen, add
+        // unread status as true, else false
+        conversations = _.map(conversations, function (c) {
+
+          var unreadMsg = _.find(c.messages, function (m) {
+            if (m.from === 'user' && !m.seen) {
+              return true;
+            }
+          });
+
+          c.unread = !_.isEmpty(unreadMsg);
+          return c;
+        });
+
 
         res
           .status(200)
