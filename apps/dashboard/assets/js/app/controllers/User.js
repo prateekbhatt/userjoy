@@ -535,7 +535,7 @@ angular.module('do.users', [])
             name: 'equals',
             key: 'eq'
           }, {
-            name: 'greater than',
+            name: 'more than',
             key: 'gt'
           }, {
             name: 'less than',
@@ -571,7 +571,8 @@ angular.module('do.users', [])
             evt) {
             $scope.filters[parentindex].name = $scope.hasDoneItems[
               index].name;
-            $scope.filters[parentindex].query = $scope.hasDoneItems[index].query;
+            $scope.filters[parentindex].query = $scope.hasDoneItems[index]
+              .query;
           }
 
           $scope.changeFilterAttribute = function (
@@ -579,7 +580,7 @@ angular.module('do.users', [])
             evt) {
 
             if ($scope.attributes[index].name == 'joined' || $scope.attributes[
-              index].name == 'lastSeen') {
+              index].name == 'lastSession') {
               $scope.filters[parentindex].showPayingStatus = false;
               $scope.filters[parentindex].showHealthStatus = false;
               $scope.filters[parentindex].showDatePicker = true;
@@ -766,11 +767,11 @@ angular.module('do.users', [])
               .countOfItems[
                 index].name;
             $scope.filters[parentindex].query = $scope.countOfItems[
-            index].query;
+              index].query;
             $scope.filters[parentindex].type = $scope.countOfItems[
               index].type;
             $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
-            $scope.filters[parentindex].optext = 'greater than';
+            $scope.filters[parentindex].optext = 'more than';
             $scope.filters[parentindex].op = 'gt';
             $scope.filters[parentindex].val = '';
           }
@@ -1001,6 +1002,7 @@ angular.module('do.users', [])
             $scope.segmentClicked = false;
             $scope.showUpdatePopover = false;
             $scope.selectedIndex = '';
+            $scope.segmentName = '';
             $scope.showPopover = false;
             $scope.showSpinner = true;
             $scope.showErrorOnInput = true;
@@ -1054,7 +1056,7 @@ angular.module('do.users', [])
                   i].joined)
                   .format("MMMM Do YYYY"),
                 health: UserList.getUsers()[i].health,
-                lastsession: moment(UserList.getUsers()[i].lastSeen)
+                lastsession: moment(UserList.getUsers()[i].lastSession)
                   .format("MMMM Do YYYY"),
                 unsubscribed: UserList.getUsers()[
                   i].unsubscribed,
@@ -1416,15 +1418,30 @@ angular.module('do.users', [])
               $scope.filterValueText = '';
               var filterValueText = '';
               for (var j = 0; j < $scope.healthStatusValuesname.length; j++) {
-                if (getFilters[i].val === $scope.healthStatusValuesname[i]
+                console.log("get filters val healthStatusValuesname key: ",
+                  getFilters[i].val, $scope.healthStatusValuesname[i].key,
+                  i);
+                if (getFilters[i].val == $scope.healthStatusValuesname[j]
                   .key) {
-                  $scope.filterValueText = $scope.healthStatusValuesname[i]
+                  filterValueText = $scope.healthStatusValuesname[j]
                     .name;
+                  console.log("inside for loop filterValueText: ",
+                    filterValueText)
                 }
-                break;
+                // break;
               };
+
+              for (var k = 0; k < $scope.payingStatusValues.length; k++) {
+                console.log("getFilters ??? null: ", getFilters[i], i);
+                if (getFilters[i].val == $scope.payingStatusValues[k].key) {
+                  filterStatusValueText = $scope.payingStatusValues[k].name;
+                }
+              };
+
+              console.log("filterValueText: ", filterValueText);
               var buttonText = '';
               var btnName = '';
+              var btnQuery = '';
               var chkMethod = false;
               var operationText = '';
               console.log("op text: ", getFilters[i].op);
@@ -1439,6 +1456,29 @@ angular.module('do.users', [])
                       j].name;
                   }
                 };
+              }
+              if (getFilters[i].method == 'hasdone' || getFilters[i].method ==
+                'hasnotdone' || getFilters[i].method == 'count') {
+                if (getFilters[i].type == 'link') {
+                  btnQuery = 'Clicked on ' + getFilters[i].name;
+                }
+
+                if (getFilters[i].type == 'form') {
+                  btnQuery = 'Submitted form ' + getFilters[i].name;
+                }
+
+                if (getFilters[i].type == 'page') {
+                  btnQuery = 'Viewed ' + getFilters[i].name;
+                }
+
+                if (getFilters[i].type == 'auto') {
+                  btnQuery = getFilters[i].name;
+                }
+
+                if (getFilters[i].type == 'track') {
+                  btnQuery = getFilters[i].name;
+                }
+
               }
               if (getFilters[i].method == 'hasdone') {
                 showHealthStatus = false;
@@ -1472,8 +1512,7 @@ angular.module('do.users', [])
                 showScore = false;
                 showDatePicker = false;
                 showOtherAttributesQuery = false;
-                buttonText = "Count of " + getFilters[
-                  i].name;
+                buttonText = "Count of " + btnQuery;
                 btnName = getFilters[i].name;
                 chkMethod = true;
                 isEvent = true;
@@ -1493,15 +1532,16 @@ angular.module('do.users', [])
                   showScore = false;
                   showDatePicker = false;
                   showOtherAttributesQuery = false;
-                  filterValueText = $scope.filterValueText;
+                  filterValueText = filterValueText;
                 } else if (getFilters[i].name == 'status') {
                   showHealthStatus = false;
                   showPayingStatus = true;
                   showScore = false;
                   showDatePicker = false;
                   showOtherAttributesQuery = false;
+                  filterValueText = filterStatusValueText;
                 } else if (getFilters[i].name == 'joined' || getFilters[i]
-                  .name == 'last seen') {
+                  .name == 'lastSession') {
                   showHealthStatus = false;
                   showPayingStatus = false;
                   showScore = false;
@@ -1521,11 +1561,13 @@ angular.module('do.users', [])
                 timeRange = '';
                 timeRangeValue = '';
               }
+              console.log("operation text: ", operationText);
               $scope.filters.push({
                 method: getFilters[i].method,
                 btntext: buttonText,
                 checkMethod: chkMethod,
                 name: btnName,
+                query: btnQuery,
                 op: getFilters[i].op,
                 optext: operationText,
                 val: getFilters[i].val,
@@ -1872,6 +1914,7 @@ angular.module('do.users', [])
       .then(function (currentApp) {
 
         var populatePage = function (err, data, uid) {
+          console.log("user profile data: ", data)
           function getRandomColor() {
             var keys = _.keys(data);
             $scope.userdata = [];
@@ -1907,6 +1950,12 @@ angular.module('do.users', [])
                 '_id' && prop != 'unsubscribed') {
                 if (prop == 'lastSeen') {
                   prop = 'Last Seen';
+                  value = $moment(value)
+                    .fromNow()
+                }
+
+                if (prop == 'lastSession') {
+                  prop = 'Last Session';
                   value = $moment(value)
                     .fromNow()
                 }
@@ -2181,7 +2230,7 @@ angular.module('do.users', [])
             name: data.name,
             profilegravatar: gravatar,
             profilesrc: src,
-            lastSession: data.lastSeen
+            lastSession: data.lastSession
           }
 
           $scope.userDataList = [];
@@ -2205,7 +2254,7 @@ angular.module('do.users', [])
           $scope.os = 'Ubuntu';
           $scope.browser = 'Mozilla Firefox';
           $scope.events = [];
-          console.log("$scope.user.lastSeen: ", $scope.user.lastSession);
+          console.log("$scope.user.lastSession: ", $scope.user.lastSession);
           $scope.toTime = $moment($scope.user.lastSession)
             .endOf('day')
             .unix();
@@ -2436,9 +2485,10 @@ angular.module('do.users', [])
                 when: $moment(InboxMsgService.getLatestConversations()[
                   i].ct)
                   .fromNow(),
-                opened: InboxMsgService.getLatestConversations()[
-                  i].toRead,
-                replied: false // TODO: get status from backend when ready
+                closed: InboxMsgService.getLatestConversations()[
+                  i].closed,
+                // unread: InboxMsgService.getLatestConversations()[
+                //   i].unread // TODO: get status from backend when ready
               })
             };
           }
