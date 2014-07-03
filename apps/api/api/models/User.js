@@ -310,11 +310,23 @@ UserSchema.statics.findOrCreate = function (aid, user, cb) {
   setOnInsert.score = DEFAULT_SCORE;
 
 
+  var set = {
+    lastSession: Date.now()
+  };
+
+
+  // if there is billing status, then it should be set every time the findOrCreate
+  // query is run. Thats why we will move the billing status key from setOnInsert
+  // to set
+  if (billingStatus) {
+    set.status = billingStatus;
+    delete setOnInsert.status;
+  }
+
+
   var update = {
     $setOnInsert: setOnInsert,
-    $set: {
-      lastSession: Date.now()
-    }
+    $set: set
   };
 
   var options = {
