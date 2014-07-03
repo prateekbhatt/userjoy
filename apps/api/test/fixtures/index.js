@@ -45,7 +45,11 @@ var accounts = {
   first: {
     name: 'Prateek',
     email: 'prattbhatt@gmail.com',
-    password: 'testtest'
+    password: 'testtest',
+
+    // set email verified as true for easily testing cases where logged in
+    // required
+    emailVerified: true
   },
 
   second: {
