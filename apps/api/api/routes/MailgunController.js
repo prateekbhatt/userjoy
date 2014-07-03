@@ -215,7 +215,6 @@ router
 
             ],
             sub: subject,
-            toRead: true,
             uid: user._id
           };
 
@@ -369,7 +368,6 @@ router
 
               ],
               sub: subject,
-              toRead: true,
               uid: user._id
             };
 
