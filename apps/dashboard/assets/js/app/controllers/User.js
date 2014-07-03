@@ -2442,6 +2442,7 @@ angular.module('do.users', [])
 
             $scope.notes.unshift({
               text: lastNote.note,
+              creator: lastNote.creator.name,
               when: $moment(lastNote.ct)
                 .fromNow()
             });
@@ -2503,6 +2504,7 @@ angular.module('do.users', [])
             for (var i = 0; i < length; i++) {
               $scope.notes.push({
                 text: notes[i].note,
+                creator: notes[i].creator.name,
                 when: $moment(notes[i].ct)
                   .fromNow()
               })

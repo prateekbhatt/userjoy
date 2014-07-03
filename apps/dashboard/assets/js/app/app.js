@@ -28,6 +28,7 @@ var app = angular.module('dodatado', [
   'http-auth-interceptor',
   'angular-momentjs',
   'do.automate',
+  'toggle-switch',
 ])
 
 .directive('fallbackSrc', function () {
