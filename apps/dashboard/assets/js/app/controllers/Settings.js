@@ -448,20 +448,22 @@ angular.module('do.settings', [])
 // ])
 
 .controller('appSettingsMessagesCtrl', ['$scope', '$log', '$state',
-  '$stateParams', 'AppModel', 'AppService', 'CurrentAppService',
+  '$stateParams', 'AppModel', 'AppService', 'CurrentAppService', '$timeout',
   function ($scope, $log, $state, $stateParams, AppModel, AppService,
-    CurrentAppService) {
+    CurrentAppService, $timeout) {
 
 
     CurrentAppService.getCurrentApp()
       .then(function (currentApp) {
 
         $scope.currApp = $stateParams.id;
+        var initializing = true;
         var populatePage = function () {
           $scope.color = AppService.getCurrentApp()
             .color;
           console.log("app color: ", $scope.color);
-          $scope.switchStatus = AppService.getCurrentApp().showMessageBox;
+          $scope.switchStatus = AppService.getCurrentApp()
+            .showMessageBox;
           if ($scope.color.toUpperCase() === '#39b3d7'.toUpperCase()) {
             $scope.btnInfoWidth = '40px';
             $scope.btnInfoHeight = '40px';
@@ -570,10 +572,19 @@ angular.module('do.settings', [])
           }
 
           $scope.$watch('switchStatus', function () {
-            console.log("switchState: ", $scope.switchStatus);
-            if ($scope.switchStatus != null && $scope.switchStatus != AppService.getCurrentApp().showMessageBox) {
-              AppModel.showFeedBackMsg($scope.currApp, $scope.switchStatus,
-                toggleSwitch);
+            console.log("switchState: ", $scope.switchStatus, AppService
+              .getCurrentApp()
+              .showMessageBox);
+            if ($scope.switchStatus != null) {
+              if (initializing) {
+                $timeout(function () {
+                  initializing = false;
+                });
+              } else {
+                AppModel.showFeedBackMsg($scope.currApp, $scope.switchStatus,
+                  toggleSwitch);
+                // do whatever you were going to do
+              }
             }
 
           })
