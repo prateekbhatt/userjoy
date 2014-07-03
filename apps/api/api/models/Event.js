@@ -128,7 +128,8 @@ EventSchema.index({
   aid: 1,
   cid: 1,
   type: 1,
-  uid: 1
+  uid: 1,
+  ct: 1
 });
 
 
