@@ -126,6 +126,7 @@ angular.module('do.automate', [])
               activeMessage = 'Activate';
             }
             $scope.automessages.push({
+              segment: AutoMsgService.getAllAutoMsg()[i].sid.name,
               title: AutoMsgService.getAllAutoMsg()[
                 i].title,
               type: AutoMsgService.getAllAutoMsg()[i]
@@ -583,16 +584,12 @@ angular.module('do.automate', [])
 
             ejs.open = '{{';
             ejs.close = '}}';
-            if(string) {
+            if (string) {
               var body = string.replace(/&#34;/g, '"');
               var html = ejs.render(body, locals);
               console.log("html: ", html);
               return html;
             }
-            // };
-            // console.log("notification body: ", $scope.notificationBody)
-
-            // return $scope.notificationBody;
           }
 
           modelsSegment.getSegment($scope.currApp, $scope.segid, cb);
@@ -990,6 +987,25 @@ angular.module('do.automate', [])
           '.jpg?d=mm';
       }
 
+      $scope.preview = function (string) {
+        var locals = {
+          user: {
+            name: $scope.sender,
+            plan: 'enterprise',
+            email: $scope.senderEmail
+          }
+        }
+
+        ejs.open = '{{';
+        ejs.close = '}}';
+        if (string) {
+          var body = string.replace(/&#34;/g, '"');
+          var html = ejs.render(body, locals);
+          console.log("html: ", html);
+          return html;
+        }
+      }
+
       $scope.gravatar = get_gravatar($scope.senderEmail, 60);
       if (AutoMsgService.getSingleAutoMsg()
         .type === 'notification') {
@@ -1153,6 +1169,25 @@ angular.module('do.automate', [])
         $scope.enableSendTest = true;
         $location.path('/apps/' + $scope.currApp +
           '/messages/automate/live/' + $scope.msgId);
+      }
+
+      $scope.preview = function (string) {
+        var locals = {
+          user: {
+            name: AutoMsgService.getSingleAutoMsg().sender.name,
+            plan: 'enterprise',
+            email: AutoMsgService.getSingleAutoMsg().sender.email
+          }
+        }
+
+        ejs.open = '{{';
+        ejs.close = '}}';
+        if (string) {
+          var body = string.replace(/&#34;/g, '"');
+          var html = ejs.render(body, locals);
+          console.log("html: ", html);
+          return html;
+        }
       }
 
       $scope.sendTestEmail = function () {
@@ -1426,6 +1461,25 @@ angular.module('do.automate', [])
         $scope.sender = AutoMsgService.getSingleAutoMsg()
           .sender.name;
         $scope.gravatar = get_gravatar($scope.senderEmail, 60);
+
+        $scope.preview = function (string) {
+        var locals = {
+          user: {
+            name: $scope.sender,
+            plan: 'enterprise',
+            email: $scope.senderEmail
+          }
+        }
+
+        ejs.open = '{{';
+        ejs.close = '}}';
+        if (string) {
+          var body = string.replace(/&#34;/g, '"');
+          var html = ejs.render(body, locals);
+          console.log("html: ", html);
+          return html;
+        }
+      }
 
         $scope.colorTheme = AppService.getCurrentApp()
           .color;
