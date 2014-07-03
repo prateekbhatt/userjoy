@@ -158,7 +158,7 @@ var UserSchema = new Schema({
 
 
   // last session of user
-  lastSeen: {
+  lastSession: {
     type: Date,
     default: Date.now
   },
@@ -240,7 +240,7 @@ UserSchema.pre('save', function (next) {
 /**
  * If the user exists, fetch the user, else create a new user
  *
- * If the user exists, update the lastSeen timestamp to now
+ * If the user exists, update the lastSession timestamp to now
  *
  * @param {String} app id
  * @param {Object} user object
@@ -315,7 +315,7 @@ UserSchema.statics.findOrCreate = function (aid, user, cb) {
   var update = {
     $setOnInsert: setOnInsert,
     $set: {
-      lastSeen: Date.now()
+      lastSession: Date.now()
     }
   };
 
@@ -427,7 +427,7 @@ UserSchema.statics.setScore = function (uid, score, cb) {
 
 
 /**
- * Updates the lastSeen timestamp of the user to the given or the current time
+ * Updates the lastSession timestamp of the user to the given or the current time
  *
  * @param {string} uid user-id
  * @param {function} cb callback (optional)
@@ -436,7 +436,7 @@ UserSchema.statics.setScore = function (uid, score, cb) {
 UserSchema.statics.updateLastSeen = function (uid, cb) {
 
   var update = {
-    lastSeen: Date.now()
+    lastSession: Date.now()
   };
 
   User.findByIdAndUpdate(uid, update, function (err) {

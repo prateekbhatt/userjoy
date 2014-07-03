@@ -398,7 +398,7 @@ describe('Resource /query', function () {
             expect(res.body.userAttributes)
               .to.be.an('array')
               .that.deep.equals(['user_id', 'email', 'browser',
-                'country', 'health', 'joined', 'lastSeen', 'os',
+                'country', 'health', 'joined', 'lastSession', 'os',
                 'score', 'status'
               ]);
 

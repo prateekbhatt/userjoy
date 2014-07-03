@@ -187,7 +187,7 @@ UserNote      |                         | notes created by team members about a 
 - score (latest engagement score of user, defaults to 50 for new user)
 - status
 - lastContactedAt
-- lastSeen (timestamp of last session of user)
+- lastSession (timestamp of last session of user)
 - lastHeardAt
 - ip
 - x tags [] Stores tags for categorizing users
