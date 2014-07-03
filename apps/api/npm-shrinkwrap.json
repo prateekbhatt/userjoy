@@ -390,6 +390,11 @@
         }
       }
     },
+    "i18n-iso-countries": {
+      "version": "0.3.0",
+      "from": "i18n-iso-countries@",
+      "resolved": "https://registry.npmjs.org/i18n-iso-countries/-/i18n-iso-countries-0.3.0.tgz"
+    },
     "include-all": {
       "version": "0.1.6",
       "from": "include-all@0.1.6",

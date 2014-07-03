@@ -69,6 +69,10 @@ router
         uid: req.params.uid,
         aid: req.params.aid
       })
+      .populate({
+        path: 'creator',
+        select: 'name'
+      })
       .sort({
         ct: -1
       })
@@ -95,15 +99,25 @@ router
   .route('/:aid/users/:uid/notes')
   .post(function (req, res, next) {
 
+    var creatorId = req.user._id;
+    var creatorName = req.user.name;
+
     UserNote
       .create({
         aid: req.params.aid,
-        creator: req.user._id,
+        creator: creatorId,
         note: req.body.note,
         uid: req.params.uid,
       }, function (err, note) {
 
         if (err) return next(err);
+
+        if (note.toJSON) note = note.toJSON();
+
+        note.creator = {
+          _id: creatorId,
+          name: creatorName
+        };
 
         res
           .status(201)

@@ -5,6 +5,7 @@
 var _ = require('lodash');
 var async = require('async');
 var cors = require('cors');
+var countries = require("i18n-iso-countries");
 var geoip = require('geoip-lite');
 var router = require('express')
   .Router();
@@ -207,7 +208,13 @@ router
 
         // get location info from ip
         var loc = geoip.lookup(user.ip);
-        if (_.isObject(loc) && loc.country) user.country = loc.country;
+
+        if (_.isObject(loc) && loc.country) {
+
+          // REF: https://github.com/cinovo/node-i18n-iso-countries#get-the-name-of-a-country-by-its-iso-3166-1-alpha-2-alpha-3-or-numeric-code
+          var fullCountryName = countries.getName(loc.country, 'en');
+          user.country = fullCountryName || loc.country;
+        }
       }
 
     }

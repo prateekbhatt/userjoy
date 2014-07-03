@@ -123,6 +123,7 @@ router
         ct: -1
       })
       .limit(10)
+      .lean()
       .exec(function (err, conversations) {
 
         if (err) return next(err);

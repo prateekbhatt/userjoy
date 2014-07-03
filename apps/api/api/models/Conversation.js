@@ -138,13 +138,6 @@ var ConversationSchema = new Schema({
   },
 
 
-  // true if the conversation has got an unread message from the user
-  toRead: {
-    type: Boolean,
-    default: false
-  },
-
-
   // user Id
   uid: {
     type: Schema.Types.ObjectId,
@@ -223,44 +216,6 @@ ConversationSchema.statics.reopened = function (coId, cb) {
   var update = {
     $set: {
       closed: false,
-      ut: Date.now()
-    }
-  };
-
-  Conversation.findByIdAndUpdate(coId, update, cb);
-};
-
-
-/**
- * Marks conversation as read ('toRead' = false)
- *
- * @param {string} coId conversation-id
- * @param {function} cb callback
- */
-
-ConversationSchema.statics.isRead = function (coId, cb) {
-  var update = {
-    $set: {
-      toRead: false,
-      ut: Date.now()
-    }
-  };
-
-  Conversation.findByIdAndUpdate(coId, update, cb);
-};
-
-
-/**
- * Marks conversation as unread ('toRead' = true)
- *
- * @param {string} coId conversation-id
- * @param {function} cb callback
- */
-
-ConversationSchema.statics.toBeRead = function (coId, cb) {
-  var update = {
-    $set: {
-      toRead: true,
       ut: Date.now()
     }
   };
@@ -433,7 +388,7 @@ function openedByTeamMember(coId, cb) {
       cb();
     });
 
-};
+}
 
 ConversationSchema.statics.openedByTeamMember = openedByTeamMember;
 

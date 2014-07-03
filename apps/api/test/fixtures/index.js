@@ -45,7 +45,11 @@ var accounts = {
   first: {
     name: 'Prateek',
     email: 'prattbhatt@gmail.com',
-    password: 'testtest'
+    password: 'testtest',
+
+    // set email verified as true for easily testing cases where logged in
+    // required
+    emailVerified: true
   },
 
   second: {
@@ -73,6 +77,7 @@ var accounts = {
     first: {
       aid: null,
       email: 'prattbhatt@gmail.com',
+      status: 'free',
       meta: [{
         k: 'name',
         v: 'Prat'
@@ -125,7 +130,6 @@ var accounts = {
       }],
       closed: true,
       sub: 'First Conversation!',
-      toRead: true,
       uid: ObjectId()
     }
   };

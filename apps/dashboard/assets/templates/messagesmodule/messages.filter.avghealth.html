@@ -23,7 +23,7 @@
                                 <a ui-sref="message.template"><span class="glyphicon glyphicon-list-alt"></span> Choose Templates</a>
                             </li> -->
                             <li>
-                                <a style="cursor: default"><i class="fa fa-paperclip"></i> Smart Filters
+                                <span style="cursor: default; color: #333;"><i class="fa fa-paperclip"></i> Smart Filters
                                 <ul style="list-style: none;">
                                     <li>
                                         <div class="progress" style="margin-left: 10px;">
@@ -80,7 +80,7 @@
                                         </div>
                                     </li> -->
                                 </ul>
-                                </a>
+                                </span>
                             </li>
                         </ul>
                         <!-- /#side-menu -->
@@ -95,12 +95,12 @@
                         <div class="col-lg-12">
                             <div class="panel panel-default">
                                 <div class="panel-heading">
-                                    <i class="fa fa-comments"></i> Conversations with users in Average Health state
+                                    <i class="fa fa-comments"></i> Open Messages with users in Average Health state
                                 </div>
                                 <!-- /.panel-heading -->
                                 <div>
                                     <div class="row">
-                                        <div ng-show="!showAvgHealthConversations" class="text-center"><br><span> There are no conversations for this filter</span><br><br></div>
+                                        <div ng-show="!showAvgHealthConversations" class="text-center"><br><span> There are no messages for this filter</span><br><br></div>
                                         <div class="col-lg-12" ng-show="showAvgHealthConversations">
                                             <div class="table-responsive">
                                                 <table ng-table="tableParamsClosed" show-filter="true" class="table table-bordered table-hover table-striped">
@@ -129,6 +129,19 @@
                                                                     <span>{{user.time}}</span>
                                                                 </td>
                                                                 <!-- <td ng-repeat="column in columnsInbox" ng-show="column.visible" sortable="column.field" class="text-center"></td> -->
+                                                                <td data-title="''" style="text-align:center">
+                                                                <a href="#" ng-click="closeConversation(user.id, user, $index)">Close</a>
+                                                            </td>
+                                                            <td data-title="''" style="text-align:center">
+                                                                <li class="dropdown" style="list-style: none;">
+                                                                    <a href="#" ng-click="assignTo(user.id)" class="dropdown-toggle">{{user.assign}}</a>
+                                                                    <ul ng-show="assignSelect" class="dropdown-menu" role="menu" style="left:auto; right: 0">
+                                                                        <li role="presentation">
+                                                                            <a style="cursor: pointer" ng-repeat="member in team" ng-click="assignToMember(member.accid._id, user.id, member.accid.name, $parent.$index)">{{member.accid.name}}</a>
+                                                                        </li>
+                                                                    </ul>
+                                                                </li>
+                                                            </td>
                                                             </tr>
                                                         </tbody>
                                                     </table>

@@ -129,8 +129,7 @@ var UserSchema = new Schema({
 
 
   joined: {
-    type: Date,
-    default: Date.now
+    type: Date
   },
 
 
@@ -158,9 +157,8 @@ var UserSchema = new Schema({
 
 
   // last session of user
-  lastSeen: {
-    type: Date,
-    default: Date.now
+  lastSession: {
+    type: Date
   },
 
 
@@ -240,7 +238,7 @@ UserSchema.pre('save', function (next) {
 /**
  * If the user exists, fetch the user, else create a new user
  *
- * If the user exists, update the lastSeen timestamp to now
+ * If the user exists, update the lastSession timestamp to now
  *
  * @param {String} app id
  * @param {Object} user object
@@ -312,11 +310,23 @@ UserSchema.statics.findOrCreate = function (aid, user, cb) {
   setOnInsert.score = DEFAULT_SCORE;
 
 
+  var set = {
+    lastSession: Date.now()
+  };
+
+
+  // if there is billing status, then it should be set every time the findOrCreate
+  // query is run. Thats why we will move the billing status key from setOnInsert
+  // to set
+  if (billingStatus) {
+    set.status = billingStatus;
+    delete setOnInsert.status;
+  }
+
+
   var update = {
     $setOnInsert: setOnInsert,
-    $set: {
-      lastSeen: Date.now()
-    }
+    $set: set
   };
 
   var options = {
@@ -427,7 +437,7 @@ UserSchema.statics.setScore = function (uid, score, cb) {
 
 
 /**
- * Updates the lastSeen timestamp of the user to the given or the current time
+ * Updates the lastSession timestamp of the user to the given or the current time
  *
  * @param {string} uid user-id
  * @param {function} cb callback (optional)
@@ -436,7 +446,7 @@ UserSchema.statics.setScore = function (uid, score, cb) {
 UserSchema.statics.updateLastSeen = function (uid, cb) {
 
   var update = {
-    lastSeen: Date.now()
+    lastSession: Date.now()
   };
 
   User.findByIdAndUpdate(uid, update, function (err) {
