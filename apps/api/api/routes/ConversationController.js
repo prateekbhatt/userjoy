@@ -15,6 +15,7 @@ var router = require('express')
  * Models
  */
 
+var Account = require('../models/Account');
 var Conversation = require('../models/Conversation');
 var User = require('../models/User');
 
@@ -75,6 +76,79 @@ function addTemplateDate(conv) {
 }
 
 
+function sendEmailsToTeam(mailerFuncName, team, loggedInUser, conv, cb) {
+
+  var config = require('../../../config')('api');
+  var dashboardUrl = config.hosts.dashboard;
+  var conversationUrl = dashboardUrl + '/apps/' + conv.aid +
+    '/messages/conversations/' + conv._id;
+
+  async.waterfall(
+
+    [
+
+      function findTeam(cb) {
+
+        // we need to send emails to all the team members other than the 
+        // sending user (current logged-in user)
+        var teamIds = _.chain(team)
+          .pluck('accid')
+          .map(function (a) {
+            return a.toString();
+          })
+          .pull(loggedInUser._id.toString())
+          .value();
+
+        Account
+          .find({
+            _id: {
+              $in: teamIds
+            }
+          })
+          .select('email name')
+          .exec(function (err, accs) {
+            cb(err, accs);
+          });
+
+      },
+
+      function sendMails(team, cb) {
+
+        var sendOne = function (account, cb) {
+
+          var mailerOpts = {
+            locals: {
+              conversationUrl: conversationUrl,
+              subject: conv.sub,
+              member: loggedInUser.name || loggedInUser.email
+            },
+            to: {
+              name: account.name,
+              email: account.email
+            }
+          };
+
+
+          accountMailer[mailerFuncName].call(this, mailerOpts, cb);
+
+        };
+
+
+        async.each(team, sendOne, cb);
+
+      }
+
+    ],
+
+    cb
+
+
+  )
+
+
+}
+
+
 /**
  * All routes on /apps
  * need to be authenticated
@@ -114,14 +188,40 @@ router
     }
 
 
-    // TODO: also take the aid as an input param as an additional check
-    Conversation.closed(coId, function (err, msg) {
-      if (err) return next(err);
+    async.waterfall(
 
-      res
-        .status(200)
-        .json(msg);
-    });
+      [
+
+        function closeConversation(cb) {
+          // TODO: also take the aid as an input param as an additional check
+          Conversation.closed(coId, function (err, conv) {
+            cb(err, conv);
+          })
+        },
+
+        function sendMails(conv, cb) {
+          var team = req.app.team;
+          var user = req.user;
+
+          sendEmailsToTeam('sendTeamClosedConversation', team, user, conv,
+            function (err) {
+              cb(err, conv);
+            });
+        }
+
+      ],
+
+
+      function callback(err, conv) {
+        if (err) return next(err);
+
+        res
+          .status(200)
+          .json(conv);
+      }
+
+
+    );
 
   });
 
@@ -145,13 +245,47 @@ router
 
 
     // TODO: also take the aid as an input param as an additional check
-    Conversation.reopened(coId, function (err, msg) {
-      if (err) return next(err);
+    async.waterfall(
 
-      res
-        .status(200)
-        .json(msg);
-    });
+      [
+
+        function reopenConversation(cb) {
+          // TODO: also take the aid as an input param as an additional check
+          Conversation.reopened(coId, function (err, conv) {
+            cb(err, conv);
+          })
+        },
+
+        function sendMails(conv, cb) {
+          var team = req.app.team;
+          var user = req.user;
+
+          sendEmailsToTeam('sendTeamReopenConversation', team, user, conv,
+            function (err) {
+              cb(err, conv);
+            });
+        }
+
+      ],
+
+
+      function callback(err, conv) {
+        if (err) return next(err);
+
+        res
+          .status(200)
+          .json(conv);
+      }
+
+
+    );
+    // Conversation.reopened(coId, function (err, msg) {
+    //   if (err) return next(err);
+
+    //   res
+    //     .status(200)
+    //     .json(msg);
+    // });
 
   });
 
@@ -603,6 +737,16 @@ router
             cb(err, con);
           });
 
+        },
+
+        function sendMails(conv, cb) {
+          var team = req.app.team;
+          var user = req.user;
+
+          sendEmailsToTeam('sendTeamReplyConversation', team, user, conv,
+            function (err) {
+              cb(err, conv);
+            });
         },
 
         function sendEmail(conv, cb) {
