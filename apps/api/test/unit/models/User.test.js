@@ -102,7 +102,7 @@ describe('Model User', function () {
       var newUser = {
         email: id + '@dodatado.com',
         browser: 'Chrome 35',
-        country: 'IN',
+        country: 'India',
         device: 'Apple iPad',
         ip: '115.118.149.224',
         joined: moment()
