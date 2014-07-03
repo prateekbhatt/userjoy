@@ -23,7 +23,7 @@
                                 <a ui-sref="message.template"><span class="glyphicon glyphicon-list-alt"></span> Choose Templates</a>
                             </li> -->
                             <li>
-                                <a style="cursor: default"><i class="fa fa-paperclip"></i> Smart Filters
+                            <span style="cursor: default; color: #333;"><i class="fa fa-paperclip"></i> Smart Filters
                                 <ul style="list-style: none;">
                                     <li>
                                         <div class="progress" style="margin-left: 10px;">
@@ -80,7 +80,7 @@
                                         </div>
                                     </li> -->
                                 </ul>
-                                </a>
+                                </span>
                             </li>
                         </ul>
                         <!-- /#side-menu -->
@@ -95,12 +95,12 @@
                         <div class="col-lg-12">
                             <div class="panel panel-default">
                                 <div class="panel-heading">
-                                    <i class="fa fa-comments"></i> Open Conversations
+                                    <i class="fa fa-comments"></i> Open Messages
                                 </div>
                                 <!-- /.panel-heading -->
                                 <div>
                                     <div class="row">
-                                        <div ng-show="!showOpenConversations" class="text-center"><br><span> There are no open conversations</span><br><br></div>
+                                        <div ng-show="!showOpenConversations" class="text-center"><br><span> There are no open messages</span><br><br></div>
                                         <div class="col-lg-12">
                                             <div class="table-responsive" ng-show="showOpenConversations">
                                                 <table ng-table="tableParamsInbox" show-filter="true" class="table table-bordered table-hover table-striped">

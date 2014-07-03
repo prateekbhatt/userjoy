@@ -23,7 +23,7 @@
                                 <a ui-sref="message.template"><span class="glyphicon glyphicon-list-alt"></span> Choose Templates</a>
                             </li> -->
                             <li ng-class="{'active': isActive('smartFilters')}">
-                                <a style="cursor: default"><i class="fa fa-paperclip"></i> Smart Filters
+                                <span style="cursor: default; color: #333;"><i class="fa fa-paperclip"></i> Smart Filters
                                 <ul style="list-style: none;">
                                     <li>
                                         <div class="progress" style="margin-left: 10px;">
@@ -80,7 +80,7 @@
                                         </div>
                                     </li> -->
                                 </ul>
-                                </a>
+                                </span>
                             </li>
                         </ul>
                         <!-- /#side-menu -->
@@ -105,10 +105,11 @@
                                             <div class="table-responsive">
                                                 <table class="table table-bordered">
                                                     <thead>
+                                                        <th class="text-center">Segment</th>
                                                         <th class="text-center">Title</th>
                                                         <th class="text-center">Type</th>
-                                                        <th class="text-center">Replied</th>
                                                         <th class="text-center">Sent</th>
+                                                        <th class="text-center">Replied</th>
                                                         <th class="text-center">Seen</th>
                                                         <th class="text-center">Clicked</th>
                                                         <th></th>
@@ -116,14 +117,15 @@
                                                     </thead>
                                                     <tbody>
                                                         <tr ng-repeat="automessage in automessages">
+                                                            <td class="text-center" style="cursor: pointer" ng-click="showAutoMsg($index)"> {{automessage.segment}} </td>
                                                             <td class="text-center" style="cursor: pointer" ng-click="showAutoMsg($index)"> {{automessage.title}} </td>
                                                             <td class="text-center" style="cursor: pointer" ng-click="showAutoMsg($index)">
                                                                 {{automessage.type}}
                                                             </td>
-                                                            <td class="text-center" style="cursor: pointer" ng-click="showAutoMsg($index)">{{automessage.replied}}</td>
                                                             <td class="text-center" style="cursor: pointer" ng-click="showAutoMsg($index)">
                                                                 {{automessage.sent}}
                                                             </td>
+                                                            <td class="text-center" style="cursor: pointer" ng-click="showAutoMsg($index)">{{automessage.replied}}</td>
                                                             <td class="text-center" style="cursor: pointer" ng-click="showAutoMsg($index)">{{automessage.seen}}</td>
                                                             <td class="text-center" style="cursor: pointer" ng-click="showAutoMsg($index)">{{automessage.clicked}}</td>
                                                             <td class="text-center">

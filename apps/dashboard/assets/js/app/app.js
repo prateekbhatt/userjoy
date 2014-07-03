@@ -430,7 +430,7 @@ var app = angular.module('dodatado', [
       key: 'contains'
     }, {
       id: "2",
-      name: 'greater than',
+      name: 'more than',
       key: 'gt'
     }, {
       id: "4",
