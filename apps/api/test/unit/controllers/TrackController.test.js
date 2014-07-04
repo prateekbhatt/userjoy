@@ -654,12 +654,7 @@ describe('Resource /track', function () {
             Event.findOne({
               aid: appId,
               amId: notf.amId,
-              meta: {
-                $elemMatch: {
-                  k: 'state',
-                  v: 'opened'
-                }
-              }
+              amState: 'opened'
             }, function (err, evn) {
 
               expect(err)

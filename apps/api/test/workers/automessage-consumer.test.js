@@ -114,13 +114,7 @@ describe('Worker automessageConsumer', function () {
       var query = {
         type: 'auto',
         amId: amId.toString(),
-        meta: {
-          $elemMatch: {
-            k: 'state',
-            v: 'queued'
-          }
-        }
-
+        amState: 'queued'
       };
 
       Event
@@ -219,13 +213,7 @@ describe('Worker automessageConsumer', function () {
       var query = {
         type: 'auto',
         amId: amId.toString(),
-        meta: {
-          $elemMatch: {
-            k: 'state',
-            v: 'queued'
-          }
-        }
-
+        amState: 'queued'
       };
 
       Event
