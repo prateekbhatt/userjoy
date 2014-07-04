@@ -16,6 +16,7 @@ var q = require('./queues')
  */
 
 var logger = require('../helpers/logger');
+var QueueError = require('../helpers/queue-error');
 
 
 /**
@@ -121,7 +122,13 @@ function cronFunc(cb) {
   async.waterfall([
 
       function find(cb) {
-        findAutoMessages(cb);
+        findAutoMessages(function (err, amsgs) {
+          if (err) return cb(err);
+          if (_.isEmpty(amsgs)) {
+            return cb(new QueueError('NO_AUTOMESSAGES_FOR_QUEUEING'));
+          }
+          cb(null, amsgs);
+        });
       },
 
       function queue(msgs, cb) {
