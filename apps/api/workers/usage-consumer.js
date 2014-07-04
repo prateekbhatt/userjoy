@@ -72,47 +72,47 @@ function usageMinutes(aid, timestamp, cb) {
         "$lt": new Date(endOfDay)
       }
     })
-    // .group({
-    //   _id: {
+    .group({
+      _id: {
 
-    //     "u": "$uid",
+        "u": "$uid",
 
-    //     "h": {
-    //       "$hour": "$ct"
-    //     },
+        "h": {
+          "$hour": "$ct"
+        },
 
-    //     "chunk": {
-    //       "$subtract": [
+        "chunk": {
+          "$subtract": [
 
-    //         {
-    //           "$minute": "$ct"
-    //         },
+            {
+              "$minute": "$ct"
+            },
 
-    //         {
-    //           "$mod": [
+            {
+              "$mod": [
 
-    //             {
-    //               "$minute": "$ct"
-    //             },
+                {
+                  "$minute": "$ct"
+                },
 
-    //             MINUTES
-    //           ]
-    //         }
+                MINUTES
+              ]
+            }
 
-    //       ]
-    //     }
+          ]
+        }
 
-    //   },
-    //   c: {
-    //     $sum: 1
-    //   }
-    // })
-    // .group({
-    //   _id: "$_id.u",
-    //   usage: {
-    //     "$sum": MINUTES
-    //   }
-    // })
+      },
+      c: {
+        $sum: 1
+      }
+    })
+    .group({
+      _id: "$_id.u",
+      usage: {
+        "$sum": MINUTES
+      }
+    })
     .exec(function (err, users) {
 
       logger.trace({
@@ -267,7 +267,16 @@ function usageConsumerWorker(cb) {
         if (err.message === 'EMPTY_USAGE_QUEUE') return finalCallback(err);
 
 
-        // if any other QueueError, delete from queue, and post to score queue
+        // if any other QueueError, log queue error, delete from queue, and
+        // post to score queue
+
+        logger.crit({
+          at: 'usageConsumer:QueueError',
+          err: err,
+          aid: aid,
+          time: time
+        });
+
         return deleteFromQueue(queueMsgId, function (err) {
 
           if (err) return finalCallback(err);

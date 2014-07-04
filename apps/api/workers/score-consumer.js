@@ -326,7 +326,17 @@ function scoreConsumerWorker(cb) {
         // if empty error, the queue should be fetched from after some time
         if (err.message === 'EMPTY_SCORE_QUEUE') return cb(err);
 
-        // if any other QueueError, delete from queue, and post to health queue
+
+        // if any other QueueError, log queue-error, delete from queue, and
+        // post to health queue
+
+        logger.crit({
+          at: 'scoreConsumer:QueueError',
+          err: err,
+          aid: aid,
+          time: time
+        });
+
         return deleteFromQueue(queueMsgId, function (err) {
 
           if (err) return cb(err);
