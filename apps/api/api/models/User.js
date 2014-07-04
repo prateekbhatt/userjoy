@@ -128,7 +128,7 @@ var UserSchema = new Schema({
   },
 
 
-  firstName: {
+  first_name: {
     type: String
   },
 
@@ -161,7 +161,7 @@ var UserSchema = new Schema({
   },
 
 
-  lastName: {
+  last_name: {
     type: String
   },
 
@@ -223,7 +223,7 @@ var UserSchema = new Schema({
   ut: {
     type: Date,
     default: Date.now
-  },
+  }
 
 });
 
