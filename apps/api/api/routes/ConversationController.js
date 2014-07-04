@@ -76,7 +76,7 @@ function addTemplateDate(conv) {
 }
 
 
-function sendEmailsToTeam(mailerFuncName, team, loggedInUser, conv, cb) {
+function sendEmailsToTeam(mailerFuncName, appName, team, loggedInUser, conv, cb) {
 
   var config = require('../../../config')('api');
   var dashboardUrl = config.hosts.dashboard;
@@ -119,7 +119,8 @@ function sendEmailsToTeam(mailerFuncName, team, loggedInUser, conv, cb) {
           var mailerOpts = {
             locals: {
               conversationUrl: conversationUrl,
-              subject: conv.sub,
+              subject: appName + ': ' + conv.sub,
+              subjectConversation: conv.sub,
               member: loggedInUser.name || loggedInUser.email
             },
             to: {
@@ -202,8 +203,9 @@ router
         function sendMails(conv, cb) {
           var team = req.app.team;
           var user = req.user;
+          var appName = req.app.name;
 
-          sendEmailsToTeam('sendTeamClosedConversation', team, user, conv,
+          sendEmailsToTeam('sendTeamClosedConversation', appName, team, user, conv,
             function (err) {
               cb(err, conv);
             });
@@ -259,8 +261,9 @@ router
         function sendMails(conv, cb) {
           var team = req.app.team;
           var user = req.user;
+          var appName = req.app.name;
 
-          sendEmailsToTeam('sendTeamReopenConversation', team, user, conv,
+          sendEmailsToTeam('sendTeamReopenConversation', appName, team, user, conv,
             function (err) {
               cb(err, conv);
             });
@@ -742,8 +745,9 @@ router
         function sendMails(conv, cb) {
           var team = req.app.team;
           var user = req.user;
+          var appName = req.app.name;
 
-          sendEmailsToTeam('sendTeamReplyConversation', team, user, conv,
+          sendEmailsToTeam('sendTeamReplyConversation',appName, team, user, conv,
             function (err) {
               cb(err, conv);
             });

@@ -50,7 +50,7 @@
                                 <tr>
                                     <th class="text-center">Sub</th>
                                     <th class="text-center">When</th>
-                                    <th class="text-center">Opened</th>
+                                    <th class="text-center"></th>
                                     <!-- <th class="text-center">Seen</th> -->
                                 </tr>
                             </thead>
@@ -59,8 +59,8 @@
                                     <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer;">{{msg.sub}}</td>
                                     <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer; width: 100%; ">{{msg.when}}</td>
                                     <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer;">
-                                        <span class="glyphicon glyphicon-ok" ng-show="{{!msg.closed}}" style="color: red;"></span>
-                                        <span class="glyphicon glyphicon-remove" ng-show="{{msg.closed}}" style="color: green;"></span>
+                                        <span class="label label-success" ng-show="{{!msg.closed}}" style="font-size: 100%;">Opened</span>
+                                        <span class="label label-danger" ng-show="{{msg.closed}}" style="font-size: 100%;">Closed</span>
                                     </td>
                                    <!--  <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer;">
                                         <span class="glyphicon glyphicon-ok" ng-show="{{msg.seen}}"></span>

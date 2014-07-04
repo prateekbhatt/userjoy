@@ -17,8 +17,8 @@ var BaseMailer = require('./BaseMailer');
  * Constants
  */
 
-var UJ_SUPPORT_EMAIL = 'support@userjoy.co';
-var UJ_SUPPORT_NAME = 'UserJoy';
+var UJ_NOREPLY_EMAIL = 'noreply@userjoy.co';
+var UJ_NOREPLY_NAME = 'UserJoy';
 
 
 
@@ -45,8 +45,8 @@ var UJ_SUPPORT_NAME = 'UserJoy';
 
 function Mailer(opts) {
 
-  this.fromName = UJ_SUPPORT_NAME;
-  this.fromEmail = UJ_SUPPORT_EMAIL;
+  this.fromName = UJ_NOREPLY_NAME;
+  this.fromEmail = UJ_NOREPLY_EMAIL;
 
   // inherit constructor properties of BaseMailer
   BaseMailer.call(this, opts);
