@@ -12,6 +12,7 @@ describe('Resource /track', function () {
    * models
    */
 
+  var AutoMessage = require('../../../api/models/AutoMessage');
   var Event = require('../../../api/models/Event');
 
 
@@ -609,61 +610,100 @@ describe('Resource /track', function () {
       });
 
     it(
-      'should return most recent queued notification, alongwith the theme color, and should create new automessage seen event',
+      'should return most recent queued notification, alongwith the theme color, and should create new automessage seen event, and increment seen count',
       function (done) {
 
         var email = saved.users.first.email;
         var testUrl = url + '?app_id=' + appId + '&email=' + email;
 
-        request
-          .get(testUrl)
-          .expect('Content-Type', /json/)
-          .expect(200)
-          .end(function (err, res) {
-            if (err) return done(err);
+        async.waterfall(
 
-            var notf = res.body;
+          [
 
-            expect(notf)
-              .to.be.an('object');
 
-            expect(notf)
-              .to.have.property("amId");
+            function makeRequest(cb) {
 
-            expect(notf)
-              .to.have.property("body");
 
-            expect(notf)
-              .to.have.property("ct");
+              request
+                .get(testUrl)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .end(function (err, res) {
+                  if (err) return done(err);
 
-            expect(notf)
-              .to.have.property("senderEmail");
+                  var notf = res.body;
 
-            expect(notf)
-              .to.have.property("senderName");
+                  expect(notf)
+                    .to.be.an('object');
 
-            expect(notf)
-              .to.have.property("uid");
+                  expect(notf)
+                    .to.have.property("amId");
 
-            expect(notf)
-              .to.have.property("color");
+                  expect(notf)
+                    .to.have.property("body");
 
-            Event.findOne({
-              aid: appId,
-              amId: notf.amId,
-              amState: 'seen'
-            }, function (err, evn) {
+                  expect(notf)
+                    .to.have.property("ct");
 
-              expect(err)
-                .to.not.exist;
+                  expect(notf)
+                    .to.have.property("senderEmail");
 
-              expect(evn.amId.toString())
-                .to.eql(notf.amId.toString());
+                  expect(notf)
+                    .to.have.property("senderName");
 
-              done();
-            })
+                  expect(notf)
+                    .to.have.property("uid");
 
-          });
+                  expect(notf)
+                    .to.have.property("color");
+
+                  cb(err, notf);
+                });
+            },
+
+
+            function automessageSeenEvent(notf, cb) {
+
+              Event.findOne({
+                aid: appId,
+                amId: notf.amId,
+                amState: 'seen'
+              }, function (err, evn) {
+
+                expect(err)
+                  .to.not.exist;
+
+                expect(evn.amId.toString())
+                  .to.eql(notf.amId.toString());
+
+                cb(err, notf);
+              });
+
+            },
+
+
+            function automessageSeenCount(notf, cb) {
+
+              AutoMessage
+                .findById(notf.amId)
+                .exec(function (err, amsg) {
+                  expect(err)
+                    .to.not.exist;
+
+                  expect(amsg.seen)
+                    .to.eql(1);
+
+                  cb(err);
+                });
+
+            }
+
+          ],
+
+          done
+
+
+        );
 
       });
 
@@ -905,7 +945,8 @@ describe('Resource /track', function () {
       });
 
 
-    it('should create new conversation with amId',
+    it(
+      'should create new conversation with amId, create automessage replied event, and increment replied count',
       function (done) {
 
         var email = saved.users.first.email;
@@ -917,46 +958,98 @@ describe('Resource /track', function () {
           'amId': saved.automessages.first._id
         };
 
-        request
-          .post(testUrl)
-          .send(newCon)
-          .expect('Content-Type', /json/)
-          .expect(201)
-          .end(function (err, res) {
 
-            if (err) return done(err);
+        async.waterfall(
 
-            var notf = res.body;
+          [
 
-            expect(notf)
-              .to.be.an('object');
+            function makeRequest(cb) {
+              request
+                .post(testUrl)
+                .send(newCon)
+                .expect('Content-Type', /json/)
+                .expect(201)
+                .end(function (err, res) {
 
-            var savedMsg = notf.messages[0];
+                  if (err) return done(err);
 
-            expect(savedMsg)
-              .to.have.property("body", newCon.body);
+                  var notf = res.body;
 
-            expect(savedMsg)
-              .to.have.property("ct");
+                  expect(notf)
+                    .to.be.an('object');
 
-            expect(savedMsg)
-              .to.have.property("seen");
+                  var savedMsg = notf.messages[0];
 
-            expect(savedMsg)
-              .to.have.property("sName");
+                  expect(savedMsg)
+                    .to.have.property("body", newCon.body);
 
-            expect(notf)
-              .to.have.property("uid");
+                  expect(savedMsg)
+                    .to.have.property("ct");
 
-            expect(notf)
-              .to.have.property("uid");
+                  expect(savedMsg)
+                    .to.have.property("seen");
 
-            expect(notf.amId)
-              .to.eql(newCon.amId.toString());
+                  expect(savedMsg)
+                    .to.have.property("sName");
+
+                  expect(notf)
+                    .to.have.property("uid");
+
+                  expect(notf)
+                    .to.have.property("uid");
+
+                  expect(notf.amId)
+                    .to.eql(newCon.amId.toString());
 
 
-            done();
-          });
+                  cb(null, notf);
+                });
+
+            },
+
+
+            function automessageRepliedEvent(notf, cb) {
+
+              Event.findOne({
+                aid: appId,
+                amId: notf.amId,
+                amState: 'replied'
+              }, function (err, evn) {
+
+                expect(err)
+                  .to.not.exist;
+
+                expect(evn.amId.toString())
+                  .to.eql(notf.amId.toString());
+
+                cb(err, notf);
+              });
+
+            },
+
+
+            function automessageRepliedCount(notf, cb) {
+
+              AutoMessage
+                .findById(notf.amId)
+                .exec(function (err, amsg) {
+                  expect(err)
+                    .to.not.exist;
+
+                  expect(amsg.replied)
+                    .to.eql(1);
+
+                  cb(err);
+                });
+
+            }
+
+          ],
+
+          done
+
+        );
+
 
       });
 
