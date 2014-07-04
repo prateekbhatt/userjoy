@@ -76,13 +76,13 @@ var AutoMessageSchema = new Schema({
   },
 
 
-  replied: {
+  opened: {
     type: Number,
     default: 0
   },
 
 
-  seen: {
+  replied: {
     type: Number,
     default: 0
   },
@@ -182,15 +182,15 @@ AutoMessageSchema.statics.updateLastQueued = function (automessageId, cb) {
  * Updates the count of clicks/sends/opens/clicks of an automessage
  *
  * @param {string} amId automessage-id
- * @param {string} type sent/seen/clicked/replied
+ * @param {string} type sent/opened/clicked/replied
  * @param {function} cb callback
  */
 
 AutoMessageSchema.statics.incrementCount = function (amId, type, cb) {
 
-  if (!_.contains(['sent', 'seen', 'clicked', 'replied'], type)) {
+  if (!_.contains(['sent', 'opened', 'clicked', 'replied'], type)) {
     return cb(new Error(
-      'AutoMessage event type must be one of sent/seen/clicked/replied'));
+      'AutoMessage event type must be one of sent/opened/clicked/replied'));
   }
 
   var update = {};
