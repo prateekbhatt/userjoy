@@ -123,17 +123,20 @@ describe('Model User', function () {
         browser: 'Chrome 35',
         country: 'India',
         device: 'Apple iPad',
+        firstName: 'Prateek',
         ip: '115.118.149.224',
         joined: moment()
           .unix() * 1000,
+        lastName: 'Bhatt',
         meta: {
           plan: 'Free Tier',
           amount: 40
         },
+        name: 'Prateek Bhatt',
         os: 'iOS 5.0',
         plan: 'enterprise',
         revenue: 499,
-        status: 'trial',
+        status: 'trial'
       };
 
       User.findOrCreate(id, newUser, function (err, usr) {
@@ -183,14 +186,30 @@ describe('Model User', function () {
           .that.equals(newUser.device);
 
         expect(usr)
+          .to.have.property("firstName")
+          .that.is.a("string")
+          .that.equals(newUser.firstName);
+
+        expect(usr)
           .to.have.property("joined")
           .that.is.a("date");
+
         expect(moment(usr.joined)
           .startOf('day')
           .unix())
           .to.eql(moment(newUser.joined)
             .startOf('day')
             .unix());
+
+        expect(usr)
+          .to.have.property("lastName")
+          .that.is.a("string")
+          .that.equals(newUser.lastName);
+
+        expect(usr)
+          .to.have.property("name")
+          .that.is.a("string")
+          .that.equals(newUser.name);
 
         expect(usr)
           .to.have.property("os")

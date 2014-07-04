@@ -115,7 +115,9 @@ router
 
     logger.trace('Fetching automessage attributes');
 
-    var userAttributes = ['user.name', 'user.email', 'user.plan'];
+    var userAttributes = ['user.name', 'user.firstName', 'user.lastName',
+      'user.email', 'user.plan'
+    ];
 
     res
       .status(200)

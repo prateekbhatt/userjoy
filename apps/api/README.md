@@ -174,8 +174,9 @@ UserNote      |                         | notes created by team members about a 
 - browser ("Chrome 35" etc.)
 - country (2 letter ISO-3166-1 country code, [REF](https://github.com/bluesmoon/node-geoip#looking-up-an-ip-address)
 - device ('Apple iPad')
-- x name
-- x username
+- name
+- firstName
+- lastName
 - x meta (object containing additonal info about users)
 - ct
 - ut
