@@ -637,9 +637,6 @@ describe('Resource /track', function () {
               .to.have.property("ct");
 
             expect(notf)
-              .to.have.property("seen");
-
-            expect(notf)
               .to.have.property("senderEmail");
 
             expect(notf)
@@ -654,7 +651,7 @@ describe('Resource /track', function () {
             Event.findOne({
               aid: appId,
               amId: notf.amId,
-              amState: 'opened'
+              amState: 'seen'
             }, function (err, evn) {
 
               expect(err)

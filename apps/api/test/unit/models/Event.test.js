@@ -349,7 +349,7 @@ describe('Model Event', function () {
 
 
     it(
-      'should return error if automessage state is not in queued/sent/clicked/opened/replied',
+      'should return error if automessage state is not in queued/sent/clicked/seen/replied',
       function (done) {
 
         var ids = {
@@ -368,7 +368,7 @@ describe('Model Event', function () {
 
           expect(err.message)
             .to.eql(
-              'automessage state must be one of queued/sent/opened/clicked/replied'
+              'automessage state must be one of queued/sent/seen/clicked/replied'
           );
 
           done();

@@ -245,7 +245,7 @@ describe('Worker automessageConsumer', function () {
             amId: amId
           })
           .exec(function (err, notf) {
-            console.log('\n\n\n\n savenotfi', err, notf);
+
             expect(err)
               .to.not.exist;
 

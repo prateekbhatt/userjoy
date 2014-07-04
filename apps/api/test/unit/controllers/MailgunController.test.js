@@ -55,7 +55,7 @@ describe('Resource /mailgun', function () {
 
   describe('POST /mailgun/opens', function () {
 
-    it('should handle open events for manual message', function (done) {
+    it('should handle seen events for manual message', function (done) {
 
       // opened
       var postData = {
@@ -90,7 +90,7 @@ describe('Resource /mailgun', function () {
     });
 
 
-    it('should handle open events for automessage events', function (
+    it('should handle seen events for automessage events', function (
       done) {
 
 
@@ -124,7 +124,7 @@ describe('Resource /mailgun', function () {
 
         [
 
-          function zeroOpened(cb) {
+          function zeroSeen(cb) {
 
             AutoMessage
               .findById(automessageId)
@@ -133,7 +133,7 @@ describe('Resource /mailgun', function () {
                 expect(err)
                   .to.not.exist;
 
-                expect(amsg.opened)
+                expect(amsg.seen)
                   .to.eql(0);
 
                 cb(err);
@@ -152,7 +152,7 @@ describe('Resource /mailgun', function () {
               .end(cb);
           },
 
-          function oneOpened(cb) {
+          function oneSeen(cb) {
 
             AutoMessage
               .findById(automessageId)
@@ -161,7 +161,7 @@ describe('Resource /mailgun', function () {
                 expect(err)
                   .to.not.exist;
 
-                expect(amsg.opened)
+                expect(amsg.seen)
                   .to.eql(1);
 
                 cb(err);
@@ -169,7 +169,7 @@ describe('Resource /mailgun', function () {
 
           },
 
-          function openSameAutomessageAgain(cb) {
+          function seeSameAutomessageAgain(cb) {
 
             request
               .post('/mailgun/opens')
@@ -189,7 +189,7 @@ describe('Resource /mailgun', function () {
                 expect(err)
                   .to.not.exist;
 
-                expect(amsg.opened)
+                expect(amsg.seen)
                   .to.eql(1);
 
                 cb(err);

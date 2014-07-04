@@ -139,7 +139,7 @@ describe('Model AutoMessage', function () {
     });
 
 
-    it('should set clicked/replied/opened/sent values as 0', function () {
+    it('should set clicked/replied/seen/sent values as 0', function () {
 
       expect(savedAutoMessage.clicked)
         .to.eql(0);
@@ -147,7 +147,7 @@ describe('Model AutoMessage', function () {
       expect(savedAutoMessage.replied)
         .to.eql(0);
 
-      expect(savedAutoMessage.opened)
+      expect(savedAutoMessage.seen)
         .to.eql(0);
 
       expect(savedAutoMessage.sent)
@@ -192,7 +192,7 @@ describe('Model AutoMessage', function () {
 
   describe('#incrementCount', function () {
 
-    it('should return error if type not one of clicked/sent/replied/opened ',
+    it('should return error if type not one of clicked/sent/replied/seen ',
       function (done) {
 
         var savedAutoMessage = saved.automessages.first;
@@ -206,7 +206,7 @@ describe('Model AutoMessage', function () {
 
             expect(err.message)
               .to.eql(
-                'AutoMessage event type must be one of sent/opened/clicked/replied'
+                'AutoMessage event type must be one of sent/seen/clicked/replied'
             );
 
             done();
@@ -216,7 +216,7 @@ describe('Model AutoMessage', function () {
       });
 
 
-    it('should increment count of clicked/sent/replied/opened',
+    it('should increment count of clicked/sent/replied/seen',
       function (done) {
 
         var savedAutoMessage = saved.automessages.first;
@@ -248,16 +248,16 @@ describe('Model AutoMessage', function () {
 
             function incrementSeen(cb) {
 
-              expect(savedAutoMessage.opened)
+              expect(savedAutoMessage.seen)
                 .to.eql(0);
 
-              AutoMessage.incrementCount(savedAutoMessage._id, 'opened',
+              AutoMessage.incrementCount(savedAutoMessage._id, 'seen',
                 function (err, amsg) {
 
                   expect(err)
                     .to.not.exist;
 
-                  expect(amsg.opened)
+                  expect(amsg.seen)
                     .to.eql(1);
 
                   cb();
