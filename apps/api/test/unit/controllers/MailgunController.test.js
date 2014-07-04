@@ -7,6 +7,7 @@ describe('Resource /mailgun', function () {
    * models
    */
 
+  var AutoMessage = require('../../../api/models/AutoMessage');
   var Conversation = require('../../../api/models/Conversation');
 
 
@@ -89,7 +90,8 @@ describe('Resource /mailgun', function () {
     });
 
 
-    it('should handle open events for automessage events', function (done) {
+    it('should handle open events for automessage events', function (
+      done) {
 
 
       // opened
@@ -118,14 +120,89 @@ describe('Resource /mailgun', function () {
         signature: '6cce16f515eef2baed2efe279d08dca631a25fd93dc98c6da8b9191ec11edc92'
       };
 
+      async.series(
+
+        [
+
+          function zeroOpened(cb) {
+
+            AutoMessage
+              .findById(automessageId)
+              .exec(function (err, amsg) {
+
+                expect(err)
+                  .to.not.exist;
+
+                expect(amsg.opened)
+                  .to.eql(0);
+
+                cb(err);
+              });
+
+          },
 
 
-      request
-        .post('/mailgun/opens')
-        .send(postData)
-        .expect('Content-Type', /json/)
-        .expect(200)
-        .end(done);
+          function makeRequest(cb) {
+
+            request
+              .post('/mailgun/opens')
+              .send(postData)
+              .expect('Content-Type', /json/)
+              .expect(200)
+              .end(cb);
+          },
+
+          function oneOpened(cb) {
+
+            AutoMessage
+              .findById(automessageId)
+              .exec(function (err, amsg) {
+
+                expect(err)
+                  .to.not.exist;
+
+                expect(amsg.opened)
+                  .to.eql(1);
+
+                cb(err);
+              });
+
+          },
+
+          function openSameAutomessageAgain(cb) {
+
+            request
+              .post('/mailgun/opens')
+              .send(postData)
+              .expect('Content-Type', /json/)
+              .expect(200)
+              .end(cb);
+          },
+
+
+          function stillOneOpened(cb) {
+
+            AutoMessage
+              .findById(automessageId)
+              .exec(function (err, amsg) {
+
+                expect(err)
+                  .to.not.exist;
+
+                expect(amsg.opened)
+                  .to.eql(1);
+
+                cb(err);
+              });
+
+          }
+
+        ],
+
+        done
+
+      );
+
 
     });
 
@@ -135,7 +212,7 @@ describe('Resource /mailgun', function () {
 
   describe('/clicks', function () {
 
-    it('should handle open events for manual message', function (done) {
+    it('should handle clicked events for manual message', function (done) {
 
       var postData = {
         uj_mid: manualMessageId,
@@ -159,6 +236,7 @@ describe('Resource /mailgun', function () {
         signature: '6cce16f515eef2baed2efe279d08dca631a25fd93dc98c6da8b9191ec11edc92'
       };
 
+
       request
         .post('/mailgun/clicks')
         .send(postData)
@@ -169,7 +247,8 @@ describe('Resource /mailgun', function () {
     });
 
 
-    it('should handle open events for automessage events', function (done) {
+    it('should handle clicked events for automessage events', function (
+      done) {
 
       var postData = {
         uj_type: 'auto',
@@ -196,14 +275,91 @@ describe('Resource /mailgun', function () {
         signature: '6cce16f515eef2baed2efe279d08dca631a25fd93dc98c6da8b9191ec11edc92'
       };
 
+      async.series(
+
+        [
+
+          function zeroClicked(cb) {
+
+            AutoMessage
+              .findById(automessageId)
+              .exec(function (err, amsg) {
+
+                expect(err)
+                  .to.not.exist;
+
+                expect(amsg.clicked)
+                  .to.eql(0);
+
+                cb(err);
+              });
+
+          },
 
 
-      request
-        .post('/mailgun/clicks')
-        .send(postData)
-        .expect('Content-Type', /json/)
-        .expect(200)
-        .end(done);
+          function makeRequest(cb) {
+
+            request
+              .post('/mailgun/clicks')
+              .send(postData)
+              .expect('Content-Type', /json/)
+              .expect(200)
+              .end(cb);
+          },
+
+          function oneClicked(cb) {
+
+            AutoMessage
+              .findById(automessageId)
+              .exec(function (err, amsg) {
+
+                expect(err)
+                  .to.not.exist;
+
+                expect(amsg.clicked)
+                  .to.eql(1);
+
+                cb(err);
+              });
+
+          },
+
+          function clickSameAutomessageAgain(cb) {
+
+            request
+              .post('/mailgun/clicks')
+              .send(postData)
+              .expect('Content-Type', /json/)
+              .expect(200)
+              .end(cb);
+          },
+
+
+          function stillOneClicked(cb) {
+
+            AutoMessage
+              .findById(automessageId)
+              .exec(function (err, amsg) {
+
+                expect(err)
+                  .to.not.exist;
+
+                expect(amsg.clicked)
+                  .to.eql(1);
+
+                cb(err);
+              });
+
+          }
+
+        ],
+
+        done
+
+      );
+
+
+
 
     });
 
@@ -213,7 +369,7 @@ describe('Resource /mailgun', function () {
 
   describe('POST /mailgun/delivers', function () {
 
-    it('should handle deliver events for manual message', function (done) {
+    it('should handle sent events for manual message', function (done) {
 
       var postData = {
         uj_mid: manualMessageId,
@@ -239,7 +395,7 @@ describe('Resource /mailgun', function () {
     });
 
 
-    it('should handle open events for automessage events', function (done) {
+    it('should handle sent events for automessage events', function (done) {
 
       var postData = {
         uj_mid: automessageId,
@@ -259,12 +415,89 @@ describe('Resource /mailgun', function () {
       };
 
 
-      request
-        .post('/mailgun/delivers')
-        .send(postData)
-        .expect('Content-Type', /json/)
-        .expect(200)
-        .end(done);
+
+      async.series(
+
+        [
+
+          function zeroSent(cb) {
+
+            AutoMessage
+              .findById(automessageId)
+              .exec(function (err, amsg) {
+
+                expect(err)
+                  .to.not.exist;
+
+                expect(amsg.sent)
+                  .to.eql(0);
+
+                cb(err);
+              });
+
+          },
+
+
+          function makeRequest(cb) {
+
+            request
+              .post('/mailgun/delivers')
+              .send(postData)
+              .expect('Content-Type', /json/)
+              .expect(200)
+              .end(cb);
+          },
+
+          function oneSent(cb) {
+
+            AutoMessage
+              .findById(automessageId)
+              .exec(function (err, amsg) {
+
+                expect(err)
+                  .to.not.exist;
+
+                expect(amsg.sent)
+                  .to.eql(1);
+
+                cb(err);
+              });
+
+          },
+
+          function deliverSameAutomessageAgain(cb) {
+
+            request
+              .post('/mailgun/delivers')
+              .send(postData)
+              .expect('Content-Type', /json/)
+              .expect(200)
+              .end(cb);
+          },
+
+
+          function stillOneSent(cb) {
+
+            AutoMessage
+              .findById(automessageId)
+              .exec(function (err, amsg) {
+
+                expect(err)
+                  .to.not.exist;
+
+                expect(amsg.sent)
+                  .to.eql(1);
+
+                cb(err);
+              });
+
+          }
+
+        ],
+
+        done
+
+      );
 
     });
 
@@ -435,12 +668,95 @@ describe('Resource /mailgun', function () {
         };
 
         console.log('\n\n\n url', url);
-        request
-          .post(url)
-          .send(postData)
-          .expect('Content-Type', /json/)
-          .expect(200)
-          .end(done);
+
+
+
+
+
+        async.series(
+
+          [
+
+            function zeroReplied(cb) {
+
+              AutoMessage
+                .findById(messageId)
+                .exec(function (err, amsg) {
+
+                  expect(err)
+                    .to.not.exist;
+
+                  expect(amsg.replied)
+                    .to.eql(0);
+
+                  cb(err);
+                });
+
+            },
+
+
+            function makeRequest(cb) {
+
+              request
+                .post(url)
+                .send(postData)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .end(done);
+            },
+
+            function oneReplied(cb) {
+
+              AutoMessage
+                .findById(messageId)
+                .exec(function (err, amsg) {
+
+                  expect(err)
+                    .to.not.exist;
+
+                  expect(amsg.replied)
+                    .to.eql(1);
+
+                  cb(err);
+                });
+
+            },
+
+            function replyToSameAutomessageAgain(cb) {
+
+              request
+                .post(url)
+                .send(postData)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .end(done);
+            },
+
+
+            function stillOneReplied(cb) {
+
+              AutoMessage
+                .findById(messageId)
+                .exec(function (err, amsg) {
+
+                  expect(err)
+                    .to.not.exist;
+
+                  expect(amsg.replied)
+                    .to.eql(1);
+
+                  cb(err);
+                });
+
+            }
+
+          ],
+
+          done
+
+        );
+
+
 
       });
 

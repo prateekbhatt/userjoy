@@ -73,6 +73,13 @@ var EventSchema = new Schema({
   },
 
 
+  // automessage status update
+  // if automessage event then store the automessage state here
+  amState: {
+    type: String
+  },
+
+
   // company Id
   cid: {
     type: Schema.Types.ObjectId,
@@ -179,34 +186,16 @@ EventSchema.statics.page = function (ids, path, cb) {
 
 
 /**
- * Create a new 'automessage' event
+ * Create a new 'auto' (automessage) event
  *
  * This helps in identifying which users have already been sent an automessage
  *
  * To query for an automessage:
 
         var query = {
-          type: 'automessage',
-          meta: {
-            $all: [
-
-              {
-                $elemMatch: {
-                  k: 'amId',
-                  v: ids.amId
-                }
-              },
-
-
-              {
-                $elemMatch: {
-                  k: 'state',
-                  v: 'sent'
-                }
-              }
-
-            ]
-          }
+          type: 'auto',
+          amId: ids.amId,
+          amState: 'sent'
         };
 
         Event.find(query, function (err, amsg) {
@@ -218,6 +207,8 @@ EventSchema.statics.page = function (ids, path, cb) {
  * @param {string} state sent/opened/clicked/replied
  * @param {string} title the title of the automessage
  * @param {function} cb callback
+ *                      @param {object} err error
+ *                      @param {boolean} updatedExisting if-new-event-created
  */
 
 EventSchema.statics.automessage = function (ids, state, title, cb) {
@@ -236,36 +227,17 @@ EventSchema.statics.automessage = function (ids, state, title, cb) {
   var newEvent = {
     aid: ids.aid,
     amId: ids.amId,
+    amState: state,
     name: title,
     type: 'auto',
     uid: ids.uid
   };
 
-
-  newEvent.meta = [
-
-    // {
-    //   k: 'amId',
-
-    //   // we need to convert it from BSON to String type, since the val field is
-    //   // of Mixed schema type
-    //   //
-    //   // Otherwise querying back the data with a stringified id does not work
-    //   v: ids.amId.toString()
-    // },
-
-    {
-      k: 'state',
-      v: state
-    }
-  ];
-
-
   var conditions = {
     aid: ids.aid,
-    meta: {
-      $elemMatch: newEvent.meta[0]
-    }
+    uid: ids.uid,
+    amId: ids.amId,
+    amState: state
   };
 
   var update = {
@@ -276,7 +248,11 @@ EventSchema.statics.automessage = function (ids, state, title, cb) {
     upsert: true
   };
 
-  Event.update(conditions, update, options, cb);
+  Event.update(conditions, update, options, function (err, numberAffected, raw) {
+    if (err) return cb(err);
+    var updatedExisting = raw.updatedExisting;
+    cb(null, updatedExisting);
+  });
 };
 
 
