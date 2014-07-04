@@ -19,6 +19,7 @@ var DailyReport = require('../api/models/DailyReport');
  */
 
 var logger = require('../helpers/logger');
+var QueueError = require('../helpers/queue-error');
 
 
 /**
@@ -87,7 +88,7 @@ function mapReduce(aid, cid, timestamp, cb) {
   var to = moment(timestamp);
 
   if (!to.isValid()) {
-    return cb(new Error('PROVIDE_VALID_TIMESTAMP'));
+    return cb(new QueueError('PROVIDE_VALID_TIMESTAMP'));
   }
 
   var from = moment(timestamp)
@@ -231,16 +232,7 @@ function deleteFromQueue(queueMsgId, cb) {
 
   scoreQueue()
     .del(queueMsgId, function (err, body) {
-
-      logger.trace({
-        at: 'workers/score-consumer deleteFromQueue',
-        queueMsgId: queueMsgId,
-        err: err,
-        body: body
-      });
-
       cb(err);
-
     });
 }
 
@@ -286,16 +278,10 @@ function scoreConsumerWorker(cb) {
         scoreQueue()
           .get(opts, function (err, res) {
 
-            logger.trace({
-              at: 'workers/score-consumer getFromQueue',
-              err: err,
-              res: res
-            });
-
             if (err) return cb(err);
 
             if (!_.isObject(res) || !res.id) {
-              return cb(new Error('EMPTY_SCORE_QUEUE'));
+              return cb(new QueueError('EMPTY_SCORE_QUEUE'));
             }
 
             // store the queue msg id, used to delete the msg from the queue
@@ -306,8 +292,8 @@ function scoreConsumerWorker(cb) {
             var time = msgBody.time;
 
             // the message body contains the app id
-            if (!aid) return cb(new Error('APP_ID_NOT_FOUND'));
-            if (!time) return cb(new Error('TIME_NOT_FOUND'));
+            if (!aid) return cb(new QueueError('APP_ID_NOT_FOUND'));
+            if (!time) return cb(new QueueError('TIME_NOT_FOUND'));
 
             cb(null, aid, time);
           });
@@ -335,43 +321,26 @@ function scoreConsumerWorker(cb) {
 
     function callback(err, aid, time) {
 
-      if (err) {
-        logger.crit({
-          at: 'workers/score-consumer callback',
-          err: err,
-          aid: aid,
-          time: time
+      if (err && err.name === 'QueueError') {
+
+        // if empty error, the queue should be fetched from after some time
+        if (err.message === 'EMPTY_SCORE_QUEUE') return cb(err);
+
+        // if any other QueueError, delete from queue, and post to health queue
+        return deleteFromQueue(queueMsgId, function (err) {
+
+          if (err) return cb(err);
+
+          return postToHealthQueue(aid, time, cb);
+
         });
+
       }
-
-
-      // if empty error, the queue should be fetched from after some time
-      if (err && err.message === 'EMPTY_SCORE_QUEUE') return cb(err);
 
 
       // if err and err is unknown, return error, and do not delete from queue
-      if (err && !_.contains([
+      return cb(err);
 
-        'APP_ID_NOT_FOUND',
-        'TIME_NOT_FOUND',
-        'PROVIDE_VALID_TIMESTAMP'
-
-      ], err.message)) {
-
-        return cb(err);
-      }
-
-
-      // else if known errors, delete from queue, and post to score queue
-      deleteFromQueue(queueMsgId, function (err) {
-
-        if (err) return cb(err);
-
-        postToHealthQueue(aid, time, function (err) {
-          cb(err);
-        });
-
-      });
     }
 
   );
@@ -381,15 +350,22 @@ function scoreConsumerWorker(cb) {
 
 module.exports = function run() {
 
-  logger.trace('run scoreConsumerWorker');
-
   async.forever(
 
     function foreverFunc(next) {
 
+      console.log('\n\n\n');
+      logger.trace('scoreConsumer:Started');
+
       scoreConsumerWorker(function (err) {
 
-        if (err) logError(err, true);
+        var logObj = {
+          at: 'scoreConsumer:Completed',
+          err: err,
+          time: Date.now()
+        };
+
+        err ? logger.crit(logObj) : logger.trace(logObj);
 
         // if error is empty queue, then wait for a minute before running the
         // worker again
@@ -406,23 +382,15 @@ module.exports = function run() {
 
     function foreverCallback(err) {
 
-      logError(err, false);
+      logger.fatal({
+        at: 'scoreConsumer',
+        err: err
+      });
 
     }
   );
 
-}
-
-
-function logError(err, keepAlive) {
-  logger.crit({
-    at: 'scoreConsumerWorker async.forever',
-    err: err,
-    keepAlive: !! keepAlive,
-    time: Date.now()
-  });
-
-}
+};
 
 
 /**

@@ -21,6 +21,7 @@ var DailyReport = require('../api/models/DailyReport');
  */
 
 var logger = require('../helpers/logger');
+var QueueError = require('../helpers/queue-error');
 
 
 /**
@@ -62,15 +63,6 @@ function usageMinutes(aid, timestamp, cb) {
     .endOf('day')
     .format();
 
-
-  logger.trace({
-    at: 'workers/usage-consumer usageMinutes',
-    aid: aid,
-    startOfDay: startOfDay,
-    endOfDay: endOfDay
-  });
-
-
   Event
     .aggregate()
     .match({
@@ -80,48 +72,55 @@ function usageMinutes(aid, timestamp, cb) {
         "$lt": new Date(endOfDay)
       }
     })
-    .group({
-      _id: {
+    // .group({
+    //   _id: {
 
-        "u": "$uid",
+    //     "u": "$uid",
 
-        "h": {
-          "$hour": "$ct"
-        },
+    //     "h": {
+    //       "$hour": "$ct"
+    //     },
 
-        "chunk": {
-          "$subtract": [
+    //     "chunk": {
+    //       "$subtract": [
 
-            {
-              "$minute": "$ct"
-            },
+    //         {
+    //           "$minute": "$ct"
+    //         },
 
-            {
-              "$mod": [
+    //         {
+    //           "$mod": [
 
-                {
-                  "$minute": "$ct"
-                },
+    //             {
+    //               "$minute": "$ct"
+    //             },
 
-                MINUTES
-              ]
-            }
+    //             MINUTES
+    //           ]
+    //         }
 
-          ]
-        }
+    //       ]
+    //     }
 
-      },
-      c: {
-        $sum: 1
-      }
-    })
-    .group({
-      _id: "$_id.u",
-      usage: {
-        "$sum": MINUTES
-      }
-    })
-    .exec(cb);
+    //   },
+    //   c: {
+    //     $sum: 1
+    //   }
+    // })
+    // .group({
+    //   _id: "$_id.u",
+    //   usage: {
+    //     "$sum": MINUTES
+    //   }
+    // })
+    .exec(function (err, users) {
+
+      logger.trace({
+        at: 'usageConsumer:mapReduce',
+        arguments: JSON.stringify(arguments)
+      });
+
+    });
 }
 
 
@@ -159,16 +158,7 @@ function deleteFromQueue(queueMsgId, cb) {
 
   usageQueue()
     .del(queueMsgId, function (err, body) {
-
-      logger.trace({
-        at: 'workers/usage-consumer deleteFromQueue',
-        queueMsgId: queueMsgId,
-        err: err,
-        body: body
-      });
-
       cb(err);
-
     });
 }
 
@@ -216,16 +206,10 @@ function usageConsumerWorker(cb) {
         usageQueue()
           .get(opts, function (err, res) {
 
-            logger.trace({
-              at: 'workers/usage-consumer getFromQueue',
-              err: err,
-              res: res
-            });
-
             if (err) return cb(err);
 
             if (!_.isObject(res) || !res.id) {
-              return cb(new Error('EMPTY_USAGE_QUEUE'));
+              return cb(new QueueError('EMPTY_USAGE_QUEUE'));
             }
 
             // store the queue msg id, used to delete the msg from the queue
@@ -236,8 +220,8 @@ function usageConsumerWorker(cb) {
             var time = msgBody.time;
 
             // the message body contains the app id
-            if (!aid) return cb(new Error('APP_ID_NOT_FOUND'));
-            if (!time) return cb(new Error('TIME_NOT_FOUND'));
+            if (!aid) return cb(new QueueError('APP_ID_NOT_FOUND'));
+            if (!time) return cb(new QueueError('TIME_NOT_FOUND'));
 
             cb(null, aid, time);
           });
@@ -246,6 +230,14 @@ function usageConsumerWorker(cb) {
 
       function calculateUsage(aid, time, cb) {
         usageMinutes(aid, time, function (err, users) {
+
+          logger.trace({
+            at: 'usageConsumer:calculateUsage',
+            users: users,
+            aid: aid,
+            time: time
+          });
+
           cb(err, users, aid, time);
         });
       },
@@ -253,7 +245,7 @@ function usageConsumerWorker(cb) {
 
       function saveUsageData(users, aid, time, cb) {
 
-        if (_.isEmpty(users)) return cb();
+        if (_.isEmpty(users)) return cb(null, aid, time);
 
         saveUsage(aid, time, users, function (err) {
           cb(err, aid, time);
@@ -265,42 +257,29 @@ function usageConsumerWorker(cb) {
 
     function callback(err, aid, time) {
 
-      if (err) {
-        logger.crit({
-          at: 'workers/usage-consumer callback',
-          err: err,
-          aid: aid,
-          time: time
+      var finalCallback = function (err) {
+        return cb(err, aid, time);
+      };
+
+      if (err && err.name === 'QueueError') {
+
+        // if empty error, the queue should be fetched from after some time
+        if (err.message === 'EMPTY_USAGE_QUEUE') return finalCallback(err);
+
+
+        // if any other QueueError, delete from queue, and post to score queue
+        return deleteFromQueue(queueMsgId, function (err) {
+
+          if (err) return finalCallback(err);
+          return postToScoreQueue(aid, time, finalCallback);
+
         });
+
       }
-
-
-      // if empty error, the queue should be fetched from after some time
-      if (err && err.message === 'EMPTY_USAGE_QUEUE') return cb(err);
-
 
       // if err and err is unknown, return error, and do not delete from queue
-      if (err && !_.contains([
+      return finalCallback(err);
 
-        'APP_ID_NOT_FOUND',
-        'TIME_NOT_FOUND'
-
-      ], err.message)) {
-
-        return cb(err);
-      }
-
-
-      // else if known errors, delete from queue, and post to score queue
-      deleteFromQueue(queueMsgId, function (err) {
-
-        if (err) return cb(err);
-
-        postToScoreQueue(aid, time, function (err) {
-          cb(err);
-        });
-
-      });
 
     }
 
@@ -311,15 +290,28 @@ function usageConsumerWorker(cb) {
 
 module.exports = function run() {
 
-  logger.trace('run usageConsumerWorker');
-
   async.forever(
 
     function foreverFunc(next) {
 
-      usageConsumerWorker(function (err) {
+      console.log('\n\n\n');
+      logger.trace({
+        at: 'usageConsumer:Started'
+      });
 
-        if (err) logError(err, true);
+
+      usageConsumerWorker(function (err, aid, time) {
+
+        var logObject = {
+          at: 'usageConsumer:Completed',
+          err: err,
+          aid: aid,
+          time: time
+        };
+
+        err ? logger.crit(logObject) : logger.trace(logObject);
+
+
 
         // if error is empty queue, then wait for a minute before running the
         // worker again
@@ -336,21 +328,16 @@ module.exports = function run() {
 
     function foreverCallback(err) {
 
-      logError(err, false);
+      logger.fatal({
+        at: 'usageConsumer:foreverCallback',
+        err: err
+      });
 
     }
   );
 
-}
+};
 
-function logError(err, keepAlive) {
-  logger.crit({
-    at: 'usageConsumerWorker async.forever',
-    err: err,
-    keepAlive: !! keepAlive,
-    time: Date.now()
-  });
-}
 
 
 module.exports._saveUsage = saveUsage;
