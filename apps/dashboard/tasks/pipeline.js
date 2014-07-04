@@ -29,6 +29,10 @@ var cssFilesToInject = [
 
   'bower_components/nvd3/nv.d3.css',
 
+  'bower_components/angular-toggle-switch/angular-toggle-switch.css',
+
+  'bower_components/angular-toggle-switch/angular-toggle-switch-bootstrap.css',
+
   // all other styles go below
   'styles/**/*.css'
 ];
@@ -65,6 +69,7 @@ var jsFilesToInject = [
   'bower_components/angular-http-auth/src/http-auth-interceptor.js',
   'bower_components/angular-momentjs/angular-momentjs.js',
   'bower_components/n3-line-chart/dist/line-chart.min.js',
+  'bower_components/angular-toggle-switch/angular-toggle-switch.min.js',
 
   // Bring in the socket.io client
   // 'js/sockets/socket.io.js',

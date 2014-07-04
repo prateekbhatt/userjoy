@@ -150,6 +150,9 @@ Message.prototype.send = function () {
 
       document.getElementById(MSG_SENT_TEMPLATE_ID)
         .style.display = 'block';
+        
+      document.getElementById(MSG_ERROR_ID)
+        .style.display = 'none';
 
       document.getElementById(MSG_TEMPLATE_ID)
         .value = '';
