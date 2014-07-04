@@ -388,7 +388,6 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 - amId
 - body
 - ct
-- seen (boolean)
 - senderEmail (required, to show gravatar in notification)
 - senderName (required)
 - title (Required, automessage title)
@@ -400,7 +399,7 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 
 ##### Notes:
 
-- Only auto notifications are stored in this. The manually created notifications are stored in the Message collection
+- Only auto notifications are stored in this. Manually created notifications are not allowed now.
 - A notification would be deleted once it has been seen by the user
 
 ### Conversation
