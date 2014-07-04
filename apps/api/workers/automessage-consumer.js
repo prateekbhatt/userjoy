@@ -416,7 +416,14 @@ function amConsumer(cb) {
           return cb(err);
         }
 
-        // if any other QueueError, delete message from queue
+
+        // if any other QueueError, log queue error, delete message from queue
+
+        logger.crit({
+          at: 'amConsumer:QueueError',
+          err: err
+        });
+
         return deleteFromQueue(function (err) {
           cb(err, queueMsgId, automessage);
         });

@@ -221,7 +221,14 @@ function healthConsumerWorker(cb) {
         if (err.message === 'EMPTY_HEALTH_QUEUE') return cb(err);
 
 
-        // if any other QueueError, delete from queue
+        // if any other QueueError, log queue error, delete from queue
+
+        logger.crit({
+          at: 'healthConsumer:QueueError',
+          err: err,
+          aid: aid
+        });
+
         return deleteFromQueue(queueMsgId, cb);
       }
 
