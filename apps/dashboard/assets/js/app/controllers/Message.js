@@ -1179,6 +1179,13 @@ angular.module('do.message', [])
                   value = $moment(value)
                     .fromNow()
                 }
+
+                if (prop == 'lastSession') {
+                  prop = 'Last Session';
+                  value = $moment(value)
+                    .fromNow()
+                }
+                
                 if (prop == 'joined') {
                   value = $moment(value)
                     .fromNow()

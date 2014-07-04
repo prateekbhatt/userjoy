@@ -17,8 +17,8 @@ var BaseMailer = require('./BaseMailer');
  * Constants
  */
 
-var UJ_SUPPORT_EMAIL = 'support@userjoy.co';
-var UJ_SUPPORT_NAME = 'UserJoy';
+var UJ_NOREPLY_EMAIL = 'noreply@userjoy.co';
+var UJ_NOREPLY_NAME = 'UserJoy';
 
 
 
@@ -45,8 +45,8 @@ var UJ_SUPPORT_NAME = 'UserJoy';
 
 function Mailer(opts) {
 
-  this.fromName = UJ_SUPPORT_NAME;
-  this.fromEmail = UJ_SUPPORT_EMAIL;
+  this.fromName = UJ_NOREPLY_NAME;
+  this.fromEmail = UJ_NOREPLY_EMAIL;
 
   // inherit constructor properties of BaseMailer
   BaseMailer.call(this, opts);
@@ -143,6 +143,49 @@ exports.sendAdminConversation = function (options, cb) {
   var mailer = new Mailer(options);
   mailer.subject = options.locals.subject;
   mailer.template = 'email-admin-conversation.ejs';
+  mailer.send(cb);
+}
+
+/**
+ * Sends Email to Team members except the user who closes the conversation
+ *
+ * @param {object} options
+ * @param {function} cb callback
+ */
+
+exports.sendTeamClosedConversation = function (options, cb) {
+  console.log('\n\n\n sendTeamClosedConversation called with', options, cb);
+  var mailer = new Mailer(options);
+  mailer.subject = options.locals.subject;
+  mailer.template = 'email-close-conversation.ejs';
+  mailer.send(cb);
+}
+
+/**
+ * Sends Email to Team members except the user who reopens the conversation
+ *
+ * @param {object} options
+ * @param {function} cb callback
+ */
+
+exports.sendTeamReopenConversation = function (options, cb) {
+  var mailer = new Mailer(options);
+  mailer.subject = options.locals.subject;
+  mailer.template = 'email-reopen-conversation.ejs';
+  mailer.send(cb);
+}
+
+/**
+ * Sends Email to Admin when a user replies
+ *
+ * @param {object} options
+ * @param {function} cb callback
+ */
+
+exports.sendTeamReplyConversation = function (options, cb) {
+  var mailer = new Mailer(options);
+  mailer.subject = options.locals.subject;
+  mailer.template = 'email-reply.ejs';
   mailer.send(cb);
 }
 

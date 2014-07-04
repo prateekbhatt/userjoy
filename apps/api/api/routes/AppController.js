@@ -187,7 +187,7 @@ router
 
 
 /**
- * PUT /apps/:aid/message-box
+ * PUT /apps/:aid/show-message-box
  *
  * @param {Boolean} show true/false
  *
