@@ -123,11 +123,11 @@ describe('Model User', function () {
         browser: 'Chrome 35',
         country: 'India',
         device: 'Apple iPad',
-        firstName: 'Prateek',
+        first_name: 'Prateek',
         ip: '115.118.149.224',
         joined: moment()
           .unix() * 1000,
-        lastName: 'Bhatt',
+        last_name: 'Bhatt',
         meta: {
           plan: 'Free Tier',
           amount: 40
@@ -186,9 +186,9 @@ describe('Model User', function () {
           .that.equals(newUser.device);
 
         expect(usr)
-          .to.have.property("firstName")
+          .to.have.property("first_name")
           .that.is.a("string")
-          .that.equals(newUser.firstName);
+          .that.equals(newUser.first_name);
 
         expect(usr)
           .to.have.property("joined")
@@ -202,9 +202,9 @@ describe('Model User', function () {
             .unix());
 
         expect(usr)
-          .to.have.property("lastName")
+          .to.have.property("last_name")
           .that.is.a("string")
-          .that.equals(newUser.lastName);
+          .that.equals(newUser.last_name);
 
         expect(usr)
           .to.have.property("name")
