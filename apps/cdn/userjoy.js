@@ -921,8 +921,13 @@ function isEmpty (val) {
 });
 require.register("ianstormtaylor-is/index.js", function(exports, require, module){
 
-var isEmpty = require('is-empty')
-  , typeOf = require('type');
+var isEmpty = require('is-empty');
+
+try {
+  var typeOf = require('type');
+} catch (e) {
+  var typeOf = require('component-type');
+}
 
 
 /**
@@ -4420,6 +4425,7 @@ exports.select = function(fn){
  */
 
 exports.reject = function(fn){
+  var dom = this.dom;
   var out = [];
   var len = this.length;
   var val, i;
@@ -7050,6 +7056,9 @@ Message.prototype.send = function () {
 
       document.getElementById(MSG_SENT_TEMPLATE_ID)
         .style.display = 'block';
+        
+      document.getElementById(MSG_ERROR_ID)
+        .style.display = 'none';
 
       document.getElementById(MSG_TEMPLATE_ID)
         .value = '';
@@ -7125,6 +7134,7 @@ var ERROR_ID = 'uj_error';
 var NOTIFICATION_TEMPLATE_ID = 'uj_notification';
 var REPLY_TEMPLATE_ID = 'uj_notification_reply';
 var SENT_TEMPLATE_ID = 'uj_notification_reply_sent';
+var SEND_MESSAGE_NOTIFICATION_ID = 'uj_send_message_notification_btn';
 
 
 /**
@@ -7185,6 +7195,7 @@ Notification.prototype.load = function (cb) {
       REPLY_TEMPLATE_ID: REPLY_TEMPLATE_ID,
       SENT_TEMPLATE_ID: SENT_TEMPLATE_ID,
       ERROR_ID: ERROR_ID,
+      SEND_MESSAGE_NOTIFICATION_ID: SEND_MESSAGE_NOTIFICATION_ID,
       gravatar: gravatar
     };
 
@@ -7249,6 +7260,9 @@ Notification.prototype.reply = function () {
     return;
   }
 
+  document.getElementById(SEND_MESSAGE_NOTIFICATION_ID)
+    .disabled = true;
+
   var reply = {
     amId: appTraits.automessageId,
     app_id: appTraits.app_id,
@@ -7276,8 +7290,15 @@ Notification.prototype.reply = function () {
 
       document.getElementById(SENT_TEMPLATE_ID)
         .style.display = 'block';
+
+      document.getElementById(ERROR_ID)
+        .style.display = 'none';
+
       document.getElementById(REPLY_TEMPLATE_ID)
         .value = '';
+
+      document.getElementById(SEND_MESSAGE_NOTIFICATION_ID)
+        .disabled = false;
 
       setTimeout(function () {
         document.getElementById(NOTIFICATION_TEMPLATE_ID)
@@ -7286,6 +7307,8 @@ Notification.prototype.reply = function () {
     },
     error: function (err) {
       self.debug(err);
+      document.getElementById(SEND_MESSAGE_NOTIFICATION_ID)
+        .disabled = false;
     },
     dataType: 'json'
   });
@@ -7297,7 +7320,6 @@ Notification.prototype.reply = function () {
  */
 
 module.exports = bind.all(new Notification());
-
 });
 require.register("userjoy/lib/notification-template.js", function(exports, require, module){
 module.exports = function anonymous(obj) {
@@ -7318,7 +7340,7 @@ module.exports = function anonymous(obj) {
     return '';
   };
 
-  return "<div id=\"" + escape(obj.NOTIFICATION_TEMPLATE_ID) + "\" style=\"position: absolute; z-index: 99999999; right: 0; margin-left: auto; margin-right: 3px;\">\n    <div style=\"float:right; width: 350px; margin-top: 50px;\">\n        <div class=\"uj-message-template\" style=\"min-height: 175px; max-height: 175px; overflow: auto; border-color: " + escape(obj.color) + "; border-right: 1px solid " + escape(obj.color) + ";border-top: 1px solid " + escape(obj.color) + "; border-bottom: 1px solid " + escape(obj.color) + "; border-radius: 4px; z-index: 99999999; background-color: #fff;\">\n            <button type=\"button\" class=\"uj-close\" aria-hidden=\"true\" onclick=\"userjoy.hideNotification()\" style=\"margin-top: -15px;\">&times;</button>\n            <img src=\"" + escape(obj.gravatar) + "\" width=\"60px\">\n            <div style=\"margin-top: -75px; margin-left: 75px;\">\n                <p style=\"margin-top: 12px;\"><b>" + escape(obj.senderName) + "</b></p>\n                <p>" + obj.body + "</p>\n            </div>\n            <span id=\"" + escape(obj.SENT_TEMPLATE_ID) + "\" style=\"margin-top: 40px; display:none; color: #7f8c8d; position: relative;\">Message Sent. Thanks!</span>\n            <span id=\"" + escape(obj.ERROR_ID) + "\" style=\"margin-top: 40px; display:none; color: #a94442; position: relative;\">Your reply cannot be blank</span>\n        </div>\n        <div class=\"uj-panel-footer\" style=\"margin-top: -23px; z-index: 99999999\">\n            <div class=\"uj-input-group\">\n                <textarea id=\"" + escape(obj.REPLY_TEMPLATE_ID) + "\" type=\"text\" name=\"msg\" class=\"uj-form-control uj-input-sm\" placeholder=\"Reply here...\" style=\"margin-top: 3px; height: 34px;\"></textarea>\n                <span class=\"uj-input-group-btn\">\n                <button class=\"uj-btn uj-btn-sm\" id=\"btn-chat\" type=\"button\" onclick=\"userjoy.replyNotification()\" style=\"margin-top: 3px; height: 34px; color: #fff; background-color: " + escape(obj.color) + "; border-color: " + escape(obj.color) + "\">\n                Send</button>\n                </span>\n            </div>\n        </div>\n    </div>\n</div>\n"
+  return "<div id=\"" + escape(obj.NOTIFICATION_TEMPLATE_ID) + "\" style=\"position: absolute; z-index: 99999999; right: 0; margin-left: auto; margin-right: 3px;\">\n    <div style=\"float:right; width: 350px; margin-top: 50px;\">\n        <div class=\"uj-message-template\" style=\"min-height: 175px; max-height: 175px; overflow: auto; border-color: " + escape(obj.color) + "; border-right: 1px solid " + escape(obj.color) + ";border-top: 1px solid " + escape(obj.color) + "; border-bottom: 1px solid " + escape(obj.color) + "; border-radius: 4px; z-index: 99999999; background-color: #fefefe;\">\n            <button type=\"button\" class=\"uj-close\" aria-hidden=\"true\" onclick=\"userjoy.hideNotification()\" style=\"margin-top: -15px;\">&times;</button>\n            <img src=\"" + escape(obj.gravatar) + "\" width=\"60px\">\n            <div style=\"margin-top: -75px; margin-left: 75px;\">\n                <p style=\"margin-top: 12px;\"><b>" + escape(obj.senderName) + "</b></p>\n                <p>" + obj.body + "</p>\n            </div>\n            <span id=\"" + escape(obj.SENT_TEMPLATE_ID) + "\" style=\"display:none; color: #7f8c8d; position: absolute; bottom: 70px;\">Message Sent. Thanks!</span>\n            <span id=\"" + escape(obj.ERROR_ID) + "\" style=\"display:none; color: #a94442; position: absolute; bottom: 70px;\">Your reply cannot be blank</span>\n            <br>\n            <div style=\"position: absolute; bottom: 60px; right: 5px;\">\n                <small style=\"color: #95a5a6;\">Powered by <a style=\"text-decoration:none; color: " + escape(obj.color) + "\" href=\"http://www.userjoy.co\", target=\"_blank\">UserJoy</a></small>\n            </div>\n        </div>\n        <div class=\"uj-panel-footer\" style=\"margin-top: -23px; z-index: 99999999\">\n            <div class=\"uj-input-group\">\n                <textarea id=\"" + escape(obj.REPLY_TEMPLATE_ID) + "\" type=\"text\" name=\"msg\" class=\"uj-form-control uj-input-sm\" placeholder=\"Reply here...\" style=\"margin-top: 3px; height: 34px;\"></textarea>\n                <span class=\"uj-input-group-btn\">\n                <button id=\"" + escape(obj.SEND_MESSAGE_NOTIFICATION_ID) + "\" class=\"uj-btn uj-btn-sm\" id=\"btn-chat\" type=\"button\" onclick=\"userjoy.replyNotification()\" style=\"margin-top: 3px; height: 34px; color: #fff; background-color: " + escape(obj.color) + "; border-color: " + escape(obj.color) + "\">\n                Send</button>\n                </span>\n            </div>\n        </div>\n    </div>\n</div>\n"
 }
 });
 require.register("userjoy/lib/queue.js", function(exports, require, module){
