@@ -474,7 +474,7 @@ router
         },
 
 
-        function createAutoMessageOpenedEvent(notf, user, app, cb) {
+        function createAutoMessageSeenEvent(notf, user, app, cb) {
 
           if (!notf) return cb(null, notf, app);
 
@@ -484,7 +484,7 @@ router
             uid: user._id
           };
 
-          var state = 'opened';
+          var state = 'seen';
           var title = notf.title;
 
           Event.automessage(ids, state, title, function (err) {

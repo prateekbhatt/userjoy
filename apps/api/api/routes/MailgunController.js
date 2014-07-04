@@ -44,6 +44,7 @@ function mailgunCallback(req, res, next) {
     if (err) {
       logger.crit({
         at: 'Mailgun Output',
+        status: 'error',
         err: err
       });
 
@@ -53,10 +54,10 @@ function mailgunCallback(req, res, next) {
 
       logger.trace({
         at: 'Mailgun Output',
-        body: req.body
+        status: 'success'
       });
 
-      res
+      return res
         .status(200)
         .json();
     }
@@ -98,16 +99,16 @@ function sendEmail(userEmail, acc, con, cb) {
 
 
 /**
- * Create an automessage event: sent/opened/clicked/replied
+ * Create an automessage event: sent/seen/clicked/replied
  *
  * if the event was created first time for the automessage by the user then
- * increment count of sent/opened/clicked/replied of automessage
+ * increment count of sent/seen/clicked/replied of automessage
  *
  * @param  {object}   ids
  *         @property {string} aid app-id
  *         @property {string} amId automessage-id
  *         @property {string} uid user-id
- * @param  {string}   state sent/opened/clicked/replied
+ * @param  {string}   state sent/seen/clicked/replied
  * @param  {string}   title title-of-the-automessage
  * @param  {Function} cb    callback
  */
@@ -476,7 +477,7 @@ router
         amId: messageId
       };
 
-      createEventAndIncrementCount(ids, 'opened', title, cb);
+      createEventAndIncrementCount(ids, 'seen', title, cb);
 
     } else if (type === 'manual') {
 

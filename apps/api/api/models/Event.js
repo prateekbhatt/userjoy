@@ -204,7 +204,7 @@ EventSchema.statics.page = function (ids, path, cb) {
  *
  *
  * @param {object} ids contains the aid, amId, uid
- * @param {string} state sent/opened/clicked/replied
+ * @param {string} state sent/seen/clicked/replied
  * @param {string} title the title of the automessage
  * @param {function} cb callback
  *                      @param {object} err error
@@ -218,9 +218,9 @@ EventSchema.statics.automessage = function (ids, state, title, cb) {
   }
 
 
-  if (!_.contains(['queued', 'sent', 'opened', 'clicked', 'replied'], state)) {
+  if (!_.contains(['queued', 'sent', 'seen', 'clicked', 'replied'], state)) {
     return cb(new Error(
-      'automessage state must be one of queued/sent/opened/clicked/replied'));
+      'automessage state must be one of queued/sent/seen/clicked/replied'));
   }
 
 

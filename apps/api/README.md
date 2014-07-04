@@ -367,8 +367,8 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 - creator (account id) (required)
 - ct
 - lastQueued (timestamp)
-- opened
 - replied
+- seen
 - sender (account id)
 - sent
 - sid
