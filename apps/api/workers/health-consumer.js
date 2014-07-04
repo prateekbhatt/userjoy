@@ -24,6 +24,7 @@ var User = require('../api/models/User');
  */
 
 var logger = require('../helpers/logger');
+var QueueError = require('../helpers/queue-error');
 
 
 /**
@@ -53,7 +54,7 @@ var healthQueue = q.health;
 function runHealthQuery(aid, health, cb) {
 
   if (!_.contains(['good', 'average', 'poor'], health)) {
-    return cb(new Error('INVALID_HEALTH_TYPE'));
+    return cb(new QueueError('INVALID_HEALTH_TYPE'));
   }
 
   async.waterfall(
@@ -75,7 +76,7 @@ function runHealthQuery(aid, health, cb) {
 
       function runQuery(segment, cb) {
 
-        if (!segment) return cb(new Error('SEGMENT_NOT_FOUND'));
+        if (!segment) return cb(new QueueError('SEGMENT_NOT_FOUND'));
 
         // segment object should be converted from BSON to JSON
         if (segment.toJSON) segment = segment.toJSON();
@@ -137,16 +138,7 @@ function deleteFromQueue(queueMsgId, cb) {
 
   healthQueue()
     .del(queueMsgId, function (err, body) {
-
-      logger.trace({
-        at: 'workers/health-consumer deleteFromQueue',
-        queueMsgId: queueMsgId,
-        err: err,
-        body: body
-      });
-
       cb(err);
-
     });
 }
 
@@ -170,16 +162,10 @@ function healthConsumerWorker(cb) {
         healthQueue()
           .get(opts, function (err, res) {
 
-            logger.trace({
-              at: 'workers/health-consumer getFromQueue',
-              err: err,
-              res: res
-            });
-
             if (err) return cb(err);
 
             if (!_.isObject(res) || !res.id) {
-              return cb(new Error('EMPTY_HEALTH_QUEUE'));
+              return cb(new QueueError('EMPTY_HEALTH_QUEUE'));
             }
 
             // store the queue msg id, used to delete the msg from the queue
@@ -189,7 +175,7 @@ function healthConsumerWorker(cb) {
             var aid = msgBody.aid;
 
             // the message body contains the app id
-            if (!aid) return cb(new Error('APP_ID_NOT_FOUND'));
+            if (!aid) return cb(new QueueError('APP_ID_NOT_FOUND'));
 
             cb(null, aid);
           });
@@ -229,36 +215,20 @@ function healthConsumerWorker(cb) {
 
     function callback(err, aid) {
 
-      if (err) {
-        logger.crit({
-          at: 'workers/score-consumer callback',
-          err: err,
-          aid: aid,
-          time: Date.now()
-        });
-      }
+      if (err && err.name === 'QueueError') {
 
-      // if empty error, the queue should be fetched from after some time
-      if (err && err.message === 'EMPTY_HEALTH_QUEUE') return cb(err);
+        // if empty error, the queue should be fetched from after some time
+        if (err.message === 'EMPTY_HEALTH_QUEUE') return cb(err);
+
+
+        // if any other QueueError, delete from queue
+        return deleteFromQueue(queueMsgId, cb);
+      }
 
 
       // if err and err is unknown, return error, and do not delete from queue
-      if (err && !_.contains([
+      return cb(err);
 
-        'APP_ID_NOT_FOUND',
-        'SEGMENT_NOT_FOUND',
-        'INVALID_HEALTH_TYPE'
-
-      ], err.message)) {
-
-        return cb(err);
-      }
-
-
-      // else if known errors, delete from queue, and post to score queue
-      deleteFromQueue(queueMsgId, function (err) {
-        cb(err);
-      });
     }
   );
 
@@ -267,15 +237,24 @@ function healthConsumerWorker(cb) {
 
 module.exports = function run() {
 
-  logger.trace('run healthConsumerWorker');
-
   async.forever(
 
     function foreverFunc(next) {
 
+      console.log('\n\n\n');
+      logger.trace({
+        at: 'healthConsumer:Started'
+      });
+
       healthConsumerWorker(function (err) {
 
-        if (err) logError(err, true);
+        var logObj = {
+          at: 'healthConsumer:Completed',
+          err: err,
+          time: Date.now()
+        };
+
+        err ? logger.crit(logObj) : logger.trace(logObj);
 
         // if error is empty queue, then wait for a minute before running the
         // worker again
@@ -292,23 +271,15 @@ module.exports = function run() {
 
     function foreverCallback(err) {
 
-      logError(err, false);
+      logger.fatal({
+        at: 'healthConsumer:foreverCallback',
+        err: err
+      });
 
     }
   );
 
-}
-
-
-function logError(err, keepAlive) {
-
-  logger.crit({
-    at: 'healthConsumerWorker async.forever',
-    err: err,
-    keepAlive: !! keepAlive,
-    time: Date.now()
-  });
-}
+};
 
 
 /**

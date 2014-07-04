@@ -42,7 +42,7 @@ var HOURLY_SCHEDULE = '0 * * * *';
  * Per Minute Cron
  */
 
-var MINUTE_SCHEDULE = '*/1 * * * *';
+var TEN_MINUTE_SCHEDULE = '*/10 * * * *';
 
 
 /**
@@ -53,7 +53,7 @@ var DAILY_SCHEDULE = '0 0 * * *';
 
 
 // TODO: THIS CODE NEEDS TO BE MANAGED IN INSIDE THE APPS CONFIG FILE
-var SCHEDULE = MINUTE_SCHEDULE;
+var SCHEDULE = TEN_MINUTE_SCHEDULE;
 if (process.env.NODE_ENV === 'production') {
   SCHEDULE = DAILY_SCHEDULE;
 }
@@ -87,7 +87,8 @@ function findActiveApps(cb) {
 
 function cronFunc(cb) {
 
-  logger.trace('workers/usagePublisher cronFunc');
+  console.log('\n\n\n');
+  logger.trace('usagePublisher:Started');
 
   async.waterfall([
 
@@ -115,24 +116,24 @@ function cronFunc(cb) {
           })
           .value();
 
-        q().post(appsData, function (err, queueIds) {
-          cb(err, queueIds, appsData);
-        });
+        q()
+          .post(appsData, function (err, queueIds) {
+            cb(err, queueIds, appsData);
+          });
       }
 
     ],
 
     function finalCallback(err, queueIds, ids, numberAffected) {
 
-      logger.trace('workers/usagePublisher Completed');
+      var logObj = {
+        at: 'usagePublisher:Completed',
+        err: err,
+        ts: Date.now()
+      };
 
-      if (err) {
-        logger.crit({
-          at: 'workers/usage-publisher',
-          err: err,
-          ts: Date.now()
-        });
-      }
+      err ? logger.crit(logObj) : logger.trace(logObj);
+
 
       if (cb) {
         return cb(err, queueIds, ids, numberAffected);
