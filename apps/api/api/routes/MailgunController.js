@@ -23,6 +23,7 @@ var logger = require('../../helpers/logger');
  */
 
 var Account = require('../models/Account');
+var AutoMessage = require('../models/AutoMessage');
 var App = require('../models/App');
 var Event = require('../models/Event');
 var Conversation = require('../models/Conversation');
@@ -60,9 +61,9 @@ function mailgunCallback(req, res, next) {
         .json();
     }
 
-  }
+  };
 
-};
+}
 
 
 function sendEmail(userEmail, acc, con, cb) {
@@ -71,7 +72,7 @@ function sendEmail(userEmail, acc, con, cb) {
    * get dashboard url from config
    */
   var config = require('../../../config')('api');
-  var dashboardUrl = config.hosts['dashboard'];
+  var dashboardUrl = config.hosts.dashboard;
   var conversationUrl = dashboardUrl + '/apps/' + con.aid +
     '/messages/conversations/' + con._id;
 
@@ -92,6 +93,36 @@ function sendEmail(userEmail, acc, con, cb) {
 
   accountMailer.sendAdminConversation(opts, function (err) {
     cb(err, con);
+  });
+}
+
+
+/**
+ * Create an automessage event: sent/opened/clicked/replied
+ *
+ * if the event was created first time for the automessage by the user then
+ * increment count of sent/opened/clicked/replied of automessage
+ *
+ * @param  {object}   ids
+ *         @property {string} aid app-id
+ *         @property {string} amId automessage-id
+ *         @property {string} uid user-id
+ * @param  {string}   state sent/opened/clicked/replied
+ * @param  {string}   title title-of-the-automessage
+ * @param  {Function} cb    callback
+ */
+function createEventAndIncrementCount(ids, state, title, cb) {
+
+  Event.automessage(ids, state, title, function (err, updatedExisting) {
+
+    if (err) return cb(err);
+
+    // if this automessage event has occurred before by the same user,
+    // then move on
+    if (updatedExisting) return cb();
+
+    // else increment the count by 1
+    AutoMessage.incrementCount(ids.amId, state, cb);
   });
 }
 
@@ -165,7 +196,7 @@ router
       at: 'MailgunController new',
       // body: req.body['stripped-text'],
       param: req.params
-    })
+    });
 
     var aid = req.params.aid;
 
@@ -226,7 +257,7 @@ router
         function getAdminAccount(con, user, cb) {
           getAdmin(con.aid, function (err, acc) {
             cb(err, acc, con, user);
-          })
+          });
         },
 
         function sendAdminConversation(acc, con, user, cb) {
@@ -250,7 +281,7 @@ router
       at: 'MailgunController reply',
       // body: req.body['stripped-text'],
       param: req.params
-    })
+    });
 
     var parsedId = appEmail.parseIdentifier(req.params.identifier);
     var type = parsedId.type;
@@ -281,7 +312,7 @@ router
               email: sender
             };
 
-            User.findOrCreate(aid, user, cb)
+            User.findOrCreate(aid, user, cb);
           },
 
 
@@ -379,7 +410,33 @@ router
           function getAdminAccount(con, user, cb) {
             getAdmin(con.aid, function (err, acc) {
               cb(err, acc, con, user);
-            })
+            });
+          },
+
+          function getAutoMessage(acc, con, user, cb) {
+            AutoMessage
+              .findById({
+                amId: con.amId
+              })
+              .select('title')
+              .exec(function (err, amsg) {
+                cb(err, acc, con, user, amsg);
+              });
+          },
+
+
+          function createEventAndIncrement(acc, con, user, amsg, cb) {
+
+            var ids = {
+              aid: con.aid,
+              uid: con.uid,
+              amId: con.amId
+            };
+
+            var title = amsg.title;
+
+            createEventAndIncrementCount(ids, 'replied', title, cb);
+
           },
 
           function sendAdminConversation(acc, con, user, cb) {
@@ -417,9 +474,9 @@ router
         aid: aid,
         uid: uid,
         amId: messageId
-      }
+      };
 
-      Event.automessage(ids, 'opened', title, cb)
+      createEventAndIncrementCount(ids, 'opened', title, cb);
 
     } else if (type === 'manual') {
 
@@ -453,9 +510,9 @@ router
         aid: aid,
         uid: uid,
         amId: messageId
-      }
+      };
 
-      Event.automessage(ids, 'clicked', title, cb)
+      createEventAndIncrementCount(ids, 'clicked', title, cb);
 
     } else if (type === 'manual') {
 
@@ -489,9 +546,9 @@ router
         aid: aid,
         uid: uid,
         amId: messageId
-      }
+      };
 
-      Event.automessage(ids, 'sent', title, cb)
+      createEventAndIncrementCount(ids, 'sent', title, cb);
 
     } else if (type === 'manual') {
 
