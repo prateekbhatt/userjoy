@@ -140,8 +140,8 @@ angular.module('do.automate', [])
                 .sent,
               seen: AutoMsgService.getAllAutoMsg()[i]
                 .seen,
-              clicked: AutoMsgService.getAllAutoMsg()[
-                i].clicked,
+              // clicked: AutoMsgService.getAllAutoMsg()[
+              //   i].clicked,
               active: AutoMsgService.getAllAutoMsg()[
                 i].active,
               id: AutoMsgService.getAllAutoMsg()[i]._id,
@@ -1055,8 +1055,13 @@ angular.module('do.automate', [])
             .replace(/&#160;/g, ' ')
             .length;
           console.log("notificationTextLength: ", notificationTextLength);
-          $scope.charactersLeft = (250 - notificationTextLength)
-            .toString();
+          $scope.charactersLeft = 250 - notificationTextLength;
+          if ($scope.charactersLeft < 10) {
+            $scope.colorText = '#e74c3c';
+          }
+          if ($scope.charactersLeft >= 10) {
+            $scope.colorText = '#2c3e50';
+          }
 
 
         } else {
@@ -1185,7 +1190,6 @@ angular.module('do.automate', [])
     }
 
     AppModel.getSingleApp($scope.currApp, populatePage);
-
 
 
 
