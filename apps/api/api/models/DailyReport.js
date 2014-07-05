@@ -112,7 +112,7 @@ DailyReportSchema.statics.upsert = function (aid, uid, cid, timestamp,
     return cb(new Error('DailyReport upsert provide valid usage'));
   }
 
-  var time = moment(timestamp);
+  var time = moment.utc(timestamp);
 
   if (!time.isValid()) {
     return cb(new Error('DailyReport upsert provide valid time'));
@@ -205,8 +205,8 @@ DailyReportSchema.statics.get = function (type, aid, uid, cid, from, to, cb) {
   var keyShouldStartWith = type === 'usage' ? 'du_' : 'ds_';
 
 
-  from = moment(from);
-  to = moment(to);
+  from = moment.utc(from);
+  to = moment.utc(to);
 
   if (!from.isValid() || !to.isValid()) {
     return cb(new Error('Provide valid from/to timestamps'));
@@ -279,7 +279,7 @@ DailyReportSchema.statics.get = function (type, aid, uid, cid, from, to, cb) {
             if (startsWith) {
 
               date = key.split(keyShouldStartWith)[1];
-              time = moment([year, month, date])
+              time = moment.utc([year, month, date])
                 .unix();
 
               // filter data between the 'from' and the 'to' times
