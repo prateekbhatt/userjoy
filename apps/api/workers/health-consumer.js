@@ -215,10 +215,25 @@ function healthConsumerWorker(cb) {
 
     function callback(err, aid) {
 
-      if (err && err.name === 'QueueError') {
+
+      var emptyQueue = false;
+
+
+      var finalCallback = function (err) {
+        return cb(err, aid, emptyQueue);
+      };
+
+
+      if (err) {
+
+        // if not QueueError, return error without deleting message from queue
+        if (err.name !== 'QueueError') {
+          return finalCallback(err);
+        }
+
 
         // if empty error, the queue should be fetched from after some time
-        if (err.message === 'EMPTY_HEALTH_QUEUE') return cb(err);
+        if (err.message === 'EMPTY_HEALTH_QUEUE') emptyQueue = true;
 
 
         // if any other QueueError, log queue error, delete from queue
@@ -229,12 +244,9 @@ function healthConsumerWorker(cb) {
           aid: aid
         });
 
-        return deleteFromQueue(queueMsgId, cb);
       }
 
-
-      // if err and err is unknown, return error, and do not delete from queue
-      return cb(err);
+      deleteFromQueue(queueMsgId, finalCallback);
 
     }
   );
@@ -253,7 +265,7 @@ module.exports = function run() {
         at: 'healthConsumer:Started'
       });
 
-      healthConsumerWorker(function (err) {
+      healthConsumerWorker(function (err, aid, emptyQueue) {
 
         var logObj = {
           at: 'healthConsumer:Completed',
@@ -265,7 +277,7 @@ module.exports = function run() {
 
         // if error is empty queue, then wait for a minute before running the
         // worker again
-        if (err && (err.message === 'EMPTY_HEALTH_QUEUE')) {
+        if (emptyQueue) {
 
           setTimeout(next, 3600000);
 

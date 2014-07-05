@@ -605,7 +605,7 @@ Query.prototype.genAttrMatchCond = function () {
 
 
   if (!_.isEmpty(filterQueries[root])) cond['$and'].push(filterQueries);
-  console.log('\n\n\n genAttrMatchCond', JSON.stringify(cond));
+
   return cond;
 };
 
