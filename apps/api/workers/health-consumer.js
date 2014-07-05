@@ -119,7 +119,16 @@ function runHealthQuery(aid, health, cb) {
           multi: true
         };
 
+
         User.update(conditions, update, options, function (err) {
+
+          logger.trace({
+            at: 'healthConsumer:updateHealthStatus',
+            conditions: JSON.stringify(conditions),
+            update: JSON.stringify(update),
+            err: err
+          });
+
           cb(err);
         });
 
