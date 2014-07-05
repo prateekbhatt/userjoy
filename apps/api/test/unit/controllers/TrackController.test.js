@@ -610,7 +610,7 @@ describe('Resource /track', function () {
       });
 
     it(
-      'should return most recent queued notification, alongwith the theme color, and should create new automessage seen event, and increment seen count',
+      'should return most recent queued notification, alongwith the theme color and showMessageBox status, and should create new automessage seen event, and increment seen count',
       function (done) {
 
         var email = saved.users.first.email;
@@ -656,6 +656,10 @@ describe('Resource /track', function () {
 
                   expect(notf)
                     .to.have.property("color");
+
+                  expect(notf)
+                    .to.have.property("showMessageBox")
+                    .that.is.a('boolean');
 
                   cb(err, notf);
                 });

@@ -521,9 +521,10 @@ router
           return next(err);
         }
 
-        // pass the theme color alongwith the notification
+        // pass the theme color and showMessageBox status alongwith the notification
         notification = notification ? notification.toJSON() : {};
         notification.color = app.color;
+        notification.showMessageBox = app.showMessageBox;
 
 
         res
