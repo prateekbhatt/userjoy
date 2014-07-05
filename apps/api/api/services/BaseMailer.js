@@ -131,10 +131,10 @@ BaseMailer.prototype.options = function () {
   };
 
 
-  // in test env, do not send emails
+  // in test/development env, do not send emails
   // REF 1: http://documentation.mailgun.com/user_manual.html#sending-via-smtp
   // REF 2: http://documentation.mailgun.com/user_manual.html#sending-in-test-mode
-  if (!_.contains(['production', 'development'], process.env.NODE_ENV)) {
+  if (!_.contains(['production'], process.env.NODE_ENV)) {
     opts.headers = opts.headers || {};
     opts.headers['X-Mailgun-Drop-Message'] = 'yes';
     logger.trace({

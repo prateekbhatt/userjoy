@@ -47,13 +47,6 @@ var NotificationSchema = new Schema({
   },
 
 
-  // has the notification been seen by the user
-  seen: {
-    type: Boolean,
-    default: false
-  },
-
-
   // sender email (account)
   senderEmail: {
     type: String,
@@ -92,30 +85,6 @@ var NotificationSchema = new Schema({
 NotificationSchema.index({
   uid: 1
 });
-
-
-/**
- * Updates seen status to true
- *
- * @param {string} id notification-id
- * @param {function} cb callback
- */
-
-NotificationSchema.statics.opened = function (id, cb) {
-
-  var update = {
-    $set: {
-      seen: true
-    }
-  };
-
-  Notification.findByIdAndUpdate(id, update, function (err, msg) {
-    if (err) return cb(err);
-    if (!msg) return cb('Notification was not found');
-    cb(null, msg);
-  });
-
-};
 
 
 var Notification = mongoose.model('Notification', NotificationSchema);

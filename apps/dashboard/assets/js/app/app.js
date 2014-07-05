@@ -28,6 +28,7 @@ var app = angular.module('dodatado', [
   'http-auth-interceptor',
   'angular-momentjs',
   'do.automate',
+  'toggle-switch',
 ])
 
 .directive('fallbackSrc', function () {
@@ -262,10 +263,17 @@ var app = angular.module('dodatado', [
               var prop = keys[i]
               value = data.userAttributes[prop];
               console.log("user attributes value: ", value);
-              attributes.push({
-                name: value,
-                value: '{{= ' + value + ' || "there" }}'
-              })
+              if (value == 'user.plan') {
+                attributes.push({
+                  name: value,
+                  value: '{{= ' + value + ' || "CHANGE THIS" }}'
+                })
+              } else {
+                attributes.push({
+                  name: value,
+                  value: '{{= ' + value + ' || "there" }}'
+                })
+              }
             };
             console.log("user attributes: ", attributes);
             // for (var i = 0; i < data.userAttributes.length; i++) {

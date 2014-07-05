@@ -11,6 +11,7 @@ var moment = require('moment');
  * models
  */
 
+var App = require('../api/models/App');
 var DailyReport = require('../api/models/DailyReport');
 
 
@@ -19,6 +20,7 @@ var DailyReport = require('../api/models/DailyReport');
  */
 
 var logger = require('../helpers/logger');
+var QueueError = require('../helpers/queue-error');
 
 
 /**
@@ -82,15 +84,15 @@ function getDateEquivalent(momentTime) {
  *
  */
 
-function mapReduce(aid, cid, timestamp, cb) {
+function mapReduce(aid, cid, updateTime, cb) {
 
-  var to = moment(timestamp);
+  var to = moment.utc(updateTime);
 
   if (!to.isValid()) {
-    return cb(new Error('PROVIDE_VALID_TIMESTAMP'));
+    return cb(new QueueError('PROVIDE_VALID_TIMESTAMP'));
   }
 
-  var from = moment(timestamp)
+  var from = moment.utc(updateTime)
     .subtract('days', NO_OF_DAYS);
 
   var timeConditions = [
@@ -231,16 +233,7 @@ function deleteFromQueue(queueMsgId, cb) {
 
   scoreQueue()
     .del(queueMsgId, function (err, body) {
-
-      logger.trace({
-        at: 'workers/score-consumer deleteFromQueue',
-        queueMsgId: queueMsgId,
-        err: err,
-        body: body
-      });
-
       cb(err);
-
     });
 }
 
@@ -286,16 +279,10 @@ function scoreConsumerWorker(cb) {
         scoreQueue()
           .get(opts, function (err, res) {
 
-            logger.trace({
-              at: 'workers/score-consumer getFromQueue',
-              err: err,
-              res: res
-            });
-
             if (err) return cb(err);
 
             if (!_.isObject(res) || !res.id) {
-              return cb(new Error('EMPTY_SCORE_QUEUE'));
+              return cb(new QueueError('EMPTY_SCORE_QUEUE'));
             }
 
             // store the queue msg id, used to delete the msg from the queue
@@ -303,75 +290,98 @@ function scoreConsumerWorker(cb) {
 
             var msgBody = res.body ? JSON.parse(res.body) : {};
             var aid = msgBody.aid;
-            var time = msgBody.time;
+            var updateTime = msgBody.updateTime;
 
             // the message body contains the app id
-            if (!aid) return cb(new Error('APP_ID_NOT_FOUND'));
-            if (!time) return cb(new Error('TIME_NOT_FOUND'));
+            if (!aid) return cb(new QueueError('APP_ID_NOT_FOUND'));
+            if (!updateTime) return cb(new QueueError(
+              'UPDATE_TIME_NOT_FOUND'));
 
-            cb(null, aid, time);
+            cb(null, aid, updateTime);
           });
       },
 
 
-      function runMapReduce(aid, time, cb) {
+      function runMapReduce(aid, updateTime, cb) {
 
         // TODO: cid is hardcoded as null
-        mapReduce(aid, null, time, function (err, scores) {
-          cb(err, scores, aid, time);
+        mapReduce(aid, null, updateTime, function (err, scores) {
+          cb(err, scores, aid, updateTime);
         });
       },
 
 
-      function saveData(scores, aid, time, cb) {
+      function saveData(scores, aid, updateTime, cb) {
         // TODO: cid is hardcoded as null
-        saveScores(aid, null, time, scores, function (err) {
-          cb(err, aid, time);
+        saveScores(aid, null, updateTime, scores, function (err) {
+          cb(err, aid, updateTime);
         });
       }
 
     ],
 
 
-    function callback(err, aid, time) {
+    function callback(err, aid, updateTime) {
+
+
+      var emptyQueue = false;
+
+
+      var finalCallback = function (err) {
+        return cb(err, aid, updateTime, emptyQueue);
+      };
+
 
       if (err) {
+
+        // if not QueueError, return error without deleting message from queue
+        if (err.name !== 'QueueError') {
+          return finalCallback(err, aid, updateTime);
+        }
+
+        // if empty queue error, the queue should be fetched from after some time
+        if (err.message === 'EMPTY_SCORE_QUEUE') emptyQueue = true;
+
+
+        // if any QueueError, log queue error,
+        // and move on and delete from score queue, and post to health queue
+
         logger.crit({
-          at: 'workers/score-consumer callback',
+          at: 'scoreConsumer:QueueError',
           err: err,
           aid: aid,
-          time: time
+          updateTime: updateTime
         });
+
       }
 
 
-      // if empty error, the queue should be fetched from after some time
-      if (err && err.message === 'EMPTY_SCORE_QUEUE') return cb(err);
+      // if QueueError or success, delete from score queue, and post to health queue
+
+      async.series(
+
+        [
+
+          function deleteFromScoreQueue(cb) {
+            deleteFromQueue(queueMsgId, cb);
+          },
+
+          function toHealthQueue(cb) {
+            postToHealthQueue(aid, updateTime, cb);
+          },
+
+          function updateQueuedHealth(cb) {
+            App.queued(aid, 'score', updateTime, cb);
+          }
+
+        ],
+
+        finalCallback
+
+      );
 
 
-      // if err and err is unknown, return error, and do not delete from queue
-      if (err && !_.contains([
 
-        'APP_ID_NOT_FOUND',
-        'TIME_NOT_FOUND',
-        'PROVIDE_VALID_TIMESTAMP'
-
-      ], err.message)) {
-
-        return cb(err);
-      }
-
-
-      // else if known errors, delete from queue, and post to score queue
-      deleteFromQueue(queueMsgId, function (err) {
-
-        if (err) return cb(err);
-
-        postToHealthQueue(aid, time, function (err) {
-          cb(err);
-        });
-
-      });
     }
 
   );
@@ -381,19 +391,27 @@ function scoreConsumerWorker(cb) {
 
 module.exports = function run() {
 
-  logger.trace('run scoreConsumerWorker');
-
   async.forever(
 
     function foreverFunc(next) {
 
-      scoreConsumerWorker(function (err) {
+      console.log('\n\n\n');
+      logger.trace('scoreConsumer:Started');
 
-        if (err) logError(err, true);
+      scoreConsumerWorker(function (err, aid, updateTime, emptyQueue) {
+
+        var logObj = {
+          at: 'scoreConsumer:Completed',
+          err: err,
+          aid: aid,
+          updateTime: updateTime
+        };
+
+        err ? logger.crit(logObj) : logger.trace(logObj);
 
         // if error is empty queue, then wait for a minute before running the
         // worker again
-        if (err && (err.message === 'EMPTY_SCORE_QUEUE')) {
+        if (emptyQueue) {
 
           setTimeout(next, 3600000);
 
@@ -406,23 +424,15 @@ module.exports = function run() {
 
     function foreverCallback(err) {
 
-      logError(err, false);
+      logger.fatal({
+        at: 'scoreConsumer',
+        err: err
+      });
 
     }
   );
 
-}
-
-
-function logError(err, keepAlive) {
-  logger.crit({
-    at: 'scoreConsumerWorker async.forever',
-    err: err,
-    keepAlive: !! keepAlive,
-    time: Date.now()
-  });
-
-}
+};
 
 
 /**

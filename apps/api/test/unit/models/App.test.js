@@ -92,6 +92,192 @@ describe('Model App', function () {
   });
 
 
+  describe('#queued', function () {
+
+    var aid1;
+    var aid2;
+    var updateTime;
+
+    before(function () {
+      aid1 = saved.apps.first._id;
+      aid2 = saved.apps.second._id;
+      updateTime = new Date();
+    });
+
+
+    it('should update queuedUsage time', function (done) {
+
+      async.series(
+
+        [
+
+          function callQueued(cb) {
+
+            App.queued([aid1, aid2], 'usage', updateTime,
+              function (err, n, raw) {
+
+                expect(err)
+                  .to.not.exist;
+
+                expect(n)
+                  .to.eql(2);
+
+                expect(raw.updatedExisting)
+                  .to.be.true;
+
+
+                cb();
+              });
+          },
+
+          function checkApp1(cb) {
+
+            App
+              .findById(aid1)
+              .exec(function (err, app) {
+                expect(err)
+                  .to.not.exist;
+
+                expect(app.queuedUsage)
+                  .to.be.a('date')
+                  .and.to.eql(updateTime);
+
+                cb();
+              });
+
+          },
+
+          function checkApp2(cb) {
+
+            App
+              .findById(aid2)
+              .exec(function (err, app) {
+                expect(err)
+                  .to.not.exist;
+
+                expect(app.queuedUsage)
+                  .to.be.a('date')
+                  .and.to.eql(updateTime);
+
+                cb();
+              });
+
+          }
+
+        ],
+
+        done
+
+      );
+
+    });
+
+
+    it('should update queuedScore time', function (done) {
+
+      async.series(
+
+        [
+
+          function callQueued(cb) {
+
+            App.queued(aid1, 'score', updateTime,
+              function (err, n, raw) {
+
+                expect(err)
+                  .to.not.exist;
+
+                expect(n)
+                  .to.eql(1);
+
+                expect(raw.updatedExisting)
+                  .to.be.true;
+
+
+                cb();
+              });
+          },
+
+          function checkApp1(cb) {
+
+            App
+              .findById(aid1)
+              .exec(function (err, app) {
+                expect(err)
+                  .to.not.exist;
+
+                expect(app.queuedScore)
+                  .to.be.a('date')
+                  .and.to.eql(updateTime);
+
+                cb();
+              });
+
+          }
+
+        ],
+
+        done
+
+      );
+
+    });
+
+    it('should update queuedHealth time', function (done) {
+
+      async.series(
+
+        [
+
+          function callQueued(cb) {
+
+            App.queued(aid1, 'health', updateTime,
+              function (err, n, raw) {
+
+                expect(err)
+                  .to.not.exist;
+
+                expect(n)
+                  .to.eql(1);
+
+                expect(raw.updatedExisting)
+                  .to.be.true;
+
+
+                cb();
+              });
+          },
+
+          function checkApp1(cb) {
+
+            App
+              .findById(aid1)
+              .exec(function (err, app) {
+                expect(err)
+                  .to.not.exist;
+
+                expect(app.queuedHealth)
+                  .to.be.a('date')
+                  .and.to.eql(updateTime);
+
+                cb();
+              });
+
+          }
+
+        ],
+
+        done
+
+      );
+
+    });
+
+
+  });
+
+
+
   describe('#addMember', function () {
 
     it('should add account to team', function (done) {

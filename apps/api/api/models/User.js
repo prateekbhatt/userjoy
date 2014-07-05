@@ -128,8 +128,8 @@ var UserSchema = new Schema({
   },
 
 
-  joined: {
-    type: Date
+  first_name: {
+    type: String
   },
 
 
@@ -146,6 +146,11 @@ var UserSchema = new Schema({
   },
 
 
+  joined: {
+    type: Date
+  },
+
+
   lastContactedAt: {
     type: Date
   },
@@ -156,6 +161,11 @@ var UserSchema = new Schema({
   },
 
 
+  last_name: {
+    type: String
+  },
+
+
   // last session of user
   lastSession: {
     type: Date
@@ -163,6 +173,12 @@ var UserSchema = new Schema({
 
 
   meta: [MetaDataSchema],
+
+
+  // name of the user
+  name: {
+    type: String
+  },
 
 
   // "iOS 5.0" etc.
@@ -207,7 +223,7 @@ var UserSchema = new Schema({
   ut: {
     type: Date,
     default: Date.now
-  },
+  }
 
 });
 

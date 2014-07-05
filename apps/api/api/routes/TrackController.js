@@ -16,6 +16,7 @@ var router = require('express')
  */
 
 var Account = require('../models/Account');
+var AutoMessage = require('../models/AutoMessage');
 var App = require('../models/App');
 var Company = require('../models/Company');
 var Conversation = require('../models/Conversation');
@@ -30,6 +31,14 @@ var User = require('../models/User');
 
 var logger = require('../../helpers/logger');
 var nocache = require('../../helpers/no-cache-headers');
+
+
+/**
+ * Lib
+ */
+
+var createEventAndIncrementCount = require(
+  '../lib/create-automessage-event-and-increment-count');
 
 
 /**
@@ -474,7 +483,7 @@ router
         },
 
 
-        function createAutoMessageOpenedEvent(notf, user, app, cb) {
+        function createAutoMessageSeenEventAndIncrement(notf, user, app, cb) {
 
           if (!notf) return cb(null, notf, app);
 
@@ -484,10 +493,10 @@ router
             uid: user._id
           };
 
-          var state = 'opened';
+          var state = 'seen';
           var title = notf.title;
 
-          Event.automessage(ids, state, title, function (err) {
+          createEventAndIncrementCount(ids, state, title, function (err) {
             cb(err, notf, app);
           });
 
@@ -512,9 +521,10 @@ router
           return next(err);
         }
 
-        // pass the theme color alongwith the notification
+        // pass the theme color and showMessageBox status alongwith the notification
         notification = notification ? notification.toJSON() : {};
         notification.color = app.color;
+        notification.showMessageBox = app.showMessageBox;
 
 
         res
@@ -614,14 +624,14 @@ router
           }
 
           User.findOne(conditions, function (err, user) {
-            cb(err, app, user);
+            if (err) return cb(err);
+            if (!user) return cb(new Error('USER_NOT_FOUND'));
+            cb(null, app, user);
           });
         },
 
 
         function createConversation(app, user, cb) {
-
-          if (!user) return cb(new Error('USER_NOT_FOUND'));
 
           var newCon = {
             aid: user.aid,
@@ -710,6 +720,40 @@ router
           accountMailer.sendAdminConversation(opts, function (err) {
             cb(err, con);
           });
+        },
+
+
+        function getAutoMessage(con, cb) {
+
+          // to get the title to create automessage event in the next step
+          AutoMessage
+            .findById(con.amId)
+            .select('title')
+            .exec(function (err, amsg) {
+              cb(err, con, amsg);
+            });
+
+        },
+
+
+        function createAutoMessageRepliedEventAndIncrement(con, amsg, cb) {
+
+          // if not reply to automessage, move on
+          if (!amId) return cb(null, con);
+
+          var ids = {
+            aid: con.aid,
+            amId: con.amId,
+            uid: con.uid
+          };
+
+          var state = 'replied';
+          var title = amsg.title;
+
+          createEventAndIncrementCount(ids, state, title, function (err) {
+            cb(err, con);
+          });
+
         }
 
       ],

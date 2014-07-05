@@ -126,39 +126,6 @@ describe('Model Notification', function () {
 
     });
 
-
-    it('should add seen status as false', function () {
-
-      expect(savedNotification)
-        .to.have.property('seen', false);
-
-    });
-
-  });
-
-  describe('#opened', function () {
-
-    it('should update seen status to true', function (done) {
-
-      var notf = saved.notifications.first;
-
-      expect(notf.seen)
-        .to.be.false;
-
-      Notification.opened(notf._id, function (err, updatedNotf) {
-
-        expect(err)
-          .to.not.exist;
-
-        expect(updatedNotf._id)
-          .to.eql(notf._id);
-
-        expect(updatedNotf.seen)
-          .to.be.true;
-
-        done();
-      })
-    });
   });
 
 });

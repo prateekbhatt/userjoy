@@ -31,10 +31,10 @@ describe('Model DailyReport', function () {
 
   describe('#upsert', function () {
 
-    var time = moment();
+    var time = moment.utc();
     var year = time.year();
     var month = time.month();
-    var timestamp = moment()
+    var timestamp = moment.utc()
       .format();
 
     var score = 65;
@@ -97,7 +97,7 @@ describe('Model DailyReport', function () {
 
           DailyReport.find({}, function (err, reports) {
 
-            var time = moment(timestamp);
+            var time = moment.utc(timestamp);
 
             var date = time.date();
             var year = time.year();
@@ -195,7 +195,7 @@ describe('Model DailyReport', function () {
 
             DailyReport.find({}, function (err, reports) {
 
-              var time = moment(timestamp);
+              var time = moment.utc(timestamp);
 
               var date = time.date();
               var year = time.year();
@@ -293,7 +293,7 @@ describe('Model DailyReport', function () {
 
             DailyReport.find({}, function (err, reports) {
 
-              var time = moment(timestamp);
+              var time = moment.utc(timestamp);
 
               var date = time.date();
               var year = time.year();
@@ -390,7 +390,7 @@ describe('Model DailyReport', function () {
 
             DailyReport.find({}, function (err, reports) {
 
-              var time = moment(timestamp);
+              var time = moment.utc(timestamp);
 
               var date = time.date();
               var year = time.year();
@@ -488,7 +488,7 @@ describe('Model DailyReport', function () {
 
             DailyReport.find({}, function (err, reports) {
 
-              var time = moment(timestamp);
+              var time = moment.utc(timestamp);
 
               var date = time.date();
               var year = time.year();
@@ -536,14 +536,14 @@ describe('Model DailyReport', function () {
                 expect(report)
                   .to.have.property('ds_' + i);
 
-              };
+              }
 
               cb();
             });
 
           }
 
-        ], done)
+        ], done);
 
       });
 
@@ -562,8 +562,8 @@ describe('Model DailyReport', function () {
               .and.have.property('message',
                 'DailyReport upsert provide valid score');
 
-            done()
-          })
+            done();
+          });
 
       });
 
@@ -581,8 +581,8 @@ describe('Model DailyReport', function () {
               .and.have.property('message',
                 'DailyReport upsert provide valid score');
 
-            done()
-          })
+            done();
+          });
 
       });
 
@@ -601,8 +601,8 @@ describe('Model DailyReport', function () {
               .and.have.property('message',
                 'DailyReport upsert provide valid usage');
 
-            done()
-          })
+            done();
+          });
 
       });
 
@@ -620,8 +620,8 @@ describe('Model DailyReport', function () {
               .and.have.property('message',
                 'DailyReport upsert provide valid usage');
 
-            done()
-          })
+            done();
+          });
 
       });
 
@@ -639,8 +639,8 @@ describe('Model DailyReport', function () {
               .and.have.property('message',
                 'DailyReport upsert provide valid time');
 
-            done()
-          })
+            done();
+          });
 
       });
 
@@ -677,10 +677,10 @@ describe('Model DailyReport', function () {
 
     before(function (done) {
 
-      var thisMonth = moment()
+      var thisMonth = moment.utc()
         .format();
 
-      var lastMonth = moment()
+      var lastMonth = moment.utc()
         .subtract('month', 1)
         .format();
 
@@ -708,9 +708,9 @@ describe('Model DailyReport', function () {
 
     it('should get the usage', function (done) {
 
-      var to = moment();
+      var to = moment.utc();
 
-      var from = moment()
+      var from = moment.utc()
         .subtract('days', 28);
 
       var noOfDays = to.diff(from, 'days');
@@ -735,7 +735,7 @@ describe('Model DailyReport', function () {
               .toString());
 
           done();
-        })
+        });
 
     });
 
@@ -744,9 +744,9 @@ describe('Model DailyReport', function () {
       'should return error if more than 28 days diff between to and from timestamps',
       function (done) {
 
-        var to = moment();
+        var to = moment.utc();
 
-        var from = moment()
+        var from = moment.utc()
           .subtract('days', 29);
 
         var noOfDays = to.diff(from, 'days');
@@ -764,7 +764,7 @@ describe('Model DailyReport', function () {
             );
 
             done();
-          })
+          });
 
       });
 
@@ -773,9 +773,9 @@ describe('Model DailyReport', function () {
       'should return error if type is not one of usage / score',
       function (done) {
 
-        var to = moment();
+        var to = moment.utc();
 
-        var from = moment()
+        var from = moment.utc()
           .subtract('days', 65);
 
         var noOfDays = to.diff(from, 'days');
@@ -793,7 +793,7 @@ describe('Model DailyReport', function () {
             );
 
             done();
-          })
+          });
 
       });
 
