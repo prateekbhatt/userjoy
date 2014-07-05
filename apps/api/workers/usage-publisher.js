@@ -155,26 +155,9 @@ function cronFunc(cb) {
 
 
       function updateQueuedTimestamp(aids, queueIds, appsData, cb) {
-
-        var query = {
-          _id: {
-            $in: aids
-          }
-        };
-
-        var update = {
-          queuedUsage: updateTime
-        };
-
-        var options = {
-          multi: true
-        };
-
-
-        App
-          .update(query, update, options, function (err, numberAffected) {
-            cb(err, queueIds, appsData);
-          });
+        App.queued(aids, 'usage', updateTime, function (err) {
+          cb(err, queueIds, appsData);
+        });
       }
 
     ],
