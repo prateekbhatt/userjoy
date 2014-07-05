@@ -144,6 +144,45 @@ AppSchema.statics.findByAccountId = function (accountId, cb) {
 
 
 /**
+ * Update the last queued times for usage/score/health queues
+ *
+ * @param {array or string} aids array-of-app-ids or single app-id
+ * @param {string} queue usage/score/queue
+ * @param {date} updateTime new-queued-time
+ * @param {function} cb callback
+ */
+
+AppSchema.statics.queued = function (aids, queue, updateTime, cb) {
+
+  if (!_.isArray(aids)) aids = [aids];
+
+  var query = {
+    _id: {
+      $in: aids
+    }
+  };
+
+  var update = {};
+
+  if (queue === 'usage') {
+    update.queuedUsage = updateTime;
+  } else if (queue === 'score') {
+    update.queuedScore = updateTime;
+  } else if (queue === 'health') {
+    update.queuedHealth = updateTime;
+  } else {
+    return cb(new Error('Queue should be one of usage/score/health'));
+  }
+
+  var options = {
+    multi: true
+  };
+
+  App.update(query, update, options, cb);
+};
+
+
+/**
  * Adds a team member to an app
  * - should not already be part of the team
  *
