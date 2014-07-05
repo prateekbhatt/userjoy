@@ -6921,7 +6921,8 @@ var MSG_TEMPLATE_ID = 'uj_message';
 var MSG_BODY_TEMPLATE_ID = 'uj_message_body';
 var MSG_SENT_TEMPLATE_ID = 'uj_message_sent';
 var MSG_ERROR_ID = 'uj_message_error';
-var MSG_SEND_FEEDBACK_ID = 'uj_message_send_button'
+var MSG_SEND_FEEDBACK_ID = 'uj_message_send_button';
+var MSG_DISPLAY_QMARK = 'uj_message_display_qmark';
 
 
 /**
@@ -6948,7 +6949,9 @@ Message.prototype.load = function () {
     MSG_SENT_TEMPLATE_ID: MSG_SENT_TEMPLATE_ID,
     MSG_ERROR_ID: MSG_ERROR_ID,
     MSG_SEND_FEEDBACK_ID: MSG_SEND_FEEDBACK_ID,
-    color: appTraits.color
+    MSG_DISPLAY_QMARK: MSG_DISPLAY_QMARK,
+    color: appTraits.color,
+    isDisplayed: appTraits.showMessageBox ? 'block' : 'none'
   };
 
   dom('body')
@@ -7110,7 +7113,7 @@ module.exports = function anonymous(obj) {
     return '';
   };
 
-  return "<div>\n    <a style=\"cursor: pointer\" onclick=\"userjoy.showFeedback()\">\n        <div style=\"position: fixed; bottom:30px; right:20px; z-index: 99999999;\">\n            <span style=\"display: inline-block;\n            min-width: 20px;\n            padding: 10px 14px;\n            font-size: 24px;\n            font-weight: 700;\n            color: #fff;\n            line-height: 1;\n            vertical-align: baseline;\n            white-space: nowrap;\n            text-align: center;\n            background-color: " + escape(obj.color) + ";\n            border-radius: 10px;\">&#63;\n            </span>\n        </div>\n    </a>\n    <div style=\"display: none\" id=\"" + escape(obj.MSG_TEMPLATE_ID) + "\">\n        <div style=\"position: fixed; right: 9px; z-index: 99999999; top: 50%; left: 50%; margin-left: -225px; height: 1000px; margin-top: -150px;\" class=\"uj-col-md-4\">\n            <div class=\"uj-panel uj-panel-default\" style=\"border-color: #ddd;\">\n                <div class=\"uj-panel-heading\">\n                    <h3 class=\"uj-panel-title\" style=\"text-align: center;\">Send us a Message</h3>\n                    <button type=\"button\" class=\"uj-close\" aria-hidden=\"true\" onclick=\"userjoy.hideFeedback()\" id=\"closeFeedback\" style=\"margin-top: -25px;\">&times;</button>\n                </div>\n                <div class=\"uj-panel-body\">\n                    <form role=\"form\">\n                        <textarea id=\"" + escape(obj.MSG_BODY_TEMPLATE_ID) + "\" class=\"uj-form-control\" style=\"padding: 4px; height: 200px; border-color: " + escape(obj.color) + "; box-shadow: none;\"></textarea>\n                        <span style=\"display: none; margin-top: 10px;\" id=\"" + escape(obj.MSG_SENT_TEMPLATE_ID) + "\">\n                        Message Sent. Thanks!</span>\n                        <span id=\"" + escape(obj.MSG_ERROR_ID) + "\" style=\" display:none; color: #a94442; margin-top: 10px;\">\n                        Your message cannot be blank\n                        </span>\n                        <button type=\"button\" class=\"uj-btn uj-btn-sm uj-btn-block\" onclick=\"userjoy.sendConversation()\" style=\"float: right; margin-top: 10px; color: #fff; background-color: " + escape(obj.color) + "; border-color: " + escape(obj.color) + "\" id=\"" + escape(obj.MSG_SEND_FEEDBACK_ID) + "\">Send Message</button>\n                        <div style=\"text-align: center;\">\n                        <small style=\"color: #95a5a6;\">Powered by <a style=\"text-decoration:none; color: " + escape(obj.color) + "\" href=\"http://www.userjoy.co\", target=\"_blank\">UserJoy</a></small>\n                        </div>\n                    </form>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n"
+  return "<div>\n    <a style=\"cursor: pointer; display: " + escape(obj.isDisplayed) + ";\" onclick=\"userjoy.showFeedback()\" id=\"" + escape(obj.MSG_DISPLAY_QMARK) + "\">\n        <div style=\"position: fixed; bottom:30px; right:20px; z-index: 99999999;\">\n            <span style=\"display: inline-block;\n            min-width: 20px;\n            padding: 10px 14px;\n            font-size: 24px;\n            font-weight: 700;\n            color: #fff;\n            line-height: 1;\n            vertical-align: baseline;\n            white-space: nowrap;\n            text-align: center;\n            background-color: " + escape(obj.color) + ";\n            border-radius: 10px;\">&#63;\n            </span>\n        </div>\n    </a>\n    <div style=\"display: none\" id=\"" + escape(obj.MSG_TEMPLATE_ID) + "\">\n        <div style=\"position: fixed; right: 9px; z-index: 99999999; top: 50%; left: 50%; margin-left: -225px; height: 1000px; margin-top: -150px;\" class=\"uj-col-md-4\">\n            <div class=\"uj-panel uj-panel-default\" style=\"border-color: #ddd;\">\n                <div class=\"uj-panel-heading\">\n                    <h3 class=\"uj-panel-title\" style=\"text-align: center;\">Send us a Message</h3>\n                    <button type=\"button\" class=\"uj-close\" aria-hidden=\"true\" onclick=\"userjoy.hideFeedback()\" id=\"closeFeedback\" style=\"margin-top: -25px;\">&times;</button>\n                </div>\n                <div class=\"uj-panel-body\">\n                    <form role=\"form\">\n                        <textarea id=\"" + escape(obj.MSG_BODY_TEMPLATE_ID) + "\" class=\"uj-form-control\" style=\"padding: 4px; height: 200px; border-color: " + escape(obj.color) + "; box-shadow: none;\"></textarea>\n                        <span style=\"display: none; margin-top: 10px;\" id=\"" + escape(obj.MSG_SENT_TEMPLATE_ID) + "\">\n                        Message Sent. Thanks!</span>\n                        <span id=\"" + escape(obj.MSG_ERROR_ID) + "\" style=\" display:none; color: #a94442; margin-top: 10px;\">\n                        Your message cannot be blank\n                        </span>\n                        <button type=\"button\" class=\"uj-btn uj-btn-sm uj-btn-block\" onclick=\"userjoy.sendConversation()\" style=\"float: right; margin-top: 10px; color: #fff; background-color: " + escape(obj.color) + "; border-color: " + escape(obj.color) + "\" id=\"" + escape(obj.MSG_SEND_FEEDBACK_ID) + "\">Send Message</button>\n                        <div style=\"text-align: center;\">\n                        <small style=\"color: #95a5a6;\">Powered by <a style=\"text-decoration:none; color: " + escape(obj.color) + "\" href=\"http://www.userjoy.co\", target=\"_blank\">UserJoy</a></small>\n                        </div>\n                    </form>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n"
 }
 });
 require.register("userjoy/lib/notification.js", function(exports, require, module){
@@ -7172,6 +7175,9 @@ Notification.prototype.load = function (cb) {
 
     // add color to the app traits
     app.setTrait('color', notf.color);
+
+    // add showMessageBox status to the app traits
+    app.setTrait('showMessageBox', notf.showMessageBox);
 
     // If no response, move on
     if (!notf.body) {
@@ -7320,6 +7326,7 @@ Notification.prototype.reply = function () {
  */
 
 module.exports = bind.all(new Notification());
+
 });
 require.register("userjoy/lib/notification-template.js", function(exports, require, module){
 module.exports = function anonymous(obj) {
