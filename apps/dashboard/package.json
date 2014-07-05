@@ -36,5 +36,8 @@
     "url": "git://github.com/prateekbhatt/littlejohn.git"
   },
   "author": "Prateek Bhatt <prattbhatt@gmail.com>",
-  "license": ""
+  "license": "",
+  "devDependencies": {
+    "grunt-filerev": "~0.2.1"
+  }
 }
