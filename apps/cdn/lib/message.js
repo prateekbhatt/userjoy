@@ -15,7 +15,8 @@ var MSG_TEMPLATE_ID = 'uj_message';
 var MSG_BODY_TEMPLATE_ID = 'uj_message_body';
 var MSG_SENT_TEMPLATE_ID = 'uj_message_sent';
 var MSG_ERROR_ID = 'uj_message_error';
-var MSG_SEND_FEEDBACK_ID = 'uj_message_send_button'
+var MSG_SEND_FEEDBACK_ID = 'uj_message_send_button';
+var MSG_DISPLAY_QMARK = 'uj_message_display_qmark';
 
 
 /**
@@ -42,7 +43,9 @@ Message.prototype.load = function () {
     MSG_SENT_TEMPLATE_ID: MSG_SENT_TEMPLATE_ID,
     MSG_ERROR_ID: MSG_ERROR_ID,
     MSG_SEND_FEEDBACK_ID: MSG_SEND_FEEDBACK_ID,
-    color: appTraits.color
+    MSG_DISPLAY_QMARK: MSG_DISPLAY_QMARK,
+    color: appTraits.color,
+    isDisplayed: appTraits.showMessageBox ? 'block' : 'none'
   };
 
   dom('body')
