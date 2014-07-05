@@ -120,7 +120,7 @@ exports.start = function startServer(done) {
         });
 
         return (done && done(err));
-      };
+      }
 
       printMessage(db, app);
       done && done(null, db, app);

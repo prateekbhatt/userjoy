@@ -18,6 +18,7 @@ var ERROR_ID = 'uj_error';
 var NOTIFICATION_TEMPLATE_ID = 'uj_notification';
 var REPLY_TEMPLATE_ID = 'uj_notification_reply';
 var SENT_TEMPLATE_ID = 'uj_notification_reply_sent';
+var SEND_MESSAGE_NOTIFICATION_ID = 'uj_send_message_notification_btn';
 
 
 /**
@@ -56,6 +57,9 @@ Notification.prototype.load = function (cb) {
     // add color to the app traits
     app.setTrait('color', notf.color);
 
+    // add showMessageBox status to the app traits
+    app.setTrait('showMessageBox', notf.showMessageBox);
+
     // If no response, move on
     if (!notf.body) {
       return cb(new Error('no new notification found'));
@@ -78,6 +82,7 @@ Notification.prototype.load = function (cb) {
       REPLY_TEMPLATE_ID: REPLY_TEMPLATE_ID,
       SENT_TEMPLATE_ID: SENT_TEMPLATE_ID,
       ERROR_ID: ERROR_ID,
+      SEND_MESSAGE_NOTIFICATION_ID: SEND_MESSAGE_NOTIFICATION_ID,
       gravatar: gravatar
     };
 
@@ -142,6 +147,9 @@ Notification.prototype.reply = function () {
     return;
   }
 
+  document.getElementById(SEND_MESSAGE_NOTIFICATION_ID)
+    .disabled = true;
+
   var reply = {
     amId: appTraits.automessageId,
     app_id: appTraits.app_id,
@@ -169,8 +177,15 @@ Notification.prototype.reply = function () {
 
       document.getElementById(SENT_TEMPLATE_ID)
         .style.display = 'block';
+
+      document.getElementById(ERROR_ID)
+        .style.display = 'none';
+
       document.getElementById(REPLY_TEMPLATE_ID)
         .value = '';
+
+      document.getElementById(SEND_MESSAGE_NOTIFICATION_ID)
+        .disabled = false;
 
       setTimeout(function () {
         document.getElementById(NOTIFICATION_TEMPLATE_ID)
@@ -179,6 +194,8 @@ Notification.prototype.reply = function () {
     },
     error: function (err) {
       self.debug(err);
+      document.getElementById(SEND_MESSAGE_NOTIFICATION_ID)
+        .disabled = false;
     },
     dataType: 'json'
   });

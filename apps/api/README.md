@@ -148,6 +148,9 @@ UserNote      |                         | notes created by team members about a 
 - ct
 - isActive (boolean)
 - name
+- queuedHealth (when was the health queue last queued)
+- queuedScore (when was the score queue last queued)
+- queuedUsage (when was the usage queue last queued)
 - team [{accId, admin}]
 - x tags [] stores all tags that the app has used for its users
 - url (domain url)
@@ -174,8 +177,9 @@ UserNote      |                         | notes created by team members about a 
 - browser ("Chrome 35" etc.)
 - country (2 letter ISO-3166-1 country code, [REF](https://github.com/bluesmoon/node-geoip#looking-up-an-ip-address)
 - device ('Apple iPad')
-- x name
-- x username
+- name
+- firstName
+- lastName
 - x meta (object containing additonal info about users)
 - ct
 - ut
@@ -333,6 +337,7 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 
 - aid (required)
 - amId (required for automessage events)
+- amState (clicked,sent,seen,replied)
 - cid
 - ct
 - module
@@ -352,8 +357,7 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 
 ##### Notes:
 
-- 'amId' and 'state' must be required for 'automessage' events ('state' is stored
-as meta property)
+- 'amId' and 'amState' must be required for 'automessage' events
 
 
 ### AutoMessage
@@ -388,7 +392,6 @@ as meta property)
 - amId
 - body
 - ct
-- seen (boolean)
 - senderEmail (required, to show gravatar in notification)
 - senderName (required)
 - title (Required, automessage title)
@@ -400,7 +403,7 @@ as meta property)
 
 ##### Notes:
 
-- Only auto notifications are stored in this. The manually created notifications are stored in the Message collection
+- Only auto notifications are stored in this. Manually created notifications are not allowed now.
 - A notification would be deleted once it has been seen by the user
 
 ### Conversation

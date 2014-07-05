@@ -1,20 +1,24 @@
 <div id="{{NOTIFICATION_TEMPLATE_ID}}" style="position: absolute; z-index: 99999999; right: 0; margin-left: auto; margin-right: 3px;">
     <div style="float:right; width: 350px; margin-top: 50px;">
-        <div class="uj-message-template" style="min-height: 175px; max-height: 175px; overflow: auto; border-color: {{color}}; border-right: 1px solid {{color}};border-top: 1px solid {{color}}; border-bottom: 1px solid {{color}}; border-radius: 4px; z-index: 99999999; background-color: #fff;">
+        <div class="uj-message-template" style="min-height: 175px; max-height: 175px; overflow: auto; border-color: {{color}}; border-right: 1px solid {{color}};border-top: 1px solid {{color}}; border-bottom: 1px solid {{color}}; border-radius: 4px; z-index: 99999999; background-color: #fefefe;">
             <button type="button" class="uj-close" aria-hidden="true" onclick="userjoy.hideNotification()" style="margin-top: -15px;">&times;</button>
             <img src="{{gravatar}}" width="60px">
             <div style="margin-top: -75px; margin-left: 75px;">
                 <p style="margin-top: 12px;"><b>{{senderName}}</b></p>
                 <p>{{!body}}</p>
             </div>
-            <span id="{{SENT_TEMPLATE_ID}}" style="margin-top: 40px; display:none; color: #7f8c8d; position: relative;">Message Sent. Thanks!</span>
-            <span id="{{ERROR_ID}}" style="margin-top: 40px; display:none; color: #a94442; position: relative;">Your reply cannot be blank</span>
+            <span id="{{SENT_TEMPLATE_ID}}" style="display:none; color: #7f8c8d; position: absolute; bottom: 70px;">Message Sent. Thanks!</span>
+            <span id="{{ERROR_ID}}" style="display:none; color: #a94442; position: absolute; bottom: 70px;">Your reply cannot be blank</span>
+            <br>
+            <div style="position: absolute; bottom: 60px; right: 16px;">
+                <small style="color: #95a5a6;">Powered by <a style="text-decoration:none; color: {{color}}" href="http://www.userjoy.co", target="_blank">UserJoy</a></small>
+            </div>
         </div>
         <div class="uj-panel-footer" style="margin-top: -23px; z-index: 99999999">
             <div class="uj-input-group">
                 <textarea id="{{REPLY_TEMPLATE_ID}}" type="text" name="msg" class="uj-form-control uj-input-sm" placeholder="Reply here..." style="margin-top: 3px; height: 34px;"></textarea>
                 <span class="uj-input-group-btn">
-                <button class="uj-btn uj-btn-sm" id="btn-chat" type="button" onclick="userjoy.replyNotification()" style="margin-top: 3px; height: 34px; color: #fff; background-color: {{color}}; border-color: {{color}}">
+                <button id="{{SEND_MESSAGE_NOTIFICATION_ID}}" class="uj-btn uj-btn-sm" id="btn-chat" type="button" onclick="userjoy.replyNotification()" style="margin-top: 3px; height: 34px; color: #fff; background-color: {{color}}; border-color: {{color}}">
                 Send</button>
                 </span>
             </div>

@@ -50,7 +50,7 @@
                                 <tr>
                                     <th class="text-center">Sub</th>
                                     <th class="text-center">When</th>
-                                    <th class="text-center">Opened</th>
+                                    <th class="text-center"></th>
                                     <!-- <th class="text-center">Seen</th> -->
                                 </tr>
                             </thead>
@@ -59,8 +59,8 @@
                                     <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer;">{{msg.sub}}</td>
                                     <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer; width: 100%; ">{{msg.when}}</td>
                                     <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer;">
-                                        <span class="glyphicon glyphicon-ok" ng-show="{{!msg.closed}}" style="color: red;"></span>
-                                        <span class="glyphicon glyphicon-remove" ng-show="{{msg.closed}}" style="color: green;"></span>
+                                        <span class="label label-success" ng-show="{{!msg.closed}}" style="font-size: 100%;">Opened</span>
+                                        <span class="label label-danger" ng-show="{{msg.closed}}" style="font-size: 100%;">Closed</span>
                                     </td>
                                    <!--  <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer;">
                                         <span class="glyphicon glyphicon-ok" ng-show="{{msg.seen}}"></span>
@@ -84,13 +84,15 @@
                         <table class="table table-striped table-condensed">
                             <thead>
                                 <tr>
-                                    <th width="50%" class="text-center">Text</th>
-                                    <th width="50%" class="text-center">When</th>
+                                    <th width="40%" class="text-center">Text</th>
+                                    <th width="20%" class="text-center">Creator</th>
+                                    <th width="40%" class="text-center">When</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr ng-repeat="note in notes">
                                     <td class="text-center">{{note.text}}</td>
+                                    <td class="text-center">{{note.creator}}</td>
                                     <td class="text-center">{{note.when}}</td>
                                 </tr>
                             </tbody>
@@ -106,7 +108,7 @@
                 <div class="text-center">
                     <div class="col-md-4 pull-left">
                         <div class="btn-group" ng-show="showPreviousBtn">
-                            <button class="btn btn-default btn-sm text-center fa fa-backward " ng-click="showEventPreviousDate()">&nbsp;Prev</button>
+                            <button class="btn btn-default btn-sm text-center" ng-click="showEventPreviousDate()"><i class="fa fa-backward "></i>&nbsp;Prev</button>
                             <!-- <button class="btn btn-default btn-sm text-center" ng-click="showEventNextDate()">Next</button> -->
                         </div>
                     </div>
@@ -114,7 +116,7 @@
                         <p><em>{{eventDate}}</em></p>
                     </div>
                     <div class="col-md-4 pull-right">
-                        <button class="btn btn-default btn-sm text-center fa fa-forward " ng-click="showEventNextDate()">Next</button>
+                        <button class="btn btn-default btn-sm text-center " ng-click="showEventNextDate()">Next <i class="fa fa-forward"></i></button>
                     </div>
                 </div>
                 <div class="row">

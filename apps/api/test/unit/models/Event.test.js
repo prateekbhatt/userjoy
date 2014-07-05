@@ -273,6 +273,7 @@ describe('Model Event', function () {
     };
     var title = 'In App Welcome Message';
     var state = 'queued';
+
     it('should create a new automessage event', function (done) {
 
       var savedEventId;
@@ -281,18 +282,14 @@ describe('Model Event', function () {
 
         shouldCreateEvent: function (cb) {
 
-          Event.automessage(ids, state, title, function (err, n, raw) {
+          Event.automessage(ids, state, title, function (err,
+            updatedExisting) {
 
             expect(err)
               .to.not.exist;
 
-            expect(n)
-              .to.eql(1);
-
-            expect(raw.updatedExisting)
+            expect(updatedExisting)
               .to.be.false;
-
-            savedEventId = raw.upserted[0]._id;
 
             cb();
 
@@ -303,12 +300,21 @@ describe('Model Event', function () {
         checkTheEvent: function (cb) {
 
           Event
-            .findById(savedEventId)
-            .exec(function (err, evn) {
+            .find({
+              aid: ids.aid,
+              amId: ids.amId,
+              uid: ids.uid,
+              amState: state
+            })
+            .exec(function (err, evns) {
               expect(err)
                 .to.not.exist;
 
-              evn = evn.toJSON();
+              expect(evns)
+                .to.be.an('array')
+                .with.length(1);
+
+              var evn = evns[0];
 
               expect(evn)
                 .to.have.property("type", "auto");
@@ -316,18 +322,8 @@ describe('Model Event', function () {
               expect(evn)
                 .to.have.property("name", "In App Welcome Message");
 
-              expect(evn.amId.toString())
-                .to.eql(ids.amId.toString());
-
-
-              expect(evn.meta[0])
-                .to.eql({
-                  k: 'state',
-                  v: state
-                });
-
-              cb()
-            })
+              cb();
+            });
         }
 
       }, done)
@@ -338,28 +334,22 @@ describe('Model Event', function () {
     // MUST RUN AFTER THE ABOVE TEST
     it('should not create same automessage event twice', function (done) {
 
-      Event.automessage(ids, state, title, function (err, n, raw) {
+      Event.automessage(ids, state, title, function (err, updatedExisting) {
 
         expect(err)
           .to.not.exist;
 
-        expect(n)
-          .to.eql(1);
-
-        expect(raw.updatedExisting)
+        expect(updatedExisting)
           .to.be.true;
 
-        expect(raw.upserted)
-          .to.not.exist;
-
-        done()
+        done();
       });
 
     });
 
 
     it(
-      'should return error if automessage state is not in queued/sent/clicked/opened/replied',
+      'should return error if automessage state is not in queued/sent/clicked/seen/replied',
       function (done) {
 
         var ids = {
@@ -378,7 +368,7 @@ describe('Model Event', function () {
 
           expect(err.message)
             .to.eql(
-              'automessage state must be one of queued/sent/opened/clicked/replied'
+              'automessage state must be one of queued/sent/seen/clicked/replied'
           );
 
           done();

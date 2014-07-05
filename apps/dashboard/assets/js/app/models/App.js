@@ -125,5 +125,18 @@ angular
           })
           .error(cb);
       }
+
+      this.showFeedBackMsg = function (appId, status, cb) {
+        var data = {
+          status: status
+        }
+        console.log("data: ", data);
+        $http.put(config.apiUrl + '/apps/' + appId + '/show-message-box', data)
+          .success(function (data) {
+            console.log("success", data);
+            cb();
+          })
+          .error(cb);
+      }
     }
   ])

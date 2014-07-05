@@ -26,7 +26,7 @@ var logger = new(winston.Logger)({
     new(winston.transports.Console)({
       level: 'trace', // TODO: should be defined according to the environment inside config.js
       colorize: true,
-      timestamp: false
+      timestamp: true
     })
   ]
 });

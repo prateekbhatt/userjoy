@@ -132,7 +132,8 @@
                                                                 <span>{{user.time}}</span>
                                                             </td>
                                                             <td data-title="''" style="text-align:center">
-                                                                <a href="#" ng-click="closeConversation(user.coid)">Close</a>
+                                                                <a href="#" ng-click="closeReopenConversation(user.id, user, $index)">{{user.buttonText}}</a>
+                                                                <!-- <a href="#" ng-click="reopenConversation(user.id, user, $index)" ng-if="!user.close">{{user.buttonText}}</a> -->
                                                             </td>
                                                             <td data-title="''" style="text-align:center">
                                                                 <li class="dropdown" style="list-style: none;">

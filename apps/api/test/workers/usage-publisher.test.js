@@ -56,7 +56,9 @@ describe('Worker usagePublisher', function () {
 
     it('should return an array of active app ids', function (done) {
 
-      worker._findActiveApps(function (err, ids) {
+      var timeNow = Date.now();
+
+      worker._findActiveApps(timeNow, function (err, ids) {
         expect(err)
           .to.not.exist;
 
@@ -80,42 +82,124 @@ describe('Worker usagePublisher', function () {
   describe('#cronFunc', function () {
 
 
-    it('should find and queue active apps', function (done) {
+    it(
+      'should find and queue active apps, and update queuedUsage timestamps',
+      function (done) {
 
-      worker._cronFunc(function (err, queueIds, appData, numberAffected) {
+        async.series(
 
-        expect(err)
-          .to.not.exist;
+          [
 
-        expect(queueIds)
-          .to.be.a("string");
+            function queuedUsageDontExist(cb) {
 
-        expect(appData)
-          .to.be.an("array")
-          .that.has.length(1);
+              // check it for the first saved app
+
+              App
+                .findById(saved.apps.first._id)
+                .exec(function (err, app) {
+
+                  expect(err)
+                    .to.not.exist;
+
+                  expect(app)
+                    .to.not.have.property('queuedUsage');
+
+                  cb();
+                });
+            },
+
+            function makeRequest(cb) {
+
+              worker._cronFunc(function (err, queueIds, appData,
+                numberAffected) {
+
+                expect(err)
+                  .to.not.exist;
+                expect(queueIds)
+                  .to.be.a("string");
+
+                expect(appData)
+                  .to.be.an("array")
+                  .that.has.length(1);
 
 
-        _.each(appData, function (d, i) {
-          d = JSON.parse(d);
+                _.each(appData, function (d, i) {
+                  d = JSON.parse(d);
 
-          expect(d)
-            .to.have.property('aid')
-            .that.is.a('string')
-            .and.deep.equals(queuedAppIds[i]);
+                  expect(d)
+                    .to.have.property('aid')
+                    .that.is.a('string')
+                    .and.deep.equals(queuedAppIds[i]);
 
-          expect(d)
-            .to.have.property('time')
-            .that.is.a('number');
+                  expect(d)
+                    .to.have.property('updateTime')
+                    .that.is.a('number');
 
-        })
+                });
+
+                cb();
+              });
+
+            },
 
 
-        done();
+            function shouldHaveUpdatedQueuedUsage(cb) {
+
+              // check it for the first saved app
+
+              App
+                .findById(saved.apps.first._id)
+                .exec(function (err, app) {
+
+                  expect(err)
+                    .to.not.exist;
+
+                  expect(app)
+                    .to.have.property('queuedUsage')
+                    .that.is.a('date');
+
+                  cb();
+                });
+            },
+
+            function makeRequestAgain(cb) {
+
+              // should not queue app again, because queuedUsage was just set
+              // now!
+
+              worker._cronFunc(function (err, queueIds, appData,
+                numberAffected) {
+
+                expect(err)
+                  .to.exist
+                  .and.to.have.property('name', 'QueueError')
+
+                expect(err)
+                  .to.have.property('message',
+                    'NO_APPS_FOUND_FOR_QUEUEING');
+
+                expect(queueIds)
+                  .to.not.exist;
+
+                expect(appData)
+                  .to.not.exist;
+
+                cb();
+              });
+
+            },
+
+
+          ],
+
+          done
+
+        );
+
+
       });
 
-    });
 
   });
-
 
 });

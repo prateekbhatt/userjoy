@@ -16,6 +16,7 @@ var q = require('./queues')
  */
 
 var logger = require('../helpers/logger');
+var QueueError = require('../helpers/queue-error');
 
 
 /**
@@ -53,15 +54,11 @@ if (process.env.NODE_ENV === 'production') {
  */
 
 function findAutoMessages(cb) {
-  logger.trace('workers/automessagePublisher findAutoMessages');
-
 
   // TODO: check if this is working
   var sixHoursAgo = moment()
     .subtract('hours', 6)
     .unix();
-
-  logger.trace(sixHoursAgo);
 
   AutoMessage
     .find({
@@ -119,12 +116,19 @@ function updateLastQueued(ids, cb) {
 
 function cronFunc(cb) {
 
-  logger.trace('workers/automessagePublisher cronFunc');
+  console.log('\n\n\n');
+  logger.trace('amPublisher:Started');
 
   async.waterfall([
 
       function find(cb) {
-        findAutoMessages(cb);
+        findAutoMessages(function (err, amsgs) {
+          if (err) return cb(err);
+          if (_.isEmpty(amsgs)) {
+            return cb(new QueueError('NO_AUTOMESSAGES_FOR_QUEUEING'));
+          }
+          cb(null, amsgs);
+        });
       },
 
       function queue(msgs, cb) {
@@ -136,9 +140,10 @@ function cronFunc(cb) {
           })
           .value();
 
-        q().post(ids, function (err, queueIds) {
-          cb(err, queueIds, ids);
-        });
+        q()
+          .post(ids, function (err, queueIds) {
+            cb(err, queueIds, ids);
+          });
       },
 
       function updateTime(queueIds, ids) {
@@ -152,15 +157,13 @@ function cronFunc(cb) {
 
     function finalCallback(err, queueIds, ids, numberAffected) {
 
-      logger.trace('workers/automessagePublisher Completed');
+      var logObj = {
+        at: 'amPublisher:Completed',
+        err: err,
+        ts: Date.now()
+      };
 
-      if (err) {
-        logger.crit({
-          at: 'jobs/automessage',
-          err: err,
-          ts: Date.now()
-        });
-      }
+      err ? logger.crit(logObj) : logger.trace(logObj);
 
       if (cb) {
         return cb(err, queueIds, ids, numberAffected);

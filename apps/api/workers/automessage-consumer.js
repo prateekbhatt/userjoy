@@ -53,7 +53,16 @@ var userMailer = require('../api/services/user-mailer');
 var appEmail = require('../helpers/app-email');
 var getRenderData = require('../helpers/get-render-data');
 var logger = require('../helpers/logger');
+var QueueError = require('../helpers/queue-error');
 var render = require('../helpers/render-message');
+
+
+/**
+ * Lib
+ */
+
+var createEventAndIncrementCount = require(
+  '../api/lib/create-automessage-event-and-increment-count');
 
 
 /**
@@ -117,7 +126,8 @@ function saveNotifications(users, amsg, cb) {
       };
 
       // create 'automessage' event
-      Event.automessage(ids, 'queued', title, cb);
+      // NOTE: unlike emails, notifications should have a 'sent' event
+      createEventAndIncrementCount(ids, 'sent', title, cb);
 
     });
 
@@ -164,7 +174,7 @@ function removeUsersAlreadySent(users, amId, cb) {
 
 
       logger.trace({
-        at: 'workers/amConsumer removeUsersAlreadySent',
+        at: 'amConsumer:removeUsersAlreadySent',
         found: users.length,
         sent: uids.length,
         new: newUsers.length
@@ -182,7 +192,6 @@ function amConsumer(cb) {
   var queueMsgId;
   var automessage;
 
-  logger.trace('amConsumer:start');
 
   async.waterfall(
 
@@ -198,16 +207,10 @@ function amConsumer(cb) {
         q()
           .get(opts, function (err, res) {
 
-            logger.trace({
-              at: 'amConsumer:getFromQueue',
-              err: err,
-              res: res
-            });
-
             if (err) return cb(err);
 
             if (!_.isObject(res) || !res.id) {
-              return cb(new Error('EMPTY_AUTOMESSAGE_QUEUE'));
+              return cb(new QueueError('EMPTY_AUTOMESSAGE_QUEUE'));
             }
 
             // store the queue message id
@@ -215,7 +218,7 @@ function amConsumer(cb) {
 
             // the message body contains the automessage id
             if (!res.body) {
-              return cb(new Error('AUTOMESSAGE_ID_NOT_FOUND_IN_QUEUE'));
+              return cb(new QueueError('AUTOMESSAGE_ID_NOT_FOUND_IN_QUEUE'));
             }
 
             cb(null, res.body);
@@ -225,21 +228,13 @@ function amConsumer(cb) {
 
       function findAutoMessage(autoMessageId, cb) {
 
-        logger.trace('amConsumer:findAutoMessage:' + autoMessageId);
-
         AutoMessage
           .findById(autoMessageId)
           .populate('sender')
           .exec(function (err, amsg) {
 
-            logger.trace({
-              at: 'workers/automessageConsumer findAutoMessage',
-              err: err,
-              amsg: amsg
-            });
-
             if (err) return cb(err);
-            if (!amsg) return cb(new Error('AUTOMESSAGE_NOT_FOUND'));
+            if (!amsg) return cb(new QueueError('AUTOMESSAGE_NOT_FOUND'));
 
             // store automessage in a local variable
             automessage = amsg;
@@ -251,24 +246,17 @@ function amConsumer(cb) {
 
       function findSegment(automessage, cb) {
 
-        logger.trace('amConsumer:findSegment:' + automessage.sid);
-
         Segment
           .findById(automessage.sid)
           .exec(function (err, seg) {
             if (err) return cb(err);
-            if (!seg) return cb(new Error('SEGMENT_NOT_FOUND'));
+            if (!seg) return cb(new QueueError('SEGMENT_NOT_FOUND'));
             cb(null, seg);
           });
       },
 
 
       function runQuery(segment, cb) {
-
-        logger.trace({
-          at: 'workers/automessageConsumer runQuery',
-          segment: segment
-        });
 
         // segment object should be converted from BSON to JSON
         segment = segment.toJSON();
@@ -308,25 +296,19 @@ function amConsumer(cb) {
       //
       // Remove all users who have been sent the automessage before
       function sentUsers(users, cb) {
-        logger.trace('amConsumer:removeUsersAlreadySent');
+
         removeUsersAlreadySent(users, automessage._id, function (err, usrs) {
           if (err) return cb(err);
-          if (_.isEmpty(usrs)) return cb(new Error('NO_USERS_MATCHED'));
+          if (_.isEmpty(usrs)) return cb(new QueueError('NO_USERS_MATCHED'));
           cb(null, usrs);
         });
       },
 
 
       function sendEmails(users, cb) {
-        logger.trace('amConsumer:sendEmails');
 
         // if message type is not email, skip this
         if (automessage.type !== "email") return cb(null, users);
-
-        logger.trace({
-          at: 'workers/automessageConsumer sendEmails',
-          users: users
-        });
 
         async.each(
 
@@ -390,23 +372,13 @@ function amConsumer(cb) {
               var title = automessage.title;
 
               Event.automessage(ids, state, title, function (err, evn) {
-                cb(err, evn)
+                cb(err, evn);
               });
 
             });
           },
 
           function callback(err) {
-
-            if (err) {
-
-              logger.crit({
-                at: 'amConsumer:send',
-                err: err,
-                amId: automessage._id
-              });
-            }
-
             cb(err, users);
           });
       },
@@ -414,15 +386,8 @@ function amConsumer(cb) {
 
       function sendNotifications(users, cb) {
 
-        logger.trace('amConsumer:sendNotifications');
-
         // if message type is not notification, skip this
         if (automessage.type !== "notification") return cb();
-
-        logger.trace({
-          at: 'workers/automessageConsumer sendNotifications',
-          users: users
-        });
 
         saveNotifications(users, automessage, cb);
 
@@ -435,55 +400,42 @@ function amConsumer(cb) {
       // function to delete message from queue
       var deleteFromQueue = function (cb) {
 
-        logger.trace('amConsumer:deleteFromQueue');
-
         q()
           .del(queueMsgId, function (err, body) {
-
-            logger.trace({
-              at: 'workers/automessageConsumer deleteFromQueue',
-              queueMsgId: queueMsgId,
-              err: err,
-              body: body
-            });
-
             cb(err);
-
           });
       };
 
 
-      if (err) logError(err, 'in amConsumer:callback:dontknow');
+      if (err && (err.name === 'QueryError')) {
 
-      // was the queue empty, then we would retry fetching messages from the
-      // queue after some time with a setTimeout
-      // if empty queue error move on, and try to fetch msg again after sometime
-      if (err && err.message === 'EMPTY_AUTOMESSAGE_QUEUE') {
-        return cb(err);
+        // was the queue empty, then we would retry fetching messages from the
+        // queue after some time with a setTimeout
+        // if empty queue error move on, and try to fetch msg again after sometime
+        if (err.message === 'EMPTY_AUTOMESSAGE_QUEUE') {
+          return cb(err);
+        }
+
+
+        // if any other QueueError, log queue error, delete message from queue
+
+        logger.crit({
+          at: 'amConsumer:QueueError',
+          err: err
+        });
+
+        return deleteFromQueue(function (err) {
+          cb(err, queueMsgId, automessage);
+        });
+
       }
-
 
       // in case of not defined / unknown errors, log error and donot delete
       // from queue
-      if (err && !_.contains([
-
-        'AUTOMESSAGE_ID_NOT_FOUND_IN_QUEUE',
-        'AUTOMESSAGE_NOT_FOUND',
-        'SEGMENT_NOT_FOUND',
-        'NO_USERS_MATCHED'
-
-      ], err.message)) {
-        return cb(err);
-      }
-
-
-      // if known errors, delete from queue
-      return deleteFromQueue(function (err) {
-        cb(err, queueMsgId, automessage);
-      });
+      return cb(err);
 
     }
-  )
+  );
 }
 
 
@@ -493,17 +445,26 @@ module.exports = function run() {
 
     function foreverFunc(next) {
 
+
+      console.log('\n\n\n');
+      logger.trace({
+        at: 'amConsumer:start'
+      });
+
       amConsumer(function (err) {
 
+        var logObj = {
+          at: 'amConsumer:Completed',
+          err: err,
+          time: Date.now()
+        };
 
-        // err has already been logged before, so commenting out the next line
-        // if (err) logError(err, true);
+        err ? logger.crit(logObj) : logger.trace(logObj);
 
         // if error is empty queue, then wait for a minute before running the
         // worker again
         if (err && err.message === 'EMPTY_AUTOMESSAGE_QUEUE') {
 
-          console.log('amConsumer:re-fetch after 5 minutes');
           setTimeout(next, 300000);
 
         } else {
@@ -516,23 +477,15 @@ module.exports = function run() {
 
     function foreverCallback(err) {
 
-      logError(err, false);
+      logger.fatal({
+        at: 'amConsumer:foreverCallback',
+        err: err
+      });
 
     }
   );
 
-}
-
-
-function logError(err, keepAlive) {
-
-  logger.crit({
-    at: 'amConsumer async.forever',
-    err: err,
-    keepAlive: !! keepAlive,
-    time: Date.now()
-  });
-}
+};
 
 
 /**

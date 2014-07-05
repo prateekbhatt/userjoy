@@ -129,8 +129,12 @@
             <div class="text-center">
                 <p style="font-size: 20px;"><strong>Preview: </strong></p>
             </div>
+            <br>
+            <div class="col-md-offset-2 col-md-4" ng-show="showNotification">
+                <span ng-style="{'color': colorText}">{{charactersLeft}} characters left</span>
+            </div>
             <!-- TODO: Replace template color with the color entered by the user -->
-            <div style="padding-top: 55px;">
+            <div style="padding-top: 35px;">
                 <div class="col-md-8 col-md-offset-2" ng-show="showNotification">
                     <div class="message-template" style="max-height: 175px; min-height: 175px; overflow: auto; border-left: 1px solid #eee;" ng-style="{'border-color': borderColor, 'border-right': borderRight, 'border-top': borderTop, 'border-bottom': borderBottom, 'border-radius': borderRadius}">
                         <img src="{{gravatar}}" width="60px">

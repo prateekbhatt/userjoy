@@ -23,10 +23,18 @@ var logger = require('../../helpers/logger');
  */
 
 var Account = require('../models/Account');
+var AutoMessage = require('../models/AutoMessage');
 var App = require('../models/App');
-var Event = require('../models/Event');
 var Conversation = require('../models/Conversation');
 var User = require('../models/User');
+
+
+/**
+ * Lib
+ */
+
+var createEventAndIncrementCount = require(
+  '../lib/create-automessage-event-and-increment-count');
 
 
 /**
@@ -43,6 +51,7 @@ function mailgunCallback(req, res, next) {
     if (err) {
       logger.crit({
         at: 'Mailgun Output',
+        status: 'error',
         err: err
       });
 
@@ -52,17 +61,17 @@ function mailgunCallback(req, res, next) {
 
       logger.trace({
         at: 'Mailgun Output',
-        body: req.body
+        status: 'success'
       });
 
-      res
+      return res
         .status(200)
         .json();
     }
 
-  }
+  };
 
-};
+}
 
 
 function sendEmail(userEmail, acc, con, cb) {
@@ -71,7 +80,7 @@ function sendEmail(userEmail, acc, con, cb) {
    * get dashboard url from config
    */
   var config = require('../../../config')('api');
-  var dashboardUrl = config.hosts['dashboard'];
+  var dashboardUrl = config.hosts.dashboard;
   var conversationUrl = dashboardUrl + '/apps/' + con.aid +
     '/messages/conversations/' + con._id;
 
@@ -165,7 +174,7 @@ router
       at: 'MailgunController new',
       // body: req.body['stripped-text'],
       param: req.params
-    })
+    });
 
     var aid = req.params.aid;
 
@@ -226,7 +235,7 @@ router
         function getAdminAccount(con, user, cb) {
           getAdmin(con.aid, function (err, acc) {
             cb(err, acc, con, user);
-          })
+          });
         },
 
         function sendAdminConversation(acc, con, user, cb) {
@@ -250,7 +259,7 @@ router
       at: 'MailgunController reply',
       // body: req.body['stripped-text'],
       param: req.params
-    })
+    });
 
     var parsedId = appEmail.parseIdentifier(req.params.identifier);
     var type = parsedId.type;
@@ -281,7 +290,7 @@ router
               email: sender
             };
 
-            User.findOrCreate(aid, user, cb)
+            User.findOrCreate(aid, user, cb);
           },
 
 
@@ -379,7 +388,33 @@ router
           function getAdminAccount(con, user, cb) {
             getAdmin(con.aid, function (err, acc) {
               cb(err, acc, con, user);
-            })
+            });
+          },
+
+          function getAutoMessage(acc, con, user, cb) {
+            AutoMessage
+              .findById({
+                amId: con.amId
+              })
+              .select('title')
+              .exec(function (err, amsg) {
+                cb(err, acc, con, user, amsg);
+              });
+          },
+
+
+          function createEventAndIncrement(acc, con, user, amsg, cb) {
+
+            var ids = {
+              aid: con.aid,
+              uid: con.uid,
+              amId: con.amId
+            };
+
+            var title = amsg.title;
+
+            createEventAndIncrementCount(ids, 'replied', title, cb);
+
           },
 
           function sendAdminConversation(acc, con, user, cb) {
@@ -417,9 +452,9 @@ router
         aid: aid,
         uid: uid,
         amId: messageId
-      }
+      };
 
-      Event.automessage(ids, 'opened', title, cb)
+      createEventAndIncrementCount(ids, 'seen', title, cb);
 
     } else if (type === 'manual') {
 
@@ -453,9 +488,9 @@ router
         aid: aid,
         uid: uid,
         amId: messageId
-      }
+      };
 
-      Event.automessage(ids, 'clicked', title, cb)
+      createEventAndIncrementCount(ids, 'clicked', title, cb);
 
     } else if (type === 'manual') {
 
@@ -489,9 +524,9 @@ router
         aid: aid,
         uid: uid,
         amId: messageId
-      }
+      };
 
-      Event.automessage(ids, 'sent', title, cb)
+      createEventAndIncrementCount(ids, 'sent', title, cb);
 
     } else if (type === 'manual') {
 

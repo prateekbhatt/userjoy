@@ -22,6 +22,7 @@ var q = require('./queues')
  */
 
 var logger = require('../helpers/logger');
+var QueueError = require('../helpers/queue-error');
 
 
 /**
@@ -42,7 +43,7 @@ var HOURLY_SCHEDULE = '0 * * * *';
  * Per Minute Cron
  */
 
-var MINUTE_SCHEDULE = '*/1 * * * *';
+var FIVE_MINUTE_SCHEDULE = '*/5 * * * *';
 
 
 /**
@@ -53,27 +54,47 @@ var DAILY_SCHEDULE = '0 0 * * *';
 
 
 // TODO: THIS CODE NEEDS TO BE MANAGED IN INSIDE THE APPS CONFIG FILE
-var SCHEDULE = MINUTE_SCHEDULE;
+var SCHEDULE = FIVE_MINUTE_SCHEDULE;
 if (process.env.NODE_ENV === 'production') {
   SCHEDULE = DAILY_SCHEDULE;
 }
 
 
 /**
- * Find all active apps
+ * Find all active apps that have not already been queued for given time
  *
+ * @param {date} updateTime start-of-day-updateTime
  * @param {function} cb callback
  */
 
-function findActiveApps(cb) {
+function findActiveApps(updateTime, cb) {
 
   App
     .find({
-      isActive: true
+      isActive: true,
+
+      $or: [
+
+        // if it has never been queued
+        {
+          queuedUsage: {
+            $exists: false
+          }
+        },
+
+        // if it has not been queued for the given time yet
+        {
+          queuedUsage: {
+            $lt: updateTime
+          }
+        }
+
+      ]
     })
     .select({
       _id: 1
     })
+    .lean()
     .exec(cb);
 
 }
@@ -87,55 +108,75 @@ function findActiveApps(cb) {
 
 function cronFunc(cb) {
 
-  logger.trace('workers/usagePublisher cronFunc');
+  console.log('\n\n\n');
+  logger.trace('usagePublisher:Started');
+
+  // update yesterday's usage
+  var updateTime = moment.utc()
+    .subtract('days', 1)
+    .startOf('day')
+    .valueOf();
 
   async.waterfall([
 
       function find(cb) {
-        findActiveApps(cb);
+        findActiveApps(updateTime, function (err, apps) {
+
+          if (err) return cb(err);
+
+          if (!_.isObject(apps) || _.isEmpty(apps)) {
+            return cb(new QueueError('NO_APPS_FOUND_FOR_QUEUEING'));
+          }
+
+          cb(null, apps);
+        });
       },
 
       function queue(apps, cb) {
 
-        var timestamp = moment()
-          .valueOf();
+        var aids = _.pluck(apps, '_id');
+        var appsData = _.map(aids, function (id) {
 
-        var appsData = _.chain(apps)
-          .pluck('_id')
-          .map(function (id) {
+          // add timestamp to app data
+          var a = {
+            aid: id.toString(),
+            updateTime: updateTime
+          };
 
-            // add timestamp to app data
-            var a = {
-              aid: id.toString(),
-              time: timestamp
-            };
+          // iron mq only accepts strings
+          return JSON.stringify(a);
+        });
 
-            // iron mq only accepts strings
-            return JSON.stringify(a);
-          })
-          .value();
+        q()
+          .post(appsData, function (err, queueIds) {
+            cb(err, aids, queueIds, appsData);
+          });
+      },
 
-        q().post(appsData, function (err, queueIds) {
+
+      function updateQueuedTimestamp(aids, queueIds, appsData, cb) {
+        App.queued(aids, 'usage', updateTime, function (err) {
           cb(err, queueIds, appsData);
         });
       }
 
     ],
 
-    function finalCallback(err, queueIds, ids, numberAffected) {
+    function finalCallback(err, queueIds, appsData, numberAffected) {
 
-      logger.trace('workers/usagePublisher Completed');
+      var logObj = {
+        at: 'usagePublisher:Completed',
+        err: err,
+        queueIds: queueIds,
+        appsData: appsData,
+        ts: Date.now()
+      };
 
-      if (err) {
-        logger.crit({
-          at: 'workers/usage-publisher',
-          err: err,
-          ts: Date.now()
-        });
-      }
+      err ? logger.crit(logObj) : logger.trace(logObj);
+
 
       if (cb) {
-        return cb(err, queueIds, ids, numberAffected);
+        return cb(err, queueIds, appsData, numberAffected);
       }
 
     });

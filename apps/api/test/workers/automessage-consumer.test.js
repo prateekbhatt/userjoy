@@ -114,13 +114,7 @@ describe('Worker automessageConsumer', function () {
       var query = {
         type: 'auto',
         amId: amId.toString(),
-        meta: {
-          $elemMatch: {
-            k: 'state',
-            v: 'queued'
-          }
-        }
-
+        amState: 'queued'
       };
 
       Event
@@ -174,6 +168,19 @@ describe('Worker automessageConsumer', function () {
           Event.remove({}, cb);
         },
 
+        function automessageSentShouldBeZero(cb) {
+          AutoMessage
+            .findById(amId)
+            .exec(function (err, amsg) {
+
+              expect(amsg)
+                .to.have.property('sent')
+                .that.eqls(0);
+
+              return cb(err);
+            });
+        },
+
         // create event to meet automessage segment
         function createEvent(cb) {
           var aid = saved.automessages.second.aid;
@@ -214,18 +221,12 @@ describe('Worker automessageConsumer', function () {
     });
 
 
-    it('should create new automessage queue event', function (done) {
+    it('should create new automessage sent event', function (done) {
 
       var query = {
         type: 'auto',
         amId: amId.toString(),
-        meta: {
-          $elemMatch: {
-            k: 'state',
-            v: 'queued'
-          }
-        }
-
+        amState: 'sent'
       };
 
       Event
@@ -240,8 +241,28 @@ describe('Worker automessageConsumer', function () {
             .that.has.length(1);
 
           expect(evn[0])
-            .to.have.property('meta')
-            .that.is.an('array');
+            .to.have.property('amState')
+            .that.eqls('sent');
+
+          done();
+        });
+
+    });
+
+
+    it('should increment automessage "sent" by 1', function (done) {
+
+      AutoMessage
+        .findById(amId)
+        .exec(function (err, amsg) {
+
+          expect(err)
+            .to.not.exist;
+
+          expect(amsg)
+            .to.be.an('object')
+            .that.has.property('sent')
+            .that.eqls(1);
 
           done();
         });
@@ -257,7 +278,7 @@ describe('Worker automessageConsumer', function () {
             amId: amId
           })
           .exec(function (err, notf) {
-            console.log('\n\n\n\n savenotfi', err, notf);
+
             expect(err)
               .to.not.exist;
 

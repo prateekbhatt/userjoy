@@ -190,4 +190,134 @@ describe('Model AutoMessage', function () {
   });
 
 
+  describe('#incrementCount', function () {
+
+    it('should return error if type not one of clicked/sent/replied/seen ',
+      function (done) {
+
+        var savedAutoMessage = saved.automessages.first;
+        var type = 'randomType';
+
+        AutoMessage.incrementCount(savedAutoMessage._id, type,
+          function (err) {
+
+            expect(err)
+              .to.exist;
+
+            expect(err.message)
+              .to.eql(
+                'AutoMessage event type must be one of sent/seen/clicked/replied'
+            );
+
+            done();
+
+          });
+
+      });
+
+
+    it('should increment count of clicked/sent/replied/seen',
+      function (done) {
+
+        var savedAutoMessage = saved.automessages.first;
+
+        async.series(
+
+          [
+
+            function incrementClicked(cb) {
+
+              expect(savedAutoMessage.clicked)
+                .to.eql(0);
+
+              AutoMessage.incrementCount(savedAutoMessage._id, 'clicked',
+                function (err, amsg) {
+
+                  expect(err)
+                    .to.not.exist;
+
+                  expect(amsg.clicked)
+                    .to.eql(1);
+
+                  cb();
+
+                });
+
+            },
+
+
+            function incrementSeen(cb) {
+
+              expect(savedAutoMessage.seen)
+                .to.eql(0);
+
+              AutoMessage.incrementCount(savedAutoMessage._id, 'seen',
+                function (err, amsg) {
+
+                  expect(err)
+                    .to.not.exist;
+
+                  expect(amsg.seen)
+                    .to.eql(1);
+
+                  cb();
+
+                });
+
+            },
+
+
+            function incrementSent(cb) {
+
+              expect(savedAutoMessage.sent)
+                .to.eql(0);
+
+              AutoMessage.incrementCount(savedAutoMessage._id, 'sent',
+                function (err, amsg) {
+
+                  expect(err)
+                    .to.not.exist;
+
+                  expect(amsg.sent)
+                    .to.eql(1);
+
+                  cb();
+
+                });
+
+            },
+
+
+            function incrementReplied(cb) {
+
+              expect(savedAutoMessage.replied)
+                .to.eql(0);
+
+              AutoMessage.incrementCount(savedAutoMessage._id, 'replied',
+                function (err, amsg) {
+
+                  expect(err)
+                    .to.not.exist;
+
+                  expect(amsg.replied)
+                    .to.eql(1);
+
+                  cb();
+
+                });
+
+            }
+
+          ],
+
+          done
+
+        )
+
+      });
+
+  });
+
+
+
 });
