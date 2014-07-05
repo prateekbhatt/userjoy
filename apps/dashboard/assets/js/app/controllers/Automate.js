@@ -166,18 +166,28 @@ angular.module('do.automate', [])
 
         $scope.changeMsgStatus = function (id, text, index) {
           if (text == 'Activate') {
-            modelsAutomate.makeMsgLive($scope.currApp, id);
-            // FIXME: The message should be changed to Deactivate when its a success. Have a callback for this.
-            $scope.automessages[index].message =
-              'Deactivate';
+            modelsAutomate.makeMsgLive($scope.currApp, id, function (err) {
+              if (err) {
+                console.log("error");
+                return;
+              }
+              console.log("$scope.automessages:", $scope.automessages, index);
+              $scope.automessages[index].message =
+                'Deactivate';
+            });
           }
 
           if (text == 'Deactivate') {
-            // FIXME: The message should be changed to Activate when its a success. Have a callback for this.
             modelsAutomate.deActivateMsg($scope.currApp,
-              id);
-            $scope.automessages[index].message =
-              'Activate';
+              id, function (err) {
+                if (err) {
+                  console.log("error");
+                  return;
+                }
+                console.log("$scope.automessages:", $scope.automessages, index);
+                $scope.automessages[index].message =
+                  'Activate';
+              });
           }
         }
 
