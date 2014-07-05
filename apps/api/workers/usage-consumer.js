@@ -12,8 +12,10 @@ var ObjectId = require('mongoose')
  * models
  */
 
-var Event = require('../api/models/Event');
+var App = require('../api/models/App');
 var DailyReport = require('../api/models/DailyReport');
+var Event = require('../api/models/Event');
+var User = require('../api/models/User');
 
 
 /**
@@ -48,18 +50,16 @@ var scoreQueue = q.score;
  * @param {function} cb callback
  */
 
-function usageMinutes(aid, timestamp, cb) {
+function usageMinutes(aid, updateTime, cb) {
 
   // cast app id into objectid
   aid = new ObjectId(aid);
 
-  // FIXME : CHANGE THIS
-  var startOfDay = moment(timestamp)
+  var startOfDay = moment.utc(updateTime)
     .startOf('day')
     .format();
 
-
-  var endOfDay = moment(timestamp)
+  var endOfDay = moment.utc(updateTime)
     .endOf('day')
     .format();
 
@@ -120,6 +120,8 @@ function usageMinutes(aid, timestamp, cb) {
         arguments: JSON.stringify(arguments)
       });
 
+      cb(err, users);
+
     });
 }
 
@@ -137,14 +139,14 @@ dailyUsage:
 
  */
 
-function saveUsage(aid, timestamp, dailyUsage, cb) {
+function saveUsage(aid, updateTime, dailyUsage, cb) {
 
   var saveIterator = function (user, cb) {
 
     var score;
     var usage = user.usage;
 
-    DailyReport.upsert(aid, user._id, undefined, timestamp, score, usage, cb);
+    DailyReport.upsert(aid, user._id, undefined, updateTime, score, usage, cb);
 
   };
 
@@ -164,11 +166,11 @@ function deleteFromQueue(queueMsgId, cb) {
 
 
 // queue app id to calculate user engagement scores
-function postToScoreQueue(aid, time, cb) {
+function postToScoreQueue(aid, updateTime, cb) {
 
   var appData = {
     aid: aid,
-    time: time
+    updateTime: updateTime
   };
 
   // ironmq accepts only strings
@@ -176,7 +178,7 @@ function postToScoreQueue(aid, time, cb) {
 
   scoreQueue()
     .post(appData, function (err) {
-      cb(err, aid, time);
+      cb(err, aid, updateTime);
     });
 }
 
@@ -217,79 +219,146 @@ function usageConsumerWorker(cb) {
 
             var msgBody = res.body ? JSON.parse(res.body) : {};
             var aid = msgBody.aid;
-            var time = msgBody.time;
+            var updateTime = msgBody.updateTime;
 
             // the message body contains the app id
-            if (!aid) return cb(new QueueError('APP_ID_NOT_FOUND'));
-            if (!time) return cb(new QueueError('TIME_NOT_FOUND'));
+            if (!aid) {
+              return cb(new QueueError('APP_ID_NOT_FOUND'));
+            }
 
-            cb(null, aid, time);
+            if (!updateTime) {
+              return cb(new QueueError('UPDATE_TIME_NOT_FOUND'));
+            }
+
+            cb(null, aid, updateTime);
           });
       },
 
 
-      function calculateUsage(aid, time, cb) {
-        usageMinutes(aid, time, function (err, users) {
-
-          logger.trace({
-            at: 'usageConsumer:calculateUsage',
-            users: users,
-            aid: aid,
-            time: time
-          });
-
-          cb(err, users, aid, time);
+      function calculateUsage(aid, updateTime, cb) {
+        usageMinutes(aid, updateTime, function (err, users) {
+          cb(err, users, aid, updateTime);
         });
       },
 
 
-      function saveUsageData(users, aid, time, cb) {
+      function getAllUsers(activeUsers, aid, updateTime, cb) {
 
-        if (_.isEmpty(users)) return cb(null, aid, time);
+        // get the ids of all users who did some activity on the given day
+        var userIds = _.chain(activeUsers)
+          .pluck('_id')
+          .map(function (id) {
+            return id.toString();
+          })
+          .value();
 
-        saveUsage(aid, time, users, function (err) {
-          cb(err, aid, time);
+
+        // get the ids of all users of app who did not do any activity on the
+        // given day. their usage should be set to 0.
+        User
+          .find({
+            aid: aid,
+            _id: {
+              $nin: userIds
+            }
+          })
+          .select('_id')
+          .lean()
+          .exec(function (err, usrs) {
+
+            if (err) return cb(err);
+
+            usrs = _.each(usrs, function (u) {
+              u.usage = 0;
+              return u;
+            });
+
+            var allUsers = usrs.concat(activeUsers);
+
+            cb(err, allUsers, aid, updateTime);
+
+          });
+
+      },
+
+
+      function saveUsageData(users, aid, updateTime, cb) {
+
+        logger.trace({
+          at: 'usage:consumer:saveUsageData',
+          users: users,
+          aid: aid,
+          updateTime: updateTime
+        });
+
+        if (_.isEmpty(users)) return cb(new QueueError('NO_USERS_FOUND'));
+
+        saveUsage(aid, updateTime, users, function (err) {
+          cb(err, aid, updateTime);
         });
       }
 
     ],
 
 
-    function callback(err, aid, time) {
+    function callback(err, aid, updateTime) {
+
+
+      var emptyQueue = false;
+
 
       var finalCallback = function (err) {
-        return cb(err, aid, time);
+        return cb(err, aid, updateTime, emptyQueue);
       };
 
-      if (err && err.name === 'QueueError') {
 
-        // if empty error, the queue should be fetched from after some time
-        if (err.message === 'EMPTY_USAGE_QUEUE') return finalCallback(err);
+      if (err) {
+
+        // if not QueueError, return error without deleting message from queue
+        if (err.name !== 'QueueError') {
+          return finalCallback(err, aid, updateTime);
+        }
+
+        // if empty queue error, the queue should be fetched from after some time
+        if (err.message === 'EMPTY_USAGE_QUEUE') emptyQueue = true;
 
 
-        // if any other QueueError, log queue error, delete from queue, and
-        // post to score queue
+        // if any QueueError, log queue error,
+        // and move on and delete from usage queue, and post to score queue
 
         logger.crit({
           at: 'usageConsumer:QueueError',
           err: err,
           aid: aid,
-          time: time
-        });
-
-        return deleteFromQueue(queueMsgId, function (err) {
-
-          if (err) return finalCallback(err);
-          return postToScoreQueue(aid, time, finalCallback);
-
+          updateTime: updateTime
         });
 
       }
 
-      // if err and err is unknown, return error, and do not delete from queue
-      return finalCallback(err);
 
+      // if QueueError or success, delete from usage queue, and post to score queue
 
+      async.series(
+
+        [
+
+          function deleteFromUsageQueue(cb) {
+            deleteFromQueue(queueMsgId, cb);
+          },
+
+          function toScoreQueue(cb) {
+            postToScoreQueue(aid, updateTime, cb);
+          },
+
+          function updateQueuedScore(cb) {
+            App.queued(aid, 'score', updateTime, cb);
+          }
+
+        ],
+
+        finalCallback
+
+      );
     }
 
   );
@@ -309,13 +378,13 @@ module.exports = function run() {
       });
 
 
-      usageConsumerWorker(function (err, aid, time) {
+      usageConsumerWorker(function (err, aid, updateTime, emptyQueue) {
 
         var logObject = {
           at: 'usageConsumer:Completed',
           err: err,
           aid: aid,
-          time: time
+          updateTime: updateTime
         };
 
         err ? logger.crit(logObject) : logger.trace(logObject);
@@ -324,9 +393,9 @@ module.exports = function run() {
 
         // if error is empty queue, then wait for a minute before running the
         // worker again
-        if (err && (err.message === 'EMPTY_USAGE_QUEUE')) {
+        if (emptyQueue) {
 
-          setTimeout(next, 3600000);
+          setTimeout(next, 300000);
 
         } else {
 

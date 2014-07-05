@@ -13,6 +13,7 @@ describe('Worker usage-consumer', function () {
    * Models
    */
 
+  var App = require('../../api/models/App');
   var DailyReport = require('../../api/models/DailyReport');
   var Event = require('../../api/models/Event');
 
@@ -63,7 +64,12 @@ describe('Worker usage-consumer', function () {
     async.series([
 
       function (cb) {
-        EventFixture(aid, [uid1, uid2], 501, cb);
+
+        // WARNING: creating events for only one user to check that even if
+        // there are no events by a user on a certain day, the dailyUsage is
+        // calculated and saved as 0 for all the other users
+
+        EventFixture(aid, [uid1], 501, cb);
       },
 
 
@@ -113,7 +119,7 @@ describe('Worker usage-consumer', function () {
   });
 
 
-  describe('#usageConsumerWorker', function () {
+  describe.only('#usageConsumerWorker', function () {
 
 
     it(
@@ -129,23 +135,27 @@ describe('Worker usage-consumer', function () {
           [
 
             function clearUsageQueue(cb) {
-              usageQueue().clear(cb);
+              usageQueue()
+                .clear(cb);
             },
 
             function clearScoreQueue(cb) {
-              scoreQueue().clear(cb);
+              scoreQueue()
+                .clear(cb);
             },
 
             function postToUsageQueue(cb) {
-              usageQueue().post(
+              usageQueue()
+                .post(
 
-                JSON.stringify({
-                  aid: aid,
-                  time: moment()
-                    .valueOf()
-                }),
+                  JSON.stringify({
+                    aid: aid,
+                    updateTime: moment.utc()
+                      .startOf('day')
+                      .valueOf()
+                  }),
 
-                cb);
+                  cb);
             },
 
 
@@ -183,13 +193,18 @@ describe('Worker usage-consumer', function () {
             function checkAfterUsage(cb) {
 
               DailyReport.find({}, function (err, usageAfter) {
-
                 expect(err)
                   .to.not.exist;
 
+
+
+                // WARNING: created events for only one user to check that even if
+                // there are no events by a user on a certain day, the dailyUsage is
+                // calculated and saved as 0 for all the other users
+
                 expect(usageAfter)
                   .to.be.an("array")
-                  .that.is.not.empty;
+                  .that.has.length.above(1);
 
 
                 _.each(usageAfter, function (h) {
@@ -209,42 +224,61 @@ describe('Worker usage-consumer', function () {
 
             // should have deleted message from usage queue
             function checkUsageQueue(cb) {
-              usageQueue().get({
-                n: 1
-              }, function (err, response) {
+              usageQueue()
+                .get({
+                  n: 1
+                }, function (err, response) {
 
-                expect(err)
-                  .to.not.exist;
+                  expect(err)
+                    .to.not.exist;
 
-                expect(response)
-                  .to.not.exist;
+                  expect(response)
+                    .to.not.exist;
 
-                cb(err);
-              })
+                  cb(err);
+                })
             },
 
 
             // should have added the aid to the score queue
             function checkScoreQueue(cb) {
-              scoreQueue().get({
-                n: 1
-              }, function (err, response) {
+              scoreQueue()
+                .get({
+                  n: 1
+                }, function (err, response) {
 
-                expect(err)
-                  .to.not.exist;
+                  expect(err)
+                    .to.not.exist;
 
-                var appData = JSON.parse(response.body);
+                  var appData = JSON.parse(response.body);
 
-                expect(appData)
-                  .to.have.property('aid')
-                  .that.eqls(aid);
+                  expect(appData)
+                    .to.have.property('aid')
+                    .that.eqls(aid);
 
-                expect(appData)
-                  .to.have.property('time')
-                  .that.is.a('number');
+                  expect(appData)
+                    .to.have.property('updateTime')
+                    .that.is.a('number');
 
-                cb(err);
-              })
+                  cb(err);
+                })
+            },
+
+
+            function updateQueuedScore(cb) {
+              App
+                .findById(aid)
+                .exec(function (err, app) {
+                  expect(err)
+                    .to.not.exist;
+
+                  expect(app)
+                    .to.have.property('queuedScore')
+                    .that.is.a('date')
+                    .and.is.not.empty;
+
+                  cb();
+                });
             }
 
           ],
