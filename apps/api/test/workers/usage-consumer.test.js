@@ -119,7 +119,7 @@ describe('Worker usage-consumer', function () {
   });
 
 
-  describe.only('#usageConsumerWorker', function () {
+  describe('#usageConsumerWorker', function () {
 
 
     it(
@@ -274,8 +274,7 @@ describe('Worker usage-consumer', function () {
 
                   expect(app)
                     .to.have.property('queuedScore')
-                    .that.is.a('date')
-                    .and.is.not.empty;
+                    .that.is.a('date');
 
                   cb();
                 });

@@ -71,7 +71,7 @@ describe('Worker score-consumer', function () {
 
       var cid;
 
-      var yesterday = moment()
+      var yesterday = moment.utc()
         .subtract('days', 1);
 
       worker._mapReduce(aid, cid, yesterday.format(),
@@ -109,8 +109,8 @@ describe('Worker score-consumer', function () {
     it('should run mapReduce and save score', function (done) {
 
 
-      var time = moment();
-      var date = time.date();
+      var updateTime = moment.utc();
+      var date = updateTime.date();
 
       async.series(
 
@@ -129,7 +129,7 @@ describe('Worker score-consumer', function () {
 
               JSON.stringify({
                 aid: aid,
-                time: time
+                updateTime: updateTime
               }),
 
               cb);
@@ -183,7 +183,7 @@ describe('Worker score-consumer', function () {
 
                 h = h.toJSON();
 
-                if (h.y === time.year() && h.m === time.month()) {
+                if (h.y === updateTime.year() && h.m === updateTime.month()) {
 
                   expect(h)
                     .to.be.an("object")
@@ -239,6 +239,9 @@ describe('Worker score-consumer', function () {
 
               cb(err);
             })
+
+
+            // TODO: add test to check if queuedHealth was updated
           }
 
         ],
