@@ -57,6 +57,9 @@ Notification.prototype.load = function (cb) {
     // add color to the app traits
     app.setTrait('color', notf.color);
 
+    // add showMessageBox status to the app traits
+    app.setTrait('showMessageBox', notf.showMessageBox);
+
     // If no response, move on
     if (!notf.body) {
       return cb(new Error('no new notification found'));
