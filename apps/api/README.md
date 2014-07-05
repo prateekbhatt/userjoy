@@ -148,6 +148,9 @@ UserNote      |                         | notes created by team members about a 
 - ct
 - isActive (boolean)
 - name
+- queuedHealth (when was the health queue last queued)
+- queuedScore (when was the score queue last queued)
+- queuedUsage (when was the usage queue last queued)
 - team [{accId, admin}]
 - x tags [] stores all tags that the app has used for its users
 - url (domain url)
