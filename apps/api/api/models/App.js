@@ -67,6 +67,25 @@ var AppSchema = new Schema({
   },
 
 
+  // last date for which health was queued for update
+  queuedHealth: {
+    type: Date
+  },
+
+
+  // last date for which score was queued for update
+  queuedScore: {
+    type: Date
+  },
+
+
+  // last date for which usage was queued for update
+  // updated inside usage-publisher
+  queuedUsage: {
+    type: Date
+  },
+
+
   // to show or not to show message box on website
   showMessageBox: {
     type: Boolean,
