@@ -234,6 +234,67 @@ describe('Resource /account', function () {
 
   });
 
+  describe('POST /account/verify-email/resend', function () {
+
+    var url = '/account/verify-email/resend';
+
+    it('should return error if email not provided', function (done) {
+
+      request
+        .post(url)
+        .expect('Content-Type', /json/)
+        .expect(400)
+        .expect({
+          status: 400,
+          error: 'Please provide your email'
+        })
+        .end(done);
+
+    });
+
+    it('should return error if account not found', function (done) {
+
+      var randomEmail = 'randomEmail@randomEmail.com';
+
+      request
+        .post(url)
+        .send({
+          email: randomEmail
+        })
+        .expect('Content-Type', /json/)
+        .expect(404)
+        .expect({
+          status: 404,
+          error: 'Account not found'
+        })
+        .end(done);
+
+    });
+
+    it('should resend confirmation email', function (done) {
+
+      var email = saved.accounts.second.email;
+
+      request
+        .post(url)
+        .send({
+          email: email
+        })
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .expect(function (res) {
+          expect(res.body)
+            .to.have.property('message')
+            .that.is.a('string')
+            .and.eqls('Verification email has been sent');
+        })
+        .end(done);
+
+    });
+
+  });
+
+
   describe('GET /account/:id/verify-email/:token', function () {
 
     it('returns error for wrong token', function (done) {
