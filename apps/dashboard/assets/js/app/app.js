@@ -43,6 +43,29 @@ var app = angular.module('dodatado', [
   return fallbackSrc;
 })
 
+.directive('compileData', function ($compile) {
+  return {
+    scope: true,
+    link: function (scope, element, attrs) {
+
+      var elmnt;
+
+      attrs.$observe('template', function (myTemplate) {
+        var myTemplate = '<span>Email is not Verified. Click <a ng-click="resendEmailVerification()" style="cursor: pointer">here</a> to resend Email</span>';
+        if (angular.isDefined(myTemplate)) {
+          // compile the provided template against the current scope
+          elmnt = $compile(myTemplate)(scope);
+
+          element.html(""); // dummy "clear"
+
+          element.append(elmnt);
+        }
+      });
+    }
+  };
+})
+
+
 .provider('appIdProvider', [
 
   function () {
@@ -192,6 +215,7 @@ var app = angular.module('dodatado', [
             return response;
           },
           'responseError': function (rejection) {
+            console.log("rejection: ", rejection);
             if (rejection.status === 400 || rejection.status ===
               500) {
               console.log("error: ", rejection.data.error);
@@ -220,6 +244,17 @@ var app = angular.module('dodatado', [
                 $rootScope.error = false;
               }, 5000);
             }
+
+            if (rejection.status === 403 && rejection.data.error ===
+              'EMAIL_NOT_VERIFIED' &&
+              rejection.config.method === 'POST') {
+              console.log("inside 403");
+              $rootScope.errMsgRootScope = '';
+              $rootScope.error = true;
+              $rootScope.errMsgRootScope =
+                '<span>Email is not Verified. Click here<a href="#"></a> to resend Email</span>';
+              console.log("errMsgRootScope: ", $rootScope.errMsgRootScope);
+            }
             var url = $location.path()
               .split('/');
             console.log("url: ", url);
@@ -230,7 +265,8 @@ var app = angular.module('dodatado', [
             // if we're not logged-in to the web service, redirect to login page
             if (rejection.status === 401 && checkUrl !=
               'login' && checkUrl != 'forgot-password' && checkUrl !=
-              'signup' && inviteUrl != 'invite') {
+              'signup' && inviteUrl != 'invite' && inviteUrl !=
+              'verify-email') {
               console.log("401 status logout");
               loginProvider.setLoggedIn = false;
               $rootScope.loggedIn = false;
