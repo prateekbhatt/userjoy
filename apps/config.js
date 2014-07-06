@@ -61,6 +61,25 @@ var IRON_IO_PROJECT_ID = {
   test: '53aa82306bfde3000500003c'
 };
 
+var INBOUND_MAIL_DOMAIN = {
+  development: 'test-mail.userjoy.co',
+  production: 'mail.userjoy.co',
+  test: 'test-mail.userjoy.co'
+};
+
+var MAILGUN_USER = {
+  development: 'postmaster@test-mail.userjoy.co',
+  production: 'postmaster@mail.userjoy.co',
+  test: 'postmaster@test-mail.userjoy.co'
+};
+
+var MAILGUN_PASS = {
+  development: '55hjroa-rz89',
+  production: '5k0o37dg6od7',
+  test: '55hjroa-rz89'
+};
+
+
 /**
  * Get hostnames of all apps
  * e.g., in production environment:
@@ -104,6 +123,9 @@ module.exports = function (appName) {
     dbPath: DATABASES[env],
     ironioProjectId: IRON_IO_PROJECT_ID[env],
     ironioToken: IRON_IO_TOKEN[env],
+    mailgunDomain: INBOUND_MAIL_DOMAIN[env],
+    mailgunPass: MAILGUN_PASS[env],
+    mailgunUser: MAILGUN_USER[env],
     port: PORTS[appName],
     redisHost: REDIS_HOST[env],
   };

@@ -392,10 +392,9 @@ router
           },
 
           function getAutoMessage(acc, con, user, cb) {
+
             AutoMessage
-              .findById({
-                amId: con.amId
-              })
+              .findById(con.amId)
               .select('title')
               .exec(function (err, amsg) {
                 cb(err, acc, con, user, amsg);
@@ -413,7 +412,9 @@ router
 
             var title = amsg.title;
 
-            createEventAndIncrementCount(ids, 'replied', title, cb);
+            createEventAndIncrementCount(ids, 'replied', title, function (err) {
+              cb(err, acc, con, user);
+            });
 
           },
 
