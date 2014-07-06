@@ -394,7 +394,12 @@ function amConsumer(cb) {
       }
     ],
 
-    function finalCallback(err) {
+    function callback(err) {
+
+
+      var finalCallback = function (err) {
+        return cb(err, queueMsgId, automessage);
+      };
 
 
       // function to delete message from queue
@@ -407,13 +412,18 @@ function amConsumer(cb) {
       };
 
 
-      if (err && (err.name === 'QueryError')) {
+      if (err) {
+
+        // in case of not defined / unknown errors, log error and donot delete
+        // from queue
+        if (err.name !== 'QueueError') return finalCallback(err);
+
 
         // was the queue empty, then we would retry fetching messages from the
         // queue after some time with a setTimeout
         // if empty queue error move on, and try to fetch msg again after sometime
         if (err.message === 'EMPTY_AUTOMESSAGE_QUEUE') {
-          return cb(err);
+          return finalCallback(err);
         }
 
 
@@ -424,15 +434,9 @@ function amConsumer(cb) {
           err: err
         });
 
-        return deleteFromQueue(function (err) {
-          cb(err, queueMsgId, automessage);
-        });
-
       }
 
-      // in case of not defined / unknown errors, log error and donot delete
-      // from queue
-      return cb(err);
+      return deleteFromQueue(finalCallback);
 
     }
   );
