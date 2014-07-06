@@ -19,10 +19,6 @@ var path = require('path');
 
 var templatesDir = path.resolve(__dirname, '../..', 'email_templates');
 
-
-var MAILGUN_USER = 'postmaster@mail.userjoy.co';
-var MAILGUN_PASS = '5k0o37dg6od7';
-
 var X_MAILER = 'UserJoy Mailer';
 
 
@@ -76,6 +72,15 @@ mailer.sendToUser(options);
 
 function BaseMailer(opts) {
 
+  /**
+   * fetch mailgun user/pass config
+   */
+
+  var config = require('../../../config')('api');
+  this.MAILGUN_USER = config.mailgunUser;
+  this.MAILGUN_PASS = config.mailgunPass;
+
+
   this.locals = opts.locals;
 
   // if there is template file, then this should be defined
@@ -91,16 +96,21 @@ function BaseMailer(opts) {
 
 
 // Prepare nodemailer transport object
-BaseMailer.prototype.transport = nodemailer.createTransport("SMTP", {
-  // secureConnection: true,
-  host: 'smtp.mailgun.org',
-  port: 587,
-  auth: {
-    user: MAILGUN_USER,
-    pass: MAILGUN_PASS
-  },
-  xMailer: X_MAILER
-});
+BaseMailer.prototype.transport = function () {
+
+  return nodemailer.createTransport("SMTP", {
+    // secureConnection: true,
+    host: 'smtp.mailgun.org',
+    port: 587,
+    auth: {
+      user: this.MAILGUN_USER,
+      pass: this.MAILGUN_PASS
+    },
+    xMailer: X_MAILER
+  });
+
+};
+
 
 
 /**
@@ -131,10 +141,10 @@ BaseMailer.prototype.options = function () {
   };
 
 
-  // in test/development env, do not send emails
+  // in test env, do not send emails
   // REF 1: http://documentation.mailgun.com/user_manual.html#sending-via-smtp
   // REF 2: http://documentation.mailgun.com/user_manual.html#sending-in-test-mode
-  if (!_.contains(['production'], process.env.NODE_ENV)) {
+  if (!_.contains(['production', 'development'], process.env.NODE_ENV)) {
     opts.headers = opts.headers || {};
     opts.headers['X-Mailgun-Drop-Message'] = 'yes';
     logger.trace({
@@ -197,9 +207,11 @@ BaseMailer.prototype.send = function (cb) {
       function sendEmail(inlinedHtml, cb) {
         var opts = self.options();
 
-        self.transport.sendMail(opts, function (err, responseStatus) {
-          cb(err, responseStatus, opts);
-        });
+        self
+          .transport()
+          .sendMail(opts, function (err, responseStatus) {
+            cb(err, responseStatus, opts);
+          });
 
       }
 
