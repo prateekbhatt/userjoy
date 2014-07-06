@@ -14,6 +14,7 @@ describe('Worker score-consumer', function () {
    */
 
   var DailyReport = require('../../api/models/DailyReport');
+  var User = require('../../api/models/User');
 
 
   /**
@@ -117,25 +118,28 @@ describe('Worker score-consumer', function () {
         [
 
           function clearScoreQueue(cb) {
-            scoreQueue().clear(cb);
+            scoreQueue()
+              .clear(cb);
           },
 
           function clearHealthQueue(cb) {
-            healthQueue().clear(cb);
+            healthQueue()
+              .clear(cb);
           },
 
           function postToScoreQueue(cb) {
-            scoreQueue().post(
+            scoreQueue()
+              .post(
 
-              JSON.stringify({
-                aid: aid,
-                updateTime: updateTime
-              }),
+                JSON.stringify({
+                  aid: aid,
+                  updateTime: updateTime
+                }),
 
-              cb);
+                cb);
           },
 
-          function checkBeforeScore(cb) {
+          function checkBeforeReportScore(cb) {
 
             DailyReport
               .find({}, function (err, scoreBefore) {
@@ -146,6 +150,23 @@ describe('Worker score-consumer', function () {
                 expect(scoreBefore)
                   .to.be.an("array")
                   .that.has.length(4);
+
+                cb();
+              });
+          },
+
+          function checkBeforeUserScore(cb) {
+
+            User
+              .findById(uid1, function (err, usr) {
+
+                expect(err)
+                  .to.not.exist;
+
+                // 50 is the default score
+                expect(usr.score)
+                  .to.be.a("number")
+                  .that.eqls(50);
 
                 cb();
               });
@@ -167,7 +188,7 @@ describe('Worker score-consumer', function () {
           },
 
 
-          function checkAfterScore(cb) {
+          function checkAfterReportScore(cb) {
 
             DailyReport.find({}, function (err, scoreAfter) {
 
@@ -204,41 +225,60 @@ describe('Worker score-consumer', function () {
             });
           },
 
+          function checkAfterUserScore(cb) {
+
+            User
+              .findById(uid1, function (err, usr) {
+
+                expect(err)
+                  .to.not.exist;
+
+                // 50 is the default score
+                expect(usr.score)
+                  .to.be.a("number")
+                  .that.not.eqls(50);
+
+                cb();
+              });
+          },
+
           // should have deleted message from score queue
           function checkScoreQueue(cb) {
-            scoreQueue().get({
-              n: 1
-            }, function (err, response) {
+            scoreQueue()
+              .get({
+                n: 1
+              }, function (err, response) {
 
-              expect(err)
-                .to.not.exist;
+                expect(err)
+                  .to.not.exist;
 
-              expect(response)
-                .to.not.exist;
+                expect(response)
+                  .to.not.exist;
 
-              cb(err);
-            })
+                cb(err);
+              })
           },
 
 
 
           // should have added the aid to the health queue
           function checkHealthQueue(cb) {
-            healthQueue().get({
-              n: 1
-            }, function (err, response) {
+            healthQueue()
+              .get({
+                n: 1
+              }, function (err, response) {
 
-              expect(err)
-                .to.not.exist;
+                expect(err)
+                  .to.not.exist;
 
-              var appData = JSON.parse(response.body);
+                var appData = JSON.parse(response.body);
 
-              expect(appData)
-                .to.have.property('aid')
-                .that.eqls(aid);
+                expect(appData)
+                  .to.have.property('aid')
+                  .that.eqls(aid);
 
-              cb(err);
-            })
+                cb(err);
+              })
 
 
             // TODO: add test to check if queuedHealth was updated

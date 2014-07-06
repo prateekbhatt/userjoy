@@ -13,6 +13,7 @@ var moment = require('moment');
 
 var App = require('../api/models/App');
 var DailyReport = require('../api/models/DailyReport');
+var User = require('../api/models/User');
 
 
 /**
@@ -206,6 +207,8 @@ function mapReduce(aid, cid, updateTime, cb) {
 
 /*
 
+Saves scores to DailyReport and sets latest score in User model
+
 INPUT:
 
 scores:
@@ -225,7 +228,12 @@ function saveScores(aid, cid, timestamp, scores, cb) {
     var score = score.value;
     var usage;
 
-    DailyReport.upsert(aid, uid, cid, timestamp, score, usage, cb);
+    DailyReport.upsert(aid, uid, cid, timestamp, score, usage, function (err) {
+
+      if (err) return cb(err);
+      User.setScore(uid, score, cb);
+
+    });
 
   };
 
