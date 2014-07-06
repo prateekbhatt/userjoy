@@ -73,7 +73,7 @@ angular
       }
 
       this.verifyEmail = function (id, tokenId) {
-        $http.get('/account/' + id + '/verify-email/' + tokenId)
+        $http.get(config.apiUrl + '/account/' + id + '/verify-email/' + tokenId)
           .success(function () {
             $location.path('/login');
           })
@@ -86,6 +86,18 @@ angular
               window.location.href = "http://userjoy.co/signup";
             }
           })
+      }
+
+      this.resendEmailVerification = function (email, cb) {
+        var data = {
+          email: email
+        };
+        $http.post(config.apiUrl + '/account/verify-email/resend', data)
+          .success(function (data) {
+            console.log("success in sending verification Email");
+            cb();
+          })
+          .error(cb);
       }
     }
   ])
