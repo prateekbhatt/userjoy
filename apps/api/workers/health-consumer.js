@@ -236,13 +236,14 @@ function healthConsumerWorker(cb) {
       if (err) {
 
         // if not QueueError, return error without deleting message from queue
-        if (err.name !== 'QueueError') {
-          return finalCallback(err);
-        }
+        if (err.name !== 'QueueError') return finalCallback(err);
 
 
         // if empty error, the queue should be fetched from after some time
-        if (err.message === 'EMPTY_HEALTH_QUEUE') emptyQueue = true;
+        if (err.message === 'EMPTY_HEALTH_QUEUE') {
+          emptyQueue = true;
+          return finalCallback(err);
+        }
 
 
         // if any other QueueError, log queue error, delete from queue
@@ -255,6 +256,7 @@ function healthConsumerWorker(cb) {
 
       }
 
+      // even if success delete from queue
       deleteFromQueue(queueMsgId, finalCallback);
 
     }
@@ -284,11 +286,11 @@ module.exports = function run() {
 
         err ? logger.crit(logObj) : logger.trace(logObj);
 
-        // if error is empty queue, then wait for a minute before running the
+        // if error is empty queue, then wait for sometime before running the
         // worker again
         if (emptyQueue) {
 
-          setTimeout(next, 3600000);
+          setTimeout(next, 300000);
 
         } else {
 

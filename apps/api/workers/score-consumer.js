@@ -190,7 +190,12 @@ function mapReduce(aid, cid, updateTime, cb) {
   // normalize the usage on a scale of 0-100 for all users
   o.finalize = function (uid, sum) {
     var normalize = (sum - MIN) * 100 / (MAX - MIN);
-    return normalize;
+
+    // if all the users have got the same usage, then MAX === MIN and returned
+    // normalized score should be 50
+    if (MIN === MAX) normalize = 50;
+
+    return Math.floor(normalize);
   };
 
 
@@ -312,6 +317,14 @@ function scoreConsumerWorker(cb) {
 
 
       function saveData(scores, aid, updateTime, cb) {
+
+        logger.trace({
+          at: 'score:consumer:saveData',
+          scores: scores,
+          aid: aid,
+          updateTime: updateTime
+        });
+
         // TODO: cid is hardcoded as null
         saveScores(aid, null, updateTime, scores, function (err) {
           cb(err, aid, updateTime);
@@ -335,16 +348,17 @@ function scoreConsumerWorker(cb) {
       if (err) {
 
         // if not QueueError, return error without deleting message from queue
-        if (err.name !== 'QueueError') {
-          return finalCallback(err, aid, updateTime);
+        if (err.name !== 'QueueError') return finalCallback(err);
+
+        // if empty QueueError, the queue should be fetched from after sometime
+        if (err.message === 'EMPTY_SCORE_QUEUE') {
+          emptyQueue = true;
+          return finalCallback(err);
         }
 
-        // if empty queue error, the queue should be fetched from after some time
-        if (err.message === 'EMPTY_SCORE_QUEUE') emptyQueue = true;
 
-
-        // if any QueueError, log queue error,
-        // and move on and delete from score queue, and post to health queue
+        // if any other QueueError, log queue error,
+        // and move on and delete from score queue
 
         logger.crit({
           at: 'scoreConsumer:QueueError',
@@ -353,32 +367,35 @@ function scoreConsumerWorker(cb) {
           updateTime: updateTime
         });
 
+        return deleteFromQueue(queueMsgId, finalCallback);
+
+      } else {
+
+        // if success, delete from score queue, and post to health queue
+
+        async.series(
+
+          [
+
+            function deleteFromScoreQueue(cb) {
+              deleteFromQueue(queueMsgId, cb);
+            },
+
+            function toHealthQueue(cb) {
+              postToHealthQueue(aid, updateTime, cb);
+            },
+
+            function updateQueuedHealth(cb) {
+              App.queued(aid, 'health', updateTime, cb);
+            }
+
+          ],
+
+          finalCallback
+
+        );
+
       }
-
-
-      // if QueueError or success, delete from score queue, and post to health queue
-
-      async.series(
-
-        [
-
-          function deleteFromScoreQueue(cb) {
-            deleteFromQueue(queueMsgId, cb);
-          },
-
-          function toHealthQueue(cb) {
-            postToHealthQueue(aid, updateTime, cb);
-          },
-
-          function updateQueuedHealth(cb) {
-            App.queued(aid, 'score', updateTime, cb);
-          }
-
-        ],
-
-        finalCallback
-
-      );
 
 
 
@@ -413,7 +430,7 @@ module.exports = function run() {
         // worker again
         if (emptyQueue) {
 
-          setTimeout(next, 3600000);
+          setTimeout(next, 300000);
 
         } else {
 
