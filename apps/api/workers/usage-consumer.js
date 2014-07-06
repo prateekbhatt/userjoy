@@ -315,16 +315,17 @@ function usageConsumerWorker(cb) {
       if (err) {
 
         // if not QueueError, return error without deleting message from queue
-        if (err.name !== 'QueueError') {
-          return finalCallback(err, aid, updateTime);
-        }
+        if (err.name !== 'QueueError') return finalCallback(err);
 
         // if empty queue error, the queue should be fetched from after some time
-        if (err.message === 'EMPTY_USAGE_QUEUE') emptyQueue = true;
+        if (err.message === 'EMPTY_USAGE_QUEUE') {
+          emptyQueue = true;
+          return finalCallback(err);
+        }
 
 
-        // if any QueueError, log queue error,
-        // and move on and delete from usage queue, and post to score queue
+        // if any other QueueError, log queue error,
+        // and move on and delete from usage queue
 
         logger.crit({
           at: 'usageConsumer:QueueError',
@@ -333,32 +334,39 @@ function usageConsumerWorker(cb) {
           updateTime: updateTime
         });
 
+
+        return deleteFromQueue(queueMsgId, finalCallback);
+
+      } else {
+
+
+        // if success, delete from usage queue, and post to score queue
+
+        async.series(
+
+          [
+
+            function deleteFromUsageQueue(cb) {
+              deleteFromQueue(queueMsgId, cb);
+            },
+
+            function toScoreQueue(cb) {
+              postToScoreQueue(aid, updateTime, cb);
+            },
+
+            function updateQueuedScore(cb) {
+              App.queued(aid, 'score', updateTime, cb);
+            }
+
+          ],
+
+          finalCallback
+
+        );
+
+
       }
 
-
-      // if QueueError or success, delete from usage queue, and post to score queue
-
-      async.series(
-
-        [
-
-          function deleteFromUsageQueue(cb) {
-            deleteFromQueue(queueMsgId, cb);
-          },
-
-          function toScoreQueue(cb) {
-            postToScoreQueue(aid, updateTime, cb);
-          },
-
-          function updateQueuedScore(cb) {
-            App.queued(aid, 'score', updateTime, cb);
-          }
-
-        ],
-
-        finalCallback
-
-      );
     }
 
   );
