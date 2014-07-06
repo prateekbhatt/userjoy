@@ -220,7 +220,7 @@ var app = angular.module('dodatado', [
           'responseError': function (rejection) {
             console.log("rejection: ", rejection);
             if (rejection.status === 400 || rejection.status ===
-              500) {
+              500 || rejection.status === 404) {
               console.log("error: ", rejection.data.error);
               $rootScope.error = true;
               if (_.isArray(rejection.data.error)) {
