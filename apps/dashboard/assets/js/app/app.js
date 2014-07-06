@@ -43,27 +43,30 @@ var app = angular.module('dodatado', [
   return fallbackSrc;
 })
 
-.directive('compileData', function ($compile) {
-  return {
-    scope: true,
-    link: function (scope, element, attrs) {
+.directive('compileData', ['$compile',
+  function ($compile) {
+    return {
+      scope: true,
+      link: function (scope, element, attrs) {
 
-      var elmnt;
+        var elmnt;
 
-      attrs.$observe('template', function (myTemplate) {
-        var myTemplate = '<span>Email is not Verified. Click <a ng-click="resendEmailVerification()" style="cursor: pointer">here</a> to resend Email</span>';
-        if (angular.isDefined(myTemplate)) {
-          // compile the provided template against the current scope
-          elmnt = $compile(myTemplate)(scope);
+        attrs.$observe('template', function (myTemplate) {
+          var myTemplate =
+            '<span>Email is not Verified. Click <a ng-click="resendEmailVerification()" style="cursor: pointer">here</a> to resend Email</span>';
+          if (angular.isDefined(myTemplate)) {
+            // compile the provided template against the current scope
+            elmnt = $compile(myTemplate)(scope);
 
-          element.html(""); // dummy "clear"
+            element.html(""); // dummy "clear"
 
-          element.append(elmnt);
-        }
-      });
-    }
-  };
-})
+            element.append(elmnt);
+          }
+        });
+      }
+    };
+  }
+])
 
 
 .provider('appIdProvider', [
@@ -217,7 +220,7 @@ var app = angular.module('dodatado', [
           'responseError': function (rejection) {
             console.log("rejection: ", rejection);
             if (rejection.status === 400 || rejection.status ===
-              500) {
+              500 || rejection.status === 404) {
               console.log("error: ", rejection.data.error);
               $rootScope.error = true;
               if (_.isArray(rejection.data.error)) {

@@ -63,6 +63,16 @@ angular.module('do.settings', [])
         },
         authenticate: true
       })
+      .state('appsettings.widget', {
+        url: '/feedback-widget',
+        views: {
+          "tab": {
+            templateUrl: '/templates/settingsmodule/settings.app.feedback-widget.html',
+            controller: 'appSettingsWidgetCtrl',
+          }
+        },
+        authenticate: true
+      })
     // .state('appsettings.health', {
     //   url: '/health',
     //   views: {
@@ -462,8 +472,7 @@ angular.module('do.settings', [])
           $scope.color = AppService.getCurrentApp()
             .color;
           console.log("app color: ", $scope.color);
-          $scope.switchStatus = AppService.getCurrentApp()
-            .showMessageBox;
+          
           if ($scope.color.toUpperCase() === '#39b3d7'.toUpperCase()) {
             $scope.btnInfoWidth = '40px';
             $scope.btnInfoHeight = '40px';
@@ -563,31 +572,6 @@ angular.module('do.settings', [])
           $scope.floatRight = 'right';
 
           $scope.borderRadius = '4px';
-
-          var toggleSwitch = function (err) {
-            if (err) {
-              $scope.switchStatus = !$scope.switchStatus;
-              return;
-            }
-          }
-
-          $scope.$watch('switchStatus', function () {
-            console.log("switchState: ", $scope.switchStatus, AppService
-              .getCurrentApp()
-              .showMessageBox);
-            if ($scope.switchStatus != null) {
-              if (initializing) {
-                $timeout(function () {
-                  initializing = false;
-                });
-              } else {
-                AppModel.showFeedBackMsg($scope.currApp, $scope.switchStatus,
-                  toggleSwitch);
-                // do whatever you were going to do
-              }
-            }
-
-          })
 
           $scope.showPreview = function (color) {
             $scope.color = color;
@@ -764,5 +748,47 @@ angular.module('do.settings', [])
 
     AppModel.redirectUser(appId, inviteId, showMsg);
 
+  }
+])
+
+.controller('appSettingsWidgetCtrl', ['$scope', 'CurrentAppService',
+  'AppModel', '$timeout', '$stateParams', 'AppService',
+  function ($scope, CurrentAppService, AppModel, $timeout, $stateParams,
+    AppService) {
+    CurrentAppService.getCurrentApp()
+      .then(function (currentApp) {
+        $scope.currApp = $stateParams.id;
+        var initializing = true;
+
+        var populatePage = function () {
+          $scope.switchStatus = AppService.getCurrentApp()
+            .showMessageBox;
+          var toggleSwitch = function (err) {
+            if (err) {
+              $scope.switchStatus = !$scope.switchStatus;
+              return;
+            }
+          }
+
+          $scope.$watch('switchStatus', function () {
+            console.log("switchState: ", $scope.switchStatus, AppService
+              .getCurrentApp()
+              .showMessageBox);
+            if ($scope.switchStatus != null) {
+              if (initializing) {
+                $timeout(function () {
+                  initializing = false;
+                });
+              } else {
+                AppModel.showFeedBackMsg($scope.currApp, $scope.switchStatus,
+                  toggleSwitch);
+              }
+            }
+
+          })
+        }
+
+        AppModel.getSingleApp($scope.currApp, populatePage);
+      })
   }
 ])
