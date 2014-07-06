@@ -31,6 +31,7 @@ $('#signup_form_submit')
     var div = document.getElementById('spin');
     var spinner = new Spinner(opts)
       .spin(div);
+    var emailId = $('#email').val();
     $('#signup_form_submit')
       .attr("disabled", true);
     // TODO: change url for production
@@ -59,7 +60,7 @@ $('#signup_form_submit')
         //   .addClass('hide');
         $('#successtext')
           .text(
-            "Signup successful! A verfication email has been sent to your email id."
+            "To complete your sign up, click the verification link in the confirmation email sent to " + emailId
         );
         //redirect to login
       },

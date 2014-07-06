@@ -11,7 +11,7 @@ describe('Helper app-email', function () {
       messageId: 'abc12345'
     };
 
-    var expectedOutput = '1234aid567+a_abc12345@mail.userjoy.co';
+    var expectedOutput = '1234aid567+a_abc12345@test-mail.userjoy.co';
 
     it('should return the reply to email', function () {
       var a = appEmail.reply.create(input);

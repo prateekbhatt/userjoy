@@ -49,10 +49,10 @@ angular.module('do.login', [])
 
 .controller('LoginCtrl', ['$scope', 'LoginService', 'AuthService', '$state',
   '$log', 'ErrMsgService', 'login', '$location', '$rootScope', 'AppService',
-  'CurrentAppService', '$timeout',
+  'CurrentAppService', '$timeout', 'AccountModel',
   function ($scope, LoginService, AuthService, $state, $log,
     ErrMsgService, login, $location, $rootScope, AppService,
-    CurrentAppService, $timeout) {
+    CurrentAppService, $timeout, AccountModel) {
 
     console.log('LoginProvider:', login.getLoggedIn());
     $scope.errMsg = '';
@@ -83,11 +83,11 @@ angular.module('do.login', [])
       ._id == null) {
       CurrentAppService.getCurrentApp()
         .then(function (currentApp) {
-          if(currentApp[0].isActive) {
+          if (currentApp[0].isActive) {
             $location.path('/apps/' + currentApp[0]._id + '/users/list');
-          } 
+          }
 
-          if(!currentApp[0].isActive) {
+          if (!currentApp[0].isActive) {
             $location.path('/apps/' + currentApp[0]._id + '/addcode');
           }
         })
@@ -111,11 +111,47 @@ angular.module('do.login', [])
           console.log(err.error);
           $rootScope.error = true;
           $rootScope.errMsgRootScope = err.error;
-          $timeout(function () {
+          if (err.error === 'EMAIL_NOT_VERIFIED') {
             $rootScope.error = false;
-          }, 5000);
+            $rootScope.errMsgRootScope = '';
+            $rootScope.errorEmailVerification = true;
+            $rootScope.errMsgEmailNotVerified =
+              '<span>Email is not Verified. Click <a ng-click="resendEmailVerification()" style="cursor: pointer">here</a> to resend Email</span>';
+          }
+          // $timeout(function () {
+          //   $rootScope.error = false;
+          //   $rootScope.errorEmailVerification = false;
+          // }, 5000);
         }
       });
+
+      var callback = function (err) {
+        if (err) {
+          console.log("error");
+          $rootScope.errorEmailVerification = false;
+          $rootScope.errMsgEmailNotVerified = '';
+          $rootScope.error = true;
+          $rootScope.errMsgRootScope = 'Error in sending verification email'
+          return;
+        }
+        $rootScope.errMsgRootScope = '';
+        $rootScope.error = false;
+        $rootScope.errorEmailVerification = false;
+        $rootScope.errMsgEmailNotVerified = '';
+        $rootScope.success = true;
+        $rootScope.successMsgRootScope =
+          'Confirmation Email sent to your email id: ' + $scope.email;
+        $timeout(function () {
+          $rootScope.success = false;
+          $rootScope.successMsgRootScope = '';
+        }, 5000);
+      }
+
+      $scope.resendEmailVerification = function () {
+        console.log("inside resend email verification");
+        AccountModel.resendEmailVerification($scope.email, callback);
+      }
+
       $scope.$watch(ErrMsgService.getErrorMessage, function () {
         if (ErrMsgService.getErrorMessage()) {
           console.log("err msg: ", ErrMsgService.getErrorMessage());
