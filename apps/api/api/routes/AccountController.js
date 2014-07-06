@@ -39,6 +39,36 @@ var accountMailer = require('../services/account-mailer');
 var logger = require('../../helpers/logger');
 
 
+function sendConfirmationMail(acc, verifyToken, cb) {
+
+
+  /**
+   * Apps config
+   */
+
+  var config = require('../../../config')('api');
+  var dashboardUrl = config.hosts.dashboard;
+
+
+  var confirmUrl = dashboardUrl + '/account/' + acc._id.toString() +
+    '/verify-email/' + verifyToken;
+
+  var mailOptions = {
+    locals: {
+      confirmUrl: confirmUrl,
+      name: acc.name
+    },
+    to: {
+      email: acc.email,
+      name: acc.name
+    }
+  };
+
+  accountMailer.sendConfirmation(mailOptions, cb);
+
+}
+
+
 function signupWithInvite(account, inviteId, cb) {
 
   async.waterfall(
@@ -90,13 +120,6 @@ function signupWithInvite(account, inviteId, cb) {
 
 function signupWithoutInvite(account, cb) {
 
-  /**
-   * Apps config
-   */
-
-  var config = require('../../../config')('api');
-  var dashboardUrl = config.hosts.dashboard;
-
   async.waterfall(
 
     [
@@ -112,23 +135,9 @@ function signupWithoutInvite(account, cb) {
         });
       },
 
-      function sendConfirmationMail(acc, verifyToken, cb) {
+      function sendMail(acc, verifyToken, cb) {
 
-        var confirmUrl = dashboardUrl + '/account/' + acc._id.toString() +
-          '/verify-email/' + verifyToken;
-
-        var mailOptions = {
-          locals: {
-            confirmUrl: confirmUrl,
-            name: acc.name
-          },
-          to: {
-            email: acc.email,
-            name: acc.name
-          }
-        };
-
-        accountMailer.sendConfirmation(mailOptions, function (err) {
+        sendConfirmationMail(acc, verifyToken, function (err) {
           cb(err, acc);
         });
 
@@ -206,6 +215,56 @@ router
 
       respond(err, acc);
     });
+
+  });
+
+
+/**
+ * POST /account/verify-email/resend
+ *
+ * Resend verification email
+ *
+ * @param {string} email email-address-of-account
+ *
+ */
+
+router
+  .route('/verify-email/resend')
+  .post(function (req, res, next) {
+
+    var email = req.body.email;
+    if (!email) return res.badRequest('Please provide your email');
+
+    Account
+      .findOne({
+        email: email
+      })
+      .select('verifyToken emailVerified name email')
+      .exec(function (err, acc) {
+
+        if (err) return next(err);
+
+        if (!acc) return res.notFound('Account not found');
+
+        if (acc.emailVerified) {
+          return res.badRequest(
+            'Your email is already verified. Please login to access your account'
+          );
+        }
+
+        sendConfirmationMail(acc, acc.verifyToken, function (err) {
+
+          if (err) return next(err);
+
+          res
+            .status(200)
+            .json({
+              message: 'Verification email has been sent'
+            });
+
+        });
+
+      });
 
   });
 
