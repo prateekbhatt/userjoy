@@ -6,16 +6,24 @@ var _ = require('lodash');
 
 
 /**
+ * apps config
+ */
+
+var config = require('../../config');
+
+
+/**
  * Returns the from-email of the app
  *
  * @param {string} aid app id
  * @return {strin} app email address
  */
 
-// TODO : move INBOUND_MAIL_DOMAIN to config.js
-var INBOUND_MAIL_DOMAIN = 'mail.userjoy.co';
-
 module.exports = function (aid) {
+
+  var INBOUND_MAIL_DOMAIN = config('api')
+    .mailgunDomain;
+
   return aid + '@' + INBOUND_MAIL_DOMAIN;
 }
 
@@ -47,6 +55,9 @@ module.exports.reply = {
    */
 
   create: function (opts) {
+
+    var INBOUND_MAIL_DOMAIN = config('api')
+      .mailgunDomain;
 
     if (_.keys(opts)
       .length !== 3) {
