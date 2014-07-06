@@ -47,16 +47,17 @@ var FIVE_MINUTE_SCHEDULE = '*/5 * * * *';
 
 
 /**
- * Daily cron
+ * Two hourly cron
+ * REF: http://serverfault.com/a/43512/191615
  */
 
-var DAILY_SCHEDULE = '0 0 * * *';
+var TWO_HOURLY_SCHEDULE = '0 */2 * * *';
 
 
 // TODO: THIS CODE NEEDS TO BE MANAGED IN INSIDE THE APPS CONFIG FILE
 var SCHEDULE = FIVE_MINUTE_SCHEDULE;
 if (process.env.NODE_ENV === 'production') {
-  SCHEDULE = DAILY_SCHEDULE;
+  SCHEDULE = TWO_HOURLY_SCHEDULE;
 }
 
 
