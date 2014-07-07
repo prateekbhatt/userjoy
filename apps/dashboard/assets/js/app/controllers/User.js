@@ -597,8 +597,9 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].query = '';
               $scope.filters[parentindex].type = '';
-              $scope.filters[parentindex].timeRange = '';
-              $scope.otherTimeRange = 'at any time';
+              $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
+              // $scope.filters[parentindex].timeRange = '';
+              // $scope.otherTimeRange = 'at any time';
               $scope.filters[parentindex].optext = 'more than';
               $scope.filters[parentindex].val = '';
               $scope.filters[parentindex].op = 'gt';
@@ -618,8 +619,9 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].query = '';
               $scope.filters[parentindex].type = '';
-              $scope.filters[parentindex].timeRange = '';
-              $scope.otherTimeRange = 'at any time';
+              $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
+              // $scope.filters[parentindex].timeRange = '';
+              // $scope.otherTimeRange = 'at any time';
               $scope.filters[parentindex].optext = 'equals';
               $scope.filters[parentindex].val = '';
             } else if ($scope.attributes[index].name == 'status') {
@@ -637,8 +639,9 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].query = '';
               $scope.filters[parentindex].type = '';
-              $scope.filters[parentindex].timeRange = '';
-              $scope.otherTimeRange = 'at any time';
+              $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
+              // $scope.filters[parentindex].timeRange = '';
+              // $scope.otherTimeRange = 'at any time';
               $scope.filters[parentindex].optext = 'equals';
               $scope.filters[parentindex].val = 'free';
               $scope.filters[parentindex].valuetext = 'Free';
@@ -658,8 +661,9 @@ angular.module('do.users', [])
                 index].name;
               $scope.filters[parentindex].query = '';
               $scope.filters[parentindex].type = '';
-              $scope.filters[parentindex].timeRange = '';
-              $scope.otherTimeRange = 'at any time';
+              $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
+              // $scope.filters[parentindex].timeRange = '';
+              // $scope.otherTimeRange = 'at any time';
               $scope.filters[parentindex].optext = 'equals';
               $scope.filters[parentindex].val = 'poor';
               $scope.filters[parentindex].valuetext = 'Poor';
@@ -678,8 +682,9 @@ angular.module('do.users', [])
               $scope.filters[parentindex].name = $scope.attributes[
                 index].name;
               $scope.filters[parentindex].type = '';
-              $scope.filters[parentindex].timeRange = '';
-              $scope.otherTimeRange = 'at any time';
+              $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
+              // $scope.filters[parentindex].timeRange = '';
+              // $scope.otherTimeRange = 'at any time';
               $scope.filters[parentindex].optext = 'contains';
               $scope.filters[parentindex].op = 'contains';
               $scope.filters[parentindex].val = '';
@@ -710,7 +715,7 @@ angular.module('do.users', [])
             $scope.filters[parentindex].val = '';
             $scope.filters[parentindex].type = $scope.hasDoneItems[
               index].type;
-            $scope.otherTimeRange = 'at any time';
+            // $scope.otherTimeRange = 'at any time';
             $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
             $scope.filters[parentindex].val = '';
           }
@@ -741,7 +746,7 @@ angular.module('do.users', [])
             $scope.filters[parentindex].val = '';
             $scope.filters[parentindex].type = $scope.hasNotDoneItems[
               index].type;
-            $scope.otherTimeRange = 'at any time';
+            // $scope.otherTimeRange = 'at any time';
             $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
             $scope.filters[parentindex].val = '';
             console.log($scope.filters);
@@ -772,7 +777,7 @@ angular.module('do.users', [])
               index].query;
             $scope.filters[parentindex].type = $scope.countOfItems[
               index].type;
-            $scope.otherTimeRange = 'at any time';
+            // $scope.otherTimeRange = 'at any time';
             $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
             $scope.filters[parentindex].optext = 'more than';
             $scope.filters[parentindex].op = 'gt';
@@ -1404,6 +1409,7 @@ angular.module('do.users', [])
                 $scope.fromTimeFrontEnd = $scope.timeSpan[i].name;
                 $scope.fromTimeFrontEndValue = $scope.timeSpan[i].value;
                 $scope.otherTimeRange = $scope.fromTimeFrontEnd;
+                console.log("otherTimeRange: ", $scope.otherTimeRange);
                 break;
               }
             };
@@ -1562,8 +1568,8 @@ angular.module('do.users', [])
                 btnName = getFilters[i].name;
                 chkMethod = true;
                 isEvent = false;
-                timeRange = '';
-                timeRangeValue = '';
+                timeRange = $scope.fromTimeFrontEnd;
+                timeRangeValue = $scope.fromTimeFrontEndValue;
               }
               console.log("operation text: ", operationText);
               $scope.filters.push({
@@ -1584,7 +1590,8 @@ angular.module('do.users', [])
                 showPayingStatus: showPayingStatus,
                 showScore: showScore,
                 showDatePicker: showDatePicker,
-                showOtherAttributesQuery: showOtherAttributesQuery
+                showOtherAttributesQuery: showOtherAttributesQuery,
+                otherTimeRange: $scope.otherTimeRange
               })
               // if($scope.segmentClicked && i == 0) {
               //     console.log("$scope.filters: ", $scope.filters);
@@ -1593,6 +1600,7 @@ angular.module('do.users', [])
 
             };
 
+            console.log("$scope.otherTimeRange: ", $scope.otherTimeRange);
             console.log("$scope.filters: ", $scope.filters);
             $scope.otherTimeRange = $scope.filters[0].timeRange;
             $scope.queryObject.list = segmentService.getSingleSegment()
@@ -1919,6 +1927,7 @@ angular.module('do.users', [])
 
         var populatePage = function (err, data, uid) {
           console.log("user profile data: ", data)
+
           function getRandomColor() {
             var keys = _.keys(data);
             $scope.userdata = [];
