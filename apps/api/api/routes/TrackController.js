@@ -464,6 +464,10 @@ router
 
         function getNotification(user, app, cb) {
 
+          // if user not found, we will move on with a null notification,
+          // so that we can at least send the app color in the response
+          if (!user) return cb(null, null, user, app);
+
           var conditions = {
             uid: user._id
           };
