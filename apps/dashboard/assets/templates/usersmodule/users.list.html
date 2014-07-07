@@ -153,7 +153,7 @@
                                                     </ul>
                                                 </div>
                                                 <div ng-if="filter.isEvent" style="float: left; padding-left: 24px;">
-                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{otherTimeRange}}</span>&nbsp;<span class="caret"></span></button>
+                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="timeRangeValues">{{otherTimeRange}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto">
                                                         <li ng-repeat="range in timeSpan">
                                                             <a style="cursor: default;" ng-click="chngrange($parent.$index, $index)">{{range.name}}
