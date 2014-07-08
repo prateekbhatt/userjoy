@@ -109,6 +109,7 @@ router
         function getTrackNames(cb) {
           Event
             .distinct('name', {
+              aid: aid,
               type: 'track'
             })
             .exec(function (err, trackNames) {
@@ -128,6 +129,7 @@ router
         function getPageviewNames(trackEvents, cb) {
           Event
             .distinct('name', {
+              aid: aid,
               type: 'page'
             })
             .exec(function (err, pvNames) {
@@ -146,6 +148,7 @@ router
         function getFormNames(tracks, pvs, cb) {
           Event
             .distinct('name', {
+              aid: aid,
               type: 'form'
             })
             .exec(function (err, names) {
@@ -164,6 +167,7 @@ router
         function getLinkNames(forms, tracks, pvs, cb) {
           Event
             .distinct('name', {
+              aid: aid,
               type: 'link'
             })
             .exec(function (err, names) {
