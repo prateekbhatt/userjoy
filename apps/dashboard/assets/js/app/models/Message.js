@@ -7,7 +7,7 @@ angular.module('models.message', ['services'])
     this.sendManualMessage = function (sub, text, uid, appId, cb) {
       console.log("uid: ", uid)
       var data = {
-        sName: 'Savinay',
+        // sName: 'Savinay',
         sub: sub,
         body: text,
         type: 'email',

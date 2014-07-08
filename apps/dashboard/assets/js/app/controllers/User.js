@@ -1084,8 +1084,8 @@ angular.module('do.users', [])
               field: 'email',
               visible: true
             }, {
-              title: 'Engagement Score',
-              field: 'userkarma',
+              title: 'Status',
+              field: 'status',
               visible: true
             }, {
               title: 'Date Joined',
@@ -1112,8 +1112,8 @@ angular.module('do.users', [])
               field: 'operatingsystem',
               visible: false
             }, {
-              title: 'Status',
-              field: 'status',
+              title: 'Engagement Score',
+              field: 'userkarma',
               visible: false
             }];
 
@@ -1851,9 +1851,9 @@ angular.module('do.users', [])
             });
 
             modalInstance.opened.then(function () {
-              $log.info(
-                'message modal template downloaded'
-              );
+              // $log.info(
+              //   'message modal template downloaded'
+              // );
             })
 
             var populateMsgOnCreation = function (err,
@@ -1873,7 +1873,7 @@ angular.module('do.users', [])
                 sanitizedMsg, UidService.get(), currentAppId,
                 populateMsgOnCreation);
             }, function () {
-              $log.info('Modal dismissed at: ' + new Date());
+              // $log.info('Modal dismissed at: ' + new Date());
             });
           }
 
@@ -2540,9 +2540,9 @@ angular.module('do.users', [])
             });
 
             modalInstance.opened.then(function () {
-              $log.info(
-                'message modal template downloaded'
-              );
+              // $log.info(
+              //   'message modal template downloaded'
+              // );
             })
 
 
@@ -2559,8 +2559,8 @@ angular.module('do.users', [])
                 sanitizedMsg, emailId, currentAppId, $scope.populateMsgOnCreation
               );
             }, function () {
-              $log.info('Modal dismissed at: ' +
-                new Date());
+              // $log.info('Modal dismissed at: ' +
+              //   new Date());
             });
           };
 
@@ -2574,8 +2574,8 @@ angular.module('do.users', [])
             });
 
             modalInstance.opened.then(function () {
-              $log.info(
-                'modal template downloaded')
+              // $log.info(
+              //   'modal template downloaded')
             })
 
             modalInstance.result.then(function (note) {
@@ -2590,8 +2590,8 @@ angular.module('do.users', [])
               );
 
             }, function () {
-              $log.info('Modal dismissed at: ' +
-                new Date());
+              // $log.info('Modal dismissed at: ' +
+              //   new Date());
             });
           };
 

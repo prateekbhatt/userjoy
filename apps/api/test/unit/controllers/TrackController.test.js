@@ -897,7 +897,7 @@ describe('Resource /track', function () {
       });
 
 
-    it('should create new conversation',
+    it('should create new conversation (message sent from message-box)',
       function (done) {
 
         var email = saved.users.first.email;
@@ -918,6 +918,9 @@ describe('Resource /track', function () {
             if (err) return done(err);
 
             var notf = res.body;
+
+            expect(notf.assignee)
+              .to.not.exist;
 
             expect(notf)
               .to.be.an('object');
@@ -950,16 +953,17 @@ describe('Resource /track', function () {
 
 
     it(
-      'should create new conversation with amId, create automessage replied event, and increment replied count',
+      'should create new conversation with amId, create automessage replied event, increment replied count, and should add assignee to new conversation',
       function (done) {
 
         var email = saved.users.first.email;
         var testUrl = url;
+        var automessage = saved.automessages.first;
         var newCon = {
           'app_id': appId,
           'email': saved.users.first.email,
           'body': 'Hey man, how are you?',
-          'amId': saved.automessages.first._id
+          'amId': automessage._id
         };
 
 
@@ -980,7 +984,11 @@ describe('Resource /track', function () {
                   var notf = res.body;
 
                   expect(notf)
-                    .to.be.an('object');
+                    .to.be.an('object')
+                    .and.not.be.empty;
+
+                  expect(notf.assignee.toString())
+                    .to.eql(automessage.creator.toString());
 
                   var savedMsg = notf.messages[0];
 
