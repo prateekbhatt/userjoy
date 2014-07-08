@@ -23,7 +23,8 @@
     "grunt-contrib-less": "~0.9.0",
     "grunt-contrib-coffee": "~0.7.0",
     "bower": "^1.2.8",
-    "passport": "^0.2.0"
+    "passport": "^0.2.0",
+    "grunt-filerev": "~0.2.1"
   },
   "scripts": {
     "start": "node app.js",
@@ -36,8 +37,5 @@
     "url": "git://github.com/prateekbhatt/littlejohn.git"
   },
   "author": "Prateek Bhatt <prattbhatt@gmail.com>",
-  "license": "",
-  "devDependencies": {
-    "grunt-filerev": "~0.2.1"
-  }
+  "license": ""
 }
