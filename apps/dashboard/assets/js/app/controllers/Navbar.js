@@ -91,14 +91,14 @@ angular.module('do.navbar', [])
 
           $scope.$watch(LoginService.getUserAuthenticated,
             function () {
-              $log.info("Navbar watch", arguments);
+              // $log.info("Navbar watch", arguments);
               $scope.loggedIn = LoginService.getUserAuthenticated();
             });
 
           $scope.apps = AppService.getLoggedInApps();
 
           $scope.$watch(AppService.getLoggedInApps, function () {
-            $log.info("Navbar watch AppService", arguments);
+            // $log.info("Navbar watch AppService", arguments);
             $scope.apps = [];
             for (var i = 0; i < AppService.getLoggedInApps()
               .length; i++) {
@@ -161,7 +161,7 @@ angular.module('do.navbar', [])
           }
 
           $scope.changeUrl = function () {
-            $log.info("inside settings changeUrl");
+            // $log.info("inside settings changeUrl");
             $location.path('/settings/profile');
           }
 
@@ -262,14 +262,14 @@ angular.module('do.navbar', [])
 
           $scope.$watch(LoginService.getUserAuthenticated,
             function () {
-              $log.info("Navbar watch", arguments);
+              // $log.info("Navbar watch", arguments);
               $scope.loggedIn = LoginService.getUserAuthenticated();
             });
 
           $scope.apps = AppService.getLoggedInApps();
 
           $scope.$watch(AppService.getLoggedInApps, function () {
-            $log.info("Navbar watch AppService", arguments);
+            // $log.info("Navbar watch AppService", arguments);
             $scope.apps = [];
             for (var i = 0; i < AppService.getLoggedInApps()
               .length; i++) {

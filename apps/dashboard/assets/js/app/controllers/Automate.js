@@ -739,19 +739,21 @@ angular.module('do.automate', [])
 
           $scope.showText = function (htmlVariable) {
             console.log($scope.htmlVariable);
-            var checkMsgLengthText = $scope.
-            notificationBody.replace(/<(?:.|\n)*?>/gm, '')
-              .replace(/&#34;/g, '"')
-              .replace(/&#160;/g, ' ');
-            console.log("notification characters: ",
-              checkMsgLengthText);
-            var checkMsgLength = checkMsgLengthText.length;
-            $scope.charactersLeft = 250 - checkMsgLength;
-            if ($scope.charactersLeft < 10) {
-              $scope.colorText = '#e74c3c';
-            }
-            if ($scope.charactersLeft >= 10) {
-              $scope.colorText = '#2c3e50';
+            if($scope.notificationBody) {
+              var checkMsgLengthText = $scope.
+              notificationBody.replace(/<(?:.|\n)*?>/gm, '')
+                .replace(/&#34;/g, '"')
+                .replace(/&#160;/g, ' ');
+              console.log("notification characters: ",
+                checkMsgLengthText);
+              var checkMsgLength = checkMsgLengthText.length;
+              $scope.charactersLeft = 250 - checkMsgLength;
+              if ($scope.charactersLeft < 10) {
+                $scope.colorText = '#e74c3c';
+              }
+              if ($scope.charactersLeft >= 10) {
+                $scope.colorText = '#2c3e50';
+              }
             }
           }
 

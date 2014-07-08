@@ -840,6 +840,11 @@ angular.module('do.message', [])
 
             $scope.individualCustomer = userEmail;
             $scope.subject = msgThread.sub;
+            if(msgThread.amId) {
+              $scope.isAutoMessage = true;
+            } else {
+              $scope.isAutoMessage = false;
+            }
 
             for (var i = 0; i < msgThread.messages.length; i++) {
               var m = msgThread.messages[i];
