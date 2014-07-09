@@ -921,13 +921,8 @@ function isEmpty (val) {
 });
 require.register("ianstormtaylor-is/index.js", function(exports, require, module){
 
-var isEmpty = require('is-empty');
-
-try {
-  var typeOf = require('type');
-} catch (e) {
-  var typeOf = require('component-type');
-}
+var isEmpty = require('is-empty')
+  , typeOf = require('type');
 
 
 /**
@@ -4425,7 +4420,6 @@ exports.select = function(fn){
  */
 
 exports.reject = function(fn){
-  var dom = this.dom;
   var out = [];
   var len = this.length;
   var val, i;
@@ -7595,9 +7589,9 @@ UserJoy.prototype.initialize = function () {
     .create(window.userjoy)
     .prioritize();
 
-  // enable autotracking forms and links after queue has been created
-  this._autoTrackForms();
-  this._autoTrackLinks();
+  // enable autotracking clicks and pageviews
+  on(window, 'click', self._autoClickHandler, true);
+  autoPageTrack.call(self);
 
   // invoke queued tasks after autotracking has been enabled
   this._invokeQueue();
@@ -8130,94 +8124,92 @@ function canonicalUrl() {
 }
 
 
-UserJoy.prototype._autoTrackForms = function () {
 
+UserJoy.prototype._autoClickHandler = function (e) {
+
+  var target = e.target || e.srcElement;
+  var tagName = target.tagName.toLowerCase();
+  var type = target.type ? target.type.toLowerCase() : '';
+  var id = target.id;
+  var form = target.form;
+  var formId = form ? form.id || form.name : '';
   var self = this;
-  var allForms = document.getElementsByTagName('form');
 
-  each(allForms, function (f) {
-    var identifier = f.id;
-    var manuallyTracked = false;
-
-    // if no id, return
-    if (!identifier) return;
-
-    // app should not have enabled manual tracking of id (check from queue)
-    each(queue.tasks, function (t) {
-
-      if (t[0] === 'track_form') {
-
-        // if its an array of form ids, and the array contains this id, then
-        // it is being manually tracked
-        if (is.array(t[1]) && contains(t[1], identifier)) {
-          manuallyTracked = true;
-        }
-
-        // if its a single form id (string), and equals the current form id,
-        // then it is being manually tracked
-        if (is.string(t[1]) && (t[1] === identifier)) {
-          manuallyTracked = true;
-        }
-
-      }
-    });
-
-    // if manually tracked, move on (do not autotrack)
-    if (manuallyTracked) return;
-
-    // else enable auto tracking, and pass name as the identifier
-    self.track_form(identifier, identifier);
+  console.log('\n\n autoClickHandler', tagName.type, id, form, formId, target);
 
 
-  });
+  if (target) {
 
-  return this;
+    if (type === 'submit' && formId) {
+
+      console.log('\n\n\n Sending form submit', formId);
+      self._sendEvent('form', formId);
+
+    } else if ((tagName === 'a' && tagName === 'button') && id) {
+
+      console.log('\n\n\n Sending click event', formId);
+      // for link clicks with ids
+      self._sendEvent('link', id);
+
+    } else {
+      // do nothing
+      return;
+    }
+
+  }
+
 }
 
 
-UserJoy.prototype._autoTrackLinks = function () {
+/**
+ * Call this function with the proper UserJoy context
+ */
 
+function autoPageTrack() {
+
+  var newVal = location.pathname + location.hashname;
   var self = this;
-  var allLinks = document.getElementsByTagName('a');
 
-  each(allLinks, function (l) {
-    var identifier = l.id;
-    var manuallyTracked = false;
+  if (window.history.pushState) {
+    /**
+     * @param {Object} obj
+     * @param {string} methodName
+     * @param {string} val
+     * @return {undefined}
+     */
+    var define = function (obj, methodName, val) {
+      var orig = obj[methodName];
+      /**
+       * @return {?}
+       */
+      obj[methodName] = function () {
+        var str = orig.apply(obj, arguments);
+        return typeof obj[val] == "function" && obj[val](), str;
+      };
+    };
+    define(window.history, "pushState", "ujPushstate");
+    define(window.history, "replaceState", "ujReplacestate");
+    /**
+     * @return {undefined}
+     */
+    var handler = function () {
+      /** @type {string} */
+      var oldVal = window.location.pathname + window.location.hash;
+      if (newVal !== oldVal) {
+        /** @type {string} */
 
-    // if no id, do not track
-    if (!identifier) return;
-
-    // app should not have enabled manual tracking of id (check from queue)
-    each(queue.tasks, function (t) {
-
-      if (t[0] === 'track_link') {
-
-        // if its an array of link ids, and the array contains this id, then
-        // it is being manually tracked
-        if (is.array(t[1]) && contains(t[1], identifier)) {
-          manuallyTracked = true;
-        }
-
-        // if its a single link id (string), and equals the current link id,
-        // then it is being manually tracked
-        if (is.string(t[1]) && (t[1] === identifier)) {
-          manuallyTracked = true;
-        }
-
+        newVal = oldVal;
+        console.log('\n\n\n handler called', newVal, oldVal, UserJoy.prototype
+          .page, '\n\n');
+        UserJoy.prototype.page.call(self);
       }
-    });
+    };
 
-
-    // if manually tracked, move on (do not autotrack)
-    if (manuallyTracked) return;
-
-    // else enable auto tracking, and pass name as the identifier
-    self.track_link(identifier, identifier);
-
-
-  });
-
-  return this;
+    /** @type {function (): undefined} */
+    history.ujPushstate = history.ujReplacestate = handler;
+    window.addEventListener("popstate", handler, true);
+    window.addEventListener("hashchange", handler, true);
+  }
 }
 
 });
