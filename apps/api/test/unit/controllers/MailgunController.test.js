@@ -625,7 +625,8 @@ describe('Resource /mailgun', function () {
       it('should handle replies to automessages', function (done) {
 
         var messageId = saved.automessages.first._id;
-        var identifier = 'u_' + messageId;
+        var identifier = 'a_' + messageId;
+        var sender = saved.users.first;
 
         var replyToEmailAuto = aid + '+' + identifier +
           '@test-mail.userjoy.co';
@@ -635,7 +636,7 @@ describe('Resource /mailgun', function () {
 
         var postData = {
           recipient: replyToEmailAuto,
-          sender: 'prattbhatt@gmail.com',
+          sender: sender.email,
           subject: 'Re: hello',
           from: 'Prateek Bhatt <prattbhatt@gmail.com>',
           'X-Envelope-From': '<prattbhatt@gmail.com>',
@@ -667,15 +668,29 @@ describe('Resource /mailgun', function () {
           'stripped-signature': 'Prateek Bhatt'
         };
 
-        console.log('\n\n\n url', url);
-
-
-
-
 
         async.series(
 
           [
+
+            function noConversationForAMsgFromUser(cb) {
+
+              Conversation
+                .findOne({
+                  amId: messageId,
+                  uid: sender._id
+                })
+                .exec(function (err, con) {
+                  expect(err)
+                    .to.not.exist;
+                  expect(con)
+                    .to.be.null;
+
+                  cb(err);
+                });
+
+            },
+
 
             function zeroReplied(cb) {
 
@@ -702,7 +717,41 @@ describe('Resource /mailgun', function () {
                 .send(postData)
                 .expect('Content-Type', /json/)
                 .expect(200)
-                .end(done);
+                .end(cb);
+            },
+
+
+            function oneConversationForAMsgFromUser(cb) {
+
+              Conversation
+                .find({
+                  amId: messageId,
+                  uid: sender._id
+                })
+                .exec(function (err, con) {
+                  expect(err)
+                    .to.not.exist;
+
+                  expect(con)
+                    .to.be.an('array')
+                    .that.has.length(1);
+
+                  var con1 = con[0];
+
+                  expect(con1)
+                    .to.be.an('object');
+
+                  expect(con1.uid.toString())
+                    .to.eql(sender._id.toString());
+
+                  expect(con1)
+                    .to.have.property('messages')
+                    .that.is.an('array')
+                    .and.has.length(1);
+
+                  cb(err);
+                });
+
             },
 
             function oneReplied(cb) {
@@ -729,7 +778,41 @@ describe('Resource /mailgun', function () {
                 .send(postData)
                 .expect('Content-Type', /json/)
                 .expect(200)
-                .end(done);
+                .end(cb);
+            },
+
+
+            function oneConversationForAMsgFromUserAndTwoMessages(cb) {
+
+              Conversation
+                .find({
+                  amId: messageId,
+                  uid: sender._id
+                })
+                .exec(function (err, con) {
+                  expect(err)
+                    .to.not.exist;
+
+                  expect(con)
+                    .to.be.an('array')
+                    .that.has.length(1);
+
+                  var con1 = con[0];
+
+                  expect(con1)
+                    .to.be.an('object');
+
+                  expect(con1.uid.toString())
+                    .to.eql(sender._id.toString());
+
+                  expect(con1)
+                    .to.have.property('messages')
+                    .that.is.an('array')
+                    .and.has.length(2);
+
+                  cb(err);
+                });
+
             },
 
 
