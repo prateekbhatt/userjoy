@@ -273,25 +273,23 @@ UserJoy.prototype.company = function (traits, fn) {
 
 
 /**
- * Track an `event` that a user has triggered with optional `properties`.
+ * Track an `event` that a user has triggered with optional `module`.
  *
  * @param {String} event
  * @param {String} module (optional)
- * @param {Object} properties (optional)
  * @param {Function} fn (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.track = function (name, module, properties, fn) {
+UserJoy.prototype.track = function (name, module, fn) {
 
 
-  this.debug('track', name, properties);
+  this.debug('track', name, module);
 
-  if (is.fn(properties)) fn = properties, properties = null;
-  if (is.fn(module)) fn = module, module = properties = null;
+  if (is.fn(module)) fn = module, module = null;
 
 
-  this._sendEvent('track', name, module, properties);
+  this._sendEvent('track', name, module);
 
   this._callback(fn);
   return this;
@@ -305,14 +303,12 @@ UserJoy.prototype.track = function (name, module, properties, fn) {
  * @param {Element or Array} links
  * @param {String or Function} name
  * @param {String or Function} module (optional)
- * @param {Object or Function} properties (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.track_link = function (links, name, module, properties) {
+UserJoy.prototype.track_link = function (links, name, module) {
   if (!links) return this;
   if (is.string(links)) links = [links]; // always arrays, handles jquery
-  if (is.object(module)) properties = module, module = null;
 
 
   var self = this;
@@ -326,11 +322,10 @@ UserJoy.prototype.track_link = function (links, name, module, properties) {
       // TODO: test the next lines
       var ev = is.fn(name) ? name(el) : name;
       var module = is.fn(module) ? module(el) : module;
-      var props = is.fn(properties) ? properties(el) : properties;
 
 
-      // self.track(ev, props);
-      self._sendEvent('link', ev, null, props);
+      // self.track(ev);
+      self._sendEvent('link', ev);
 
       if (el.href && el.target !== '_blank' && !isMeta(e)) {
         prevent(e);
@@ -352,16 +347,14 @@ UserJoy.prototype.track_link = function (links, name, module, properties) {
  * @param {Element or Array} forms
  * @param {String or Function} name
  * @param {String or Object or Function} module
- * @param {Object or Function} properties (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.track_form = function (forms, name, module, properties) {
+UserJoy.prototype.track_form = function (forms, name, module) {
 
 
   if (!forms) return this;
   if (is.string(forms)) forms = [forms]; // always arrays, handles jquery
-  if (is.object(module)) properties = module, module = null;
 
   var self = this;
   each(forms, function (el_id) {
@@ -375,10 +368,9 @@ UserJoy.prototype.track_form = function (forms, name, module, properties) {
       // TODO: check the next lines
       var ev = is.fn(name) ? name(el) : name;
       var module = is.fn(module) ? module(el) : module;
-      var props = is.fn(properties) ? properties(el) : properties;
 
-      // self.track(ev, props);
-      self._sendEvent('form', ev, module, props);
+      // self.track(ev);
+      self._sendEvent('form', ev, module);
 
       self._callback(function () {
         el.submit();
@@ -403,22 +395,19 @@ UserJoy.prototype.track_form = function (forms, name, module, properties) {
 
 /**
  * Trigger a pageview, labeling the current page with an optional `module`,
- * `name` and `properties`.
+ * and `name`.
  *
  * @param {String} name (optional)
  * @param {String} module (optional)
- * @param {Object or String} properties (or path) (optional)
  * @param {Function} fn (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.page = function (name, module, properties, fn) {
+UserJoy.prototype.page = function (name, module, fn) {
 
   name = name || canonicalPath();
 
-  if (is.fn(properties)) fn = properties, properties = null;
-  if (is.fn(module)) fn = module, properties = module = null;
-  if (is.object(module)) properties = module, module = null;
+  if (is.fn(module)) fn = module, module = null;
 
   // var defs = {
   //   path: canonicalPath(),
@@ -432,10 +421,8 @@ UserJoy.prototype.page = function (name, module, properties, fn) {
 
   // if (category) defs.category = category;
 
-  // properties = clone(properties) || {};
-  // defaults(properties, defs);
 
-  this._sendEvent('page', name, module, properties);
+  this._sendEvent('page', name, module);
 
   this._callback(fn);
   return this;
@@ -474,12 +461,11 @@ UserJoy.prototype._callback = function (fn) {
  * @param {String} type of event (link/form/track)
  * @param {String} name of event
  * @param {String} name of module
- * @param {Object} additional properties of event (optional)
  * @return {UserJoy}
  * @api private
  */
 
-UserJoy.prototype._sendEvent = function (type, name, module, properties) {
+UserJoy.prototype._sendEvent = function (type, name, module) {
 
   var self = this;
 
@@ -512,7 +498,6 @@ UserJoy.prototype._sendEvent = function (type, name, module, properties) {
   if (cid) data.c = cid;
 
   if (module) data.e.module = module;
-  if (properties) data.e.meta = properties;
 
   self.debug('Sending new event: %o', data);
 
