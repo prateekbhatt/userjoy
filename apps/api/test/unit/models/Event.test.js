@@ -92,11 +92,7 @@ describe('Model Event', function () {
           aid: randomId(),
           name: 'Create Action',
           type: 'track',
-          uid: randomId(),
-          meta: [{
-            k: 'status',
-            v: 'paying'
-          }]
+          uid: randomId()
         };
 
         Event.create(newEvent, function (err, evn) {
@@ -121,28 +117,17 @@ describe('Model Event', function () {
     });
 
 
-    it('should add event metadata', function () {
-      expect(savedEvent.meta)
-        .to.be.an("array");
-
-      expect(savedEvent.meta)
-        .to.have.length(1);
-
-      expect(savedEvent.meta[0])
-        .to.have.property("k", "status");
-    });
-
   });
 
 
   describe('#track', function () {
 
-    it('should return error if less than 6 arguments are passed',
+    it('should return error if less/more than 5 arguments are passed',
       function () {
 
         expect(Event.track)
           .to.
-        throw ('Event.track: Expected six arguments');
+        throw ('Event.track: Expected five arguments');
 
       });
 
@@ -157,13 +142,9 @@ describe('Model Event', function () {
       var name = 'Open chat';
       var module = 'Group';
 
-      var meta = {
-        members: 99
-      };
-
       var type = 'randomEventTypeThatIsNotValid';
 
-      Event.track(type, ids, name, module, meta, function (err, evn) {
+      Event.track(type, ids, name, module, function (err, evn) {
 
         expect(err)
           .to.exist
@@ -189,24 +170,14 @@ describe('Model Event', function () {
       var name = 'Open chat';
       var module = 'Group';
 
-      var meta = {
-        members: 99
-      };
-
       var type = 'track';
 
-      Event.track(type, ids, name, module, meta, function (err, evn) {
+      Event.track(type, ids, name, module, function (err, evn) {
 
         expect(err)
           .to.not.exist;
 
         evn = evn.toJSON();
-
-        expect(evn.meta)
-          .to.be.an("array");
-
-        expect(evn.meta)
-          .to.have.length(1);
 
         expect(evn)
           .to.have.property("type", "track");
@@ -216,12 +187,6 @@ describe('Model Event', function () {
 
         expect(evn)
           .to.have.property("module", "Group");
-
-        expect(evn.meta)
-          .to.eql([{
-            k: 'members',
-            v: 99
-          }]);
 
         done();
       });
@@ -247,9 +212,6 @@ describe('Model Event', function () {
 
         expect(err)
           .to.not.exist;
-
-        expect(evn.meta)
-          .to.be.an("array");
 
         expect(evn)
           .to.have.property("type", "page");

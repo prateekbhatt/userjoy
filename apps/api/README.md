@@ -66,7 +66,7 @@ To create threads, we append the parent message id to the app email address, and
 
 ###### MetaData
 
-We allow the apps to pass custom attributes related to users, companies and events. These attributes should be stored in a metadata field using (```metadata: [{ k: 'key', v: 'value'}]```) array. [Reference](http://calv.info/indexing-schemaless-documents-in-mongo/)
+We allow the apps to pass custom attributes related to users and companies. These attributes should be stored in a metadata field using (```metadata: [{ k: 'key', v: 'value'}]```) array. [Reference](http://calv.info/indexing-schemaless-documents-in-mongo/)
 
 > #### Schema
 
@@ -108,7 +108,7 @@ AutoMessage   |                         | automated messages
 Company       |                         | companies of a specific account
 Conversation  | Message                 | conversation threads between users and accounts
 DailyReport   |                         | the score, usage of a user for a specific company (monthly)
-Event         | meta (metadata)         | events belonging to a user
+Event         |                         | events belonging to a user
 Invite        |                         | tokens of team members that have been invited to use an app
 Notification  |                         | notifications to be shown to the user (only auto)
 Segment       | filters                 | all the segments defined for an app
@@ -341,7 +341,6 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 - cid
 - ct
 - module
-- meta [Metadata]
 - name (required)
 - type (required)
 - uid (required)
