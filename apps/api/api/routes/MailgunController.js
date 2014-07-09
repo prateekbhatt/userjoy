@@ -211,8 +211,6 @@ router
 
               {
 
-                // TODO: remove previous messages from body before saving
-                // body: removeQuotedText(toEmail, message.msg.body),
                 body: body,
                 ct: ct,
                 from: 'user',
@@ -357,32 +355,68 @@ router
 
           function createConversation(user, cb) {
 
-            var newConv = {
+            Conversation.findOne({
               aid: aid,
               amId: messageId,
-              ct: ct,
-              messages: [
+              uid: user._id
+            }, function (err, con) {
 
-                {
+              if (err) {
+                return cb(err);
+              }
 
-                  // TODO: remove previous messages from body before saving
-                  // body: removeQuotedText(toEmail, message.msg.body),
+              // if conversation is not found, then create a new conversation,
+              // else if conversation is found, then add a new reply to the 
+              // existing conversation
+
+              if (_.isEmpty(con)) {
+
+                var newConv = {
+                  aid: aid,
+                  amId: messageId,
+                  ct: ct,
+                  messages: [
+
+                    {
+
+                      body: body,
+                      ct: ct,
+                      from: 'user',
+                      sent: true,
+                      sName: user.name || user.email,
+                      type: 'email',
+
+                    }
+
+                  ],
+                  sub: subject,
+                  uid: user._id
+                };
+
+                Conversation.create(newConv, function (err, con) {
+                  cb(err, con, user);
+                });
+
+
+              } else {
+
+                var newMsg = {
                   body: body,
                   ct: ct,
                   from: 'user',
                   sent: true,
+                  sName: user.name || user.email,
                   type: 'email',
+                };
 
-                }
+                con.messages.push(newMsg);
+                con.save(function (err, updatedCon) {
+                  cb(err, con, user);
+                });
+              }
 
-              ],
-              sub: subject,
-              uid: user._id
-            };
-
-            Conversation.create(newConv, function (err, con) {
-              cb(err, con, user);
             });
+
           },
 
           function getAdminAccount(con, user, cb) {
@@ -412,7 +446,8 @@ router
 
             var title = amsg.title;
 
-            createEventAndIncrementCount(ids, 'replied', title, function (err) {
+            createEventAndIncrementCount(ids, 'replied', title, function (
+              err) {
               cb(err, acc, con, user);
             });
 
