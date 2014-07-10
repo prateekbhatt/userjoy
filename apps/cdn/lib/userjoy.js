@@ -98,8 +98,11 @@ UserJoy.prototype.initialize = function () {
   on(window, 'click', self._autoClickHandler, true);
   autoPageTrack.call(self);
 
+  // track the first page view
+  self.page();
+
   // invoke queued tasks after autotracking has been enabled
-  this._invokeQueue();
+  self._invokeQueue();
 
 
   notification.load(function (err) {
@@ -652,7 +655,7 @@ UserJoy.prototype._autoClickHandler = function (e) {
 
 function autoPageTrack() {
 
-  var newVal = location.pathname + location.hashname;
+  var newVal = location.pathname + location.hash;
   var self = this;
 
   if (window.history.pushState) {
