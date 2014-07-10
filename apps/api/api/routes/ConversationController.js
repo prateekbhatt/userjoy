@@ -769,6 +769,9 @@ router
 
               var fromEmail = appEmail(aid);
               var fromName = req.user.name;
+              var type = conv.amId ? 'auto' : 'manual';
+
+
               var replyToEmail = appEmail.reply.create({
                 aid: conv.aid.toString(),
                 type: 'manual',
