@@ -42,6 +42,7 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <i class="fa fa-envelope"></i> {{subject}}
+                <span class="pull-right label label-info" ng-if="isAutoMessage">AutoMessage</span>
             </div>
             <div class="panel-body">
                 <div class="col-md-12" ng-repeat="message in messagesWithSrc">
@@ -133,8 +134,8 @@
                     <br>
                     <div class="col-md-12" style="padding-top: 45px;">
                         <div class="btn-toolbar" style="padding-right: 20px;">
-                            <button type="submit" class="btn btn-success col-md-2 pull-right" ng-click="validateAndAddReply()" ng-disabled="disableReply">Reply</button>
-                            <button class="btn btn-default col-md-2 pull-right" ng-click="closeTicket()" ng-disabled="disableClose">{{buttontext}}</button>&nbsp;&nbsp;
+                            <button type="button" class="btn btn-success col-md-2 pull-right" ng-click="validateAndAddReply()" ng-disabled="disableReply" id="repliedToConversation">Reply</button>
+                            <button type="button" class="btn btn-default col-md-2 pull-right" ng-click="closeTicket()" ng-disabled="disableClose" id="reopenedOrClosed">{{buttontext}}</button>&nbsp;&nbsp;
                         </div>
                     </div>
                 </div>
