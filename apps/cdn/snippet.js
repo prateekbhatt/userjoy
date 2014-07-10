@@ -8,7 +8,37 @@ window.userjoy=window.userjoy||[],window.userjoy.methods=["identify","company","
 
 window.userjoy.load('53bab67e1be0e59955e061f1');
 
+
 userjoy.identify({
-  // TODO: Replace email below with that of the logged in user
-  email: 'test@userjoy.co'
+
+  // TODO: logged in user's email.
+  // Used to identify the user and send him email messages
+  // (REQUIRED)
+  email: 'test@userjoy.co',
+
+  // TODO: logged in user's unique id.
+  // if your app allows a user to change his email address,
+  // then user_id is required to identify user
+  // (OPTIONAL)
+  user_id: '758439753849',
+
+  // TODO: logged in user's payment status
+  // MUST be one of 'trial' / 'free' / 'paying' / 'cancelled'
+  // (REQUIRED)
+  status: 'trial',
+
+  // TODO: logged in user's sign-up date in UNIX timestamp
+  // (milliseconds after epoch)
+  // (REQUIRED)
+  joined: 1403353187345,
+
+  // TODO: logged in user's subscription plan
+  // Helps you segment users by plan name
+  // (OPTIONAL)
+  plan: 'Enterprise',
+
+  // TODO: monthly revenue from user
+  // (OPTIONAL)
+  revenue: 499
+
 });
