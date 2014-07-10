@@ -7,6 +7,7 @@ window.userjoy=window.userjoy||[],window.userjoy.methods=["identify","company","
 
 
 window.userjoy.load('53bab67e1be0e59955e061f1');
+
 userjoy.identify({
   // TODO: Replace email below with that of the logged in user
   email: 'test@userjoy.co'

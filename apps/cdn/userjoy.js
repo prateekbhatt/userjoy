@@ -7589,13 +7589,16 @@ UserJoy.prototype.initialize = function () {
     .create(window.userjoy)
     .prioritize();
 
-  // enable autotracking clicks and pageviews
+  // enable autotracking clicks, form-submits and pageviews
   on(window, 'click', self._autoClickHandler, true);
   autoPageTrack.call(self);
 
-  // invoke queued tasks after autotracking has been enabled
-  this._invokeQueue();
+  // track the first page view, the first page is not handled by the event
+  // listener
+  self.page();
 
+  // invoke queued tasks after autotracking has been enabled
+  self._invokeQueue();
 
   notification.load(function (err) {
 
@@ -7610,7 +7613,7 @@ UserJoy.prototype.initialize = function () {
   });
 
 
-  this.debug('INITIALIZED:: %o', this);
+  this.debug('initialized: %o', this);
 
   return this;
 };
@@ -8118,6 +8121,17 @@ UserJoy.prototype._autoClickHandler = function (e) {
   var formId = form ? form.id || form.name : '';
   var self = this;
 
+  // console.log('\n\n _autoClickHandler',
+
+  //   {
+  //     target: target,
+  //     tagName: tagName,
+  //     type: type,
+  //     id: id,
+  //     formId: formId
+  //   },
+
+  //   '\n\n');
 
   if (target) {
 
@@ -8125,9 +8139,10 @@ UserJoy.prototype._autoClickHandler = function (e) {
 
       self._sendEvent('form', formId);
 
-    } else if ((tagName === 'a' && tagName === 'button') && id) {
+    } else if ((tagName === 'a' || tagName === 'button') && id && (type !==
+      'submit')) {
 
-      // for link clicks with ids
+      // for link or button clicks with ids
       self._sendEvent('link', id);
 
     } else {
@@ -8147,7 +8162,7 @@ UserJoy.prototype._autoClickHandler = function (e) {
 
 function autoPageTrack() {
 
-  var newVal = location.pathname + location.hashname;
+  var newVal = location.pathname + location.hash;
   var self = this;
 
   if (window.history.pushState) {
@@ -8174,8 +8189,8 @@ function autoPageTrack() {
     };
 
     history.ujPushstate = history.ujReplacestate = handler;
-    window.addEventListener("popstate", handler, true);
-    window.addEventListener("hashchange", handler, true);
+    on(window, "popstate", handler, true);
+    on(window, "hashchange", handler, true);
   }
 }
 
