@@ -122,7 +122,7 @@
                                                     <tbody>
                                                         <!-- <td ng-repeat="column in columnsSent" ng-show="column.visible" sortable="column.field" class="text-center"></td> -->
                                                         <tr ng-repeat="user in $data | filter:searchText" >
-                                                            <td data-title="'User'" style="text-align:center; cursor:pointer" ng-click="showSelectedMail(user.id)">
+                                                            <td data-title="'User'" style="text-align:center; cursor:pointer" ng-click="showSelectedMail(user.id)" id="showUnreadMsgs">
                                                                 <span>{{user.name}}</span>
                                                             </td>
                                                             <td data-title="'Subject'" style="text-align:center; cursor:pointer" ng-click="showSelectedMail(user.id)">

@@ -49,6 +49,60 @@ var accountMailer = require('../services/account-mailer');
 
 
 /**
+ * this function is used to create a new conversation when
+ * 1. the user replies to a notification
+ * 2. the user sends a message through the message box
+ *
+ * @param  {object}   automessage
+ *         @property {string} _id ObjectId
+ *         @property {object} creator
+ *                   @property {string} _id creator-account-id
+ * @param  {object}   user user-obj
+ * @param  {string} msg msg-body]
+ * @param  {Function} cb   callback
+ */
+
+function createConversation(amsg, user, body, cb) {
+
+  var newCon = {
+    aid: user.aid,
+    messages: [],
+    sub: 'Message from ' + user.email,
+    uid: user._id
+  };
+
+
+  // if automessage is present
+  if (amsg) {
+    newCon.amId = amsg._id;
+    newCon.assignee = amsg.creator._id
+  }
+
+
+  var msg = {
+    body: body,
+
+    // add from as 'user'
+    from: 'user',
+
+    // type should be notification
+    type: 'notification',
+
+    // add sender name 'sName' as user's name or email
+    // TODO: Check is user.name will work
+    sName: user.name || user.email
+
+  };
+
+  newCon.messages.push(msg);
+
+  Conversation.create(newCon, function (err, con) {
+    cb(err, con);
+  });
+}
+
+
+/**
  * Add CORS support for all /track routes
  */
 
@@ -146,7 +200,7 @@ router
 
     if (event.type === 'page') {
 
-      // FIXME : pageview events must accept module name and meta data
+      // FIXME : pageview events must accept module name
 
       var name = event.name;
       return Event.page(ids, name, callback);
@@ -155,10 +209,9 @@ router
 
       var name = event.name;
       var module = event.module;
-      var meta = event.meta;
       var type = event.type;
 
-      return Event.track(type, ids, name, module, meta, callback);
+      return Event.track(type, ids, name, module, callback);
 
     } else {
 
@@ -596,27 +649,10 @@ router
 
     async.waterfall([
 
-
-        function getApp(cb) {
-          App.findById(aid, function (err, app) {
-            if (err) {
-
-              if (err.name === 'CastError') {
-                return cb(new Error('INVALID_APP_KEY'));
-              }
-
-              return cb(err);
-            }
-            if (!app) return cb(new Error('APP_NOT_FOUND'));
-            cb(null, app);
-          });
-        },
-
-
-        function findUser(app, cb) {
+        function findUser(cb) {
 
           var conditions = {
-            aid: app._id
+            aid: aid
           };
 
           if (user_id) {
@@ -628,137 +664,225 @@ router
           }
 
           User.findOne(conditions, function (err, user) {
-            if (err) return cb(err);
-            if (!user) return cb(new Error('USER_NOT_FOUND'));
-            cb(null, app, user);
-          });
-        },
 
+            if (err) {
 
-        function createConversation(app, user, cb) {
+              if (err.name === 'CastError' && err.path === 'aid') {
+                return cb(new Error('INVALID_APP_KEY'));
+              }
 
-          var newCon = {
-            aid: user.aid,
-            messages: [],
-            sub: 'Message from ' + user.email,
-            uid: user._id
-          };
-
-
-          // if amId is present
-          if (amId) newCon.amId = amId;
-
-
-          var msg = {
-            body: body,
-
-            // add from as 'user'
-            from: 'user',
-
-            // type should be notification
-            type: 'notification',
-
-            // add sender name 'sName' as user's name or email
-            // TODO: Check is user.name will work
-            sName: user.name || user.email
-
-          };
-
-          newCon.messages.push(msg);
-
-          Conversation.create(newCon, function (err, con) {
-            cb(err, app, con);
-          });
-        },
-
-        function getAdmin(app, con, cb) {
-
-          var admin = _.find(app.team, function (t) {
-            return t.admin === true;
-          });
-
-          if (!_.isObject(admin)) return cb(new Error('ADMIN_NOT_FOUND'));
-
-          Account
-            .findById(admin.accid)
-            .select({
-              _id: -1,
-              name: 1,
-              email: 1
-            })
-            .lean()
-            .exec(function (err, acc) {
-              if (err) return cb(err);
-              if (!acc) return cb(new Error('ADMIN_NOT_FOUND'));
-
-              cb(null, acc, con);
-            });
-
-        },
-
-        function sendMail(acc, con, cb) {
-
-          /**
-           * require config for dashboard url
-           */
-          var config = require('../../../config')('api');
-          var dashboardUrl = config.hosts['dashboard'];
-          var conversationUrl = dashboardUrl + '/apps/' + con.aid +
-            '/messages/conversations/' + con._id;
-
-
-          var opts = {
-            locals: {
-              conversationUrl: conversationUrl,
-              message: con.messages[con.messages.length - 1].body,
-              name: acc.name,
-              sentBy: email,
-              subject: con.sub
-            },
-            to: {
-              name: acc.name,
-              email: acc.email
+              return cb(err);
             }
-          };
-
-          accountMailer.sendAdminConversation(opts, function (err) {
-            cb(err, con);
+            if (!user) return cb(new Error('USER_NOT_FOUND'));
+            cb(null, user);
           });
         },
 
 
-        function getAutoMessage(con, cb) {
+        function getAccount(user, cb) {
 
-          // to get the title to create automessage event in the next step
-          AutoMessage
-            .findById(con.amId)
-            .select('title')
-            .exec(function (err, amsg) {
-              cb(err, con, amsg);
-            });
-
-        },
+          if (amId) {
 
 
-        function createAutoMessageRepliedEventAndIncrement(con, amsg, cb) {
+            async.waterfall(
 
-          // if not reply to automessage, move on
-          if (!amId) return cb(null, con);
+              [
 
-          var ids = {
-            aid: con.aid,
-            amId: con.amId,
-            uid: con.uid
-          };
+                function getAutoMessage(cb) {
 
-          var state = 'replied';
-          var title = amsg.title;
+                  // to get the title to create automessage event in the next step
+                  AutoMessage
+                    .findById(amId)
+                    .select('title creator')
+                    .populate({
+                      path: 'creator',
+                      select: 'name email'
+                    })
+                    .exec(function (err, amsg) {
 
-          createEventAndIncrementCount(ids, state, title, function (err) {
-            cb(err, con);
-          });
+                      if (err) return cb(err);
+                      if (!amsg) {
+                        return cb(new Error('AUTOMESSAGE_NOT_FOUND'));
+                      }
+
+                      cb(null, amsg);
+                    });
+
+                },
+
+                function createNewConversation(amsg, cb) {
+                  createConversation(amsg, user, body, function (err, con) {
+                    cb(err, con, amsg);
+                  });
+                },
+
+                function sendMail(con, amsg, cb) {
+
+                  var acc = amsg.creator;
+
+                  if (!acc) {
+                    return cb(new Error('AUTOMESSAGE_CREATOR_NOT_FOUND'));
+                  }
+
+
+                  /**
+                   * require config for dashboard url
+                   */
+                  var config = require('../../../config')('api');
+                  var dashboardUrl = config.hosts['dashboard'];
+                  var conversationUrl = dashboardUrl + '/apps/' + con.aid +
+                    '/messages/conversations/' + con._id;
+
+
+                  var opts = {
+                    locals: {
+                      conversationUrl: conversationUrl,
+                      message: con.messages[con.messages.length - 1].body,
+                      name: acc.name,
+                      sentBy: email,
+                      subject: con.sub
+                    },
+                    to: {
+                      name: acc.name,
+                      email: acc.email
+                    }
+                  };
+
+                  accountMailer.sendAdminConversation(opts, function (err) {
+                    cb(err, con, amsg);
+                  });
+                },
+
+
+                function createAutoMessageRepliedEventAndIncrement(con, amsg,
+                  cb) {
+
+                  // if not reply to automessage, move on
+                  if (!amId) return cb(null, con);
+
+                  var ids = {
+                    aid: con.aid,
+                    amId: con.amId,
+                    uid: con.uid
+                  };
+
+                  var state = 'replied';
+                  var title = amsg.title;
+
+                  createEventAndIncrementCount(ids, state, title, function (
+                    err) {
+                    cb(err, con);
+                  });
+
+                }
+
+
+              ],
+
+              function (err, con) {
+                cb(err, con);
+              }
+
+            );
+
+
+          } else {
+
+
+            async.waterfall(
+
+              [
+
+                function createNewConversation(cb) {
+                  createConversation(null, user, body, function (err, con) {
+                    cb(err, con);
+                  });
+                },
+
+                function getApp(con, cb) {
+
+                  App.findById(aid, function (err, app) {
+                    if (err) {
+
+                      if (err.name === 'CastError') {
+                        return cb(new Error('INVALID_APP_KEY'));
+                      }
+
+                      return cb(err);
+                    }
+                    if (!app) return cb(new Error('APP_NOT_FOUND'));
+                    cb(null, con, app);
+                  });
+                },
+
+
+                function getAdmin(con, app, cb) {
+                  var admin = _.find(app.team, function (t) {
+                    return t.admin === true;
+                  });
+
+                  if (!_.isObject(admin)) return cb(new Error(
+                    'ADMIN_NOT_FOUND'));
+
+                  Account
+                    .findById(admin.accid)
+                    .select({
+                      _id: -1,
+                      name: 1,
+                      email: 1
+                    })
+                    .lean()
+                    .exec(function (err, acc) {
+                      if (err) return cb(err);
+                      if (!acc) return cb(new Error('ADMIN_NOT_FOUND'));
+
+                      cb(null, con, acc);
+                    });
+                },
+
+                function sendMail(con, acc, cb) {
+
+                  /**
+                   * require config for dashboard url
+                   */
+                  var config = require('../../../config')('api');
+                  var dashboardUrl = config.hosts['dashboard'];
+                  var conversationUrl = dashboardUrl + '/apps/' + con.aid +
+                    '/messages/conversations/' + con._id;
+
+
+                  var opts = {
+                    locals: {
+                      conversationUrl: conversationUrl,
+                      message: con.messages[con.messages.length - 1].body,
+                      name: acc.name,
+                      sentBy: email,
+                      subject: con.sub
+                    },
+                    to: {
+                      name: acc.name,
+                      email: acc.email
+                    }
+                  };
+
+                  accountMailer.sendAdminConversation(opts, function (err) {
+                    cb(err, con);
+                  });
+                }
+
+              ],
+
+              function (err, con) {
+                cb(err, con);
+              }
+
+            );
+
+
+          }
 
         }
+
 
       ],
 

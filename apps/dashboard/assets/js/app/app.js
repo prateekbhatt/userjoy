@@ -150,10 +150,13 @@ var app = angular.module('dodatado', [
 
 .config(['$stateProvider', '$urlRouterProvider',
   '$locationProvider', '$httpProvider', '$provide', '$momentProvider',
-  'loginProvider',
+  'loginProvider', '$logProvider',
   function ($stateProvider, $urlRouterProvider,
     $locationProvider, $httpProvider, $provide, $momentProvider,
-    loginProvider) {
+    loginProvider, $logProvider) {
+
+
+    $logProvider.debugEnabled(false);
 
     // errorProvider.setError(false);
     // $rootScope.error = false;

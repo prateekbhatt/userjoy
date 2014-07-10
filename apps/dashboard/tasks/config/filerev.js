@@ -29,6 +29,9 @@ module.exports = function (grunt) {
     prodCss: {
       src: '.tmp/public/min/production.css'
     },
+    prodJst: {
+      src: '.tmp/public/jst.js'
+    }
   });
 
   grunt.loadNpmTasks('grunt-filerev');

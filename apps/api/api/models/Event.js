@@ -18,39 +18,6 @@ var Schema = mongoose.Schema;
 
 
 /**
- * helpers
- */
-
-var metadata = require('../../helpers/metadata');
-
-
-/**
- * Define property schema (embedded document)
- */
-
-var MetaDataSchema = new Schema({
-
-    // key
-    k: {
-      type: Schema.Types.Mixed,
-      required: true
-    },
-
-    // value
-    v: {
-      type: Schema.Types.Mixed,
-      required: true
-    }
-
-  },
-
-  {
-    _id: false
-  });
-
-
-
-/**
  * Define event schema
  */
 
@@ -66,7 +33,6 @@ var EventSchema = new Schema({
 
 
   // automessage Id
-  // this should not be part of the meta array because this is a db id
   amId: {
     type: Schema.Types.ObjectId,
     ref: 'AutoMessage'
@@ -96,10 +62,6 @@ var EventSchema = new Schema({
 
   // name of the module
   module: String,
-
-
-  // metadata about the event
-  meta: [MetaDataSchema],
 
 
   // name of the event
@@ -147,21 +109,19 @@ EventSchema.index({
  * @param {object} ids (should contain aid, uid, cid)
  * @param {string} action
  * @param {string} module
- * @param {object} meta contains a list of metadata of the event
  * @param {function} cb callback
  */
 
-EventSchema.statics.track = function (type, ids, name, module, meta, cb) {
+EventSchema.statics.track = function (type, ids, name, module, cb) {
 
-  if (arguments.length !== 6) {
-    throw new Error('Event.track: Expected six arguments');
+  if (arguments.length !== 5) {
+    throw new Error('Event.track: Expected five arguments');
   }
 
   var newEvent = {
     aid: ids.aid,
     cid: ids.cid,
     module: module,
-    meta: metadata.toArray(meta),
     name: name,
     type: type,
     uid: ids.uid

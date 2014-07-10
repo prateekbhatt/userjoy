@@ -119,7 +119,7 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr ng-repeat="user in $data" >
-                                                                <td data-title="'User'" style="text-align:center; cursor:pointer" ng-click="showClosedConversations(user.id)">
+                                                                <td data-title="'User'" style="text-align:center; cursor:pointer" ng-click="showClosedConversations(user.id)" id="showClosedConversations">
                                                                     <span>{{user.name}}</span>
                                                                 </td>
                                                                 <td data-title="'Subject'" style="text-align:center; cursor:pointer" ng-click="showClosedConversations(user.id)">

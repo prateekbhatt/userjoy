@@ -25,14 +25,14 @@
                             </a>
                     </li> -->
                     <li>
-                        <a ng-click="goToUsers()" ng-class="{'active': isActive('users')}" style="cursor: pointer;">
+                        <a ng-click="goToUsers()" ng-class="{'active': isActive('users')}" style="cursor: pointer;" id="users">
                         <i class="fa fa-user">
                         </i>
                         Users
                         </a>
                     </li>
                     <li>
-                        <a ng-click="goToConversations()" ng-class="{'active': isActive('messages')}" style="cursor: pointer;">
+                        <a ng-click="goToConversations()" ng-class="{'active': isActive('messages')}" style="cursor: pointer;" id="messages">
                         <i class="fa fa-envelope-o">
                         </i>
                         Messages
@@ -63,12 +63,12 @@
                                 <a role="menuitem" tabindex="-1" href="#" ng-show="apps" ng-click="changeApp(app)">
                                 &nbsp;&nbsp;&nbsp;{{app.name}}
                                 </a>
-                                <a href="#" style="font-size: 14px" ng-show="apps" ng-click="goToSettings(app)" class="fa fa-cog">&nbsp;Settings for {{app.name}}</a>
+                                <a href="#" style="font-size: 14px" ng-show="apps" ng-click="goToSettings(app)" class="fa fa-cog" id="settingscurrentapp">&nbsp;Settings for {{app.name}}</a>
                                 <hr ng-show="!$last">
                                 <!-- <button class="gylphicon glyphicon"></button> -->
                             </li>
                             <hr>
-                            <a ui-sref="onboarding" class="btn btn-sm btn-info btn-block fa fa-plus" style="margin-right: 18px; margin-left: 18px; margin-bottom: 15px; width: 85%;">&nbsp;New App</a>
+                            <a ui-sref="onboarding" class="btn btn-sm btn-info btn-block fa fa-plus" style="margin-right: 18px; margin-left: 18px; margin-bottom: 15px; width: 85%;" id="onboardingnewapp">&nbsp;New App</a>
                         </ul>
                     </li>
                     <li class="dropdown">
@@ -81,18 +81,18 @@
                         </a>
                         <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" ng-show="visibleDropdown">
                             <li role="presentation">
-                                <a role="menuitem" tabindex="-1" ng-click="goToAccountSettings()" ng-class="{'active': isAccountActive('settings')}" style="cursor: pointer;">
+                                <a role="menuitem" tabindex="-1" ng-click="goToAccountSettings()" ng-class="{'active': isAccountActive('settings')}" style="cursor: pointer;" id="accountsettings">
                                 <span class="fa fa-cog"></span>&nbsp;&nbsp;&nbsp;&nbsp;Settings
                                 </a>
                             </li>
                             <li role="presentation">
-                                <a role="menuitem" tabindex="-1" href="http://docs.userjoy.co" ng-class="{'active': isAccountActive('docs')}" target="_blank">
+                                <a role="menuitem" tabindex="-1" href="http://docs.userjoy.co" ng-class="{'active': isAccountActive('docs')}" target="_blank" id="docs">
                                 <i class="fa fa-book"></i>&nbsp;&nbsp;&nbsp;&nbsp;Docs
                                 </a>
                             </li>
                             <li role="presentation" class="divider"></li>
                             <li role="presentation">
-                                <a role="menuitem" tabindex="-1" href="#" ng-click="logout()">
+                                <a role="menuitem" tabindex="-1" href="#" ng-click="logout()" id="logout">
                                 <span class="glyphicon glyphicon-off"></span>&nbsp;&nbsp;&nbsp;&nbsp;Logout
                                 </a>
                             </li>

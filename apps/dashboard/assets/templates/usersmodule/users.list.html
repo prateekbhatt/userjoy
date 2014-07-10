@@ -2,7 +2,7 @@
 <div class="panel">
     <div class="panel-body">
         <div class="caption-full">
-            <form name="usersListForm" novalidate>
+            <form name="usersListForm" novalidate id="filterUsersAndRunQuery">
                 <div class="col-md-8" style="margin-left: 10px;">
                     <div class="row" style="padding-left: 40px;">
                         <div class="col-md-12">
@@ -29,7 +29,7 @@
                                                     <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.btntext}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto;">
                                                         <li class="dropdown dropdown-submenu">
-                                                            <a style="cursor: default">Has done</a>
+                                                            <a style="cursor: default" id="hasdoneQueries">Has done</a>
                                                             <ul class="dropdown-menu" style="max-height: 356px; overflow-y: scroll;">
                                                                 <li ng-repeat="hasDoneItem in hasDoneItems">
                                                                     <a style="cursor: default" ng-click="changeFilterHasDone($parent.$index, $index, $event)">{{hasDoneItem.query}}
@@ -37,18 +37,18 @@
                                                                 </li>
                                                             </ul>
                                                         </li>
-                                                        <li class="dropdown dropdown-submenu"><a style="cursor: default">Has not done</a>
+                                                        <li class="dropdown dropdown-submenu"><a style="cursor: default" id="hasnotdonequeries">Has not done</a>
                                                             <ul class="dropdown-menu" style="max-height: 356px; overflow-y: scroll;">
                                                                 <li ng-repeat="hasNotDoneItem in hasNotDoneItems"><a style="cursor: default" ng-click="changeFilterHasNotDone($parent.$index, $index, $event)">{{hasNotDoneItem.query}}</a></li>
                                                             </ul>
                                                         </li>
-                                                        <li class="dropdown dropdown-submenu"><a style="cursor: default">Count of</a>
+                                                        <li class="dropdown dropdown-submenu"><a style="cursor: default" id="countOfQueries">Count of</a>
                                                             <ul class="dropdown-menu" style="max-height: 356px; overflow-y: scroll;">
                                                                 <li ng-repeat="countOfItem in countOfItems"><a style="cursor: default" ng-click="changeFilterCountOf($parent.$index, $index, $event)">{{countOfItem.query}}</a></li>
                                                             </ul>
                                                         </li>
                                                         <li role="presentation" class="divider"></li>
-                                                        <li ng-repeat="attribute in attributes" ><a style="cursor: default;" ng-click="changeFilterAttribute($parent.$index, $index, $event)">{{attribute.name}}</a></li>
+                                                        <li ng-repeat="attribute in attributes" ><a style="cursor: default;" ng-click="changeFilterAttribute($parent.$index, $index, $event)" id="attributeQueries">{{attribute.name}}</a></li>
                                                     </ul>
                                                 </div>
                                                 <div ng-if="filter.checkMethod && !filter.showDatePicker && !filter.showOtherAttributesQuery &&
@@ -173,7 +173,7 @@
                         <br>
                         <div class="row">
                             <div class="col-md-4" style="margin-left: 20px">
-                                <button class="btn btn-default btn-sm" ng-click="addAnotherFilter()" ng-show="true">
+                                <button type="button" class="btn btn-default btn-sm" ng-click="addAnotherFilter()" ng-show="true">
                                 <i class="fa fa-plus-square"></i>
                                 Filter
                                 </button>
@@ -182,10 +182,10 @@
                         <br>
                         <div class="row">
                             <div class="col-md-12" style="margin-left: 20px">
-                                <button class="btn btn-info btn-sm fa fa-toggle-right" ng-click="runQuery()">
+                                <button type="button" class="btn btn-info btn-sm fa fa-toggle-right" ng-click="runQuery()">
                                 Run
                                 </button>
-                                <button class="btn btn-default btn-sm fa fa-save" ng-click="saveQuery()" ng-show="showSaveButton">
+                                <button type="button" class="btn btn-default btn-sm fa fa-save" ng-click="saveQuery()" ng-show="showSaveButton">
                                 Save
                                 </button>
                                 <div class="popover right" tabindex="-1" style="display: block; position: absolute; top: -73px; left: 145px;" ng-show="showPopover">
@@ -198,12 +198,12 @@
                                                 <input id="segmentName" type="text" class="form-control input-sm" name="segmentName" placeholder="Segment" ng-model="segmentName" required >
                                                 <br>
                                                 <button type="submit" class="btn btn-info btn-sm" ng-click="createSegment()">Create</button>
-                                                <button class="btn btn-default btn-sm" ng-click="closePopover($event)">Close</button>
+                                                <button type="button" class="btn btn-default btn-sm" ng-click="closePopover($event)">Close</button>
                                             </div>
                                         </form>
                                     </div>
                                 </div>
-                                <button class="btn btn-default fa fa-refresh btn-sm" ng-click="updateQuery()" ng-show="showUpdateButton">
+                                <button type="button" class="btn btn-default fa fa-refresh btn-sm" ng-click="updateQuery()" ng-show="showUpdateButton">
                                 Update
                                 </button>
                                 <img src="/images/spiffygif_30x30.gif" ng-show="showSpinner">
@@ -217,12 +217,12 @@
                                                 <input id="segmentName" type="text" class="form-control input-sm" name="updatedSegmentName" placeholder="Segment" ng-model="updatedSegmentName" required  ng-disabled="isHealth">
                                                 <br>
                                                 <button type="submit" class="btn btn-info btn-sm" ng-click="updateSegment()">Update</button>
-                                                <button class="btn btn-default btn-sm" ng-click="closeUpdatePopover($event)">Close</button>
+                                                <button type="button" class="btn btn-default btn-sm" ng-click="closeUpdatePopover($event)">Close</button>
                                             </div>
                                         </form>
                                     </div>
                                 </div>
-                                <button class="btn btn-default btn-sm pull-right" ng-click="clearAllFilters()" ng-show="showUpdateButton || showSaveButton">Clear
+                                <button  type="button" class="btn btn-default btn-sm pull-right" ng-click="clearAllFilters()" ng-show="showUpdateButton || showSaveButton">Clear
                                 </button>
                                 <!-- <span us-spinner></span> -->
                             </div>
@@ -239,7 +239,7 @@
                             <div class="row"  ng-show="showUsers">
                                 <div class="col-md-4" style="margin-top: 10px; margin-left: 20px;">
                                     <span class="fa fa-user">&nbsp;&nbsp;{{countUsers}} <b>users</b></span> &nbsp;&nbsp;
-                                    <button class="fa fa-envelope-o btn btn-info" ng-click="openModal()">
+                                    <button type="button" class="fa fa-envelope-o btn btn-info" ng-click="openModal()">
                                     <span>Message</span></button>
                                 </div>
                                 <div class="col-md-6">
@@ -279,12 +279,12 @@
                                                                 <div>Email</div>
                                                             </th>
                                                             <th class="text-center" ng-show="columns[2].visible" ng-class="{
-                                                                'sort-asc': tableParams.isSortBy('userkarma', 'asc'),
-                                                                'sort-desc': tableParams.isSortBy('userkarma', 'desc'),
+                                                                'sort-asc': tableParams.isSortBy('status', 'asc'),
+                                                                'sort-desc': tableParams.isSortBy('status', 'desc'),
                                                                 'sortable': !$first
                                                                 }"
-                                                                ng-click="tableParams.sorting('userkarma', tableParams.isSortBy('userkarma', 'asc') ? 'desc' : 'asc')">
-                                                                <div>Engagement Score</div>
+                                                                ng-click="tableParams.sorting('status', tableParams.isSortBy('status', 'asc') ? 'desc' : 'asc')">
+                                                                <div>Status</div>
                                                             </th>
                                                             <th class="text-center" ng-show="columns[3].visible" ng-class="{
                                                                 'sort-asc': tableParams.isSortBy('datejoined', 'asc'),
@@ -334,13 +334,14 @@
                                                                 ng-click="tableParams.sorting('operatingsystem', tableParams.isSortBy('operatingsystem', 'asc') ? 'desc' : 'asc')">
                                                                 <div>OS</div>
                                                             </th>
+
                                                             <th class="text-center" ng-show="columns[9].visible" ng-class="{
-                                                                'sort-asc': tableParams.isSortBy('status', 'asc'),
-                                                                'sort-desc': tableParams.isSortBy('status', 'desc'),
+                                                                'sort-asc': tableParams.isSortBy('userkarma', 'asc'),
+                                                                'sort-desc': tableParams.isSortBy('userkarma', 'desc'),
                                                                 'sortable': !$first
                                                                 }"
-                                                                ng-click="tableParams.sorting('status', tableParams.isSortBy('status', 'asc') ? 'desc' : 'asc')">
-                                                                <div>Status</div>
+                                                                ng-click="tableParams.sorting('userkarma', tableParams.isSortBy('userkarma', 'asc') ? 'desc' : 'asc')">
+                                                                <div>Engagement Score</div>
                                                             </th>
                                                         </tr>
                                                     </thead>
@@ -351,8 +352,8 @@
                                                         <td data-title="'Email Id'" class="text-center" sortable="email" ng-show="columns[1].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
                                                             <span>{{user.email}}</span>
                                                         </td>
-                                                        <td data-title="'User Karma'" class="text-center" sortable="userkarma" ng-show="columns[2].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
-                                                            <span>{{user.userkarma}}</span>
+                                                        <td data-title="'Status'" class="text-center" sortable="status" ng-show="columns[2].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
+                                                            <span>{{user.status}}</span>
                                                         </td>
                                                         <td data-title="'Date Joined'" class="text-center" sortable="datejoined" ng-show="columns[3].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
                                                             <span>{{user.datejoined}}</span>
@@ -372,9 +373,10 @@
                                                         <td data-title="'Operating System'" class="text-center" sortable="operatingsystem" ng-show="columns[8].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
                                                             <span>{{user.os}}</span>
                                                         </td>
-                                                        <td data-title="'Status'" class="text-center" sortable="status" ng-show="columns[9].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
-                                                            <span>{{user.status}}</span>
+                                                        <td data-title="'User Karma'" class="text-center" sortable="userkarma" ng-show="columns[9].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
+                                                            <span>{{user.userkarma}}</span>
                                                         </td>
+
                                                         <!-- <td data-title="'Unsubscribed'" class="text-center" sortable="status" ng-show="columns[4].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
                                                                                                                     <span>{{user.unsubscribed}}</span>
                                                         </td> -->
