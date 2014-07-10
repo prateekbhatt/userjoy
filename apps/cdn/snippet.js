@@ -35,6 +35,11 @@ window.userjoy=window.userjoy||[],window.userjoy.methods=["identify","company","
     // (REQUIRED)
     joined: 1403353187345,
 
+    // TODO: logged in user's name ('first-name last-name')
+    // Used while sending emails e.g. 'Hi John, ...'
+    // (OPTIONAL)
+    name: 'John Appleseed',
+
     // TODO: logged in user's subscription plan
     // Helps you segment users by plan name
     // (OPTIONAL)
