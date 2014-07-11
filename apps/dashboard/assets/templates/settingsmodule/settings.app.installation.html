@@ -1,34 +1,104 @@
 <div class="col-md-offset-1">
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">Add the code to your app</h3>
-        </div>
-        <!-- <div class="panel-body">
-            <p>Paste this code before <span style="color: #428bca;">&lt;/body&gt;</span> on every page where your users are logged in. Edit code by adding email id, user id ....<p>
-            <br>
-            <textarea class="form-control" rows="10">Code to be added here .....</textarea>
-            <div style="padding-top:20px">
-                <button class="btn btn-success pull-right">Copy to Clipboard</button>
-                <button class="btn btn-success pull-right" style="margin-right:10px">Send to Developer</button>
+            <h3 class="panel-title" style="color:#31708f">Start tracking your customers by adding the <strong>UserJoy</strong> code to your website</h3>
             </div>
-        </div> -->
-        <div class="panel-body">
-                <h4>Edit code by adding email id, user id ....</h4>
+            <div class="panel-body">
+            
+                
+                <h4>Paste this code before <code>
+&lt;/body&gt;
+</code>  on every page where users are logged in</h4>
                 <br>
                 <pre id="selectable" ng-click="selectText('selectable')" style="color: #2c3e50;"><code  ng-model="codeSnippet">
-window.userjoy=window.userjoy||[],window.userjoy.methods=["identify","company","track","page","track_link","track_form"],window.userjoy.factory=function(a){return function(){var b=Array.prototype.slice.call(arguments);return b.unshift(a),window.userjoy.push(b),window.userjoy}};for(var i=0;i < window.userjoy.methods.length;i++){var key=window.userjoy.methods[i];window.userjoy[key]=window.userjoy.factory(key)}window.userjoy.load=function(a){if(!document.getElementById("userjoy-js")){window._userjoy_id=a;var b=document.createElement("script");b.type="text/javascript",b.id="userjoy-js",b.async=!0,b.src=("https:"===document.location.protocol?"https:":"http:")+"//d1jozu9mugm1h5.cloudfront.net/js/userjoy.js";var c=document.getElementsByTagName("script")[0];c.parentNode.insertBefore(b,c)}};​​</code>
+window.userjoy=window.userjoy||[],window.userjoy.methods=["identify","company","track","page","track_link","track_form"],window.userjoy.factory=function(e){return function(){var t=Array.prototype.slice.call(arguments);return t.unshift(e),window.userjoy.push(t),window.userjoy}};for(var i=0;i < window.userjoy.methods.length;i++){var key=window.userjoy.methods[i];window.userjoy[key]=window.userjoy.factory(key)}window.userjoy.load=function(e){if(!document.getElementById("userjoy-client-js")){window._userjoy_id=e;var t=document.createElement("script");t.type="text/javascript",t.id="userjoy-client-js",t.async=!0,t.src=("https:"===document.location.protocol?"https:":"http:")+"//d1jozu9mugm1h5.cloudfront.net/js/userjoy.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n)}};</code>
 <code>
-window.userjoy.load('{{apiKey}}');
+userjoy.load('{{apiKey}}');
 </code>
-<code>
-userjoy.page();
-</code>
+
 <code>
 userjoy.identify({
-  // TODO: Replace email below with that of the logged in user
-  email: 'test@userjoy.co'
-});
-</code></pre>
+</code>
+
+<code>
+    // TODO: logged in user's email.
+</code>
+<code>
+    // Used to identify the user and send him email messages
+</code>
+<code>
+    // (REQUIRED)
+</code>
+<code>
+   email: 'test@userjoy.co',
+</code>
+
+<code>
+    // TODO: logged in user's unique id.
+</code>
+<code>
+    // if your app allows a user to change his email address,
+</code>
+<code>
+    // then user_id is required to identify user
+</code>
+<code>
+    // (OPTIONAL)
+</code>
+<code>
+    user_id: '758439753849',
+</code>
+
+<code>
+    // TODO: logged in user's payment status
+    </code>
+<code>
+    // MUST be one of 'trial' / 'free' / 'paying' / 'cancelled'
+</code>
+<code>
+    // (REQUIRED)
+</code>
+<code>
+    status: 'trial',
+</code>
+
+<code>
+    // TODO: logged in user's sign-up date in UNIX timestamp
+</code>
+<code>
+    // (milliseconds after epoch)
+</code>
+<code>
+    // (REQUIRED)
+</code>
+<code>
+    joined: 1403353187345,
+</code>
+
+<code>
+    // TODO: logged in user's subscription plan
+</code>
+<code>
+    // Helps you segment users by plan name
+</code>
+<code>
+    // (OPTIONAL)
+</code>
+<code>
+    plan: 'Enterprise',
+</code>
+
+<code>
+    // TODO: monthly revenue from user
+</code>
+<code>
+    // (OPTIONAL)
+</code>
+<code>
+    revenue: 499
+</code>
+});</pre>
+
                 <!-- <textarea class="form-control" rows="10">Code to be added here .....</textarea> -->
                 <div style="padding-top:20px">
                     <!-- <button class="btn btn-info pull-right" style="margin-right:10px">Copy to Clipboard</button> -->
