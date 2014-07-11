@@ -921,13 +921,8 @@ function isEmpty (val) {
 });
 require.register("ianstormtaylor-is/index.js", function(exports, require, module){
 
-var isEmpty = require('is-empty');
-
-try {
-  var typeOf = require('type');
-} catch (e) {
-  var typeOf = require('component-type');
-}
+var isEmpty = require('is-empty')
+  , typeOf = require('type');
 
 
 /**
@@ -4425,7 +4420,6 @@ exports.select = function(fn){
  */
 
 exports.reject = function(fn){
-  var dom = this.dom;
   var out = [];
   var len = this.length;
   var val, i;
@@ -7595,15 +7589,16 @@ UserJoy.prototype.initialize = function () {
     .create(window.userjoy)
     .prioritize();
 
-  // enable autotracking forms and links after queue has been created
-  this._autoTrackForms();
-  this._autoTrackLinks();
+  // enable autotracking clicks, form-submits and pageviews
+  on(window, 'click', self._autoClickHandler, true);
+  autoPageTrack.call(self);
+
+  // track the first page view, the first page is not handled by the event
+  // listener
+  self.page();
 
   // invoke queued tasks after autotracking has been enabled
-  this._invokeQueue();
-
-
-
+  self._invokeQueue();
 
   notification.load(function (err) {
 
@@ -7618,7 +7613,7 @@ UserJoy.prototype.initialize = function () {
   });
 
 
-  this.debug('INITIALIZED:: %o', this);
+  this.debug('initialized: %o', this);
 
   return this;
 };
@@ -7776,25 +7771,23 @@ UserJoy.prototype.company = function (traits, fn) {
 
 
 /**
- * Track an `event` that a user has triggered with optional `properties`.
+ * Track an `event` that a user has triggered with optional `module`.
  *
  * @param {String} event
  * @param {String} module (optional)
- * @param {Object} properties (optional)
  * @param {Function} fn (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.track = function (name, module, properties, fn) {
+UserJoy.prototype.track = function (name, module, fn) {
 
 
-  this.debug('track', name, properties);
+  this.debug('track', name, module);
 
-  if (is.fn(properties)) fn = properties, properties = null;
-  if (is.fn(module)) fn = module, module = properties = null;
+  if (is.fn(module)) fn = module, module = null;
 
 
-  this._sendEvent('track', name, module, properties);
+  this._sendEvent('track', name, module);
 
   this._callback(fn);
   return this;
@@ -7808,14 +7801,12 @@ UserJoy.prototype.track = function (name, module, properties, fn) {
  * @param {Element or Array} links
  * @param {String or Function} name
  * @param {String or Function} module (optional)
- * @param {Object or Function} properties (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.track_link = function (links, name, module, properties) {
+UserJoy.prototype.track_link = function (links, name, module) {
   if (!links) return this;
   if (is.string(links)) links = [links]; // always arrays, handles jquery
-  if (is.object(module)) properties = module, module = null;
 
 
   var self = this;
@@ -7829,11 +7820,10 @@ UserJoy.prototype.track_link = function (links, name, module, properties) {
       // TODO: test the next lines
       var ev = is.fn(name) ? name(el) : name;
       var module = is.fn(module) ? module(el) : module;
-      var props = is.fn(properties) ? properties(el) : properties;
 
 
-      // self.track(ev, props);
-      self._sendEvent('link', ev, null, props);
+      // self.track(ev);
+      self._sendEvent('link', ev);
 
       if (el.href && el.target !== '_blank' && !isMeta(e)) {
         prevent(e);
@@ -7855,16 +7845,14 @@ UserJoy.prototype.track_link = function (links, name, module, properties) {
  * @param {Element or Array} forms
  * @param {String or Function} name
  * @param {String or Object or Function} module
- * @param {Object or Function} properties (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.track_form = function (forms, name, module, properties) {
+UserJoy.prototype.track_form = function (forms, name, module) {
 
 
   if (!forms) return this;
   if (is.string(forms)) forms = [forms]; // always arrays, handles jquery
-  if (is.object(module)) properties = module, module = null;
 
   var self = this;
   each(forms, function (el_id) {
@@ -7878,10 +7866,9 @@ UserJoy.prototype.track_form = function (forms, name, module, properties) {
       // TODO: check the next lines
       var ev = is.fn(name) ? name(el) : name;
       var module = is.fn(module) ? module(el) : module;
-      var props = is.fn(properties) ? properties(el) : properties;
 
-      // self.track(ev, props);
-      self._sendEvent('form', ev, module, props);
+      // self.track(ev);
+      self._sendEvent('form', ev, module);
 
       self._callback(function () {
         el.submit();
@@ -7906,22 +7893,19 @@ UserJoy.prototype.track_form = function (forms, name, module, properties) {
 
 /**
  * Trigger a pageview, labeling the current page with an optional `module`,
- * `name` and `properties`.
+ * and `name`.
  *
  * @param {String} name (optional)
  * @param {String} module (optional)
- * @param {Object or String} properties (or path) (optional)
  * @param {Function} fn (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.page = function (name, module, properties, fn) {
+UserJoy.prototype.page = function (name, module, fn) {
 
   name = name || canonicalPath();
 
-  if (is.fn(properties)) fn = properties, properties = null;
-  if (is.fn(module)) fn = module, properties = module = null;
-  if (is.object(module)) properties = module, module = null;
+  if (is.fn(module)) fn = module, module = null;
 
   // var defs = {
   //   path: canonicalPath(),
@@ -7935,10 +7919,8 @@ UserJoy.prototype.page = function (name, module, properties, fn) {
 
   // if (category) defs.category = category;
 
-  // properties = clone(properties) || {};
-  // defaults(properties, defs);
 
-  this._sendEvent('page', name, module, properties);
+  this._sendEvent('page', name, module);
 
   this._callback(fn);
   return this;
@@ -7977,12 +7959,11 @@ UserJoy.prototype._callback = function (fn) {
  * @param {String} type of event (link/form/track)
  * @param {String} name of event
  * @param {String} name of module
- * @param {Object} additional properties of event (optional)
  * @return {UserJoy}
  * @api private
  */
 
-UserJoy.prototype._sendEvent = function (type, name, module, properties) {
+UserJoy.prototype._sendEvent = function (type, name, module) {
 
   var self = this;
 
@@ -8015,7 +7996,6 @@ UserJoy.prototype._sendEvent = function (type, name, module, properties) {
   if (cid) data.c = cid;
 
   if (module) data.e.module = module;
-  if (properties) data.e.meta = properties;
 
   self.debug('Sending new event: %o', data);
 
@@ -8130,94 +8110,88 @@ function canonicalUrl() {
 }
 
 
-UserJoy.prototype._autoTrackForms = function () {
 
+UserJoy.prototype._autoClickHandler = function (e) {
+
+  var target = e.target || e.srcElement;
+  var tagName = target.tagName.toLowerCase();
+  var type = target.type ? target.type.toLowerCase() : '';
+  var id = target.id;
+  var form = target.form;
+  var formId = form ? form.id || form.name : '';
   var self = this;
-  var allForms = document.getElementsByTagName('form');
 
-  each(allForms, function (f) {
-    var identifier = f.id;
-    var manuallyTracked = false;
+  // console.log('\n\n _autoClickHandler',
 
-    // if no id, return
-    if (!identifier) return;
+  //   {
+  //     target: target,
+  //     tagName: tagName,
+  //     type: type,
+  //     id: id,
+  //     formId: formId
+  //   },
 
-    // app should not have enabled manual tracking of id (check from queue)
-    each(queue.tasks, function (t) {
+  //   '\n\n');
 
-      if (t[0] === 'track_form') {
+  if (target) {
 
-        // if its an array of form ids, and the array contains this id, then
-        // it is being manually tracked
-        if (is.array(t[1]) && contains(t[1], identifier)) {
-          manuallyTracked = true;
-        }
+    if (type === 'submit' && formId) {
 
-        // if its a single form id (string), and equals the current form id,
-        // then it is being manually tracked
-        if (is.string(t[1]) && (t[1] === identifier)) {
-          manuallyTracked = true;
-        }
+      self._sendEvent('form', formId);
 
-      }
-    });
+    } else if ((tagName === 'a' || tagName === 'button') && id && (type !==
+      'submit')) {
 
-    // if manually tracked, move on (do not autotrack)
-    if (manuallyTracked) return;
+      // for link or button clicks with ids
+      self._sendEvent('link', id);
 
-    // else enable auto tracking, and pass name as the identifier
-    self.track_form(identifier, identifier);
+    } else {
+      // do nothing
+      return;
+    }
 
+  };
 
-  });
-
-  return this;
 }
 
 
-UserJoy.prototype._autoTrackLinks = function () {
+/**
+ * Call this function with the proper UserJoy context (this)
+ * e.g. autoPageTrack.call(this)
+ */
 
+function autoPageTrack() {
+
+  var newVal = location.pathname + location.hash;
   var self = this;
-  var allLinks = document.getElementsByTagName('a');
 
-  each(allLinks, function (l) {
-    var identifier = l.id;
-    var manuallyTracked = false;
+  if (window.history.pushState) {
 
-    // if no id, do not track
-    if (!identifier) return;
+    var define = function (obj, methodName, val) {
+      var orig = obj[methodName];
+      obj[methodName] = function () {
+        var str = orig.apply(obj, arguments);
+        return typeof obj[val] == "function" && obj[val](), str;
+      };
+    };
 
-    // app should not have enabled manual tracking of id (check from queue)
-    each(queue.tasks, function (t) {
+    define(window.history, "pushState", "ujPushstate");
+    define(window.history, "replaceState", "ujReplacestate");
 
-      if (t[0] === 'track_link') {
+    var handler = function () {
 
-        // if its an array of link ids, and the array contains this id, then
-        // it is being manually tracked
-        if (is.array(t[1]) && contains(t[1], identifier)) {
-          manuallyTracked = true;
-        }
+      var oldVal = window.location.pathname + window.location.hash;
+      if (newVal !== oldVal) {
 
-        // if its a single link id (string), and equals the current link id,
-        // then it is being manually tracked
-        if (is.string(t[1]) && (t[1] === identifier)) {
-          manuallyTracked = true;
-        }
-
+        newVal = oldVal;
+        UserJoy.prototype.page.call(self);
       }
-    });
+    };
 
-
-    // if manually tracked, move on (do not autotrack)
-    if (manuallyTracked) return;
-
-    // else enable auto tracking, and pass name as the identifier
-    self.track_link(identifier, identifier);
-
-
-  });
-
-  return this;
+    history.ujPushstate = history.ujReplacestate = handler;
+    on(window, "popstate", handler, true);
+    on(window, "hashchange", handler, true);
+  }
 }
 
 });

@@ -200,7 +200,7 @@ router
 
     if (event.type === 'page') {
 
-      // FIXME : pageview events must accept module name and meta data
+      // FIXME : pageview events must accept module name
 
       var name = event.name;
       return Event.page(ids, name, callback);
@@ -209,10 +209,9 @@ router
 
       var name = event.name;
       var module = event.module;
-      var meta = event.meta;
       var type = event.type;
 
-      return Event.track(type, ids, name, module, meta, callback);
+      return Event.track(type, ids, name, module, callback);
 
     } else {
 

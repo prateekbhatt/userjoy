@@ -128,10 +128,6 @@ describe('Worker automessageConsumer', function () {
             .to.be.an('array')
             .that.has.length(1);
 
-          expect(evn[0])
-            .to.have.property('meta')
-            .that.is.an('array');
-
           done();
         });
 
