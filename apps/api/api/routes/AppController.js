@@ -274,7 +274,9 @@ router
     var mailerOpts = {
       locals: {
         aid: aid,
-        appName: req.app.name
+        appName: req.app.name,
+        fromEmail: req.user.email,
+        fromName: req.user.name
       },
 
       to: {
