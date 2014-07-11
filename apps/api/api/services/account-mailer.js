@@ -98,6 +98,8 @@ exports.sendInvite = function (options, cb) {
 
 exports.sendInstallCode = function (options, cb) {
   var mailer = new Mailer(options);
+  mailer.fromEmail = options.locals.fromEmail;
+  mailer.fromName = options.locals.fromName;
   mailer.subject = 'Install Code for UserJoy';
   mailer.template = 'install-code.ejs';
   mailer.send(cb);
