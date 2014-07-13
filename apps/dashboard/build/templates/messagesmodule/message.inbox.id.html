@@ -1,0 +1,147 @@
+<div ng-include src="'/templates/navbar/navbar.html'"></div>
+<button class="fa fa-backward btn btn-default" style="width: 200px;" ng-click="doTheBack()"><span>&nbsp;&nbsp;Back</span></button>
+<br>
+<br>
+<div>
+    <div class="col-md-3 well">
+        <div class="row">
+            <div class="col-md-4">
+                <img ng-src={{customergravatar}}
+                alt="" class="img-rounded img-responsive" style="height:70px; cursor: pointer;" fallback-src={{customersrc}} ng-click="goToUserProfile()" />
+            </div>
+            <!-- <div class="col-md-4">
+            </div> -->
+            <div class="col-md-4 col-md-offset-1">
+                <a class="btn btn-info" ng-click="goToUserProfile()">View Profile</a>
+            </div>
+        </div>
+        <!-- <div class="row">
+            <div class="col-md-12">
+                <blockquote>
+                    <small><cite title="Source Title">Ahmedabad, India  <i class="glyphicon glyphicon-map-marker"></i></cite></small>
+                    <small><cite title="Source Title">{{customerEmail}}  <i class="glyphicon glyphicon-envelope"></i></cite></small>
+                </blockquote>
+            </div>
+            <br>
+            <br>
+        </div> -->
+        <br>
+        <div class="row">
+            <div class="col-md-12">
+                <h3>{{customername}}</h3>
+                <p ng-repeat="firstList in userdata" ng-if="firstList.data == 'Health' && firstList.value == 'average'" style="color: #428bca;"><b>{{firstList.data}}</b> : {{firstList.value}} <i class="fa fa-meh-o"></i></p>
+                <p ng-repeat="firstList in userdata" ng-if="firstList.data == 'Health' && firstList.value == 'good'" style="color: #2ecc71;"><b>{{firstList.data}}</b> : {{firstList.value}} <i class="fa fa-smile-o"></i></p>
+                <p ng-repeat="firstList in userdata" ng-if="firstList.data == 'Health' && firstList.value == 'poor'" style="color: #e74c3c;"><b>{{firstList.data}}</b> : {{firstList.value}} <i class="fa fa-frown-o"></i></p>
+                <p ng-repeat="firstList in userdata" ng-if="!(firstList.data == 'Health')"><b>{{firstList.data}}</b> : {{firstList.value}}</p>
+                <p ng-show="showCompany" ng-repeat="company in companies"><b>Company: </b>{{company.name}}</p>
+                <p ng-show="showCompanies"><b>Companies: </b><span ng-repeat="company in companies"><span ng-show="$last"> and</span> {{company.name}} <span ng-show="!$last">,</span></span></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="fa fa-envelope"></i> {{subject}}
+                <span class="pull-right label label-info" ng-if="isAutoMessage">AutoMessage</span>
+            </div>
+            <div class="panel-body">
+                <div class="col-md-12" ng-repeat="message in messagesWithSrc">
+                    <br ng-show="!$first">
+                    <br ng-show="!$first">
+                    <div class="blockquote-box clearfix">
+                        <div class="square pull-left">
+                            <img ng-src={{message.gravatar}} alt="" class="" fallback-src={{message.src}} width="60" height="60" />
+                            <!-- <img gravatar-src="'a@b.com'" gravatar-size="80" default={{message.src}}> -->
+                        </div>
+                        <div class="col-md-5">
+                            <span style="font-size: 19px;">
+                            <strong>{{message.createdby}}</strong></span>&nbsp;&nbsp;
+                            <span class="label label-default" ng-show={{message.admin}}>Team</span>
+                            <span class="label label-success" ng-show={{message.seen}}>Seen</span>
+                        </div>
+                        <div class="col-md-push-1 col-md-1">
+                        </div>
+                        <div class="col-md-push-1 col-md-3">
+                            <em>
+                            <small>messaged {{message.createdat}}</small> &nbsp;
+                            </em>
+                            <!-- <a class="glyphicon glyphicon-pencil"></a>
+                            <a class="glyphicon glyphicon-remove"></a> -->
+
+                        </div>
+                        <div class="col-md-9" style="overflow: auto;">
+                            <p ng-bind-html="message.messagebody | newlines">
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <br>
+                <div ng-show="replyButtonClicked" ng-repeat="reply in replies">
+                    <div class="col-md-12">
+                        <br>
+                        <br>
+                        <div class="blockquote-box clearfix">
+                            <div class="square pull-left">
+                                <img ng-src={{replygravatar}} alt="" class="" fallback-src={{replysrc}} width="60" height="60" />
+                            </div>
+                            <div class="col-md-5">
+                                <span style="font-size: 19px;">
+                                <strong>{{user}}</strong></span>&nbsp;&nbsp;
+                                <span class="label label-default">Team</span>
+                            </div>
+                            <div class="col-md-push-1 col-md-1">
+                            </div>
+                            <div class="col-md-push-1 col-md-3">
+                                <em>
+                                <small>messaged {{today}}</small> &nbsp;
+                                <!-- <a class="glyphicon glyphicon-pencil"></a>
+                                <a class="glyphicon glyphicon-remove"></a> -->
+                                </em>
+                            </div>
+                            <div class="col-md-9" style="overflow: auto;">
+                                <p value="reply.body" ng-bind-html="reply.body | newlines">
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div ng-show="!insideReplyBox">
+                                                            <textarea class="form-control" placeholder="Click here to Reply or Forward" ng-click="showReplyButton()"></textarea>
+                </div> -->
+                <div>
+                    <div class="col-md-5" style="padding-top: 30px;" ng-show="showerror">
+                        <div class="alert alert-danger text-center" style="background-color: #f2dede; border-color: #ebccd1; padding: 7px">
+                            <small class="error" ng-show="showerror" style="color: #a94442">
+                            There was an error. Reply cannot be blank.
+                            </small>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                    <div class="col-md-12" style="padding-top: 45px;">
+                        <div>
+                            <div class="square pull-left">
+                                <img ng-src={{replygravatar}} alt="" class="" fallback-src={{replysrc}} width="60" height="60" />
+                            </div>
+                        </div>
+                        <div class="col-md-10" style="width: 85%">
+                            <textarea class="form-control" rows="5" ng-model="replytext" ng-change="changeButtonText()"></textarea>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                    <br>
+                    <div class="col-md-12" style="padding-top: 45px;">
+                        <div class="btn-toolbar" style="padding-right: 20px;">
+                            <button type="button" class="btn btn-success col-md-2 pull-right" ng-click="validateAndAddReply()" ng-disabled="disableReply" id="repliedToConversation">Reply</button>
+                            <button type="button" class="btn btn-default col-md-2 pull-right" ng-click="closeTicket()" ng-disabled="disableClose" id="reopenedOrClosed">{{buttontext}}</button>&nbsp;&nbsp;
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+        </div>
+    </div>
+    <br>
+</div>

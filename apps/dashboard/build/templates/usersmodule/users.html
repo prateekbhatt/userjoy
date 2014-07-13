@@ -1,0 +1,23 @@
+<div ng-include src="'/templates/navbar/navbar.html'"></div>
+<div class="row">
+    <div ng-include src="'/templates/navbar/server-error-success.html'" class="col-md-offset-4 col-md-4"></div>
+</div>
+<div class="panel panel-default">
+    <div class="container">
+
+        <div class="row">
+
+            <div class="col-md-3">
+                <h3>Analyze your Users</h3>
+                <br>
+                <div class="list-group">
+                    <a ui-sref="users.segment" class="list-group-item" ng-click="{ active: isActive('/users/segment')}">Create Segments</a>
+                    <a ui-sref="users.list" class="list-group-item" ng-click="{ active: isActive('/users/list')}">Filter Users</a>
+                </div>
+            </div>
+            <div ui-view="panel" autoscroll="false"></div>
+        </div>
+    </div>
+
+</div>
+

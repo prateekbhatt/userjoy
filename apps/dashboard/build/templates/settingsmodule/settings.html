@@ -1,0 +1,26 @@
+<div ng-include src="'/templates/navbar/navbar.html'"></div>
+
+<div class="container">
+    <div class="row form-group">
+        <div class="col-xs-10 col-xs-offset-1">
+            <ul class="nav nav-pills nav-justified thumbnail setup-panel">
+                <li ui-sref-active="active" class="item">
+                    <a ui-sref="settings.profile">
+                    <h4 class="list-group-item-heading">Profile Settings</h4>
+                    </a>
+                </li>
+                <li ui-sref-active="active" class="item">
+                    <a ui-sref="settings.app">
+                    <h4 class="list-group-item-heading">App Settings</h4>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="row form-group">
+        <div class="col-xs-10 col-xs-offset-1">
+            <div ui-view="tab" autoscroll="false">
+            </div>
+        </div>
+    </div>
+</div>
