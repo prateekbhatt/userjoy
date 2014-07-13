@@ -1,0 +1,76 @@
+<div ng-include src="'/templates/navbar/navbar.installation.html'"></div>
+<div class="row">
+    <div class="col-md-6">
+        <label class="col-md-2 col-md-offset-2 control-label" style="font-size: 20px; padding-left: 0px">From: </label>
+        <input class="form-control" disabled ng-model="accountEmail" style="width: 400px;" required>
+    </div>
+    <div class="col-md-6">
+        <label class="col-md-1 col-md-offset-2 control-label" style="font-size: 20px; padding-left: 0px">To: </label>
+        <input class="form-control" ng-model="toEmail" placeholder="email address" style="width: 400px" type="email">
+    </div>
+</div>
+<br>
+<br>
+<br>
+<div class="row">
+    <div class="col-md-8 col-md-offset-2 text-center">
+        <textarea rows="20" class="form-control">
+        Hey,
+        Could you please integrate UserJoy code on our website. The code goes here:
+
+        <script type="text/javascript">
+          window.userjoy=window.userjoy||[],window.userjoy.methods=["identify","company","track","page","track_link","track_form"],window.userjoy.factory=function(e){return function(){var t=Array.prototype.slice.call(arguments);return t.unshift(e),window.userjoy.push(t),window.userjoy}};for(var i=0;i < window.userjoy.methods.length;i++){var key=window.userjoy.methods[i];window.userjoy[key]=window.userjoy.factory(key)}window.userjoy.load=function(e){if(!document.getElementById("userjoy-client-js")){window._userjoy_id=e;var t=document.createElement("script");t.type="text/javascript",t.id="userjoy-client-js",t.async=!0,t.src=("https:"===document.location.protocol?"https:":"http:")+"//d1jozu9mugm1h5.cloudfront.net/js/userjoy.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n)}};
+
+
+          userjoy.load('{{appId}}');
+
+          userjoy.identify({
+
+            // TODO: logged in user's email.
+            // Used to identify the user and send him email messages
+            // (REQUIRED)
+            email: 'test@userjoy.co',
+
+            // TODO: logged in user's unique id.
+            // if your app allows a user to change his email address,
+            // then user_id is required to identify user
+            // (OPTIONAL)
+            user_id: '758439753849',
+
+            // TODO: logged in user's payment status
+            // MUST be one of 'trial' / 'free' / 'paying' / 'cancelled'
+            // (REQUIRED)
+            status: 'trial',
+
+            // TODO: logged in user's sign-up date in UNIX timestamp
+            // (milliseconds after epoch)
+            // (REQUIRED)
+            joined: 1403353187345,
+
+            // TODO: logged in user's name ('first-name last-name')
+            // Used while sending emails e.g. 'Hi John, ...'
+            // (OPTIONAL)
+            name: 'John Appleseed',
+
+            // TODO: logged in user's subscription plan
+            // Helps you segment users by plan name
+            // (OPTIONAL)
+            plan: 'Enterprise',
+
+            // TODO: monthly revenue from user
+            // (OPTIONAL)
+            revenue: 499
+
+          });
+        </script>
+
+        
+        Review the TODO comments and edit the code
+        </textarea>
+    </div>
+</div>
+<br>
+<br>
+<div class="row col-md-offset-4 col-md-4">
+  <button class="btn btn-info btn-block" ng-click="sendEmail()" ng-disabled="!(toEmail.length && enableSendEmail)" id="sendToDeveloper">Send to Developer</button>
+</div>

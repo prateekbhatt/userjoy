@@ -1,0 +1,57 @@
+<div ng-include src="'/templates/navbar/navbar.html'"></div>
+<button class="fa fa-backward btn btn-default" style="width: 260px; " ng-click="goToAutoMessages()"><span>&nbsp;&nbsp;Back to AutoMessages List</span></button>
+<div class="row text-center" ng-show="showEmailPreview">
+    <div class="btn-group btn-breadcrumb">
+        <button class="btn btn-default" style="cursor:not-allowed">Select Segment</button>
+        <button class="btn btn-default" style="cursor:not-allowed">Compose Message</button>
+        <button class="btn btn-default" style="cursor:not-allowed">Send Test Email</button>
+        <button class="btn btn-info" style="cursor:not-allowed">Make it Live</button>
+    </div>
+</div>
+<div class="row text-center" ng-show="showNotificationPreview">
+    <div class="btn-group btn-breadcrumb">
+        <button class="btn btn-default" style="cursor:not-allowed">Select Segment</button>
+        <button class="btn btn-default" style="cursor:not-allowed">Compose Message</button>
+        <button class="btn btn-info" style="cursor:not-allowed">Make it Live</button>
+    </div>
+</div>
+<div>
+    <div class="row" style="padding-top: 50px;">
+        <div class="col-md-push-4 col-md-4" ng-show="showNotificationPreview">
+            <div class="message-template" style="max-height: 175px; min-height: 175px; overflow: auto; border-left: 1px solid #eee;" ng-style="{'border-color': borderColor, 'border-right': borderRight, 'border-top': borderTop, 'border-bottom': borderBottom, 'border-radius': borderRadius}">
+                <img src="{{gravatar}}" width="60px">
+                <div style="margin-top: -75px; margin-left: 75px;">
+                    <p style="margin-top: 12px;"><b>{{sender}}</b></p>
+                    <p ng-bind-html="preview(previewText)"></p>
+                </div>
+            </div>
+            <div class="panel-footer" style="margin-top: -21px;">
+                <div class="input-group">
+                    <input id="btn-input" type="text" class="form-control input-sm" placeholder="Type your message here..." disabled="disabled"/>
+                    <span class="input-group-btn">
+                    <button class="btn btn-sm disabled" id="btn-chat" ng-style="{'background-color': backGrndColor, 'border-color': borderColor}" style="color: #ffffff">
+                    Send</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-push-3 col-md-6" ng-show="showEmailPreview">
+            <div class="text-center">
+                <label style="font-size: 18px;">Subject: </label>&nbsp;<span ng-bind-html="preview(subject)" class="emailPreview"></span>
+            </div>
+            <div class="message-template" style="min-height: 300px; overflow: auto; max-height: 300px;  border: 1px solid #ecf0f1; border-radius: 4px;">
+                <p ng-bind-html="preview(previewText)"></p>
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+    <div class="row col-md-push-4 col-md-4" style="padding-left: 24px; padding-right: 0px;" ng-show="showNotificationPreview">
+        <button type="button" class="btn btn-info btn-block" ng-click="changeMsgStatus()" ng-disabled="statusButton" id="notificationLiveBtn">{{msgStatus}}</button>
+    </div>
+    <div class="row col-md-push-3 col-md-6" style="padding-left: 24px; padding-right: 0px;" ng-show="showEmailPreview">
+        <button type="button" class="btn btn-info btn-block" ng-click="changeMsgStatus()" ng-disabled="statusButton" id="autoEmailLiveBtn">{{msgStatus}}</button>
+    </div>
+    <br>
+    <br>
+</div>
