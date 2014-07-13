@@ -1,0 +1,83 @@
+<div class="col-md-offset-1">
+    <form id="settings_team_form" class="form-horizontal" role="form" ng-submit="addTeamMember()" novalidate name="name_update_form">
+        <div style="padding-top:30px">
+            <div class="row" ng-show="showMsgSuccess">
+                <!-- <div class="col-md-4 alert alert-success">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="hideMsgSuccessAlert()">&times;</button>
+                    Invitation successfully sent!!
+                </div> -->
+            </div>
+            <div class="row">
+                <label for="teamMember" class="col-md-4" style="font-size: 20px; padding-left: 16px;"><strong>Add Team Member</strong></label>
+            </div>
+            <div class="row" style="padding-top:15px">
+                <div class="col-md-7">
+                    <input class="form-control" type="email" name="teamMember"  ng-model="teamMember" placeholder="Email Address" required>
+                </div>
+            </div>
+            <div class="row" style="padding-top:15px">
+                <div class="col-md-7">
+                    <input class="form-control" type="text" name="nameMember"  ng-model="nameMember" placeholder="Name" required>
+                </div>
+            </div>
+            <div class="row" style="padding-top:15px">
+                <div class="col-md-7">
+                    <button type="submit" class="btn btn-info pull-left" style="padding-top:10px" ng-disabled="!(teamMember.length && nameMember.length && enableInvite)" id="sendInviteTeamMember">Send Invite</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <br>
+    <hr>
+    <br>
+    <div class="row">
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading"><h4>Team Members</h4></div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="text-center" width="50%">Name</th>
+                        <th class="text-center">Email Id</th>
+                        <!-- <th class="text-center">Incoming Email</th>
+                        <th class="text-center"></th> -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- TODO: Get Data from Backend -->
+                    <tr ng-repeat="member in team">
+                        <td class="text-center">{{member.name}}</td>
+                        <td class="text-center">{{member.email}}</td>
+                        <!-- <td>{{member.incomingEmail}}</td>
+                        <td><a class="btn btn-sm btn-default fa fa-times-circle-o" ng-click="removeTeamMember(member)"></a></td> -->
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <br>
+    <br>
+    <div class="row" ng-show="invitedTeam.length">
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading"><h4>Invited Team Members</h4></div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="text-center" width="50%">Name</th>
+                        <th class="text-center">Email Id</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- TODO: Get Data from Backend -->
+                    <tr ng-repeat="member in invitedTeam">
+                        <td class="text-center">{{member.toName}}</td>
+                        <td class="text-center">{{member.toEmail}}</td>
+                        <!-- <td>{{member.incomingEmail}}</td>
+                        <td><a class="btn btn-sm btn-default fa fa-times-circle-o" ng-click="removeTeamMember(member)"></a></td> -->
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

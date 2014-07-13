@@ -1,0 +1,21 @@
+<div ng-controller="ProfileCtrl">
+    <div class="modal-header">
+        <h3 class="modal-title">Write Message</h3>
+    </div>
+    <form name="sendMsgForm" class="form-horizontal" role="form" ng-submit="sendManualMessage()" novalidate id="sendManualMsg">
+        <div class="modal-body">
+            <p ng-bind="content"></p>
+            <div class="media">
+                <div style="margin-bottom: 25px;">
+                    <input id="subject" type="text" class="form-control" name="sub" placeholder="Subject" ng-model="mail.sub" required autofocus>
+                </div>
+                <div style="margin-bottom: 25px;">
+                    <textarea id="messagetext" class="form-control" placeholder="Message" type="text" name="text" ng-model="mail.msgtext" required rows="5"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-info">Send</button>
+        </div>
+    </form>
+</div>

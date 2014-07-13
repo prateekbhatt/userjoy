@@ -1,3 +1,6 @@
+var path = require('path');
+
+
 /**
  *
  * NOTE: Overriden the function in this file to send the
@@ -55,20 +58,36 @@ module.exports = function sendAngularBase() {
   var res = this.res;
   var sails = req._sails;
 
+  // in non-production env, render the homepage file
   var viewFilePath = 'homepage.ejs';
+
+  // in production, send the assets/index file
+  var indexFilePath = path.resolve(__dirname, '../../assets/index.html');
+
   var statusCode = 200;
   var result = {
     status: statusCode
   };
 
   res.status(result.status);
-  res.render(viewFilePath, function(err) {
-    // If the view doesn't exist, or an error occured, send json
-    if (err) {
-      return res.json(result, result.status);
-    }
 
-    // Otherwise, serve the `views/homepage.ejs` page
-    res.view(viewFilePath);
-  });
+
+  if (process.env.NODE_ENV === 'production') {
+
+    return res.sendfile(indexFilePath);
+
+  } else {
+
+    return res.render(viewFilePath, function (err) {
+      // If the view doesn't exist, or an error occured, send json
+      if (err) {
+        return res.json(result, result.status);
+      }
+
+      // Otherwise, serve the `views/homepage.ejs` page
+      res.view(viewFilePath);
+    });
+  }
+
+
 };
