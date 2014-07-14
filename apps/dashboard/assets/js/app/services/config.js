@@ -18,7 +18,7 @@ angular.module('services.config', [])
       siteName: 'DoDataDo',
       // no trailing slash!
       siteUrl: '/',
-      apiUrl: 'http://api.userjoy.co',
+      apiUrl: 'https://api.userjoy.co',
 
       currentUser: false
     };
