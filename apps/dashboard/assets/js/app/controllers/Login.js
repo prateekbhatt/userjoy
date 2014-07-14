@@ -58,11 +58,11 @@ angular.module('do.login', [])
     $scope.errMsg = '';
     $scope.showError = false;
     $scope.enableLogin = true;
-    $scope.signupHref = 'http://userjoy.co/signup';
+    $scope.signupHref = 'https://userjoy.co/signup';
     if (window.location.href.split('/')[2] == 'app.do.localhost') {
       $scope.signupHref = 'http://do.localhost/signup';
     } else {
-      $scope.signupHref = 'http://userjoy.co/signup';
+      $scope.signupHref = 'https://userjoy.co/signup';
     }
     console.log("$rootScope loggedIn: ", $rootScope.loggedIn, AppService.getCurrentApp());
     if ($rootScope.loggedIn && AppService.getCurrentApp()

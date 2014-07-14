@@ -18,7 +18,7 @@ case 'do.localhost':
   signupApiUrl = 'http://api.do.localhost/account';
   break;
 default:
-  signupApiUrl = 'http://api.userjoy.co/account';
+  signupApiUrl = 'https://api.userjoy.co/account';
 }
 
 $('#signup_form_submit')
@@ -154,6 +154,6 @@ function redirectToLogin() {
   if (window.location.href.split("/")[2] == 'do.localhost') {
     window.location.href = "http://app.do.localhost/login";
   } else {
-    window.location.href = "http://app.userjoy.co/login"
+    window.location.href = "https://app.userjoy.co/login"
   }
 }
