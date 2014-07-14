@@ -31,10 +31,10 @@ var user = require('./user');
 
 
 // Change while testing in localhost
-// Grunt replace is used to change this api url from 'api.do.localhost' to
-// 'api.userjoy.co' in production and vice-versa
+// Grunt replace is used to change this api url from 'http://api.do.localhost' to
+// 'https://api.userjoy.co' in production and vice-versa
 // Two grunt tasks have been defined for this: build and buildDev
-var API_URL = 'http://api.userjoy.co/track';
+var API_URL = 'https://api.userjoy.co/track';
 
 
 

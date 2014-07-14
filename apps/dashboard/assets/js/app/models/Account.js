@@ -83,7 +83,7 @@ angular
             if (window.location.href.split("/")[2] == 'app.do.localhost') {
               window.location.href = "http://do.localhost/signup";
             } else {
-              window.location.href = "http://userjoy.co/signup";
+              window.location.href = "https://userjoy.co/signup";
             }
           })
       }
