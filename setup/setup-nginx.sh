@@ -189,18 +189,26 @@ upstream $SERVER_NAME {
     server 127.0.0.1:$PORT;
 }
 
-# strip www from url
-server {
-    server_name www.$SERVER_NAME;
-    return 301 https://$SERVER_NAME\$request_uri;
-}
 
+# strip www from url
 # redirect http requests to https
 # REF: http://serverfault.com/a/337893/191615
 server {
     listen 80;
+    server_name www.$SERVER_NAME $SERVER_NAME;
     return 301 https://$SERVER_NAME\$request_uri;
 }
+
+
+
+# strip www from url for https requests
+server {
+    listen 443;
+    server_name www.$SERVER_NAME;
+    return 301 https://$SERVER_NAME\$request_uri;
+}
+
+
 
 # the nginx server instance
 server {
