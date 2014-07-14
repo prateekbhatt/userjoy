@@ -32,10 +32,10 @@ var API_CORS_WHITELIST = {
     'http://do.localhost'
   ],
   production: [
-    'http://app.userjoy.co',
-    'http://userjoy.co',
-    'http://www.app.userjoy.co',
-    'http://www.userjoy.co'
+    'https://app.userjoy.co',
+    'https://userjoy.co',
+    'https://www.app.userjoy.co',
+    'https://www.userjoy.co'
   ],
   test: [
     'http://app.do.localhost',
@@ -85,12 +85,15 @@ var MAILGUN_PASS = {
  * e.g., in production environment:
  * dashboard: app.userjoy.co
  */
-function getHosts(url) {
+function getHosts(env, url) {
+
+  var protocol = (env === 'production') ? 'https://' : 'http://';
+
   var hosts = {
-    website: 'http://' + url,
-    dashboard: 'http://' + 'app.' + url,
-    api: 'http://' + 'api.' + url,
-    cdn: 'http://' + 'cdn.' + url
+    website: protocol + url,
+    dashboard: protocol + 'app.' + url,
+    api: protocol + 'api.' + url,
+    cdn: protocol + 'cdn.' + url
   };
   return hosts;
 }
@@ -131,7 +134,7 @@ module.exports = function (appName) {
   };
 
   config.cookieDomain = '.'.concat(config.baseUrl);
-  config.hosts = getHosts(config.baseUrl);
+  config.hosts = getHosts(env, config.baseUrl);
   config.appUrl = config.hosts[appName];
 
   return config;
