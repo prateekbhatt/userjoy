@@ -17,8 +17,9 @@ body, h1, h2, h3, h4, h5, h6 {
 .intro-header {
 	padding-top: 50px; /* If you're making other pages, make sure there is 50px of padding to make sure the navbar doesn't overlap content! */
 	padding-bottom: 50px;
+	background-color: #29333a;
 	color: #f8f8f8;
-	background: url(/images/landing_page_img/intro-bg.jpg) no-repeat center center;
+	/*background: url(/images/landing_page_img/intro-bg.jpg) no-repeat center center;*/
 	background-size: cover;
 	text-align: center;
 }
@@ -100,7 +101,7 @@ body, h1, h2, h3, h4, h5, h6 {
 .banner {
 	padding: 100px 0;
 	color: #f8f8f8;
-	background: url(/images/landing_page_img/banner-bg.jpg) no-repeat center center;
+	background-color: #29333a;
 	background-size: cover;
 }
 
