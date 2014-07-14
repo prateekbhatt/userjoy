@@ -205,7 +205,16 @@ server {
 # REF: http://serverfault.com/a/258424/191615
 server {
     listen 443;
+
+    # REF: https://support.comodo.com/index.php?/Default/Knowledgebase/Article/View/789/37/certificate-installation-nginx
     ssl on;
+    ssl_certificate /etc/nginx/ssl/m87_ssl_bundle_public.crt;
+    ssl_certificate_key /etc/nginx/ssl/m87_ssl_private_key.pem;
+    #enables SSLv3/TLSv1, but not SSLv2 which is weak and should no longer be used.
+    ssl_protocols SSLv3 TLSv1;
+    #Disables all weak ciphers
+    ssl_ciphers ALL:!aNULL:!ADH:!eNULL:!LOW:!EXP:RC4+RSA:+HIGH:+MEDIUM;
+
     server_name www.$SERVER_NAME;
     return 301 https://$SERVER_NAME\$request_uri;
 }
