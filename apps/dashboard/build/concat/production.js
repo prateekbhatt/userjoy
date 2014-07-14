@@ -56005,11 +56005,11 @@ angular.module('do.login', [])
     $scope.errMsg = '';
     $scope.showError = false;
     $scope.enableLogin = true;
-    $scope.signupHref = 'http://userjoy.co/signup';
+    $scope.signupHref = 'https://userjoy.co/signup';
     if (window.location.href.split('/')[2] == 'app.do.localhost') {
       $scope.signupHref = 'http://do.localhost/signup';
     } else {
-      $scope.signupHref = 'http://userjoy.co/signup';
+      $scope.signupHref = 'https://userjoy.co/signup';
     }
     console.log("$rootScope loggedIn: ", $rootScope.loggedIn, AppService.getCurrentApp());
     if ($rootScope.loggedIn && AppService.getCurrentApp()
@@ -62721,7 +62721,7 @@ angular
             if (window.location.href.split("/")[2] == 'app.do.localhost') {
               window.location.href = "http://do.localhost/signup";
             } else {
-              window.location.href = "http://userjoy.co/signup";
+              window.location.href = "https://userjoy.co/signup";
             }
           })
       }
@@ -64024,7 +64024,7 @@ angular.module('services.config', [])
       siteName: 'DoDataDo',
       // no trailing slash!
       siteUrl: '/',
-      apiUrl: 'http://api.userjoy.co',
+      apiUrl: 'https://api.userjoy.co',
 
       currentUser: false
     };
