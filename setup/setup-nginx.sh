@@ -202,8 +202,10 @@ server {
 
 
 # strip www from url for https requests
+# REF: http://serverfault.com/a/258424/191615
 server {
     listen 443;
+    ssl on;
     server_name www.$SERVER_NAME;
     return 301 https://$SERVER_NAME\$request_uri;
 }
