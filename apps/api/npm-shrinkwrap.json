@@ -1168,6 +1168,11 @@
       "version": "0.6.6",
       "from": "qs@0.6.6"
     },
+    "url-join": {
+      "version": "0.0.1",
+      "from": "url-join@",
+      "resolved": "https://registry.npmjs.org/url-join/-/url-join-0.0.1.tgz"
+    },
     "winston": {
       "version": "0.7.3",
       "from": "winston@0.7.3",
