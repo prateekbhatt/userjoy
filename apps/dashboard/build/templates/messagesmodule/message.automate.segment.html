@@ -1,0 +1,35 @@
+<div ng-include src="'/templates/navbar/navbar.html'"></div>
+<div class="row text-center">
+    <div class="btn-group btn-breadcrumb">
+        <button class="btn btn-info" style="cursor:not-allowed">Select Segment</button>
+        <button class="btn btn-default" style="cursor:not-allowed">Compose Message</button>
+        <button class="btn btn-default" style="cursor:not-allowed">Send Test Email</button>
+        <button class="btn btn-default" style="cursor:not-allowed">Make it Live</button>
+    </div>
+</div>
+<br>
+<div class="row col-md-6 col-md-offset-3" style="padding-top:20px;">
+    <div class="panel panel-info" style="border-color: #bce8f1">
+        <div class="panel-heading" style="background-color: #d9edf7; border-color: #bce8f1">
+            <h3 class="panel-title text-center" style="color:#31708f">Select a Segment</h3>
+        </div>
+        <div class="panel-body">
+            <br>
+            <label class="col-md-3 control-label" style="font-size: 20px; padding-top: 5px;">Segments</label>
+            <div class="col-md-9">
+                <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{selectedIcon.name}}</span>&nbsp;<span class="caret"></span></button>
+                <ul class="select dropdown-menu" role="select" style="left: 15px;">
+                    <li class="dropdown" ng-repeat="segment in segmenticons">
+                        <a style="cursor: default;" ng-click="changeText($index)">{{segment.label}}</a>
+                    </li>
+                </ul>
+            </div>
+            <br>
+            <br>
+            <div class="btn-toolbar" style="padding-top: 45px;">
+                <a class="btn btn-info pull-right" href="/apps/{{currApp}}/messages/automate/segments/{{sid}}/write" ng-click="storeSegment()" id="createAutoMsgForSegment">Compose Message</a>&nbsp;&nbsp;&nbsp;
+                <a class="btn btn-default pull-right" href="/apps/{{currApp}}/users/list" id="createSegmentForAutoMsg">Create New Segment</a>
+            </div>
+        </div>
+    </div>
+</div>

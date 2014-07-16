@@ -1,0 +1,42 @@
+<div ng-include src="'/templates/navbar/navbar.html'"></div>
+<div class="panel">
+    <div class="panel-body">
+        <div class="col-md-3">
+            <div id="wrapper-settings">
+                <!-- Sidebar -->
+                <div id="sidebar-wrapper-settings">
+                    <ul class="sidebar-nav">
+                        <li class="sidebar-brand"><strong>Account Settings </strong>
+                        </li>
+                        <li class="active"><a ng-click="goToProfileSettings()" style="cursor: pointer">Profile</a>
+                        </li>
+                        <li><a ng-click="goToChangePassword()" style="cursor: pointer">Change Password</a>
+                        </li>
+                        <li><a ui-sref="onboarding">Add a New App</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9" id="page-wrapper-settings">
+            <form id="settings_profile_form" class="form-horizontal" role="form" ng-submit="changeProfileName()" novalidate name="name_update_form">
+               <!--  <div ng-show="profileNameChangeSuccess" class="alert alert-success">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="hideSuccessAlert()">&times;</button>
+                    Profile Name Changed Successfully
+                </div> -->
+                <div ng-show="profileNameChangeError" class="alert alert-danger">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="hideErrorAlert()">&times;</button>
+                    Error in changing profile name
+                </div>
+                <div style="padding-top:30px">
+                    <label for="name" class="col-md-2 control-label" style="font-size: 20px; padding-left: 0px"><strong>Your Name</strong></label>
+                    <div class="col-md-7">
+                        <input class="form-control" type="text" name="name"  ng-model="name" required>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-info pull-right" style="padding-top:10px" ng-disabled="!name.length" id="updateProfileName">Update</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

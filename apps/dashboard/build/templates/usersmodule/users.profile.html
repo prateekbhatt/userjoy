@@ -1,0 +1,157 @@
+<div ng-include src="'/templates/navbar/navbar.html'"></div>
+<div class="panel">
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-3 well">
+                <div class="row">
+                    <div class="col-md-4">
+                        <img ng-src="{{user.profilegravatar}}" alt="" class="img-rounded img-responsive" style="height: 80px;" fallback-src={{user.profilesrc}}>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-info" ng-click="openMessageModal()">Message</button>
+                            <button type="button" class="btn btn-info" ng-click="openNoteModal()">Note</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="padding-left: 15px;">
+                    <br>
+                    <br>
+                    <p ng-repeat="firstList in userDataList" ng-if="firstList.data == 'Health' && firstList.value == 'average'" style="color: #428bca;"><b>{{firstList.data}}</b> : {{firstList.value}} <i class="fa fa-meh-o"></i></p>
+                    <p ng-repeat="firstList in userDataList" ng-if="firstList.data == 'Health' && firstList.value == 'good'" style="color: #2ecc71;"><b>{{firstList.data}}</b> : {{firstList.value}} <i class="fa fa-smile-o"></i></p>
+                    <p ng-repeat="firstList in userDataList" ng-if="firstList.data == 'Health' && firstList.value == 'poor'" style="color: #e74c3c;"><b>{{firstList.data}}</b> : {{firstList.value}} <i class="fa fa-frown-o"></i></p>
+                    <p ng-repeat="firstList in userDataList" ng-if="!(firstList.data == 'Health')"><b>{{firstList.data}}</b> : {{firstList.value}}</p>
+                    <p ng-show="showCompany" ng-repeat="company in companies"><b>Company: </b>{{company.name}}</p>
+                    <p ng-show="showCompanies"><b>Companies: </b><span ng-repeat="company in companies"><span ng-show="$last"> and</span> {{company.name}} <span ng-show="!$last">,</span></span></p>
+                </div>
+            </div>
+            <div class="col-md-4 col-md-push-1">
+                <tabset justified="true">
+                <tab heading="Score">
+                <div class="row">
+                    <div>
+                        <nvd3-discrete-bar-chart data="graphData"  id="showXAxisExample" width="450" height="230" xAxisTickFormat="xAxisTickFormatFunction()" showYAxis="true" showXAxis="false" tooltips="true" tooltipcontent="toolTipContentFunction()" color="colorFunction()" noData="New user! Scores will be available in a few days"><svg></svg>
+                        </nvd3-discrete-bar-chart>
+                        <!-- <p class="text-center" style="margin-top: -10px;">Date</p> -->
+                    </div>
+                </div>
+                </tab>
+                <tab heading="Messages">
+                <div class="row text-center" ng-show="msgs.length == 0">
+                    <br>
+                    <em><p>&nbsp;You have no conversations with {{user.email}}</p></em>
+                    <button type="button" class="btn btn-info" ng-click="openMessageModal()">Create Message</button>
+                </div>
+                <div class="row" ng-show="msgs.length">
+                    <br>
+                    <div class="col-md-12" style="margin-left: 15px">
+                        <table class="table table-striped table-condensed">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Sub</th>
+                                    <th class="text-center">When</th>
+                                    <th class="text-center"></th>
+                                    <!-- <th class="text-center">Seen</th> -->
+                                </tr>
+                            </thead>
+                            <tbody style="font-size: 13px;">
+                                <tr class="text-center" ng-repeat="msg in msgs">
+                                    <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer;">{{msg.sub}}</td>
+                                    <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer; width: 100%; ">{{msg.when}}</td>
+                                    <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer;">
+                                        <span class="label label-success" ng-show="{{!msg.closed}}" style="font-size: 100%;">Open</span>
+                                        <span class="label label-danger" ng-show="{{msg.closed}}" style="font-size: 100%;">Closed</span>
+                                    </td>
+                                   <!--  <td ng-click="redirectToConversation(msg.id)" style="cursor: pointer;">
+                                        <span class="glyphicon glyphicon-ok" ng-show="{{msg.seen}}"></span>
+                                        <span class="glyphicon glyphicon-remove" ng-show="{{!msg.replied}}"></span>
+                                    </td> -->
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                </tab>
+                <tab heading="Notes">
+                <div class="row text-center" ng-show="notes.length == 0">&nbsp;
+                    <br>
+                    <em><p>No notes have been created about {{user.email}}</p></em>
+                    <button type="button" class="btn btn-info" ng-click="openNoteModal()">Create a Note</button>
+                </div>
+                <div class="row" ng-show="notes.length">&nbsp;
+                    <br>
+                    <div class="col-md-12" style="margin-left: 15px">
+                        <table class="table table-striped table-condensed">
+                            <thead>
+                                <tr>
+                                    <th width="40%" class="text-center">Text</th>
+                                    <th width="20%" class="text-center">Creator</th>
+                                    <th width="40%" class="text-center">When</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="note in notes">
+                                    <td class="text-center">{{note.text}}</td>
+                                    <td class="text-center">{{note.creator}}</td>
+                                    <td class="text-center">{{note.when}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                </tab>
+                </tabset>
+            </div>
+            <div class="col-md-3 col-md-push-2">
+                <h4><b>Recent Activity</b></h4>
+                <br>
+                <div class="text-center">
+                    <div class="col-md-4 pull-left">
+                        <div class="btn-group" ng-show="showPreviousBtn">
+                            <button class="btn btn-default btn-sm text-center" ng-click="showEventPreviousDate()"><i class="fa fa-backward "></i>&nbsp;Prev</button>
+                            <!-- <button class="btn btn-default btn-sm text-center" ng-click="showEventNextDate()">Next</button> -->
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <p><em>{{eventDate}}</em></p>
+                    </div>
+                    <div class="col-md-4 pull-right">
+                        <button class="btn btn-default btn-sm text-center " ng-click="showEventNextDate()">Next <i class="fa fa-forward"></i></button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12" id="affix-demo">
+                        <br>
+                        <!-- <p><em>{{eventDate}}</em></p> -->
+                        <p ng-show="!showEvents">There was no activity for {{eventDate}}</p>
+                        <ul class="list-group" ng-show="showEvents">
+
+                            <li class="list-group-item" ng-repeat="event in events" ng-class="{'list-group-item-danger': event.type == 'auto', 'list-group-item-success': event.type == 'form', 'list-group-item-info': event.type == 'page', 'list-group-item-default': event.type == 'link', 'list-group-item-warning': event.type == 'track'}">
+                                <span ng-class="{'fa fa-comments': event.type == 'auto', 'fa fa-flash': event.type == 'form', 'fa fa-globe': event.type == 'page', 'fa fa-link': event.type == 'link', 'fa fa-road': event.type == 'track'}" title="{{event.title}}" style="font-size: 12px; width: 140px; word-wrap: break-word;"> {{event.name}}</span>
+                                <em class="pull-right" style="font-size: 11px;" title="{{event.timestamp}}">{{event.when}}</em>
+                            </li>
+                           <!--  <li class="list-group-item list-group-item-success" ng-if="event.type == 'form'" ng-repeat="event in events">
+                                <span class = "fa fa-comments" title="Submitted form"> {{event.name}}</span>
+                                <em class="pull-right" style="font-size: 11px;" title="{{event.timestamp}}">{{event.when}}</em>
+                            </li>
+                            <li class="list-group-item list-group-item-info" ng-if="event.type == 'page'" ng-repeat="event in events">
+                                <span class = "fa fa-globe" title="Viewed {{event.name}}"> {{event.name}}</span>
+                                <em class="pull-right" style="font-size: 11px;" title="{{event.timestamp}}">{{event.when}}</em>
+                            </li>
+                            <li class="list-group-item list-group-item-default" ng-if="event.type == 'link'" ng-repeat="event in events" style="border-left: 4px solid #7f8c8d;">
+                                <span class = "fa fa-link" title="Link"> {{event.name}}</span>
+                                <em class="pull-right" style="font-size: 11px;" title="{{event.timestamp}}">{{event.when}}</em>
+                            </li>
+                            <li class="list-group-item list-group-item-warning" ng-if="event.type == 'track'" ng-repeat="event in events">
+                                <span class = "fa fa-road" title="Track"> {{event.name}}</span>
+                                <em class="pull-right" style="font-size: 11px;" title="{{event.timestamp}}">{{event.when}}</em>
+                            </li> -->
+                           
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>

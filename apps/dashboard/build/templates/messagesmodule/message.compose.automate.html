@@ -1,0 +1,169 @@
+<div ng-include src="'/templates/navbar/navbar.html'"></div>
+<div class="panel" style="min-height: 500px;">
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-3">
+                <div id="wrapper-settings">
+                    <!-- Sidebar -->
+                    <div id="sidebar-wrapper-settings">
+                        <ul class="sidebar-nav">
+                            <li>
+                                <a href="/apps/{{currApp}}/messages/open" ng-click="showTableInbox()"><i class="fa fa-inbox"></i> Open Messages</a>
+                            </li>
+                            <li>
+                                <a href="/apps/{{currApp}}/messages/unread"><i class="fa fa-exclamation"></i>&nbsp; Unread Messages</a>
+                            </li>
+                            <li>
+                                <a href="/apps/{{currApp}}/messages/closed"><i class="fa fa-check"></i>&nbsp; Closed Messages</a>
+                            </li>
+                            <li class="active">
+                                <a href="/apps/{{currApp}}/messages/automate"><i class="fa fa-edit"></i> Automate Messages </a>
+                            </li>
+                            <!-- <li>
+                                <a ui-sref="message.template"><span class="glyphicon glyphicon-list-alt"></span> Choose Templates</a>
+                            </li> -->
+                            <li ng-class="{'active': isActive('smartFilters')}">
+                                <span style="cursor: default; color: #333;"><i class="fa fa-paperclip"></i> Smart Filters
+                                <ul style="list-style: none;">
+                                    <li>
+                                        <div class="progress" style="margin-left: 10px;">
+                                            <a href="/apps/{{currApp}}/messages/goodhealth" style="cursor: pointer">
+                                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #5cb85c;">
+                                                <span class="progress-type pull-left"><strong>Good Health</strong></span>
+                                            </div>
+                                            </a>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="progress" style="margin-left: 10px;">
+                                            <a href="/apps/{{currApp}}/messages/avghealth" style="cursor: pointer">
+                                            <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #428bca;">
+                                                <span class="progress-type pull-left"><strong>Average Health</strong></span>
+                                            </div>
+                                            </a>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="progress" style="margin-left: 10px;">
+                                            <a href="/apps/{{currApp}}/messages/poorhealth" style="cursor: pointer">
+                                            <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #d9534f;">
+                                                <span class="progress-type pull-left"><strong>Poor Health</strong></span>
+                                            </div>
+                                            </a>
+                                        </div>
+                                    </li>
+                                    <!-- <li>
+                                        <div class="progress" style="margin-left: 30px;">
+                                            <a ui-sref="#goodhealth" style="cursor: pointer">
+                                            <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #f0ad4e;">
+                                                <span class="progress-type pull-left"><strong>Open Conversations</strong></span>
+                                            </div>
+                                            </a>
+                                        </div>
+                                    </li> -->
+                                    <!-- <li>
+                                        <div class="progress" style="margin-left: 30px;">
+                                            <a href="/apps/{{currApp}}/messages/closed" style="cursor: pointer">
+                                            <div class="progress-bar progress-bar-default" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #999;">
+                                                <span class="progress-type pull-left"><strong>Closed Conversations</strong></span>
+                                            </div>
+                                            </a>
+                                        </div>
+                                    </li> -->
+                                    <!-- <li>
+                                        <div class="progress" style="margin-left: 30px;">
+                                            <a ui-sref="#goodhealth" style="cursor: pointer">
+                                            <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #5bc0de;">
+                                                <span class="progress-type pull-left"><strong>Paying Customers</strong></span>
+                                            </div>
+                                            </a>
+                                        </div>
+                                    </li> -->
+                                </ul>
+                                </span>
+                            </li>
+                        </ul>
+                        <!-- /#side-menu -->
+                    </div>
+                    <!-- /.sidebar-collapse -->
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div id="wrapper">
+                    <!-- /.row -->
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="panel panel-default" >
+                                <div class="panel-heading">
+                                    <i class="fa fa-inbox"></i> Auto Messages
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div>
+                                    <div class="row">
+                                    <div class="text-center" ng-show="!showTable"><br><span>There are no Automatic Messages!! Create one</span><br><br></div>
+                                        <div class="col-lg-12" ng-if="showTable">
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <th class="text-center">Segment</th>
+                                                        <th class="text-center">Title</th>
+                                                        <th class="text-center">Type</th>
+                                                        <th class="text-center">Sent</th>
+                                                        <th class="text-center">Replied</th>
+                                                        <th class="text-center">Seen</th>
+                                                        <!-- <th class="text-center">Clicked</th> -->
+                                                        <th></th>
+                                                        <!-- <th></th> -->
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr ng-repeat="automessage in automessages">
+                                                            <td class="text-center" style="cursor: pointer" ng-click="showAutoMsg($index)"> {{automessage.segment}} </td>
+                                                            <td class="text-center" style="cursor: pointer" ng-click="showAutoMsg($index)"> {{automessage.title}} </td>
+                                                            <td class="text-center" style="cursor: pointer" ng-click="showAutoMsg($index)">
+                                                                {{automessage.type}}
+                                                            </td>
+                                                            <td class="text-center" style="cursor: pointer" ng-click="showAutoMsg($index)">
+                                                                {{automessage.sent}}
+                                                            </td>
+                                                            <td class="text-center" style="cursor: pointer" ng-click="showAutoMsg($index)">{{automessage.replied}}</td>
+                                                            <td class="text-center" style="cursor: pointer" ng-click="showAutoMsg($index)">{{automessage.seen}}</td>
+                                                            <!-- <td class="text-center" style="cursor: pointer" ng-click="showAutoMsg($index)">{{automessage.clicked}}</td> -->
+                                                            <td class="text-center">
+                                                                <a style="cursor: pointer" class="btn btn-sm btn-info" ng-click="changeMsgStatus(automessage.id, automessage.message, $index)" id="activate-deactivateAutoMsg">{{automessage.message}}</a>
+                                                            </td>
+                                                            <!-- <td class="text-center">
+                                                                <a style="cursor: pointer;" class="btn btn-sm btn-default" ng-click="editAutoMessage(automessage.id, $index)"><i class="fa fa-edit"></i> Edit</a>
+                                                            </td> -->
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <!-- /.table-responsive -->
+                                        </div>
+                                        <div class="text-center" style="padding-top: 20px;">
+                                            <div class="col-md-push-4 col-md-4">
+                                                <a class="btn btn-info btn-block" href="/apps/{{currApp}}/messages/automate/segments">Create New Auto Message</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <br>
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                            <!-- /.panel -->
+                            <div class="row" style="padding-top:50px">
+                            </div>
+                        </div>
+                        <!-- /.col-lg-8 -->
+                        <!-- /.col-lg-4 -->
+                    </div>
+                    <!-- /.row -->
+                </div>
+                <!-- /#page-wrapper -->
+                <!-- /#wrapper -->
+            </div>
+        </div>
+    </div>
+</div>
