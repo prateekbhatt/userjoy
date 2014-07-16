@@ -64,9 +64,9 @@ Every app has a default inbound email address which is "aid@mail.userjoy.co", wh
 
 To create threads, we append the parent message id to the app email address, and create the reply-ro email. e.g. "Reply to UserJoy <1234+5678@mail.userjoy.co>" where aid = 1234 and message id = 5678. So, we know that the inbound message is a reply to message with id 5678
 
-###### MetaData
+###### Custom MetaData
 
-We allow the apps to pass custom attributes related to users and companies. These attributes should be stored in a metadata field using (```metadata: [{ k: 'key', v: 'value'}]```) array. [Reference](http://calv.info/indexing-schemaless-documents-in-mongo/)
+We allow the apps to pass 'custom' attributes related to users and companies. These attributes should be stored in a 'custom' metadata field using (```custom: [{ k: 'key', v: 'value'}]```) array. [Reference](http://calv.info/indexing-schemaless-documents-in-mongo/)
 
 > #### Schema
 
@@ -176,11 +176,11 @@ UserNote      |                         | notes created by team members about a 
 - email (required)
 - browser ("Chrome 35" etc.)
 - country (2 letter ISO-3166-1 country code, [REF](https://github.com/bluesmoon/node-geoip#looking-up-an-ip-address)
+- custom (object containing additonal info about users)
 - device ('Apple iPad')
 - name
 - firstName
 - lastName
-- x meta (object containing additonal info about users)
 - ct
 - ut
 - health (latest health status of the user, defaults to average for new user)

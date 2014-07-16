@@ -122,16 +122,16 @@ describe('Model User', function () {
         email: id + '@dodatado.com',
         browser: 'Chrome 35',
         country: 'India',
+        custom: {
+          plan: 'Free Tier',
+          amount: 40
+        },
         device: 'Apple iPad',
         first_name: 'Prateek',
         ip: '115.118.149.224',
         joined: moment()
           .unix() * 1000,
         last_name: 'Bhatt',
-        meta: {
-          plan: 'Free Tier',
-          amount: 40
-        },
         name: 'Prateek Bhatt',
         os: 'iOS 5.0',
         plan: 'enterprise',
@@ -146,7 +146,7 @@ describe('Model User', function () {
 
         expect(usr.toJSON())
           .to.be.an('object')
-          .and.to.have.property("meta")
+          .and.to.have.property("custom")
           .that.is.an("array")
           .that.has.length(2)
           .that.deep.equals([{
