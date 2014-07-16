@@ -29,9 +29,17 @@ module.exports = function(grunt) {
 				expand: true,
 				cwd: '.tmp/public',
 				src: ['**/*'],
-				dest: 'www'
+				dest: 'build'
 			}]
-		}
+		},
+    prod: {
+      files: [{
+        expand: true,
+        cwd: 'build',
+        src: ['**/*'],
+        dest: '.tmp/public'
+      }]
+    }
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-copy');

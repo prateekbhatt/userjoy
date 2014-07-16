@@ -146,49 +146,93 @@ EOF
 
 elif [[ $1 == 'prod' ]]; then
 
-  declare -a DO_APPS=( "website" "dashboard" "api" )
+  # ask if the user has already copied the private and public ssl keys to /etc/nginx/ssl folder
+  # REF: http://stackoverflow.com/a/1885534/1463434
+  read -p "Have you put the 'm87_ssl_bundle_public.crt' and 'm87_ssl_private_key.pem' files in /etc/nginx/ssl folder? " -n 1 -r
+  echo  'hELLO'   # (optional) move to a new line
+  if [[ $REPLY =~ ^[Yy]$ ]]
+  then
+    # do dangerous stuff
 
-  echo 'Creating nginx production files in sites-available and'
-  echo 'creating symlinks for nginx config files from sites-available in sites-enabled'
+    declare -a DO_APPS=( "website" "dashboard" "api" )
 
-
-  for app in "${DO_APPS[@]}"; do
-
-    # set define port for the app
-    if [[ $app == 'website' ]]; then
-
-      PORT=8000
-      SERVER_NAME='userjoy.co'
-
-    elif [[ $app == 'dashboard' ]]; then
-
-      PORT=8001
-      SERVER_NAME='app.userjoy.co'
-
-    elif [[ $app == 'api' ]]; then
-
-      PORT=8002
-      SERVER_NAME='api.userjoy.co'
-
-    fi
+    echo 'Creating nginx production files in sites-available and'
+    echo 'creating symlinks for nginx config files from sites-available in sites-enabled'
 
 
-    # create nginx config files
-    cat > /etc/nginx/sites-available/app-$app << EOF
+    for app in "${DO_APPS[@]}"; do
+
+      # set define port for the app
+      if [[ $app == 'website' ]]; then
+
+        PORT=8000
+        SERVER_NAME='userjoy.co'
+
+      elif [[ $app == 'dashboard' ]]; then
+
+        PORT=8001
+        SERVER_NAME='app.userjoy.co'
+
+      elif [[ $app == 'api' ]]; then
+
+        PORT=8002
+        SERVER_NAME='api.userjoy.co'
+
+      fi
+
+
+      # create nginx config files
+      cat > /etc/nginx/sites-available/app-$app << EOF
 
 # the IP(s) on which the app node server is running.
 upstream $SERVER_NAME {
     server 127.0.0.1:$PORT;
 }
 
+
+# strip www from url
+# redirect http requests to https
+# REF: http://serverfault.com/a/337893/191615
 server {
-    server_name www.$SERVER_NAME;
-    return 301 \$scheme://$SERVER_NAME\$request_uri;
+    listen 80;
+    server_name www.$SERVER_NAME $SERVER_NAME;
+    return 301 https://$SERVER_NAME\$request_uri;
 }
+
+
+
+# strip www from url for https requests
+# REF: http://serverfault.com/a/258424/191615
+server {
+    listen 443;
+
+    # REF: https://support.comodo.com/index.php?/Default/Knowledgebase/Article/View/789/37/certificate-installation-nginx
+    ssl on;
+    ssl_certificate /etc/nginx/ssl/m87_ssl_bundle_public.crt;
+    ssl_certificate_key /etc/nginx/ssl/m87_ssl_private_key.pem;
+    #enables SSLv3/TLSv1, but not SSLv2 which is weak and should no longer be used.
+    ssl_protocols SSLv3 TLSv1;
+    #Disables all weak ciphers
+    ssl_ciphers ALL:!aNULL:!ADH:!eNULL:!LOW:!EXP:RC4+RSA:+HIGH:+MEDIUM;
+
+    server_name www.$SERVER_NAME;
+    return 301 https://$SERVER_NAME\$request_uri;
+}
+
+
 
 # the nginx server instance
 server {
-    listen 0.0.0.0:80;
+    listen 443;
+
+    # REF: https://support.comodo.com/index.php?/Default/Knowledgebase/Article/View/789/37/certificate-installation-nginx
+    ssl on;
+    ssl_certificate /etc/nginx/ssl/m87_ssl_bundle_public.crt;
+    ssl_certificate_key /etc/nginx/ssl/m87_ssl_private_key.pem;
+    #enables SSLv3/TLSv1, but not SSLv2 which is weak and should no longer be used.
+    ssl_protocols SSLv3 TLSv1;
+    #Disables all weak ciphers
+    ssl_ciphers ALL:!aNULL:!ADH:!eNULL:!LOW:!EXP:RC4+RSA:+HIGH:+MEDIUM;
 
     server_name $SERVER_NAME;
     access_log /var/log/nginx/$SERVER_NAME.log;
@@ -211,8 +255,11 @@ server {
 
 EOF
 
-    sudo ln -sf /etc/nginx/sites-available/app-$app /etc/nginx/sites-enabled/app-$app
-  done
+      sudo ln -sf /etc/nginx/sites-available/app-$app /etc/nginx/sites-enabled/app-$app
+    done
+
+  fi
+
 
 fi
 

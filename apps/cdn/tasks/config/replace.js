@@ -15,16 +15,16 @@ module.exports = function (grunt) {
       src: ['./userjoy.js'],
       dest: './build/userjoy-prod.js',
       replacements: [{
-        from: 'api.do.localhost',
-        to: 'api.userjoy.co'
+        from: 'http://api.do.localhost',
+        to: 'https://api.userjoy.co'
       }]
     },
     dev: {
       src: ['./userjoy.js'],
       dest: './build/userjoy-dev.js',
       replacements: [{
-        from: 'api.userjoy.co',
-        to: 'api.do.localhost'
+        from: 'https://api.userjoy.co',
+        to: 'http://api.do.localhost'
       }]
     }
   });
