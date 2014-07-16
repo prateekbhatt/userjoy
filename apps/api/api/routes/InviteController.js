@@ -6,6 +6,7 @@ var async = require('async');
 var path = require('path');
 var router = require('express')
   .Router();
+var urljoin = require('url-join');
 
 
 /**
@@ -257,9 +258,9 @@ router
         function sendInviteEmail(invite, cb) {
 
           var inviteId = invite._id.toString();
+          var dashboardUrl = config.hosts.dashboard;
 
-          var inviteUrl = path.join(config.hosts.dashboard, 'apps', aid,
-            'invite',
+          var inviteUrl = urljoin(dashboardUrl, 'apps', aid, 'invite',
             inviteId);
 
           var mailOptions = {
