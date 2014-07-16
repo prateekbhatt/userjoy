@@ -1462,7 +1462,7 @@ describe('Lib query', function () {
 
             _.each(users, function (u) {
               expect(u)
-                .to.have.property('meta')
+                .to.have.property('custom')
                 .that.is.an('object');
             });
 

@@ -51,7 +51,6 @@ var userMailer = require('../api/services/user-mailer');
  */
 
 var appEmail = require('../helpers/app-email');
-var getRenderData = require('../helpers/get-render-data');
 var logger = require('../helpers/logger');
 var QueueError = require('../helpers/queue-error');
 var render = require('../helpers/render-message');
@@ -100,7 +99,10 @@ function saveNotifications(users, amsg, cb) {
     var uid = u._id;
 
     // get locals (user metadata, emails, user_id) for rendering the message body
-    var renderLocals = getRenderData(u);
+    // NOTE: not allowing user custom metadata now
+    var renderLocals = {
+      user: u
+    };
 
     // render the body of the automessage before saving it as a notification
     var renderedBody = render.string(body, renderLocals);
