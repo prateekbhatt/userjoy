@@ -409,7 +409,7 @@ Query.prototype.run = function (cb) {
 
         var users = _.map(self.filteredUsers, function (u) {
           if (u.toJSON) u = u.toJSON();
-          u.meta = metadata.toObject(u.meta);
+          u.custom = metadata.toObject(u.custom);
           return u;
         });
 

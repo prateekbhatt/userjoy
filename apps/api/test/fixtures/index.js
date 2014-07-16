@@ -78,7 +78,8 @@ var accounts = {
       aid: null,
       email: 'prattbhatt@gmail.com',
       status: 'free',
-      meta: [{
+      name: 'Prat',
+      custom: [{
         k: 'name',
         v: 'Prat'
       }]
