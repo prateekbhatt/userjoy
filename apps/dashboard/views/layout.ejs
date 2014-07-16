@@ -4,7 +4,7 @@
         <title>UserJoy</title>
         <!-- Viewport mobile tag for sensible mobile support -->
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-        <link rel="icon" href="favicon.ico" type="image/x-icon">
+        <link rel="icon" href="/favicon.ico" type="image/x-icon">
         <!--
         Stylesheets and Preprocessors
         ==============================
@@ -22,7 +22,7 @@
                 + Use a different or additional preprocessor, like SASS, SCSS or Stylus
         -->
         <!--STYLES-->
-        <link rel="stylesheet" href="min/production.7643af4e.css">
+        <link rel="stylesheet" href="/min/production.7643af4e.css">
         <!--STYLES END-->
         <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
     </head>
@@ -63,8 +63,21 @@
             + Import scripts from other directories
             + Use a different preprocessor, like TypeScript
         -->
+        <script type="text/javascript">
+
+            window.userjoy=window.userjoy||[],window.userjoy.methods=["identify","company","track","page","track_link","track_form"],window.userjoy.factory=function(e){return function(){var t=Array.prototype.slice.call(arguments);return t.unshift(e),window.userjoy.push(t),window.userjoy}};for(var i=0;i < window.userjoy.methods.length;i++){var key=window.userjoy.methods[i];window.userjoy[key]=window.userjoy.factory(key)}window.userjoy.load=function(e){if(!document.getElementById("userjoy-client-js")){window._userjoy_id=e;var t=document.createElement("script");t.type="text/javascript",t.id="userjoy-client-js",t.async=!0,t.src=("https:"===document.location.protocol?"https:":"http:")+"//d1jozu9mugm1h5.cloudfront.net/js/userjoy.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n)}};
+
+
+            if (location.hostname === 'app.userjoy.co') {
+                // production
+                userjoy.load('53b7dfe2ee3fb61c714d510e');
+            } else {
+                userjoy.load('53c6380d5ef20c4d3e3e28b1');
+            }
+
+        </script>
         <!--SCRIPTS-->
-        <script src="min/production.d7c28d09.js"></script>
+        <script src="/min/production.595f25af.js"></script>
         <!--SCRIPTS END-->
     </body>
 </html>
