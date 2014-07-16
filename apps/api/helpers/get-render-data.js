@@ -10,7 +10,7 @@ var _ = require('lodash');
 
 
 /**
- * The 'meta' array must have been converted toObject before calling this function
+ * The 'custom' array must have been converted toObject before calling this function
  * The 'email' and 'user_id' are passed alongwith the all the metadata keys
  *
  * INPUT:
@@ -19,7 +19,7 @@ var _ = require('lodash');
       _id: 42389472398472839,
       user_id: 'prateekbhatt',
       email: 'prattbhatt@gmail.com',
-      meta: {
+      custom: {
         name: 'Prateek',
         status: 'Free',
         amount: 49
@@ -46,18 +46,18 @@ function getRenderData(user) {
     user = user.toJSON();
   }
 
-  var meta = user.meta;
+  var custom = user.custom;
 
-  if (_.isArray(meta)) {
-    throw new Error('getRenderData "user.meta" must be an object');
+  if (_.isArray(custom)) {
+    throw new Error('getRenderData "user.custom" must be an object');
   }
 
-  // add the email and user_id properties to the meta object
-  meta.email = user.email;
-  meta.user_id = user.user_id;
+  // add the email and user_id properties to the custom object
+  custom.email = user.email;
+  custom.user_id = user.user_id;
 
   var locals = {
-    user: meta
+    user: custom
   };
 
   return locals;
