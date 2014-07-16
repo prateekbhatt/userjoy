@@ -20,31 +20,31 @@ describe('Helper get-render-data', function () {
 
     beforeEach(function () {
       user = saved.users.first.toJSON();
-      user.meta = metadata.toObject(user.meta);
+      user.custom = metadata.toObject(user.custom);
 
       output = {
         user: {
-          user_id: user.user_id,
           email: user.email,
-          name: user.meta.name
+          user_id: user.user_id,
+          name: user.custom.name
         }
       }
     });
 
 
-    it('should throw error if user.meta is array, not object', function () {
+    it('should throw error if user.custom is array, not object', function () {
 
       function metaArray() {
         getRenderData({
           email: 'randomemail@example.com',
-          meta: [{
+          custom: [{
             k: 'name',
             v: 'Prateek'
           }]
         })
       }
 
-      expect(metaArray).to.throw('getRenderData "user.meta" must be an object');
+      expect(metaArray).to.throw('getRenderData "user.custom" must be an object');
 
     });
 

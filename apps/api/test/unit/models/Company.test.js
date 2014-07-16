@@ -128,11 +128,17 @@ describe('Model Company', function () {
       });
     });
 
-    it('should create company if company does not exist', function (done) {
+    it('should create company if company does not exist', function (
+      done) {
 
       var newCompany = {
-        name: 'Do Data Do',
-        company_id: 'thisisarandomcompanyid??'
+        name: 'DoDataDo',
+        company_id: 'thisisarandomcompanyid??',
+        custom: {
+          friends: 10,
+          team: 'UJ'
+        },
+        joined: new Date()
       };
 
       Company.findOrCreate(randomId, newCompany, function (err, com) {
@@ -142,8 +148,26 @@ describe('Model Company', function () {
           .to.not.exist;
         expect(com)
           .to.be.ok;
+
+        com.toJSON && (com = com.toJSON());
         expect(com.name)
           .to.eql(newCompany.name);
+
+        expect(com)
+          .to.have.property("custom")
+          .that.is.an("array")
+          .that.eqls([{
+            k: 'friends',
+            v: 10
+          }, {
+            k: 'team',
+            v: 'UJ'
+          }]);
+
+        expect(com)
+          .to.have.property('joined')
+          .that.is.a('date');
+
         done();
       });
 
