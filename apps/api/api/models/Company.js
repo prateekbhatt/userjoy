@@ -72,7 +72,7 @@ var CompanySchema = new Schema({
     required: [true, 'Invalid company id']
   },
 
-  meta: [MetaDataSchema],
+  custom: [MetaDataSchema],
 
 
   name: {
@@ -178,8 +178,8 @@ CompanySchema.statics.findOrCreate = function (aid, company, cb) {
   // add aid to company
   company.aid = aid;
 
-  // format metadata to array
-  company.meta = metadata.toArray(company.meta);
+  // format custom metadata to array
+  company.custom = metadata.toArray(company.custom);
 
   // aid to query
   conditions.aid = aid;

@@ -117,6 +117,9 @@ var UserSchema = new Schema({
   },
 
 
+  custom: [MetaDataSchema],
+
+
   // "Apple iPad" etc.
   device: {
     type: String
@@ -170,9 +173,6 @@ var UserSchema = new Schema({
   lastSession: {
     type: Date
   },
-
-
-  meta: [MetaDataSchema],
 
 
   // name of the user
@@ -306,8 +306,8 @@ UserSchema.statics.findOrCreate = function (aid, user, cb) {
   // add aid to user
   user.aid = aid;
 
-  // format metadata to array
-  user.meta = metadata.toArray(user.meta);
+  // format custom metadata to array
+  user.custom = metadata.toArray(user.custom);
 
   // aid to query
   conditions.aid = aid;
