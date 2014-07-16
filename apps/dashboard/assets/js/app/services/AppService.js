@@ -29,6 +29,13 @@ angular.module('services.AppService', [])
 
     this.setCurrentApp = function (value) {
       defaultApp = value;
+      userjoy.company({
+
+        name: value.name,
+        company_id: value._id,
+        status: 'trial',
+        joined: new Date(value.ct).getTime()
+      });
     }
 
     // return {
