@@ -1,0 +1,29 @@
+<div ng-include src="'/templates/navbar/navbar.html'"></div>
+<div class="row text-center">
+    <div class="btn-group btn-breadcrumb">
+        <button class="btn btn-default" style="cursor:not-allowed">Select Segment</button>
+        <button class="btn btn-default" style="cursor:not-allowed">Compose Message</button>
+        <button class="btn btn-info" style="cursor:not-allowed">Send Test Email</button>
+        <button class="btn btn-default" style="cursor:not-allowed">Make it Live</button>
+    </div>
+</div>
+<br>
+<br>
+<div class="row" style="padding-top: 50px;">
+    <div class="col-md-push-3 col-md-6">
+        <div class="text-center">
+            <label style="font-size: 18px;">Subject: </label>&nbsp;<span ng-bind-html="preview(subject)" class="emailPreview"></span>
+        </div>
+        <div class="message-template" style="min-height: 300px; overflow: auto; max-height: 300px; border: 1px solid #ecf0f1; border-radius: 4px;" >
+            <p ng-bind-html="preview(previewText)"></p>
+        </div>
+    </div>
+    <br>
+    <br>
+    <br>
+</div>
+<div class="col-md-6 col-md-push-3 row" style="padding-left: 24px; padding-right: 0px;">
+    <button type="button" class="btn btn-info btn-block" ng-click="sendTestEmail()" ng-disabled="!enableSendTest" id="sendTestAutoEmail">Send Test Email</button>
+</div>
+<br>
+<br>

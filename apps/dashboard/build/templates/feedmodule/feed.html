@@ -1,0 +1,181 @@
+<div ng-include src="'/templates/navbar/navbar.html'"></div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <i class="fa fa-users fa-5x"></i>
+                        </div>
+                        <div class="col-xs-6 text-right">
+                            <p style="font-size: 50px;">456</p>
+                            <p class="announcement-text">Total Users</p>
+                        </div>
+                    </div>
+                </div>
+                <a href="/users/list">
+                <div class="panel-footer announcement-bottom">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            View All Users
+                        </div>
+                        <div class="col-xs-6 text-right">
+                            <i class="fa fa-arrow-circle-right"></i>
+                        </div>
+                    </div>
+                </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="panel panel-notice" style="background-color: #FCFCDD; border-color: #faebcc;">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <i class="fa fa-user fa-5x"></i>
+                        </div>
+                        <div class="col-xs-6 text-right">
+                            <p style="font-size: 50px;">38</p>
+                            <p class="announcement-text">Users Today</p>
+                        </div>
+                    </div>
+                </div>
+                <a href="/users/list">
+                <div class="panel-footer announcement-bottom">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            View Users today
+                        </div>
+                        <div class="col-xs-6 text-right">
+                            <i class="fa fa-arrow-circle-right"></i>
+                        </div>
+                    </div>
+                </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="panel panel-danger" style="border-color: #ebccd1;">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <i class="fa fa-warning fa-5x"></i>
+                        </div>
+                        <div class="col-xs-6 text-right">
+                            <p style="font-size: 50px;">37</p>
+                            <p class="announcement-text">Risk Users</p>
+                        </div>
+                    </div>
+                </div>
+                <a href="/users/list">
+                <div class="panel-footer announcement-bottom">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            View Risk users
+                        </div>
+                        <div class="col-xs-6 text-right">
+                            <i class="fa fa-arrow-circle-right"></i>
+                        </div>
+                    </div>
+                </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="panel panel-default" >
+                <div class="panel-heading" style="color: #333; background-color: #f5f5f5; border-color: #ddd;">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <i class="fa fa-envelope fa-5x"></i>
+                        </div>
+                        <div class="col-xs-6 text-right">
+                            <p style="font-size: 50px;">57</p>
+                            <p class="announcement-text">New Messages!</p>
+                        </div>
+                    </div>
+                </div>
+                <a ui-sref="message.inbox">
+                <div class="panel-footer announcement-bottom">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            View Inbox
+                        </div>
+                        <div class="col-xs-6 text-right">
+                            <i class="fa fa-arrow-circle-right"></i>
+                        </div>
+                    </div>
+                </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container" style="padding-top: 50px;">
+    <div class="row">
+        <div class="col-sm-5 col-md-5 col-md-offset-1">
+            <div class="panel panel-default" style="height: 200px;">
+                <div class="panel-body">
+                    <p><strong>Highest Pulse Users today</strong></p>
+                    <p></p>
+                    <p></p>
+                    <p></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-5 col-md-5">
+            <div class="panel panel-default" style="height: 200px;">
+                <div class="panel-body">
+                    <p><strong>Lowest Pulse Users today</strong></p>
+                    <p></p>
+                    <p></p>
+                    <p></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4 col-md-5 col-md-offset-1">
+            <div class="panel panel-default" style="height: 200px;">
+                <div class="panel-body">
+                    <p><strong>Most Used Features</strong></p>
+                    <p></p>
+                    <p></p>
+                    <p></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-5 col-md-5">
+            <div class="panel panel-default" style="height: 200px;">
+                <div class="panel-body">
+                    <p><strong>Notes added today</strong></p>
+                    <p></p>
+                    <p></p>
+                    <p></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4 col-md-5 col-md-offset-1">
+            <div class="panel panel-default" style="height: 200px;">
+                <div class="panel-body">
+                    <p><strong>Overall Pulse (Last Month)</strong></p>
+                    <p></p>
+                    <p></p>
+                    <p></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-5 col-md-5">
+            <div class="panel panel-default" style="height: 200px;">
+                <div class="panel-body">
+                    <p><strong>User Pulse Segmentation (Last Month)</strong></p>
+                    <p></p>
+                    <p></p>
+                    <p></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
