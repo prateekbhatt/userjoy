@@ -87,7 +87,7 @@ var MAILGUN_PASS = {
  */
 function getHosts(env, url) {
 
-  var protocol = (env === 'production') ? 'https://' : 'http://';
+  var protocol = (env !== 'production') ? 'http://' : 'https://';
 
   var hosts = {
     website: protocol + url,
