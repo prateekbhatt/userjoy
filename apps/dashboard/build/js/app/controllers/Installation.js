@@ -45,8 +45,8 @@ angular.module('do.install', [])
 
     $scope.installapp = function () {
 
-      $log.info($scope.name);
-      $log.info($scope.url);
+      // $log.info($scope.name);
+      // $log.info($scope.url);
       if ($scope.app_form.$valid) {
 
       } else {
