@@ -138,6 +138,7 @@ describe('Model Company', function () {
           friends: 10,
           team: 'UJ'
         },
+        joined: new Date()
       };
 
       Company.findOrCreate(randomId, newCompany, function (err, com) {
@@ -162,6 +163,11 @@ describe('Model Company', function () {
             k: 'team',
             v: 'UJ'
           }]);
+
+        expect(com)
+          .to.have.property('joined')
+          .that.is.a('date');
+
         done();
       });
 
