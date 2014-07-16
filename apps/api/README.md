@@ -275,8 +275,8 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 - aid
 - company_id (required, similar to user_id)
 - name (required)
-- x meta (object containing additonal info about users)
 - ct (should be passed by js snippet)
+- custom (object containing additonal info about users)
 - ut
 - plan
 - revenue
