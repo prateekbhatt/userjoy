@@ -4,7 +4,7 @@ angular.module('do.automate', [])
   function ($stateProvider) {
     $stateProvider
       .state('automate', {
-        url: '/apps/:id/messages/automate',
+        url: '/apps/:id/automessage',
         views: {
           "main": {
             templateUrl: '/templates/messagesmodule/message.compose.automate.html',
@@ -15,7 +15,7 @@ angular.module('do.automate', [])
 
       })
       .state('automateSegment', {
-        url: '/apps/:id/messages/automate/segments',
+        url: '/apps/:id/automessage/segments',
         views: {
           "main": {
             templateUrl: '/templates/messagesmodule/message.automate.segment.html',
@@ -26,7 +26,7 @@ angular.module('do.automate', [])
 
       })
       .state('automateWrite', {
-        url: '/apps/:id/messages/automate/segments/:sid/write',
+        url: '/apps/:id/automessage/segments/:sid/write',
         views: {
           "main": {
             templateUrl: '/templates/messagesmodule/message.compose.automate.write.html'
@@ -36,7 +36,7 @@ angular.module('do.automate', [])
 
       })
       .state('automateUpdate', {
-        url: '/apps/:id/messages/automate/:mid/update',
+        url: '/apps/:id/automessage/:mid/update',
         views: {
           "main": {
             templateUrl: '/templates/messagesmodule/message.automate.update.html',
@@ -47,7 +47,7 @@ angular.module('do.automate', [])
 
       })
       .state('automateTest', {
-        url: '/apps/:id/messages/automate/test/:mid',
+        url: '/apps/:id/automessage/test/:mid',
         views: {
           "main": {
             templateUrl: '/templates/messagesmodule/message.automate.test.email.html',
@@ -58,7 +58,7 @@ angular.module('do.automate', [])
 
       })
       .state('automateLive', {
-        url: '/apps/:id/messages/automate/live/:mid',
+        url: '/apps/:id/automessage/live/:mid',
         views: {
           "main": {
             templateUrl: '/templates/messagesmodule/message.automate.live.html',
@@ -69,7 +69,7 @@ angular.module('do.automate', [])
 
       })
       .state('automateStatus', {
-        url: '/apps/:id/messages/automate/status/:mid',
+        url: '/apps/:id/automessage/status/:mid',
         views: {
           "main": {
             templateUrl: '/templates/messagesmodule/message.automate.status.html',
@@ -80,7 +80,7 @@ angular.module('do.automate', [])
 
       })
       .state('automateUpdateTest', {
-        url: '/apps/:id/messages/automate/update/test/:mid',
+        url: '/apps/:id/automessage/update/test/:mid',
         views: {
           "main": {
             templateUrl: '/templates/messagesmodule/message.automate.update.test.email.html',
@@ -160,7 +160,7 @@ angular.module('do.automate', [])
 
         $scope.showAutoMsg = function (index) {
           $location.path('/apps/' + $scope.currApp +
-            '/messages/automate/' + $scope.automessages[
+            '/automessage/' + $scope.automessages[
               index].id + '/update');
         }
 
@@ -171,7 +171,8 @@ angular.module('do.automate', [])
                 console.log("error");
                 return;
               }
-              console.log("$scope.automessages:", $scope.automessages, index);
+              console.log("$scope.automessages:", $scope.automessages,
+                index);
               $scope.automessages[index].message =
                 'Deactivate';
             });
@@ -184,7 +185,8 @@ angular.module('do.automate', [])
                   console.log("error");
                   return;
                 }
-                console.log("$scope.automessages:", $scope.automessages, index);
+                console.log("$scope.automessages:", $scope.automessages,
+                  index);
                 $scope.automessages[index].message =
                   'Activate';
               });
@@ -193,7 +195,7 @@ angular.module('do.automate', [])
 
         $scope.editAutoMessage = function (id, index) {
           $location.path('/apps/' + $scope.currApp +
-            '/messages/automate/' + id + '/update');
+            '/automessage/' + id + '/update');
           // modelsAutomate.editAutoMsg($scope.currApp, id, index);
         }
 
@@ -739,7 +741,7 @@ angular.module('do.automate', [])
 
           $scope.showText = function (htmlVariable) {
             console.log($scope.htmlVariable);
-            if($scope.notificationBody) {
+            if ($scope.notificationBody) {
               var checkMsgLengthText = $scope.
               notificationBody.replace(/<(?:.|\n)*?>/gm, '')
                 .replace(/&#34;/g, '"')
@@ -1261,7 +1263,7 @@ angular.module('do.automate', [])
         }
         $scope.enableSendTest = true;
         $location.path('/apps/' + $scope.currApp +
-          '/messages/automate/live/' + $scope.msgId);
+          '/automessage/live/' + $scope.msgId);
       }
 
       $scope.preview = function (string) {
@@ -1614,7 +1616,7 @@ angular.module('do.automate', [])
         showAutoMsgCallback);
 
       $scope.goToAutoMessages = function () {
-        $location.path('/apps/' + $scope.currApp + '/messages/automate');
+        $location.path('/apps/' + $scope.currApp + '/automessage');
       }
 
       var callbackMakeLive = function (err) {
@@ -1723,11 +1725,11 @@ angular.module('do.automate', [])
         modelsAutomate.deActivateMsg($scope.currApp,
           $scope.msgId);
         $scope.msgStatus = 'Make it Live';
-        $location.path('/apps/' + $scope.currApp + '/messages/automate');
+        $location.path('/apps/' + $scope.currApp + '/automessage');
       } else {
         modelsAutomate.makeMsgLive($scope.currApp, $scope.msgId);
         $scope.msgStatus = 'Deactivate this Message';
-        $location.path('/apps/' + $scope.currApp + '/messages/automate');
+        $location.path('/apps/' + $scope.currApp + '/automessage');
       }
     }
 
@@ -1739,8 +1741,9 @@ angular.module('do.automate', [])
 
 .controller('updateTestMsgCtrl', ['$scope', 'saveMsgService', 'modelsAutomate',
   'AppService', 'AutoMsgService', '$stateParams', '$location', 'AppModel',
+  '$rootScope', '$timeout',
   function ($scope, saveMsgService, modelsAutomate, AppService,
-    AutoMsgService, $stateParams, $location, AppModel) {
+    AutoMsgService, $stateParams, $location, AppModel, $rootScope, $timeout) {
     $scope.enableSendTest = true;
     $scope.currApp = $stateParams.id;
     $scope.msgId = $stateParams.mid;
@@ -1762,7 +1765,7 @@ angular.module('do.automate', [])
       }
 
       $scope.goToAutoMessages = function () {
-        $location.path('/apps/' + $scope.currApp + '/messages/automate');
+        $location.path('/apps/' + $scope.currApp + '/automessage');
       }
 
       modelsAutomate.getSingleAutoMsg($scope.currApp, $scope.msgId,
