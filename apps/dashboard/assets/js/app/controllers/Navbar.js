@@ -40,6 +40,11 @@ angular.module('do.navbar', [])
           return path === location;
         }
 
+        $scope.isAutoMessageActive = function (path) {
+          var location = $location.path.split('/')[4];
+          return path === location;
+        }
+
         $scope.showDropdown = function () {
           $scope.visibleDropdown = true;
         };
@@ -49,18 +54,6 @@ angular.module('do.navbar', [])
 
         $scope.appId = $location.path()
           .split("/")[2];
-        //        if ($location.path()
-        //          .split("/")[2] != 'settings') {
-        //          AppService.setAppId($scope.appId);
-        //        } else {
-        //          $scope.appId = AppService.getAppId();
-        //        }
-        // console.log("app id after refreshing: ", $scope.appId);
-        //        if ($scope.appId == null || $scope.appId == '') {
-        //          console.log("app ID is null")
-        //          $scope.appId = currentApp[0]._id;
-        //          AppService.setAppId(currentApp[0]._id);
-        //        }
 
         var callback = function () {
           var appsconnected;
@@ -160,6 +153,14 @@ angular.module('do.navbar', [])
             }
           }
 
+          $scope.goToAutoMessages = function () {
+            if(AppService.getCurrentApp().isActive) {
+              $location.path('/apps/' + $scope.appId + '/automessage');
+            } else {
+              $location.path('/apps/' + $scope.appId + '/addcode');
+            }
+          }
+
           $scope.changeUrl = function () {
             // $log.info("inside settings changeUrl");
             $location.path('/settings/profile');
@@ -248,6 +249,8 @@ angular.module('do.navbar', [])
           var location = $location.path().split('/')[4];
           return path === location;
         }
+
+
 
         $scope.logoutFirstTimeOnboarding = function () {
           AuthService.logout();
