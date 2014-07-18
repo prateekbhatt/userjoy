@@ -54329,7 +54329,7 @@ angular.module('do.automate', [])
   function ($stateProvider) {
     $stateProvider
       .state('automate', {
-        url: '/apps/:id/messages/automate',
+        url: '/apps/:id/automessage',
         views: {
           "main": {
             templateUrl: '/templates/messagesmodule/message.compose.automate.html',
@@ -54340,7 +54340,7 @@ angular.module('do.automate', [])
 
       })
       .state('automateSegment', {
-        url: '/apps/:id/messages/automate/segments',
+        url: '/apps/:id/automessage/segments',
         views: {
           "main": {
             templateUrl: '/templates/messagesmodule/message.automate.segment.html',
@@ -54351,7 +54351,7 @@ angular.module('do.automate', [])
 
       })
       .state('automateWrite', {
-        url: '/apps/:id/messages/automate/segments/:sid/write',
+        url: '/apps/:id/automessage/segments/:sid/write',
         views: {
           "main": {
             templateUrl: '/templates/messagesmodule/message.compose.automate.write.html'
@@ -54361,7 +54361,7 @@ angular.module('do.automate', [])
 
       })
       .state('automateUpdate', {
-        url: '/apps/:id/messages/automate/:mid/update',
+        url: '/apps/:id/automessage/:mid/update',
         views: {
           "main": {
             templateUrl: '/templates/messagesmodule/message.automate.update.html',
@@ -54372,7 +54372,7 @@ angular.module('do.automate', [])
 
       })
       .state('automateTest', {
-        url: '/apps/:id/messages/automate/test/:mid',
+        url: '/apps/:id/automessage/test/:mid',
         views: {
           "main": {
             templateUrl: '/templates/messagesmodule/message.automate.test.email.html',
@@ -54383,7 +54383,7 @@ angular.module('do.automate', [])
 
       })
       .state('automateLive', {
-        url: '/apps/:id/messages/automate/live/:mid',
+        url: '/apps/:id/automessage/live/:mid',
         views: {
           "main": {
             templateUrl: '/templates/messagesmodule/message.automate.live.html',
@@ -54394,7 +54394,7 @@ angular.module('do.automate', [])
 
       })
       .state('automateStatus', {
-        url: '/apps/:id/messages/automate/status/:mid',
+        url: '/apps/:id/automessage/status/:mid',
         views: {
           "main": {
             templateUrl: '/templates/messagesmodule/message.automate.status.html',
@@ -54405,7 +54405,7 @@ angular.module('do.automate', [])
 
       })
       .state('automateUpdateTest', {
-        url: '/apps/:id/messages/automate/update/test/:mid',
+        url: '/apps/:id/automessage/update/test/:mid',
         views: {
           "main": {
             templateUrl: '/templates/messagesmodule/message.automate.update.test.email.html',
@@ -54485,7 +54485,7 @@ angular.module('do.automate', [])
 
         $scope.showAutoMsg = function (index) {
           $location.path('/apps/' + $scope.currApp +
-            '/messages/automate/' + $scope.automessages[
+            '/automessage/' + $scope.automessages[
               index].id + '/update');
         }
 
@@ -54496,7 +54496,8 @@ angular.module('do.automate', [])
                 console.log("error");
                 return;
               }
-              console.log("$scope.automessages:", $scope.automessages, index);
+              console.log("$scope.automessages:", $scope.automessages,
+                index);
               $scope.automessages[index].message =
                 'Deactivate';
             });
@@ -54509,7 +54510,8 @@ angular.module('do.automate', [])
                   console.log("error");
                   return;
                 }
-                console.log("$scope.automessages:", $scope.automessages, index);
+                console.log("$scope.automessages:", $scope.automessages,
+                  index);
                 $scope.automessages[index].message =
                   'Activate';
               });
@@ -54518,7 +54520,7 @@ angular.module('do.automate', [])
 
         $scope.editAutoMessage = function (id, index) {
           $location.path('/apps/' + $scope.currApp +
-            '/messages/automate/' + id + '/update');
+            '/automessage/' + id + '/update');
           // modelsAutomate.editAutoMsg($scope.currApp, id, index);
         }
 
@@ -54999,10 +55001,13 @@ angular.module('do.automate', [])
             if ($scope.showNotification) {
               if ($scope.notificationBody) {
                 var checkMsgLengthText = $scope.
-                notificationBody.replace(/<(?:.|\n)*?>/gm, '');
+                notificationBody.replace(/<(?:.|\n)*?>/gm, '')
+                  .replace(/&#34;/g, '"')
+                  .replace(/&#160;/g, ' ');
                 console.log("notification characters: ",
                   checkMsgLengthText);
                 var checkMsgLength = checkMsgLengthText.length;
+                console.log("checkMsgLength: ", checkMsgLength);
                 if (checkMsgLength > 250) {
                   $rootScope.error = true;
                   $rootScope.errMsgRootScope =
@@ -55064,7 +55069,7 @@ angular.module('do.automate', [])
 
           $scope.showText = function (htmlVariable) {
             console.log($scope.htmlVariable);
-            if($scope.notificationBody) {
+            if ($scope.notificationBody) {
               var checkMsgLengthText = $scope.
               notificationBody.replace(/<(?:.|\n)*?>/gm, '')
                 .replace(/&#34;/g, '"')
@@ -55441,7 +55446,9 @@ angular.module('do.automate', [])
         $scope.updateMessage = function () {
           if ($scope.showNotification) {
             var checkMsgLengthText = $scope.
-            notificationBody.replace(/<(?:.|\n)*?>/gm, '');
+            notificationBody.replace(/<(?:.|\n)*?>/gm, '')
+              .replace(/&#34;/g, '"')
+              .replace(/&#160;/g, ' ');
             console.log("notification characters: ", checkMsgLengthText);
             var checkMsgLength = checkMsgLengthText.length;
             if (checkMsgLength > 250) {
@@ -55586,7 +55593,7 @@ angular.module('do.automate', [])
         }
         $scope.enableSendTest = true;
         $location.path('/apps/' + $scope.currApp +
-          '/messages/automate/live/' + $scope.msgId);
+          '/automessage/live/' + $scope.msgId);
       }
 
       $scope.preview = function (string) {
@@ -55939,7 +55946,7 @@ angular.module('do.automate', [])
         showAutoMsgCallback);
 
       $scope.goToAutoMessages = function () {
-        $location.path('/apps/' + $scope.currApp + '/messages/automate');
+        $location.path('/apps/' + $scope.currApp + '/automessage');
       }
 
       var callbackMakeLive = function (err) {
@@ -56048,11 +56055,11 @@ angular.module('do.automate', [])
         modelsAutomate.deActivateMsg($scope.currApp,
           $scope.msgId);
         $scope.msgStatus = 'Make it Live';
-        $location.path('/apps/' + $scope.currApp + '/messages/automate');
+        $location.path('/apps/' + $scope.currApp + '/automessage');
       } else {
         modelsAutomate.makeMsgLive($scope.currApp, $scope.msgId);
         $scope.msgStatus = 'Deactivate this Message';
-        $location.path('/apps/' + $scope.currApp + '/messages/automate');
+        $location.path('/apps/' + $scope.currApp + '/automessage');
       }
     }
 
@@ -56064,8 +56071,9 @@ angular.module('do.automate', [])
 
 .controller('updateTestMsgCtrl', ['$scope', 'saveMsgService', 'modelsAutomate',
   'AppService', 'AutoMsgService', '$stateParams', '$location', 'AppModel',
+  '$rootScope', '$timeout',
   function ($scope, saveMsgService, modelsAutomate, AppService,
-    AutoMsgService, $stateParams, $location, AppModel) {
+    AutoMsgService, $stateParams, $location, AppModel, $rootScope, $timeout) {
     $scope.enableSendTest = true;
     $scope.currApp = $stateParams.id;
     $scope.msgId = $stateParams.mid;
@@ -56087,7 +56095,7 @@ angular.module('do.automate', [])
       }
 
       $scope.goToAutoMessages = function () {
-        $location.path('/apps/' + $scope.currApp + '/messages/automate');
+        $location.path('/apps/' + $scope.currApp + '/automessage');
       }
 
       modelsAutomate.getSingleAutoMsg($scope.currApp, $scope.msgId,
@@ -56701,6 +56709,33 @@ angular.module('do.message', [])
             $scope.showTable = true;
           }
 
+          $scope.goToOpenMsg = function () {
+            $location.path('/apps/' + $stateParams.id + '/messages/open');
+          }
+
+          $scope.goToUnreadMsg = function () {
+            $location.path('/apps/' + $stateParams.id + '/messages/unread');
+          }
+
+          $scope.goToClosedMsg = function () {
+            $location.path('/apps/' + $stateParams.id + '/messages/closed');
+          }
+
+          $scope.goToGoodHealth = function () {
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/goodhealth');
+          }
+
+          $scope.goToAvgHealth = function () {
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/avghealth');
+          }
+
+          $scope.goToPoorHealth = function () {
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/poorhealth');
+          }
+
           $scope.pageNo = '';
           $scope.pageCount = '';
 
@@ -56993,6 +57028,33 @@ angular.module('do.message', [])
 
 
         var populatePage = function () {
+
+          $scope.goToOpenMsg = function () {
+            $location.path('/apps/' + $stateParams.id + '/messages/open');
+          }
+
+          $scope.goToUnreadMsg = function () {
+            $location.path('/apps/' + $stateParams.id + '/messages/unread');
+          }
+
+          $scope.goToClosedMsg = function () {
+            $location.path('/apps/' + $stateParams.id + '/messages/closed');
+          }
+
+          $scope.goToGoodHealth = function () {
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/goodhealth');
+          }
+
+          $scope.goToAvgHealth = function () {
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/avghealth');
+          }
+
+          $scope.goToPoorHealth = function () {
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/poorhealth');
+          }
           $scope.unreadmsg = [];
           var msg = [];
           var populateUnreadMsg = function () {
@@ -57152,15 +57214,15 @@ angular.module('do.message', [])
                 });
             } else {
               MsgService.reopenConversation($scope.currApp, coId,
-              function (err, user) {
-                if (err) {
-                  console.log("error");
-                  return;
-                }
-                console.log("changing buttontext to close");
-                $scope.unreadmsg[index].buttonText = 'Close';
-                $scope.unreadmsg[index].close = false;
-              });
+                function (err, user) {
+                  if (err) {
+                    console.log("error");
+                    return;
+                  }
+                  console.log("changing buttontext to close");
+                  $scope.unreadmsg[index].buttonText = 'Close';
+                  $scope.unreadmsg[index].close = false;
+                });
             }
           }
 
@@ -57365,7 +57427,7 @@ angular.module('do.message', [])
 
             $scope.individualCustomer = userEmail;
             $scope.subject = msgThread.sub;
-            if(msgThread.amId) {
+            if (msgThread.amId) {
               $scope.isAutoMessage = true;
             } else {
               $scope.isAutoMessage = false;
@@ -57374,8 +57436,9 @@ angular.module('do.message', [])
             for (var i = 0; i < msgThread.messages.length; i++) {
               var m = msgThread.messages[i];
               var isSeen = false;
+              var mBody = m.body.replace(/\\r\\n/g, '<br/>');
               var mObj = {
-                messagebody: m.body,
+                messagebody: mBody,
                 createdat: $moment(m.ct)
                   .fromNow(),
                 seen: isSeen,
@@ -57637,9 +57700,9 @@ angular.module('do.message', [])
 
             var size = size || 80;
             console.log("gravatar image: ",
-              'http://www.gravatar.com/avatar/' + MD5(email) +
+              'https://www.gravatar.com/avatar/' + MD5(email) +
               '.jpg?d=404');
-            return 'http://www.gravatar.com/avatar/' + MD5(email) +
+            return 'https://www.gravatar.com/avatar/' + MD5(email) +
               '.jpg?d=404';
           }
 
@@ -57930,7 +57993,8 @@ angular.module('do.message', [])
               return;
             }
             if (ThreadService.getReply) {
-              $scope.replytextInDiv = $scope.replytext;
+              $scope.replytextInDiv = $scope.replytext.replace(/\r/g,
+                '');
               $scope.replytext = '';
               console.log("pushing msg");
               $scope.replies.push({
@@ -57982,7 +58046,9 @@ angular.module('do.message', [])
             if ($scope.replytext.length > 0) {
               console.log("reply button clicked and validated");
               $scope.replyButtonClicked = true;
-              var sanitizedReply = $scope.replytext.replace(/\n/g, '<br/>');
+              var sanitizedReply = $scope.replytext.replace(/\n/g, '<br/>')
+                .replace(/\r/g, '');
+              console.log("sanitized reply: ", sanitizedReply);
               MsgService.replyToMsg($scope.appId, $scope.coId,
                 sanitizedReply,
                 AccountService.get()
@@ -58001,7 +58067,8 @@ angular.module('do.message', [])
               if ($scope.replytext.length > 0) {
                 $scope.replyButtonClicked = true;
                 $scope.replytextInDiv = $scope.replytext.replace(/\n/g,
-                  '<br/>');
+                  '<br/>')
+                  .replace(/\r/g, '');
                 MsgService.replyToMsg($scope.appId, $scope.coId, $scope.replytextInDiv,
                   AccountService.get()
                   ._id, closeOrReopenReplyCallBack);
@@ -58075,6 +58142,34 @@ angular.module('do.message', [])
         var msg = [];
 
         var populatePage = function () {
+
+          $scope.goToOpenMsg = function () {
+            $location.path('/apps/' + $stateParams.id + '/messages/open');
+          }
+
+          $scope.goToUnreadMsg = function () {
+            $location.path('/apps/' + $stateParams.id + '/messages/unread');
+          }
+
+          $scope.goToClosedMsg = function () {
+            $location.path('/apps/' + $stateParams.id + '/messages/closed');
+          }
+
+          $scope.goToGoodHealth = function () {
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/goodhealth');
+          }
+
+          $scope.goToAvgHealth = function () {
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/avghealth');
+          }
+
+          $scope.goToPoorHealth = function () {
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/poorhealth');
+          }
+
           function showClosedMsg() {
             $scope.closedmsg = [];
             msg = InboxMsgService.getClosedMessage();
@@ -58290,6 +58385,34 @@ angular.module('do.message', [])
         // }
 
         var populatePage = function () {
+
+          $scope.goToOpenMsg = function () {
+            $location.path('/apps/' + $stateParams.id + '/messages/open');
+          }
+
+          $scope.goToUnreadMsg = function () {
+            $location.path('/apps/' + $stateParams.id + '/messages/unread');
+          }
+
+          $scope.goToClosedMsg = function () {
+            $location.path('/apps/' + $stateParams.id + '/messages/closed');
+          }
+
+          $scope.goToGoodHealth = function () {
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/goodhealth');
+          }
+
+          $scope.goToAvgHealth = function () {
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/avghealth');
+          }
+
+          $scope.goToPoorHealth = function () {
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/poorhealth');
+          }
+
           function showGoodHealthMsg(msg) {
             if (msg.length == 0) {
               $scope.showGoodHealthConversations = false;
@@ -58472,6 +58595,34 @@ angular.module('do.message', [])
         var msg = [];
 
         var populatePage = function () {
+
+          $scope.goToOpenMsg = function () {
+            $location.path('/apps/' + $stateParams.id + '/messages/open');
+          }
+
+          $scope.goToUnreadMsg = function () {
+            $location.path('/apps/' + $stateParams.id + '/messages/unread');
+          }
+
+          $scope.goToClosedMsg = function () {
+            $location.path('/apps/' + $stateParams.id + '/messages/closed');
+          }
+
+          $scope.goToGoodHealth = function () {
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/goodhealth');
+          }
+
+          $scope.goToAvgHealth = function () {
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/avghealth');
+          }
+
+          $scope.goToPoorHealth = function () {
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/poorhealth');
+          }
+
           function showAvgHealthMsg(msg) {
             $scope.avghealthmsg = [];
             $scope.averageHealthMsg = msg
@@ -58745,6 +58896,34 @@ angular.module('do.message', [])
         // }
 
         var populatePage = function () {
+
+          $scope.goToOpenMsg = function () {
+            $location.path('/apps/' + $stateParams.id + '/messages/open');
+          }
+
+          $scope.goToUnreadMsg = function () {
+            $location.path('/apps/' + $stateParams.id + '/messages/unread');
+          }
+
+          $scope.goToClosedMsg = function () {
+            $location.path('/apps/' + $stateParams.id + '/messages/closed');
+          }
+
+          $scope.goToGoodHealth = function () {
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/goodhealth');
+          }
+
+          $scope.goToAvgHealth = function () {
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/avghealth');
+          }
+
+          $scope.goToPoorHealth = function () {
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/poorhealth');
+          }
+
           function showPoorHealthMsg(msg) {
             $scope.poorhealthmsg = [];
             $scope.poorHealthMsgView = msg
@@ -58945,6 +59124,11 @@ angular.module('do.navbar', [])
           return path === location;
         }
 
+        $scope.isAutoMessageActive = function (path) {
+          var location = $location.path.split('/')[4];
+          return path === location;
+        }
+
         $scope.showDropdown = function () {
           $scope.visibleDropdown = true;
         };
@@ -58954,18 +59138,6 @@ angular.module('do.navbar', [])
 
         $scope.appId = $location.path()
           .split("/")[2];
-        //        if ($location.path()
-        //          .split("/")[2] != 'settings') {
-        //          AppService.setAppId($scope.appId);
-        //        } else {
-        //          $scope.appId = AppService.getAppId();
-        //        }
-        // console.log("app id after refreshing: ", $scope.appId);
-        //        if ($scope.appId == null || $scope.appId == '') {
-        //          console.log("app ID is null")
-        //          $scope.appId = currentApp[0]._id;
-        //          AppService.setAppId(currentApp[0]._id);
-        //        }
 
         var callback = function () {
           var appsconnected;
@@ -59065,6 +59237,14 @@ angular.module('do.navbar', [])
             }
           }
 
+          $scope.goToAutoMessages = function () {
+            if(AppService.getCurrentApp().isActive) {
+              $location.path('/apps/' + $scope.appId + '/automessage');
+            } else {
+              $location.path('/apps/' + $scope.appId + '/addcode');
+            }
+          }
+
           $scope.changeUrl = function () {
             // $log.info("inside settings changeUrl");
             $location.path('/settings/profile');
@@ -59153,6 +59333,8 @@ angular.module('do.navbar', [])
           var location = $location.path().split('/')[4];
           return path === location;
         }
+
+
 
         $scope.logoutFirstTimeOnboarding = function () {
           AuthService.logout();
@@ -62381,9 +62563,9 @@ angular.module('do.users', [])
 
             var size = size || 80;
             console.log("gravatar image: ",
-              'http://www.gravatar.com/avatar/' + MD5(email) +
+              'https://www.gravatar.com/avatar/' + MD5(email) +
               '.jpg?d=404');
-            return 'http://www.gravatar.com/avatar/' + MD5(email) +
+            return 'https://www.gravatar.com/avatar/' + MD5(email) +
               '.jpg?d=404';
           }
 
@@ -63727,12 +63909,12 @@ angular.module('models.automate', ['services'])
           AutoMsgService.setSingleAutoMsg(response.automessage);
           if (data.type === "email") {
             $location.path('/apps/' + appId +
-              '/messages/automate/test/' + response.automessage._id);
+              '/automessage/test/' + response.automessage._id);
           }
 
           if (data.type === 'notification') {
             $location.path('/apps/' + appId +
-              '/messages/automate/live/' + response.automessage._id);
+              '/automessage/live/' + response.automessage._id);
           }
         })
         .error(function (err) {
@@ -63794,10 +63976,10 @@ angular.module('models.automate', ['services'])
           console.log("success: ", data);
           if (data.automessage.type === "email") {
             $location.path('/apps/' + appId +
-              '/messages/automate/update/test/' + data.automessage._id);
+              '/automessage/update/test/' + data.automessage._id);
           }
           if (data.automessage.type === "notification") {
-            $location.path('/apps/' + appId + '/messages/automate');
+            $location.path('/apps/' + appId + '/automessage');
           }
         })
         .error(function () {
