@@ -23,7 +23,7 @@ var cssFilesToInject = [
   // e.g. 'bower_components/bootstrap/dist/css/bootstrap.css',
   'bower_components/ng-table/ng-table.css',
 
-  'bower_components/font-awesome/css/font-awesome.css',
+  // 'bower_components/font-awesome/css/font-awesome.css',
 
   'bower_components/angular-motion/dist/angular-motion.min.css',
 

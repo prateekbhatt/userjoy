@@ -38,8 +38,15 @@
                         Messages
                         </a>
                     </li>
+                    <li>
+                        <a ng-click="goToAutoMessages()" ng-class="{'active': isActive('automessage')}" style="cursor: pointer;" id="automessages">
+                        <i class="fa fa-bullhorn">
+                        </i>
+                        Auto Messages
+                        </a>
+                    </li>
                 </ul>
-                <div class="col-md-5 col-md-push-1" style="margin-top: 15px;">
+                <div class="col-md-5" style="margin-top: 15px;">
                     <div class="alert alert-success text-center" style="padding: 3px; border-color: #30b661; margin-bottom: 0px; position: absolute; width: 500px;" ng-show="success">{{successMsgRootScope}}</div>
                     <div class="alert alert-danger text-center" style="padding: 3px; border-color: #c0392b; margin-bottom: 0px; position: absolute; width: 500px;" ng-show="error">{{errMsgRootScope}}</div>
                 </div>

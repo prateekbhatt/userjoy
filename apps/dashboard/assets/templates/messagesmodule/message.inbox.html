@@ -8,17 +8,17 @@
                     <div id="sidebar-wrapper-settings">
                         <ul class="sidebar-nav">
                             <li class="active">
-                                <a href="/apps/{{currApp}}/messages/open" ng-click="showTableInbox()"><i class="fa fa-inbox"></i> Open Messages</a>
+                                <a ng-click="goToOpenMsg()" style="cursor: pointer;"><i class="fa fa-inbox"></i> Open Messages</a>
                             </li>
                             <li>
-                                <a href="/apps/{{currApp}}/messages/unread"><i class="fa fa-exclamation"></i>&nbsp; Unread Messages</a>
+                                <a ng-click="goToUnreadMsg()" style="cursor: pointer;"><i class="fa fa-exclamation"></i>&nbsp; Unread Messages</a>
                             </li>
                             <li>
-                                <a href="/apps/{{currApp}}/messages/closed"><i class="fa fa-check"></i>&nbsp; Closed Messages</a>
+                                <a ng-click="goToClosedMsg()" style="cursor: pointer;"><i class="fa fa-check"></i>&nbsp; Closed Messages</a>
                             </li>
-                            <li>
+                            <!-- <li>
                                 <a href="/apps/{{currApp}}/messages/automate"><i class="fa fa-edit"></i> Automate Messages </a>
-                            </li>
+                            </li> -->
                            <!--  <li>
                                 <a ui-sref="message.template"><span class="glyphicon glyphicon-list-alt"></span> Choose Templates</a>
                             </li> -->
@@ -27,7 +27,7 @@
                                 <ul style="list-style: none;">
                                     <li>
                                         <div class="progress" style="margin-left: 10px;">
-                                            <a href="/apps/{{currApp}}/messages/goodhealth" style="cursor: pointer">
+                                            <a style="cursor: pointer" ng-click="goToGoodHealth()">
                                             <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #5cb85c;">
                                                 <span class="progress-type pull-left"><strong>Good Health</strong></span>
                                             </div>
@@ -36,7 +36,7 @@
                                     </li>
                                     <li>
                                         <div class="progress" style="margin-left: 10px;">
-                                            <a href="/apps/{{currApp}}/messages/avghealth" style="cursor: pointer">
+                                            <a style="cursor: pointer" ng-click="goToAvgHealth()">
                                             <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #428bca;">
                                                 <span class="progress-type pull-left"><strong>Average Health</strong></span>
                                             </div>
@@ -45,7 +45,7 @@
                                     </li>
                                     <li>
                                         <div class="progress" style="margin-left: 10px;">
-                                            <a href="/apps/{{currApp}}/messages/poorhealth" style="cursor: pointer">
+                                            <a style="cursor: pointer" ng-click="goToPoorHealth()">
                                             <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #d9534f;">
                                                 <span class="progress-type pull-left"><strong>Poor Health</strong></span>
                                             </div>
