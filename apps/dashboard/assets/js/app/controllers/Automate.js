@@ -676,10 +676,13 @@ angular.module('do.automate', [])
             if ($scope.showNotification) {
               if ($scope.notificationBody) {
                 var checkMsgLengthText = $scope.
-                notificationBody.replace(/<(?:.|\n)*?>/gm, '');
+                notificationBody.replace(/<(?:.|\n)*?>/gm, '')
+                  .replace(/&#34;/g, '"')
+                  .replace(/&#160;/g, ' ');
                 console.log("notification characters: ",
                   checkMsgLengthText);
                 var checkMsgLength = checkMsgLengthText.length;
+                console.log("checkMsgLength: ", checkMsgLength);
                 if (checkMsgLength > 250) {
                   $rootScope.error = true;
                   $rootScope.errMsgRootScope =
@@ -1118,7 +1121,9 @@ angular.module('do.automate', [])
         $scope.updateMessage = function () {
           if ($scope.showNotification) {
             var checkMsgLengthText = $scope.
-            notificationBody.replace(/<(?:.|\n)*?>/gm, '');
+            notificationBody.replace(/<(?:.|\n)*?>/gm, '')
+              .replace(/&#34;/g, '"')
+              .replace(/&#160;/g, ' ');
             console.log("notification characters: ", checkMsgLengthText);
             var checkMsgLength = checkMsgLengthText.length;
             if (checkMsgLength > 250) {
