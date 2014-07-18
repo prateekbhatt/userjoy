@@ -33,12 +33,12 @@ angular.module('models.automate', ['services'])
           AutoMsgService.setSingleAutoMsg(response.automessage);
           if (data.type === "email") {
             $location.path('/apps/' + appId +
-              '/messages/automate/test/' + response.automessage._id);
+              '/automessage/test/' + response.automessage._id);
           }
 
           if (data.type === 'notification') {
             $location.path('/apps/' + appId +
-              '/messages/automate/live/' + response.automessage._id);
+              '/automessage/live/' + response.automessage._id);
           }
         })
         .error(function (err) {
@@ -100,10 +100,10 @@ angular.module('models.automate', ['services'])
           console.log("success: ", data);
           if (data.automessage.type === "email") {
             $location.path('/apps/' + appId +
-              '/messages/automate/update/test/' + data.automessage._id);
+              '/automessage/update/test/' + data.automessage._id);
           }
           if (data.automessage.type === "notification") {
-            $location.path('/apps/' + appId + '/messages/automate');
+            $location.path('/apps/' + appId + '/automessage');
           }
         })
         .error(function () {
