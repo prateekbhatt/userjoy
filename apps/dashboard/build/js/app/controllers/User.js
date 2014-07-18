@@ -2223,9 +2223,9 @@ angular.module('do.users', [])
 
             var size = size || 80;
             console.log("gravatar image: ",
-              'http://www.gravatar.com/avatar/' + MD5(email) +
+              'https://www.gravatar.com/avatar/' + MD5(email) +
               '.jpg?d=404');
-            return 'http://www.gravatar.com/avatar/' + MD5(email) +
+            return 'https://www.gravatar.com/avatar/' + MD5(email) +
               '.jpg?d=404';
           }
 
