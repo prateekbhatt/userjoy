@@ -70,7 +70,7 @@
 
                         </div>
                         <div class="col-md-9" style="overflow: auto;">
-                            <p ng-bind-html="message.messagebody | newlines">
+                            <p ng-bind-html="message.messagebody | newlines | unsafe">
                             </p>
                         </div>
                     </div>
@@ -100,7 +100,7 @@
                                 </em>
                             </div>
                             <div class="col-md-9" style="overflow: auto;">
-                                <p value="reply.body" ng-bind-html="reply.body | newlines">
+                                <p value="reply.body" ng-bind-html="reply.body | newlines | unsafe">
                                 </p>
                             </div>
                         </div>
