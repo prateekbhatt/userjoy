@@ -53895,11 +53895,13 @@ var app = angular.module('dodatado', [
   }
 })
 
-.filter('unsafe', function ($sce) {
-  return function (val) {
-    return $sce.trustAsHtml(val);
+.filter('unsafe', ['$sce',
+  function ($sce) {
+    return function (val) {
+      return $sce.trustAsHtml(val);
+    }
   }
-})
+])
 
 .config(['$stateProvider', '$urlRouterProvider',
   '$locationProvider', '$httpProvider', '$provide', '$momentProvider',
