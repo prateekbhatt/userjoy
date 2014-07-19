@@ -134,16 +134,16 @@ describe('Model DailyReport', function () {
 
             for (var i = 1; i <= daysInMonth; i++) {
 
-              // all other dates should be initialized to 0
+              // all other dates should be initialized to null
               if (i === date) {
                 continue;
               }
 
               expect(report)
-                .to.have.property('du_' + i);
+                .to.have.property('du_' + i, null);
 
               expect(report)
-                .to.have.property('ds_' + i);
+                .to.have.property('ds_' + i, null);
 
             };
 

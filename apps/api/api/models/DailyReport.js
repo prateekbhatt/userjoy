@@ -161,8 +161,8 @@ DailyReportSchema.statics.upsert = function (aid, uid, cid, timestamp,
       continue;
     }
 
-    setOnInsert['du_' + i] = 0;
-    setOnInsert['ds_' + i] = 0;
+    setOnInsert['du_' + i] = null;
+    setOnInsert['ds_' + i] = null;
   };
 
 
