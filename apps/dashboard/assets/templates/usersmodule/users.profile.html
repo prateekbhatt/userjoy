@@ -127,7 +127,7 @@
                         <ul class="list-group" ng-show="showEvents">
 
                             <li class="list-group-item" ng-repeat="event in events" ng-class="{'list-group-item-danger': event.type == 'auto', 'list-group-item-success': event.type == 'form', 'list-group-item-info': event.type == 'page', 'list-group-item-default': event.type == 'link', 'list-group-item-warning': event.type == 'track'}">
-                                <span ng-class="{'fa fa-comments': event.type == 'auto', 'fa fa-flash': event.type == 'form', 'fa fa-globe': event.type == 'page', 'fa fa-link': event.type == 'link', 'fa fa-road': event.type == 'track'}" title="{{event.title}}" style="font-size: 12px; width: 140px; word-wrap: break-word;"> {{event.name}}</span>
+                                <span ng-class="{'fa fa-comments': event.type == 'auto', 'fa fa-flash': event.type == 'form', 'fa fa-globe': event.type == 'page', 'fa fa-link': event.type == 'link', 'fa fa-road': event.type == 'track'}" title="{{event.title}}" style="font-size: 12px; width: 225px; word-wrap: break-word;"> {{event.name}}</span>
                                 <em class="pull-right" style="font-size: 11px;" title="{{event.timestamp}}">{{event.when}}</em>
                             </li>
                            <!--  <li class="list-group-item list-group-item-success" ng-if="event.type == 'form'" ng-repeat="event in events">
