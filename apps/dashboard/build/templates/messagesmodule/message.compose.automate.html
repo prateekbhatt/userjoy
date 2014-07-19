@@ -4,8 +4,13 @@
         <div class="row">
             <div class="col-md-3">
                 <div id="wrapper-settings">
+                    <div id="sidebar-wrapper-settings" style="background-color: #fff; border: 0px;">
+                        <div style="padding-top: 20px;">
+                            <a class="btn btn-info btn-block" href="/apps/{{currApp}}/automessage/segments">Create New Auto Message</a>
+                        </div>
+                    </div>
                     <!-- Sidebar -->
-                    <div id="sidebar-wrapper-settings">
+                    <!-- <div id="sidebar-wrapper-settings">
                         <ul class="sidebar-nav">
                             <li>
                                 <a href="/apps/{{currApp}}/messages/open"><i class="fa fa-inbox"></i> Open Messages</a>
@@ -16,12 +21,6 @@
                             <li>
                                 <a href="/apps/{{currApp}}/messages/closed"><i class="fa fa-check"></i>&nbsp; Closed Messages</a>
                             </li>
-                            <!-- <li class="active">
-                                <a href="/apps/{{currApp}}/messages/automate"><i class="fa fa-edit"></i> Automate Messages </a>
-                            </li> -->
-                            <!-- <li>
-                                <a ui-sref="message.template"><span class="glyphicon glyphicon-list-alt"></span> Choose Templates</a>
-                            </li> -->
                             <li ng-class="{'active': isActive('smartFilters')}">
                                 <span style="cursor: default; color: #333;"><i class="fa fa-paperclip"></i> Smart Filters
                                 <ul style="list-style: none;">
@@ -51,7 +50,7 @@
                                             </div>
                                             </a>
                                         </div>
-                                    </li>
+                                    </li> -->
                                     <!-- <li>
                                         <div class="progress" style="margin-left: 30px;">
                                             <a ui-sref="#goodhealth" style="cursor: pointer">
@@ -79,12 +78,11 @@
                                             </a>
                                         </div>
                                     </li> -->
-                                </ul>
+                                <!-- </ul>
                                 </span>
                             </li>
-                        </ul>
+                        </ul> -->
                         <!-- /#side-menu -->
-                    </div>
                     <!-- /.sidebar-collapse -->
                 </div>
             </div>
