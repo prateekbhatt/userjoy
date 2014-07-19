@@ -1443,7 +1443,8 @@ angular.module('do.message', [])
               return;
             }
             if (ThreadService.getReply) {
-              $scope.replytextInDiv = $scope.replytext;
+              $scope.replytextInDiv = $scope.replytext.replace(/\\r\\n/g,
+                '<br/>');
               $scope.replytext = '';
               $scope.replies.push({
                 body: $scope.replytextInDiv
@@ -1460,10 +1461,10 @@ angular.module('do.message', [])
               return;
             }
             if (ThreadService.getReply) {
-              $scope.replytextInDiv = $scope.replytext.replace(/\r/g,
-                '');
+              $scope.replytextInDiv = $scope.replytext.replace(/\\r\\n/g,
+                '<br/>');
               $scope.replytext = '';
-              console.log("pushing msg");
+              console.log("pushing msg: ", $scope.replytextInDiv);
               $scope.replies.push({
                 body: $scope.replytextInDiv
               })
@@ -1513,7 +1514,8 @@ angular.module('do.message', [])
             if ($scope.replytext.length > 0) {
               console.log("reply button clicked and validated");
               $scope.replyButtonClicked = true;
-              var sanitizedReply = $scope.replytext.replace(/\n/g, '<br/>')
+              var sanitizedReply = $scope.replytext.replace(/\n/g,
+                '<br/>')
                 .replace(/\r/g, '');
               console.log("sanitized reply: ", sanitizedReply);
               MsgService.replyToMsg($scope.appId, $scope.coId,
@@ -1556,7 +1558,9 @@ angular.module('do.message', [])
             } else {
               if ($scope.replytext.length > 0) {
                 $scope.replyButtonClicked = true;
-                $scope.replytextInDiv = $scope.replytext;
+                $scope.replytextInDiv = $scope.replytextreplace(/\n/g,
+                  '<br/>')
+                  .replace(/\r/g, '');;
                 MsgService.replyToMsg($scope.appId, $scope.coId, $scope.replytextInDiv,
                   AccountService.get()
                   ._id, closeOrReopenReplyCallBack);
