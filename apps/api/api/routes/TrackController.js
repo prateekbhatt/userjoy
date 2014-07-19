@@ -739,7 +739,7 @@ router
                       conversationUrl: conversationUrl,
                       message: con.messages[con.messages.length - 1].body,
                       name: acc.name,
-                      sentBy: email,
+                      sentBy: user.email,
                       subject: con.sub
                     },
                     to: {
@@ -856,7 +856,7 @@ router
                       conversationUrl: conversationUrl,
                       message: con.messages[con.messages.length - 1].body,
                       name: acc.name,
-                      sentBy: email,
+                      sentBy: user.email,
                       subject: con.sub
                     },
                     to: {
