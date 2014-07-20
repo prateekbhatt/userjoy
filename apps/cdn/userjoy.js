@@ -8065,14 +8065,14 @@ UserJoy.prototype.replyNotification = notification.reply;
  * Expose function to show conversation box
  */
 
-UserJoy.prototype.showFeedback = message.show;
+UserJoy.prototype.showMessageBox = message.show;
 
 
 /**
  * Expose function to hide conversation box
  */
 
-UserJoy.prototype.hideFeedback = message.hide;
+UserJoy.prototype.hideMessageBox = message.hide;
 
 
 /**
