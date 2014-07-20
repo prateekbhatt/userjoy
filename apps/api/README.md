@@ -277,6 +277,7 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 - name (required)
 - ct (should be passed by js snippet)
 - custom (object containing additonal info about users)
+- joined (when did the company join the service)
 - ut
 - plan
 - revenue

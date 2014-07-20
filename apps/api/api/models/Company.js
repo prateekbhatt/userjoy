@@ -72,7 +72,13 @@ var CompanySchema = new Schema({
     required: [true, 'Invalid company id']
   },
 
+
   custom: [MetaDataSchema],
+
+
+  joined: {
+    type: Date
+  },
 
 
   name: {
