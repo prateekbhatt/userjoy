@@ -181,16 +181,34 @@ function mapReduce(aid, cid, updateTime, cb) {
 
   // calculate the sum of usage in the last 14 days for each user
   o.reduce = function (uid, usageVals) {
+
+    // remove all the 'null' values from the array
+    for (var i = usageVals.length - 1; i >= 0; i--) {
+      if (usageVals[i] === null) {
+        usageVals.splice(i, 1);
+      }
+    }
+
+    // find sum of all vals
     var sum = Array.sum(usageVals);
-    if (sum > MAX) MAX = sum;
-    if (sum < MIN) MIN = sum;
-    return sum;
+    var numberOfDays = usageVals.length;
+    var avg = sum/numberOfDays;
+
+    if (!numberOfDays) {
+      avg = 0;
+    } else {
+      avg = Math.floor(avg);
+    }
+
+    if (avg > MAX) MAX = avg;
+    if (avg < MIN) MIN = avg;
+    return avg;
   };
 
 
   // normalize the usage on a scale of 0-100 for all users
-  o.finalize = function (uid, sum) {
-    var normalize = (sum - MIN) * 100 / (MAX - MIN);
+  o.finalize = function (uid, avg) {
+    var normalize = (avg - MIN) * 100 / (MAX - MIN);
 
     // if all the users have got the same usage, then MAX === MIN and returned
     // normalized score should be 50
