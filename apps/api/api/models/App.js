@@ -96,12 +96,6 @@ var AppSchema = new Schema({
   team: [TeamMemberSchema],
 
 
-  url: {
-    type: String,
-    required: [true, 'Domain url is required']
-  },
-
-
   ut: {
     type: Date,
     default: Date.now

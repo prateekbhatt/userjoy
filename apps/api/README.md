@@ -153,7 +153,6 @@ UserNote      |                         | notes created by team members about a 
 - queuedUsage (when was the usage queue last queued)
 - team [{accId, admin}]
 - x tags [] stores all tags that the app has used for its users
-- url (domain url)
 - ut
 
 
