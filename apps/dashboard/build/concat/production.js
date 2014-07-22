@@ -56221,8 +56221,7 @@ angular.module('do.install', [])
       }
 
       var data = {
-        name: $scope.name,
-        url: $scope.url
+        name: $scope.name
       };
 
       AppModel.addNewApp(data);
@@ -57984,8 +57983,10 @@ angular.module('do.message', [])
               return;
             }
             if (ThreadService.getReply) {
-              $scope.replytextInDiv = $scope.replytext.replace(/\\r\\n/g,
-                '<br/>');
+              // $scope.replytextInDiv = $scope.replytext.replace(/\\r\\n/g,
+              //   '<br/>');
+              $scope.replytextInDiv = $scope.replytext;
+              console.log("$scope.replytextInDiv: ", $scope.replytextInDiv);
               $scope.replytext = '';
               $scope.replies.push({
                 body: $scope.replytextInDiv
@@ -62631,11 +62632,10 @@ angular.module('do.users', [])
             .unix();
 
           $scope.toScoreTime = $moment()
-            .subtract('days', 1)
             .startOf('day')
             .unix();
           $scope.fromScoreTime = $moment()
-            .subtract('days', 29)
+            .subtract('days', 28)
             .startOf('day')
             .unix();
 
