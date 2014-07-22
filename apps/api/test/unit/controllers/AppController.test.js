@@ -62,9 +62,7 @@ describe('Resource /apps', function () {
 
     it('should return error if name is not present', function (done) {
 
-      var newApp = {
-        url: 'dodatado.com'
-      };
+      var newApp = {};
 
       request
         .post('/apps')
@@ -82,35 +80,12 @@ describe('Resource /apps', function () {
 
     });
 
-    it('should return error if url is not present', function (done) {
-
-      var newApp = {
-        name: 'my-new-app'
-      };
-
-      request
-        .post('/apps')
-        .set('cookie', loginCookie)
-        .send(newApp)
-        .expect('Content-Type', /json/)
-        .expect(400)
-        .expect({
-          "error": [
-            "Domain url is required"
-          ],
-          "status": 400
-        })
-        .end(done);
-
-    });
-
     it('should create new app',
 
       function (done) {
 
         var newApp = {
-          name: 'new-app',
-          url: 'new-app.co'
+          name: 'new-app'
         };
 
         request

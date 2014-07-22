@@ -62,13 +62,11 @@ var accounts = {
   apps = {
 
     first: {
-      name: 'First App',
-      url: 'firstapp.co'
+      name: 'First App'
     },
 
     second: {
-      name: 'Second App',
-      url: 'secondapp.co'
+      name: 'Second App'
     }
   },
 

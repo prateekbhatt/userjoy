@@ -1,5 +1,5 @@
 <div>
-    <a style="cursor: pointer; display: {{isDisplayed}};" onclick="userjoy.showFeedback()" id="{{MSG_DISPLAY_QMARK}}">
+    <a style="cursor: pointer; display: {{isDisplayed}};" onclick="userjoy.showMessageBox()" id="{{MSG_DISPLAY_QMARK}}">
         <div style="position: fixed; bottom:30px; right:20px; z-index: 99999999;">
             <span style="display: inline-block;
             min-width: 20px;
@@ -21,7 +21,7 @@
             <div class="uj-panel uj-panel-default" style="border-color: #ddd;">
                 <div class="uj-panel-heading">
                     <h3 class="uj-panel-title" style="text-align: center;">Send us a Message</h3>
-                    <button type="button" class="uj-close" aria-hidden="true" onclick="userjoy.hideFeedback()" id="closeFeedback" style="margin-top: -25px;">&times;</button>
+                    <button type="button" class="uj-close" aria-hidden="true" onclick="userjoy.hideMessageBox()" id="close-userjoy-message-box" style="margin-top: -25px;">&times;</button>
                 </div>
                 <div class="uj-panel-body">
                     <form role="form">

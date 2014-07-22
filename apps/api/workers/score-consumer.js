@@ -192,13 +192,15 @@ function mapReduce(aid, cid, updateTime, cb) {
     // find sum of all vals
     var sum = Array.sum(usageVals);
     var numberOfDays = usageVals.length;
-    var avg = sum/numberOfDays;
 
+    // NOTE: if number of days is 0, its an error , and should not have happened
+    // just return avg as 0, WITHOUT affecting the MIN and MAX values
     if (!numberOfDays) {
-      avg = 0;
-    } else {
-      avg = Math.floor(avg);
+      return 0;
     }
+
+    var avg = sum/numberOfDays;
+    avg = Math.floor(avg);
 
     if (avg > MAX) MAX = avg;
     if (avg < MIN) MIN = avg;
