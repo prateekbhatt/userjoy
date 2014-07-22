@@ -1443,8 +1443,10 @@ angular.module('do.message', [])
               return;
             }
             if (ThreadService.getReply) {
-              $scope.replytextInDiv = $scope.replytext.replace(/\\r\\n/g,
-                '<br/>');
+              // $scope.replytextInDiv = $scope.replytext.replace(/\\r\\n/g,
+              //   '<br/>');
+              $scope.replytextInDiv = $scope.replytext;
+              console.log("$scope.replytextInDiv: ", $scope.replytextInDiv);
               $scope.replytext = '';
               $scope.replies.push({
                 body: $scope.replytextInDiv
