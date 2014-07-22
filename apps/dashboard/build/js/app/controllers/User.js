@@ -2279,11 +2279,10 @@ angular.module('do.users', [])
             .unix();
 
           $scope.toScoreTime = $moment()
-            .subtract('days', 1)
             .startOf('day')
             .unix();
           $scope.fromScoreTime = $moment()
-            .subtract('days', 29)
+            .subtract('days', 28)
             .startOf('day')
             .unix();
 
