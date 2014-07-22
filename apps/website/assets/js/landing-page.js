@@ -44,4 +44,11 @@ window.heap = window.heap || [], heap.load = function (t, e) {
     }
   }, p = ["identify", "track"], c = 0; c < p.length; c++) heap[p[c]] = o(p[c])
 };
-heap.load("1077055861");
+
+if (location.hostname === 'userjoy.co') {
+  // in production
+  heap.load("1077055861");
+} else {
+  // dev / test
+  heap.load("3435971415");
+}
