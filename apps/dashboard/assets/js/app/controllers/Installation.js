@@ -54,8 +54,7 @@ angular.module('do.install', [])
       }
 
       var data = {
-        name: $scope.name,
-        url: $scope.url
+        name: $scope.name
       };
 
       AppModel.addNewApp(data);
