@@ -147,10 +147,11 @@ UserNote      |                         | notes created by team members about a 
 - color (hex color code for notifications / feedback)
 - ct
 - isActive (boolean)
-- name
+- name (name of the company, e.g. DoDataDo)
 - queuedHealth (when was the health queue last queued)
 - queuedScore (when was the score queue last queued)
 - queuedUsage (when was the usage queue last queued)
+- subdomain (dodatado.mail.userjoy.co)
 - team [{accId, admin}]
 - x tags [] stores all tags that the app has used for its users
 - ut

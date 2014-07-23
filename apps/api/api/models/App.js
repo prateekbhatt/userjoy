@@ -62,7 +62,7 @@ var AppSchema = new Schema({
 
   name: {
     type: String,
-    required: [true, 'App name is required'],
+    required: [true, 'App name is required']
     // validate: appNameValidator
   },
 
@@ -90,6 +90,15 @@ var AppSchema = new Schema({
   showMessageBox: {
     type: Boolean,
     default: true
+  },
+
+
+  // dodatado.mail.userjoy.co
+  subdomain: {
+    type: String,
+    lowercase: true,
+    required: [true, 'App subdomain is required'],
+    unique: true
   },
 
 

@@ -57,6 +57,62 @@ describe('Model App', function () {
 
     });
 
+    it('should return error if name/subdomain not provided', function (
+      done) {
+
+      var newApp = {};
+      App.create(newApp, function (err, savedApp) {
+
+        expect(err)
+          .to.exist;
+
+        expect(Object.keys(err.errors))
+          .to.have.length(2);
+
+        expect(err.errors.name.message)
+          .to.eql('App name is required');
+
+        expect(err.errors.subdomain.message)
+          .to.eql('App subdomain is required');
+
+        expect(savedApp)
+          .to.not.exist;
+
+        done();
+      })
+
+    });
+
+
+    it('should return error if subdomain is not unique', function (done) {
+
+      var newApp = {
+        name: saved.apps.first.name,
+        subdomain: saved.apps.first.subdomain
+      };
+
+      App.create(newApp, function (err, savedApp) {
+
+        expect(err)
+          .to.exist;
+
+        expect(err.name)
+          .to.eql('MongoError');
+
+        expect(err.code)
+          .to.eql(11000);
+
+        expect(_.contains(err.message, '$email'))
+          .to.be.false;
+
+        expect(savedApp)
+          .to.not.exist;
+
+        done();
+      })
+
+    });
+
   });
 
 
