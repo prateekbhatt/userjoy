@@ -37,7 +37,8 @@ describe('Resource /apps', function () {
       function (done) {
 
         var newApp = {
-          name: 'My New App'
+          name: 'My New App',
+          subdomain: 'my-New-app'
         };
 
         request
@@ -60,7 +61,7 @@ describe('Resource /apps', function () {
         loginUser(done);
       });
 
-    it('should return error if name is not present', function (done) {
+    it('should return error if name/subdomain is not present', function (done) {
 
       var newApp = {};
 
@@ -72,6 +73,7 @@ describe('Resource /apps', function () {
         .expect(400)
         .expect({
           "error": [
+            "App subdomain is required",
             "App name is required"
           ],
           "status": 400
@@ -85,7 +87,8 @@ describe('Resource /apps', function () {
       function (done) {
 
         var newApp = {
-          name: 'new-app'
+          name: 'new-app',
+          subdomain: 'newapp'
         };
 
         request
