@@ -35,8 +35,6 @@ name       | required  | type      | description
 -----      | ------    | ------    | ----------
 email      | yes       | String    | email address of the logged in user
 user_id    | no        | String    | unique user id, should be database id
-first_name | no        | String    | first name of the user
-last_name  | no        | String    | last name of the user
 name       | no        | String    | full name / username of the user
 plan       | no        | String    | name of the plan
 revenue    | no        | Number    | amount of revenue from this user
