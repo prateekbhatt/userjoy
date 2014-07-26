@@ -17,10 +17,19 @@
             <ul class="nav navbar-nav">
               <li><a href="/pricing">Pricing</a></li>
               <li><a href="http://docs.userjoy.co/" target="_blank">Documentation</a></li>
-
+              <li>
+                  <!-- REF: http://stackoverflow.com/a/18784002/1463434 -->
+                  <form action="/signup">
+                      <button class="btn btn-success navbar-btn">Get Started</button>
+                  </form>
+              </li>
+              <li>&nbsp;&nbsp;</li>
+              <li>
+                  <form action="https://app.userjoy.co/login">
+                      <button class="btn btn-default navbar-btn">Login</button>
+                  </form>
+              </li>
             </ul>
-            <a href="/signup" class="btn btn-success navbar-btn">Get Started</a>
-            <a href="https://app.userjoy.co/login" class="btn btn-default navbar-btn">Login</a>
             <!-- <a class="btn navbar-btn btn-default" href="<%= sails.config.hosts.dashboard %>">Login</a> -->
         </div>
         <!-- /.navbar-collapse -->
