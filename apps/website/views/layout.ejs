@@ -1,27 +1,37 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>SaaS Customer Analytics + Messaging</title>
-    <meta name="description" content="See what users are doing on your app in realtime, and communicate personally with them" />
+    <title>
+        <%= (typeof(title) !== 'undefined') ? title + ' | UserJoy' : 'Customer Intelligence, Lifecycle Marketing, CRM for SaaS | UserJoy' %>
+    </title>
 
     <!-- Viewport mobile tag for sensible mobile support -->
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
+    <meta name="description" content="<%= (typeof(meta_desc) !== 'undefined') ? meta_desc : '' %>">
+
+
     <!-- Twitter Card data -->
     <meta name="twitter:card" content="userjoy">
     <meta name="twitter:site" content="@userjoyco">
-    <meta name="twitter:title" content="UserJoy(userjoyco) on twitter">
-    <meta name="twitter:description" content="See what users are doing on your app in realtime, and communicate personally with them">
-    <meta name="twitter:creator" content="@author_handle">
+    <meta name="twitter:title" content="<%= (typeof(title) !== 'undefined') ? title + ' | UserJoy' : 'Customer Intelligence, Lifecycle Marketing, CRM for SaaS | UserJoy' %>">
+
+    <meta name="twitter:description" content="<%= (typeof(meta_desc) !== 'undefined') ? meta_desc : '' %>">
+
+    <meta name="twitter:creator" content="@userjoyco">
     <!-- Twitter Summary card images must be at least 200x200px -->
     <meta name="twitter:image" content=" https://pbs.twimg.com/profile_images/458268631244095488/Fq7EKwmD.png">
 
+
     <!-- Open Graph data -->
-    <meta property="og:title" content="SaaS Customer Analytics + Messaging" />
+    <meta property="og:title" content="<%= (typeof(title) !== 'undefined') ? title + ' | UserJoy' : 'Customer Intelligence, Lifecycle Marketing, CRM for SaaS | UserJoy' %>" />
+
     <meta property="og:type" content="businesses" />
     <meta property="og:url" content=" https://userjoy.co/" />
+
     <meta property="og:image" content=" https://pbs.twimg.com/profile_images/458268631244095488/Fq7EKwmD.png" />
-    <meta property="og:description" content="See what users are doing on your app in realtime, and communicate personally with them" />
+
+    <meta property="og:description" content="<%= (typeof(meta_desc) !== 'undefined') ? meta_desc : '' %>" />
     <meta property="og:site_name" content="UserJoy" />
     <meta property="fb:admins" content="1289973391" />
 
