@@ -22,46 +22,68 @@
 module.exports.routes = {
 
 
-    // Make the view located at `views/homepage.ejs` (or `views/homepage.jade`, etc. depending on your
-    // default view engine) your home page.
-    // 
-    // (Alternatively, remove this and add an `index.html` file in your `assets` directory)
-    '/': {
-        view: 'homepage'
-    },
-    
-    '/signup': {
-        view: 'signup'
-    },
+  // Make the view located at `views/homepage.ejs` (or `views/homepage.jade`, etc. depending on your
+  // default view engine) your home page.
+  //
+  // (Alternatively, remove this and add an `index.html` file in your `assets` directory)
+  '/': {
+    view: 'homepage',
+    meta_desc: 'See what users are doing on your app in realtime, and communicate personally with them'
+  },
 
-    '/legal/terms': {
-        view: 'termsofservice'
-    },
+  '/signup': {
+    view: 'signup',
+    locals: {
+      title: 'Get started with customer success : Create an account',
+      meta_desc: 'Create an UserJoy account and increase freemium / trial conversions and customer engagement'
+    }
+  },
 
-    '/legal/privacy': {
-        view: 'privacypolicy'
-    },
-    
-    '/legal/refund': {
-        view: 'refundpolicy'
-    },
+  '/legal/terms': {
+    view: 'termsofservice',
+    locals: {
+      title: 'Terms of Service',
+      meta_desc: 'The terms of service of UserJoy'
+    }
+  },
 
-    '/contact': {
-        view: 'contact'
-    },
+  '/legal/privacy': {
+    view: 'privacypolicy',
+    locals: {
+      title: 'Privacy Policy',
+      meta_desc: 'The privacy policy of UserJoy'
+    }
+  },
 
-    '/pricing': {
-        view: 'pricing'
-    },
+  '/legal/refund': {
+    view: 'refundpolicy',
+    locals: {
+      title: 'Refund Policy',
+      meta_desc: 'The refund policy of UserJoy'
+    }
+  },
 
-    '/register': {
-        view: 'signupwufoo'
-    },
-    // Custom routes here...
+  '/contact': {
+    view: 'contact',
+    locals: {
+      title: 'Contact Us',
+      meta_desc: 'Questions? Need Help? Send us an email, schedule a call or follow us on Twitter at @userjoyco.'
+    }
+  },
+
+  '/pricing': {
+    view: 'pricing',
+    locals: {
+      title: 'Pricing',
+      meta_desc: 'Get started with a 14-day free trial. There\'s no risk, no obligation and no credit card required. You can cancel your account at any time.'
+    }
+  },
+
+  // Custom routes here...
 
 
-    // If a request to a URL doesn't match any of the custom routes above, it is matched 
-    // against Sails route blueprints.  See `config/blueprints.js` for configuration options
-    // and examples.
+  // If a request to a URL doesn't match any of the custom routes above, it is matched
+  // against Sails route blueprints.  See `config/blueprints.js` for configuration options
+  // and examples.
 
 };
