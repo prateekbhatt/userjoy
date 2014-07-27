@@ -28,7 +28,9 @@ module.exports.routes = {
   // (Alternatively, remove this and add an `index.html` file in your `assets` directory)
   '/': {
     view: 'homepage',
-    meta_desc: 'See what users are doing on your app in realtime, and communicate personally with them'
+    locals: {
+      meta_desc: 'See what users are doing on your app in realtime, and communicate personally with them'
+    }
   },
 
   '/signup': {
