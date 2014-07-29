@@ -57,31 +57,29 @@ describe('Model App', function () {
 
     });
 
-    it('should return error if name/subdomain not provided', function (
-      done) {
+    it(
+      'should return error if name not provided, but not if subdomain is not provided',
+      function (done) {
 
-      var newApp = {};
-      App.create(newApp, function (err, savedApp) {
+        var newApp = {};
+        App.create(newApp, function (err, savedApp) {
 
-        expect(err)
-          .to.exist;
+          expect(err)
+            .to.exist;
 
-        expect(Object.keys(err.errors))
-          .to.have.length(2);
+          expect(Object.keys(err.errors))
+            .to.have.length(1);
 
-        expect(err.errors.name.message)
-          .to.eql('App name is required');
+          expect(err.errors.name.message)
+            .to.eql('App name is required');
 
-        expect(err.errors.subdomain.message)
-          .to.eql('App subdomain is required');
+          expect(savedApp)
+            .to.not.exist;
 
-        expect(savedApp)
-          .to.not.exist;
+          done();
+        })
 
-        done();
-      })
-
-    });
+      });
 
 
     it('should return error if subdomain is not unique', function (done) {
@@ -389,4 +387,39 @@ describe('Model App', function () {
       });
 
   });
+
+
+  describe('#createDefaultApp', function () {
+
+    it('should create default app for an account', function (done) {
+
+      var accid = saved.accounts.first._id;
+
+      App.createDefaultApp(accid, function (err, defaultApp) {
+
+        expect(err)
+          .to.be.null;
+
+        expect(defaultApp)
+          .to.be.an("object");
+
+        expect(defaultApp.name)
+          .to.eql('YOUR COMPANY');
+
+        var teamIds = _.pluck(defaultApp.team, 'accid');
+
+        expect(teamIds)
+          .to.not.be.empty;
+
+        expect(teamIds)
+          .to.contain(accid);
+
+        done();
+      });
+    });
+
+
+  });
+
+
 });

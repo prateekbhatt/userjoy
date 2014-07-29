@@ -158,6 +158,41 @@ router
 
 
 /**
+ * PUT /apps/:aid
+ *
+ * Update the name and subdomain of the default app
+ */
+
+router
+  .route('/:aid')
+  .put(function (req, res, next) {
+
+    req.app.name = req.body.name;
+    req.app.subdomain = req.body.subdomain || req.app.subdomain;
+
+    if (!req.app.subdomain) {
+      return res.badRequest('App subdomain is required');
+    }
+
+    req.app.save(function (err, app) {
+
+      if (err) {
+        return next(err);
+      }
+
+      if (!app) {
+        return next(new Error('Error in PUT /apps/:aid/name'));
+      }
+
+      res
+        .status(200)
+        .json(app);
+
+    });
+  });
+
+
+/**
  * PUT /apps/:aid/name
  *
  * Update the name of the app

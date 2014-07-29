@@ -129,13 +129,19 @@ function signupWithoutInvite(account, cb) {
         Account.create(account, cb);
       },
 
-      function createVerifyToken(acc, cb) {
-        acc.createVerifyToken(function (err, acc, verifyToken) {
-          cb(err, acc, verifyToken);
+      function defaultApp(acc, cb) {
+        App.createDefaultApp(acc._id, function (err, app) {
+          cb(err, acc, app);
         });
       },
 
-      function sendMail(acc, verifyToken, cb) {
+      function createVerifyToken(acc, app, cb) {
+        acc.createVerifyToken(function (err, acc, verifyToken) {
+          cb(err, acc, app, verifyToken);
+        });
+      },
+
+      function sendMail(acc, app, verifyToken, cb) {
 
         sendConfirmationMail(acc, verifyToken, function (err) {
           cb(err, acc);
@@ -200,9 +206,20 @@ router
 
     var respond = function (err, acc) {
       if (err) return next(err);
-      res
-        .status(201)
-        .json(acc);
+
+
+      req.login(acc, function (err) {
+
+        if (err) return next(err);
+
+        return res
+          .status(201)
+          .json({
+            account: acc,
+            message: 'Logged In Successfully'
+          });
+
+      });
     }
 
     if (!inviteId) return signupWithoutInvite(account, respond);

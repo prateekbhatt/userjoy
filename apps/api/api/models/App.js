@@ -94,11 +94,16 @@ var AppSchema = new Schema({
 
 
   // dodatado.mail.userjoy.co
+  //
+  // this field is not required now, because when a new account is made,
+  // a default app is created without the subdomain
+  // sparse index is required for allowing null values
+  // REF: http://stackoverflow.com/a/9693138/1463434
   subdomain: {
     type: String,
     lowercase: true,
-    required: [true, 'App subdomain is required'],
-    unique: true
+    unique: true,
+    sparse: true
   },
 
 
@@ -232,6 +237,32 @@ AppSchema.statics.addMember = function (aid, accid, cb) {
 
     cb
   );
+};
+
+
+/**
+ * When a new account signs up, we create a default app, and in the next step
+ * ask the new user to integrate the code for the default app. This is being
+ * done to simplify the onboarding UX for a new account
+ *
+ * @param {string} accid account-id
+ * @param {function} cb callback
+ */
+
+AppSchema.statics.createDefaultApp = function (accid, cb) {
+
+  var defaultApp = {
+    name: 'YOUR COMPANY',
+    subdomain: 'yourcompany',
+    team: []
+  };
+
+  defaultApp.team.push({
+    accid: accid,
+    admin: true
+  });
+
+  App.create(defaultApp, cb);
 };
 
 
