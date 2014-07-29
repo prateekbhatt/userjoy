@@ -61,7 +61,7 @@ describe('Resource /apps', function () {
         loginUser(done);
       });
 
-    it('should return error if name/subdomain is not present', function (done) {
+    it('should return error if name is not present', function (done) {
 
       var newApp = {};
 
@@ -73,7 +73,6 @@ describe('Resource /apps', function () {
         .expect(400)
         .expect({
           "error": [
-            "App subdomain is required",
             "App name is required"
           ],
           "status": 400
@@ -281,6 +280,75 @@ describe('Resource /apps', function () {
           .end(done);
 
       });
+  });
+
+
+
+
+  describe('PUT /apps/:aid', function () {
+
+    before(function (done) {
+      logoutUser(done);
+    });
+
+    it('returns error if not logged in',
+
+      function (done) {
+
+        var newName = 'Heres my new name';
+        var newSubdomain = 'mycompany';
+
+        request
+          .put('/apps/' + saved.apps.first._id)
+          .send({
+            name: newName,
+            subdomain: newSubdomain
+          })
+          .expect('Content-Type', /json/)
+          .expect(401)
+          .end(done);
+
+      });
+
+
+    it('logging in user', function (done) {
+      loginUser(done);
+    });
+
+
+    // TODO: write test case when a default app (it doesnot have a subdomain is
+    // being updated and no subdomain is provided (it should throw a bad request
+    // error))
+
+    it('updates app name and subdomain',
+
+      function (done) {
+
+        var newName = 'New App Name';
+        var newSubdomain = 'mycompany';
+
+        request
+          .put('/apps/' + saved.apps.first._id)
+          .send({
+            name: newName,
+            subdomain: newSubdomain
+          })
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .expect(function (res) {
+            if (res.body.name !== newName) {
+              return 'Name was not updated';
+            }
+
+            if (res.body.subdomain !== newSubdomain) {
+              return 'subdomain was not updated';
+            }
+          })
+          .end(done);
+
+      });
+
   });
 
 

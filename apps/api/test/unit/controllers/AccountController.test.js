@@ -12,6 +12,7 @@ describe('Resource /account', function () {
    */
 
   var Account = require('../../../api/models/Account');
+  var App = require('../../../api/models/App');
 
 
   /**
@@ -103,16 +104,52 @@ describe('Resource /account', function () {
 
   describe('POST /account', function () {
 
-    it('creates new account', function (done) {
+    it('creates new account, creates default app and logs in user',
+      function (done) {
 
-      request
-        .post('/account')
-        .send(newAccount)
-        .expect('Content-Type', /json/)
-        .expect(201)
-        .end(done);
+        var newAccount = {
 
-    });
+          name: 'Prats',
+          email: 'prattbhatt+1@gmail.com',
+          password: 'testingtesting'
+
+        };
+
+        request
+          .post('/account')
+          .send(newAccount)
+          .expect('Content-Type', /json/)
+          .expect(201)
+          .expect(function (res) {
+            if (res.header['set-cookie'].length !== 1) {
+              return 'header should contain with set-cookie array with one element';
+            }
+
+            expect(res.body)
+              .to.have.property('message', 'Logged In Successfully');
+
+            var acc = res.body.account;
+
+            App.findByAccountId(acc._id, function (err, apps) {
+
+              expect(err)
+                .to.not.exist;
+
+              expect(apps)
+                .to.be.an('array')
+                .and.have.length(1);
+
+              var defaultApp = apps[0];
+
+              expect(defaultApp)
+                .to.have.property('name', 'YOUR COMPANY');
+
+
+            })
+          })
+          .end(done);
+
+      });
 
     it('returns error if duplicate email', function (done) {
 
