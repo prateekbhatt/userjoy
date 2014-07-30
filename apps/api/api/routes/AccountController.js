@@ -144,7 +144,7 @@ function signupWithoutInvite(account, cb) {
       function sendMail(acc, app, verifyToken, cb) {
 
         sendConfirmationMail(acc, verifyToken, function (err) {
-          cb(err, acc);
+          cb(err, acc, app);
         });
 
       },
@@ -204,7 +204,7 @@ router
     var account = req.body;
     var inviteId = req.body.inviteId;
 
-    var respond = function (err, acc) {
+    var respond = function (err, acc, app) {
       if (err) return next(err);
 
 
@@ -216,6 +216,7 @@ router
           .status(201)
           .json({
             account: acc,
+            app: app,
             message: 'Logged In Successfully'
           });
 
