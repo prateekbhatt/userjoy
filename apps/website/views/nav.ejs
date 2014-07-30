@@ -1,6 +1,6 @@
 <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'/>
-<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-    <div class="container">
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation" style="border-width: 0 0 3px;">
+    <div class="container-fluid">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
             <span class="sr-only">Toggle navigation</span>
@@ -13,11 +13,25 @@
             </a>
         </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
-        <ul class="collapse navbar-collapse navbar-right navbar-ex1-collapse">
-        <a href="https://app.userjoy.co/login" class="btn navbar-btn btn-danger">Login</a>
-            <!-- <a href="/signup" class="btn navbar-btn btn-success">Get Started</a> -->
+        <div class="collapse navbar-collapse navbar-right navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+              <li><a href="/pricing">Pricing</a></li>
+              <li><a href="http://docs.userjoy.co/" target="_blank">Documentation</a></li>
+              <li>
+                  <!-- REF: http://stackoverflow.com/a/18784002/1463434 -->
+                  <form action="/signup">
+                      <button class="btn btn-success navbar-btn">Get Started</button>
+                  </form>
+              </li>
+              <li>&nbsp;&nbsp;</li>
+              <li>
+                  <form action="https://app.userjoy.co/login">
+                      <button id="navbar-login-btn" class="btn navbar-btn">Login</button>
+                  </form>
+              </li>
+            </ul>
             <!-- <a class="btn navbar-btn btn-default" href="<%= sails.config.hosts.dashboard %>">Login</a> -->
-        </ul>
+        </div>
         <!-- /.navbar-collapse -->
     </div>
     <!-- /.container -->
