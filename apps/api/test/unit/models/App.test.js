@@ -414,6 +414,11 @@ describe('Model App', function () {
         expect(teamIds)
           .to.contain(accid);
 
+        // default app should not have subdomain, because subdomain has unique
+        // and sparse indexes defined on it
+        expect(defaultApp)
+          .to.not.have.property('subdomain');
+
         done();
       });
     });
