@@ -253,7 +253,6 @@ AppSchema.statics.createDefaultApp = function (accid, cb) {
 
   var defaultApp = {
     name: 'YOUR COMPANY',
-    subdomain: 'yourcompany',
     team: []
   };
 
