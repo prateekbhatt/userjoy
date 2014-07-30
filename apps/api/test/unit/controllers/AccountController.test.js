@@ -128,7 +128,25 @@ describe('Resource /account', function () {
             expect(res.body)
               .to.have.property('message', 'Logged In Successfully');
 
+            expect(res.body)
+              .to.have.property('account')
+              .that.is.an('object');
+
+            expect(res.body)
+              .to.have.property('app')
+              .that.is.an('object')
+              .and.has.property('name', 'YOUR COMPANY');
+
             var acc = res.body.account;
+            var app = res.body.app;
+
+            // account must be in team of the app
+            var teamIds = _.pluck(app.team, 'accid');
+            expect(teamIds)
+              .to.contain(acc._id.toString());
+
+
+
 
             App.findByAccountId(acc._id, function (err, apps) {
 
