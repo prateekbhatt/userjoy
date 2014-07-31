@@ -29,6 +29,7 @@ var app = angular.module('dodatado', [
   'angular-momentjs',
   'do.automate',
   'toggle-switch',
+  'angular-tour',
 ])
 
 .directive('fallbackSrc', function () {
@@ -393,6 +394,7 @@ var app = angular.module('dodatado', [
 
     // check cookie to set if user is authenticated
     if (ipCookie('loggedin')) {
+      $log.info('loggedin cookie found to be true');
       // $log.info('app.run setUserAuthenticated');
       LoginService.setUserAuthenticated(true);
       login.setLoggedIn(true);

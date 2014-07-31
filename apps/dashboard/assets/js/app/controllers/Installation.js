@@ -4,7 +4,7 @@ angular.module('do.install', [])
   function ($stateProvider) {
     $stateProvider
       .state('onboarding', {
-        url: '/onboarding',
+        url: '/apps/:id/onboarding',
         views: {
           "main": {
             templateUrl: '/templates/onboardingAppmodule/installation.onboarding.html',
@@ -19,6 +19,16 @@ angular.module('do.install', [])
           "main": {
             templateUrl: '/templates/onboardingAppmodule/installation.addcode.html',
             controller: 'installAddcodeAppCtrl'
+          }
+        },
+        authenticate: true
+      })
+      .state('inviteteam', {
+        url: '/apps/:id/invite',
+        views: {
+          "main": {
+            templateUrl: '/templates/onboardingAppmodule/installation.inviteteam.html',
+            controller: 'installInviteTeamAppCtrl'
           }
         },
         authenticate: true
@@ -38,27 +48,61 @@ angular.module('do.install', [])
 ])
 
 .controller('installOnboardingAppCtrl', ['$scope', '$http', 'config', '$state',
-  'AppService', '$log', 'AppModel',
-  function ($scope, $http, config, $state, AppService, $log, AppModel) {
+  'AppService', '$log', 'AppModel', 'AccountService',
+  'CurrentAccountService', '$stateParams', '$location',
+  function ($scope, $http, config, $state, AppService, $log, AppModel,
+    AccountService, CurrentAccountService, $stateParams, $location) {
 
-    AppService.setAppName('Apps');
+    CurrentAccountService.getCurrentAccount()
+      .then(function (currentAccount) {
+        $scope.appId = $stateParams.id;
+        AppService.setAppName('Apps');
+        console.log("loggedinAccount: ", currentAccount);
+        var firstName = currentAccount.name.split(' ')[0].toLowerCase();
+        $scope.placeHolderEmail = firstName + '@app.mail.userjoy.co';
+        $scope.$watch('name', function () {
+          if ($scope.name) {
+            $scope.email = firstName + '@' + $scope.name +
+              '.mail.userjoy.co';
+          }
+        })
 
-    $scope.installapp = function () {
+        $scope.installapp = function () {
+          console.log("$scope.name: ", $scope.name);
+          if (AppService.getCurrentApp()
+            .isActive) {
+            if ($scope.app_form.$valid) {
 
-      // $log.info($scope.name);
-      // $log.info($scope.url);
-      if ($scope.app_form.$valid) {
+            } else {
+              $scope.submitted = true;
+            }
 
-      } else {
-        $scope.submitted = true;
-      }
+            if ($scope.name == null) {
+              console.log("$scope.name is empty");
+              $rootScope.errMsgRootScope =
+                'Enter a valid application name';
+              $rootScope.error = true;
+              $timeout(function () {
+                $rootScope.error = false;
+              }, 5000);
+              return;
+            }
 
-      var data = {
-        name: $scope.name
-      };
+            var data = {
+              name: $scope.name,
+              subdomain: $scope.email
+            };
 
-      AppModel.addNewApp(data);
-    }
+            AppModel.addNewApp(data, $scope.appId);
+
+          } else {
+            $location.path('/apps/' + $scope.appId + '/addcode');
+          }
+          // $log.info($scope.name);
+          // $log.info($scope.url);
+        }
+      })
+
   }
 ])
 
@@ -80,7 +124,8 @@ angular.module('do.install', [])
           console.log("currentApp: ", AppService.getCurrentApp());
           $scope.apiKey = AppService.getCurrentApp()
             ._id;
-          AppService.setAppName(AppService.getCurrentApp().name);
+          AppService.setAppName(AppService.getCurrentApp()
+            .name);
         }
 
         AppModel.getSingleApp($scope.appId, populateCode)
@@ -91,7 +136,7 @@ angular.module('do.install', [])
             return;
           }
           if (data.isActive) {
-            $location.path('/apps/' + $scope.appId + '/users/list');
+            $location.path('/apps/' + $scope.appId + '/onboarding');
           } else {
             $rootScope.info = true;
             $rootScope.infoMsgRootScope =
@@ -133,23 +178,68 @@ angular.module('do.install', [])
   }
 ])
 
+.controller('installInviteTeamAppCtrl', ['$scope', '$stateParams', 'AppModel', '$rootScope', '$timeout', '$location',
+  function ($scope, $stateParams, AppModel, $rootScope, $timeout, $location) {
+
+    $scope.enableInvite = true;
+    $scope.appId = $stateParams.id;
+    $scope.inviteTeamMember = function () {
+      $scope.enableInvite = false;
+      var data = {
+        email: $scope.email,
+        name: $scope.name
+      };
+      console.log("data: ", data);
+
+      var showSuccessMsg = function (err) {
+        $scope.enableInvite = true;
+        if (err) {
+          return err;
+        }
+
+        $scope.email = '';
+        $scope.name = '';
+
+        $rootScope.showSuccess = true;
+        $rootScope.showSuccessMsgRootScope = 'Invitation sent successfully';
+        $timeout(function () {
+          $rootScope.showSuccess = false;
+        }, 3000);
+
+        // $scope.showMsgSuccess = true;
+      }
+
+      AppModel.addNewMember(data, $scope.appId,
+        showSuccessMsg);
+    }
+
+    $scope.proceedToApp = function () {
+      $location.path('/apps/' + $scope.appId + '/users/list');
+    }
+  }
+])
+
 .controller('installSendEmailAppCtrl', ['$scope', '$stateParams', 'AppModel',
   'AccountService', '$location', '$rootScope', '$timeout',
-  function ($scope, $stateParams, AppModel, AccountService, $location, $rootScope, $timeout) {
+  function ($scope, $stateParams, AppModel, AccountService, $location,
+    $rootScope, $timeout) {
     console.log("inside send email ctrl");
     $scope.enableSendEmail = true;
     $scope.appId = $stateParams.id;
-    $scope.accountEmail = AccountService.get().email;
-    $scope.accountname = AccountService.get().name;
+    $scope.accountEmail = AccountService.get()
+      .email;
+    $scope.accountname = AccountService.get()
+      .name;
     $scope.userjoyEmail = 'support@userjoy.co';
     var callback = function (err) {
       $scope.enableSendEmail = true;
-      if(err) {
+      if (err) {
         return;
       }
       $rootScope.showSuccess = true;
-      $rootScope.showSuccessMsgRootScope = 'An email has been sent to your developer';
-      $timeout(function(){
+      $rootScope.showSuccessMsgRootScope =
+        'An email has been sent to your developer';
+      $timeout(function () {
         $rootScope.showSuccess = false;
         $rootScope.showSuccessMsgRootScope = '';
       }, 5000);
