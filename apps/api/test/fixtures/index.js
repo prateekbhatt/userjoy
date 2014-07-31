@@ -105,7 +105,8 @@ var accounts = {
           body: 'Hello World',
           from: 'user',
           sName: 'Prateek',
-          type: 'email'
+          type: 'email',
+          emailId: 'firstMessageEmailId@domain123'
         },
 
         {

@@ -76,7 +76,8 @@ function addTemplateDate(conv) {
 }
 
 
-function sendEmailsToTeam(mailerFuncName, appName, team, loggedInUser, conv, cb) {
+function sendEmailsToTeam(mailerFuncName, appName, team, loggedInUser, conv,
+  cb) {
 
   var config = require('../../../config')('api');
   var dashboardUrl = config.hosts.dashboard;
@@ -89,7 +90,7 @@ function sendEmailsToTeam(mailerFuncName, appName, team, loggedInUser, conv, cb)
 
       function findTeam(cb) {
 
-        // we need to send emails to all the team members other than the 
+        // we need to send emails to all the team members other than the
         // sending user (current logged-in user)
         var teamIds = _.chain(team)
           .pluck('accid')
@@ -205,7 +206,8 @@ router
           var user = req.user;
           var appName = req.app.name;
 
-          sendEmailsToTeam('sendTeamClosedConversation', appName, team, user, conv,
+          sendEmailsToTeam('sendTeamClosedConversation', appName, team, user,
+            conv,
             function (err) {
               cb(err, conv);
             });
@@ -263,7 +265,8 @@ router
           var user = req.user;
           var appName = req.app.name;
 
-          sendEmailsToTeam('sendTeamReopenConversation', appName, team, user, conv,
+          sendEmailsToTeam('sendTeamReopenConversation', appName, team, user,
+            conv,
             function (err) {
               cb(err, conv);
             });
@@ -623,11 +626,15 @@ router
 
             var fromEmail = appEmail(aid);
             var fromName = req.user.name;
-            var replyToEmail = appEmail.reply.create({
-              aid: conv.aid.toString(),
-              type: 'manual',
-              messageId: conv._id
-            });
+
+            // var replyToEmail = appEmail.reply.create({
+            //   aid: conv.aid.toString(),
+            //   type: 'manual',
+            //   messageId: conv._id
+            // });
+
+            // reply-to email should be the same as from email
+            var replyToEmail = fromEmail;
 
             var opts = {
 
@@ -661,20 +668,31 @@ router
 
             };
 
-            userMailer.sendManualMessage(opts, cb);
+            userMailer.sendManualMessage(opts, function (err, res) {
+
+              if (err) return cb(err);
+
+              var emailId = res.messageId;
+
+              Conversation.updateEmailId(msgId, emailId,
+                function (err, updateCon) {
+                  cb(err, updateCon);
+                });
+
+            });
           };
 
-          async.map(cons, iterator, function (err) {
+          async.map(cons, iterator, function (err, cons) {
 
             if (err) return cb(err);
 
             // the cons were modified in the last function, toEmail and toName
             // fields were added to make it easier for sending emails. remove
             // those fields before passing the response
-            _.each(cons, function (c) {
-              delete c.toEmail;
-              delete c.toName;
-            });
+            // _.each(cons, function (c) {
+            //   delete c.toEmail;
+            //   delete c.toName;
+            // });
 
 
             cb(null, cons);
@@ -685,7 +703,7 @@ router
       ],
 
       function callback(err, cons) {
-
+        console.log('\n\n\n ALLL CONS RA', err, cons);
         if (err) return next(err);
         res
           .status(201)
@@ -736,29 +754,33 @@ router
           // reply type is always email
           reply.type = 'email';
 
-          Conversation.reply(aid, coId, reply, function (err, con) {
-            cb(err, con);
-          });
+          Conversation.replyByConversationId(aid, coId, reply,
+            function (err, con) {
+              cb(err, con);
+            });
 
         },
 
-        function sendMails(conv, cb) {
+        function sendTeamEmails(conv, cb) {
           var team = req.app.team;
           var user = req.user;
           var appName = req.app.name;
 
-          sendEmailsToTeam('sendTeamReplyConversation',appName, team, user, conv,
+          sendEmailsToTeam('sendTeamReplyConversation', appName, team, user,
+            conv,
             function (err) {
               cb(err, conv);
             });
         },
 
-        function sendEmail(conv, cb) {
+        function sendUserEmail(conv, cb) {
 
           User
             .findById(conv.uid)
             .select('email name')
             .exec(function (err, user) {
+
+              if (err) return cb(err);
 
               // add message dates
               conv = addTemplateDate(conv);
@@ -767,17 +789,23 @@ router
               var msgId = _.last(conv.messages)
                 ._id;
 
+              // generate from email address
               var fromEmail = appEmail(aid);
+
+
               var fromName = req.user.name;
               var type = conv.amId ? 'auto' : 'manual';
 
 
-              var replyToEmail = appEmail.reply.create({
-                aid: conv.aid.toString(),
-                type: 'manual',
-                messageId: conv._id
-              });
+              // generate reply-to email address
+              // var replyToEmail = appEmail.reply.create({
+              //   aid: conv.aid.toString(),
+              //   type: 'manual',
+              //   messageId: conv._id
+              // });
 
+              // reply-to email should be the same as from email
+              var replyToEmail = fromEmail;
 
               // clone the conversation, in order to avoid the messages array
               // from being disordered while rendering the mailer template
@@ -816,11 +844,20 @@ router
               };
 
 
-              userMailer.sendManualMessage(opts, function (err) {
-                cb(err, conv);
+              userMailer.sendManualMessage(opts, function (err, res) {
+
+                if (err) return cb(err);
+
+                var emailId = res.messageId;
+
+                Conversation.updateEmailId(msgId, emailId,
+                  function (err, updateCon) {
+                    cb(err, updateCon);
+                  });
+
               });
 
-            })
+            });
 
         }
 
