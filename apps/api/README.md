@@ -160,6 +160,7 @@ UserNote      |                         | notes created by team members about a 
 ##### Indexes:
 
 - team.accid
+- subdomain (unique, sparse)
 
 
 ##### Notes:
@@ -439,6 +440,7 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 > - body
 > - clicked (boolean)
 > - ct
+> - emailId (unique-message-id set by mail-clients/mailgun, used to track email replies)
 > - from (enum: [user, account]) (is it sent from a 'user' or an 'account')
 > - seen (boolean)
 > - sent (boolean)
