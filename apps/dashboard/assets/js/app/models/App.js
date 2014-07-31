@@ -44,15 +44,15 @@ angular
 
       }
 
-      this.addNewApp = function (data) {
+      this.addNewApp = function (data, appId) {
         $http
-          .post(config.apiUrl + '/apps', data)
+          .put(config.apiUrl + '/apps/' + appId, data)
           .success(function (savedApp) {
             // $state.transitionTo('addcode');
             AppService.new(savedApp);
             AppService.setCurrentApp(savedApp);
             AppService.setAppName(savedApp.name);
-            $location.path('/apps/' + AppService.getCurrentApp()._id + '/addcode')
+            $location.path('/apps/' + AppService.getCurrentApp()._id + '/users/list')
             console.log("apps created: ", AppService.getLoggedInApps(),
               savedApp);
           })
