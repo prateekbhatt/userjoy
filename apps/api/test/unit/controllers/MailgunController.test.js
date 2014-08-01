@@ -559,27 +559,32 @@ describe('Resource /mailgun', function () {
 
 
 
-  describe('POST /mailgun/reply/apps/:aid/conversations/:identifier',
+  // ALERT: CHANGE THIS URL
+  describe('POST /mailgun/new/apps/:aid',
     function () {
 
       var aid;
+      var repliedConv;
+      var replyToEmailId;
 
       beforeEach(function () {
         aid = saved.apps.first._id;
+        repliedConv = saved.conversations.first;
+        replyToEmailId = repliedConv.messages[0].emailId;
       });
 
 
-      it('should handle replies to manual messages', function (done) {
+      it.only('should handle replies to manual messages', function (done) {
 
         var conversationId = saved.conversations.first._id;
-        var identifier = 'm_' + conversationId;
-        var replyToEmailManual = aid + '+' + identifier +
-          '@mail.userjoy.co';
-        var url = '/mailgun/reply/apps/' + aid + '/conversations/' +
-          identifier;
+
+        // TODO: remove the identifier
+        var url = '/mailgun/new/apps/' + aid;
 
         var postData = {
-          recipient: replyToEmailManual,
+          recipient: 'prattbhatt@gmail.com',
+          'In-Reply-To': replyToEmailId,
+          'Message-Id': '<CANxoqd841GbOz3xHkKGyBZ=3OiCwuF-cQhgxf6Qwx8Q4NzhHoQ@mail.gmail.com>',
           sender: 'prattbhatt@gmail.com',
           subject: 'Re: hello',
           from: 'Prateek Bhatt <prattbhatt@gmail.com>',
@@ -592,10 +597,8 @@ describe('Resource /mailgun', function () {
           'Dkim-Signature': 'v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20120113; h=mime-version:in-reply-to:references:date:message-id:subject:from:to :content-type; bh=mkPbjGJ5QNE8/UjGFkulM+FK6SjCO9QE8MlsUdY225s=; b=Ap0tZC2vWxeYiZrQXvwFKL+N77LVoBXEMpCdietBwZf+yRudotfeih/BFBOXL2gbbF AC4jittfMtWRg9UI0bQ8coW812d2adoM1JuVMe9PF51QFoFElvpmoSjfkg4F99y6nrKe 70ALKCiAAW1pZS8Mn2DGzBrkzK2MjnfbG6MJAWMgHJ0eXqQ9ZpNWTIItDP494NNae0VY ceLui9IqI1dnKDPIVYXV54GNqAGxOjYGsO2zEThLuoWLEX8DuqBLSgO6fleW7WVTzUhl e+YDR+nTdeHOq/npQqOJqxOpUoSCdsHrWxl2SNRmNz5P54AVgQieNGp4uJVqlHTWK+/V l2pw==',
           'Mime-Version': '1.0',
           'X-Received': 'by 10.58.122.196 with SMTP id lu4mr94612veb.52.1403119488279; Wed, 18 Jun 2014 12:24:48 -0700 (PDT)',
-          'In-Reply-To': '<3465d93faa3870d007e54fc1625612@prateek>',
           References: '<3465d93faa3870d007e54fc1625612@prateek>',
           Date: 'Thu, 19 Jun 2014 00:54:48 +0530',
-          'Message-Id': '<CANxoqd841GbOz3xHkKGyBZ=3OiCwuF-cQhgxf6Qwx8Q4NzhHoQ@mail.gmail.com>',
           Subject: 'Re: hello',
           From: 'Prateek Bhatt <prattbhatt@gmail.com>',
           To: 'Reply to prateek <539dd58b5278319f3fc6bbce+m_53a1e6a9ecc26ee1312b4fe5@mail.userjoy.co>',
@@ -617,7 +620,19 @@ describe('Resource /mailgun', function () {
           .send(postData)
           .expect('Content-Type', /json/)
           .expect(200)
-          .end(done);
+          .end(function (err) {
+
+            expect(err)
+              .to.not.exist;
+
+            Conversation.findById(repliedConv._id, function (err, con) {
+              expect(con.messages[2])
+                .to.have.property('emailId', postData['Message-Id']);
+
+              done();
+            });
+
+          });
 
       });
 
@@ -637,6 +652,8 @@ describe('Resource /mailgun', function () {
         var postData = {
           recipient: replyToEmailAuto,
           sender: sender.email,
+          'In-Reply-To': replyToEmailId,
+          'Message-Id': '<CANxoqd841GbOz3xHkKGyBZ=3OiCwuF-cQhgxf6Qwx8Q4NzhHoQ@mail.gmail.com>',
           subject: 'Re: hello',
           from: 'Prateek Bhatt <prattbhatt@gmail.com>',
           'X-Envelope-From': '<prattbhatt@gmail.com>',
@@ -648,10 +665,8 @@ describe('Resource /mailgun', function () {
           'Dkim-Signature': 'v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20120113; h=mime-version:in-reply-to:references:date:message-id:subject:from:to :content-type; bh=mkPbjGJ5QNE8/UjGFkulM+FK6SjCO9QE8MlsUdY225s=; b=Ap0tZC2vWxeYiZrQXvwFKL+N77LVoBXEMpCdietBwZf+yRudotfeih/BFBOXL2gbbF AC4jittfMtWRg9UI0bQ8coW812d2adoM1JuVMe9PF51QFoFElvpmoSjfkg4F99y6nrKe 70ALKCiAAW1pZS8Mn2DGzBrkzK2MjnfbG6MJAWMgHJ0eXqQ9ZpNWTIItDP494NNae0VY ceLui9IqI1dnKDPIVYXV54GNqAGxOjYGsO2zEThLuoWLEX8DuqBLSgO6fleW7WVTzUhl e+YDR+nTdeHOq/npQqOJqxOpUoSCdsHrWxl2SNRmNz5P54AVgQieNGp4uJVqlHTWK+/V l2pw==',
           'Mime-Version': '1.0',
           'X-Received': 'by 10.58.122.196 with SMTP id lu4mr94612veb.52.1403119488279; Wed, 18 Jun 2014 12:24:48 -0700 (PDT)',
-          'In-Reply-To': '<3465d93faa3870d007e54fc1625612@prateek>',
           References: '<3465d93faa3870d007e54fc1625612@prateek>',
           Date: 'Thu, 19 Jun 2014 00:54:48 +0530',
-          'Message-Id': '<CANxoqd841GbOz3xHkKGyBZ=3OiCwuF-cQhgxf6Qwx8Q4NzhHoQ@mail.gmail.com>',
           Subject: 'Re: hello',
           From: 'Prateek Bhatt <prattbhatt@gmail.com>',
           To: 'Reply to prateek <539dd58b5278319f3fc6bbce+m_53a1e6a9ecc26ee1312b4fe5@test-mail.userjoy.co>',
