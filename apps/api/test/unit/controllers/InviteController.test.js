@@ -67,9 +67,6 @@ describe('Resource /apps/:aid/invites', function () {
             .to.not.be.empty;
 
           expect(res.body[0])
-            .to.have.property("toName");
-
-          expect(res.body[0])
             .to.have.property("toEmail");
 
           expect(res.body[0])
@@ -115,18 +112,17 @@ describe('Resource /apps/:aid/invites', function () {
     });
 
 
-    it('should create and send new invite',
+    it('should create and send new invites',
 
       function (done) {
 
-        var newInvite = {
-          name: 'Prats',
-          email: 'prattbhatt@gmail.com'
+        var newInvites = {
+          emails: ['prattbhatt@gmail.com', 'prattbhatt+1@gmail.com']
         };
 
         request
           .post(testUrl)
-          .send(newInvite)
+          .send(newInvites)
           .set('cookie', loginCookie)
           .expect('Content-Type', /json/)
           .expect(201)
@@ -136,13 +132,15 @@ describe('Resource /apps/:aid/invites', function () {
               .to.not.exist;
 
             expect(res.body)
-              .to.be.an("object");
+              .to.have.property('invites')
+              .that.is.an("array")
+              .and.has.length(newInvites.emails.length);
 
             expect(res.body)
-              .to.have.property("toEmail", newInvite.email);
+              .to.have.property('message')
+              .that.is.a("string")
+              .and.equals('Invites sent successfully');
 
-            expect(res.body)
-              .to.have.property("toName", newInvite.name);
 
             done(err);
           });

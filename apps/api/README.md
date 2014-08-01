@@ -459,15 +459,13 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 - aid (required)
 - ct
 - from (accountId) (required)
-- status (pending / cancelled / joined)
 - toEmail (required)
-- toName (required)
 - ut
 
 ##### Notes:
 
-- Invites should be deleted once accepted (?)
-- Use mongo objectId as invite token
+- Invites are deleted once accepted
+- Using mongo objectId as invite token
 
 #### PONDER
 
