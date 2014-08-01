@@ -183,11 +183,18 @@ angular.module('do.install', [])
 
     $scope.enableInvite = true;
     $scope.appId = $stateParams.id;
+    var emailIds = [];
     $scope.inviteTeamMember = function () {
+      console.log("$scope.invitees email: ", $scope.invitees);
       $scope.enableInvite = false;
+      for (var i = 0; i < $scope.invitees.length; i++) {
+        emailIds[i] = $scope.invitees[i].email;
+      };
+
+      console.log("emailIds: ", emailIds);
+
       var data = {
-        email: $scope.email,
-        name: $scope.name
+        emails: emailIds
       };
       console.log("data: ", data);
 
@@ -211,6 +218,20 @@ angular.module('do.install', [])
 
       AppModel.addNewMember(data, $scope.appId,
         showSuccessMsg);
+    }
+
+    $scope.invitees = [{
+      email: ''
+    }];
+
+    $scope.addAnotherTeamMember = function () {
+      $scope.invitees.push({
+        email: ''
+      });
+    }
+
+    $scope.removeTeamMember = function () {
+      $scope.invitees.pop();
     }
 
     $scope.proceedToApp = function () {

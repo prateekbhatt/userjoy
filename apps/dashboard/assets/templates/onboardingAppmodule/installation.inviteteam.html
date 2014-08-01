@@ -31,24 +31,27 @@
                         <h3 class="panel-title text-center" style="color:#31708f">Invite Your Team Members</h3>
                     </div>
                     <div class="panel-body">
-                        <!-- <div class="alert alert-danger text-center"
-                            ng-show="submitted && app_form.name.$invalid"><strong>Enter your application name</strong></div>
-                            <div class="alert alert-danger text-center"
-                        ng-show="submitted && app_form.domain.$invalid"><strong>Enter your domain name</strong></div> -->
                         <div class="form-group">
-                            <label for="domain" class="col-md-4 control-label" style="font-size: 20px"><strong>Email</strong></label>
-                            <div class="col-md-8">
-                                <input class="form-control" type="email" name="email" placeholder="Email Id" ng-model="email" required>
+                            <div ng-repeat="invitee in invitees">
+                                <label for="domain" class="col-md-3 control-label" style="font-size: 20px; margin-top: 20px;"><strong>Email</strong></label>
+                                <div class="col-md-7" style="margin-top: 20px;">
+                                    <input class="form-control" type="email" name="email" placeholder="Email Id" ng-model="invitee.email" required>
+                                </div>
+                            </div>
+                            <div class="col-md-1" style="margin-top: 20px;">
+                                <button class="btn btn-default" style="background-color: #ccc;" ng-click="addAnotherTeamMember()">
+                                <i class="fa fa-plus-square-o"></i>
+                                </button>
+                            </div>
+                            <div class="col-md-1" ng-hide="invitees.length == 1" style="margin-top: 20px;">
+                                <button class="btn btn-default" style="background-color: #ccc;" ng-click="removeTeamMember()">
+                                <i class="fa fa-times"></i>
+                                </button>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="name" class="col-md-4 control-label" style="font-size: 20px"><strong>Name</strong></label>
-                            <div class="col-md-8">
-                                <input class="form-control" type="text" name="name" placeholder="Name" ng-model="name" required>
-                            </div>
-                        </div>
-                        <button class="btn btn-success pull-right" ng-click="proceedToApp()">Proceed To App</button>
-                        <button type="submit" class="btn btn-success pull-right" style="padding-top:10px; margin-right:10px" id="onboardinglink" ng-click="inviteTeamMember()" ng-disabled="!enableInvite">Send Invite</button>
+                        <br>
+                        <button type="submit" class="btn btn-success pull-right" style="padding-top:10px" id="onboardinglink" ng-click="inviteTeamMember()" ng-disabled="!enableInvite">Send Invite</button>
+                        <button class="btn btn-success pull-right" ng-click="proceedToApp()" style="margin-right: 10px;">Skip</button>
                     </div>
                 </div>
             </fieldset>
