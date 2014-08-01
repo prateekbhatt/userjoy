@@ -87,7 +87,7 @@ function BaseMailer(opts) {
   this.template = null;
 
   this.toEmail = opts.to.email;
-  this.toName = opts.to.name;
+  this.toName = opts.to.name || this.toEmail;
 
   this.html = null;
 

@@ -1,7 +1,7 @@
 {{ include header }}
-<p>Hi {{= name || 'there' }},</p>
+<p>Hi,</p>
 <br>
-<p>You have received an invitation to join <b>{{= appName }}</b> on UserJoy. Please click on the link below to accept the invitation.</p>
+<p>{{= fromName }} has invited you to join <b>{{= appName }}</b> on UserJoy. Please click on the link below to accept the invitation.</p>
 
 </td>
 <td class="expander"></td>
@@ -16,7 +16,7 @@
       <table class="button">
         <tr>
           <td>
-            <a href="{{= inviteUrl }}">Accept</a>
+            <a href="{{= inviteUrl }}">Accept Invitation</a>
           </td>
         </tr>
       </table>
