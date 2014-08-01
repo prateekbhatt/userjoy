@@ -59,6 +59,7 @@ angular
       }
 
       this.addNewMember = function (data, appId, cb) {
+        console.log("data: ", data);
         $http.post(config.apiUrl + '/apps/' + appId + '/invites',
           data)
           .success(function (data) {

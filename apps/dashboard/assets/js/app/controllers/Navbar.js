@@ -244,9 +244,9 @@ angular.module('do.navbar', [])
         $scope.showDropdownApp = function () {
           $scope.visibleDropdownApp = true;
         }
-        if(($location.path().split("/")[3] == 'onboarding' || $location.path().split("/")[3] == 'addcode') && currentApp.length == 1) {
-          $scope.firstTimeOnboarding = true;
-        }
+        // if(($location.path().split("/")[3] == 'onboarding' || $location.path().split("/")[3] == 'addcode') || $location.path().split("/")[3] == 'sendemail' || $location.path().split("/")[3] == 'invite') && currentApp.length == 1) {
+        //   $scope.firstTimeOnboarding = true;
+        // }
 
         $scope.isAccountActive = function (path) {
           var location = $location.path().split('/')[4];
