@@ -584,6 +584,10 @@ describe('Resource /apps/:aid/conversations', function () {
               .to.have.property('sName')
               .that.equals(saved.accounts.first.name);
 
+            expect(messages[0])
+              .to.have.property('emailId')
+              .that.is.a('string');
+
           })
           .end(done);
 
@@ -681,6 +685,11 @@ describe('Resource /apps/:aid/conversations', function () {
 
             expect(con.messages[2].sName)
               .to.exist;
+
+            expect(con.messages[2])
+              .to.have.property('emailId')
+              .that.is.a('string');
+
           })
           .end(done);
 

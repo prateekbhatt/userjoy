@@ -74,6 +74,10 @@ function mailgunCallback(req, res, next) {
 }
 
 
+/**
+ * Sends email to admin of the app
+ */
+
 function sendEmail(userEmail, acc, con, cb) {
 
   /**
@@ -166,102 +170,128 @@ function getAdmin(aid, cb) {
 }
 
 
+/**
+ * Get account of the assignee of the conversation
+ * Used to send him an email
+ *
+ * @param {string} accid account-id
+ * @param {function} cb callback
+ */
+
+function getAssigneeAccount(accid, cb) {
+  Account
+    .findById(accid)
+    .select({
+      _id: -1,
+      name: 1,
+      email: 1
+    })
+    .lean()
+    .exec(cb);
+}
+
+
+
+// router
+//   .route('/new/apps/:aid')
+//   .post(function (req, res, next) {
+
+//     logger.trace({
+//       at: 'MailgunController new',
+//       // body: req.body['stripped-text'],
+//       param: req.params
+//     });
+
+//     var aid = req.params.aid;
+
+//     // REF: http://documentation.mailgun.com/user_manual.html#routes
+//     var body = req.body['stripped-text'];
+
+//     var ct = req.body.timestamp * 1000;
+//     var sender = req.body.sender;
+//     var subject = req.body.subject;
+
+//     var user = {
+//       email: sender
+//     };
+
+//     var callback = mailgunCallback(req, res, next);
+
+//     async.waterfall(
+
+//       [
+
+//         function getOrCreateUser(cb) {
+//           User.findOrCreate(aid, user, function (err, usr) {
+//             cb(err, usr);
+//           });
+//         },
+
+
+//         function createConversation(user, cb) {
+
+//           var newConv = {
+//             aid: aid,
+//             ct: ct,
+//             messages: [
+
+//               {
+
+//                 body: body,
+//                 ct: ct,
+//                 from: 'user',
+//                 sent: true,
+//                 sName: user.name || user.email,
+//                 type: 'email',
+
+//               }
+
+//             ],
+//             sub: subject,
+//             uid: user._id
+//           };
+
+//           Conversation.create(newConv, function (err, con) {
+//             cb(err, con, user);
+//           });
+//         },
+
+//         function getAdminAccount(con, user, cb) {
+//           getAdmin(con.aid, function (err, acc) {
+//             cb(err, acc, con, user);
+//           });
+//         },
+
+//         function sendAdminConversation(acc, con, user, cb) {
+//           sendEmail(user.email, acc, con, cb);
+//         }
+
+
+//       ],
+
+//       callback);
+
+//   });
+
+
+
 router
   .route('/new/apps/:aid')
   .post(function (req, res, next) {
 
     logger.trace({
-      at: 'MailgunController new',
-      // body: req.body['stripped-text'],
-      param: req.params
-    });
-
-    var aid = req.params.aid;
-
-    // REF: http://documentation.mailgun.com/user_manual.html#routes
-    var body = req.body['stripped-text'];
-
-    var ct = req.body.timestamp * 1000;
-    var sender = req.body.sender;
-    var subject = req.body.subject;
-
-    var user = {
-      email: sender
-    };
-
-    var callback = mailgunCallback(req, res, next);
-
-    async.waterfall(
-
-      [
-
-        function getOrCreateUser(cb) {
-          User.findOrCreate(aid, user, function (err, usr) {
-            cb(err, usr);
-          });
-        },
-
-
-        function createConversation(user, cb) {
-
-          var newConv = {
-            aid: aid,
-            ct: ct,
-            messages: [
-
-              {
-
-                body: body,
-                ct: ct,
-                from: 'user',
-                sent: true,
-                sName: user.name || user.email,
-                type: 'email',
-
-              }
-
-            ],
-            sub: subject,
-            uid: user._id
-          };
-
-          Conversation.create(newConv, function (err, con) {
-            cb(err, con, user);
-          });
-        },
-
-        function getAdminAccount(con, user, cb) {
-          getAdmin(con.aid, function (err, acc) {
-            cb(err, acc, con, user);
-          });
-        },
-
-        function sendAdminConversation(acc, con, user, cb) {
-          sendEmail(user.email, acc, con, cb);
-        }
-
-
-      ],
-
-      callback);
-
-  });
-
-
-
-router
-  .route('/reply/apps/:aid/conversations/:identifier')
-  .post(function (req, res, next) {
-
-    logger.trace({
       at: 'MailgunController reply',
       // body: req.body['stripped-text'],
-      param: req.params
+      param: req.params,
+      body: req.body
     });
 
-    var parsedId = appEmail.parseIdentifier(req.params.identifier);
-    var type = parsedId.type;
-    var messageId = parsedId.messageId;
+
+    // get unique message-ids set by mailgun/gmail/outlook ...
+    // used for creating email threads
+    var replyToEmailId = req.body['In-Reply-To'];
+    var newMsgEmailId = req.body['Message-Id'];
+
 
     var aid = req.params.aid;
 
@@ -275,9 +305,12 @@ router
     var callback = mailgunCallback(req, res, next);
 
 
-    if (type === 'manual') {
+console.log('\n\n\n\n THE EMAIL IDS', replyToEmailId, newMsgEmailId, '\n\n\n\n');
 
-      // if manual message, create new reply
+
+    if (replyToEmailId) {
+
+      // IF ITS A REPLY THEN replyToEmailId MUST BE PRESENT
 
       async.waterfall(
 
@@ -298,6 +331,10 @@ router
 
               body: body,
               ct: ct,
+
+              // the unique message-id of the email
+              emailId: newMsgEmailId,
+
               from: 'user',
               sent: true,
               sName: user.name || user.email,
@@ -305,26 +342,19 @@ router
 
             };
 
-            Conversation.reply(aid, messageId, reply, function (err, con) {
-              cb(err, user, con);
-            });
+            Conversation.replyByEmailId(replyToEmailId, reply,
+              function (err, con) {
+                cb(err, user, con);
+              });
           },
 
           function getAccount(user, con, cb) {
-            Account
-              .findById(con.assignee)
-              .select({
-                _id: -1,
-                name: 1,
-                email: 1
-              })
-              .lean()
-              .exec(function (err, acc) {
-                if (err) return cb(err);
-                if (!acc) return cb(new Error('ADMIN_NOT_FOUND'));
+            getAssigneeAccount(con.assignee, function (err, acc) {
+              if (err) return cb(err);
+              if (!acc) return cb(new Error('ADMIN_NOT_FOUND'));
 
-                cb(null, acc, user, con);
-              });
+              cb(null, acc, user, con);
+            });
           },
 
           function sendAdminConversation(acc, user, con, cb) {
@@ -335,88 +365,47 @@ router
         ], callback);
 
 
+    } else {
 
-    } else if (type === 'auto') {
-
-      // if automessage, create new conversation
+      // IF ITS A NEW EMAIL
 
       async.waterfall(
 
         [
 
           function getOrCreateUser(cb) {
-            var user = {
-              email: sender
-            };
-
-            User.findOrCreate(aid, user, cb);
+            User.findOrCreate(aid, user, function (err, usr) {
+              cb(err, usr);
+            });
           },
 
 
           function createConversation(user, cb) {
 
-            Conversation.findOne({
+            var newConv = {
               aid: aid,
-              amId: messageId,
-              uid: user._id
-            }, function (err, con) {
+              ct: ct,
+              messages: [
 
-              if (err) {
-                return cb(err);
-              }
+                {
 
-              // if conversation is not found, then create a new conversation,
-              // else if conversation is found, then add a new reply to the 
-              // existing conversation
-
-              if (_.isEmpty(con)) {
-
-                var newConv = {
-                  aid: aid,
-                  amId: messageId,
-                  ct: ct,
-                  messages: [
-
-                    {
-
-                      body: body,
-                      ct: ct,
-                      from: 'user',
-                      sent: true,
-                      sName: user.name || user.email,
-                      type: 'email',
-
-                    }
-
-                  ],
-                  sub: subject,
-                  uid: user._id
-                };
-
-                Conversation.create(newConv, function (err, con) {
-                  cb(err, con, user);
-                });
-
-
-              } else {
-
-                var newMsg = {
                   body: body,
                   ct: ct,
                   from: 'user',
                   sent: true,
                   sName: user.name || user.email,
                   type: 'email',
-                };
 
-                con.messages.push(newMsg);
-                con.save(function (err, updatedCon) {
-                  cb(err, con, user);
-                });
-              }
+                }
 
+              ],
+              sub: subject,
+              uid: user._id
+            };
+
+            Conversation.create(newConv, function (err, con) {
+              cb(err, con, user);
             });
-
           },
 
           function getAdminAccount(con, user, cb) {
@@ -425,47 +414,18 @@ router
             });
           },
 
-          function getAutoMessage(acc, con, user, cb) {
-
-            AutoMessage
-              .findById(con.amId)
-              .select('title')
-              .exec(function (err, amsg) {
-                cb(err, acc, con, user, amsg);
-              });
-          },
-
-
-          function createEventAndIncrement(acc, con, user, amsg, cb) {
-
-            var ids = {
-              aid: con.aid,
-              uid: con.uid,
-              amId: con.amId
-            };
-
-            var title = amsg.title;
-
-            createEventAndIncrementCount(ids, 'replied', title, function (
-              err) {
-              cb(err, acc, con, user);
-            });
-
-          },
-
           function sendAdminConversation(acc, con, user, cb) {
             sendEmail(user.email, acc, con, cb);
           }
+
 
         ],
 
         callback);
 
 
-    } else {
-
-      callback(new Error('neither manual not automessage'));
     }
+
 
   });
 
