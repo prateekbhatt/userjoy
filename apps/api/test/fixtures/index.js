@@ -141,8 +141,7 @@ var invites = {
   first: {
     aid: null,
     from: null,
-    toEmail: accounts.second.email,
-    toName: 'Prats'
+    toEmail: accounts.second.email
   }
 };
 

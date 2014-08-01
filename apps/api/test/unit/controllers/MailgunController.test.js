@@ -574,7 +574,7 @@ describe('Resource /mailgun', function () {
       });
 
 
-      it.only('should handle replies to manual messages', function (done) {
+      it('should handle replies to manual messages', function (done) {
 
         var conversationId = saved.conversations.first._id;
 

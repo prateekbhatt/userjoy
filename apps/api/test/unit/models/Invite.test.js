@@ -25,7 +25,7 @@ describe('Model Invite', function () {
   describe('#create', function () {
 
     it(
-      'should return error if aid/from/toEmail/toName is not provided',
+      'should return error if aid/from/toEmail is not provided',
       function (done) {
 
         var newInv = {};
@@ -37,7 +37,7 @@ describe('Model Invite', function () {
 
           expect(Object.keys(err.errors)
             .length)
-            .to.eql(4);
+            .to.eql(3);
 
           expect(err.errors.aid.message)
             .to.eql('Invalid aid');
@@ -47,9 +47,6 @@ describe('Model Invite', function () {
 
           expect(err.errors.toEmail.message)
             .to.eql('Provide invitee email');
-
-          expect(err.errors.toName.message)
-            .to.eql('Provide invitee name');
 
           expect(inv)
             .to.not.exist;
@@ -65,8 +62,7 @@ describe('Model Invite', function () {
       var newInvite = {
         aid: randomId(),
         from: randomId(),
-        toEmail: 'prattbhatt@gmail.com',
-        toName: 'Prateek Invite Mail Test'
+        toEmail: 'prattbhatt@gmail.com'
       };
 
       Invite.create(newInvite, function (err, inv) {
@@ -88,9 +84,6 @@ describe('Model Invite', function () {
         expect(inv)
           .to.have.property('toEmail', newInvite.toEmail);
 
-        expect(inv)
-          .to.have.property('toName', newInvite.toName);
-
         done();
       });
 
@@ -104,18 +97,10 @@ describe('Model Invite', function () {
     });
 
 
-    it('should add ut (updated) timestamp', function () {
+    it('should not add ut (updated) timestamp', function () {
 
       expect(savedInvite)
-        .to.have.property('ut');
-
-    });
-
-
-    it('should set status as pending', function () {
-
-      expect(savedInvite.status)
-        .to.eql('pending');
+        .to.not.have.property('ut');
 
     });
 
