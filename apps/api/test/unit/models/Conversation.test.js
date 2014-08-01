@@ -360,7 +360,7 @@ describe('Model Conversation', function () {
   });
 
 
-  describe.only('#replyByEmailId', function () {
+  describe('#replyByEmailId', function () {
 
     it('should return error if reply body not provided', function (done) {
 
@@ -468,8 +468,7 @@ describe('Model Conversation', function () {
         type: 'email',
         emailId: 'randomId'
       };
-      var replyToEmailId = "<" + saved.conversations.first.messages[0].emailId +
-        ">";
+      var replyToEmailId = saved.conversations.first.messages[0].emailId;
 
 
       Conversation.replyByEmailId(replyToEmailId, reply,
