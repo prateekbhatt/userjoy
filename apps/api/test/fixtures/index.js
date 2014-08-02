@@ -251,7 +251,8 @@ function createApp(accid, app, fn) {
   app.team = [];
   app.team.push({
     accid: accid,
-    admin: true
+    admin: true,
+    username: 'PRateek'
   });
 
   App.create(app, fn);
