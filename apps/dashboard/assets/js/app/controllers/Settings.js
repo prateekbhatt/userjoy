@@ -355,8 +355,8 @@ angular.module('do.settings', [])
           for (var i = 0; i < AppService.getCurrentApp()
             .team.length; i++) {
             $scope.team.push({
-              name: AppService.getCurrentApp()
-                .team[i].accid.name,
+              // name: AppService.getCurrentApp()
+              //   .team[i].accid.name,
               email: AppService.getCurrentApp()
                 .team[i].accid.email
             })
@@ -378,16 +378,18 @@ angular.module('do.settings', [])
 
             $scope.showMsgSuccess = true;
             $scope.invitedTeam.push({
-              toName: $scope.nameMember,
+              // toName: $scope.nameMember,
               toEmail: $scope.teamMember
             })
           }
 
           $scope.addTeamMember = function () {
             $scope.enableInvite = false;
+            var emailArray = [];
+            emailArray[0] = $scope.teamMember;
             var data = {
-              email: $scope.teamMember,
-              name: $scope.nameMember
+              emails: emailArray
+              // name: $scope.nameMember
             };
             console.log("data: ", data);
 

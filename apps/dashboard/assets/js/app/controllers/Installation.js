@@ -206,8 +206,10 @@ angular.module('do.install', [])
           return err;
         }
 
-        $scope.email = '';
-        $scope.name = '';
+        $location.path('/apps/' + $scope.appId + '/users/list');
+
+        // $scope.email = '';
+        // $scope.name = '';
 
         $rootScope.showSuccess = true;
         $rootScope.showSuccessMsgRootScope = 'Invitation sent successfully';
