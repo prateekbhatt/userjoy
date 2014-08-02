@@ -58,46 +58,47 @@ angular.module('do.install', [])
         $scope.appId = $stateParams.id;
         AppService.setAppName('Apps');
         console.log("loggedinAccount: ", currentAccount);
-        var firstName = currentAccount.name.split(' ')[0].toLowerCase();
-        $scope.placeHolderEmail = firstName + '@app.mail.userjoy.co';
+        $scope.firstName = currentAccount.name.split(' ')[0].toLowerCase();
+        $scope.placeHolderEmail = 'app';
         $scope.$watch('name', function () {
           if ($scope.name) {
-            $scope.email = firstName + '@' + $scope.name +
-              '.mail.userjoy.co';
+            $scope.email = $scope.name.split(' ')
+              .join('')
+              .toLowerCase();
           }
         })
 
         $scope.installapp = function () {
           console.log("$scope.name: ", $scope.name);
-          if (AppService.getCurrentApp()
-            .isActive) {
-            if ($scope.app_form.$valid) {
-
-            } else {
-              $scope.submitted = true;
-            }
-
-            if ($scope.name == null) {
-              console.log("$scope.name is empty");
-              $rootScope.errMsgRootScope =
-                'Enter a valid application name';
-              $rootScope.error = true;
-              $timeout(function () {
-                $rootScope.error = false;
-              }, 5000);
-              return;
-            }
-
-            var data = {
-              name: $scope.name,
-              subdomain: $scope.email
-            };
-
-            AppModel.addNewApp(data, $scope.appId);
+          // if (AppService.getCurrentApp()
+          //   .isActive) {
+          if ($scope.app_form.$valid) {
 
           } else {
-            $location.path('/apps/' + $scope.appId + '/addcode');
+            $scope.submitted = true;
           }
+
+          if ($scope.name == null) {
+            console.log("$scope.name is empty");
+            $rootScope.errMsgRootScope =
+              'Enter a valid application name';
+            $rootScope.error = true;
+            $timeout(function () {
+              $rootScope.error = false;
+            }, 5000);
+            return;
+          }
+
+          var data = {
+            name: $scope.name,
+            subdomain: $scope.email
+          };
+
+          AppModel.addNewApp(data, $scope.appId);
+
+          // } else {
+          //   $location.path('/apps/' + $scope.appId + '/addcode');
+          // }
           // $log.info($scope.name);
           // $log.info($scope.url);
         }
@@ -178,7 +179,8 @@ angular.module('do.install', [])
   }
 ])
 
-.controller('installInviteTeamAppCtrl', ['$scope', '$stateParams', 'AppModel', '$rootScope', '$timeout', '$location',
+.controller('installInviteTeamAppCtrl', ['$scope', '$stateParams', 'AppModel',
+  '$rootScope', '$timeout', '$location',
   function ($scope, $stateParams, AppModel, $rootScope, $timeout, $location) {
 
     $scope.enableInvite = true;

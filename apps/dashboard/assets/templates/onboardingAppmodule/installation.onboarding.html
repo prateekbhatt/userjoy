@@ -33,8 +33,8 @@
                     </div>
                     <div class="panel-body">
                         <!-- <div class="alert alert-danger text-center"
-                        ng-show="submitted && app_form.name.$invalid"><strong>Enter your application name</strong></div>
-                        <div class="alert alert-danger text-center"
+                                                ng-show="submitted && app_form.name.$invalid"><strong>Enter your application name</strong></div>
+                                                <div class="alert alert-danger text-center"
                         ng-show="submitted && app_form.domain.$invalid"><strong>Enter your domain name</strong></div> -->
                         <div class="form-group">
                             <label for="name" class="col-md-4 control-label" style="font-size: 20px"><strong>Application Name</strong></label>
@@ -45,7 +45,7 @@
                         <div class="form-group">
                             <label for="domain" class="col-md-4 control-label" style="font-size: 20px"><strong>Your Email Id</strong></label>
                             <div class="col-md-8">
-                                <input class="form-control" type="email" name="email" placeholder="{{placeHolderEmail}}" ng-model="email" required>
+                                <p class="col-md-2" style="margin-top: 10px;">{{firstName}}@</p><input class="form-control col-md-3" type="text" name="email" placeholder="app" ng-model="email" required style="width: 30%;"><p class="col-md-4" style="margin-top: 10px;">.mail.userjoy.co</p>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-success pull-right" style="padding-top:10px" id="onboardinglink">Next</button>
