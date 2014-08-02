@@ -13,6 +13,7 @@ describe('Resource /account', function () {
 
   var Account = require('../../../api/models/Account');
   var App = require('../../../api/models/App');
+  var Invite = require('../../../api/models/Invite');
 
 
   /**
@@ -109,8 +110,8 @@ describe('Resource /account', function () {
 
         var newAccount = {
 
-          name: 'Prats',
-          email: 'prattbhatt+1@gmail.com',
+          name: 'Pratt Bhatt',
+          email: 'prattbhatt+2@gmail.com',
           password: 'testingtesting'
 
         };
@@ -145,8 +146,18 @@ describe('Resource /account', function () {
             expect(teamIds)
               .to.contain(acc._id.toString());
 
+            var teamUsernames = _.pluck(app.team, 'username');
+            expect(teamUsernames)
+              .to.contain('pratt');
+
+          })
+          .end(function (err, res) {
+
+            if (err) return done(err);
 
 
+            // check if default app has been made
+            var acc = res.body.account;
 
             App.findByAccountId(acc._id, function (err, apps) {
 
@@ -162,10 +173,12 @@ describe('Resource /account', function () {
               expect(defaultApp)
                 .to.have.property('name', 'YOUR COMPANY');
 
+              done(err);
 
-            })
-          })
-          .end(done);
+            });
+
+
+          });
 
       });
 
@@ -190,6 +203,242 @@ describe('Resource /account', function () {
         .end(done);
 
     });
+
+    it('returns error if email is not provided', function (done) {
+
+      request
+        .post('/account')
+        .send(accountWithoutEmail)
+        .expect('Content-Type', /json/)
+        .expect(400)
+        .expect({
+          "error": ["Email is required"],
+          "status": 400
+        })
+        .end(done);
+
+    });
+
+    it('returns error if password is not provided', function (done) {
+
+      request
+        .post('/account')
+        .send(accountWithoutPassword)
+        .expect('Content-Type', /json/)
+        .expect(400)
+        .expect({
+          "error": ["Password is required"],
+          "status": 400
+        })
+        .end(done);
+
+    });
+
+    it('should return error if password is shorter than 8 characters',
+      function (done) {
+
+        var acc = {
+          name: 'Pratt',
+          email: 'prateek@example.com',
+          password: '1234567'
+        };
+
+        request
+          .post('/account')
+          .send(acc)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            "error": ["Password should be longer than 8 characters"],
+            "status": 400
+          })
+          .end(done);
+
+      });
+
+
+    it('should return error if name is not provided',
+      function (done) {
+
+        var acc = {
+          email: 'prateek@example.com',
+          password: '12345678'
+        };
+
+        request
+          .post('/account')
+          .send(acc)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            "error": ['name is required'],
+            "status": 400
+          })
+          .end(done);
+
+      });
+
+    it('should return error if name is shorter than 2 characters',
+      function (done) {
+
+        var acc = {
+          name: 'N',
+          email: 'prateek@example.com',
+          password: '12345678'
+        };
+
+        request
+          .post('/account')
+          .send(acc)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            "error": ['Name should be longer than 2 characters'],
+            "status": 400
+          })
+          .end(done);
+
+      });
+
+  });
+
+
+  describe('POST /account/invite', function () {
+
+    it(
+      'creates new account, creates default app, deletes invite, and logs in user',
+      function (done) {
+
+        var newAccount = {
+
+          name: 'Pratt Bhatt',
+          email: 'prattbhatt+3@gmail.com',
+          password: 'testingtesting'
+
+        };
+
+        var inviteId;
+        var invitedByApp = saved.apps.first;
+
+
+
+        async.series([
+
+          function createInvite(done) {
+
+            // create invite
+            Invite.create({
+
+              aid: invitedByApp._id,
+              from: saved.accounts.first._id,
+              toEmail: saved.accounts.second.email
+
+            }, function (err, invite) {
+
+              if (err) return done(err);
+              inviteId = invite._id;
+
+
+              // pass inviteId in the account body
+              newAccount.inviteId = inviteId;
+
+              done();
+            });
+          },
+
+
+          function createAccount(done) {
+
+            request
+              .post('/account/invite')
+              .send(newAccount)
+              .expect('Content-Type', /json/)
+              .expect(201)
+              .expect(function (res) {
+
+                if (res.header['set-cookie'].length !== 1) {
+                  return 'header should contain with set-cookie array with one element';
+                }
+
+                expect(res.body)
+                  .to.have.property('message',
+                    'Logged In Successfully');
+
+                expect(res.body)
+                  .to.have.property('account')
+                  .that.is.an('object');
+
+                expect(res.body)
+                  .to.have.property('app')
+                  .that.is.an('object')
+                  .and.has.property('name', invitedByApp.name);
+
+                var acc = res.body.account;
+                var app = res.body.app;
+
+                // account must be in team of the app
+                var teamIds = _.pluck(app.team, 'accid');
+                expect(teamIds)
+                  .to.contain(acc._id.toString());
+
+                var teamUsernames = _.pluck(app.team, 'username');
+                expect(teamUsernames)
+                  .to.contain('pratt');
+
+              })
+              .end(function (err, res) {
+
+                if (err) return done(err);
+
+
+                // check if default app has been made
+                var acc = res.body.account;
+
+                App.findByAccountId(acc._id, function (err, apps) {
+
+                  expect(err)
+                    .to.not.exist;
+
+                  expect(apps)
+                    .to.be.an('array')
+                    .and.have.length(1);
+
+                  var defaultApp = apps[0];
+
+                  expect(defaultApp)
+                    .to.have.property('name', invitedByApp.name);
+
+                  done(err);
+
+                });
+
+              });
+
+          },
+
+
+          function inviteShouldBeDeleted(done) {
+
+            // invite should have been deleted
+            Invite
+              .findById(inviteId)
+              .exec(function (err, inv) {
+                expect(err)
+                  .to.not.exist;
+
+                expect(inv)
+                  .to.not.exist;
+
+                done();
+              });
+
+          }
+
+        ], done)
+
+
+      });
+
 
     it('returns error if email is not provided', function (done) {
 

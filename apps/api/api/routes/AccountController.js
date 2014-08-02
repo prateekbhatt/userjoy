@@ -118,45 +118,6 @@ function signupWithInvite(account, inviteId, cb) {
 }
 
 
-function signupWithoutInvite(account, cb) {
-
-  async.waterfall(
-
-    [
-
-      function createAccount(cb) {
-        account.emailVerified = false;
-        Account.create(account, cb);
-      },
-
-      function defaultApp(acc, cb) {
-        App.createDefaultApp(acc._id, function (err, app) {
-          cb(err, acc, app);
-        });
-      },
-
-      function createVerifyToken(acc, app, cb) {
-        acc.createVerifyToken(function (err, acc, verifyToken) {
-          cb(err, acc, app, verifyToken);
-        });
-      },
-
-      function sendMail(acc, app, verifyToken, cb) {
-
-        sendConfirmationMail(acc, verifyToken, function (err) {
-          cb(err, acc, app);
-        });
-
-      },
-
-    ],
-
-    cb
-
-  );
-}
-
-
 
 /**
  * GET /account/
@@ -185,6 +146,183 @@ router
  * POST /account
  *
  * Create a new account
+ *
+ * Check if invited:
+ * - if invited, add as team member to app
+ * - else, send email confirmation mail (TODO)
+ */
+
+router
+  .route('/')
+  .post(function (req, res, next) {
+
+    /**
+     * Apps config
+     */
+
+    var config = require('../../../config')('api');
+
+    var account = req.body;
+
+    async.waterfall(
+
+      [
+
+        function createAccount(cb) {
+          account.emailVerified = false;
+          Account.create(account, cb);
+        },
+
+        function defaultApp(acc, cb) {
+          App.createDefaultApp(acc._id, acc.name, function (err, app) {
+            cb(err, acc, app);
+          });
+        },
+
+        function createVerifyToken(acc, app, cb) {
+          acc.createVerifyToken(function (err, acc, verifyToken) {
+            cb(err, acc, app, verifyToken);
+          });
+        },
+
+        function sendMail(acc, app, verifyToken, cb) {
+
+          sendConfirmationMail(acc, verifyToken, function (err) {
+            cb(err, acc, app);
+          });
+
+        },
+
+        function autoLogin(acc, app, cb) {
+
+          req.login(acc, function (err) {
+            cb(err, acc, app);
+          });
+        }
+      ],
+
+      function callback(err, acc, app) {
+
+        if (err) return next(err);
+
+        return res
+          .status(201)
+          .json({
+            account: acc,
+            app: app,
+            message: 'Logged In Successfully'
+          });
+      }
+
+    );
+
+  });
+
+
+/**
+ * POST /account/invite
+ *
+ * Create a new account with invite
+ *
+ * Check if invited:
+ * - if invited, add as team member to app
+ * - else, send email confirmation mail (TODO)
+ */
+
+router
+  .route('/invite')
+  .post(function (req, res, next) {
+
+    /**
+     * Apps config
+     */
+
+    var config = require('../../../config')('api');
+
+    var account = req.body;
+    var inviteId = req.body.inviteId;
+
+
+    logger.trace({
+      at: 'AccountController:createInvite',
+      body: req.body
+    });
+
+
+    if (!inviteId) return res.badRequest('inviteId is required');
+
+
+    async.waterfall(
+
+      [
+
+        function findInvite(cb) {
+
+          Invite
+            .findById(inviteId)
+            .exec(function (err, invite) {
+              if (err) return cb(err);
+              if (!invite) return cb(new Error('Invite not found'));
+              cb(null, invite);
+            });
+        },
+
+        function createAccount(invite, cb) {
+
+          // set emailVerified as true
+          account.emailVerified = true;
+
+          Account.create(account, function (err, acc) {
+            cb(err, acc, invite);
+          });
+        },
+
+        function addMember(acc, invite, cb) {
+
+          // add as a team member to the app the user was invited to
+          App.addMember(invite.aid, acc._id, acc.name, function (err, app) {
+            cb(err, acc, invite, app);
+          });
+        },
+
+        function deleteInvite(acc, invite, app, cb) {
+          // delete invite
+          Invite.findByIdAndRemove(invite._id, function (err) {
+            cb(err, acc, app);
+          });
+
+        },
+
+        function autoLogin(acc, app, cb) {
+
+          req.login(acc, function (err) {
+            cb(err, acc, app);
+          });
+        }
+      ],
+
+      function callback(err, acc, app) {
+
+        if (err) return next(err);
+
+        return res
+          .status(201)
+          .json({
+            account: acc,
+            app: app,
+            message: 'Logged In Successfully'
+          });
+      }
+
+    );
+
+  });
+
+
+/**
+ * POST /account/invite
+ *
+ * Creates a new account with an invite id
  *
  * Check if invited:
  * - if invited, add as team member to app

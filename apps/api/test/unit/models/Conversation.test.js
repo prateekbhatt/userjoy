@@ -1,4 +1,4 @@
-describe('Model Conversation', function () {
+describe.only('Model Conversation', function () {
 
   /**
    * npm dependencies

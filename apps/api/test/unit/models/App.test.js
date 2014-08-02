@@ -39,23 +39,28 @@ describe('Model App', function () {
         .to.have.property("showMessageBox", true);
     });
 
-    it('should add account to team and as admin', function () {
+    it('should add account to team and as admin, also add username',
+      function () {
 
-      var team = saved.apps.first.team;
+        var team = saved.apps.first.team;
 
-      expect(team)
-        .to.be.an("array");
+        expect(team)
+          .to.be.an("array");
 
-      expect(team)
-        .to.have.length(1);
+        expect(team)
+          .to.have.length(1);
 
-      expect(team[0].accid)
-        .to.eql(saved.accounts.first._id);
+        expect(team[0].accid)
+          .to.eql(saved.accounts.first._id);
 
-      expect(team[0].admin)
-        .to.be.true;
+        expect(team[0].admin)
+          .to.be.true;
 
-    });
+        expect(team[0].username)
+          .to.be.a('string')
+          .that.equals('prateek');
+
+      });
 
     it(
       'should return error if name not provided, but not if subdomain is not provided',
@@ -331,15 +336,15 @@ describe('Model App', function () {
   });
 
 
-
   describe('#addMember', function () {
 
     it('should add account to team', function (done) {
 
       var aid = saved.apps.first._id;
       var newMemberId = randomId();
+      var newMemberName = 'RandOm Name';
 
-      App.addMember(aid, newMemberId, function (err, app) {
+      App.addMember(aid, newMemberId, newMemberName, function (err, app) {
 
         expect(err)
           .to.be.null;
@@ -352,12 +357,13 @@ describe('Model App', function () {
 
 
         var teamIds = _.pluck(app.team, 'accid');
-
-        expect(teamIds)
-          .to.not.be.empty;
+        var teamUsernames = _.pluck(app.team, 'username');
 
         expect(teamIds)
           .to.contain(newMemberId);
+
+        expect(teamUsernames)
+          .to.contain('random');
 
         done();
       });
@@ -369,8 +375,9 @@ describe('Model App', function () {
 
         var aid = saved.apps.first._id;
         var adminId = saved.apps.first.team[0].accid;
+        var adminName = 'somename';
 
-        App.addMember(aid, adminId, function (err, app) {
+        App.addMember(aid, adminId, adminName, function (err, app) {
 
           expect(err)
             .to.exist;
@@ -389,13 +396,77 @@ describe('Model App', function () {
   });
 
 
+  describe('#usernameExists', function () {
+
+    it('should return true if username exists', function () {
+      var app = saved.apps.first;
+      var existingUsername = app.team[0].username;
+
+      var exists = app.usernameExists(existingUsername);
+      expect(exists)
+        .to.be.true;
+    });
+
+
+    it('should return false if username exists', function () {
+
+      var app = saved.apps.first;
+      var nonexistingUsername = 'randomrandom';
+
+      var exists = app.usernameExists(nonexistingUsername);
+      expect(exists)
+        .to.be.false;
+    });
+
+  });
+
+
+  describe('#getUsername', function () {
+
+    it('should return username if it doesnot exist', function () {
+
+      var app = saved.apps.first;
+      var nonexistingUsername = 'randomrandom';
+
+      var un = app.getUsername(nonexistingUsername);
+      expect(un)
+        .to.eql(nonexistingUsername);
+    });
+
+
+    it('should take firstName and lowercase it while generating username',
+      function () {
+
+        var app = saved.apps.first;
+        var nonexistingUsername = 'RandOm Dandom';
+
+        var un = app.getUsername(nonexistingUsername);
+        expect(un)
+          .to.eql('random');
+      });
+
+
+    it('should return append number to username to make it unique',
+      function () {
+        var app = saved.apps.first;
+        var existingUsername = app.team[0].username;
+
+        var un = app.getUsername(existingUsername);
+        expect(un)
+          .to.eql(existingUsername + '1');
+      });
+
+  });
+
+
   describe('#createDefaultApp', function () {
 
     it('should create default app for an account', function (done) {
 
       var accid = saved.accounts.first._id;
+      var accName = 'Prateek Bhatt';
 
-      App.createDefaultApp(accid, function (err, defaultApp) {
+      App.createDefaultApp(accid, accName, function (err, defaultApp) {
 
         expect(err)
           .to.be.null;
@@ -407,9 +478,7 @@ describe('Model App', function () {
           .to.eql('YOUR COMPANY');
 
         var teamIds = _.pluck(defaultApp.team, 'accid');
-
-        expect(teamIds)
-          .to.not.be.empty;
+        var teamUsernames = _.pluck(defaultApp.team, 'username');
 
         expect(teamIds)
           .to.contain(accid);
@@ -418,6 +487,9 @@ describe('Model App', function () {
         // and sparse indexes defined on it
         expect(defaultApp)
           .to.not.have.property('subdomain');
+
+        expect(teamUsernames)
+          .to.contain('prateek');
 
         done();
       });
