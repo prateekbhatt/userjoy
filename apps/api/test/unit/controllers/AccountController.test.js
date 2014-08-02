@@ -122,7 +122,7 @@ describe('Resource /account', function () {
           .expect('Content-Type', /json/)
           .expect(201)
           .expect(function (res) {
-            if (res.header['set-cookie'].length !== 1) {
+            if (!res.header['set-cookie'].length) {
               return 'header should contain with set-cookie array with one element';
             }
 
@@ -355,10 +355,6 @@ describe('Resource /account', function () {
               .expect('Content-Type', /json/)
               .expect(201)
               .expect(function (res) {
-
-                if (res.header['set-cookie'].length !== 1) {
-                  return 'header should contain with set-cookie array with one element';
-                }
 
                 expect(res.body)
                   .to.have.property('message',
