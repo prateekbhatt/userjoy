@@ -152,7 +152,7 @@ UserNote      |                         | notes created by team members about a 
 - queuedScore (when was the score queue last queued)
 - queuedUsage (when was the usage queue last queued)
 - subdomain (dodatado.mail.userjoy.co)
-- team [{accId, admin}]
+- team [{accId, admin, username, customEmail}]
 - x tags [] stores all tags that the app has used for its users
 - ut
 

@@ -102,7 +102,7 @@ router
         },
 
         function addToTeam(account, cb) {
-          App.addMember(aid, account._id, function (err, app) {
+          App.addMember(aid, account._id, account.name, function (err, app) {
 
             // if 'is team member' error, delete invite and send response
 
