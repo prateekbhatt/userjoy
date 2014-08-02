@@ -28,7 +28,21 @@ var TeamMemberSchema = new Schema({
   admin: {
     type: Boolean,
     default: false
+  },
+
+  // "pratt@dodatado.mail.userjoy.co"
+  // this field has to be unique for each app
+  username: {
+    type: String,
+    lowercase: true
+  },
+
+  // "prateek@dodatado.com"
+  customEmail: {
+    type: String,
+    lowercase: true
   }
+
 });
 
 
@@ -196,10 +210,11 @@ AppSchema.statics.queued = function (aids, queue, updateTime, cb) {
  *
  * @param {string} aid app-id
  * @param {string} accid team-member account id
+ * @param {string} accName account-name
  * @param {function} cb callback
  */
 
-AppSchema.statics.addMember = function (aid, accid, cb) {
+AppSchema.statics.addMember = function (aid, accid, accName, cb) {
 
   async.waterfall(
     [
@@ -226,8 +241,10 @@ AppSchema.statics.addMember = function (aid, accid, cb) {
       },
 
       function addMember(app, cb) {
+
         app.team.push({
-          accid: accid
+          accid: accid,
+          username: app.getUsername(accName)
         });
 
         app.save(cb)
@@ -246,20 +263,140 @@ AppSchema.statics.addMember = function (aid, accid, cb) {
  * done to simplify the onboarding UX for a new account
  *
  * @param {string} accid account-id
+ * @param {string} accName account-name
  * @param {function} cb callback
  */
 
-AppSchema.statics.createDefaultApp = function (accid, cb) {
+AppSchema.statics.createDefaultApp = function (accid, accName, cb) {
+
+  // CREATE USERNAME
+  // AT THIS POINT, THERE ARE NO USERS, SO WE DO NOT NEED TO WORRY
+  // ABOUT THE UNIQUENESS
+  if (!accName) return cb(new Error('name is required'));
+
+  // split by spaces
+  var firstName = accName.split(' ')[0];
+
+  // lowercase the username
+  var username = firstName.toLowerCase();
+
+
 
   var defaultApp = {
     name: 'YOUR COMPANY',
     team: []
   };
 
+
   defaultApp.team.push({
     accid: accid,
-    admin: true
+    admin: true,
+    username: username
   });
+
+
+  App.create(defaultApp, cb);
+};
+
+
+/**
+ * checks if username exists
+ *
+ * @param {string} username
+ * @return {boolean}
+ */
+
+AppSchema.methods.usernameExists = function (username) {
+
+  var app = this;
+
+  // existing usernames
+  var exists = _.chain(app.team)
+    .pluck('username')
+    .reject(function (u) {
+      return !u;
+    })
+    .map(function (u) {
+      return u.toLowerCase();
+    })
+    .contains(username.toLowerCase())
+    .value();
+
+  return exists;
+
+};
+
+
+/**
+ * Checks if the username is available
+ * if not, appends 1,2,3,4 so on to the username, till its unique :)
+ * Also, just takes the first word, and lowercases it
+ *
+ * EXAMPLE:
+ * For 'Prateek Bhatt':
+ * if 'prateek', 'prateek1' are not available,
+ * then returns 'prateek2'
+ *
+ * @param {string} name
+ * @return {string} available-username
+ */
+
+AppSchema.methods.getUsername = function (name) {
+
+  var app = this;
+
+  if (!name) throw new Error('name is required');
+
+  // split by spaces
+  var firstName = name.split(' ')[0];
+
+  // lowercase the username
+  var username = firstName.toLowerCase();
+
+  var checkName = username;
+  var i = 1;
+
+  while (app.usernameExists(checkName)) {
+    checkName = username + i;
+    i += 1;
+  }
+
+  return checkName;
+};
+
+
+/**
+ * Updates the username of a team member
+ *
+ * EXAMPLE:
+ *
+ * "prateek@dodatado.mail.userjoy.co"
+ * username: "prateek"
+ * subdomain: "dodatado"
+ *
+ * NOTES:
+ *
+ * Return error if not unique for the app
+ * Should be lowercase
+ * Should not have spaces and special characters other than "." and "_"
+ *
+ *
+ * @param {string} aid app-id
+ * @param {string} accid account-id
+ * @param {function} cb callback
+ */
+
+AppSchema.methods.updateUsername = function (accid, username, cb) {
+
+  var app = this;
+
+  // lowercase the username
+  username && (username = username.toLowerCase());
+
+  // if not unique username, return error
+  if (app.usernameExists(username)) {
+    return cb(new Error('It must be a unique username for the app'));
+  }
 
   App.create(defaultApp, cb);
 };
