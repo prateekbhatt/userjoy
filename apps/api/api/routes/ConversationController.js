@@ -510,7 +510,10 @@ router
     var aid = req.app._id;
     var sub = newMsg.sub;
     var uids = newMsg.uids;
-    var fromEmail = appEmail(aid);
+
+    var subdomain = req.app.subdomain;
+    var username = req.app.getUsernameByAccountId(req.user._id);
+    var fromEmail = appEmail(username, subdomain);
 
     // since this is a multi-query request (transaction), we need to make all
     // input validations upfront
@@ -624,17 +627,7 @@ router
             var msgId = _.last(conv.messages)
               ._id;
 
-            var fromEmail = appEmail(aid);
             var fromName = req.user.name;
-
-            // var replyToEmail = appEmail.reply.create({
-            //   aid: conv.aid.toString(),
-            //   type: 'manual',
-            //   messageId: conv._id
-            // });
-
-            // reply-to email should be the same as from email
-            var replyToEmail = fromEmail;
 
             var opts = {
 
@@ -647,16 +640,14 @@ router
                 conversation: conv
               },
 
+              // ALERT: change this before pushing to production
+              // NOT REQUIRED TO TRACK manual/auto messages separately anymore
+              //
               // pass the message id of the reply
               // this would be used to track if the message was opened
               metadata: {
                 'uj_type': 'manual',
                 'uj_mid': msgId
-              },
-
-              replyTo: {
-                email: replyToEmail,
-                name: 'Reply to ' + fromName
               },
 
               subject: conv.sub,
@@ -703,7 +694,7 @@ router
       ],
 
       function callback(err, cons) {
-        console.log('\n\n\n ALLL CONS RA', err, cons);
+
         if (err) return next(err);
         res
           .status(201)
@@ -728,6 +719,10 @@ router
     var accid = req.user._id;
     var aid = req.app._id;
     var coId = req.params.coId;
+
+    var subdomain = req.app.subdomain;
+    var username = req.app.getUsernameByAccountId(req.user._id);
+    var fromEmail = appEmail(username, subdomain);
 
     // sName should be the name of the loggedin account or its primary email
     var sName = req.user.name || req.user.email;
@@ -789,23 +784,9 @@ router
               var msgId = _.last(conv.messages)
                 ._id;
 
-              // generate from email address
-              var fromEmail = appEmail(aid);
-
 
               var fromName = req.user.name;
               var type = conv.amId ? 'auto' : 'manual';
-
-
-              // generate reply-to email address
-              // var replyToEmail = appEmail.reply.create({
-              //   aid: conv.aid.toString(),
-              //   type: 'manual',
-              //   messageId: conv._id
-              // });
-
-              // reply-to email should be the same as from email
-              var replyToEmail = fromEmail;
 
               // clone the conversation, in order to avoid the messages array
               // from being disordered while rendering the mailer template
@@ -822,16 +803,14 @@ router
                   conversation: clonedConv
                 },
 
+                // ALERT: REMOVE ALL THIS
+                // not required to check manual / automessage anymore
+                //
                 // pass the message id of the reply
                 // this would be used to track if the message was opened
                 metadata: {
                   'uj_type': 'manual',
                   'uj_mid': msgId
-                },
-
-                replyTo: {
-                  email: replyToEmail,
-                  name: 'Reply to ' + fromName
                 },
 
                 subject: conv.sub,

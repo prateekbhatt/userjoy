@@ -421,6 +421,79 @@ describe('Model App', function () {
   });
 
 
+  describe('#findBySubdomain', function () {
+
+    it('should return app', function (done) {
+
+      var givenApp = saved.apps.first;
+      var subdomain = givenApp.subdomain;
+
+      App.findBySubdomain(subdomain, function (err, app) {
+        expect(err)
+          .to.not.exist;
+
+        expect(app)
+          .to.be.an('object')
+          .and.to.have.property('subdomain', subdomain);
+
+        done();
+      });
+
+    });
+
+  });
+
+
+  describe('#getAccountIdByUsername', function () {
+
+    it('should return account id', function () {
+      var app = saved.apps.first;
+      var member = app.team[0];
+      var givenUsername = member.username;
+
+      var foundAccountId = app.getAccountIdByUsername(givenUsername);
+      expect(foundAccountId)
+        .to.eql(member.accid);
+    });
+
+    it('should return null if username does not exist', function () {
+      var app = saved.apps.first;
+      var member = app.team[0];
+      var givenUsername = 'randomUsernameThatDontExist';
+
+      var foundAccountId = app.getAccountIdByUsername(givenUsername);
+      expect(foundAccountId)
+        .to.be.null;
+    });
+
+  });
+
+
+  describe('#getUsernameByAccountId', function () {
+
+    it('should return username', function () {
+      var app = saved.apps.first;
+      var member = app.team[0];
+      var givenAccId = member.accid;
+
+      var foundUsername = app.getUsernameByAccountId(givenAccId);
+      expect(foundUsername)
+        .to.eql(member.username);
+    });
+
+    it('should return null if accid does not exist', function () {
+      var app = saved.apps.first;
+      var member = app.team[0];
+      var givenAccId = 'randomAccidThatDontExist';
+
+      var foundUsername = app.getUsernameByAccountId(givenAccId);
+      expect(foundUsername)
+        .to.be.null;
+    });
+
+  });
+
+
   describe('#getUsername', function () {
 
     it('should return username if it doesnot exist', function () {
