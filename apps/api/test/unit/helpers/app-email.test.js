@@ -3,6 +3,25 @@ describe('Helper app-email', function () {
   var appEmail = require('../../../helpers/app-email');
 
 
+  describe('()', function () {
+
+    it('should create userjoy email id for the user', function () {
+
+      var username = 'prateek';
+      var subdomain = 'dodatado';
+
+      var expectedOutput = 'prateek@dodatado.test-mail.userjoy.co';
+
+      var output = appEmail(username, subdomain);
+
+      expect(output)
+        .to.eql(expectedOutput);
+
+    });
+
+  });
+
+
   describe('#reply.create', function () {
 
     var input = {
