@@ -48,7 +48,7 @@ describe('Resource /auth', function () {
           .end(done);
       });
 
-    it('should return error if the email is not verified',
+    it('should NOT return error if the email is not verified',
       function (done) {
 
         var acc = saved.accounts.second;
@@ -64,11 +64,7 @@ describe('Resource /auth', function () {
             password: acc.password
           })
           .expect('Content-Type', /json/)
-          .expect(403)
-          .expect({
-            status: 403,
-            error: "EMAIL_NOT_VERIFIED"
-          })
+          .expect(200)
           .expect(function (res) {
             if (res.header['set-cookie'].length !== 1) {
               return 'header should contain with set-cookie array with one element';

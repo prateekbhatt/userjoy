@@ -69,56 +69,6 @@ function sendConfirmationMail(acc, verifyToken, cb) {
 }
 
 
-function signupWithInvite(account, inviteId, cb) {
-
-  async.waterfall(
-
-    [
-
-      function findInvite(cb) {
-
-        Invite
-          .findById(inviteId)
-          .exec(function (err, invite) {
-            if (err) return cb(err);
-            if (!invite) return cb(new Error('Invite not found'));
-            cb(null, invite);
-          });
-      },
-
-      function createAccount(invite, cb) {
-
-        // set emailVerified as true
-        account.emailVerified = true;
-
-        Account.create(account, function (err, acc) {
-          cb(err, acc, invite);
-        });
-      },
-
-      function addMember(acc, invite, cb) {
-
-        // add as a team member to the app the user was invited to
-        App.addMember(invite.aid, acc._id, function (err, app) {
-          cb(err, acc, invite);
-        });
-      },
-
-      function deleteInvite(acc, invite, cb) {
-        // delete invite
-        Invite.findByIdAndRemove(invite._id, function (err) {
-          cb(err, acc);
-        });
-
-      }
-    ],
-
-    cb
-  );
-}
-
-
-
 /**
  * GET /account/
  *
@@ -291,14 +241,8 @@ router
             cb(err, acc, app);
           });
 
-        },
-
-        function autoLogin(acc, app, cb) {
-
-          req.login(acc, function (err) {
-            cb(err, acc, app);
-          });
         }
+
       ],
 
       function callback(err, acc, app) {

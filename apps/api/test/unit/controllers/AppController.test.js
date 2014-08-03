@@ -243,6 +243,10 @@ describe('Resource /apps', function () {
               .and.has.keys(['_id', 'name', 'email'])
               .and.has.property('_id', saved.accounts.first._id.toString());
 
+            expect(res.body.team[0])
+              .to.have.property('username')
+              .that.is.a('string');
+
           })
           .expect(200)
           .end(done);

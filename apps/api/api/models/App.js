@@ -300,6 +300,62 @@ AppSchema.statics.createDefaultApp = function (accid, accName, cb) {
 
 
 /**
+ * Find app by subdomain
+ *
+ * @param {string} subdomain
+ * @param {function} cb callback
+ */
+
+AppSchema.statics.findBySubdomain = function (subdomain, cb) {
+
+  App
+    .findOne({
+      subdomain: subdomain
+    })
+    .exec(cb);
+
+};
+
+
+/**
+ * Get the account id of a team member from his username
+ *
+ * @param {string} username
+ * @return {string} account-id
+ */
+
+AppSchema.methods.getAccountIdByUsername = function (username) {
+
+  var app = this;
+
+  var acc = _.find(app.team, {
+    username: username
+  });
+
+  return acc ? acc.accid : null;
+};
+
+
+/**
+ * Get the username of a team member from his account id
+ *
+ * @param {string} accid account-id
+ * @return {string} username
+ */
+
+AppSchema.methods.getUsernameByAccountId = function (accid) {
+
+  var app = this;
+
+  var acc = _.find(app.team, function (u) {
+    return u.accid.toString() === accid.toString();
+  });
+
+  return acc ? acc.username : null;
+};
+
+
+/**
  * checks if username exists
  *
  * @param {string} username
