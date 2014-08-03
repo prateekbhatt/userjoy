@@ -14,7 +14,6 @@ var router = require('express')
  * Helpers
  */
 
-var appEmail = require('../../helpers/app-email');
 var logger = require('../../helpers/logger');
 
 
@@ -191,92 +190,8 @@ function getAssigneeAccount(accid, cb) {
 }
 
 
-
-// router
-//   .route('/new/apps/:aid')
-//   .post(function (req, res, next) {
-
-//     logger.trace({
-//       at: 'MailgunController new',
-//       // body: req.body['stripped-text'],
-//       param: req.params
-//     });
-
-//     var aid = req.params.aid;
-
-//     // REF: http://documentation.mailgun.com/user_manual.html#routes
-//     var body = req.body['stripped-text'];
-
-//     var ct = req.body.timestamp * 1000;
-//     var sender = req.body.sender;
-//     var subject = req.body.subject;
-
-//     var user = {
-//       email: sender
-//     };
-
-//     var callback = mailgunCallback(req, res, next);
-
-//     async.waterfall(
-
-//       [
-
-//         function getOrCreateUser(cb) {
-//           User.findOrCreate(aid, user, function (err, usr) {
-//             cb(err, usr);
-//           });
-//         },
-
-
-//         function createConversation(user, cb) {
-
-//           var newConv = {
-//             aid: aid,
-//             ct: ct,
-//             messages: [
-
-//               {
-
-//                 body: body,
-//                 ct: ct,
-//                 from: 'user',
-//                 sent: true,
-//                 sName: user.name || user.email,
-//                 type: 'email',
-
-//               }
-
-//             ],
-//             sub: subject,
-//             uid: user._id
-//           };
-
-//           Conversation.create(newConv, function (err, con) {
-//             cb(err, con, user);
-//           });
-//         },
-
-//         function getAdminAccount(con, user, cb) {
-//           getAdmin(con.aid, function (err, acc) {
-//             cb(err, acc, con, user);
-//           });
-//         },
-
-//         function sendAdminConversation(acc, con, user, cb) {
-//           sendEmail(user.email, acc, con, cb);
-//         }
-
-
-//       ],
-
-//       callback);
-
-//   });
-
-
-
 router
-  .route('/new/apps/:aid')
+  .route('/subdomain/:subdomain/username/:username')
   .post(function (req, res, next) {
 
     logger.trace({
@@ -286,14 +201,14 @@ router
       body: req.body
     });
 
+    var subdomain = req.params.subdomain;
+    var username = req.params.username;
+
 
     // get unique message-ids set by mailgun/gmail/outlook ...
     // used for creating email threads
     var replyToEmailId = req.body['In-Reply-To'];
     var newMsgEmailId = req.body['Message-Id'];
-
-
-    var aid = req.params.aid;
 
     // REF: http://documentation.mailgun.com/user_manual.html#routes
     var body = req.body['stripped-text'];
@@ -305,7 +220,8 @@ router
     var callback = mailgunCallback(req, res, next);
 
 
-console.log('\n\n\n\n THE EMAIL IDS', replyToEmailId, newMsgEmailId, '\n\n\n\n');
+    console.log('\n\n\n\n THE EMAIL IDS', replyToEmailId, newMsgEmailId,
+      '\n\n\n\n');
 
 
     if (replyToEmailId) {
@@ -316,12 +232,20 @@ console.log('\n\n\n\n THE EMAIL IDS', replyToEmailId, newMsgEmailId, '\n\n\n\n')
 
         [
 
-          function getOrCreateUser(cb) {
+          function getApp(cb) {
+
+            App.findBySubdomain(subdomain, function (err, app) {
+              cb(err, app);
+            });
+
+          },
+
+          function getOrCreateUser(app, cb) {
             var user = {
               email: sender
             };
 
-            User.findOrCreate(aid, user, cb);
+            User.findOrCreate(app._id, user, cb);
           },
 
 
@@ -373,17 +297,29 @@ console.log('\n\n\n\n THE EMAIL IDS', replyToEmailId, newMsgEmailId, '\n\n\n\n')
 
         [
 
-          function getOrCreateUser(cb) {
-            User.findOrCreate(aid, user, function (err, usr) {
-              cb(err, usr);
+          function getApp(cb) {
+            App.findBySubdomain(subdomain, function (err, app) {
+              cb(err, app);
             });
           },
 
 
-          function createConversation(user, cb) {
+          function getOrCreateUser(app, cb) {
+
+            var user = {
+              email: sender
+            };
+
+            User.findOrCreate(app._id, user, function (err, usr) {
+              cb(err, app, usr);
+            });
+          },
+
+
+          function createConversation(app, user, cb) {
 
             var newConv = {
-              aid: aid,
+              aid: app._id,
               ct: ct,
               messages: [
 
@@ -391,6 +327,10 @@ console.log('\n\n\n\n THE EMAIL IDS', replyToEmailId, newMsgEmailId, '\n\n\n\n')
 
                   body: body,
                   ct: ct,
+
+                  // the unique message-id of the email
+                  emailId: newMsgEmailId,
+
                   from: 'user',
                   sent: true,
                   sName: user.name || user.email,
@@ -402,6 +342,14 @@ console.log('\n\n\n\n THE EMAIL IDS', replyToEmailId, newMsgEmailId, '\n\n\n\n')
               sub: subject,
               uid: user._id
             };
+
+            // get account id of assignee
+            var assignee = app.getAccountIdByUsername(username);
+
+            // if not team member not found, do not assign
+            if (assignee) newConv.assignee = assignee;
+
+            console.log('\n\n\n\n\n CREAting conversATION', newConv, '\n\n\n\n');
 
             Conversation.create(newConv, function (err, con) {
               cb(err, con, user);
