@@ -37,8 +37,8 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <!-- <th class="text-center" width="50%">Name</th> -->
                         <th class="text-center">Email Id</th>
+                        <th class="text-center" width="50%">UserJoy Email Id</th>
                         <!-- <th class="text-center">Incoming Email</th>
                         <th class="text-center"></th> -->
                     </tr>
@@ -48,8 +48,8 @@
                     <tr ng-repeat="member in team">
                         <!-- <td class="text-center">{{member.name}}</td> -->
                         <td class="text-center">{{member.email}}</td>
-                        <!-- <td>{{member.incomingEmail}}</td>
-                        <td><a class="btn btn-sm btn-default fa fa-times-circle-o" ng-click="removeTeamMember(member)"></a></td> -->
+                        <td class="text-center">{{member.ujEmail}}</td>
+                       <!--  <td><a class="btn btn-sm btn-default fa fa-times-circle-o" ng-click="removeTeamMember(member)"></a></td> -->
                     </tr>
                 </tbody>
             </table>
