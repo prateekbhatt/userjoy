@@ -220,10 +220,6 @@ router
     var callback = mailgunCallback(req, res, next);
 
 
-    console.log('\n\n\n\n THE EMAIL IDS', replyToEmailId, newMsgEmailId,
-      '\n\n\n\n');
-
-
     if (replyToEmailId) {
 
       // IF ITS A REPLY THEN replyToEmailId MUST BE PRESENT
@@ -348,8 +344,6 @@ router
 
             // if not team member not found, do not assign
             if (assignee) newConv.assignee = assignee;
-
-            console.log('\n\n\n\n\n CREAting conversATION', newConv, '\n\n\n\n');
 
             Conversation.create(newConv, function (err, con) {
               cb(err, con, user);

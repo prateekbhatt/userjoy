@@ -128,7 +128,8 @@ var accounts = {
         body: 'Hello World 2',
         from: 'account',
         sName: 'Prateek2',
-        type: 'notification'
+        type: 'notification',
+        emailId: 'secondMessageEmailId@domain123'
       }],
       closed: true,
       sub: 'First Conversation!',
@@ -453,8 +454,13 @@ module.exports = function loadFixtures(callback) {
     createFirstAutoMessage: function (cb) {
 
       var aid = apps.first._id;
-      var accid = accounts.first._id;
-      var sender = accounts.second._id;
+
+      // WARNING: Changing the next two lines would break tests in
+      // AutoMessageController:send-test, and also in amconsumer
+      var accid = accounts.second._id;
+      var sender = accounts.first._id;
+
+
       var sid = segments.first._id;
       var automessage = automessages.first;
 
@@ -471,8 +477,13 @@ module.exports = function loadFixtures(callback) {
     createSecondAutoMessage: function (cb) {
 
       var aid = apps.first._id;
-      var accid = accounts.first._id;
-      var sender = accounts.second._id;
+
+      // WARNING: Changing the next two lines would break tests in
+      // AutoMessageController:send-test, and also in amconsumer
+      var accid = accounts.second._id;
+      var sender = accounts.first._id;
+
+
       var sid = segments.first._id;
       var automessage = automessages.second;
 
