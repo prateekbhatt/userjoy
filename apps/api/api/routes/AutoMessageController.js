@@ -13,6 +13,8 @@ var router = require('express')
  */
 
 var AutoMessage = require('../models/AutoMessage');
+var Conversation = require('../models/Conversation');
+var User = require('../models/User');
 
 
 /**
@@ -214,6 +216,12 @@ router
     var aid = req.params.aid;
     var amId = req.params.amId;
 
+    // get fromEmail address from username
+    var subdomain = req.app.subdomain;
+    var username = req.app.getUsernameByAccountId(req.user._id);
+    var fromEmail = appEmail(username, subdomain);
+
+
     async.waterfall(
 
       [
@@ -233,22 +241,64 @@ router
         },
 
 
-        function sendMail(amsg, cb) {
-
-          var locals = {
-            user: req.user
+        // get or create an user for the admin in its own app
+        function getOrCreateUser(amsg, cb) {
+          var user = {
+            email: amsg.sender.email
           };
 
-          // render body and subject in BEFORE calling mailer service
-          var body = render.string(amsg.body, locals);
-          var subject = render.string(amsg.sub, locals);
+          User.findOrCreate(req.app._id, user, function (err, usr) {
+            cb(err, amsg, usr);
+          });
+        },
 
-          var fromEmail = appEmail(aid);
+
+        function createConversation(amsg, user, cb) {
+
+          // locals to be passed for rendering the templates
+          var locals = {
+            user: user
+          };
+
+          // render body and subject
+          var body = render.string(amsg.body, locals);
+          var sub = render.string(amsg.sub, locals);
+
+          var newConversation = {
+            aid: aid,
+            assignee: amsg.sender._id,
+            messages: [],
+            sub: sub,
+            uid: user._id
+          };
+
+          var newMsg = {
+            accid: amsg.sender._id,
+            body: body,
+
+            // add from as 'account'
+            from: 'account',
+
+            sName: amsg.sender.name,
+            type: 'email'
+          };
+
+          // push message into conversation
+          newConversation.messages.push(newMsg);
+
+          Conversation.create(newConversation, function (err, con) {
+            cb(err, amsg, user, con);
+          });
+        },
+
+
+        function sendMail(amsg, user, con, cb) {
+
           var fromName = amsg.sender.name;
 
           var options = {
             locals: {
-              body: body
+              body: con.messages[0].body,
             },
             from: {
               email: fromEmail,
@@ -264,47 +314,27 @@ router
             //   'uj_type': 'auto',
             // },
 
-            replyTo: {
-              email: appEmail.reply.create({
-                aid: amsg.aid,
-                type: 'auto',
-                messageId: amsg._id
-              }),
-              name: 'Reply to ' + fromName
-            },
-            subject: subject,
+            subject: con.sub,
             to: {
-              email: req.user.email,
-              name: req.user.name
+              email: user.email,
+              name: user.name || user.email
             },
           };
 
-          userMailer.sendAutoMessage(options, function (err, responseStatus) {
+          userMailer.sendAutoMessage(options, function (err, resp) {
 
-            if (err) {
+            var msgId = con.messages[0]._id;
+            var emailId = resp.messageId;
 
-              logger.crit({
-                at: 'automessage:send-test',
-                toEmail: req.user.email,
-                err: err,
-                res: responseStatus
-              });
-            } else {
-              logger.debug({
-                at: 'automessage:send-test',
-                toEmail: req.user.email,
-                res: responseStatus
-              });
-            }
-
-            cb(err);
+            // update emailId to allow threading
+            Conversation.updateEmailId(msgId, emailId, cb);
           });
 
         }
       ],
 
 
-      function callback(err, responseStatus) {
+      function callback(err) {
 
         if (err) {
 
@@ -351,7 +381,8 @@ router
     var status = req.params.status;
 
     if (!_.contains(['true', 'false'], status)) {
-      return res.badRequest('Active status should be either true or false');
+      return res.badRequest(
+        'Active status should be either true or false');
     }
 
 
