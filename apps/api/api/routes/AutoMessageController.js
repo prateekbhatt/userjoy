@@ -31,14 +31,13 @@ var isAuthenticated = require('../policies/isAuthenticated');
 
 var appEmail = require('../../helpers/app-email');
 var logger = require('../../helpers/logger');
-var render = require('../../helpers/render-message');
 
 
 /**
  * Services
  */
 
-var userMailer = require('../services/user-mailer');
+var automessage = require('../services/automessage');
 
 
 /**
@@ -216,11 +215,6 @@ router
     var aid = req.params.aid;
     var amId = req.params.amId;
 
-    // get fromEmail address from username
-    var subdomain = req.app.subdomain;
-    var username = req.app.getUsernameByAccountId(req.user._id);
-    var fromEmail = appEmail(username, subdomain);
-
 
     async.waterfall(
 
@@ -253,83 +247,8 @@ router
         },
 
 
-        function createConversation(amsg, user, cb) {
-
-          // locals to be passed for rendering the templates
-          var locals = {
-            user: user
-          };
-
-          // render body and subject
-          var body = render.string(amsg.body, locals);
-          var sub = render.string(amsg.sub, locals);
-
-          var newConversation = {
-            aid: aid,
-            assignee: amsg.sender._id,
-            messages: [],
-            sub: sub,
-            uid: user._id
-          };
-
-          var newMsg = {
-            accid: amsg.sender._id,
-            body: body,
-
-            // add from as 'account'
-            from: 'account',
-
-            sName: amsg.sender.name,
-            type: 'email'
-          };
-
-          // push message into conversation
-          newConversation.messages.push(newMsg);
-
-          Conversation.create(newConversation, function (err, con) {
-            cb(err, amsg, user, con);
-          });
-        },
-
-
-        function sendMail(amsg, user, con, cb) {
-
-          var fromName = amsg.sender.name;
-
-          var options = {
-            locals: {
-              body: con.messages[0].body,
-            },
-            from: {
-              email: fromEmail,
-              name: fromName
-            },
-
-            // NOTE: tracking should be disabled for test mail
-            // metadata: {
-            //   'uj_aid': amsg.aid,
-            //   'uj_title': amsg.title,
-            //   'uj_mid': amsg._id,
-            //   'uj_uid': req.user,
-            //   'uj_type': 'auto',
-            // },
-
-            subject: con.sub,
-            to: {
-              email: user.email,
-              name: user.name || user.email
-            },
-          };
-
-          userMailer.sendAutoMessage(options, function (err, resp) {
-
-            var msgId = con.messages[0]._id;
-            var emailId = resp.messageId;
-
-            // update emailId to allow threading
-            Conversation.updateEmailId(msgId, emailId, cb);
-          });
-
+        function createConversationAndSend(amsg, user, cb) {
+          automessage(req.app, amsg, amsg.sender, user, cb);
         }
       ],
 

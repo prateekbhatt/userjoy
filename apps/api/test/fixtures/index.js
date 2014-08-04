@@ -453,8 +453,13 @@ module.exports = function loadFixtures(callback) {
     createFirstAutoMessage: function (cb) {
 
       var aid = apps.first._id;
-      var accid = accounts.first._id;
-      var sender = accounts.second._id;
+
+      // WARNING: Changing the next two lines would break tests in
+      // AutoMessageController:send-test
+      var accid = accounts.second._id;
+      var sender = accounts.first._id;
+
+
       var sid = segments.first._id;
       var automessage = automessages.first;
 
