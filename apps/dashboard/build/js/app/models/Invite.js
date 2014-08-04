@@ -11,7 +11,7 @@ angular
           password: password,
           inviteId: inviteId
         }
-        $http.post(config.apiUrl + '/account', data)
+        $http.post(config.apiUrl + '/account/invite', data)
           .success(function (successdata) {
             console.log(
               "account created for invited member");

@@ -22,7 +22,8 @@ angular.module('models.auth', ['services'])
 
           authService.loginConfirmed();
           ipCookie('loggedin', "true", {
-            path: '/'
+            path: '/',
+            domain: config.cookieDomain
           });
           LoginService.setUserAuthenticated(true);
           login.setLoggedIn(true);
