@@ -468,7 +468,7 @@ describe('Model Conversation', function () {
         type: 'email',
         emailId: 'randomId'
       };
-      var replyToEmailId = saved.conversations.first.messages[0].emailId;
+      var replyToEmailId = saved.conversations.second.messages[0].emailId;
 
 
       Conversation.replyByEmailId(replyToEmailId, reply,
@@ -479,9 +479,9 @@ describe('Model Conversation', function () {
 
           expect(con.messages)
             .to.be.an('array')
-            .that.has.length(3);
+            .that.has.length(2);
 
-          var msg = con.messages[2];
+          var msg = con.messages[1];
 
           expect(msg)
             .to.be.an('object');
@@ -618,9 +618,9 @@ describe('Model Conversation', function () {
 
           expect(con.messages)
             .to.be.an('array')
-            .that.has.length(4);
+            .that.has.length(3);
 
-          var msg = con.messages[3];
+          var msg = con.messages[2];
 
           expect(msg)
             .to.be.an('object');

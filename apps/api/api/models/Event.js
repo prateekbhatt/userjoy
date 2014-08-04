@@ -178,9 +178,9 @@ EventSchema.statics.automessage = function (ids, state, title, cb) {
   }
 
 
-  if (!_.contains(['queued', 'sent', 'seen', 'clicked', 'replied'], state)) {
+  if (!_.contains(['sent', 'seen', 'clicked', 'replied'], state)) {
     return cb(new Error(
-      'automessage state must be one of queued/sent/seen/clicked/replied'));
+      'automessage state must be one of sent/seen/clicked/replied'));
   }
 
 
