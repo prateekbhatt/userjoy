@@ -10,15 +10,23 @@ var opts = {
 };
 
 var signupApiUrl;
+var loginApiUrl;
+var cookieDomain;
 switch (document.domain) {
 case 'www.do.localhost':
   signupApiUrl = 'http://api.do.localhost/account';
+  loginApiUrl = 'http://api.do.localhost/auth/login';
+  cookieDomain = '.do.localhost';
   break;
 case 'do.localhost':
   signupApiUrl = 'http://api.do.localhost/account';
+  loginApiUrl = 'http://api.do.localhost/auth/login';
+  cookieDomain = '.do.localhost';
   break;
 default:
   signupApiUrl = 'https://api.userjoy.co/account';
+  loginApiUrl = 'https://api.userjoy.co/auth/login';
+  cookieDomain = '.userjoy.co';
 }
 
 $('#signup_form_submit')
@@ -31,13 +39,18 @@ $('#signup_form_submit')
     var div = document.getElementById('spin');
     var spinner = new Spinner(opts)
       .spin(div);
-    var emailId = $('#email').val();
+    var emailId = $('#email')
+      .val();
     $('#signup_form_submit')
       .attr("disabled", true);
     // TODO: change url for production
     $.ajax({
       url: signupApiUrl,
       type: 'POST',
+      crossDomain: true,
+      xhrFields: {
+        withCredentials: true
+      },
       data: $('#signup_form')
         .serialize(),
       dataType: 'json',
@@ -47,22 +60,27 @@ $('#signup_form_submit')
           .css({
             display: "none"
           })
-        console.log('signup success', arguments);
+        console.log('signup success', arguments, data);
         $('#signup_form_submit')
           .attr("disabled", false);
-        $("#signupsuccess")
-          .css("display", "block");
+        // $("#signupsuccess")
+        //   .css("display", "block");
         $("#signupalert")
           .css("display", "none");
-        // $('#signupsuccess')
-        //   .removeClass('hide');
-        // $('#signupalert')
-        //   .addClass('hide');
-        $('#successtext')
-          .text(
-            "To complete your sign up, click the verification link in the confirmation email sent to " + emailId
-        );
-        //redirect to login
+
+        // set "loggedin" cookie on root domain
+        $.cookie("loggedin", true, {
+
+          path: '/',
+
+          domain: cookieDomain
+        });
+
+
+        // set
+        window.location.href = "http://app.do.localhost/apps/" + data.app._id +
+          "/addcode";
+
       },
       error: function (error) {
         spinner.stop();
@@ -91,7 +109,6 @@ $('#signup_form_submit')
 // })
 
 $(function () {
-  console.log("inside validate jquery");
   $("#signup_form")
     .validate({
       rules: {

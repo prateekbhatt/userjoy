@@ -5,18 +5,18 @@
     <br>
     <br>
     <div class="row">
-
         <div id="signupbox" class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
             <div class="panel panel-default">
                 <div class="panel-heading text-center">
-                    <div class="panel-title"><h4>Get started in under 15 minutes</h4></div>
+                    <div class="panel-title"><h4>Get started in under 10 minutes</h4></div>
+                    <div style="float:right; font-size: 85%; position: relative; top:-10px"><a id="signinlink" href="javascript:redirectToLogin()">Sign In</a></div>
                 </div>
                 <div class="panel-body">
                     <form id="signup_form" class="form-horizontal" role="form">
-                        <div id="signupsuccess" class="alert alert-success" style="display: none;">
+                        <!-- <div id="signupsuccess" class="alert alert-success" style="display: none;">
                             <button type="button" class="close" aria-hidden="true" onclick="closeSuccessMsg()">&times;</button>
                             <span id="successtext"></span>
-                        </div>
+                        </div> -->
                         <div id="signupalert" class="alert alert-danger" style="display: none;">
                             <button type="button" class="close" aria-hidden="true" onclick="closeErrMsg()">&times;</button>
                             <p><strong>Error</strong>:
@@ -49,20 +49,18 @@
                                 <a href="/legal/privacy" target="_blank">privacy policy</a>.</small>
                                 <br>
                                 <br>
-                                <button id="signup_form_submit" class="btn btn-lg btn-success" type="submit">Create Account</button>
-                                <span id="spin">
-                                </span>
+                                <button id="signup_form_submit" class="btn btn-lg btn-success col-md-6" type="submit">Create Account</button>
+                                <br>
+                                <p class="col-md-1 col-md-offset-1" id="spin" style="margin-top: 10px;">
+                                </p>
                             </div>
                         </div>
                     </form>
-
-                   <!--  <h4 class="col-md-offset-3 col-md-9">
-                      <a id="signinlink" href="javascript:redirectToLogin()">Have an account? Sign In</a>
+                    <!--  <h4 class="col-md-offset-3 col-md-9">
+                                        <a id="signinlink" href="javascript:redirectToLogin()">Have an account? Sign In</a>
                     </h4> -->
                 </div>
             </div>
         </div>
-
     </div>
-
 </div>

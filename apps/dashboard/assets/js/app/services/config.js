@@ -9,7 +9,7 @@ angular.module('services.config', [])
       // no trailing slash!
       siteUrl: '/',
       apiUrl: 'http://api.do.localhost',
-
+      cookieDomain: '.do.localhost',
       currentUser: false
     };
 
@@ -19,6 +19,7 @@ angular.module('services.config', [])
       // no trailing slash!
       siteUrl: '/',
       apiUrl: 'https://api.userjoy.co',
+      cookieDomain: '.userjoy.co',
 
       currentUser: false
     };
