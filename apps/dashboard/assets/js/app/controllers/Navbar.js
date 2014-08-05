@@ -240,9 +240,9 @@ angular.module('do.navbar', [])
 ])
 
 .controller('navbarInstallationCtrl', ['$scope', 'AuthService', '$location',
-  'LoginService', 'AppService', '$log', 'CurrentAppService', 'AppModel',
+  'LoginService', 'AppService', '$log', 'CurrentAppService', 'AppModel', 'AccountModel',
   function ($scope, AuthService, $location, LoginService, AppService, $log,
-    CurrentAppService, AppModel) {
+    CurrentAppService, AppModel, AccountModel) {
 
 
 
@@ -327,16 +327,41 @@ angular.module('do.navbar', [])
             console.log("connectedapps: ", $scope.connectedapps);
           });
 
+          // $scope.changeApp = function (app) {
+          //   $scope.displayApp = app.name;
+          //   AppService.setAppName(app.name);
+          //   if (app.isActive) {
+          //     AppService.setCurrentApp(app);
+          //     $location.path('/apps/' + AppService.getCurrentApp()
+          //       ._id + '/users/list');
+          //   } else {
+          //     $location.path('/apps/' + app._id + '/addcode/newapp');
+          //   }
+          // }
+          //
           $scope.changeApp = function (app) {
             $scope.displayApp = app.name;
             AppService.setAppName(app.name);
-            if (app.isActive) {
-              AppService.setCurrentApp(app);
-              $location.path('/apps/' + AppService.getCurrentApp()
-                ._id + '/users/list');
-            } else {
-              $location.path('/apps/' + app._id + '/addcode/newapp');
+
+            var data = {
+              defaultApp: app._id
             }
+
+            AccountModel.updateDefaultApp(data, function (err,
+              updatedApp) {
+              if (err) {
+                console.log("error");
+                return;
+              }
+              if (app.isActive) {
+                AppService.setCurrentApp(app);
+                $location.path('/apps/' + AppService.getCurrentApp()
+                  ._id + '/users/list');
+              } else {
+                $location.path('/apps/' + app._id + '/addcode/newapp');
+              }
+            })
+
           }
 
           $scope.goToSettings = function (app) {
