@@ -23,7 +23,6 @@ var AutoMessage = require('../../api/models/AutoMessage');
 var Company = require('../../api/models/Company');
 var Conversation = require('../../api/models/Conversation');
 var Invite = require('../../api/models/Invite');
-var Notification = require('../../api/models/Notification');
 var Segment = require('../../api/models/Segment');
 var User = require('../../api/models/User');
 var UserNote = require('../../api/models/UserNote');
@@ -124,6 +123,10 @@ var accounts = {
     second: {
       assignee: null,
       aid: null,
+
+      // WARNING: this is used for testing TrackController:notifications automessages
+      amId: null,
+
       messages: [{
         body: 'Hello World 2',
         from: 'account',
@@ -143,21 +146,6 @@ var invites = {
     aid: null,
     from: null,
     toEmail: accounts.second.email
-  }
-};
-
-
-var notifications = {
-
-  first: {
-    accid: null,
-    aid: null,
-    amId: null,
-    senderEmail: 'prattbhatt@gmail.com',
-    senderName: 'Prateek Bhatt',
-    title: 'New Title for Notification',
-    body: 'Hello World',
-    uid: null,
   }
 };
 
@@ -273,22 +261,15 @@ function createCompany(aid, company, fn) {
 }
 
 
-function createConversation(accid, aid, uid, con, fn) {
+function createConversation(accid, aid, uid, amId, con, fn) {
   con.aid = aid;
   con.assignee = accid;
   con.uid = uid;
+
+  // for automessage notifications
+  con.amId = amId;
+
   Conversation.create(con, fn);
-}
-
-
-function createNotification(accid, aid, amId, uid, notf, fn) {
-
-  notf.accid = accid;
-  notf.aid = aid;
-  notf.amId = amId;
-  notf.uid = uid;
-  Notification.create(notf, fn);
-
 }
 
 
@@ -406,36 +387,6 @@ module.exports = function loadFixtures(callback) {
     },
 
 
-    createFirstConversation: function (cb) {
-      var accid = accounts.first._id;
-      var aid = apps.first._id;
-      var uid = users.first._id;
-      var newCon = conversations.first;
-
-      // set the account id of the second message to first account _id
-      newCon.messages[1].accid = accid;
-
-      createConversation(accid, aid, uid, newCon, function (err, con) {
-        if (err) return cb(err);
-        conversations.first = con;
-        cb();
-      });
-    },
-
-    createSecondConversation: function (cb) {
-      var accid = accounts.first._id;
-      var aid = apps.first._id;
-      var uid = users.first._id;
-      var newCon = conversations.second;
-
-      createConversation(accid, aid, uid, newCon, function (err, con) {
-        if (err) return cb(err);
-        conversations.second = con;
-        cb();
-      });
-    },
-
-
     createFirstSegment: function (cb) {
 
       var aid = apps.first._id;
@@ -497,22 +448,37 @@ module.exports = function loadFixtures(callback) {
     },
 
 
-    createFirstNotification: function (cb) {
-
-      var aid = apps.first._id;
-      var amId = automessages.first._id;
+    createFirstConversation: function (cb) {
       var accid = accounts.first._id;
+      var aid = apps.first._id;
       var uid = users.first._id;
-      var notification = notifications.first;
+      var newCon = conversations.first;
 
-      createNotification(accid, aid, amId, uid, notification, function (err,
-        notf) {
+      // set the account id of the second message to first account _id
+      newCon.messages[1].accid = accid;
+
+      createConversation(accid, aid, uid, null, newCon, function (err, con) {
         if (err) return cb(err);
-        notifications.first = notf;
+        conversations.first = con;
         cb();
       });
-
     },
+
+    createSecondConversation: function (cb) {
+      var accid = accounts.first._id;
+      var aid = apps.first._id;
+      var uid = users.first._id;
+      var newCon = conversations.second;
+
+      var amId = automessages.first._id;
+
+      createConversation(accid, aid, uid, amId, newCon, function (err, con) {
+        if (err) return cb(err);
+        conversations.second = con;
+        cb();
+      });
+    },
+
 
     createFirstInvite: function (cb) {
 
@@ -577,7 +543,6 @@ module.exports = function loadFixtures(callback) {
       companies: companies,
       conversations: conversations,
       invites: invites,
-      notifications: notifications,
       segments: segments,
       users: users,
       usernotes: usernotes

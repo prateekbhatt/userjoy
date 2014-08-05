@@ -21,7 +21,6 @@ var App = require('../models/App');
 var Company = require('../models/Company');
 var Conversation = require('../models/Conversation');
 var Event = require('../models/Event');
-var Notification = require('../models/Notification');
 var User = require('../models/User');
 
 
@@ -522,20 +521,60 @@ router
           if (!user) return cb(null, null, user, app);
 
           var conditions = {
-            uid: user._id
-          };
-
-          // get the latest notification
-          var options = {
-            sort: {
-              ct: -1
+            uid: user._id,
+            messages: {
+              $elemMatch: {
+                type: 'notification',
+                seen: false
+              }
             }
           };
 
-          Notification.findOneAndRemove(conditions, options, function (err,
-            notf) {
-            cb(err, notf, user, app);
-          });
+          Conversation
+            .find(conditions)
+            .sort({
+              ct: -1
+            })
+            .limit(1)
+            .populate('assignee', 'name email')
+            .exec(function (err, convs) {
+
+              if (err) return cb(err);
+
+              // check for 'no' conversation found
+              if (!convs || !convs.length) {
+                return cb(null, null, user, app);
+              }
+
+
+              var con = convs[0];
+
+
+              // assume first message is notification
+              var msg = con.messages[0];
+
+              var sender = con.assignee;
+
+              // create notification object
+
+              var notf = {
+                _id: msg._id,
+
+                amId: con.amId,
+
+                body: msg.body,
+
+                ct: msg.ct,
+                senderEmail: sender.email,
+                senderName: sender.name,
+
+                title: con.sub,
+                uid: con.uid
+              }
+
+
+              cb(err, notf, user, app);
+            });
 
         },
 
@@ -554,7 +593,15 @@ router
           var title = notf.title;
 
           createEventAndIncrementCount(ids, state, title, function (err) {
-            cb(err, notf, app);
+
+            if (err) return cb(err);
+
+            // update seen status
+            // TODO: write test for this
+            Conversation.opened(notf._id, function (err) {
+              cb(err, notf, app);
+            });
+
           });
 
         }
@@ -579,7 +626,8 @@ router
         }
 
         // pass the theme color and showMessageBox status alongwith the notification
-        notification = notification ? notification.toJSON() : {};
+        notification = notification || {};
+
         notification.color = app.color;
         notification.showMessageBox = app.showMessageBox;
 
