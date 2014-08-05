@@ -13,6 +13,7 @@ describe('Resource /track', function () {
    */
 
   var AutoMessage = require('../../../api/models/AutoMessage');
+  var Conversation = require('../../../api/models/Conversation');
   var Event = require('../../../api/models/Event');
 
 
@@ -615,23 +616,25 @@ describe('Resource /track', function () {
 
         var email = saved.users.first.email;
         var testUrl = url + '?app_id=' + appId + '&email=' + email;
+        var currentNotf;
+
 
         async.waterfall(
 
           [
 
-
             function makeRequest(cb) {
-
 
               request
                 .get(testUrl)
                 .expect('Content-Type', /json/)
                 .expect(200)
                 .end(function (err, res) {
+
                   if (err) return done(err);
 
                   var notf = res.body;
+                  currentNotf = notf;
 
                   expect(notf)
                     .to.be.an('object');
@@ -699,6 +702,36 @@ describe('Resource /track', function () {
 
                   cb(err);
                 });
+
+            },
+
+            function updatedSeenStatus(cb) {
+
+              Conversation
+                .find({
+                  'aid': appId,
+                  'amId': currentNotf.amId,
+                  uid: currentNotf.uid,
+                  'messages.type': 'notification'
+                })
+                .sort('-ct')
+                .limit(1)
+                .exec(function (err, conv) {
+
+                  expect(conv)
+                    .to.be.an('array')
+                    .that.is.not.empty;
+
+                  expect(conv[0].messages)
+                    .to.be.an('array')
+                    .that.has.length(1);
+
+                  expect(conv[0].messages[0])
+                    .to.have.property('seen')
+                    .that.is.true;
+
+                  cb();
+                })
 
             }
 
