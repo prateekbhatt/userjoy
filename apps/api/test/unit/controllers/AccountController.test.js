@@ -710,6 +710,65 @@ describe('Resource /account', function () {
   });
 
 
+  describe('PUT /account/default-app', function () {
+
+    var newApp;
+
+    before(function (done) {
+      newApp = saved.apps.first._id;
+      logoutUser(done);
+    });
+
+    it('should return unauthorized error if not logged in', function (done) {
+
+      request
+        .put('/account/default-app')
+        .send({
+          defaultApp: newApp
+        })
+        .expect('Content-Type', /json/)
+        .expect(401)
+        .expect({
+          status: 401,
+          error: 'Unauthorized'
+        })
+        .end(done);
+
+    });
+
+    it('logging in user', function (done) {
+      loginUser(done)
+    });
+
+    it('should update default app id', function (done) {
+
+      request
+        .put('/account/default-app')
+        .set('cookie', loginCookie)
+        .send({
+          defaultApp: newApp
+        })
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .expect(function (res) {
+
+          var msg = res.body.message;
+          var acc = res.body.account;
+
+          expect(msg)
+            .to.eql('Updated default app');
+
+          expect(acc.defaultApp.toString())
+            .to.eql(newApp.toString());
+
+        })
+        .end(done);
+
+    });
+
+  });
+
+
   describe('PUT /account/password/update', function () {
 
     var newPass = 'WowCoolPassword';
