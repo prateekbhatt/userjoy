@@ -511,6 +511,41 @@ router
 
 
 /**
+ * PUT /account/default-app
+ * Update account default app
+ *
+ * @param {string} defaultApp
+ */
+
+router
+  .route('/default-app')
+  .put(isAuthenticated)
+  .put(function (req, res, next) {
+
+    var defaultApp = req.body.defaultApp;
+
+    if (!defaultApp) return res.badRequest('Please provide the app id');
+
+    req.user.defaultApp = defaultApp;
+    req.user.save(function (err, account) {
+
+      if (err) {
+        return next(err);
+      }
+
+      res
+        .status(200)
+        .json({
+          message: 'Updated default app',
+          account: account
+        });
+
+    });
+
+  });
+
+
+/**
  * PUT /account/forgot-password
  *
  * TODO: add the respective get request

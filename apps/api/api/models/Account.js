@@ -23,6 +23,12 @@ var SALT_WORK_FACTOR = 10;
 
 var AccountSchema = new Schema({
 
+  // stores the app to which the user last logged in
+  defaultApp: {
+    type: Schema.Types.ObjectId,
+    ref: 'App'
+  },
+
   email: {
     type: String,
     unique: [true, 'Email is already present'],

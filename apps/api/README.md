@@ -121,6 +121,7 @@ UserNote      |                         | notes created by team members about a 
 
 ##### Columns:
 
+- defaultApp (id of the app the account was last logged into)
 - email (required)
 - name (required)
 - password (required)

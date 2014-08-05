@@ -188,7 +188,6 @@ router
     // if sender account id is not provided, add logged in account as sender
     newAutoMessage.sender = sender || accid;
 
-    console.log('\n\n\n\n\nlets CHEck oUT', this, '\n\n\n\n\n\n');
     // if type notification, make title as subject
     // TODO: test this case
     if (newAutoMessage.type === 'notification') {
