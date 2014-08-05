@@ -322,7 +322,7 @@ function amConsumer(cb) {
 
         logger.crit({
           at: 'amConsumer:QueueError',
-          err: err
+          err: err ? JSON.stringify(err) : ''
         });
 
       }
@@ -349,7 +349,7 @@ module.exports = function run() {
 
         var logObj = {
           at: 'amConsumer:Completed',
-          err: err,
+          err: err ? JSON.stringify(err) : '',
           time: Date.now()
         };
 
