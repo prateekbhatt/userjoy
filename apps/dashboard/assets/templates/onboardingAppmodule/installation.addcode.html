@@ -5,12 +5,16 @@
             <div class="stepwizard">
                 <div class="stepwizard-row">
                     <div class="stepwizard-step">
-                        <button class="btn btn-default btn-circle" style="cursor:not-allowed">1</button>
+                        <button class="btn btn-success btn-circle" style="cursor:not-allowed">1</button>
+                        <p>Install Code</p>
+                    </div>
+                    <div class="stepwizard-step">
+                        <button class="btn btn-default btn-circle" style="cursor:not-allowed">2</button>
                         <p>Onboarding</p>
                     </div>
                     <div class="stepwizard-step">
-                        <button class="btn btn-success btn-circle" style="cursor:not-allowed">2</button>
-                        <p>Install Code</p>
+                        <button class="btn btn-default btn-circle" style="cursor:not-allowed">3</button>
+                        <p>Invite Team</p>
                     </div>
                 </div>
             </div>
@@ -26,6 +30,12 @@
                 <h3 class="panel-title" style="color:#31708f">Start tracking your customers by adding the <strong>UserJoy</strong> code to your website</h3>
             </div>
             <div class="panel-body">
+            <div class="row">
+                <div class="col-md-offset-7 col-md-5">
+                    <button class="btn btn-success btn-block fa fa-envelope-o" ng-click="sendToDeveloper()" id="sendToDeveloper">&nbsp;&nbsp;Send Instructions to your Developer</button>
+                </div>
+            </div>
+            <br>
             <ol>
 
                 <li>Paste this code before <code>
@@ -136,9 +146,9 @@
 </ol>
                 <!-- <textarea class="form-control" rows="10">Code to be added here .....</textarea> -->
                 <div style="padding-top:20px">
-                    <a class="btn btn-info pull-right" ng-click="startTracking()" href="#" id="startTracking">Start Tracking Now!</a>
+                    <a class="btn btn-success pull-right" ng-click="startTracking()" href="#" id="startTracking">Start Tracking Now!</a>
                     <!-- <button class="btn btn-info pull-right" style="margin-right:10px">Copy to Clipboard</button> -->
-                    <button class="btn btn-info pull-right" style="margin-right:10px" ng-click="sendToDeveloper()" id="sendToDeveloper">Send to Developer</button>
+                    <!-- <button class="btn btn-info pull-right" style="margin-right:10px" ng-click="sendToDeveloper()" id="sendToDeveloper">Send to Developer</button> -->
                 </div>
             </div>
         </div>
