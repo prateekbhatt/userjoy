@@ -17,10 +17,10 @@ angular.module('do.navbar', [])
 
 .controller('NavbarCtrl', ['$scope', 'AuthService', 'LoginService',
   '$location', '$log', 'AppService', '$http', 'config',
-  'CurrentAppService', '$rootScope', '$timeout', 'AppModel',
+  'CurrentAppService', '$rootScope', '$timeout', 'AppModel', 'AccountModel',
   function ($scope, AuthService, LoginService, $location, $log,
     AppService, $http, config, CurrentAppService, $rootScope, $timeout,
-    AppModel
+    AppModel, AccountModel
   ) {
 
     CurrentAppService.getCurrentApp()
@@ -36,7 +36,8 @@ angular.module('do.navbar', [])
         }
 
         $scope.isAccountActive = function (path) {
-          var location = $location.path().split('/')[4];
+          var location = $location.path()
+            .split('/')[4];
           return path === location;
         }
 
@@ -112,13 +113,26 @@ angular.module('do.navbar', [])
           $scope.changeApp = function (app) {
             $scope.displayApp = app.name;
             AppService.setAppName(app.name);
-            if (app.isActive) {
-              AppService.setCurrentApp(app);
-              $location.path('/apps/' + AppService.getCurrentApp()
-                ._id + '/users/list');
-            } else {
-              $location.path('/apps/' + app._id + '/addcode');
+
+            var data = {
+              defaultApp: app._id
             }
+
+            AccountModel.updateDefaultApp(data, function (err,
+              updatedApp) {
+              if (err) {
+                console.log("error");
+                return;
+              }
+              if (app.isActive) {
+                AppService.setCurrentApp(app);
+                $location.path('/apps/' + AppService.getCurrentApp()
+                  ._id + '/users/list');
+              } else {
+                $location.path('/apps/' + app._id + '/addcode/newapp');
+              }
+            })
+
           }
 
           $scope.goToSettings = function (app) {
@@ -129,7 +143,7 @@ angular.module('do.navbar', [])
               $location.path('/apps/' + AppService.getCurrentApp()
                 ._id + '/settings/general');
             } else {
-              $location.path('/apps/' + app._id + '/addcode');
+              $location.path('/apps/' + app._id + '/addcode/newapp');
             }
           }
 
@@ -138,26 +152,29 @@ angular.module('do.navbar', [])
           }
 
           $scope.goToUsers = function () {
-            if(AppService.getCurrentApp().isActive) {
+            if (AppService.getCurrentApp()
+              .isActive) {
               $location.path('/apps/' + $scope.appId + '/users/list');
             } else {
-              $location.path('/apps/' + $scope.appId + '/addcode');
+              $location.path('/apps/' + $scope.appId + '/addcode/newapp');
             }
           }
 
           $scope.goToConversations = function () {
-            if(AppService.getCurrentApp().isActive) {
+            if (AppService.getCurrentApp()
+              .isActive) {
               $location.path('/apps/' + $scope.appId + '/messages/open');
             } else {
-              $location.path('/apps/' + $scope.appId + '/addcode');
+              $location.path('/apps/' + $scope.appId + '/addcode/newapp');
             }
           }
 
           $scope.goToAutoMessages = function () {
-            if(AppService.getCurrentApp().isActive) {
+            if (AppService.getCurrentApp()
+              .isActive) {
               $location.path('/apps/' + $scope.appId + '/automessage');
             } else {
-              $location.path('/apps/' + $scope.appId + '/addcode');
+              $location.path('/apps/' + $scope.appId + '/addcode/newapp');
             }
           }
 
@@ -167,7 +184,8 @@ angular.module('do.navbar', [])
           }
 
           $scope.redirectToApp = function () {
-            console.log("currentApp: ", AppService.getCurrentApp(), $scope
+            console.log("currentApp: ", AppService.getCurrentApp(),
+              $scope
               .appId);
             if (_.isEmpty(AppService.getCurrentApp())) {
               var cb = function (err) {
@@ -177,9 +195,14 @@ angular.module('do.navbar', [])
                 }
                 if (AppService.getCurrentApp()
                   .isActive) {
-                  $location.path('/apps/' + $scope.appId + '/users/list');
+                  $location.path('/apps/' + $scope.appId +
+                    '/users/list');
+                } else if ($scope.firstTimeOnboarding) {
+                  $location.path('/apps/' + $scope.appId +
+                    '/addcode');
                 } else {
-                  $location.path('/apps/' + $scope.appId + '/addcode');
+                  $location.path('/apps/' + $scope.appId +
+                    '/addcode/newapp');
                 }
               }
               AppModel.getSingleApp($scope.appId, cb);
@@ -187,8 +210,12 @@ angular.module('do.navbar', [])
               if (AppService.getCurrentApp()
                 .isActive) {
                 $location.path('/apps/' + $scope.appId + '/users/list');
+              } else if ($scope.firstTimeOnboarding) {
+                $location.path('/apps/' + $scope.appId +
+                  '/addcode');
               } else {
-                $location.path('/apps/' + $scope.appId + '/addcode');
+                $location.path('/apps/' + $scope.appId +
+                  '/addcode/newapp');
               }
             }
           }
@@ -208,31 +235,35 @@ angular.module('do.navbar', [])
 
       })
 
-    // 
+    //
   }
 ])
 
 .controller('navbarInstallationCtrl', ['$scope', 'AuthService', '$location',
-  'LoginService', 'AppService', '$log', 'CurrentAppService', 'AppModel',
+  'LoginService', 'AppService', '$log', 'CurrentAppService', 'AppModel', 'AccountModel',
   function ($scope, AuthService, $location, LoginService, AppService, $log,
-    CurrentAppService, AppModel) {
+    CurrentAppService, AppModel, AccountModel) {
 
 
 
     CurrentAppService.getCurrentApp()
       .then(function (currentApp) {
-
+        console.log("current app navbar installation : ", currentApp);
         $scope.firstTimeOnboarding = false;
         $scope.appId = $location.path()
           .split("/")[2];
-        if($scope.appId == null || $scope.appId == '') {
-          if(currentApp[0] != null) {
+        if ($scope.appId == null || $scope.appId == '') {
+          if (currentApp[0] != null) {
             $scope.appId = currentApp[0]._id;
           }
         }
 
         console.log("No. of Apps : ", currentApp.length);
-
+        if (currentApp.length == 1 && !currentApp[0].isActive) {
+          $scope.firstTimeOnboarding = true;
+        } else {
+          $scope.firstTimeOnboarding = false;
+        }
         $scope.showDropdown = function () {
           $scope.visibleDropdown = true;
         }
@@ -249,7 +280,8 @@ angular.module('do.navbar', [])
         // }
 
         $scope.isAccountActive = function (path) {
-          var location = $location.path().split('/')[4];
+          var location = $location.path()
+            .split('/')[4];
           return path === location;
         }
 
@@ -258,6 +290,8 @@ angular.module('do.navbar', [])
         $scope.logoutFirstTimeOnboarding = function () {
           AuthService.logout();
         }
+
+
 
         var callback = function () {
 
@@ -273,7 +307,7 @@ angular.module('do.navbar', [])
             });
 
           $scope.apps = AppService.getLoggedInApps();
-
+          console.log("AppService getLoggedInApps: ", AppService.getLoggedInApps());
           $scope.$watch(AppService.getLoggedInApps, function () {
             // $log.info("Navbar watch AppService", arguments);
             $scope.apps = [];
@@ -293,16 +327,41 @@ angular.module('do.navbar', [])
             console.log("connectedapps: ", $scope.connectedapps);
           });
 
+          // $scope.changeApp = function (app) {
+          //   $scope.displayApp = app.name;
+          //   AppService.setAppName(app.name);
+          //   if (app.isActive) {
+          //     AppService.setCurrentApp(app);
+          //     $location.path('/apps/' + AppService.getCurrentApp()
+          //       ._id + '/users/list');
+          //   } else {
+          //     $location.path('/apps/' + app._id + '/addcode/newapp');
+          //   }
+          // }
+          //
           $scope.changeApp = function (app) {
             $scope.displayApp = app.name;
             AppService.setAppName(app.name);
-            if (app.isActive) {
-              AppService.setCurrentApp(app);
-              $location.path('/apps/' + AppService.getCurrentApp()
-                ._id + '/users/list');
-            } else {
-              $location.path('/apps/' + app._id + '/addcode');
+
+            var data = {
+              defaultApp: app._id
             }
+
+            AccountModel.updateDefaultApp(data, function (err,
+              updatedApp) {
+              if (err) {
+                console.log("error");
+                return;
+              }
+              if (app.isActive) {
+                AppService.setCurrentApp(app);
+                $location.path('/apps/' + AppService.getCurrentApp()
+                  ._id + '/users/list');
+              } else {
+                $location.path('/apps/' + app._id + '/addcode/newapp');
+              }
+            })
+
           }
 
           $scope.goToSettings = function (app) {
@@ -313,7 +372,7 @@ angular.module('do.navbar', [])
               $location.path('/apps/' + AppService.getCurrentApp()
                 ._id + '/settings/general');
             } else {
-              $location.path('/apps/' + app._id + '/addcode');
+              $location.path('/apps/' + app._id + '/addcode/newapp');
             }
           }
 
@@ -322,7 +381,8 @@ angular.module('do.navbar', [])
           }
 
           $scope.redirectToApp = function () {
-            console.log("currentApp: ", AppService.getCurrentApp(), $scope
+            console.log("currentApp: ", AppService.getCurrentApp(),
+              $scope
               .appId);
             if (_.isEmpty(AppService.getCurrentApp())) {
               var cb = function (err) {
@@ -334,9 +394,12 @@ angular.module('do.navbar', [])
                   .isActive) {
                   $location.path('/apps/' + AppService.getCurrentApp()
                     ._id + '/users/list');
+                } else if ($scope.firstTimeOnboarding) {
+                  $location.path('/apps/' + $scope.appId +
+                    '/addcode');
                 } else {
                   $location.path('/apps/' + AppService.getCurrentApp()
-                    ._id + '/addcode');
+                    ._id + '/addcode/newapp');
                 }
               }
               AppModel.getSingleApp($scope.appId, cb);
@@ -345,17 +408,23 @@ angular.module('do.navbar', [])
                 .isActive) {
                 $location.path('/apps/' + AppService.getCurrentApp()
                   ._id + '/users/list');
+              } else if ($scope.firstTimeOnboarding) {
+                $location.path('/apps/' + $scope.appId +
+                  '/addcode');
               } else {
                 $location.path('/apps/' + AppService.getCurrentApp()
-                  ._id + '/addcode');
+                  ._id + '/addcode/newapp');
               }
             }
           }
         }
 
 
-        if(currentApp.length > 0) {
+        if (currentApp.length > 0 && $scope.appId != 'onboarding') {
           AppModel.getSingleApp($scope.appId, callback);
+        } else {
+          $scope.apps = currentApp;
+          $scope.displayApp = 'Apps';
         }
 
       })
