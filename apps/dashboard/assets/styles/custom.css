@@ -4,7 +4,7 @@ html, body {
     height: 100%;
 }
 
-body { 
+body {
     padding: 72px 0 0 0;
 }
 /*Placeholder Font Color*/
@@ -123,11 +123,11 @@ padding: 0 0 60px;
 }
 }*/
 
-/* 
+/*
 Author: Start Bootstrap - http://startbootstrap.com
 'SB Admin' HTML Template by Start Bootstrap
 
-All Start Bootstrap themes are licensed under Apache 2.0. 
+All Start Bootstrap themes are licensed under Apache 2.0.
 For more info and more free Bootstrap 3 HTML themes, visit http://startbootstrap.com!
 */
 
@@ -864,9 +864,21 @@ pre code {
     border-radius: 0;
 }
 
+.avg-health {
+  border-right: 8px solid #5bc0de;
+}
+
+.good-health {
+  border-right: 8px solid #13987e; 
+}
+
+.bad-health {
+  border-right: 8px solid #d9534f; 
+}
+
 
 /*.active-smart-filters {
-    background-color: #e0e0e0;   
+    background-color: #e0e0e0;
 }
 */
 }

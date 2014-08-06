@@ -65394,12 +65394,42 @@ angular.module('do.install', [])
         },
         authenticate: true
       })
+      .state('inviteteamnewapp', {
+        url: '/apps/:id/invite/newapp',
+        views: {
+          "main": {
+            templateUrl: '/templates/onboardingAppmodule/installation.inviteteam.newapp.html',
+            controller: 'installInviteTeamNewAppCtrl'
+          }
+        },
+        authenticate: true
+      })
       .state('sendemail', {
         url: '/apps/:id/sendemail',
         views: {
           "main": {
             templateUrl: '/templates/onboardingAppmodule/installation.sendemail.html',
             controller: 'installSendEmailAppCtrl'
+          }
+        },
+        authenticate: true
+      })
+      .state('onboardingnewapp', {
+        url: '/apps/onboarding/newapp',
+        views: {
+          "main": {
+            templateUrl: '/templates/onboardingAppmodule/installation.onboarding.newapp.html',
+            controller: 'installOnboardingNewAppCtrl'
+          }
+        },
+        authenticate: true
+      })
+      .state('addcodenewapp', {
+        url: '/apps/:id/addcode/newapp',
+        views: {
+          "main": {
+            templateUrl: '/templates/onboardingAppmodule/installation.addcode.newapp.html',
+            controller: 'installAddcodeNewAppCtrl'
           }
         },
         authenticate: true
@@ -65431,8 +65461,6 @@ angular.module('do.install', [])
 
         $scope.installapp = function () {
           console.log("$scope.name: ", $scope.name);
-          // if (AppService.getCurrentApp()
-          //   .isActive) {
           if ($scope.app_form.$valid) {
 
           } else {
@@ -65456,12 +65484,6 @@ angular.module('do.install', [])
           };
 
           AppModel.addNewApp(data, $scope.appId);
-
-          // } else {
-          //   $location.path('/apps/' + $scope.appId + '/addcode');
-          // }
-          // $log.info($scope.name);
-          // $log.info($scope.url);
         }
       })
 
@@ -65605,6 +65627,71 @@ angular.module('do.install', [])
   }
 ])
 
+.controller('installInviteTeamAppCtrl', ['$scope', '$stateParams', 'AppModel',
+  '$rootScope', '$timeout', '$location',
+  function ($scope, $stateParams, AppModel, $rootScope, $timeout, $location) {
+
+    $scope.enableInvite = true;
+    $scope.appId = $stateParams.id;
+    var emailIds = [];
+    $scope.inviteTeamMember = function () {
+      console.log("$scope.invitees email: ", $scope.invitees);
+      $scope.enableInvite = false;
+      for (var i = 0; i < $scope.invitees.length; i++) {
+        emailIds[i] = $scope.invitees[i].email;
+      };
+
+      console.log("emailIds: ", emailIds);
+
+      var data = {
+        emails: emailIds
+      };
+      console.log("data: ", data);
+
+      var showSuccessMsg = function (err) {
+        $scope.enableInvite = true;
+        if (err) {
+          return err;
+        }
+
+        $location.path('/apps/' + $scope.appId + '/users/list');
+
+        // $scope.email = '';
+        // $scope.name = '';
+
+        $rootScope.showSuccess = true;
+        $rootScope.showSuccessMsgRootScope = 'Invitation sent successfully';
+        $timeout(function () {
+          $rootScope.showSuccess = false;
+        }, 3000);
+
+        // $scope.showMsgSuccess = true;
+      }
+
+      AppModel.addNewMember(data, $scope.appId,
+        showSuccessMsg);
+    }
+
+    $scope.invitees = [{
+      email: ''
+    }];
+
+    $scope.addAnotherTeamMember = function () {
+      $scope.invitees.push({
+        email: ''
+      });
+    }
+
+    $scope.removeTeamMember = function () {
+      $scope.invitees.pop();
+    }
+
+    $scope.proceedToApp = function () {
+      $location.path('/apps/' + $scope.appId + '/users/list');
+    }
+  }
+])
+
 .controller('installSendEmailAppCtrl', ['$scope', '$stateParams', 'AppModel',
   'AccountService', '$location', '$rootScope', '$timeout',
   function ($scope, $stateParams, AppModel, AccountService, $location,
@@ -65637,6 +65724,131 @@ angular.module('do.install', [])
     }
   }
 ])
+
+.controller('installOnboardingNewAppCtrl', ['$scope', '$http', 'config', '$state',
+  'AppService', '$log', 'AppModel', 'AccountService',
+  'CurrentAccountService', '$stateParams', '$location',
+  function ($scope, $http, config, $state, AppService, $log, AppModel,
+    AccountService, CurrentAccountService, $stateParams, $location) {
+
+    CurrentAccountService.getCurrentAccount()
+      .then(function (currentAccount) {
+        // $scope.appId = $stateParams.id;
+        AppService.setAppName('Apps');
+        console.log("loggedinAccount: ", currentAccount);
+        $scope.firstName = currentAccount.name.split(' ')[0].toLowerCase();
+        $scope.placeHolderEmail = 'app';
+        $scope.$watch('name', function () {
+          if ($scope.name) {
+            $scope.email = $scope.name.split(' ')
+              .join('')
+              .toLowerCase();
+          }
+        })
+
+        $scope.installapp = function () {
+          console.log("$scope.name: ", $scope.name);
+          if ($scope.app_form.$valid) {
+
+          } else {
+            $scope.submitted = true;
+          }
+
+          if ($scope.name == null) {
+            console.log("$scope.name is empty");
+            $rootScope.errMsgRootScope =
+              'Enter a valid application name';
+            $rootScope.error = true;
+            $timeout(function () {
+              $rootScope.error = false;
+            }, 5000);
+            return;
+          }
+
+          var data = {
+            name: $scope.name,
+            subdomain: $scope.email
+          };
+
+          AppModel.addAnotherNewApp(data);
+        }
+      })
+
+  }
+])
+
+.controller('installAddcodeNewAppCtrl', ['$scope', '$http', 'AppService',
+  '$location', 'CurrentAppService', 'AppModel', '$stateParams', '$rootScope',
+  '$timeout',
+  function ($scope, $http, AppService, $location, CurrentAppService,
+    AppModel, $stateParams, $rootScope, $timeout) {
+    CurrentAppService.getCurrentApp()
+      .then(function (currentApp) {
+        $scope.appId = $stateParams.id;
+        // $scope.codeSnippet = '';
+
+        var populateCode = function (err) {
+          if (err) {
+            console.log("error");
+            return;
+          }
+          console.log("currentApp: ", AppService.getCurrentApp());
+          $scope.apiKey = AppService.getCurrentApp()
+            ._id;
+          AppService.setAppName(AppService.getCurrentApp()
+            .name);
+        }
+
+        AppModel.getSingleApp($scope.appId, populateCode)
+
+        var callback = function (err, data) {
+          if (err) {
+            console.log("error");
+            return;
+          }
+          if (data.isActive) {
+            $location.path('/apps/' + $scope.appId + '/invite/newapp');
+          } else {
+            $rootScope.info = true;
+            $rootScope.infoMsgRootScope =
+              'We have not received any data yet. Please check if the UserJoy Code is installed on your app.';
+            $timeout(function () {
+              $rootScope.info = false;
+              $rootScope.infoMsgRootScope = '';
+            }, 5000);
+          }
+        }
+
+        $scope.selectText = function (containerid) {
+          if (document.selection) {
+            var range = document.body.createTextRange();
+            range.moveToElementText(document.getElementById(containerid));
+            range.select();
+          } else if (window.getSelection) {
+            var range = document.createRange();
+            range.selectNode(document.getElementById(containerid));
+            window.getSelection()
+              .addRange(range);
+          }
+        }
+
+        $scope.sendToDeveloper = function () {
+          $location.path('/apps/' + $scope.appId + '/sendemail');
+        }
+
+        console.log("$scope.appId ---->>>>>", $scope.appId);
+        $scope.startTracking = function () {
+          AppModel.checkIfActiveNewApp($scope.appId, callback);
+        }
+        console.log("codeSnippet: ", $scope.codeSnippet);
+        $scope.getTextToCopy = function () {
+          return $scope.codeSnippet;
+        }
+
+      })
+  }
+])
+
 angular.module('do.login', [])
 
 .config(['$stateProvider',
@@ -66030,11 +66242,13 @@ angular.module('do.message', [])
           }
 
           $scope.goToUnreadMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/unread');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/unread');
           }
 
           $scope.goToClosedMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/closed');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/closed');
           }
 
           $scope.goToGoodHealth = function () {
@@ -66293,7 +66507,8 @@ angular.module('do.message', [])
             }
             console.log("$scope.openmsg -->", $scope.openmsg,
               name, index);
-            var newIndex = ($scope.pageNo - 1) * $scope.pageCount + index;
+            var newIndex = ($scope.pageNo - 1) * $scope.pageCount +
+              index;
             console.log("new index: ", newIndex);
             $scope.openmsg[newIndex].assign = 'Assigned to ' +
               name;
@@ -66350,11 +66565,13 @@ angular.module('do.message', [])
           }
 
           $scope.goToUnreadMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/unread');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/unread');
           }
 
           $scope.goToClosedMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/closed');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/closed');
           }
 
           $scope.goToGoodHealth = function () {
@@ -66393,7 +66610,7 @@ angular.module('do.message', [])
               //     .name,
               //   coid: msg[i].coId
               // })
-              // 
+              //
               var m = {
                 id: msg[i]._id,
                 name: msg[i].uid.email,
@@ -66568,7 +66785,8 @@ angular.module('do.message', [])
             }
             console.log("$scope.openmsg -->", $scope.openmsg,
               name, index);
-            var newIndex = ($scope.pageNo - 1) * $scope.pageCount + index;
+            var newIndex = ($scope.pageNo - 1) * $scope.pageCount +
+              index;
             console.log("new index: ", newIndex);
             $scope.unreadmsg[newIndex].assign = 'Assigned to ' +
               name;
@@ -66793,7 +67011,7 @@ angular.module('do.message', [])
           function get_gravatar(email, size) {
 
             // MD5 (Message-Digest Algorithm) by WebToolkit
-            // 
+            //
 
             var MD5 = function (s) {
               function L(k, d) {
@@ -67156,7 +67374,8 @@ angular.module('do.message', [])
                 }
               }
               // console.log("value prop: ", value, prop);
-              if (prop != 'companies' && prop != 'ct' && prop != 'meta' &&
+              if (prop != 'companies' && prop != 'ct' && prop !=
+                'meta' &&
                 prop != 'ut' && prop != '__v' && prop != 'aid' && prop !=
                 '_id') {
                 if (prop == 'lastSeen') {
@@ -67192,10 +67411,10 @@ angular.module('do.message', [])
             // TODO: You have to get more data from backend
           }
 
-            function getUserProfile() {
-              UserModel.getUserProfile(ThreadService.getThread()
-                .uid._id, $scope.appId, populateUserProfile);
-            }
+          function getUserProfile() {
+            UserModel.getUserProfile(ThreadService.getThread()
+              .uid._id, $scope.appId, populateUserProfile);
+          }
 
           $scope.healthScore = '50';
           $scope.plan = 'Basic';
@@ -67297,6 +67516,12 @@ angular.module('do.message', [])
               $scope.replytextInDiv = $scope.replytext;
               console.log("$scope.replytextInDiv: ", $scope.replytextInDiv);
               $scope.replytext = '';
+              if (!ThreadService.getThread()
+                .closed) {
+                $scope.buttontext = 'Close';
+              } else {
+                $scope.buttontext = 'Reopen';
+              }
               $scope.replies.push({
                 body: $scope.replytextInDiv
               })
@@ -67312,7 +67537,8 @@ angular.module('do.message', [])
               return;
             }
             if (ThreadService.getReply) {
-              $scope.replytextInDiv = $scope.replytext.replace(/\\r\\n/g,
+              $scope.replytextInDiv = $scope.replytext.replace(
+                /\\r\\n/g,
                 '<br/>');
               $scope.replytext = '';
               console.log("pushing msg: ", $scope.replytextInDiv);
@@ -67325,7 +67551,8 @@ angular.module('do.message', [])
 
               if (!ThreadService.getThread()
                 .closed) {
-                MsgService.closeConversationRequest($scope.appId, $scope
+                MsgService.closeConversationRequest($scope.appId,
+                  $scope
                   .coId, function (err, user) {
                     if (err) {
                       console.log("error");
@@ -67366,7 +67593,7 @@ angular.module('do.message', [])
               console.log("reply button clicked and validated");
               $scope.replyButtonClicked = true;
               var sanitizedReply = $scope.replytext.replace(/\n/g,
-                '<br/>')
+                  '<br/>')
                 .replace(/\r/g, '');
               console.log("sanitized reply: ", sanitizedReply);
               MsgService.replyToMsg($scope.appId, $scope.coId,
@@ -67440,7 +67667,7 @@ angular.module('do.message', [])
 
 
 
-    // 
+    //
 
   }
 ])
@@ -67470,11 +67697,13 @@ angular.module('do.message', [])
           }
 
           $scope.goToUnreadMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/unread');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/unread');
           }
 
           $scope.goToClosedMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/closed');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/closed');
           }
 
           $scope.goToGoodHealth = function () {
@@ -67713,11 +67942,13 @@ angular.module('do.message', [])
           }
 
           $scope.goToUnreadMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/unread');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/unread');
           }
 
           $scope.goToClosedMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/closed');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/closed');
           }
 
           $scope.goToGoodHealth = function () {
@@ -67872,7 +68103,8 @@ angular.module('do.message', [])
             }
             console.log("$scope.goodhealthmsg -->", $scope.goodhealthmsg,
               name, index);
-            var newIndex = ($scope.pageNo - 1) * $scope.pageCount + index;
+            var newIndex = ($scope.pageNo - 1) * $scope.pageCount +
+              index;
             console.log("new index: ", newIndex);
             $scope.goodhealthmsg[newIndex].assign = 'Assigned to ' +
               name;
@@ -67923,11 +68155,13 @@ angular.module('do.message', [])
           }
 
           $scope.goToUnreadMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/unread');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/unread');
           }
 
           $scope.goToClosedMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/closed');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/closed');
           }
 
           $scope.goToGoodHealth = function () {
@@ -68079,7 +68313,8 @@ angular.module('do.message', [])
             }
             console.log("$scope.avghealthmsg -->", $scope.avghealthmsg,
               name, index);
-            var newIndex = ($scope.pageNo - 1) * $scope.pageCount + index;
+            var newIndex = ($scope.pageNo - 1) * $scope.pageCount +
+              index;
             console.log("new index: ", newIndex);
             $scope.avghealthmsg[newIndex].assign = 'Assigned to ' +
               name;
@@ -68224,11 +68459,13 @@ angular.module('do.message', [])
           }
 
           $scope.goToUnreadMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/unread');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/unread');
           }
 
           $scope.goToClosedMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/closed');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/closed');
           }
 
           $scope.goToGoodHealth = function () {
@@ -68380,7 +68617,8 @@ angular.module('do.message', [])
             }
             console.log("$scope.poorhealthmsg -->", $scope.poorhealthmsg,
               name, index);
-            var newIndex = ($scope.pageNo - 1) * $scope.pageCount + index;
+            var newIndex = ($scope.pageNo - 1) * $scope.pageCount +
+              index;
             console.log("new index: ", newIndex);
             $scope.poorhealthmsg[newIndex].assign = 'Assigned to ' +
               name;
@@ -68404,6 +68642,7 @@ angular.module('do.message', [])
       })
   }
 ]);
+
 angular.module('do.navbar', [])
 
 /*.config(['$stateProvider',
@@ -68423,10 +68662,10 @@ angular.module('do.navbar', [])
 
 .controller('NavbarCtrl', ['$scope', 'AuthService', 'LoginService',
   '$location', '$log', 'AppService', '$http', 'config',
-  'CurrentAppService', '$rootScope', '$timeout', 'AppModel',
+  'CurrentAppService', '$rootScope', '$timeout', 'AppModel', 'AccountModel',
   function ($scope, AuthService, LoginService, $location, $log,
     AppService, $http, config, CurrentAppService, $rootScope, $timeout,
-    AppModel
+    AppModel, AccountModel
   ) {
 
     CurrentAppService.getCurrentApp()
@@ -68442,7 +68681,8 @@ angular.module('do.navbar', [])
         }
 
         $scope.isAccountActive = function (path) {
-          var location = $location.path().split('/')[4];
+          var location = $location.path()
+            .split('/')[4];
           return path === location;
         }
 
@@ -68518,13 +68758,26 @@ angular.module('do.navbar', [])
           $scope.changeApp = function (app) {
             $scope.displayApp = app.name;
             AppService.setAppName(app.name);
-            if (app.isActive) {
-              AppService.setCurrentApp(app);
-              $location.path('/apps/' + AppService.getCurrentApp()
-                ._id + '/users/list');
-            } else {
-              $location.path('/apps/' + app._id + '/addcode');
+
+            var data = {
+              defaultApp: app._id
             }
+
+            AccountModel.updateDefaultApp(data, function (err,
+              updatedApp) {
+              if (err) {
+                console.log("error");
+                return;
+              }
+              if (app.isActive) {
+                AppService.setCurrentApp(app);
+                $location.path('/apps/' + AppService.getCurrentApp()
+                  ._id + '/users/list');
+              } else {
+                $location.path('/apps/' + app._id + '/addcode/newapp');
+              }
+            })
+
           }
 
           $scope.goToSettings = function (app) {
@@ -68535,7 +68788,7 @@ angular.module('do.navbar', [])
               $location.path('/apps/' + AppService.getCurrentApp()
                 ._id + '/settings/general');
             } else {
-              $location.path('/apps/' + app._id + '/addcode');
+              $location.path('/apps/' + app._id + '/addcode/newapp');
             }
           }
 
@@ -68544,26 +68797,29 @@ angular.module('do.navbar', [])
           }
 
           $scope.goToUsers = function () {
-            if(AppService.getCurrentApp().isActive) {
+            if (AppService.getCurrentApp()
+              .isActive) {
               $location.path('/apps/' + $scope.appId + '/users/list');
             } else {
-              $location.path('/apps/' + $scope.appId + '/addcode');
+              $location.path('/apps/' + $scope.appId + '/addcode/newapp');
             }
           }
 
           $scope.goToConversations = function () {
-            if(AppService.getCurrentApp().isActive) {
+            if (AppService.getCurrentApp()
+              .isActive) {
               $location.path('/apps/' + $scope.appId + '/messages/open');
             } else {
-              $location.path('/apps/' + $scope.appId + '/addcode');
+              $location.path('/apps/' + $scope.appId + '/addcode/newapp');
             }
           }
 
           $scope.goToAutoMessages = function () {
-            if(AppService.getCurrentApp().isActive) {
+            if (AppService.getCurrentApp()
+              .isActive) {
               $location.path('/apps/' + $scope.appId + '/automessage');
             } else {
-              $location.path('/apps/' + $scope.appId + '/addcode');
+              $location.path('/apps/' + $scope.appId + '/addcode/newapp');
             }
           }
 
@@ -68573,7 +68829,8 @@ angular.module('do.navbar', [])
           }
 
           $scope.redirectToApp = function () {
-            console.log("currentApp: ", AppService.getCurrentApp(), $scope
+            console.log("currentApp: ", AppService.getCurrentApp(),
+              $scope
               .appId);
             if (_.isEmpty(AppService.getCurrentApp())) {
               var cb = function (err) {
@@ -68583,9 +68840,14 @@ angular.module('do.navbar', [])
                 }
                 if (AppService.getCurrentApp()
                   .isActive) {
-                  $location.path('/apps/' + $scope.appId + '/users/list');
+                  $location.path('/apps/' + $scope.appId +
+                    '/users/list');
+                } else if ($scope.firstTimeOnboarding) {
+                  $location.path('/apps/' + $scope.appId +
+                    '/addcode');
                 } else {
-                  $location.path('/apps/' + $scope.appId + '/addcode');
+                  $location.path('/apps/' + $scope.appId +
+                    '/addcode/newapp');
                 }
               }
               AppModel.getSingleApp($scope.appId, cb);
@@ -68593,8 +68855,12 @@ angular.module('do.navbar', [])
               if (AppService.getCurrentApp()
                 .isActive) {
                 $location.path('/apps/' + $scope.appId + '/users/list');
+              } else if ($scope.firstTimeOnboarding) {
+                $location.path('/apps/' + $scope.appId +
+                  '/addcode');
               } else {
-                $location.path('/apps/' + $scope.appId + '/addcode');
+                $location.path('/apps/' + $scope.appId +
+                  '/addcode/newapp');
               }
             }
           }
@@ -68614,31 +68880,35 @@ angular.module('do.navbar', [])
 
       })
 
-    // 
+    //
   }
 ])
 
 .controller('navbarInstallationCtrl', ['$scope', 'AuthService', '$location',
-  'LoginService', 'AppService', '$log', 'CurrentAppService', 'AppModel',
+  'LoginService', 'AppService', '$log', 'CurrentAppService', 'AppModel', 'AccountModel',
   function ($scope, AuthService, $location, LoginService, AppService, $log,
-    CurrentAppService, AppModel) {
+    CurrentAppService, AppModel, AccountModel) {
 
 
 
     CurrentAppService.getCurrentApp()
       .then(function (currentApp) {
-
+        console.log("current app navbar installation : ", currentApp);
         $scope.firstTimeOnboarding = false;
         $scope.appId = $location.path()
           .split("/")[2];
-        if($scope.appId == null || $scope.appId == '') {
-          if(currentApp[0] != null) {
+        if ($scope.appId == null || $scope.appId == '') {
+          if (currentApp[0] != null) {
             $scope.appId = currentApp[0]._id;
           }
         }
 
         console.log("No. of Apps : ", currentApp.length);
-
+        if (currentApp.length == 1 && !currentApp[0].isActive) {
+          $scope.firstTimeOnboarding = true;
+        } else {
+          $scope.firstTimeOnboarding = false;
+        }
         $scope.showDropdown = function () {
           $scope.visibleDropdown = true;
         }
@@ -68655,7 +68925,8 @@ angular.module('do.navbar', [])
         // }
 
         $scope.isAccountActive = function (path) {
-          var location = $location.path().split('/')[4];
+          var location = $location.path()
+            .split('/')[4];
           return path === location;
         }
 
@@ -68664,6 +68935,8 @@ angular.module('do.navbar', [])
         $scope.logoutFirstTimeOnboarding = function () {
           AuthService.logout();
         }
+
+
 
         var callback = function () {
 
@@ -68679,7 +68952,7 @@ angular.module('do.navbar', [])
             });
 
           $scope.apps = AppService.getLoggedInApps();
-
+          console.log("AppService getLoggedInApps: ", AppService.getLoggedInApps());
           $scope.$watch(AppService.getLoggedInApps, function () {
             // $log.info("Navbar watch AppService", arguments);
             $scope.apps = [];
@@ -68699,16 +68972,41 @@ angular.module('do.navbar', [])
             console.log("connectedapps: ", $scope.connectedapps);
           });
 
+          // $scope.changeApp = function (app) {
+          //   $scope.displayApp = app.name;
+          //   AppService.setAppName(app.name);
+          //   if (app.isActive) {
+          //     AppService.setCurrentApp(app);
+          //     $location.path('/apps/' + AppService.getCurrentApp()
+          //       ._id + '/users/list');
+          //   } else {
+          //     $location.path('/apps/' + app._id + '/addcode/newapp');
+          //   }
+          // }
+          //
           $scope.changeApp = function (app) {
             $scope.displayApp = app.name;
             AppService.setAppName(app.name);
-            if (app.isActive) {
-              AppService.setCurrentApp(app);
-              $location.path('/apps/' + AppService.getCurrentApp()
-                ._id + '/users/list');
-            } else {
-              $location.path('/apps/' + app._id + '/addcode');
+
+            var data = {
+              defaultApp: app._id
             }
+
+            AccountModel.updateDefaultApp(data, function (err,
+              updatedApp) {
+              if (err) {
+                console.log("error");
+                return;
+              }
+              if (app.isActive) {
+                AppService.setCurrentApp(app);
+                $location.path('/apps/' + AppService.getCurrentApp()
+                  ._id + '/users/list');
+              } else {
+                $location.path('/apps/' + app._id + '/addcode/newapp');
+              }
+            })
+
           }
 
           $scope.goToSettings = function (app) {
@@ -68719,7 +69017,7 @@ angular.module('do.navbar', [])
               $location.path('/apps/' + AppService.getCurrentApp()
                 ._id + '/settings/general');
             } else {
-              $location.path('/apps/' + app._id + '/addcode');
+              $location.path('/apps/' + app._id + '/addcode/newapp');
             }
           }
 
@@ -68728,7 +69026,8 @@ angular.module('do.navbar', [])
           }
 
           $scope.redirectToApp = function () {
-            console.log("currentApp: ", AppService.getCurrentApp(), $scope
+            console.log("currentApp: ", AppService.getCurrentApp(),
+              $scope
               .appId);
             if (_.isEmpty(AppService.getCurrentApp())) {
               var cb = function (err) {
@@ -68740,9 +69039,12 @@ angular.module('do.navbar', [])
                   .isActive) {
                   $location.path('/apps/' + AppService.getCurrentApp()
                     ._id + '/users/list');
+                } else if ($scope.firstTimeOnboarding) {
+                  $location.path('/apps/' + $scope.appId +
+                    '/addcode');
                 } else {
                   $location.path('/apps/' + AppService.getCurrentApp()
-                    ._id + '/addcode');
+                    ._id + '/addcode/newapp');
                 }
               }
               AppModel.getSingleApp($scope.appId, cb);
@@ -68751,17 +69053,23 @@ angular.module('do.navbar', [])
                 .isActive) {
                 $location.path('/apps/' + AppService.getCurrentApp()
                   ._id + '/users/list');
+              } else if ($scope.firstTimeOnboarding) {
+                $location.path('/apps/' + $scope.appId +
+                  '/addcode');
               } else {
                 $location.path('/apps/' + AppService.getCurrentApp()
-                  ._id + '/addcode');
+                  ._id + '/addcode/newapp');
               }
             }
           }
         }
 
 
-        if(currentApp.length > 0) {
+        if (currentApp.length > 0 && $scope.appId != 'onboarding') {
           AppModel.getSingleApp($scope.appId, callback);
+        } else {
+          $scope.apps = currentApp;
+          $scope.displayApp = 'Apps';
         }
 
       })
@@ -68778,6 +69086,7 @@ angular.module('do.navbar', [])
 
   }
 ]);
+
 angular.module('do.popupmessage', [])
 
 .config(['$stateProvider',
@@ -68825,411 +69134,411 @@ angular.module('do.popupmessage', [])
 angular.module('do.settings', [])
 
 .config(['$stateProvider',
-    function($stateProvider) {
-        $stateProvider
-            .state('settings', {
-                url: '/apps/:id/account',
-                views: {
-                    "main": {
-                        templateUrl: '/templates/settingsmodule/settings.html',
-                        controller: 'profileSettingsCtrl'
-                    }
-                },
-                authenticate: true
-            })
-            .state('accountsettings', {
-                url: '/apps/:id/account/settings',
-                views: {
-                    "main": {
-                        templateUrl: '/templates/settingsmodule/settings.profile.html',
-                        controller: 'profileSettingsCtrl',
-                    }
-                },
-                authenticate: true
-            })
-            .state('changePassword', {
-                url: '/apps/:id/account/settings/changePassword',
-                views: {
-                    "main": {
-                        templateUrl: '/templates/settingsmodule/settings.profile.changePassword.html',
-                        controller: 'changePasswordCtrl',
-                    }
-                },
-                authenticate: true
-            })
-            .state('appsettings', {
-                url: '/apps/:id/settings',
-                views: {
-                    "main": {
-                        templateUrl: '/templates/settingsmodule/settings.app.html',
-                        controller: 'appSettingsCtrl',
-                    }
-                },
-                authenticate: true
-            })
-            .state('appsettings.general', {
-                url: '/general',
-                views: {
-                    "tab": {
-                        templateUrl: '/templates/settingsmodule/settings.app.general.html',
-                        controller: 'appSettingsGeneralCtrl',
-                    }
-                },
-                authenticate: true
-            })
-            .state('appsettings.team', {
-                url: '/team',
-                views: {
-                    "tab": {
-                        templateUrl: '/templates/settingsmodule/settings.app.team.html',
-                        controller: 'appSettingsTeamCtrl',
-                    }
-                },
-                authenticate: true
-            })
-            .state('appsettings.widget', {
-                url: '/feedback-widget',
-                views: {
-                    "tab": {
-                        templateUrl: '/templates/settingsmodule/settings.app.feedback-widget.html',
-                        controller: 'appSettingsWidgetCtrl',
-                    }
-                },
-                authenticate: true
-            })
-        // .state('appsettings.health', {
-        //   url: '/health',
-        //   views: {
-        //     "tab": {
-        //       templateUrl: '/templates/settingsmodule/settings.app.health.html',
-        //       controller: 'appSettingsHealthCtrl',
-        //     }
-        //   },
-        //   authenticate: true
-        // })
-        .state('appsettings.messages', {
-            url: '/colorthemes',
-            views: {
-                "tab": {
-                    templateUrl: '/templates/settingsmodule/settings.app.messages.html',
-                    controller: 'appSettingsMessagesCtrl',
-                }
-            },
-            authenticate: true
-        })
-        // .state('appsettings.environment', {
-        //   url: '/environment',
-        //   views: {
-        //     "tab": {
-        //       templateUrl: '/templates/settingsmodule/settings.app.environment.html',
-        //       controller: 'appSettingsEnvironmentCtrl',
-        //     }
-        //   },
-        //   authenticate: true
-        // })
-        .state('appsettings.billing', {
-            url: '/billing',
-            views: {
-                "tab": {
-                    templateUrl: '/templates/settingsmodule/settings.app.billing.html',
-                    controller: 'appSettingsBillingCtrl',
-                }
-            },
-            authenticate: true
-        })
-            .state('appsettings.installation', {
-                url: '/installation',
-                views: {
-                    "tab": {
-                        templateUrl: '/templates/settingsmodule/settings.app.installation.html',
-                        controller: 'appSettingsInstallationCtrl',
-                    }
-                },
-                authenticate: true
-            })
-            .state('redirect', {
-                url: '/apps/:aid/invite/:id',
-                views: {
-                    "main": {
-                        templateUrl: '/templates/settingsmodule/settings.redirect.invite.html',
-                        controller: 'appSettingsInviteCtrl',
-                    }
-                }
-            })
+  function ($stateProvider) {
+    $stateProvider
+      .state('settings', {
+        url: '/apps/:id/account',
+        views: {
+          "main": {
+            templateUrl: '/templates/settingsmodule/settings.html',
+            controller: 'profileSettingsCtrl'
+          }
+        },
+        authenticate: true
+      })
+      .state('accountsettings', {
+        url: '/apps/:id/account/settings',
+        views: {
+          "main": {
+            templateUrl: '/templates/settingsmodule/settings.profile.html',
+            controller: 'profileSettingsCtrl',
+          }
+        },
+        authenticate: true
+      })
+      .state('changePassword', {
+        url: '/apps/:id/account/settings/changePassword',
+        views: {
+          "main": {
+            templateUrl: '/templates/settingsmodule/settings.profile.changePassword.html',
+            controller: 'changePasswordCtrl',
+          }
+        },
+        authenticate: true
+      })
+      .state('appsettings', {
+        url: '/apps/:id/settings',
+        views: {
+          "main": {
+            templateUrl: '/templates/settingsmodule/settings.app.html',
+            controller: 'appSettingsCtrl',
+          }
+        },
+        authenticate: true
+      })
+      .state('appsettings.general', {
+        url: '/general',
+        views: {
+          "tab": {
+            templateUrl: '/templates/settingsmodule/settings.app.general.html',
+            controller: 'appSettingsGeneralCtrl',
+          }
+        },
+        authenticate: true
+      })
+      .state('appsettings.team', {
+        url: '/team',
+        views: {
+          "tab": {
+            templateUrl: '/templates/settingsmodule/settings.app.team.html',
+            controller: 'appSettingsTeamCtrl',
+          }
+        },
+        authenticate: true
+      })
+      .state('appsettings.widget', {
+        url: '/feedback-widget',
+        views: {
+          "tab": {
+            templateUrl: '/templates/settingsmodule/settings.app.feedback-widget.html',
+            controller: 'appSettingsWidgetCtrl',
+          }
+        },
+        authenticate: true
+      })
+    // .state('appsettings.health', {
+    //   url: '/health',
+    //   views: {
+    //     "tab": {
+    //       templateUrl: '/templates/settingsmodule/settings.app.health.html',
+    //       controller: 'appSettingsHealthCtrl',
+    //     }
+    //   },
+    //   authenticate: true
+    // })
+    .state('appsettings.messages', {
+      url: '/colorthemes',
+      views: {
+        "tab": {
+          templateUrl: '/templates/settingsmodule/settings.app.messages.html',
+          controller: 'appSettingsMessagesCtrl',
+        }
+      },
+      authenticate: true
+    })
+    // .state('appsettings.environment', {
+    //   url: '/environment',
+    //   views: {
+    //     "tab": {
+    //       templateUrl: '/templates/settingsmodule/settings.app.environment.html',
+    //       controller: 'appSettingsEnvironmentCtrl',
+    //     }
+    //   },
+    //   authenticate: true
+    // })
+    .state('appsettings.billing', {
+      url: '/billing',
+      views: {
+        "tab": {
+          templateUrl: '/templates/settingsmodule/settings.app.billing.html',
+          controller: 'appSettingsBillingCtrl',
+        }
+      },
+      authenticate: true
+    })
+      .state('appsettings.installation', {
+        url: '/installation',
+        views: {
+          "tab": {
+            templateUrl: '/templates/settingsmodule/settings.app.installation.html',
+            controller: 'appSettingsInstallationCtrl',
+          }
+        },
+        authenticate: true
+      })
+      .state('redirect', {
+        url: '/apps/:aid/invite/:id',
+        views: {
+          "main": {
+            templateUrl: '/templates/settingsmodule/settings.redirect.invite.html',
+            controller: 'appSettingsInviteCtrl',
+          }
+        }
+      })
 
-    }
+  }
 ])
 
 
 .controller('profileSettingsCtrl', ['$scope', '$log', '$state', '$location',
-    '$http', 'config', 'AccountService', 'AccountModel', 'AppService',
-    '$stateParams',
-    function($scope, $log, $state, $location, $http, config,
-        AccountService, AccountModel, AppService, $stateParams) {
+  '$http', 'config', 'AccountService', 'AccountModel', 'AppService',
+  '$stateParams',
+  function ($scope, $log, $state, $location, $http, config,
+    AccountService, AccountModel, AppService, $stateParams) {
 
-        $scope.appId = $stateParams.id;
-        $scope.profileNameChangeSuccess = false;
-        $scope.profileNameChangeError = false;
-        $scope.hideSuccessAlert = function() {
-            $scope.profileNameChangeSuccess = false;
-        }
-
-        $scope.hideErrorAlert = function() {
-            $scope.profileNameChangeError = false;
-        }
-
-        $scope.goToProfileSettings = function() {
-            $location.path('/apps/' + $scope.appId + '/account/settings');
-        }
-
-        $scope.goToChangePassword = function() {
-            $location.path('/apps/' + $scope.appId +
-                '/account/settings/changePassword');
-        }
-
-
-        function setName() {
-            var account = AccountService.get();
-            if (typeof account === 'object') {
-                $scope.name = account.name;
-                console.log("profile name: ", $scope.name, account.name);
-            }
-        }
-
-        function init() {
-            setName();
-        }
-
-        $scope.name = '';
-
-        init();
-
-        $scope.$watch(AccountService.get, setName);
-
-        console.log("$location.path: --------->>>> ", $location.path());
-        if ($location.path() ===
-            '/account') {
-            $location.path('/apps/' + AppService.getCurrentApp()
-                ._id + '/users/list');
-        }
-
-        $scope.changeProfileName = function() {
-            console.log("updating profile name");
-            AccountModel.updateName($scope.name, function(err, acc) {
-                if (err) {
-                    $log.error('failed to update name', err);
-                    $scope.profileNameChangeError = true;
-                    return;
-                }
-                $scope.profileNameChangeSuccess = true;
-                AccountService.set(acc);
-            });
-        }
+    $scope.appId = $stateParams.id;
+    $scope.profileNameChangeSuccess = false;
+    $scope.profileNameChangeError = false;
+    $scope.hideSuccessAlert = function () {
+      $scope.profileNameChangeSuccess = false;
     }
+
+    $scope.hideErrorAlert = function () {
+      $scope.profileNameChangeError = false;
+    }
+
+    $scope.goToProfileSettings = function () {
+      $location.path('/apps/' + $scope.appId + '/account/settings');
+    }
+
+    $scope.goToChangePassword = function () {
+      $location.path('/apps/' + $scope.appId +
+        '/account/settings/changePassword');
+    }
+
+
+    function setName() {
+      var account = AccountService.get();
+      if (typeof account === 'object') {
+        $scope.name = account.name;
+        console.log("profile name: ", $scope.name, account.name);
+      }
+    }
+
+    function init() {
+      setName();
+    }
+
+    $scope.name = '';
+
+    init();
+
+    $scope.$watch(AccountService.get, setName);
+
+    console.log("$location.path: --------->>>> ", $location.path());
+    if ($location.path() ===
+      '/account') {
+      $location.path('/apps/' + AppService.getCurrentApp()
+        ._id + '/users/list');
+    }
+
+    $scope.changeProfileName = function () {
+      console.log("updating profile name");
+      AccountModel.updateName($scope.name, function (err, acc) {
+        if (err) {
+          $log.error('failed to update name', err);
+          $scope.profileNameChangeError = true;
+          return;
+        }
+        $scope.profileNameChangeSuccess = true;
+        AccountService.set(acc);
+      });
+    }
+  }
 ])
 
 .controller('changePasswordCtrl', ['$scope', 'AccountModel', '$log',
-    '$stateParams', '$location',
-    function($scope, AccountModel, $log, $stateParams, $location) {
+  '$stateParams', '$location',
+  function ($scope, AccountModel, $log, $stateParams, $location) {
 
-        // $scope.newPwdLen = true;
-        $scope.new_pwd = '';
-        $scope.showError = false;
-        $scope.appId = $stateParams.id;
-        $scope.pwdChangedSuccess = false;
-        $scope.errMsg = '';
-        $scope.hideErrorAlert = function() {
-            $scope.showError = false;
-        }
-
-        $scope.goToProfileSettings = function() {
-            $location.path('/apps/' + $scope.appId + '/account/settings');
-        }
-
-        $scope.goToChangePassword = function() {
-            $location.path('/apps/' + $scope.appId +
-                '/account/settings/changePassword');
-        }
-
-        $scope.hideSuccessAlert = function() {
-            $scope.pwdChangedSuccess = false;
-        }
-        $scope.changePassword = function() {
-            AccountModel.updatePwd($scope.current_pwd, $scope.new_pwd,
-                function(err, data) {
-                    if (err) {
-                        $log.error('failed to update pwd:', err);
-                        $scope.showError = true;
-                        $scope.errMsg = err.error;
-                        return;
-                    }
-                    $scope.pwdChangedSuccess = true;
-                    $log.info("password changed successfully!");
-                })
-        }
+    // $scope.newPwdLen = true;
+    $scope.new_pwd = '';
+    $scope.showError = false;
+    $scope.appId = $stateParams.id;
+    $scope.pwdChangedSuccess = false;
+    $scope.errMsg = '';
+    $scope.hideErrorAlert = function () {
+      $scope.showError = false;
     }
+
+    $scope.goToProfileSettings = function () {
+      $location.path('/apps/' + $scope.appId + '/account/settings');
+    }
+
+    $scope.goToChangePassword = function () {
+      $location.path('/apps/' + $scope.appId +
+        '/account/settings/changePassword');
+    }
+
+    $scope.hideSuccessAlert = function () {
+      $scope.pwdChangedSuccess = false;
+    }
+    $scope.changePassword = function () {
+      AccountModel.updatePwd($scope.current_pwd, $scope.new_pwd,
+        function (err, data) {
+          if (err) {
+            $log.error('failed to update pwd:', err);
+            $scope.showError = true;
+            $scope.errMsg = err.error;
+            return;
+          }
+          $scope.pwdChangedSuccess = true;
+          $log.info("password changed successfully!");
+        })
+    }
+  }
 ])
 
 .controller('appSettingsCtrl', ['$scope', '$log', '$state', '$location',
-    'AppService', 'CurrentAppService', 'AppModel', '$stateParams',
-    function($scope, $log, $state, $location, AppService, CurrentAppService,
-        AppModel, $stateParams) {
+  'AppService', 'CurrentAppService', 'AppModel', '$stateParams',
+  function ($scope, $log, $state, $location, AppService, CurrentAppService,
+    AppModel, $stateParams) {
 
-        var url = $location.path()
-            .split('/');
-        if (url.length == 4) {
-            $location.path('/apps/' + $stateParams.id + '/settings/general')
+    var url = $location.path()
+      .split('/');
+    if (url.length == 4) {
+      $location.path('/apps/' + $stateParams.id + '/settings/general')
+    }
+
+    CurrentAppService.getCurrentApp()
+      .then(function (currentApp) {
+        $scope.appId = $stateParams.id;
+
+        $scope.isActive = function (path) {
+          var location = $location.path()
+            .split('/')[4];
+          return path === location;
         }
 
-        CurrentAppService.getCurrentApp()
-            .then(function(currentApp) {
-                $scope.appId = $stateParams.id;
+        var populatePage = function () {
+          $scope.App = AppService.getCurrentApp()
+            .name;
+        }
+        AppModel.getSingleApp($scope.appId, populatePage);
+      })
 
-                $scope.isActive = function(path) {
-                    var location = $location.path()
-                        .split('/')[4];
-                    return path === location;
-                }
+    // if (window.location.href ===
+    //   'http://app.do.localhost/app/settings') {
+    //   $location.path('/app/settings/general');
+    // }
 
-                var populatePage = function() {
-                    $scope.App = AppService.getCurrentApp()
-                        .name;
-                }
-                AppModel.getSingleApp($scope.appId, populatePage);
-            })
-
-        // if (window.location.href ===
-        //   'http://app.do.localhost/app/settings') {
-        //   $location.path('/app/settings/general');
-        // }
-
-    }
+  }
 ])
 
 .controller('appSettingsGeneralCtrl', ['$scope', '$log', '$state',
-    'AppService', 'AppModel', 'CurrentAppService', '$stateParams',
-    function($scope, $log, $state, AppService, AppModel, CurrentAppService,
-        $stateParams) {
+  'AppService', 'AppModel', 'CurrentAppService', '$stateParams',
+  function ($scope, $log, $state, AppService, AppModel, CurrentAppService,
+    $stateParams) {
 
-        CurrentAppService.getCurrentApp()
-            .then(function(currentApp) {
-                $scope.currApp = $stateParams.id;
+    CurrentAppService.getCurrentApp()
+      .then(function (currentApp) {
+        $scope.currApp = $stateParams.id;
 
-                var populatePage = function() {
-                    $scope.name = AppService.getCurrentApp()
-                        .name;
-                    var appId = AppService.getCurrentApp()
-                        ._id;
+        var populatePage = function () {
+          $scope.name = AppService.getCurrentApp()
+            .name;
+          var appId = AppService.getCurrentApp()
+            ._id;
 
-                    $scope.changeAppName = function() {
-                        AppModel.updateName($scope.name, appId, function(err, data) {
-                            if (err) {
-                                $log.info("Error in updating app name");
-                                return;
-                            }
-                            $log.info("app name changed successfully!")
-                        })
-                    }
-                }
-                AppModel.getSingleApp($scope.currApp, populatePage);
+          $scope.changeAppName = function () {
+            AppModel.updateName($scope.name, appId, function (err, data) {
+              if (err) {
+                $log.info("Error in updating app name");
+                return;
+              }
+              $log.info("app name changed successfully!")
             })
+          }
+        }
+        AppModel.getSingleApp($scope.currApp, populatePage);
+      })
 
-    }
+  }
 ])
 
 .controller('appSettingsTeamCtrl', ['$scope', '$log', '$state',
-    'CurrentAppService', 'AppModel', 'InviteModel', 'InviteIdService',
-    'AppService', '$stateParams',
-    function($scope, $log, $state, CurrentAppService, AppModel,
-        InviteModel, InviteIdService, AppService, $stateParams) {
+  'CurrentAppService', 'AppModel', 'InviteModel', 'InviteIdService',
+  'AppService', '$stateParams',
+  function ($scope, $log, $state, CurrentAppService, AppModel,
+    InviteModel, InviteIdService, AppService, $stateParams) {
 
-        // TODO: Get data from backend
-        CurrentAppService.getCurrentApp()
-            .then(function(currentApp) {
+    // TODO: Get data from backend
+    CurrentAppService.getCurrentApp()
+      .then(function (currentApp) {
 
-                $scope.enableInvite = true;
-                $scope.currApp = $stateParams.id;
-                $scope.invTeamMember = false;
-                $scope.showMsgSuccess = false;
-                $scope.team = [];
-                $scope.invitedTeam = [];
+        $scope.enableInvite = true;
+        $scope.currApp = $stateParams.id;
+        $scope.invTeamMember = false;
+        $scope.showMsgSuccess = false;
+        $scope.team = [];
+        $scope.invitedTeam = [];
 
-                var populatePage = function() {
+        var populatePage = function () {
 
-                    $scope.hideMsgSuccessAlert = function() {
-                        $scope.showMsgSuccess = false;
-                    }
+          $scope.hideMsgSuccessAlert = function () {
+            $scope.showMsgSuccess = false;
+          }
 
 
 
-                    var populateInvitedMembers = function() {
-                        $scope.invitedTeam = InviteIdService.getInvitedMembers();
-                        // $scope.showMsgSuccess = true;
-                    }
-                    InviteModel.getPendingInvites($scope.currApp,
-                        populateInvitedMembers);
-                    // $scope.team = currentApp.team;
+          var populateInvitedMembers = function () {
+            $scope.invitedTeam = InviteIdService.getInvitedMembers();
+            // $scope.showMsgSuccess = true;
+          }
+          InviteModel.getPendingInvites($scope.currApp,
+            populateInvitedMembers);
+          // $scope.team = currentApp.team;
 
-                    var length = InviteIdService.getInvitedMembers()
-                        .length;
-                    $scope.$watch('length', function() {
-                        $scope.invTeamMember = true;
-                    })
+          var length = InviteIdService.getInvitedMembers()
+            .length;
+          $scope.$watch('length', function () {
+            $scope.invTeamMember = true;
+          })
 
-                    for (var i = 0; i < AppService.getCurrentApp()
-                        .team.length; i++) {
-                        var userjoyEmail = '';
-                        userjoyEmail = AppService.getCurrentApp()
-                            .team[i].username + '@' + AppService.getCurrentApp()
-                            .subdomain + '.mail.userjoy.co';
-                        $scope.team.push({
-                            // name: AppService.getCurrentApp()
-                            //   .team[i].accid.name,
-                            email: AppService.getCurrentApp()
-                                .team[i].accid.email,
-                            ujEmail: userjoyEmail
-                        })
-                    };
-
-                    $scope.removeTeamMember = function(teamMember) {
-                        // TODO: Add code to remove team member
-                        $log.info(
-                            "team member removed function called");
-                        var index = $scope.team.indexOf(teamMember);
-                        $scope.team.splice(index, 1);
-                    }
-
-                    var showSuccessMsg = function(err) {
-                        $scope.enableInvite = true;
-                        if (err) {
-                            return err;
-                        }
-
-                        $scope.showMsgSuccess = true;
-                        $scope.invitedTeam.push({
-                            // toName: $scope.nameMember,
-                            toEmail: $scope.teamMember
-                        })
-                    }
-
-                    $scope.addTeamMember = function() {
-                        $scope.enableInvite = false;
-                        var emailArray = [];
-                        emailArray[0] = $scope.teamMember;
-                        var data = {
-                            emails: emailArray
-                            // name: $scope.nameMember
-                        };
-                        console.log("data: ", data);
-
-                        AppModel.addNewMember(data, $scope.currApp,
-                            showSuccessMsg);
-                    }
-                }
-
-                AppModel.getSingleApp($scope.currApp, populatePage);
+          for (var i = 0; i < AppService.getCurrentApp()
+            .team.length; i++) {
+            var userjoyEmail = '';
+            userjoyEmail = AppService.getCurrentApp()
+              .team[i].username + '@' + AppService.getCurrentApp()
+              .subdomain + '.mail.userjoy.co';
+            $scope.team.push({
+              // name: AppService.getCurrentApp()
+              //   .team[i].accid.name,
+              email: AppService.getCurrentApp()
+                .team[i].accid.email,
+              ujEmail: userjoyEmail
             })
-    }
+          };
+
+          $scope.removeTeamMember = function (teamMember) {
+            // TODO: Add code to remove team member
+            $log.info(
+              "team member removed function called");
+            var index = $scope.team.indexOf(teamMember);
+            $scope.team.splice(index, 1);
+          }
+
+          var showSuccessMsg = function (err) {
+            $scope.enableInvite = true;
+            if (err) {
+              return err;
+            }
+
+            $scope.showMsgSuccess = true;
+            $scope.invitedTeam.push({
+              // toName: $scope.nameMember,
+              toEmail: $scope.teamMember
+            })
+          }
+
+          $scope.addTeamMember = function () {
+            $scope.enableInvite = false;
+            var emailArray = [];
+            emailArray[0] = $scope.teamMember;
+            var data = {
+              emails: emailArray
+              // name: $scope.nameMember
+            };
+            console.log("data: ", data);
+
+            AppModel.addNewMember(data, $scope.currApp,
+              showSuccessMsg);
+          }
+        }
+
+        AppModel.getSingleApp($scope.currApp, populatePage);
+      })
+  }
 ])
 
 // .controller('appSettingsHealthCtrl', ['$scope', '$log', '$state',
@@ -69289,233 +69598,233 @@ angular.module('do.settings', [])
 // ])
 
 .controller('appSettingsMessagesCtrl', ['$scope', '$log', '$state',
-    '$stateParams', 'AppModel', 'AppService', 'CurrentAppService', '$timeout',
-    function($scope, $log, $state, $stateParams, AppModel, AppService,
-        CurrentAppService, $timeout) {
+  '$stateParams', 'AppModel', 'AppService', 'CurrentAppService', '$timeout',
+  function ($scope, $log, $state, $stateParams, AppModel, AppService,
+    CurrentAppService, $timeout) {
 
 
-        CurrentAppService.getCurrentApp()
-            .then(function(currentApp) {
+    CurrentAppService.getCurrentApp()
+      .then(function (currentApp) {
 
-                $scope.currApp = $stateParams.id;
-                var initializing = true;
-                var populatePage = function() {
-                    $scope.color = AppService.getCurrentApp()
-                        .color;
-                    console.log("app color: ", $scope.color);
+        $scope.currApp = $stateParams.id;
+        var initializing = true;
+        var populatePage = function () {
+          $scope.color = AppService.getCurrentApp()
+            .color;
+          console.log("app color: ", $scope.color);
 
-                    if ($scope.color.toUpperCase() === '#39b3d7'.toUpperCase()) {
-                        $scope.btnInfoWidth = '40px';
-                        $scope.btnInfoHeight = '40px';
-                        $scope.btnPrimaryWidth = '30px';
-                        $scope.btnPrimaryHeight = '30px';
-                        $scope.btnDefaultWidth = '30px';
-                        $scope.btnDefaultHeight = '30px';
-                        $scope.btnSuccessWidth = '30px';
-                        $scope.btnSuccessHeight = '30px';
-                        $scope.btnWarningWidth = '30px';
-                        $scope.btnWarningHeight = '30px';
-                        $scope.btnDangerWidth = '30px';
-                        $scope.btnDangerHeight = '30px';
-                    }
-                    if ($scope.color.toUpperCase() === '#3276B1'.toUpperCase()) {
-                        $scope.btnInfoWidth = '30px';
-                        $scope.btnInfoHeight = '30px';
-                        $scope.btnPrimaryWidth = '40px';
-                        $scope.btnPrimaryHeight = '40px';
-                        $scope.btnDefaultWidth = '30px';
-                        $scope.btnDefaultHeight = '30px';
-                        $scope.btnSuccessWidth = '30px';
-                        $scope.btnSuccessHeight = '30px';
-                        $scope.btnWarningWidth = '30px';
-                        $scope.btnWarningHeight = '30px';
-                        $scope.btnDangerWidth = '30px';
-                        $scope.btnDangerHeight = '30px';
-                    }
-                    if ($scope.color.toUpperCase() === '#7f8c8d'.toUpperCase()) {
-                        $scope.btnInfoWidth = '30px';
-                        $scope.btnInfoHeight = '30px';
-                        $scope.btnPrimaryWidth = '30px';
-                        $scope.btnPrimaryHeight = '30px';
-                        $scope.btnDefaultWidth = '40px';
-                        $scope.btnDefaultHeight = '40px';
-                        $scope.btnSuccessWidth = '30px';
-                        $scope.btnSuccessHeight = '30px';
-                        $scope.btnWarningWidth = '30px';
-                        $scope.btnWarningHeight = '30px';
-                        $scope.btnDangerWidth = '30px';
-                        $scope.btnDangerHeight = '30px';
-                    }
-                    if ($scope.color.toUpperCase() === '#18bc9c'.toUpperCase()) {
-                        $scope.btnInfoWidth = '30px';
-                        $scope.btnInfoHeight = '30px';
-                        $scope.btnPrimaryWidth = '30px';
-                        $scope.btnPrimaryHeight = '30px';
-                        $scope.btnDefaultWidth = '30px';
-                        $scope.btnDefaultHeight = '30px';
-                        $scope.btnSuccessWidth = '40px';
-                        $scope.btnSuccessHeight = '40px';
-                        $scope.btnWarningWidth = '30px';
-                        $scope.btnWarningHeight = '30px';
-                        $scope.btnDangerWidth = '30px';
-                        $scope.btnDangerHeight = '30px';
-                    }
-                    if ($scope.color.toUpperCase() === '#f0ad4e'.toUpperCase()) {
-                        $scope.btnInfoWidth = '30px';
-                        $scope.btnInfoHeight = '30px';
-                        $scope.btnPrimaryWidth = '30px';
-                        $scope.btnPrimaryHeight = '30px';
-                        $scope.btnDefaultWidth = '30px';
-                        $scope.btnDefaultHeight = '30px';
-                        $scope.btnSuccessWidth = '30px';
-                        $scope.btnSuccessHeight = '30px';
-                        $scope.btnWarningWidth = '40px';
-                        $scope.btnWarningHeight = '40px';
-                        $scope.btnDangerWidth = '30px';
-                        $scope.btnDangerHeight = '30px';
-                    }
-                    if ($scope.color.toUpperCase() === '#d9534f'.toUpperCase()) {
-                        $scope.btnInfoWidth = '30px';
-                        $scope.btnInfoHeight = '30px';
-                        $scope.btnPrimaryWidth = '30px';
-                        $scope.btnPrimaryHeight = '30px';
-                        $scope.btnDefaultWidth = '30px';
-                        $scope.btnDefaultHeight = '30px';
-                        $scope.btnSuccessWidth = '30px';
-                        $scope.btnSuccessHeight = '30px';
-                        $scope.btnWarningWidth = '30px';
-                        $scope.btnWarningHeight = '30px';
-                        $scope.btnDangerWidth = '40px';
-                        $scope.btnDangerHeight = '40px';
-                    }
-                    // $scope.color = '#39b3d7'
-                    $scope.notfHeight = '150px';
-                    $scope.overflow = 'auto'
-                    $scope.marginTop = '3px';
-                    $scope.borderColor = $scope.color;
-                    $scope.borderRight = '1px solid' + $scope.color;
-                    $scope.borderTop = '1px solid' + $scope.color;
-                    $scope.borderBottom = '1px solid' + $scope.color;
-                    $scope.borderLeft = '1px solid' + $scope.color;
-                    $scope.btnBackgrndColor = $scope.color;
-                    $scope.btnBorderColor = $scope.color;
-                    $scope.btnColor = '#ffffff';
-                    $scope.floatRight = 'right';
+          if ($scope.color.toUpperCase() === '#39b3d7'.toUpperCase()) {
+            $scope.btnInfoWidth = '40px';
+            $scope.btnInfoHeight = '40px';
+            $scope.btnPrimaryWidth = '30px';
+            $scope.btnPrimaryHeight = '30px';
+            $scope.btnDefaultWidth = '30px';
+            $scope.btnDefaultHeight = '30px';
+            $scope.btnSuccessWidth = '30px';
+            $scope.btnSuccessHeight = '30px';
+            $scope.btnWarningWidth = '30px';
+            $scope.btnWarningHeight = '30px';
+            $scope.btnDangerWidth = '30px';
+            $scope.btnDangerHeight = '30px';
+          }
+          if ($scope.color.toUpperCase() === '#3276B1'.toUpperCase()) {
+            $scope.btnInfoWidth = '30px';
+            $scope.btnInfoHeight = '30px';
+            $scope.btnPrimaryWidth = '40px';
+            $scope.btnPrimaryHeight = '40px';
+            $scope.btnDefaultWidth = '30px';
+            $scope.btnDefaultHeight = '30px';
+            $scope.btnSuccessWidth = '30px';
+            $scope.btnSuccessHeight = '30px';
+            $scope.btnWarningWidth = '30px';
+            $scope.btnWarningHeight = '30px';
+            $scope.btnDangerWidth = '30px';
+            $scope.btnDangerHeight = '30px';
+          }
+          if ($scope.color.toUpperCase() === '#7f8c8d'.toUpperCase()) {
+            $scope.btnInfoWidth = '30px';
+            $scope.btnInfoHeight = '30px';
+            $scope.btnPrimaryWidth = '30px';
+            $scope.btnPrimaryHeight = '30px';
+            $scope.btnDefaultWidth = '40px';
+            $scope.btnDefaultHeight = '40px';
+            $scope.btnSuccessWidth = '30px';
+            $scope.btnSuccessHeight = '30px';
+            $scope.btnWarningWidth = '30px';
+            $scope.btnWarningHeight = '30px';
+            $scope.btnDangerWidth = '30px';
+            $scope.btnDangerHeight = '30px';
+          }
+          if ($scope.color.toUpperCase() === '#18bc9c'.toUpperCase()) {
+            $scope.btnInfoWidth = '30px';
+            $scope.btnInfoHeight = '30px';
+            $scope.btnPrimaryWidth = '30px';
+            $scope.btnPrimaryHeight = '30px';
+            $scope.btnDefaultWidth = '30px';
+            $scope.btnDefaultHeight = '30px';
+            $scope.btnSuccessWidth = '40px';
+            $scope.btnSuccessHeight = '40px';
+            $scope.btnWarningWidth = '30px';
+            $scope.btnWarningHeight = '30px';
+            $scope.btnDangerWidth = '30px';
+            $scope.btnDangerHeight = '30px';
+          }
+          if ($scope.color.toUpperCase() === '#f0ad4e'.toUpperCase()) {
+            $scope.btnInfoWidth = '30px';
+            $scope.btnInfoHeight = '30px';
+            $scope.btnPrimaryWidth = '30px';
+            $scope.btnPrimaryHeight = '30px';
+            $scope.btnDefaultWidth = '30px';
+            $scope.btnDefaultHeight = '30px';
+            $scope.btnSuccessWidth = '30px';
+            $scope.btnSuccessHeight = '30px';
+            $scope.btnWarningWidth = '40px';
+            $scope.btnWarningHeight = '40px';
+            $scope.btnDangerWidth = '30px';
+            $scope.btnDangerHeight = '30px';
+          }
+          if ($scope.color.toUpperCase() === '#d9534f'.toUpperCase()) {
+            $scope.btnInfoWidth = '30px';
+            $scope.btnInfoHeight = '30px';
+            $scope.btnPrimaryWidth = '30px';
+            $scope.btnPrimaryHeight = '30px';
+            $scope.btnDefaultWidth = '30px';
+            $scope.btnDefaultHeight = '30px';
+            $scope.btnSuccessWidth = '30px';
+            $scope.btnSuccessHeight = '30px';
+            $scope.btnWarningWidth = '30px';
+            $scope.btnWarningHeight = '30px';
+            $scope.btnDangerWidth = '40px';
+            $scope.btnDangerHeight = '40px';
+          }
+          // $scope.color = '#39b3d7'
+          $scope.notfHeight = '150px';
+          $scope.overflow = 'auto'
+          $scope.marginTop = '3px';
+          $scope.borderColor = $scope.color;
+          $scope.borderRight = '1px solid' + $scope.color;
+          $scope.borderTop = '1px solid' + $scope.color;
+          $scope.borderBottom = '1px solid' + $scope.color;
+          $scope.borderLeft = '1px solid' + $scope.color;
+          $scope.btnBackgrndColor = $scope.color;
+          $scope.btnBorderColor = $scope.color;
+          $scope.btnColor = '#ffffff';
+          $scope.floatRight = 'right';
 
-                    $scope.borderRadius = '4px';
+          $scope.borderRadius = '4px';
 
-                    $scope.showPreview = function(color) {
-                        $scope.color = color;
-                        if (color === '#39b3d7') {
-                            $scope.btnInfoWidth = '40px';
-                            $scope.btnInfoHeight = '40px';
-                            $scope.btnPrimaryWidth = '30px';
-                            $scope.btnPrimaryHeight = '30px';
-                            $scope.btnDefaultWidth = '30px';
-                            $scope.btnDefaultHeight = '30px';
-                            $scope.btnSuccessWidth = '30px';
-                            $scope.btnSuccessHeight = '30px';
-                            $scope.btnWarningWidth = '30px';
-                            $scope.btnWarningHeight = '30px';
-                            $scope.btnDangerWidth = '30px';
-                            $scope.btnDangerHeight = '30px';
-                        }
-                        if (color === '#3276b1') {
-                            $scope.btnInfoWidth = '30px';
-                            $scope.btnInfoHeight = '30px';
-                            $scope.btnPrimaryWidth = '40px';
-                            $scope.btnPrimaryHeight = '40px';
-                            $scope.btnDefaultWidth = '30px';
-                            $scope.btnDefaultHeight = '30px';
-                            $scope.btnSuccessWidth = '30px';
-                            $scope.btnSuccessHeight = '30px';
-                            $scope.btnWarningWidth = '30px';
-                            $scope.btnWarningHeight = '30px';
-                            $scope.btnDangerWidth = '30px';
-                            $scope.btnDangerHeight = '30px';
-                        }
-                        if (color === '#7f8c8d') {
-                            $scope.btnInfoWidth = '30px';
-                            $scope.btnInfoHeight = '30px';
-                            $scope.btnPrimaryWidth = '30px';
-                            $scope.btnPrimaryHeight = '30px';
-                            $scope.btnDefaultWidth = '40px';
-                            $scope.btnDefaultHeight = '40px';
-                            $scope.btnSuccessWidth = '30px';
-                            $scope.btnSuccessHeight = '30px';
-                            $scope.btnWarningWidth = '30px';
-                            $scope.btnWarningHeight = '30px';
-                            $scope.btnDangerWidth = '30px';
-                            $scope.btnDangerHeight = '30px';
-                        }
-                        if (color === '#18bc9c') {
-                            $scope.btnInfoWidth = '30px';
-                            $scope.btnInfoHeight = '30px';
-                            $scope.btnPrimaryWidth = '30px';
-                            $scope.btnPrimaryHeight = '30px';
-                            $scope.btnDefaultWidth = '30px';
-                            $scope.btnDefaultHeight = '30px';
-                            $scope.btnSuccessWidth = '40px';
-                            $scope.btnSuccessHeight = '40px';
-                            $scope.btnWarningWidth = '30px';
-                            $scope.btnWarningHeight = '30px';
-                            $scope.btnDangerWidth = '30px';
-                            $scope.btnDangerHeight = '30px';
-                        }
-                        if (color === '#f0ad4e') {
-                            $scope.btnInfoWidth = '30px';
-                            $scope.btnInfoHeight = '30px';
-                            $scope.btnPrimaryWidth = '30px';
-                            $scope.btnPrimaryHeight = '30px';
-                            $scope.btnDefaultWidth = '30px';
-                            $scope.btnDefaultHeight = '30px';
-                            $scope.btnSuccessWidth = '30px';
-                            $scope.btnSuccessHeight = '30px';
-                            $scope.btnWarningWidth = '40px';
-                            $scope.btnWarningHeight = '40px';
-                            $scope.btnDangerWidth = '30px';
-                            $scope.btnDangerHeight = '30px';
-                        }
-                        if (color === '#d9534f') {
-                            $scope.btnInfoWidth = '30px';
-                            $scope.btnInfoHeight = '30px';
-                            $scope.btnPrimaryWidth = '30px';
-                            $scope.btnPrimaryHeight = '30px';
-                            $scope.btnDefaultWidth = '30px';
-                            $scope.btnDefaultHeight = '30px';
-                            $scope.btnSuccessWidth = '30px';
-                            $scope.btnSuccessHeight = '30px';
-                            $scope.btnWarningWidth = '30px';
-                            $scope.btnWarningHeight = '30px';
-                            $scope.btnDangerWidth = '40px';
-                            $scope.btnDangerHeight = '40px';
-                        }
-                        $scope.btnHeight = '40px';
-                        $scope.btnWidth = '40px';
-                        console.log("color: ", color);
-                        $scope.borderColor = color;
-                        $scope.borderRight = '1px solid' + color;
-                        $scope.borderTop = '1px solid' + color;
-                        $scope.borderBottom = '1px solid' + color;
-                        $scope.borderLeft = '1px solid' + color;
-                        $scope.btnBackgrndColor = color;
-                        $scope.btnBorderColor = color;
-                        $scope.btnColor = '#ffffff';
-                    }
+          $scope.showPreview = function (color) {
+            $scope.color = color;
+            if (color === '#39b3d7') {
+              $scope.btnInfoWidth = '40px';
+              $scope.btnInfoHeight = '40px';
+              $scope.btnPrimaryWidth = '30px';
+              $scope.btnPrimaryHeight = '30px';
+              $scope.btnDefaultWidth = '30px';
+              $scope.btnDefaultHeight = '30px';
+              $scope.btnSuccessWidth = '30px';
+              $scope.btnSuccessHeight = '30px';
+              $scope.btnWarningWidth = '30px';
+              $scope.btnWarningHeight = '30px';
+              $scope.btnDangerWidth = '30px';
+              $scope.btnDangerHeight = '30px';
+            }
+            if (color === '#3276b1') {
+              $scope.btnInfoWidth = '30px';
+              $scope.btnInfoHeight = '30px';
+              $scope.btnPrimaryWidth = '40px';
+              $scope.btnPrimaryHeight = '40px';
+              $scope.btnDefaultWidth = '30px';
+              $scope.btnDefaultHeight = '30px';
+              $scope.btnSuccessWidth = '30px';
+              $scope.btnSuccessHeight = '30px';
+              $scope.btnWarningWidth = '30px';
+              $scope.btnWarningHeight = '30px';
+              $scope.btnDangerWidth = '30px';
+              $scope.btnDangerHeight = '30px';
+            }
+            if (color === '#7f8c8d') {
+              $scope.btnInfoWidth = '30px';
+              $scope.btnInfoHeight = '30px';
+              $scope.btnPrimaryWidth = '30px';
+              $scope.btnPrimaryHeight = '30px';
+              $scope.btnDefaultWidth = '40px';
+              $scope.btnDefaultHeight = '40px';
+              $scope.btnSuccessWidth = '30px';
+              $scope.btnSuccessHeight = '30px';
+              $scope.btnWarningWidth = '30px';
+              $scope.btnWarningHeight = '30px';
+              $scope.btnDangerWidth = '30px';
+              $scope.btnDangerHeight = '30px';
+            }
+            if (color === '#18bc9c') {
+              $scope.btnInfoWidth = '30px';
+              $scope.btnInfoHeight = '30px';
+              $scope.btnPrimaryWidth = '30px';
+              $scope.btnPrimaryHeight = '30px';
+              $scope.btnDefaultWidth = '30px';
+              $scope.btnDefaultHeight = '30px';
+              $scope.btnSuccessWidth = '40px';
+              $scope.btnSuccessHeight = '40px';
+              $scope.btnWarningWidth = '30px';
+              $scope.btnWarningHeight = '30px';
+              $scope.btnDangerWidth = '30px';
+              $scope.btnDangerHeight = '30px';
+            }
+            if (color === '#f0ad4e') {
+              $scope.btnInfoWidth = '30px';
+              $scope.btnInfoHeight = '30px';
+              $scope.btnPrimaryWidth = '30px';
+              $scope.btnPrimaryHeight = '30px';
+              $scope.btnDefaultWidth = '30px';
+              $scope.btnDefaultHeight = '30px';
+              $scope.btnSuccessWidth = '30px';
+              $scope.btnSuccessHeight = '30px';
+              $scope.btnWarningWidth = '40px';
+              $scope.btnWarningHeight = '40px';
+              $scope.btnDangerWidth = '30px';
+              $scope.btnDangerHeight = '30px';
+            }
+            if (color === '#d9534f') {
+              $scope.btnInfoWidth = '30px';
+              $scope.btnInfoHeight = '30px';
+              $scope.btnPrimaryWidth = '30px';
+              $scope.btnPrimaryHeight = '30px';
+              $scope.btnDefaultWidth = '30px';
+              $scope.btnDefaultHeight = '30px';
+              $scope.btnSuccessWidth = '30px';
+              $scope.btnSuccessHeight = '30px';
+              $scope.btnWarningWidth = '30px';
+              $scope.btnWarningHeight = '30px';
+              $scope.btnDangerWidth = '40px';
+              $scope.btnDangerHeight = '40px';
+            }
+            $scope.btnHeight = '40px';
+            $scope.btnWidth = '40px';
+            console.log("color: ", color);
+            $scope.borderColor = color;
+            $scope.borderRight = '1px solid' + color;
+            $scope.borderTop = '1px solid' + color;
+            $scope.borderBottom = '1px solid' + color;
+            $scope.borderLeft = '1px solid' + color;
+            $scope.btnBackgrndColor = color;
+            $scope.btnBorderColor = color;
+            $scope.btnColor = '#ffffff';
+          }
 
-                    $scope.saveColor = function() {
-                        AppModel.updateColor($scope.currApp, $scope.color);
-                    }
-                }
-
-
-                AppModel.getSingleApp($scope.currApp, populatePage);
-            })
+          $scope.saveColor = function () {
+            AppModel.updateColor($scope.currApp, $scope.color);
+          }
+        }
 
 
+        AppModel.getSingleApp($scope.currApp, populatePage);
+      })
 
 
-    }
+
+
+  }
 ])
 
 // .controller('appSettingsEnvironmentCtrl', ['$scope', '$log', '$state',
@@ -69528,102 +69837,103 @@ angular.module('do.settings', [])
 // ])
 
 .controller('appSettingsBillingCtrl', ['$scope', '$log', '$state',
-    function($scope, $log, $state) {
+  function ($scope, $log, $state) {
 
-    }
+  }
 ])
 
 .controller('appSettingsInstallationCtrl', ['$scope', '$log', '$state',
-    '$stateParams', '$location',
-    function($scope, $log, $state, $stateParams, $location) {
-        $scope.apiKey = $stateParams.id;
-        $scope.sendToDeveloper = function() {
-            $location.path('/apps/' + $scope.apiKey + '/sendemail');
-        }
-        $scope.selectText = function(containerid) {
-            if (document.selection) {
-                var range = document.body.createTextRange();
-                range.moveToElementText(document.getElementById(containerid));
-                range.select();
-            } else if (window.getSelection) {
-                var range = document.createRange();
-                range.selectNode(document.getElementById(containerid));
-                window.getSelection()
-                    .addRange(range);
-            }
-        }
+  '$stateParams', '$location',
+  function ($scope, $log, $state, $stateParams, $location) {
+    $scope.apiKey = $stateParams.id;
+    $scope.sendToDeveloper = function () {
+      $location.path('/apps/' + $scope.apiKey + '/sendemail');
     }
+    $scope.selectText = function (containerid) {
+      if (document.selection) {
+        var range = document.body.createTextRange();
+        range.moveToElementText(document.getElementById(containerid));
+        range.select();
+      } else if (window.getSelection) {
+        var range = document.createRange();
+        range.selectNode(document.getElementById(containerid));
+        window.getSelection()
+          .addRange(range);
+      }
+    }
+  }
 ])
 
 .controller('appSettingsInviteCtrl', ['$scope', '$rootScope', 'AppModel',
-    'InviteIdService', '$rootScope',
-    function($scope, $rootScope, AppModel, InviteIdService, $rootScope) {
+  'InviteIdService', '$rootScope',
+  function ($scope, $rootScope, AppModel, InviteIdService, $rootScope) {
+    $scope.noError = true;
+    $scope.error = false;
+    var url = window.location.href;
+    var appId = url.split("/")[4];
+    var inviteId = url.split("/")[6];
+    // $rootScope.isInvited = true;
+    // $rootScope.invitedAppId = appId;
+    InviteIdService.setInviteId(inviteId);
+    var showMsg = function (err) {
+      if (err) {
+        $scope.noError = false;
+        $scope.error = true;
+        return;
+      } else {
         $scope.noError = true;
         $scope.error = false;
-        var url = window.location.href;
-        var appId = url.split("/")[4];
-        var inviteId = url.split("/")[6];
-        // $rootScope.isInvited = true;
-        // $rootScope.invitedAppId = appId;
-        InviteIdService.setInviteId(inviteId);
-        var showMsg = function(err) {
-            if (err) {
-                $scope.noError = false;
-                $scope.error = true;
-                return;
-            } else {
-                $scope.noError = true;
-                $scope.error = false;
-            }
-        }
-
-        AppModel.redirectUser(appId, inviteId, showMsg);
-
+      }
     }
+
+    AppModel.redirectUser(appId, inviteId, showMsg);
+
+  }
 ])
 
 .controller('appSettingsWidgetCtrl', ['$scope', 'CurrentAppService',
-    'AppModel', '$timeout', '$stateParams', 'AppService',
-    function($scope, CurrentAppService, AppModel, $timeout, $stateParams,
-        AppService) {
-        CurrentAppService.getCurrentApp()
-            .then(function(currentApp) {
-                $scope.currApp = $stateParams.id;
-                var initializing = true;
+  'AppModel', '$timeout', '$stateParams', 'AppService',
+  function ($scope, CurrentAppService, AppModel, $timeout, $stateParams,
+    AppService) {
+    CurrentAppService.getCurrentApp()
+      .then(function (currentApp) {
+        $scope.currApp = $stateParams.id;
+        var initializing = true;
 
-                var populatePage = function() {
-                    $scope.switchStatus = AppService.getCurrentApp()
-                        .showMessageBox;
-                    var toggleSwitch = function(err) {
-                        if (err) {
-                            $scope.switchStatus = !$scope.switchStatus;
-                            return;
-                        }
-                    }
+        var populatePage = function () {
+          $scope.switchStatus = AppService.getCurrentApp()
+            .showMessageBox;
+          var toggleSwitch = function (err) {
+            if (err) {
+              $scope.switchStatus = !$scope.switchStatus;
+              return;
+            }
+          }
 
-                    $scope.$watch('switchStatus', function() {
-                        console.log("switchState: ", $scope.switchStatus,
-                            AppService
-                            .getCurrentApp()
-                            .showMessageBox);
-                        if ($scope.switchStatus != null) {
-                            if (initializing) {
-                                $timeout(function() {
-                                    initializing = false;
-                                });
-                            } else {
-                                AppModel.showFeedBackMsg($scope.currApp, $scope.switchStatus,
-                                    toggleSwitch);
-                            }
-                        }
+          $scope.$watch('switchStatus', function () {
+            console.log("switchState: ", $scope.switchStatus,
+              AppService
+              .getCurrentApp()
+              .showMessageBox);
+            if ($scope.switchStatus != null) {
+              if (initializing) {
+                $timeout(function () {
+                  initializing = false;
+                });
+              } else {
+                AppModel.showFeedBackMsg($scope.currApp, $scope.switchStatus,
+                  toggleSwitch);
+              }
+            }
 
-                    })
-                }
+          })
+        }
 
-                AppModel.getSingleApp($scope.currApp, populatePage);
-            })
-    }
+        AppModel.getSingleApp($scope.currApp, populatePage);
+      })
+  }
 ])
+
 angular.module('do.signup', [])
 
 .config(['$stateProvider',
@@ -72619,8 +72929,17 @@ angular
           })
           .error(cb);
       }
+
+      this.updateDefaultApp = function (data, cb) {
+        $http.put(config.apiUrl + '/account/default-app', data)
+          .success(function (data) {
+            cb(null, data);
+          })
+          .error(cb);
+      }
     }
   ])
+
 angular
   .module('models.apps', ['services'])
   .service('AppModel', ['$http', 'config', '$state', 'AppService',
@@ -72675,9 +72994,28 @@ angular
             AppService.new(savedApp);
             AppService.setCurrentApp(savedApp);
             AppService.setAppName(savedApp.name);
-            $location.path('/apps/' + AppService.getCurrentApp()._id + '/invite')
+            $location.path('/apps/' + AppService.getCurrentApp()
+              ._id + '/invite')
             console.log("apps created: ", AppService.getLoggedInApps(),
               savedApp);
+          })
+      }
+
+      this.addAnotherNewApp = function (data) {
+        $http
+          .post(config.apiUrl + '/apps', data)
+          .success(function (savedApp) {
+            // $state.transitionTo('addcode');
+            AppService.new(savedApp);
+            AppService.setCurrentApp(savedApp);
+            AppService.setAppName(savedApp.name);
+            $location.path('/apps/' + AppService.getCurrentApp()
+              ._id + '/addcode')
+            console.log("apps created: ", AppService.getLoggedInApps(),
+              savedApp);
+          })
+          .error(function () {
+            console.log("error");
           })
       }
 
@@ -72738,11 +73076,24 @@ angular
           .error(cb);
       }
 
+
+
+      this.checkIfActiveNewApp = function (appId, cb) {
+        $http.put(config.apiUrl + '/apps/' + appId + '/activate')
+          .success(function (data) {
+            console.log("success: ", data);
+            cb(null, data);
+          })
+          .error(cb);
+      }
+
+
       this.sendCodeToDeveloper = function (appId, email, cb) {
         var data = {
           email: email
         }
-        $http.post(config.apiUrl + '/apps/' + appId + '/send-code-to-developer', data)
+        $http.post(config.apiUrl + '/apps/' + appId +
+          '/send-code-to-developer', data)
           .success(function (data) {
             console.log("success sending code to developer");
             cb();
@@ -72755,7 +73106,8 @@ angular
           status: status
         }
         console.log("data: ", data);
-        $http.put(config.apiUrl + '/apps/' + appId + '/show-message-box', data)
+        $http.put(config.apiUrl + '/apps/' + appId + '/show-message-box',
+          data)
           .success(function (data) {
             console.log("success", data);
             cb();
@@ -72764,24 +73116,26 @@ angular
       }
     }
   ])
+
 angular.module('models.auth', ['services'])
 
 .service('AuthService', ['$http', 'utils', 'ipCookie', 'LoginService',
   '$log', 'config', '$state', '$location', 'AppService',
-  'ErrMsgService', 'authService', 'login', '$rootScope',
+  'ErrMsgService', 'authService', 'login', '$rootScope', 'AccountModel',
+  'AppModel',
   function ($http, utils, ipCookie, LoginService, $log, config, $state,
     $location, AppService, ErrMsgService, authService, login,
-    $rootScope) {
+    $rootScope, AccountModel, AppModel) {
 
     this.attemptLogin = function (email, password, callback) {
 
       var loginSuccessful;
 
       var data = {
-        email: email,
-        password: password
-      }
-      // post $http request to /auth/login
+          email: email,
+          password: password
+        }
+        // post $http request to /auth/login
 
       $http.post(config.apiUrl + '/auth/login', data)
         .success(function (data) {
@@ -72804,27 +73158,78 @@ angular.module('models.auth', ['services'])
 
               if (AppService.getLoggedInApps()
                 .length > 0) {
-                console.log("AppService data Auth.js", AppService.getLoggedInApps());
-                if (AppService.getLoggedInApps()[0].isActive) {
-                  $location.path('/apps/' + AppService.getLoggedInApps()[
-                    0]._id + '/users/list');
-                } else {
-                  console.log("Auth.js redirecting to addcode url");
-                  $location.path('/apps/' + AppService.getLoggedInApps()[
-                    0]._id + '/addcode');
-                }
-                AppService.setCurrentApp(AppService.getLoggedInApps()[0]);
-                AppService.setAppName(AppService.getLoggedInApps()[0].name);
+
+
+                AccountModel.get(function (err, acc) {
+                  if (err) {
+                    console.log("error");
+                    return;
+                  }
+                  if (acc.defaultApp) {
+                    var callback = function (err) {
+                      if (err) {
+                        console.log("error");
+                        return;
+                      }
+
+                      if (AppService.getCurrentApp()
+                        .isActive) {
+                        $location.path('/apps/' + AppService.getCurrentApp()
+                          ._id + '/users/list');
+                      } else {
+                        $location.path('/apps/' + AppService.getCurrentApp()
+                          ._id + '/addcode');
+                      }
+                    }
+                    AppModel.getSingleApp(acc.defaultApp, callback);
+
+                  } else {
+
+                    console.log("AppService data Auth.js", AppService.getLoggedInApps());
+
+                    var data = {
+                      defaultApp: AppService.getLoggedInApps()[0]._id
+                    }
+                    AccountModel.updateDefaultApp(data, function (err,
+                      updatedApp) {
+
+                      if(err) {
+                        console.log("error");
+                        return;
+                      }
+
+                      console.log("updated app: ", updatedApp);
+                      if (AppService.getLoggedInApps()[0].isActive) {
+                        $location.path('/apps/' + AppService.getLoggedInApps()[
+                          0]._id + '/users/list');
+                      } else {
+                        console.log(
+                          "Auth.js redirecting to addcode url");
+                        $location.path('/apps/' + AppService.getLoggedInApps()[
+                          0]._id + '/addcode');
+                      }
+                      AppService.setCurrentApp(AppService.getLoggedInApps()[
+                        0]);
+                      AppService.setAppName(AppService.getLoggedInApps()[
+                        0].name);
+
+                    });
+
+
+                  }
+
+                })
+
               } else {
-                $state.go('onboarding');
-                AppService.setAppName('Apps');
+                $state.go('login');
+                // AppService.setAppName('Apps');
               }
             })
             .error(function () {
               $log.error("error in fetching /apps");
               // TODO
             })
-            callback(null);
+          callback(null);
         })
         .error(callback);
     };
@@ -72848,6 +73253,7 @@ angular.module('models.auth', ['services'])
 
   }
 ]);
+
 angular
   .module('models.Invite', ['services'])
   .service('InviteModel', ['$http', 'config', '$location', 'AuthService',
