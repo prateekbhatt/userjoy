@@ -61,9 +61,29 @@ describe('Resource /apps', function () {
         loginUser(done);
       });
 
-    it('should return error if name is not present', function (done) {
+    it('should return error if subdomain is not present', function (done) {
 
       var newApp = {};
+
+      request
+        .post('/apps')
+        .set('cookie', loginCookie)
+        .send(newApp)
+        .expect('Content-Type', /json/)
+        .expect(400)
+        .expect({
+          "error": 'Please provide an email subdomain',
+          "status": 400
+        })
+        .end(done);
+
+    });
+
+    it('should return error if name is not present', function (done) {
+
+      var newApp = {
+        subdomain: 'hadomain'
+      };
 
       request
         .post('/apps')

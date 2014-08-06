@@ -106,6 +106,10 @@ router
     var newApp = req.body;
 
 
+    if (!newApp.subdomain) {
+      return res.badRequest('Please provide an email subdomain');
+    }
+
     // add admin to newApp
     newApp.team = [];
     newApp.team.push({
