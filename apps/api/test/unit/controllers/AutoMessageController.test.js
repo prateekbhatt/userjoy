@@ -48,7 +48,7 @@ describe('Resource /apps/:aid/automessages', function () {
       });
 
     it(
-      'should return error if body/sid/title/type is not present',
+      'should return error if body/sid/sub/title/type is not present',
       function (done) {
 
         request
@@ -61,6 +61,7 @@ describe('Resource /apps/:aid/automessages', function () {
             "error": [
               "Provide automessage type",
               "Provide automessage title",
+              "Subject is required for AutoMessage",
               "Invalid segment id",
               "Provide automessage body",
             ],

@@ -61,9 +61,29 @@ describe('Resource /apps', function () {
         loginUser(done);
       });
 
-    it('should return error if name is not present', function (done) {
+    it('should return error if subdomain is not present', function (done) {
 
       var newApp = {};
+
+      request
+        .post('/apps')
+        .set('cookie', loginCookie)
+        .send(newApp)
+        .expect('Content-Type', /json/)
+        .expect(400)
+        .expect({
+          "error": 'Please provide an email subdomain',
+          "status": 400
+        })
+        .end(done);
+
+    });
+
+    it('should return error if name is not present', function (done) {
+
+      var newApp = {
+        subdomain: 'hadomain'
+      };
 
       request
         .post('/apps')
@@ -80,6 +100,29 @@ describe('Resource /apps', function () {
         .end(done);
 
     });
+
+
+    it('should return error if duplicate subdomain', function (done) {
+
+      var newApp = {
+        name: 'whaddaname',
+        subdomain: saved.apps.first.subdomain
+      };
+
+      request
+        .post('/apps')
+        .set('cookie', loginCookie)
+        .send(newApp)
+        .expect('Content-Type', /json/)
+        .expect(400)
+        .expect({
+          "error": "Please choose a different email subdomain",
+          "status": 400
+        })
+        .end(done);
+
+    });
+
 
     it('should create new app',
 
