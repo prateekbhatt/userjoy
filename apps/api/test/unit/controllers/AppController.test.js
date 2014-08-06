@@ -101,6 +101,29 @@ describe('Resource /apps', function () {
 
     });
 
+
+    it('should return error if duplicate subdomain', function (done) {
+
+      var newApp = {
+        name: 'whaddaname',
+        subdomain: saved.apps.first.subdomain
+      };
+
+      request
+        .post('/apps')
+        .set('cookie', loginCookie)
+        .send(newApp)
+        .expect('Content-Type', /json/)
+        .expect(400)
+        .expect({
+          "error": "Please choose a different email subdomain",
+          "status": 400
+        })
+        .end(done);
+
+    });
+
+
     it('should create new app',
 
       function (done) {
