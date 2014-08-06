@@ -125,6 +125,7 @@ var accounts = {
       aid: null,
 
       // WARNING: this is used for testing TrackController:notifications automessages
+      // and TrackController:replyNotification
       amId: null,
 
       messages: [{

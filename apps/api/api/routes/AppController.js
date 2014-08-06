@@ -106,6 +106,10 @@ router
     var newApp = req.body;
 
 
+    if (!newApp.subdomain) {
+      return res.badRequest('Please provide an email subdomain');
+    }
+
     // add admin to newApp
     newApp.team = [];
     newApp.team.push({
@@ -118,6 +122,16 @@ router
       .create(newApp, function (err, app) {
 
         if (err) {
+
+          if (err.name == 'MongoError' && (err.code == 11000 || err.code ==
+            11001)) {
+
+            if (_.contains(err.message, '$subdomain')) {
+              return res.badRequest(
+                'Please choose a different email subdomain');
+            }
+          }
+
           return next(err);
         }
 
@@ -237,7 +251,8 @@ router
     var status = req.body.status;
 
     if (!_.isBoolean(status)) {
-      return res.badRequest('Message box status should be either true or false');
+      return res.badRequest(
+        'Message box status should be either true or false');
     }
 
     req.app.showMessageBox = status;

@@ -24,7 +24,7 @@ describe('Model AutoMessage', function () {
   describe('#create', function () {
 
     it(
-      'should return error if aid/body/creator/sender/sid/title/type is not provided',
+      'should return error if aid/body/creator/sender/sid/sub/title/type is not provided',
       function (done) {
 
         var newAutoMsg = {};
@@ -36,7 +36,7 @@ describe('Model AutoMessage', function () {
 
           expect(Object.keys(err.errors)
             .length)
-            .to.eql(7);
+            .to.eql(8);
 
           expect(err.errors.aid.message)
             .to.eql('Invalid aid');
@@ -52,6 +52,9 @@ describe('Model AutoMessage', function () {
 
           expect(err.errors.sid.message)
             .to.eql('Invalid segment id');
+
+          expect(err.errors.sub.message)
+            .to.eql('Subject is required for AutoMessage');
 
           expect(err.errors.title.message)
             .to.eql('Provide automessage title');
