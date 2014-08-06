@@ -68885,7 +68885,8 @@ angular.module('do.navbar', [])
 ])
 
 .controller('navbarInstallationCtrl', ['$scope', 'AuthService', '$location',
-  'LoginService', 'AppService', '$log', 'CurrentAppService', 'AppModel', 'AccountModel',
+  'LoginService', 'AppService', '$log', 'CurrentAppService', 'AppModel',
+  'AccountModel',
   function ($scope, AuthService, $location, LoginService, AppService, $log,
     CurrentAppService, AppModel, AccountModel) {
 
@@ -68972,19 +68973,8 @@ angular.module('do.navbar', [])
             console.log("connectedapps: ", $scope.connectedapps);
           });
 
-          // $scope.changeApp = function (app) {
-          //   $scope.displayApp = app.name;
-          //   AppService.setAppName(app.name);
-          //   if (app.isActive) {
-          //     AppService.setCurrentApp(app);
-          //     $location.path('/apps/' + AppService.getCurrentApp()
-          //       ._id + '/users/list');
-          //   } else {
-          //     $location.path('/apps/' + app._id + '/addcode/newapp');
-          //   }
-          // }
-          //
           $scope.changeApp = function (app) {
+            console.log("inside change app");
             $scope.displayApp = app.name;
             AppService.setAppName(app.name);
 
@@ -69022,7 +69012,20 @@ angular.module('do.navbar', [])
           }
 
           $scope.goToAccountSettings = function () {
-            $location.path('/apps/' + $scope.appId + '/account/settings');
+            if($scope.appId != 'onboarding') {
+              $location.path('/apps/' + $scope.appId + '/account/settings');
+            } else {
+              AccountModel.get(function(err, acc) {
+                console.log("default app : ", acc);
+                if(err) {
+                  console.log("error");
+                  $location.path('/apps/' + AppService.getLoggedInApps()[0]._id + '/account/settings');
+                  return;
+                }
+                $location.path('/apps/' + acc.defaultApp + '/account/settings');
+
+              })
+            }
           }
 
           $scope.redirectToApp = function () {
@@ -69068,8 +69071,10 @@ angular.module('do.navbar', [])
         if (currentApp.length > 0 && $scope.appId != 'onboarding') {
           AppModel.getSingleApp($scope.appId, callback);
         } else {
+          console.log("inside else ");
           $scope.apps = currentApp;
           $scope.displayApp = 'Apps';
+          callback();
         }
 
       })
