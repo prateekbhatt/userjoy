@@ -134,6 +134,18 @@ var ConversationSchema = new Schema({
   },
 
 
+  // all tickets are shown in the messages panel
+  //
+  // when a new automessage conversation is created, it is not a ticket
+  // however if a user replies back to an automessage, the conversation becomes
+  // a ticket
+  isTicket: {
+    type: Boolean,
+    required: true,
+    default: true
+  },
+
+
   messages: [MessageSchema],
 
 
