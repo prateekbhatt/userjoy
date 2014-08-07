@@ -193,6 +193,16 @@ describe('Model Conversation', function () {
     });
 
 
+    it('should add "isTicket" value as true', function () {
+
+      expect(savedConversation)
+        .to.have.property('isTicket')
+        .that.is.a("boolean")
+        .and.is.true;
+
+    });
+
+
     it('should store amId if provided', function (done) {
 
       var newConversation = {
@@ -232,6 +242,62 @@ describe('Model Conversation', function () {
 
         expect(con)
           .to.have.property("uid", newConversation.uid);
+
+        done();
+      });
+
+    });
+
+  });
+
+
+  describe('#updateEmailId', function () {
+
+
+    it('should return error if no messages with id found',
+      function (done) {
+
+        var newEmailId = 'HaAbCdE';
+        var msgId = mongoose.Schema.ObjectId();
+
+        Conversation.updateEmailId(msgId, newEmailId, function (err, con) {
+
+          expect(err)
+            .to.exist;
+
+          expect(err.message)
+            .to.eql('Conversation not found');
+
+          expect(con)
+            .to.not.exist;
+
+          done();
+        })
+
+      });
+
+    it('should update emailId', function (done) {
+
+      var newEmailId = 'HaAbCdE';
+      var conv = saved.conversations.first;
+      var msgId = conv.messages[0]._id;
+
+      Conversation.updateEmailId(msgId, newEmailId, function (err, con) {
+
+        expect(err)
+          .to.not.exist;
+
+        expect(con)
+          .to.be.an('object');
+
+        expect(con)
+          .to.have.property("messages")
+          .that.is.an('array');
+
+        var msg = con.messages.id(msgId);
+
+        expect(msg)
+          .to.have.property('emailId', newEmailId);
 
         done();
       });
@@ -304,7 +370,234 @@ describe('Model Conversation', function () {
   });
 
 
-  describe('#reply', function () {
+  describe('#replyByEmailId', function () {
+
+    it('should return error if reply body not provided', function (done) {
+
+      var savedCon = saved.conversations.first;
+      var reply = {};
+      var replyToEmailId = 'savedCon._id';
+
+
+      Conversation.replyByEmailId(replyToEmailId, reply,
+        function (err, con) {
+
+          expect(err)
+            .to.exist
+            .and.have.property('message', 'Provide message body');
+
+          done();
+
+        });
+
+    });
+
+
+    it('should return error if account from type is not provided',
+      function (done) {
+
+        var savedCon = saved.conversations.first;
+        var reply = {
+          body: 'Heya',
+          from: 'randomness'
+        };
+        var replyToEmailId = 'savedCon._id';
+
+
+        Conversation.replyByEmailId(replyToEmailId, reply,
+          function (err, con) {
+
+            expect(err)
+              .to.exist
+              .and.have.property('message',
+                'Provide valid from type, either user/account');
+
+            done();
+
+          });
+
+      });
+
+
+    it('should return error if reply type is not provided', function (done) {
+
+      var savedCon = saved.conversations.first;
+      var reply = {
+        body: 'Heya',
+        from: 'account'
+      };
+      var replyToEmailId = 'savedCon._id';
+
+
+      Conversation.replyByEmailId(replyToEmailId, reply,
+        function (err, con) {
+
+          expect(err)
+            .to.exist
+            .and.have.property('message', 'Provide message type');
+
+          done();
+
+        });
+
+    });
+
+
+
+    it('should return error if reply emailId is not provided',
+      function (done) {
+
+        var savedCon = saved.conversations.first;
+        var reply = {
+          body: 'Heya',
+          from: 'account',
+          type: 'manual'
+        };
+        var replyToEmailId = 'savedCon._id';
+
+
+        Conversation.replyByEmailId(replyToEmailId, reply,
+          function (err, con) {
+
+            expect(err)
+              .to.exist
+              .and.have.property('message', 'Provide message type');
+
+            done();
+
+          });
+
+      });
+
+    it(
+      'should create a reply to a conversation, and update isTicket to true',
+      function (done) {
+
+        var savedCon = saved.conversations.first;
+        var reply = {
+          body: 'Heya',
+          from: 'account',
+          type: 'email',
+          emailId: 'randomId'
+        };
+        var replyToEmailId;
+
+
+        var newConversation = {
+          aid: randomId(),
+          assignee: randomId(),
+
+          // to test if isTicket becomes true
+          isTicket: false,
+
+          messages: [{
+            body: 'Hello World',
+            from: 'user',
+            type: 'email',
+            emailId: 'heyyou@fdafas'
+          }],
+          sub: 'My new subject',
+          uid: randomId()
+        };
+
+
+        async.waterfall(
+
+          [
+
+            function createConversationWhichIsNotTicket(cb) {
+
+              Conversation
+                .create(newConversation, function (err, con) {
+
+                  expect(err)
+                    .to.not.exist;
+
+                  // should be true after replying
+                  expect(con.isTicket)
+                    .to.be.false;
+
+                  expect(con.messages)
+                    .to.be.an('array')
+                    .that.has.length(1);
+
+                  cb(err, con);
+                });
+
+            },
+
+            function createReply(createdCon, cb) {
+
+              replyToEmailId = createdCon.messages[0].emailId;
+
+              Conversation.replyByEmailId(replyToEmailId, reply,
+                function (err, con) {
+
+                  expect(err)
+                    .to.not.exist;
+
+                  // isTicket should get updated to true on replying
+                  expect(con)
+                    .to.have.property('isTicket')
+                    .that.is.a('boolean')
+                    .and.eqls(true);
+
+                  expect(con.messages)
+                    .to.be.an('array')
+                    .that.has.length(2);
+
+                  var msg = con.messages[1];
+
+                  expect(msg)
+                    .to.be.an('object');
+
+                  expect(msg.body)
+                    .to.eql(reply.body);
+
+                  expect(msg.from)
+                    .to.eql(reply.from);
+
+
+                  expect(msg.type)
+                    .to.eql(reply.type);
+
+                  expect(msg.clicked)
+                    .to.be.false;
+
+                  expect(msg.seen)
+                    .to.be.false;
+
+                  expect(msg.sent)
+                    .to.be.false;
+
+                  expect(msg.ct)
+                    .to.be.a('date');
+
+                  expect(msg._id)
+                    .to.not.be.empty;
+
+                  expect(msg.emailId)
+                    .to.eql(reply.emailId);
+
+                  cb(err, con);
+
+                });
+            }
+
+          ],
+
+          done);
+
+
+
+
+
+      });
+
+  });
+
+
+  describe('#replyByConversationId', function () {
 
     it('should return error if reply body not provided', function (done) {
 
@@ -314,15 +607,16 @@ describe('Model Conversation', function () {
       var aid = savedCon.aid;
 
 
-      Conversation.reply(aid, coId, reply, function (err, con) {
+      Conversation.replyByConversationId(aid, coId, reply,
+        function (err, con) {
 
-        expect(err)
-          .to.exist
-          .and.have.property('message', 'Provide message body');
+          expect(err)
+            .to.exist
+            .and.have.property('message', 'Provide message body');
 
-        done();
+          done();
 
-      });
+        });
 
     });
 
@@ -339,16 +633,17 @@ describe('Model Conversation', function () {
         var aid = savedCon.aid;
 
 
-        Conversation.reply(aid, coId, reply, function (err, con) {
+        Conversation.replyByConversationId(aid, coId, reply,
+          function (err, con) {
 
-          expect(err)
-            .to.exist
-            .and.have.property('message',
-              'Provide valid from type, either user/account');
+            expect(err)
+              .to.exist
+              .and.have.property('message',
+                'Provide valid from type, either user/account');
 
-          done();
+            done();
 
-        });
+          });
 
       });
 
@@ -364,76 +659,146 @@ describe('Model Conversation', function () {
       var aid = savedCon.aid;
 
 
-      Conversation.reply(aid, coId, reply, function (err, con) {
+      Conversation.replyByConversationId(aid, coId, reply,
+        function (err, con) {
 
-        expect(err)
-          .to.exist
-          .and.have.property('message', 'Provide message type');
+          expect(err)
+            .to.exist
+            .and.have.property('message', 'Provide message type');
 
-        done();
+          done();
 
-      });
-
-    });
-
-    it('should create a reply to a conversation', function (done) {
-
-      var savedCon = saved.conversations.first;
-      var reply = {
-        body: 'Heya',
-        from: 'account',
-        type: 'email'
-      };
-      var coId = savedCon._id;
-      var aid = savedCon.aid;
-
-
-      Conversation.reply(aid, coId, reply, function (err, con) {
-
-        expect(err)
-          .to.not.exist;
-
-        expect(con.messages)
-          .to.be.an('array')
-          .that.has.length(3);
-
-        var msg = con.messages[2];
-
-        expect(msg)
-          .to.be.an('object');
-
-        expect(msg.body)
-          .to.eql(reply.body);
-
-        expect(msg.from)
-          .to.eql(reply.from);
-
-        expect(msg.type)
-          .to.eql(reply.type);
-
-        expect(msg.clicked)
-          .to.be.false;
-
-        expect(msg.seen)
-          .to.be.false;
-
-        expect(msg.sent)
-          .to.be.false;
-
-        expect(msg.ct)
-          .to.be.a('date');
-
-        expect(msg._id)
-          .to.not.be.empty;
-
-        done();
-
-      });
-
+        });
 
     });
+
+    it(
+      'should create a reply to a conversation, and update isTicket to true',
+      function (done) {
+
+        var reply = {
+          body: 'Heya',
+          from: 'account',
+          type: 'email'
+        };
+        var coId;
+        var aid;
+
+
+
+        var newConversation = {
+          aid: randomId(),
+          assignee: randomId(),
+
+          // to test if isTicket becomes true
+          isTicket: false,
+
+          messages: [{
+            body: 'Hello World',
+            from: 'user',
+            type: 'email',
+            emailId: 'heyyou@fdafas'
+          }],
+          sub: 'My new subject',
+          uid: randomId()
+        };
+
+
+        async.waterfall(
+
+          [
+
+            function createConversationWhichIsNotTicket(cb) {
+
+              Conversation
+                .create(newConversation, function (err, con) {
+
+                  expect(err)
+                    .to.not.exist;
+
+                  // should be true after replying
+                  expect(con.isTicket)
+                    .to.be.false;
+
+                  expect(con.messages)
+                    .to.be.an('array')
+                    .that.has.length(1);
+
+                  cb(err, con);
+                });
+
+            },
+
+            function createReply(createdCon, cb) {
+
+              aid = createdCon.aid;
+              coId = createdCon._id;
+
+
+              Conversation.replyByConversationId(aid, coId, reply,
+                function (err, con) {
+
+                  expect(err)
+                    .to.not.exist;
+
+                  // isTicket should get updated to true on replying
+                  expect(con)
+                    .to.have.property('isTicket')
+                    .that.is.a('boolean')
+                    .and.eqls(true);
+
+                  expect(con.messages)
+                    .to.be.an('array')
+                    .that.has.length(2);
+
+                  var msg = con.messages[1];
+
+                  expect(msg)
+                    .to.be.an('object');
+
+                  expect(msg.body)
+                    .to.eql(reply.body);
+
+                  expect(msg.from)
+                    .to.eql(reply.from);
+
+                  expect(msg.type)
+                    .to.eql(reply.type);
+
+                  expect(msg.clicked)
+                    .to.be.false;
+
+                  expect(msg.seen)
+                    .to.be.false;
+
+                  expect(msg.sent)
+                    .to.be.false;
+
+                  expect(msg.ct)
+                    .to.be.a('date');
+
+                  expect(msg._id)
+                    .to.not.be.empty;
+
+                  cb();
+
+                });
+
+
+            }
+
+          ],
+
+          done);
+
+
+
+
+
+      });
 
   });
+
 
   describe('#clicked', function () {
 

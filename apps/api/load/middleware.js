@@ -82,7 +82,7 @@ module.exports.session = function loadSessionMiddleware(app) {
     key: 'userjoy.sid',
     cookie: {
       domain: cookieDomain,
-      maxAge: 86400000
+      maxAge: 864000000
     },
     store: sessionStore
   }));

@@ -49,6 +49,7 @@ var jsFilesToInject = [
   //
   'bower_components/jquery/dist/jquery.js',
   'bower_components/bootstrap/dist/js/bootstrap.js',
+  'bower_components/jquery-cookie/jquery.cookie.js',
 
   // All of the rest of your app scripts
   'js/**/*.js'

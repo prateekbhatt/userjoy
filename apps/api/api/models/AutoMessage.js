@@ -113,6 +113,7 @@ var AutoMessageSchema = new Schema({
   // subject (for email type)
   sub: {
     type: String,
+    required: [true, 'Subject is required for AutoMessage']
     // TODO: subject must be provided for type: email
   },
 
@@ -155,6 +156,7 @@ AutoMessageSchema.index({
 
 AutoMessageSchema.pre('save', function (next) {
   this.ut = new Date;
+
   next();
 });
 

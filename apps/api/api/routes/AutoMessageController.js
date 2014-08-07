@@ -13,6 +13,8 @@ var router = require('express')
  */
 
 var AutoMessage = require('../models/AutoMessage');
+var Conversation = require('../models/Conversation');
+var User = require('../models/User');
 
 
 /**
@@ -29,14 +31,13 @@ var isAuthenticated = require('../policies/isAuthenticated');
 
 var appEmail = require('../../helpers/app-email');
 var logger = require('../../helpers/logger');
-var render = require('../../helpers/render-message');
 
 
 /**
  * Services
  */
 
-var userMailer = require('../services/user-mailer');
+var sendAutoMessage = require('../services/automessage');
 
 
 /**
@@ -187,6 +188,11 @@ router
     // if sender account id is not provided, add logged in account as sender
     newAutoMessage.sender = sender || accid;
 
+    // if type notification, make title as subject
+    // TODO: test this case
+    if (newAutoMessage.type === 'notification') {
+      newAutoMessage.sub = newAutoMessage.title;
+    }
 
     AutoMessage
       .create(newAutoMessage, function (err, savedAutoMsg) {
@@ -214,6 +220,7 @@ router
     var aid = req.params.aid;
     var amId = req.params.amId;
 
+
     async.waterfall(
 
       [
@@ -233,78 +240,27 @@ router
         },
 
 
-        function sendMail(amsg, cb) {
-
-          var locals = {
-            user: req.user
+        // get or create an user for the admin in its own app
+        function getOrCreateUser(amsg, cb) {
+          var user = {
+            email: amsg.sender.email
           };
 
-          // render body and subject in BEFORE calling mailer service
-          var body = render.string(amsg.body, locals);
-          var subject = render.string(amsg.sub, locals);
-
-          var fromEmail = appEmail(aid);
-          var fromName = amsg.sender.name;
-
-          var options = {
-            locals: {
-              body: body
-            },
-            from: {
-              email: fromEmail,
-              name: fromName
-            },
-
-            // NOTE: tracking should be disabled for test mail
-            // metadata: {
-            //   'uj_aid': amsg.aid,
-            //   'uj_title': amsg.title,
-            //   'uj_mid': amsg._id,
-            //   'uj_uid': req.user,
-            //   'uj_type': 'auto',
-            // },
-
-            replyTo: {
-              email: appEmail.reply.create({
-                aid: amsg.aid,
-                type: 'auto',
-                messageId: amsg._id
-              }),
-              name: 'Reply to ' + fromName
-            },
-            subject: subject,
-            to: {
-              email: req.user.email,
-              name: req.user.name
-            },
-          };
-
-          userMailer.sendAutoMessage(options, function (err, responseStatus) {
-
-            if (err) {
-
-              logger.crit({
-                at: 'automessage:send-test',
-                toEmail: req.user.email,
-                err: err,
-                res: responseStatus
-              });
-            } else {
-              logger.debug({
-                at: 'automessage:send-test',
-                toEmail: req.user.email,
-                res: responseStatus
-              });
-            }
-
-            cb(err);
+          User.findOrCreate(req.app._id, user, function (err, usr) {
+            cb(err, amsg, usr);
           });
+        },
 
+
+        function createConversationAndSend(amsg, user, cb) {
+          sendAutoMessage(req.app, amsg, amsg.sender, user, function (err, con) {
+            cb(err, con)
+          });
         }
       ],
 
 
-      function callback(err, responseStatus) {
+      function callback(err, con) {
 
         if (err) {
 
@@ -318,7 +274,8 @@ router
         res
           .status(200)
           .json({
-            message: 'Message is queued'
+            message: 'Message is queued',
+            conversation: con
           });
 
 
@@ -351,7 +308,8 @@ router
     var status = req.params.status;
 
     if (!_.contains(['true', 'false'], status)) {
-      return res.badRequest('Active status should be either true or false');
+      return res.badRequest(
+        'Active status should be either true or false');
     }
 
 

@@ -168,7 +168,39 @@ describe('Resource /apps/:aid/conversations', function () {
 
 
     before(function (done) {
-      logoutUser(done);
+
+      async.series([
+
+        function logout(cb) {
+
+          logoutUser(cb);
+        },
+
+
+        function createNonTicketConversation(cb) {
+
+          // create conversation with isTicket status as false
+          var newConversation = {
+            aid: aid,
+            assignee: saved.accounts.first._id,
+            isTicket: false,
+            messages: [{
+              body: 'Hello World',
+              from: 'user',
+              type: 'email',
+            }],
+            sub: 'My new subject',
+            uid: saved.users.first._id
+          };
+
+          Conversation.create(newConversation, cb);
+
+        }
+
+      ], done);
+
+
+
     });
 
 
@@ -197,37 +229,69 @@ describe('Resource /apps/:aid/conversations', function () {
 
 
     it(
-      'should return all open conversations belonging to app, and populate uid / assignee',
+      'should return all open ticket conversations belonging to app, and populate uid / assignee',
 
       function (done) {
 
-        request
-          .get(basePath)
-          .set('cookie', loginCookie)
-          .expect('Content-Type', /json/)
-          .expect(function (res) {
+        var totalConsBelongingToApp;
 
-            expect(res.body)
-              .to.be.an("array")
-              .that.is.not.empty;
+        async.series([
 
-            expect(res.body[0])
-              .to.have.property('assignee')
-              .that.is.an('object')
-              .that.has.keys(['_id', 'name', 'email']);
+          function beforeCheck(cb) {
 
-            expect(res.body[0])
-              .to.have.property('uid')
-              .that.is.an('object')
-              .that.has.keys(['_id', 'email']);
+            Conversation
+              .find({
+                aid: aid
+              })
+              .exec(function (err, cons) {
+                expect(err)
+                  .to.not.exist;
 
-            _.each(res.body, function (m) {
-              expect(m.closed)
-                .to.be.false;
-            });
+                expect(cons)
+                  .to.be.an('array')
+                  .that.has.length.above(0);
 
-          })
-          .end(done);
+                totalConsBelongingToApp = cons.length;
+
+                cb();
+              });
+
+          },
+
+          function getConversations(cb) {
+
+            request
+              .get(basePath)
+              .set('cookie', loginCookie)
+              .expect('Content-Type', /json/)
+              .expect(function (res) {
+
+                expect(res.body)
+                  .to.be.an("array")
+                  .that.has.length.below(totalConsBelongingToApp)
+                  .and.is.not.empty;
+
+                expect(res.body[0])
+                  .to.have.property('assignee')
+                  .that.is.an('object')
+                  .that.has.keys(['_id', 'name', 'email']);
+
+                expect(res.body[0])
+                  .to.have.property('uid')
+                  .that.is.an('object')
+                  .that.has.keys(['_id', 'email']);
+
+                _.each(res.body, function (m) {
+                  expect(m.closed)
+                    .to.be.false;
+                });
+
+              })
+              .end(cb);
+          }
+
+        ], done)
+
 
       });
 
@@ -584,6 +648,10 @@ describe('Resource /apps/:aid/conversations', function () {
               .to.have.property('sName')
               .that.equals(saved.accounts.first.name);
 
+            expect(messages[0])
+              .to.have.property('emailId')
+              .that.is.a('string');
+
           })
           .end(done);
 
@@ -681,6 +749,11 @@ describe('Resource /apps/:aid/conversations', function () {
 
             expect(con.messages[2].sName)
               .to.exist;
+
+            expect(con.messages[2])
+              .to.have.property('emailId')
+              .that.is.a('string');
+
           })
           .end(done);
 

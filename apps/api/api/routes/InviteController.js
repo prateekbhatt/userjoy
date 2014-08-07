@@ -102,7 +102,7 @@ router
         },
 
         function addToTeam(account, cb) {
-          App.addMember(aid, account._id, function (err, app) {
+          App.addMember(aid, account._id, account.name, function (err, app) {
 
             // if 'is team member' error, delete invite and send response
 
@@ -219,7 +219,9 @@ router.param('aid', hasAccess);
 /**
  * POST /apps/:aid/invites
  *
- * Sends invite to add a new team member
+ * Sends invites to new team members
+ *
+ * @param {array} emails all-emails-where-invite-has-to-be-sent
  */
 
 router
@@ -233,65 +235,77 @@ router
     var config = require('../../../config')('api');
 
     var aid = req.params.aid;
-    var email = req.body.email;
-    var name = req.body.name;
+    var emails = req.body.emails;
+    var fromName = req.user.name || req.user.email;
     var uid = req.user._id;
 
 
-    async.waterfall(
+    var sendInviteToEmail = function (email, cb) {
 
-      [
+      async.waterfall(
 
-        function createInvite(cb) {
+        [
 
-          var newInvite = {
-            aid: aid,
-            from: uid,
-            toEmail: email,
-            toName: name
-          };
+          function createInvite(cb) {
 
-          Invite.create(newInvite, cb);
-        },
+            var newInvite = {
+              aid: aid,
+              from: uid,
+              toEmail: email
+            };
 
-
-        function sendInviteEmail(invite, cb) {
-
-          var inviteId = invite._id.toString();
-          var dashboardUrl = config.hosts.dashboard;
-
-          var inviteUrl = urljoin(dashboardUrl, 'apps', aid, 'invite',
-            inviteId);
-
-          var mailOptions = {
-            locals: {
-              inviteUrl: inviteUrl,
-              name: invite.toName,
-              appName: req.app.name
-            },
-            to: {
-              email: invite.toEmail,
-              name: invite.toName
-            }
-          };
-
-          accountMailer.sendInvite(mailOptions, function (err) {
-            cb(err, invite);
-          });
-        }
-
-      ],
+            Invite.create(newInvite, cb);
+          },
 
 
-      function callback(err, invite) {
-        if (err) return next(err);
+          function sendInviteEmail(invite, cb) {
 
-        res
-          .status(201)
-          .json(invite);
+            var inviteId = invite._id.toString();
+            var dashboardUrl = config.hosts.dashboard;
 
-      }
-    );
+            var inviteUrl = urljoin(dashboardUrl, 'apps', aid, 'invite',
+              inviteId);
+
+            var mailOptions = {
+              locals: {
+                inviteUrl: inviteUrl,
+                fromName: fromName,
+                appName: req.app.name
+              },
+              to: {
+                email: invite.toEmail
+              }
+            };
+
+            accountMailer.sendInvite(mailOptions, function (err) {
+              cb(err, invite);
+            });
+          }
+
+        ],
+
+        cb
+      );
+
+    };
+
+
+    var callback = function (err, invites) {
+      if (err) return next(err);
+
+      res
+        .status(201)
+        .json({
+          message: 'Invites sent successfully',
+          invites: invites
+        });
+
+    }
+
+
+    async.map(emails, sendInviteToEmail, callback);
+
+
   });
 
 

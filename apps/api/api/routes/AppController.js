@@ -106,6 +106,10 @@ router
     var newApp = req.body;
 
 
+    if (!newApp.subdomain) {
+      return res.badRequest('Please provide an email subdomain');
+    }
+
     // add admin to newApp
     newApp.team = [];
     newApp.team.push({
@@ -118,6 +122,22 @@ router
       .create(newApp, function (err, app) {
 
         if (err) {
+
+          if (err.name == 'MongoError' && (err.code == 11000 || err.code ==
+            11001)) {
+
+            if (_.contains(err.message, '$subdomain')) {
+              return res.badRequest(
+                'Please choose a different email subdomain');
+            }
+          }
+
+
+          // subdomain must be a single alphanumeric word
+          if (err.name === 'ValidationError' && err.errors.subdomain) {
+            return res.badRequest(err.errors.subdomain.message);
+          }
+
           return next(err);
         }
 
@@ -154,6 +174,47 @@ router
         .json(req.app);
     });
 
+  });
+
+
+/**
+ * PUT /apps/:aid
+ *
+ * Update the name and subdomain of the default app
+ */
+
+router
+  .route('/:aid')
+  .put(function (req, res, next) {
+
+    req.app.name = req.body.name;
+    req.app.subdomain = req.body.subdomain || req.app.subdomain;
+
+    if (!req.app.subdomain) {
+      return res.badRequest('App subdomain is required');
+    }
+
+    req.app.save(function (err, app) {
+
+      if (err) {
+
+        // subdomain must be a single alphanumeric word
+        if (err.name === 'ValidationError' && err.errors.subdomain) {
+          return res.badRequest(err.errors.subdomain.message);
+        }
+
+        return next(err);
+      }
+
+      if (!app) {
+        return next(new Error('Error in PUT /apps/:aid/name'));
+      }
+
+      res
+        .status(200)
+        .json(app);
+
+    });
   });
 
 
@@ -202,7 +263,8 @@ router
     var status = req.body.status;
 
     if (!_.isBoolean(status)) {
-      return res.badRequest('Message box status should be either true or false');
+      return res.badRequest(
+        'Message box status should be either true or false');
     }
 
     req.app.showMessageBox = status;

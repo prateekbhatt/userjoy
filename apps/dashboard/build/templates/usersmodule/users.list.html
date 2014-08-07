@@ -1,4 +1,7 @@
 <div ng-include src="'/templates/navbar/navbar.html'"></div>
+<div style="margin-top: 5px;">
+<!-- <flash:messages></flash:messages> -->
+</div>
 <div class="panel">
     <div class="panel-body">
         <div class="caption-full">
@@ -345,7 +348,7 @@
                                                             </th>
                                                         </tr>
                                                     </thead>
-                                                    <tr ng-repeat="user in $data">
+                                                    <tr ng-repeat="user in $data" ng-class="{'good-health': user.health == 'good', 'bad-health': user.health == 'poor', 'avg-health': user.health == 'average'}">
                                                         <td width="30" style="text-align: left">
                                                             <input type="checkbox" ng-model="checkboxes.items[user.id]" />
                                                         </td>
@@ -391,9 +394,9 @@
                     </div>
                 </div>
                 <div class="col-md-3" style="margin-left: 60px;">
-                    <div class="panel panel-default" style="min-height: 825px; width: 300px;" id="segment">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">
+                    <div class="panel panel-default" style="min-height: 825px; width: 300px; overflow: auto; border-color: #bdc3c7;" id="segment">
+                        <div class="panel-heading" style="color: #7b8a8b; background-color: #bdc3c7; border-color: #bdc3c7;">
+                            <h3 class="panel-title" style="color: #fff;">
                             Segments</h3>
                         </div>
                         <div ng-show="!segmentsCreated">

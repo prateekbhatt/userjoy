@@ -33,9 +33,9 @@ var Query = require('../api/lib/query');
 // mongoose not able to find Account model
 var Account = require('../api/models/Account');
 
+var App = require('../api/models/App');
 var AutoMessage = require('../api/models/AutoMessage');
 var Event = require('../api/models/Event');
-var Notification = require('../api/models/Notification');
 var Segment = require('../api/models/Segment');
 
 
@@ -43,17 +43,15 @@ var Segment = require('../api/models/Segment');
  * Services
  */
 
-var userMailer = require('../api/services/user-mailer');
+var sendAutomessage = require('../api/services/automessage');
 
 
 /**
  * Helpers
  */
 
-var appEmail = require('../helpers/app-email');
 var logger = require('../helpers/logger');
 var QueueError = require('../helpers/queue-error');
-var render = require('../helpers/render-message');
 
 
 /**
@@ -82,60 +80,6 @@ var MINUTE_SCHEDULE = '*/1 * * * *';
 var SCHEDULE = MINUTE_SCHEDULE;
 if (process.env.NODE_ENV === 'production') {
   SCHEDULE = HOURLY_SCHEDULE;
-}
-
-
-function saveNotifications(users, amsg, cb) {
-
-  var aid = amsg.aid;
-  var amId = amsg._id;
-  var body = amsg.body;
-  var senderEmail = amsg.sender.email;
-  var senderName = amsg.sender.name;
-  var title = amsg.title;
-
-  var iterator = function (u, cb) {
-
-    var uid = u._id;
-
-    // get locals (user metadata, emails, user_id) for rendering the message body
-    // NOTE: not allowing user custom metadata now
-    var renderLocals = {
-      user: u
-    };
-
-    // render the body of the automessage before saving it as a notification
-    var renderedBody = render.string(body, renderLocals);
-
-    var n = {
-      amId: amId,
-      body: renderedBody,
-      senderEmail: senderEmail,
-      senderName: senderName,
-      title: title,
-      uid: uid
-    };
-
-    // save the new notification
-    Notification.create(n, function (err) {
-      if (err) return cb(err);
-
-      // ids object (required to create an 'automessage' event)
-      var ids = {
-        aid: aid,
-        amId: amId,
-        uid: uid
-      };
-
-      // create 'automessage' event
-      // NOTE: unlike emails, notifications should have a 'sent' event
-      createEventAndIncrementCount(ids, 'sent', title, cb);
-
-    });
-
-  };
-
-  async.each(users, iterator, cb);
 }
 
 
@@ -192,7 +136,9 @@ function amConsumer(cb) {
 
   // the iron mq message id (required to delete the message from the queue)
   var queueMsgId;
+
   var automessage;
+  var currentApp;
 
 
   async.waterfall(
@@ -241,12 +187,26 @@ function amConsumer(cb) {
             // store automessage in a local variable
             automessage = amsg;
 
-            cb(null, automessage);
+            cb();
           });
       },
 
 
-      function findSegment(automessage, cb) {
+      function findApp(cb) {
+
+        App
+          .findById(automessage.aid)
+          .exec(function (err, app) {
+            if (err) return cb(err);
+            if (!app) return cb(new Error('APP_NOT_FOUND'));
+            currentApp = app;
+            cb();
+          });
+
+      },
+
+
+      function findSegment(cb) {
 
         Segment
           .findById(automessage.sid)
@@ -307,93 +267,22 @@ function amConsumer(cb) {
       },
 
 
-      function sendEmails(users, cb) {
-
-        // if message type is not email, skip this
-        if (automessage.type !== "email") return cb(null, users);
+      function createAndSendAutomessage(users, cb) {
 
         async.each(
 
           users,
 
           function iterator(u, cb) {
-
-            // locals to render body and subject
-            var locals = {
-              user: u
-            };
-
-            // render body and subject in BEFORE calling mailer service
-            var body = render.string(automessage.body, locals);
-            var subject = render.string(automessage.sub, locals);
-
-            var fromEmail = appEmail(automessage.aid);
-            var fromName = automessage.sender.name;
-
-            var options = {
-              locals: {
-                body: body
-              },
-              from: {
-                email: fromEmail,
-                name: fromName
-              },
-              metadata: {
-                'uj_aid': automessage.aid,
-                'uj_title': automessage.title,
-                'uj_mid': automessage._id,
-                'uj_uid': u._id,
-                'uj_type': 'auto',
-              },
-              replyTo: {
-                email: appEmail.reply.create({
-                  aid: automessage.aid,
-                  type: 'auto',
-                  messageId: automessage._id
-                }),
-                name: 'Reply to ' + fromName
-              },
-              subject: subject,
-              to: {
-                email: u.email,
-                name: u.name
-              },
-            };
-
-
-            userMailer.sendAutoMessage(options, function (err) {
-              if (err) return cb(err);
-
-              var ids = {
-                aid: automessage.aid,
-                amId: automessage._id,
-                uid: u._id
-              };
-
-              var state = 'queued';
-              var title = automessage.title;
-
-              Event.automessage(ids, state, title, function (err, evn) {
-                cb(err, evn);
-              });
-
-            });
+            sendAutomessage(currentApp, automessage, automessage.sender, u, cb);
           },
 
-          function callback(err) {
-            cb(err, users);
-          });
+          cb
+
+        );
+
       },
 
-
-      function sendNotifications(users, cb) {
-
-        // if message type is not notification, skip this
-        if (automessage.type !== "notification") return cb();
-
-        saveNotifications(users, automessage, cb);
-
-      }
     ],
 
     function callback(err) {
@@ -433,7 +322,7 @@ function amConsumer(cb) {
 
         logger.crit({
           at: 'amConsumer:QueueError',
-          err: err
+          err: err ? JSON.stringify(err) : ''
         });
 
       }
@@ -452,7 +341,6 @@ module.exports = function run() {
     function foreverFunc(next) {
 
 
-      console.log('\n\n\n');
       logger.trace({
         at: 'amConsumer:start'
       });
@@ -461,7 +349,7 @@ module.exports = function run() {
 
         var logObj = {
           at: 'amConsumer:Completed',
-          err: err,
+          err: err ? JSON.stringify(err) : '',
           time: Date.now()
         };
 
