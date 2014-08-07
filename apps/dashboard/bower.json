@@ -43,10 +43,11 @@
     "angular-jquery": "~0.2.1",
     "ng-table": "0.3.1",
     "ejs": "~1.0.0",
-    "angular-toggle-switch": "~0.3.0"
+    "angular-toggle-switch": "~0.3.0",
+    "angular-flash-messages": "~1.1.0"
   },
   "resolutions": {
-    "angular": "~1.2.15",
+    "angular": "~1.2.10",
     "d3": "3.4.8",
     "nvd3": "~1.1.15-beta",
     "jquery": ">= 1.9.0"
