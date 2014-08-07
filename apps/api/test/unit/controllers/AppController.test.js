@@ -38,7 +38,7 @@ describe('Resource /apps', function () {
 
         var newApp = {
           name: 'My New App',
-          subdomain: 'my-New-app'
+          subdomain: 'myNewapp'
         };
 
         request
@@ -123,6 +123,28 @@ describe('Resource /apps', function () {
 
     });
 
+
+    it('should return error if subdomain is not alphanumeric',
+      function (done) {
+
+        var newApp = {
+          name: 'whaddaname',
+          subdomain: 'fdsa-fdsa4233'
+        };
+
+        request
+          .post('/apps')
+          .set('cookie', loginCookie)
+          .send(newApp)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            "error": "Subdomain must be a single alpha-numeric word",
+            "status": 400
+          })
+          .end(done);
+
+      });
 
     it('should create new app',
 
@@ -366,6 +388,31 @@ describe('Resource /apps', function () {
     // TODO: write test case when a default app (it doesnot have a subdomain is
     // being updated and no subdomain is provided (it should throw a bad request
     // error))
+
+    it('should return error if subdomain is not alphanumeric',
+
+      function (done) {
+
+        var newName = 'New App Name';
+        var newSubdomain = 'my company';
+
+        request
+          .put('/apps/' + saved.apps.first._id)
+          .send({
+            name: newName,
+            subdomain: newSubdomain
+          })
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            "error": "Subdomain must be a single alpha-numeric word",
+            "status": 400
+          })
+          .end(done);
+
+      });
+
 
     it('updates app name and subdomain',
 

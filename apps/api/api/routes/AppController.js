@@ -132,6 +132,12 @@ router
             }
           }
 
+
+          // subdomain must be a single alphanumeric word
+          if (err.name === 'ValidationError' && err.errors.subdomain) {
+            return res.badRequest(err.errors.subdomain.message);
+          }
+
           return next(err);
         }
 
@@ -191,6 +197,12 @@ router
     req.app.save(function (err, app) {
 
       if (err) {
+
+        // subdomain must be a single alphanumeric word
+        if (err.name === 'ValidationError' && err.errors.subdomain) {
+          return res.badRequest(err.errors.subdomain.message);
+        }
+
         return next(err);
       }
 
