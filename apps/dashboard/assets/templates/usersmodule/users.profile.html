@@ -32,7 +32,7 @@
                     <div>
                         <nvd3-discrete-bar-chart data="graphData"  id="showXAxisExample" width="450" height="230" xAxisTickFormat="xAxisTickFormatFunction()" forcey="[0,100]" showYAxis="true" showXAxis="false" tooltips="true" tooltipcontent="toolTipContentFunction()" color="colorFunction()" noData="New user! Scores will be available in a few days"><svg></svg>
                         </nvd3-discrete-bar-chart>
-                        <p class="text-center" style="margin-top: -10px;">Engagement Score</p>
+                        <p class="text-center" style="margin-top: -10px;" ng-if="graphDataValues.length > 0">Engagement Score</p>
                     </div>
                 </div>
                 </tab>
