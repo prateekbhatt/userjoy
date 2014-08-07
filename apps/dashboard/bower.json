@@ -45,6 +45,7 @@
     "ejs": "~1.0.0",
     "angular-toggle-switch": "~0.3.0",
     "angular-flash-messages": "~1.1.0"
+    "angular-tour": "~0.1.1"
   },
   "resolutions": {
     "angular": "~1.2.10",

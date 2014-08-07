@@ -1,16 +1,17 @@
-<% include nav.ejs %>
-<div class="container" style="padding-top:70px">
+<div class="container">
+    <br>
+    <br>
     <div class="row">
         <h2 class="text-center">UserJoy</h2>
     </div>
     <br>
     <br>
     <div class="row">
-        <div id="signupbox" class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
-            <div class="panel panel-default">
-                <div class="panel-heading text-center">
-                    <div class="panel-title"><h4>Get started in under 10 minutes</h4></div>
-                    <div style="float:right; font-size: 85%; position: relative; top:-10px"><a id="signinlink" href="javascript:redirectToLogin()">Sign In</a></div>
+        <div id="signupbox" class="col-md-8 col-md-offset-2 col-sm-12">
+            <div>
+                <div class="text-center">
+                    <h3>Start increasing your trial conversions and upsells now</h3>
+                    <br>
                 </div>
                 <div class="panel-body">
                     <form id="signup_form" class="form-horizontal" role="form">
@@ -25,19 +26,19 @@
                             </p>
                         </div>
                         <div class="form-group">
-                            <label for="name" class="col-md-3 control-label">Name</label>
+                            <label for="name" class="col-md-3 control-label">Name *</label>
                             <div class="col-md-9">
                                 <input type="text" class="form-control" name="name" id="name" placeholder="John Appleseed" required autofocus>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="email" class="col-md-3 control-label">Email</label>
+                            <label for="email" class="col-md-3 control-label">Email *</label>
                             <div class="col-md-9">
                                 <input type="email" class="form-control" name="email" id="email" placeholder="john.appleseed@apple.com" required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="password" class="col-md-3 control-label">Password</label>
+                            <label for="password" class="col-md-3 control-label">Password *</label>
                             <div class="col-md-9">
                                 <input type="password" class="form-control" name="password" id="password" placeholder="*************" required>
                             </div>
@@ -45,16 +46,23 @@
                         <div class="form-group">
                             <!-- Button -->
                             <div class="col-md-offset-3 col-md-9">
-                                <small>By signing up, you agree to our
-                                <a href="/legal/terms" target="_blank">terms</a> and
-                                <a href="/legal/privacy" target="_blank">privacy policy</a>.</small>
-                                <br>
-                                <br>
-                                <button id="signup_form_submit" class="btn btn-lg btn-success col-md-6" type="submit">Create Account</button>
+                                <button id="signup_form_submit" class="btn btn-lg btn-success col-md-6" type="submit">
+                                <strong>Start My Trial</strong>
+                                </button>
                                 <br>
                                 <p class="col-md-1 col-md-offset-1" id="spin" style="margin-top: 10px;">
                                 </p>
+                                <br>
+                                <br>
+                                <br>
+                                <small>By signing up, you agree to our
+                                <a href="/legal/terms" target="_blank">terms</a> and
+                                <a href="/legal/privacy" target="_blank">privacy policy</a>.</small>
                             </div>
+<!--
+                            <div class="text-center">
+                                <small>Already have an account?<a id="signinlink" href="javascript:redirectToLogin()">Sign In</a></small>
+                            </div> -->
                         </div>
                     </form>
                     <!--  <h4 class="col-md-offset-3 col-md-9">
@@ -65,4 +73,7 @@
         </div>
     </div>
 </div>
+<br>
+<br>
+<br>
 <% include footer.ejs %>
