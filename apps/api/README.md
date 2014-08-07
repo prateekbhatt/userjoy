@@ -417,6 +417,7 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 - assignee (account id)
 - closed (boolean)
 - ct
+- isTicket (boolean, if false, message would not appear in the inbox)
 - sub
 - uid
 - ut
@@ -430,6 +431,8 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 ##### Notes:
 
 - assignee should not be required. It is possible that the conversation is a new one and is not assigned to any team member. In this case we will send emails to all team members/ only admin (?)
+- when a new automessage conversation is created, the isTicket status is false, and the conversation wont appear in the inbox. however, if the user replies back to the conversation, the isTicket status changes to true and the conversation starts appearing in the inbox
+
 
 ##### Embedded Documents:
 

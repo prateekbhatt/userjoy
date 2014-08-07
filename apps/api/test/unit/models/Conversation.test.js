@@ -193,6 +193,16 @@ describe('Model Conversation', function () {
     });
 
 
+    it('should add "isTicket" value as true', function () {
+
+      expect(savedConversation)
+        .to.have.property('isTicket')
+        .that.is.a("boolean")
+        .and.is.true;
+
+    });
+
+
     it('should store amId if provided', function (done) {
 
       var newConversation = {
