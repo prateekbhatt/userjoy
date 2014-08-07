@@ -117,7 +117,10 @@ var AppSchema = new Schema({
     type: String,
     lowercase: true,
     unique: true,
-    sparse: true
+    sparse: true,
+    validate: [validate({
+      message: 'Subdomain must be a single alpha-numeric word'
+    }, 'isAlphanumeric')]
   },
 
 

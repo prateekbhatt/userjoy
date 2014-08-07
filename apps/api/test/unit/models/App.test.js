@@ -116,6 +116,33 @@ describe('Model App', function () {
 
     });
 
+    it('should return error if subdomain is not alphanumeric',
+      function (done) {
+
+        var newApp = {
+          name: saved.apps.first.name,
+          subdomain: 'abcsfdsafsa fsda'
+        };
+
+        App.create(newApp, function (err, savedApp) {
+
+          expect(err)
+            .to.exist;
+
+          expect(err.name)
+            .to.eql('ValidationError');
+
+          expect(err.errors.subdomain.message)
+            .to.eql('Subdomain must be a single alpha-numeric word');
+
+          expect(savedApp)
+            .to.not.exist;
+
+          done();
+        })
+
+      });
+
   });
 
 
