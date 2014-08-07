@@ -364,11 +364,14 @@ angular.module('do.install', [])
   }
 ])
 
-.controller('installOnboardingNewAppCtrl', ['$scope', '$http', 'config', '$state',
+.controller('installOnboardingNewAppCtrl', ['$scope', '$http', 'config',
+  '$state',
   'AppService', '$log', 'AppModel', 'AccountService',
-  'CurrentAccountService', '$stateParams', '$location',
+  'CurrentAccountService', '$stateParams', '$location', '$rootScope',
+  '$timeout',
   function ($scope, $http, config, $state, AppService, $log, AppModel,
-    AccountService, CurrentAccountService, $stateParams, $location) {
+    AccountService, CurrentAccountService, $stateParams, $location,
+    $rootScope, $timeout) {
 
     CurrentAccountService.getCurrentAccount()
       .then(function (currentAccount) {
@@ -384,6 +387,10 @@ angular.module('do.install', [])
               .toLowerCase();
           }
         })
+
+        // $scope.$watch('email', function () {
+        //   if($scope.email.match)
+        // })
 
         $scope.installapp = function () {
           console.log("$scope.name: ", $scope.name);
@@ -404,12 +411,24 @@ angular.module('do.install', [])
             return;
           }
 
-          var data = {
-            name: $scope.name,
-            subdomain: $scope.email
-          };
+          if ($scope.email.match(/^[a-zA-Z0-9_]*$/g)) {
+            var data = {
+              name: $scope.name,
+              subdomain: $scope.email
+            };
 
-          AppModel.addAnotherNewApp(data);
+            AppModel.addAnotherNewApp(data);
+
+          } else {
+            $rootScope.errMsgRootScope =
+              'Only alphanumeric characters allowed in the email id';
+            $rootScope.error = true;
+            $timeout(function () {
+              $rootScope.error = false;
+            }, 5000);
+            return;
+          }
+
         }
       })
 
