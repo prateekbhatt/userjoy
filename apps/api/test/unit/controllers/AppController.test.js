@@ -37,7 +37,8 @@ describe('Resource /apps', function () {
       function (done) {
 
         var newApp = {
-          name: 'My New App'
+          name: 'My New App',
+          subdomain: 'myNewapp'
         };
 
         request
@@ -60,9 +61,29 @@ describe('Resource /apps', function () {
         loginUser(done);
       });
 
-    it('should return error if name is not present', function (done) {
+    it('should return error if subdomain is not present', function (done) {
 
       var newApp = {};
+
+      request
+        .post('/apps')
+        .set('cookie', loginCookie)
+        .send(newApp)
+        .expect('Content-Type', /json/)
+        .expect(400)
+        .expect({
+          "error": 'Please provide an email subdomain',
+          "status": 400
+        })
+        .end(done);
+
+    });
+
+    it('should return error if name is not present', function (done) {
+
+      var newApp = {
+        subdomain: 'hadomain'
+      };
 
       request
         .post('/apps')
@@ -80,12 +101,58 @@ describe('Resource /apps', function () {
 
     });
 
+
+    it('should return error if duplicate subdomain', function (done) {
+
+      var newApp = {
+        name: 'whaddaname',
+        subdomain: saved.apps.first.subdomain
+      };
+
+      request
+        .post('/apps')
+        .set('cookie', loginCookie)
+        .send(newApp)
+        .expect('Content-Type', /json/)
+        .expect(400)
+        .expect({
+          "error": "Please choose a different email subdomain",
+          "status": 400
+        })
+        .end(done);
+
+    });
+
+
+    it('should return error if subdomain is not alphanumeric',
+      function (done) {
+
+        var newApp = {
+          name: 'whaddaname',
+          subdomain: 'fdsa-fdsa4233'
+        };
+
+        request
+          .post('/apps')
+          .set('cookie', loginCookie)
+          .send(newApp)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            "error": "Subdomain must be a single alpha-numeric word",
+            "status": 400
+          })
+          .end(done);
+
+      });
+
     it('should create new app',
 
       function (done) {
 
         var newApp = {
-          name: 'new-app'
+          name: 'new-app',
+          subdomain: 'newapp'
         };
 
         request
@@ -241,6 +308,10 @@ describe('Resource /apps', function () {
               .and.has.keys(['_id', 'name', 'email'])
               .and.has.property('_id', saved.accounts.first._id.toString());
 
+            expect(res.body.team[0])
+              .to.have.property('username')
+              .that.is.a('string');
+
           })
           .expect(200)
           .end(done);
@@ -278,6 +349,100 @@ describe('Resource /apps', function () {
           .end(done);
 
       });
+  });
+
+
+
+
+  describe('PUT /apps/:aid', function () {
+
+    before(function (done) {
+      logoutUser(done);
+    });
+
+    it('returns error if not logged in',
+
+      function (done) {
+
+        var newName = 'Heres my new name';
+        var newSubdomain = 'mycompany';
+
+        request
+          .put('/apps/' + saved.apps.first._id)
+          .send({
+            name: newName,
+            subdomain: newSubdomain
+          })
+          .expect('Content-Type', /json/)
+          .expect(401)
+          .end(done);
+
+      });
+
+
+    it('logging in user', function (done) {
+      loginUser(done);
+    });
+
+
+    // TODO: write test case when a default app (it doesnot have a subdomain is
+    // being updated and no subdomain is provided (it should throw a bad request
+    // error))
+
+    it('should return error if subdomain is not alphanumeric',
+
+      function (done) {
+
+        var newName = 'New App Name';
+        var newSubdomain = 'my company';
+
+        request
+          .put('/apps/' + saved.apps.first._id)
+          .send({
+            name: newName,
+            subdomain: newSubdomain
+          })
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            "error": "Subdomain must be a single alpha-numeric word",
+            "status": 400
+          })
+          .end(done);
+
+      });
+
+
+    it('updates app name and subdomain',
+
+      function (done) {
+
+        var newName = 'New App Name';
+        var newSubdomain = 'mycompany';
+
+        request
+          .put('/apps/' + saved.apps.first._id)
+          .send({
+            name: newName,
+            subdomain: newSubdomain
+          })
+          .set('cookie', loginCookie)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .expect(function (res) {
+            if (res.body.name !== newName) {
+              return 'Name was not updated';
+            }
+
+            if (res.body.subdomain !== newSubdomain) {
+              return 'subdomain was not updated';
+            }
+          })
+          .end(done);
+
+      });
+
   });
 
 

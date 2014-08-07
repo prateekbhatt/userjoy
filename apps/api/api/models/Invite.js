@@ -44,46 +44,14 @@ var InviteSchema = new Schema({
   },
 
 
-  status: {
-    type: String,
-    required: [true, 'Invalid status'],
-    enum: ['pending', 'cancelled', 'joined'],
-    default: 'pending'
-  },
-
-
   // email of the invitee
   toEmail: {
     type: String,
     required: [true, 'Provide invitee email']
-  },
-
-
-  // name of the invitee
-  toName: {
-    type: String,
-    required: [true, 'Provide invitee name']
-  },
-
-
-  // updated at timestamp
-  ut: {
-    type: Date,
-    default: Date.now
   }
 
 });
 
-
-/**
- * Adds updated (ut) timestamps
- * Created timestamp (ct) is added by default
- */
-
-InviteSchema.pre('save', function (next) {
-  this.ut = new Date;
-  next();
-});
 
 var Invite = mongoose.model('Invite', InviteSchema);
 

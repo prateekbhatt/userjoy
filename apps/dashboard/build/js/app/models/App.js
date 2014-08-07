@@ -44,7 +44,22 @@ angular
 
       }
 
-      this.addNewApp = function (data) {
+      this.addNewApp = function (data, appId) {
+        $http
+          .put(config.apiUrl + '/apps/' + appId, data)
+          .success(function (savedApp) {
+            // $state.transitionTo('addcode');
+            AppService.new(savedApp);
+            AppService.setCurrentApp(savedApp);
+            AppService.setAppName(savedApp.name);
+            $location.path('/apps/' + AppService.getCurrentApp()
+              ._id + '/invite')
+            console.log("apps created: ", AppService.getLoggedInApps(),
+              savedApp);
+          })
+      }
+
+      this.addAnotherNewApp = function (data) {
         $http
           .post(config.apiUrl + '/apps', data)
           .success(function (savedApp) {
@@ -52,13 +67,18 @@ angular
             AppService.new(savedApp);
             AppService.setCurrentApp(savedApp);
             AppService.setAppName(savedApp.name);
-            $location.path('/apps/' + AppService.getCurrentApp()._id + '/addcode')
+            $location.path('/apps/' + AppService.getCurrentApp()
+              ._id + '/addcode/newapp');
             console.log("apps created: ", AppService.getLoggedInApps(),
               savedApp);
+          })
+          .error(function () {
+            console.log("error");
           })
       }
 
       this.addNewMember = function (data, appId, cb) {
+        console.log("data: ", data);
         $http.post(config.apiUrl + '/apps/' + appId + '/invites',
           data)
           .success(function (data) {
@@ -114,11 +134,24 @@ angular
           .error(cb);
       }
 
+
+
+      this.checkIfActiveNewApp = function (appId, cb) {
+        $http.put(config.apiUrl + '/apps/' + appId + '/activate')
+          .success(function (data) {
+            console.log("success: ", data);
+            cb(null, data);
+          })
+          .error(cb);
+      }
+
+
       this.sendCodeToDeveloper = function (appId, email, cb) {
         var data = {
           email: email
         }
-        $http.post(config.apiUrl + '/apps/' + appId + '/send-code-to-developer', data)
+        $http.post(config.apiUrl + '/apps/' + appId +
+          '/send-code-to-developer', data)
           .success(function (data) {
             console.log("success sending code to developer");
             cb();
@@ -131,7 +164,8 @@ angular
           status: status
         }
         console.log("data: ", data);
-        $http.put(config.apiUrl + '/apps/' + appId + '/show-message-box', data)
+        $http.put(config.apiUrl + '/apps/' + appId + '/show-message-box',
+          data)
           .success(function (data) {
             console.log("success", data);
             cb();

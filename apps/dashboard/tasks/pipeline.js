@@ -33,6 +33,8 @@ var cssFilesToInject = [
 
   'bower_components/angular-toggle-switch/angular-toggle-switch-bootstrap.css',
 
+  'bower_components/angular-tour/dist/angular-tour.css',
+
   // all other styles go below
   'styles/**/*.css'
 ];
@@ -49,6 +51,7 @@ var jsFilesToInject = [
   // *->    you might put other dependencies like jQuery or Angular here   <-*
   //
   'bower_components/ejs/ejs.js',
+  'bower_components/jquery/dist/jquery.js',
   'bower_components/angular/angular.js',
   'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
   'bower_components/angular-ui-router/release/angular-ui-router.js',
@@ -70,6 +73,8 @@ var jsFilesToInject = [
   'bower_components/angular-momentjs/angular-momentjs.js',
   'bower_components/n3-line-chart/dist/line-chart.min.js',
   'bower_components/angular-toggle-switch/angular-toggle-switch.min.js',
+  'bower_components/angular-tour/dist/angular-tour-tpls.min.js',
+  'bower_components/angular-flash-messages/angular-flash.js',
 
   // Bring in the socket.io client
   // 'js/sockets/socket.io.js',

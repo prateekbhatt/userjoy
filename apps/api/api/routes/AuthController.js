@@ -37,9 +37,9 @@ router.post('/login', function (req, res, next) {
 
 
     // if account has not verified its email, then do not allow to login
-    if (!user.emailVerified) {
-      return res.forbidden('EMAIL_NOT_VERIFIED');
-    }
+    // if (!user.emailVerified) {
+    //   return res.forbidden('EMAIL_NOT_VERIFIED');
+    // }
 
 
     req.login(user, function (err) {

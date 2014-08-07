@@ -23,7 +23,6 @@ var AutoMessage = require('../../api/models/AutoMessage');
 var Company = require('../../api/models/Company');
 var Conversation = require('../../api/models/Conversation');
 var Invite = require('../../api/models/Invite');
-var Notification = require('../../api/models/Notification');
 var Segment = require('../../api/models/Segment');
 var User = require('../../api/models/User');
 var UserNote = require('../../api/models/UserNote');
@@ -62,11 +61,13 @@ var accounts = {
   apps = {
 
     first: {
-      name: 'First App'
+      name: 'First App',
+      subdomain: 'firstapp'
     },
 
     second: {
-      name: 'Second App'
+      name: 'Second App',
+      subdomain: 'secondapp'
     }
   },
 
@@ -103,7 +104,8 @@ var accounts = {
           body: 'Hello World',
           from: 'user',
           sName: 'Prateek',
-          type: 'email'
+          type: 'email',
+          emailId: 'firstMessageEmailId@domain123'
         },
 
         {
@@ -121,11 +123,17 @@ var accounts = {
     second: {
       assignee: null,
       aid: null,
+
+      // WARNING: this is used for testing TrackController:notifications automessages
+      // and TrackController:replyNotification
+      amId: null,
+
       messages: [{
         body: 'Hello World 2',
         from: 'account',
         sName: 'Prateek2',
-        type: 'notification'
+        type: 'notification',
+        emailId: 'secondMessageEmailId@domain123'
       }],
       closed: true,
       sub: 'First Conversation!',
@@ -138,23 +146,7 @@ var invites = {
   first: {
     aid: null,
     from: null,
-    toEmail: accounts.second.email,
-    toName: 'Prats'
-  }
-};
-
-
-var notifications = {
-
-  first: {
-    accid: null,
-    aid: null,
-    amId: null,
-    senderEmail: 'prattbhatt@gmail.com',
-    senderName: 'Prateek Bhatt',
-    title: 'New Title for Notification',
-    body: 'Hello World',
-    uid: null,
+    toEmail: accounts.second.email
   }
 };
 
@@ -249,7 +241,8 @@ function createApp(accid, app, fn) {
   app.team = [];
   app.team.push({
     accid: accid,
-    admin: true
+    admin: true,
+    username: 'PRateek'
   });
 
   App.create(app, fn);
@@ -269,22 +262,15 @@ function createCompany(aid, company, fn) {
 }
 
 
-function createConversation(accid, aid, uid, con, fn) {
+function createConversation(accid, aid, uid, amId, con, fn) {
   con.aid = aid;
   con.assignee = accid;
   con.uid = uid;
+
+  // for automessage notifications
+  con.amId = amId;
+
   Conversation.create(con, fn);
-}
-
-
-function createNotification(accid, aid, amId, uid, notf, fn) {
-
-  notf.accid = accid;
-  notf.aid = aid;
-  notf.amId = amId;
-  notf.uid = uid;
-  Notification.create(notf, fn);
-
 }
 
 
@@ -402,36 +388,6 @@ module.exports = function loadFixtures(callback) {
     },
 
 
-    createFirstConversation: function (cb) {
-      var accid = accounts.first._id;
-      var aid = apps.first._id;
-      var uid = users.first._id;
-      var newCon = conversations.first;
-
-      // set the account id of the second message to first account _id
-      newCon.messages[1].accid = accid;
-
-      createConversation(accid, aid, uid, newCon, function (err, con) {
-        if (err) return cb(err);
-        conversations.first = con;
-        cb();
-      });
-    },
-
-    createSecondConversation: function (cb) {
-      var accid = accounts.first._id;
-      var aid = apps.first._id;
-      var uid = users.first._id;
-      var newCon = conversations.second;
-
-      createConversation(accid, aid, uid, newCon, function (err, con) {
-        if (err) return cb(err);
-        conversations.second = con;
-        cb();
-      });
-    },
-
-
     createFirstSegment: function (cb) {
 
       var aid = apps.first._id;
@@ -450,8 +406,13 @@ module.exports = function loadFixtures(callback) {
     createFirstAutoMessage: function (cb) {
 
       var aid = apps.first._id;
-      var accid = accounts.first._id;
-      var sender = accounts.second._id;
+
+      // WARNING: Changing the next two lines would break tests in
+      // AutoMessageController:send-test, and also in amconsumer
+      var accid = accounts.second._id;
+      var sender = accounts.first._id;
+
+
       var sid = segments.first._id;
       var automessage = automessages.first;
 
@@ -468,8 +429,13 @@ module.exports = function loadFixtures(callback) {
     createSecondAutoMessage: function (cb) {
 
       var aid = apps.first._id;
-      var accid = accounts.first._id;
-      var sender = accounts.second._id;
+
+      // WARNING: Changing the next two lines would break tests in
+      // AutoMessageController:send-test, and also in amconsumer
+      var accid = accounts.second._id;
+      var sender = accounts.first._id;
+
+
       var sid = segments.first._id;
       var automessage = automessages.second;
 
@@ -483,22 +449,37 @@ module.exports = function loadFixtures(callback) {
     },
 
 
-    createFirstNotification: function (cb) {
-
-      var aid = apps.first._id;
-      var amId = automessages.first._id;
+    createFirstConversation: function (cb) {
       var accid = accounts.first._id;
+      var aid = apps.first._id;
       var uid = users.first._id;
-      var notification = notifications.first;
+      var newCon = conversations.first;
 
-      createNotification(accid, aid, amId, uid, notification, function (err,
-        notf) {
+      // set the account id of the second message to first account _id
+      newCon.messages[1].accid = accid;
+
+      createConversation(accid, aid, uid, null, newCon, function (err, con) {
         if (err) return cb(err);
-        notifications.first = notf;
+        conversations.first = con;
         cb();
       });
-
     },
+
+    createSecondConversation: function (cb) {
+      var accid = accounts.first._id;
+      var aid = apps.first._id;
+      var uid = users.first._id;
+      var newCon = conversations.second;
+
+      var amId = automessages.first._id;
+
+      createConversation(accid, aid, uid, amId, newCon, function (err, con) {
+        if (err) return cb(err);
+        conversations.second = con;
+        cb();
+      });
+    },
+
 
     createFirstInvite: function (cb) {
 
@@ -563,7 +544,6 @@ module.exports = function loadFixtures(callback) {
       companies: companies,
       conversations: conversations,
       invites: invites,
-      notifications: notifications,
       segments: segments,
       users: users,
       usernotes: usernotes

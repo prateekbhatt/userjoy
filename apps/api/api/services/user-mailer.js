@@ -61,7 +61,7 @@ function Mailer(opts) {
 
   if (opts.replyTo) {
     this.replyToEmail = opts.replyTo.email;
-    this.replyToName = opts.replyTo.name;
+    this.replyToName = opts.replyTo.name || opts.from.name;
   }
 
   // inherit constructor properties of BaseMailer

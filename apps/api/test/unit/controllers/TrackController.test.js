@@ -13,6 +13,7 @@ describe('Resource /track', function () {
    */
 
   var AutoMessage = require('../../../api/models/AutoMessage');
+  var Conversation = require('../../../api/models/Conversation');
   var Event = require('../../../api/models/Event');
 
 
@@ -615,23 +616,25 @@ describe('Resource /track', function () {
 
         var email = saved.users.first.email;
         var testUrl = url + '?app_id=' + appId + '&email=' + email;
+        var currentNotf;
+
 
         async.waterfall(
 
           [
 
-
             function makeRequest(cb) {
-
 
               request
                 .get(testUrl)
                 .expect('Content-Type', /json/)
                 .expect(200)
                 .end(function (err, res) {
+
                   if (err) return done(err);
 
                   var notf = res.body;
+                  currentNotf = notf;
 
                   expect(notf)
                     .to.be.an('object');
@@ -641,6 +644,10 @@ describe('Resource /track', function () {
 
                   expect(notf)
                     .to.have.property("body");
+
+                  expect(notf)
+                    .to.have.property("coId")
+                    .that.is.ok;
 
                   expect(notf)
                     .to.have.property("ct");
@@ -699,6 +706,36 @@ describe('Resource /track', function () {
 
                   cb(err);
                 });
+
+            },
+
+            function updatedSeenStatus(cb) {
+
+              Conversation
+                .find({
+                  'aid': appId,
+                  'amId': currentNotf.amId,
+                  uid: currentNotf.uid,
+                  'messages.type': 'notification'
+                })
+                .sort('-ct')
+                .limit(1)
+                .exec(function (err, conv) {
+
+                  expect(conv)
+                    .to.be.an('array')
+                    .that.is.not.empty;
+
+                  expect(conv[0].messages)
+                    .to.be.an('array')
+                    .that.has.length(1);
+
+                  expect(conv[0].messages[0])
+                    .to.have.property('seen')
+                    .that.is.true;
+
+                  cb();
+                })
 
             }
 
@@ -951,25 +988,94 @@ describe('Resource /track', function () {
 
       });
 
+  });
+
+
+  describe('POST /track/notifications/reply', function () {
+
+    var url = '/track/notifications/reply';
+    var appId;
+
+    before(function (done) {
+      appId = saved.apps.first._id;
+      logoutUser(done);
+    });
+
+    it('should return error if there is no body',
+      function (done) {
+
+        var testUrl = url;
+        var newCon = {
+          'app_id': appId,
+          'email': saved.users.first.email
+        };
+
+        request
+          .post(testUrl)
+          .send(newCon)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            status: 400,
+            error: 'Please write a message'
+          })
+          .end(done);
+
+      });
+
+    it('should return error if there is no coId (conversation id)',
+      function (done) {
+
+        var testUrl = url;
+        var newCon = {
+          'app_id': appId,
+          body: 'testing body'
+        };
+
+        request
+          .post(testUrl)
+          .send(newCon)
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .expect({
+            status: 400,
+            error: 'Please send conversation id with the params'
+          })
+          .end(done);
+
+      });
 
     it(
-      'should create new conversation with amId, create automessage replied event, increment replied count, and should add assignee to new conversation',
+      'should create a new reply to conversation with amId, create automessage replied event, increment replied count',
       function (done) {
 
         var email = saved.users.first.email;
         var testUrl = url;
-        var automessage = saved.automessages.first;
+        var con = saved.conversations.second;
+        var coId = con._id;
         var newCon = {
           'app_id': appId,
-          'email': saved.users.first.email,
           'body': 'Hey man, how are you?',
-          'amId': automessage._id
+          'coId': coId
         };
 
+
+        var noOfMessagesBefore;
 
         async.waterfall(
 
           [
+
+            function beforeCheck(cb) {
+
+              Conversation
+                .findById(coId)
+                .exec(function (err, conv) {
+                  noOfMessagesBefore = conv.messages.length;
+                  cb()
+                });
+
+            },
 
             function makeRequest(cb) {
               request
@@ -988,9 +1094,10 @@ describe('Resource /track', function () {
                     .and.not.be.empty;
 
                   expect(notf.assignee.toString())
-                    .to.eql(automessage.creator.toString());
+                    .to.eql(con.assignee.toString());
 
-                  var savedMsg = notf.messages[0];
+                  // last message
+                  var savedMsg = notf.messages[noOfMessagesBefore];
 
                   expect(savedMsg)
                     .to.have.property("body", newCon.body);
@@ -1010,8 +1117,8 @@ describe('Resource /track', function () {
                   expect(notf)
                     .to.have.property("uid");
 
-                  expect(notf.amId)
-                    .to.eql(newCon.amId.toString());
+                  expect(notf)
+                    .to.have.property('amId');
 
 
                   cb(null, notf);
@@ -1052,6 +1159,24 @@ describe('Resource /track', function () {
                     .to.eql(1);
 
                   cb(err);
+                });
+
+            },
+
+
+            function afterCheck(cb) {
+
+              Conversation
+                .findById(coId)
+                .exec(function (err, conv) {
+
+                  expect(conv)
+                    .to.be.an('object')
+                    .and.to.have.property('messages')
+                    .that.is.an('array')
+                    .and.has.length(noOfMessagesBefore + 1);
+
+                  cb();
                 });
 
             }

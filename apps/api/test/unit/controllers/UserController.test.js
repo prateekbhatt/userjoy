@@ -14,6 +14,7 @@ describe('Resource /apps/:aid/users', function () {
    * models
    */
 
+  var Conversation = require('../../../api/models/Conversation');
   var Event = require('../../../api/models/Event');
 
 
@@ -132,35 +133,91 @@ describe('Resource /apps/:aid/users', function () {
     });
 
 
-    it('should return upto latest 10 conversations of user', function (
-      done) {
+    it('should return upto latest 10 ticket conversations of user',
+      function (done) {
 
-      request
-        .get(testUrl)
-        .set('cookie', loginCookie)
-        .expect('Content-Type', /json/)
-        .expect(200)
-        .end(function (err, res) {
 
-          if (err) return done(err);
+        var totalConsBelongingToUser;
 
-          expect(res.body)
-            .to.be.an("array")
-            .and.to.have.length.above(0);
+        async.series([
 
-          expect(res.body)
-            .to.have.length.of.at.most(10);
 
-          expect(res.body[0])
-            .to.have.property('sub');
+          function createNonTicketConversation(cb) {
+            // create conversation with isTicket status as false
+            var newConversation = {
+              aid: aid,
+              assignee: saved.accounts.first._id,
+              isTicket: false,
+              messages: [{
+                body: 'Hello World',
+                from: 'user',
+                type: 'email',
+              }],
+              sub: 'My new subject',
+              uid: uid
+            };
 
-          expect(res.body[0])
-            .to.have.property('closed');
+            Conversation.create(newConversation, cb);
+          },
 
-          done();
-        });
 
-    });
+          function beforeCheck(cb) {
+
+            Conversation
+              .find({
+                aid: aid,
+                uid: uid
+              })
+              .exec(function (err, cons) {
+                expect(err)
+                  .to.not.exist;
+
+                expect(cons)
+                  .to.be.an('array')
+                  .that.has.length.above(0);
+
+                totalConsBelongingToUser = cons.length;
+
+                cb();
+              });
+
+          },
+
+          function getConversations(cb) {
+
+            request
+              .get(testUrl)
+              .set('cookie', loginCookie)
+              .expect('Content-Type', /json/)
+              .expect(200)
+              .end(function (err, res) {
+
+                if (err) return done(err);
+
+                expect(res.body)
+                  .to.be.an("array")
+                  .that.has.length.below(totalConsBelongingToUser)
+                  .and.is.not.empty;
+
+                expect(res.body)
+                  .to.have.length.of.at.most(10);
+
+                expect(res.body[0])
+                  .to.have.property('sub');
+
+                expect(res.body[0])
+                  .to.have.property('closed');
+
+                cb();
+
+              });
+          }
+
+        ], done);
+
+
+
+      });
 
   });
 

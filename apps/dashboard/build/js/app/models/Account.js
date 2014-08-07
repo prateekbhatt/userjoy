@@ -99,5 +99,13 @@ angular
           })
           .error(cb);
       }
+
+      this.updateDefaultApp = function (data, cb) {
+        $http.put(config.apiUrl + '/account/default-app', data)
+          .success(function (data) {
+            cb(null, data);
+          })
+          .error(cb);
+      }
     }
   ])

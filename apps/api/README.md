@@ -121,6 +121,7 @@ UserNote      |                         | notes created by team members about a 
 
 ##### Columns:
 
+- defaultApp (id of the app the account was last logged into)
 - email (required)
 - name (required)
 - password (required)
@@ -147,11 +148,12 @@ UserNote      |                         | notes created by team members about a 
 - color (hex color code for notifications / feedback)
 - ct
 - isActive (boolean)
-- name
+- name (name of the company, e.g. DoDataDo)
 - queuedHealth (when was the health queue last queued)
 - queuedScore (when was the score queue last queued)
 - queuedUsage (when was the usage queue last queued)
-- team [{accId, admin}]
+- subdomain (dodatado.mail.userjoy.co)
+- team [{accId, admin, username, customEmail}]
 - x tags [] stores all tags that the app has used for its users
 - ut
 
@@ -159,6 +161,7 @@ UserNote      |                         | notes created by team members about a 
 ##### Indexes:
 
 - team.accid
+- subdomain (unique, sparse)
 
 
 ##### Notes:
@@ -414,6 +417,7 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 - assignee (account id)
 - closed (boolean)
 - ct
+- isTicket (boolean, if false, message would not appear in the inbox)
 - sub
 - uid
 - ut
@@ -427,6 +431,8 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 ##### Notes:
 
 - assignee should not be required. It is possible that the conversation is a new one and is not assigned to any team member. In this case we will send emails to all team members/ only admin (?)
+- when a new automessage conversation is created, the isTicket status is false, and the conversation wont appear in the inbox. however, if the user replies back to the conversation, the isTicket status changes to true and the conversation starts appearing in the inbox
+
 
 ##### Embedded Documents:
 
@@ -438,6 +444,7 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 > - body
 > - clicked (boolean)
 > - ct
+> - emailId (unique-message-id set by mail-clients/mailgun, used to track email replies)
 > - from (enum: [user, account]) (is it sent from a 'user' or an 'account')
 > - seen (boolean)
 > - sent (boolean)
@@ -456,15 +463,13 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 - aid (required)
 - ct
 - from (accountId) (required)
-- status (pending / cancelled / joined)
 - toEmail (required)
-- toName (required)
 - ut
 
 ##### Notes:
 
-- Invites should be deleted once accepted (?)
-- Use mongo objectId as invite token
+- Invites are deleted once accepted
+- Using mongo objectId as invite token
 
 #### PONDER
 

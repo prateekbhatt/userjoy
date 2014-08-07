@@ -14,8 +14,8 @@ describe('Worker automessageConsumer', function () {
    */
 
   var AutoMessage = require('../../api/models/AutoMessage');
+  var Conversation = require('../../api/models/Conversation');
   var Event = require('../../api/models/Event');
-  var Notification = require('../../api/models/Notification');
 
 
   /**
@@ -109,12 +109,12 @@ describe('Worker automessageConsumer', function () {
     });
 
 
-    it('should create new automessage queue event', function (done) {
+    it('should create new automessage sent event', function (done) {
 
       var query = {
         type: 'auto',
         amId: amId.toString(),
-        amState: 'queued'
+        amState: 'sent'
       };
 
       Event
@@ -133,7 +133,7 @@ describe('Worker automessageConsumer', function () {
 
     });
 
-
+    // TODO: write to test case that isTicket is set to false for new automessage conversation
 
   });
 
@@ -266,37 +266,49 @@ describe('Worker automessageConsumer', function () {
     });
 
 
-    it('should create new notification to be shown to the user',
+    it(
+      'should create new notification conversation to be shown to the user',
       function (done) {
 
-        Notification
+        Conversation
           .find({
-            amId: amId
+            amId: amId,
+            'messages.type': 'notification'
           })
-          .exec(function (err, notf) {
+          .exec(function (err, cons) {
 
             expect(err)
               .to.not.exist;
 
-            expect(notf)
+            expect(cons)
               .to.be.an("array")
               .that.has.length(1);
 
-            expect(notf[0])
-              .to.have.property('senderEmail')
+            expect(cons[0])
+              .to.have.property('sub')
               .that.is.a('string')
               .and.is.not.empty;
 
-            expect(notf[0])
-              .to.have.property('senderName')
-              .that.is.a('string')
+            expect(cons[0])
+              .to.have.property('isTicket')
+              .that.is.a('boolean')
+              .and.is.false;
+
+            expect(cons[0])
+              .to.have.property('messages')
+              .that.is.an('array')
               .and.is.not.empty;
 
-            expect(notf[0].amId.toString())
+            expect(cons[0].messages[0])
+              .to.have.property('type')
+              .that.eqls('notification');
+
+            expect(cons[0].amId.toString())
               .to.equal(amId.toString());
 
-            expect(notf[0].body)
-              .to.equal('Hey Prat, Welkom to Second CabanaLand!');
+            expect(cons[0].messages[0])
+              .to.have.property('body')
+              .and.to.equal('Hey Prat, Welkom to Second CabanaLand!');
 
             done();
           });
@@ -347,7 +359,7 @@ describe('Worker automessageConsumer', function () {
                 uid: usr1._id
               },
 
-              'queued',
+              'sent',
               'Create Notification',
 
               function (err, evn) {

@@ -181,11 +181,13 @@ angular.module('do.message', [])
           }
 
           $scope.goToUnreadMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/unread');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/unread');
           }
 
           $scope.goToClosedMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/closed');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/closed');
           }
 
           $scope.goToGoodHealth = function () {
@@ -444,7 +446,8 @@ angular.module('do.message', [])
             }
             console.log("$scope.openmsg -->", $scope.openmsg,
               name, index);
-            var newIndex = ($scope.pageNo - 1) * $scope.pageCount + index;
+            var newIndex = ($scope.pageNo - 1) * $scope.pageCount +
+              index;
             console.log("new index: ", newIndex);
             $scope.openmsg[newIndex].assign = 'Assigned to ' +
               name;
@@ -501,11 +504,13 @@ angular.module('do.message', [])
           }
 
           $scope.goToUnreadMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/unread');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/unread');
           }
 
           $scope.goToClosedMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/closed');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/closed');
           }
 
           $scope.goToGoodHealth = function () {
@@ -544,7 +549,7 @@ angular.module('do.message', [])
               //     .name,
               //   coid: msg[i].coId
               // })
-              // 
+              //
               var m = {
                 id: msg[i]._id,
                 name: msg[i].uid.email,
@@ -719,7 +724,8 @@ angular.module('do.message', [])
             }
             console.log("$scope.openmsg -->", $scope.openmsg,
               name, index);
-            var newIndex = ($scope.pageNo - 1) * $scope.pageCount + index;
+            var newIndex = ($scope.pageNo - 1) * $scope.pageCount +
+              index;
             console.log("new index: ", newIndex);
             $scope.unreadmsg[newIndex].assign = 'Assigned to ' +
               name;
@@ -944,7 +950,7 @@ angular.module('do.message', [])
           function get_gravatar(email, size) {
 
             // MD5 (Message-Digest Algorithm) by WebToolkit
-            // 
+            //
 
             var MD5 = function (s) {
               function L(k, d) {
@@ -1307,7 +1313,8 @@ angular.module('do.message', [])
                 }
               }
               // console.log("value prop: ", value, prop);
-              if (prop != 'companies' && prop != 'ct' && prop != 'meta' &&
+              if (prop != 'companies' && prop != 'ct' && prop !=
+                'meta' &&
                 prop != 'ut' && prop != '__v' && prop != 'aid' && prop !=
                 '_id') {
                 if (prop == 'lastSeen') {
@@ -1343,10 +1350,10 @@ angular.module('do.message', [])
             // TODO: You have to get more data from backend
           }
 
-            function getUserProfile() {
-              UserModel.getUserProfile(ThreadService.getThread()
-                .uid._id, $scope.appId, populateUserProfile);
-            }
+          function getUserProfile() {
+            UserModel.getUserProfile(ThreadService.getThread()
+              .uid._id, $scope.appId, populateUserProfile);
+          }
 
           $scope.healthScore = '50';
           $scope.plan = 'Basic';
@@ -1448,6 +1455,12 @@ angular.module('do.message', [])
               $scope.replytextInDiv = $scope.replytext;
               console.log("$scope.replytextInDiv: ", $scope.replytextInDiv);
               $scope.replytext = '';
+              if (!ThreadService.getThread()
+                .closed) {
+                $scope.buttontext = 'Close';
+              } else {
+                $scope.buttontext = 'Reopen';
+              }
               $scope.replies.push({
                 body: $scope.replytextInDiv
               })
@@ -1463,7 +1476,8 @@ angular.module('do.message', [])
               return;
             }
             if (ThreadService.getReply) {
-              $scope.replytextInDiv = $scope.replytext.replace(/\\r\\n/g,
+              $scope.replytextInDiv = $scope.replytext.replace(
+                /\\r\\n/g,
                 '<br/>');
               $scope.replytext = '';
               console.log("pushing msg: ", $scope.replytextInDiv);
@@ -1476,7 +1490,8 @@ angular.module('do.message', [])
 
               if (!ThreadService.getThread()
                 .closed) {
-                MsgService.closeConversationRequest($scope.appId, $scope
+                MsgService.closeConversationRequest($scope.appId,
+                  $scope
                   .coId, function (err, user) {
                     if (err) {
                       console.log("error");
@@ -1517,7 +1532,7 @@ angular.module('do.message', [])
               console.log("reply button clicked and validated");
               $scope.replyButtonClicked = true;
               var sanitizedReply = $scope.replytext.replace(/\n/g,
-                '<br/>')
+                  '<br/>')
                 .replace(/\r/g, '');
               console.log("sanitized reply: ", sanitizedReply);
               MsgService.replyToMsg($scope.appId, $scope.coId,
@@ -1591,7 +1606,7 @@ angular.module('do.message', [])
 
 
 
-    // 
+    //
 
   }
 ])
@@ -1621,11 +1636,13 @@ angular.module('do.message', [])
           }
 
           $scope.goToUnreadMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/unread');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/unread');
           }
 
           $scope.goToClosedMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/closed');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/closed');
           }
 
           $scope.goToGoodHealth = function () {
@@ -1864,11 +1881,13 @@ angular.module('do.message', [])
           }
 
           $scope.goToUnreadMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/unread');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/unread');
           }
 
           $scope.goToClosedMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/closed');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/closed');
           }
 
           $scope.goToGoodHealth = function () {
@@ -2023,7 +2042,8 @@ angular.module('do.message', [])
             }
             console.log("$scope.goodhealthmsg -->", $scope.goodhealthmsg,
               name, index);
-            var newIndex = ($scope.pageNo - 1) * $scope.pageCount + index;
+            var newIndex = ($scope.pageNo - 1) * $scope.pageCount +
+              index;
             console.log("new index: ", newIndex);
             $scope.goodhealthmsg[newIndex].assign = 'Assigned to ' +
               name;
@@ -2074,11 +2094,13 @@ angular.module('do.message', [])
           }
 
           $scope.goToUnreadMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/unread');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/unread');
           }
 
           $scope.goToClosedMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/closed');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/closed');
           }
 
           $scope.goToGoodHealth = function () {
@@ -2230,7 +2252,8 @@ angular.module('do.message', [])
             }
             console.log("$scope.avghealthmsg -->", $scope.avghealthmsg,
               name, index);
-            var newIndex = ($scope.pageNo - 1) * $scope.pageCount + index;
+            var newIndex = ($scope.pageNo - 1) * $scope.pageCount +
+              index;
             console.log("new index: ", newIndex);
             $scope.avghealthmsg[newIndex].assign = 'Assigned to ' +
               name;
@@ -2375,11 +2398,13 @@ angular.module('do.message', [])
           }
 
           $scope.goToUnreadMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/unread');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/unread');
           }
 
           $scope.goToClosedMsg = function () {
-            $location.path('/apps/' + $stateParams.id + '/messages/closed');
+            $location.path('/apps/' + $stateParams.id +
+              '/messages/closed');
           }
 
           $scope.goToGoodHealth = function () {
@@ -2531,7 +2556,8 @@ angular.module('do.message', [])
             }
             console.log("$scope.poorhealthmsg -->", $scope.poorhealthmsg,
               name, index);
-            var newIndex = ($scope.pageNo - 1) * $scope.pageCount + index;
+            var newIndex = ($scope.pageNo - 1) * $scope.pageCount +
+              index;
             console.log("new index: ", newIndex);
             $scope.poorhealthmsg[newIndex].assign = 'Assigned to ' +
               name;

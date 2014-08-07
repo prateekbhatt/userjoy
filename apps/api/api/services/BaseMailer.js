@@ -87,7 +87,7 @@ function BaseMailer(opts) {
   this.template = null;
 
   this.toEmail = opts.to.email;
-  this.toName = opts.to.name;
+  this.toName = opts.to.name || this.toEmail;
 
   this.html = null;
 
@@ -227,7 +227,19 @@ BaseMailer.prototype.send = function (cb) {
         opts: mailOptions
       });
 
-      cb(err)
+
+      // WARNING
+      // =======
+      //
+      // Nodemailer strips out the starting '<' and ending '>' from the messageId
+      // We need to get it back!!!
+      //
+      // BEFORE: "32424242@userjoy.co"
+      // AFTER: "<32424242@userjoy.co>"
+      responseStatus.messageId = '<' + responseStatus.messageId + '>';
+
+
+      cb(err, responseStatus);
     }
 
   );

@@ -48,6 +48,12 @@ var MessageSchema = new Schema({
   },
 
 
+  // message id to track reply-to emails
+  emailId: {
+    type: String
+  },
+
+
   // is it from a user or an account
   from: {
     type: String,
@@ -128,6 +134,18 @@ var ConversationSchema = new Schema({
   },
 
 
+  // all tickets are shown in the messages panel
+  //
+  // when a new automessage conversation is created, it is not a ticket
+  // however if a user replies back to an automessage, the conversation becomes
+  // a ticket
+  isTicket: {
+    type: Boolean,
+    required: true,
+    default: true
+  },
+
+
   messages: [MessageSchema],
 
 
@@ -184,6 +202,34 @@ ConversationSchema.pre('save', function (next) {
 
 
 /**
+ * After an email has been sent by Mailgun, it sends us a 'message-id'.
+ * We need to store this 'message-id' in 'emailId'.
+ * It is used to track conversation replies / threads.
+ *
+ * @param {string} mid stored-embedded-document-message-id
+ * @param {string} emailId message-id-that-has-been-returned-by-mailgun
+ * @param {function} cb callback
+ */
+
+ConversationSchema.statics.updateEmailId = function (mid, emailId, cb) {
+
+  Conversation
+    .findOne({
+      'messages._id': mid
+    })
+    .exec(function (err, con) {
+
+      if (err) return cb(err);
+      if (!con) return cb(new Error('Conversation not found'));
+
+      var msg = con.messages.id(mid);
+      msg.emailId = emailId;
+      con.save(cb);
+    });
+};
+
+
+/**
  * Updates closed status of conversation to true
  *
  * TODO: Add closed_by to track the account id of the team member who has closed
@@ -225,15 +271,20 @@ ConversationSchema.statics.reopened = function (coId, cb) {
 
 
 /**
- * Creates reply to a conversation
+ * Adds a reply from user to a conversation by its emailId (Mailgun)
  *
- * @param {string} aid app-id
- * @param {string} coId conversation-id
+ * Updates 'isTicket' status to true
+ * When an automessage conversation is created, the isTicket status is false,
+ * however when a user replies to an automessage, the isTicket status should
+ * become true
+ *
+ * @param {string} replyToEmailId unique-email-message-id
  * @param {object} reply  reply-message-object
  * @param {function} cb callback
  */
 
-ConversationSchema.statics.reply = function (aid, coId, reply, cb) {
+ConversationSchema.statics.replyByEmailId = function (replyToEmailId, reply,
+  cb) {
 
   if (!reply.body) {
     return cb(new Error('Provide message body'));
@@ -250,12 +301,73 @@ ConversationSchema.statics.reply = function (aid, coId, reply, cb) {
   }
 
 
+  if (!reply.emailId) {
+    return cb(new Error('Provide message emailId'));
+  }
+
+
+  // find conversation with the message with the replyToEmailId
+  var conditions = {
+    'messages.emailId': replyToEmailId
+  };
+
+  var update = {
+    isTicket: true,
+    $push: {
+      messages: reply
+    }
+  };
+
+  Conversation.findOneAndUpdate(conditions, update, function (err, con) {
+
+    if (err) return cb(err);
+    if (!con) return cb(new Error('Conversation not found'));
+
+    cb(null, con);
+  });
+};
+
+
+/**
+ * Adds a reply to a conversation by the conversation-id (UserJoy Dashboard)
+ *
+ * Updates 'isTicket' status to true
+ * When an automessage conversation is created, the isTicket status is false,
+ * however when a user replies to an automessage, the isTicket status should
+ * become true
+ *
+ * @param {string} aid unique-email-message-id
+ * @param {string} coId conversation-id
+ * @param {object} reply  reply-message-object
+ * @param {function} cb callback
+ */
+
+ConversationSchema.statics.replyByConversationId = function (aid, coId,
+  reply, cb) {
+
+  if (!reply.body) {
+    return cb(new Error('Provide message body'));
+  }
+
+
+  if (!_.contains(['user', 'account'], reply.from)) {
+    return cb(new Error('Provide valid from type, either user/account'));
+  }
+
+
+  if (!_.contains(['email', 'notification'], reply.type)) {
+    return cb(new Error('Provide message type'));
+  }
+
+
+  // find conversation with the message with the replyToEmailId
   var conditions = {
     _id: coId,
     aid: aid
   };
 
   var update = {
+    isTicket: true,
     $push: {
       messages: reply
     }

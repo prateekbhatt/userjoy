@@ -59,6 +59,7 @@ function UserJoy() {
     IDENTIFY_URL: API_URL + '/identify',
     COMPANY_URL: API_URL + '/company',
     NOTIFICATION_FETCH_URL: API_URL + '/notifications',
+    NOTIFICATION_REPLY_URL: API_URL + '/notifications/reply',
     CONVERSATION_URL: API_URL + '/conversations'
   });
 

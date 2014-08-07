@@ -65,10 +65,10 @@ Notification.prototype.load = function (cb) {
       return cb(new Error('no new notification found'));
     }
 
-    // Persist the automessageId from the notification obj.
-    // Would be needed to create a new conversation in case the user
+    // Persist the conversationId from the notification obj.
+    // Would be needed to reply to the conversation in case the user
     // replies back
-    app.setTrait('automessageId', notf.amId);
+    app.setTrait('coId', notf.coId);
 
     var gravatar = getGravatar(notf.senderEmail, 80);
 
@@ -137,7 +137,7 @@ Notification.prototype.reply = function () {
   var self = this;
   var appTraits = app.traits();
   var userTraits = user.traits();
-  var REPLY_URL = appTraits.CONVERSATION_URL;
+  var REPLY_URL = appTraits.NOTIFICATION_REPLY_URL;
   var msg = dom('#' + REPLY_TEMPLATE_ID)
     .val();
 
@@ -151,9 +151,9 @@ Notification.prototype.reply = function () {
     .disabled = true;
 
   var reply = {
-    amId: appTraits.automessageId,
     app_id: appTraits.app_id,
-    body: msg
+    body: msg,
+    coId: appTraits.coId
   };
 
   if (userTraits.user_id) {

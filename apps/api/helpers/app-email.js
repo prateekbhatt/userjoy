@@ -15,16 +15,21 @@ var config = require('../../config');
 /**
  * Returns the from-email of the app
  *
- * @param {string} aid app id
- * @return {strin} app email address
+ * @param {string} username
+ * @param {string} subdomain
+ * @return {strin} user-email-address
  */
 
-module.exports = function (aid) {
+module.exports = function (username, subdomain) {
+
+  if (!username || !subdomain) {
+    throw new Error('Both username and subdomain are required');
+  }
 
   var INBOUND_MAIL_DOMAIN = config('api')
     .mailgunDomain;
 
-  return aid + '@' + INBOUND_MAIL_DOMAIN;
+  return username + '@' + subdomain + '.' + INBOUND_MAIL_DOMAIN;
 }
 
 

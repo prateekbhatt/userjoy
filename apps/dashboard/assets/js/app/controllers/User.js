@@ -52,220 +52,6 @@ angular.module('do.users', [])
   }
 ])
 
-// .controller('UserSegmentCtrl', ['$scope', '$location', 'segment',
-//     'queryMatching', '$filter', 'countOfActions', 'hasNotDone',
-//     'hasDoneActions', 'ngTableParams',
-//     function ($scope, $location, segment, queryMatching, $filter,
-//         countOfActions, hasNotDone, hasDoneActions,
-//         ngTableParams) {
-
-
-//         $scope.state = 'form-control';
-//         $scope.isErr = '';
-//         $scope.method = 'count';
-//         $scope.checkMethod = true;
-//         $scope.rootOperator = 'and';
-//         $scope.newFilterArray = [{
-//                 method: 'hasdone',
-//                 name: 'Create new chat',
-//                 op: '',
-//                 val: ''
-//             },
-
-//             {
-//                 method: 'count',
-//                 name: 'Logged In',
-//                 op: 'gt',
-//                 val: 20
-//             }
-//         ]
-
-
-//         $scope.selectFilter = 'Users';
-//         $scope.hasNotDoneItems = [];
-//         $scope.hasNotDoneItems = hasNotDone.getAllHasNotDoneActions();
-//         $scope.hasDoneItems = [];
-//         $scope.hasDoneItems = hasDoneActions.getAllHasDoneActions();
-//         $scope.countOfItems = [];
-//         $scope.countOfItems = countOfActions.getCountOfActions();
-//         $scope.hasDoneOrHasNotDoneClicked = false;
-//         $scope.hasCountOfClicked = true;
-
-//         $scope.changeFilterHasDone = function (parentindex, index, evt) {
-//             $scope.method = 'hasdone';
-//             $scope.filters[parentindex].checkMethod = false;
-//             console.log("has done: ", parentindex);
-//             $scope.filters[parentindex].btntext = 'Has Done';
-//             $scope.filters[parentindex].method = 'hasdone';
-//             $scope.filters[parentindex].name = $scope.hasDoneItems[index].name;
-//             $scope.filters[parentindex].op = '';
-//             $scope.filters[parentindex].optext = '';
-//             $scope.filters[parentindex].val = '';
-
-
-//             $scope.hasDoneOrHasNotDone = true;
-//             $scope.textHasDoneNotHasDone = $scope.hasDoneItems[index].name;
-//             $scope.hasDoneOrHasNotDoneClicked = true;
-//             $scope.hasCountOfClicked = false;
-//             $scope.selectFilterHasOrHasNotDone = 'Has done ';
-//             console.log("index: ", index);
-//         }
-
-//         $scope.changeFilterHasNotDone = function (parentindex, index, evt) {
-//             $scope.method = 'hasnotdone';
-//             $scope.filters[parentindex].checkMethod = false;
-//             console.log("has not done: ", parentindex);
-//             $scope.filters[parentindex].method = 'hasnotdone';
-//             $scope.filters[parentindex].btntext = 'Has Not Done ';
-//             $scope.filters[parentindex].name = $scope.hasNotDoneItems[
-//                 index].name;
-//             $scope.filters[parentindex].op = '';
-//             $scope.filters[parentindex].optext = '';
-//             $scope.filters[parentindex].val = '';
-//             console.log($scope.filters);
-
-
-
-//             $scope.hasDoneOrHasNotDone = true;
-//             $scope.textHasDoneNotHasDone = $scope.hasDoneItems[index].name;
-//             $scope.hasDoneOrHasNotDoneClicked = true;
-//             $scope.hasCountOfClicked = false;
-//             $scope.selectFilterHasOrHasNotDone = 'Has not done';
-//             console.log("index: ", index);
-//         }
-
-
-
-//         $scope.changeFilterCountOf = function (parentindex, index, evt) {
-//             $scope.method = 'count';
-//             $scope.filters[parentindex].checkMethod = true;
-//             console.log("count: ", parentindex);
-//             $scope.filters[parentindex].method = 'count';
-//             $scope.filters[parentindex].btntext = 'Count Of ' + $scope.countOfItems[
-//                 index].name;
-
-
-
-
-//             $scope.hasDoneOrHasNotDone = false;
-//             $scope.hasCountOfClicked = true;
-//             $scope.hasDoneOrHasNotDoneClicked = false;
-//             console.log("index: ", index);
-//         }
-
-//         $scope.isActive = function (viewLocation) {
-//             return viewLocation === $location.path();
-//         };
-
-
-//         var segments = segment.get.all();
-//         $scope.dropdown = [];
-//         for (var i = segments.length - 1; i >= 0; i--) {
-//             $scope.dropdown.push({
-//                 text: segments[i].name
-//             });
-//         };
-
-
-//         $scope.segments = segment.get.all();
-//         $scope.segmenticons = [];
-//         $scope.selectedIcon = $scope.segments[0].name;
-
-//         for (var i = $scope.segments.length - 1; i >= 0; i--) {
-//             $scope.segmenticons.push({
-//                 value: $scope.segments[i].name,
-//                 label: $scope.segments[i].name
-//             })
-//         };
-
-
-//         $scope.queries = queryMatching.get.all();
-//         $scope.query = [];
-//         $scope.queryDisplayed = $scope.queries[0].name;
-//         $scope.selectedQuery = queryMatching.get.selected();
-//         $scope.selectedqueries = [];
-//         for (var i = 0; i <= $scope.queries.length - 1; i++) {
-//             $scope.selectedqueries.push({
-//                 value: $scope.queries[i].name,
-//                 label: $scope.queries[i].name
-//             })
-//         };
-
-
-//         $scope.chngquery = function (parentindex, index) {
-//             console.log("parentindex: ", parentindex);
-//             $scope.filters[parentindex].optext = $scope.queries[index].name;
-//             $scope.filters[parentindex].op = $scope.queries[index].key;
-//             console.log($scope.filters[parentindex].op);
-//             console.log($scope.filters);
-//         }
-
-//         $scope.runQuery = function () {
-//             console.log("run Query: ", $scope.filters);
-//         }
-
-//         console.log("queryDisplayed: ", $scope.queryDisplayed);
-
-//         $scope.text = 'AND';
-//         $scope.segmentFilterCtrl = segment.get.selected();
-//         $scope.queryFilterCtrl = queryMatching.get.selected();
-//         $scope.filters = [];
-//         $scope.addAnotherFilter = function addAnotherFilter() {
-//             $scope.checkMethod = true;
-//             $scope.filters.push({
-//                 method: 'count',
-//                 btntext: 'Choose',
-//                 checkMethod: 'true',
-//                 name: '',
-//                 op: 'eq',
-//                 optext: 'equal',
-//                 val: ''
-//             })
-//         }
-
-//         $scope.removeFilter = function removeFilter(
-//             filterToRemove) {
-//             var index = $scope.filters.indexOf(
-//                 filterToRemove);
-//             $scope.filters.splice(index, 1);
-//         }
-//         $scope.switchAndOr = function switchAndOr() {
-//             if ($scope.text === 'AND') {
-//                 $scope.text = 'OR'
-//             } else {
-//                 $scope.text = 'AND'
-//             }
-//         }
-
-//         $scope.showErr = false;
-//         $scope.errMsg = 'Enter the outlined fields';
-//         $scope.errorclass = '';
-
-//         $scope.hideErrorAlert = function () {
-//             $scope.showErr = false;
-//         }
-
-//         $scope.isErr = 'error';
-
-//         $scope.signupForm = function () {
-//             console.log($scope.filters);
-//             for (var i = 0; i < $scope.filters.length; i++) {
-//                 console.log("val: ", $scope.filters[i].val);
-//                 if ($scope.filters[i].val == '' && $scope.filters[i].method ==
-//                     'count') {
-//                     console.log("val: ", $scope.filters[i].val);
-//                     $scope.showErr = true;
-//                     // $scope.isErr = 'error';
-//                     // console.log("error class", $scope.isErr);
-//                 } else {
-//                     $scope.showErr = false;
-//                     // $scope.isErr = '';
-//                 }
-//             };
-//         }
-//     }
-// ])
-
 .controller('UserListCtrl', ['$scope', '$location', 'segment',
   'queryMatching', '$filter', 'countOfActions', 'hasNotDone',
   'hasDoneActions', 'ngTableParams', 'login', 'modelsQuery',
@@ -273,17 +59,18 @@ angular.module('do.users', [])
   'userAttributes', 'lodash', '$modal',
   'UidService', '$moment', 'UserList', '$timeout', 'modelsSegment',
   'segmentService', 'CurrentAppService', 'UserModel', '$log',
-  'MsgService', '$stateParams', '$rootScope',
+  'MsgService', '$stateParams', '$rootScope', 'flash',
   function ($scope, $location, segment, queryMatching, $filter,
     countOfActions, hasNotDone, hasDoneActions,
     ngTableParams, login, modelsQuery, AppService, segment,
     queryMatching, eventNames, userAttributes, lodash, $modal,
     UidService, $moment, UserList, $timeout, modelsSegment,
     segmentService, CurrentAppService, UserModel, $log, MsgService,
-    $stateParams, $rootScope) {
+    $stateParams, $rootScope, flash) {
 
     CurrentAppService.getCurrentApp()
       .then(function (currentApp) {
+        // flash('Saved!');
         console.log("Promise Resolved: ", currentApp);
         console.log("current App from service -->: ",
           AppService.getCurrentApp());
@@ -2000,7 +1787,7 @@ angular.module('do.users', [])
           function get_gravatar(email, size) {
 
             // MD5 (Message-Digest Algorithm) by WebToolkit
-            // 
+            //
 
             var MD5 = function (s) {
               function L(k, d) {
@@ -2424,6 +2211,8 @@ angular.module('do.users', [])
               };
             }
 
+            $scope.graphDataValues = value;
+            console.log("$scope.graphDataValues: ", $scope.graphDataValues, $scope.graphDataValues.length);
             $scope.graphData = [{
               "key": "Series 1",
               "values": value

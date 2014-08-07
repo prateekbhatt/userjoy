@@ -29,6 +29,8 @@ var app = angular.module('dodatado', [
   'angular-momentjs',
   'do.automate',
   'toggle-switch',
+  'angular-tour',
+  'flash',
 ])
 
 .directive('fallbackSrc', function () {
@@ -182,9 +184,9 @@ var app = angular.module('dodatado', [
     delete $httpProvider.defaults.headers.common['X-Requested-With'];
 
     $httpProvider.interceptors.push(['$rootScope', '$location', '$q',
-      '$timeout',
+      '$timeout', 'flash',
       function ($rootScope, $location, $q,
-        $timeout) {
+        $timeout, flash) {
         $rootScope.error = false;
         $rootScope.success = false;
         $rootScope.errMsgRootScope = '';
@@ -393,6 +395,7 @@ var app = angular.module('dodatado', [
 
     // check cookie to set if user is authenticated
     if (ipCookie('loggedin')) {
+      $log.info('loggedin cookie found to be true');
       // $log.info('app.run setUserAuthenticated');
       LoginService.setUserAuthenticated(true);
       login.setLoggedIn(true);

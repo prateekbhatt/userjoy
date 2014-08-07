@@ -354,11 +354,16 @@ angular.module('do.settings', [])
 
           for (var i = 0; i < AppService.getCurrentApp()
             .team.length; i++) {
+            var userjoyEmail = '';
+            userjoyEmail = AppService.getCurrentApp()
+              .team[i].username + '@' + AppService.getCurrentApp()
+              .subdomain + '.mail.userjoy.co';
             $scope.team.push({
-              name: AppService.getCurrentApp()
-                .team[i].accid.name,
+              // name: AppService.getCurrentApp()
+              //   .team[i].accid.name,
               email: AppService.getCurrentApp()
-                .team[i].accid.email
+                .team[i].accid.email,
+              ujEmail: userjoyEmail
             })
           };
 
@@ -378,16 +383,18 @@ angular.module('do.settings', [])
 
             $scope.showMsgSuccess = true;
             $scope.invitedTeam.push({
-              toName: $scope.nameMember,
+              // toName: $scope.nameMember,
               toEmail: $scope.teamMember
             })
           }
 
           $scope.addTeamMember = function () {
             $scope.enableInvite = false;
+            var emailArray = [];
+            emailArray[0] = $scope.teamMember;
             var data = {
-              email: $scope.teamMember,
-              name: $scope.nameMember
+              emails: emailArray
+              // name: $scope.nameMember
             };
             console.log("data: ", data);
 
@@ -472,7 +479,7 @@ angular.module('do.settings', [])
           $scope.color = AppService.getCurrentApp()
             .color;
           console.log("app color: ", $scope.color);
-          
+
           if ($scope.color.toUpperCase() === '#39b3d7'.toUpperCase()) {
             $scope.btnInfoWidth = '40px';
             $scope.btnInfoHeight = '40px';
@@ -771,7 +778,8 @@ angular.module('do.settings', [])
           }
 
           $scope.$watch('switchStatus', function () {
-            console.log("switchState: ", $scope.switchStatus, AppService
+            console.log("switchState: ", $scope.switchStatus,
+              AppService
               .getCurrentApp()
               .showMessageBox);
             if ($scope.switchStatus != null) {

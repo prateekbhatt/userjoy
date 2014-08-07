@@ -5,12 +5,16 @@
             <div class="stepwizard">
                 <div class="stepwizard-row">
                     <div class="stepwizard-step">
-                        <button class="btn btn-success btn-circle" style="cursor:not-allowed">1</button>
+                        <button class="btn btn-default btn-circle" style="cursor:not-allowed">1</button>
+                        <p>Install Code</p>
+                    </div>
+                    <div class="stepwizard-step">
+                        <button class="btn btn-success btn-circle" style="cursor:not-allowed">2</button>
                         <p>Onboarding</p>
                     </div>
                     <div class="stepwizard-step">
-                        <button class="btn btn-default btn-circle" style="cursor:not-allowed">2</button>
-                        <p>Install Code</p>
+                        <button class="btn btn-default btn-circle" style="cursor:not-allowed">3</button>
+                        <p>Invite Team</p>
                     </div>
                 </div>
             </div>
@@ -29,8 +33,8 @@
                     </div>
                     <div class="panel-body">
                         <!-- <div class="alert alert-danger text-center"
-                        ng-show="submitted && app_form.name.$invalid"><strong>Enter your application name</strong></div>
-                        <div class="alert alert-danger text-center"
+                                                ng-show="submitted && app_form.name.$invalid"><strong>Enter your application name</strong></div>
+                                                <div class="alert alert-danger text-center"
                         ng-show="submitted && app_form.domain.$invalid"><strong>Enter your domain name</strong></div> -->
                         <div class="form-group">
                             <label for="name" class="col-md-4 control-label" style="font-size: 20px"><strong>Application Name</strong></label>
@@ -38,15 +42,15 @@
                                 <input class="form-control" type="text" name="name" placeholder="Enter Application Name" ng-model="name" required>
                             </div>
                         </div>
-                        <!-- <div class="form-group">
-                            <label for="domain" class="col-md-4 control-label" style="font-size: 20px"><strong>Domain</strong></label>
+                        <div class="form-group">
+                            <label for="domain" class="col-md-4 control-label" style="font-size: 20px"><strong>Your Email Id</strong></label>
                             <div class="col-md-8">
-                                <input class="form-control" type="text" name="url" placeholder="Enter Domain Url" ng-model="url" required>
+                                <p class="col-md-2" style="margin-top: 10px;">{{firstName}}@</p><input class="form-control col-md-3" type="text" name="email" placeholder="app" ng-model="email" required style="width: 30%;"><p class="col-md-4" style="margin-top: 10px;">.mail.userjoy.co</p>
                             </div>
-                        </div> -->
-                        <button type="submit" class="btn btn-info pull-right" style="padding-top:10px" id="onboardinglink">Next</button>
+                        </div>
+                        <button type="submit" class="btn btn-success pull-right" style="padding-top:10px" id="onboardinglink">Next</button>
                     </div>
-                <!-- </div> -->
+                </div>
             </fieldset>
         </form>
     </div>
