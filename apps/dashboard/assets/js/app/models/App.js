@@ -68,7 +68,7 @@ angular
             AppService.setCurrentApp(savedApp);
             AppService.setAppName(savedApp.name);
             $location.path('/apps/' + AppService.getCurrentApp()
-              ._id + '/addcode')
+              ._id + '/addcode/newapp');
             console.log("apps created: ", AppService.getLoggedInApps(),
               savedApp);
           })

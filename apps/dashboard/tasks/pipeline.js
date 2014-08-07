@@ -74,6 +74,7 @@ var jsFilesToInject = [
   'bower_components/n3-line-chart/dist/line-chart.min.js',
   'bower_components/angular-toggle-switch/angular-toggle-switch.min.js',
   'bower_components/angular-tour/dist/angular-tour-tpls.min.js',
+  'bower_components/angular-flash-messages/angular-flash.js',
 
   // Bring in the socket.io client
   // 'js/sockets/socket.io.js',
