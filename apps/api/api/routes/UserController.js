@@ -102,7 +102,7 @@ router
 /**
  * GET /apps/:aid/users/:uid/conversations
  *
- * Returns 10 latest conversations of the user
+ * Returns 10 latest ticket conversations of the user
  */
 
 router
@@ -117,7 +117,8 @@ router
     Conversation
       .find({
         uid: req.params.uid,
-        aid: req.params.aid
+        aid: req.params.aid,
+        isTicket: true
       })
       .sort({
         ct: -1

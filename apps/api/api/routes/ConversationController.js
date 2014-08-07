@@ -301,7 +301,7 @@ router
  *
  * @query {string} filter  open/closed (optional)
  *
- * Returns all open conversations for app
+ * Returns all open ticket conversations for app (open: true, isTicket: true)
  */
 
 router
@@ -314,7 +314,8 @@ router
 
     // match conversation by filter condition
     var convMatch = {
-      aid: aid
+      aid: aid,
+      isTicket: true
     };
 
 
