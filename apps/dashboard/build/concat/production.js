@@ -63102,6 +63102,64 @@ factory('ipCookie', ['$document',
 })(this, this.angular, void 0);
 angular.module("toggle-switch",["ng"]).directive("toggleSwitch",function(){return{restrict:"EA",replace:!0,scope:{model:"=",disabled:"@",onLabel:"@",offLabel:"@",knobLabel:"@"},template:'<div class="switch" ng-click="toggle()" ng-class="{ \'disabled\': disabled }"><div class="switch-animate" ng-class="{\'switch-off\': !model, \'switch-on\': model}"><span class="switch-left" ng-bind="onLabel"></span><span class="knob" ng-bind="knobLabel"></span><span class="switch-right" ng-bind="offLabel"></span></div></div>',controller:["$scope",function($scope){$scope.toggle=function(){$scope.disabled||($scope.model=!$scope.model)}}],compile:function(element,attrs){attrs.onLabel||(attrs.onLabel="On"),attrs.offLabel||(attrs.offLabel="Off"),attrs.knobLabel||(attrs.knobLabel=" "),attrs.disabled||(attrs.disabled=!1)}}});
 !function(){"use strict";angular.module("angular-tour",["angular-tour.tpls","angular-tour.tour"]),angular.module("angular-tour.tpls",["tour/tour.tpl.html"]),angular.module("tour/tour.tpl.html",[]).run(["$templateCache",function(a){a.put("tour/tour.tpl.html",'<div class="tour-tip">\n    <span class="tour-arrow tt-{{ ttPlacement }}"></span>\n    <div class="tour-content-wrapper">\n        <p ng-bind="ttContent"></p>\n        <a ng-click="setCurrentStep(getCurrentStep() + 1)" ng-bind="ttNextLabel" class="small button tour-next-tip"></a>\n        <a ng-click="closeTour()" class="tour-close-tip">×</a>\n    </div>\n</div>')}]),angular.module("angular-tour.tour",[]).constant("tourConfig",{placement:"top",animation:!0,nextLabel:"Next",scrollSpeed:500,offset:28}).controller("TourController",["$scope","orderedList",function(a,b){var c=this,d=c.steps=b();c.postTourCallback=angular.noop,c.postStepCallback=angular.noop,c.currentStep=0,a.$watch(function(){return c.currentStep},function(a){c.select(a)}),c.select=function(a){if(angular.isNumber(a)){c.unselectAllSteps();var b=d.get(a);b&&(b.ttOpen=!0),c.currentStep!==a&&(c.currentStep=a),a>=d.getCount()&&c.postTourCallback(),c.postStepCallback()}},c.addStep=function(a){angular.isNumber(a.index)&&!isNaN(a.index)?d.set(a.index,a):d.push(a)},c.unselectAllSteps=function(){d.forEach(function(a){a.ttOpen=!1})},c.cancelTour=function(){c.unselectAllSteps(),c.postTourCallback()},a.openTour=function(){var a=c.currentStep>=d.getCount()||c.currentStep<0?0:c.currentStep;c.select(a)},a.closeTour=function(){c.cancelTour()}}]).directive("tour",["$parse",function(a){return{controller:"TourController",restrict:"EA",scope:!0,link:function(b,c,d,e){if(!angular.isDefined(d.step))throw"The <tour> directive requires a `step` attribute to bind the current step to.";var f=a(d.step);b.$watch(d.step,function(a){e.currentStep=a}),e.postTourCallback=function(){angular.isDefined(d.postTour)&&b.$parent.$eval(d.postTour)},e.postStepCallback=function(){angular.isDefined(d.postStep)&&b.$parent.$eval(d.postStep)},b.setCurrentStep=function(a){f.assign(b.$parent,a),e.currentStep=a},b.getCurrentStep=function(){return e.currentStep}}}}]).directive("tourtip",["$window","$compile","$interpolate","$timeout","scrollTo","tourConfig",function(a,b,c,d,e,f){var g=(c.startSymbol(),c.endSymbol(),"<div tour-popup></div>");return{require:"^tour",restrict:"EA",scope:!0,link:function(c,h,i,j){function k(){var b,d,g,i,j,k,l;if(c.ttContent){c.ttAnimation?m.fadeIn():m.css({display:"block"}),h.after(m),l=h.children().eq(0).length>0?h.children().eq(0):h;var n=function(){switch(b=l.position(),d=m.width(),g=m.height(),k=l.width(),j=l.height(),c.ttPlacement){case"right":i={top:b.top,left:b.left+k+c.ttOffset};break;case"bottom":i={top:b.top+j+c.ttOffset,left:b.left};break;case"left":i={top:b.top,left:b.left-d-c.ttOffset};break;default:i={top:b.top-g-c.ttOffset,left:b.left}}i.top+="px",i.left+="px",m.css(i),e(m,-200,-300,f.scrollSpeed)};angular.element(a).bind("resize."+c.$id,function(){n()}),n()}}function l(){m.detach(),angular.element(a).unbind("resize."+c.$id)}i.$observe("tourtip",function(a){c.ttContent=a}),i.$observe("tourtipPlacement",function(a){c.ttPlacement=a||f.placement}),i.$observe("tourtipNextLabel",function(a){c.ttNextLabel=a||f.nextLabel}),i.$observe("tourtipOffset",function(a){c.ttOffset=parseInt(a,10)||f.offset}),c.ttOpen=!1,c.ttAnimation=f.animation,c.index=parseInt(i.tourtipStep,10);var m=b(g)(c);j.addStep(c),d(function(){c.$watch("ttOpen",function(a){a?k():l()})},500),c.$on("$destroy",function(){angular.element(a).unbind("resize."+c.$id),m.remove(),m=null})}}}]).directive("tourPopup",function(){return{replace:!0,templateUrl:"tour/tour.tpl.html",scope:!0,restrict:"EA",link:function(){}}}).factory("orderedList",function(){var a=function(){this.map={},this._array=[]};a.prototype.set=function(a,b){if(angular.isNumber(a))if(a in this.map)this.map[a]=b;else{if(a<this._array.length){var c=a-1>0?a-1:0;this._array.splice(c,0,a)}else this._array.push(a);this.map[a]=b,this._array.sort(function(a,b){return a-b})}},a.prototype.indexOf=function(a){for(var b in this.map)if(this.map.hasOwnProperty(b)&&this.map[b]===a)return Number(b)},a.prototype.push=function(a){var b=this._array[this._array.length-1]+1||0;this._array.push(b),this.map[b]=a,this._array.sort(function(a,b){return a-b})},a.prototype.remove=function(a){var b=this._array.indexOf(a);if(-1===b)throw new Error("key does not exist");this._array.splice(b,1),delete this.map[a]},a.prototype.get=function(a){return this.map[a]},a.prototype.getCount=function(){return this._array.length},a.prototype.forEach=function(a){for(var b,c,d=0;d<this._array.length;d++)b=this._array[d],c=this.map[b],a(c,b)},a.prototype.first=function(){var a,b;return a=this._array[0],b=this.map[a]};var b=function(){return new a};return b}).factory("scrollTo",function(){return function(a,b,c,d){a?(b=b||-100,c=c||-100,d=d||500,$("html,body").stop().animate({scrollTop:a.offset().top+b,scrollLeft:a.offset().left+c},d)):$("html,body").stop().animate({scrollTop:0},d)}})}(window,document);
+angular.module('flash', [])
+.factory('flash', ['$rootScope', '$timeout', function($rootScope, $timeout) {
+  var messages = [];
+
+  var reset;
+  var cleanup = function() {
+    $timeout.cancel(reset);
+    reset = $timeout(function() { messages = []; });
+  };
+
+  var emit = function() {
+    $rootScope.$emit('flash:message', messages, cleanup);
+  };
+
+  $rootScope.$on('$locationChangeSuccess', emit);
+
+  var asMessage = function(level, text) {
+    if (!text) {
+      text = level;
+      level = 'success';
+    }
+    return { level: level, text: text };
+  };
+
+  var asArrayOfMessages = function(level, text) {
+    if (level instanceof Array) return level.map(function(message) {
+      return message.text ? message : asMessage(message);
+    });
+    return text ? [{ level: level, text: text }] : [asMessage(level)];
+  };
+
+  var flash = function(level, text) {
+    emit(messages = asArrayOfMessages(level, text));
+  };
+
+  ['error', 'warning', 'info', 'success'].forEach(function (level) {
+    flash[level] = function (text) { flash(level, text); };
+  });
+
+  return flash;
+}])
+
+.directive('flashMessages', [function() {
+  var directive = { restrict: 'EA', replace: true };
+  directive.template =
+    '<ol id="flash-messages">' +
+      '<li ng-repeat="m in messages" class="{{m.level}}">{{m.text}}</li>' +
+    '</ol>';
+
+  directive.controller = ['$scope', '$rootScope', function($scope, $rootScope) {
+    $rootScope.$on('flash:message', function(_, messages, done) {
+      $scope.messages = messages;
+      done();
+    });
+  }];
+
+  return directive;
+}]);
 var app = angular.module('dodatado', [
   'ui.bootstrap',
   'ui.router',
@@ -63134,6 +63192,7 @@ var app = angular.module('dodatado', [
   'do.automate',
   'toggle-switch',
   'angular-tour',
+  'flash',
 ])
 
 .directive('fallbackSrc', function () {
@@ -63287,9 +63346,9 @@ var app = angular.module('dodatado', [
     delete $httpProvider.defaults.headers.common['X-Requested-With'];
 
     $httpProvider.interceptors.push(['$rootScope', '$location', '$q',
-      '$timeout',
+      '$timeout', 'flash',
       function ($rootScope, $location, $q,
-        $timeout) {
+        $timeout, flash) {
         $rootScope.error = false;
         $rootScope.success = false;
         $rootScope.errMsgRootScope = '';
@@ -65890,11 +65949,14 @@ angular.module('do.install', [])
   }
 ])
 
-.controller('installOnboardingNewAppCtrl', ['$scope', '$http', 'config', '$state',
+.controller('installOnboardingNewAppCtrl', ['$scope', '$http', 'config',
+  '$state',
   'AppService', '$log', 'AppModel', 'AccountService',
-  'CurrentAccountService', '$stateParams', '$location',
+  'CurrentAccountService', '$stateParams', '$location', '$rootScope',
+  '$timeout',
   function ($scope, $http, config, $state, AppService, $log, AppModel,
-    AccountService, CurrentAccountService, $stateParams, $location) {
+    AccountService, CurrentAccountService, $stateParams, $location,
+    $rootScope, $timeout) {
 
     CurrentAccountService.getCurrentAccount()
       .then(function (currentAccount) {
@@ -65910,6 +65972,10 @@ angular.module('do.install', [])
               .toLowerCase();
           }
         })
+
+        // $scope.$watch('email', function () {
+        //   if($scope.email.match)
+        // })
 
         $scope.installapp = function () {
           console.log("$scope.name: ", $scope.name);
@@ -65930,12 +65996,24 @@ angular.module('do.install', [])
             return;
           }
 
-          var data = {
-            name: $scope.name,
-            subdomain: $scope.email
-          };
+          if ($scope.email.match(/^[a-zA-Z0-9]*$/g)) {
+            var data = {
+              name: $scope.name,
+              subdomain: $scope.email
+            };
 
-          AppModel.addAnotherNewApp(data);
+            AppModel.addAnotherNewApp(data);
+
+          } else {
+            $rootScope.errMsgRootScope =
+              'Only alphanumeric characters allowed in the email id';
+            $rootScope.error = true;
+            $timeout(function () {
+              $rootScope.error = false;
+            }, 5000);
+            return;
+          }
+
         }
       })
 
@@ -70205,220 +70283,6 @@ angular.module('do.users', [])
   }
 ])
 
-// .controller('UserSegmentCtrl', ['$scope', '$location', 'segment',
-//     'queryMatching', '$filter', 'countOfActions', 'hasNotDone',
-//     'hasDoneActions', 'ngTableParams',
-//     function ($scope, $location, segment, queryMatching, $filter,
-//         countOfActions, hasNotDone, hasDoneActions,
-//         ngTableParams) {
-
-
-//         $scope.state = 'form-control';
-//         $scope.isErr = '';
-//         $scope.method = 'count';
-//         $scope.checkMethod = true;
-//         $scope.rootOperator = 'and';
-//         $scope.newFilterArray = [{
-//                 method: 'hasdone',
-//                 name: 'Create new chat',
-//                 op: '',
-//                 val: ''
-//             },
-
-//             {
-//                 method: 'count',
-//                 name: 'Logged In',
-//                 op: 'gt',
-//                 val: 20
-//             }
-//         ]
-
-
-//         $scope.selectFilter = 'Users';
-//         $scope.hasNotDoneItems = [];
-//         $scope.hasNotDoneItems = hasNotDone.getAllHasNotDoneActions();
-//         $scope.hasDoneItems = [];
-//         $scope.hasDoneItems = hasDoneActions.getAllHasDoneActions();
-//         $scope.countOfItems = [];
-//         $scope.countOfItems = countOfActions.getCountOfActions();
-//         $scope.hasDoneOrHasNotDoneClicked = false;
-//         $scope.hasCountOfClicked = true;
-
-//         $scope.changeFilterHasDone = function (parentindex, index, evt) {
-//             $scope.method = 'hasdone';
-//             $scope.filters[parentindex].checkMethod = false;
-//             console.log("has done: ", parentindex);
-//             $scope.filters[parentindex].btntext = 'Has Done';
-//             $scope.filters[parentindex].method = 'hasdone';
-//             $scope.filters[parentindex].name = $scope.hasDoneItems[index].name;
-//             $scope.filters[parentindex].op = '';
-//             $scope.filters[parentindex].optext = '';
-//             $scope.filters[parentindex].val = '';
-
-
-//             $scope.hasDoneOrHasNotDone = true;
-//             $scope.textHasDoneNotHasDone = $scope.hasDoneItems[index].name;
-//             $scope.hasDoneOrHasNotDoneClicked = true;
-//             $scope.hasCountOfClicked = false;
-//             $scope.selectFilterHasOrHasNotDone = 'Has done ';
-//             console.log("index: ", index);
-//         }
-
-//         $scope.changeFilterHasNotDone = function (parentindex, index, evt) {
-//             $scope.method = 'hasnotdone';
-//             $scope.filters[parentindex].checkMethod = false;
-//             console.log("has not done: ", parentindex);
-//             $scope.filters[parentindex].method = 'hasnotdone';
-//             $scope.filters[parentindex].btntext = 'Has Not Done ';
-//             $scope.filters[parentindex].name = $scope.hasNotDoneItems[
-//                 index].name;
-//             $scope.filters[parentindex].op = '';
-//             $scope.filters[parentindex].optext = '';
-//             $scope.filters[parentindex].val = '';
-//             console.log($scope.filters);
-
-
-
-//             $scope.hasDoneOrHasNotDone = true;
-//             $scope.textHasDoneNotHasDone = $scope.hasDoneItems[index].name;
-//             $scope.hasDoneOrHasNotDoneClicked = true;
-//             $scope.hasCountOfClicked = false;
-//             $scope.selectFilterHasOrHasNotDone = 'Has not done';
-//             console.log("index: ", index);
-//         }
-
-
-
-//         $scope.changeFilterCountOf = function (parentindex, index, evt) {
-//             $scope.method = 'count';
-//             $scope.filters[parentindex].checkMethod = true;
-//             console.log("count: ", parentindex);
-//             $scope.filters[parentindex].method = 'count';
-//             $scope.filters[parentindex].btntext = 'Count Of ' + $scope.countOfItems[
-//                 index].name;
-
-
-
-
-//             $scope.hasDoneOrHasNotDone = false;
-//             $scope.hasCountOfClicked = true;
-//             $scope.hasDoneOrHasNotDoneClicked = false;
-//             console.log("index: ", index);
-//         }
-
-//         $scope.isActive = function (viewLocation) {
-//             return viewLocation === $location.path();
-//         };
-
-
-//         var segments = segment.get.all();
-//         $scope.dropdown = [];
-//         for (var i = segments.length - 1; i >= 0; i--) {
-//             $scope.dropdown.push({
-//                 text: segments[i].name
-//             });
-//         };
-
-
-//         $scope.segments = segment.get.all();
-//         $scope.segmenticons = [];
-//         $scope.selectedIcon = $scope.segments[0].name;
-
-//         for (var i = $scope.segments.length - 1; i >= 0; i--) {
-//             $scope.segmenticons.push({
-//                 value: $scope.segments[i].name,
-//                 label: $scope.segments[i].name
-//             })
-//         };
-
-
-//         $scope.queries = queryMatching.get.all();
-//         $scope.query = [];
-//         $scope.queryDisplayed = $scope.queries[0].name;
-//         $scope.selectedQuery = queryMatching.get.selected();
-//         $scope.selectedqueries = [];
-//         for (var i = 0; i <= $scope.queries.length - 1; i++) {
-//             $scope.selectedqueries.push({
-//                 value: $scope.queries[i].name,
-//                 label: $scope.queries[i].name
-//             })
-//         };
-
-
-//         $scope.chngquery = function (parentindex, index) {
-//             console.log("parentindex: ", parentindex);
-//             $scope.filters[parentindex].optext = $scope.queries[index].name;
-//             $scope.filters[parentindex].op = $scope.queries[index].key;
-//             console.log($scope.filters[parentindex].op);
-//             console.log($scope.filters);
-//         }
-
-//         $scope.runQuery = function () {
-//             console.log("run Query: ", $scope.filters);
-//         }
-
-//         console.log("queryDisplayed: ", $scope.queryDisplayed);
-
-//         $scope.text = 'AND';
-//         $scope.segmentFilterCtrl = segment.get.selected();
-//         $scope.queryFilterCtrl = queryMatching.get.selected();
-//         $scope.filters = [];
-//         $scope.addAnotherFilter = function addAnotherFilter() {
-//             $scope.checkMethod = true;
-//             $scope.filters.push({
-//                 method: 'count',
-//                 btntext: 'Choose',
-//                 checkMethod: 'true',
-//                 name: '',
-//                 op: 'eq',
-//                 optext: 'equal',
-//                 val: ''
-//             })
-//         }
-
-//         $scope.removeFilter = function removeFilter(
-//             filterToRemove) {
-//             var index = $scope.filters.indexOf(
-//                 filterToRemove);
-//             $scope.filters.splice(index, 1);
-//         }
-//         $scope.switchAndOr = function switchAndOr() {
-//             if ($scope.text === 'AND') {
-//                 $scope.text = 'OR'
-//             } else {
-//                 $scope.text = 'AND'
-//             }
-//         }
-
-//         $scope.showErr = false;
-//         $scope.errMsg = 'Enter the outlined fields';
-//         $scope.errorclass = '';
-
-//         $scope.hideErrorAlert = function () {
-//             $scope.showErr = false;
-//         }
-
-//         $scope.isErr = 'error';
-
-//         $scope.signupForm = function () {
-//             console.log($scope.filters);
-//             for (var i = 0; i < $scope.filters.length; i++) {
-//                 console.log("val: ", $scope.filters[i].val);
-//                 if ($scope.filters[i].val == '' && $scope.filters[i].method ==
-//                     'count') {
-//                     console.log("val: ", $scope.filters[i].val);
-//                     $scope.showErr = true;
-//                     // $scope.isErr = 'error';
-//                     // console.log("error class", $scope.isErr);
-//                 } else {
-//                     $scope.showErr = false;
-//                     // $scope.isErr = '';
-//                 }
-//             };
-//         }
-//     }
-// ])
-
 .controller('UserListCtrl', ['$scope', '$location', 'segment',
   'queryMatching', '$filter', 'countOfActions', 'hasNotDone',
   'hasDoneActions', 'ngTableParams', 'login', 'modelsQuery',
@@ -70426,17 +70290,18 @@ angular.module('do.users', [])
   'userAttributes', 'lodash', '$modal',
   'UidService', '$moment', 'UserList', '$timeout', 'modelsSegment',
   'segmentService', 'CurrentAppService', 'UserModel', '$log',
-  'MsgService', '$stateParams', '$rootScope',
+  'MsgService', '$stateParams', '$rootScope', 'flash',
   function ($scope, $location, segment, queryMatching, $filter,
     countOfActions, hasNotDone, hasDoneActions,
     ngTableParams, login, modelsQuery, AppService, segment,
     queryMatching, eventNames, userAttributes, lodash, $modal,
     UidService, $moment, UserList, $timeout, modelsSegment,
     segmentService, CurrentAppService, UserModel, $log, MsgService,
-    $stateParams, $rootScope) {
+    $stateParams, $rootScope, flash) {
 
     CurrentAppService.getCurrentApp()
       .then(function (currentApp) {
+        // flash('Saved!');
         console.log("Promise Resolved: ", currentApp);
         console.log("current App from service -->: ",
           AppService.getCurrentApp());
@@ -72153,7 +72018,7 @@ angular.module('do.users', [])
           function get_gravatar(email, size) {
 
             // MD5 (Message-Digest Algorithm) by WebToolkit
-            // 
+            //
 
             var MD5 = function (s) {
               function L(k, d) {
@@ -72577,6 +72442,8 @@ angular.module('do.users', [])
               };
             }
 
+            $scope.graphDataValues = value;
+            console.log("$scope.graphDataValues: ", $scope.graphDataValues, $scope.graphDataValues.length);
             $scope.graphData = [{
               "key": "Series 1",
               "values": value
@@ -72939,6 +72806,7 @@ angular.module('do.users', [])
 
   }
 ])
+
 angular.module('do.home', [])
 
 .config(['$stateProvider',
@@ -73180,7 +73048,7 @@ angular
             AppService.setCurrentApp(savedApp);
             AppService.setAppName(savedApp.name);
             $location.path('/apps/' + AppService.getCurrentApp()
-              ._id + '/addcode')
+              ._id + '/addcode/newapp');
             console.log("apps created: ", AppService.getLoggedInApps(),
               savedApp);
           })

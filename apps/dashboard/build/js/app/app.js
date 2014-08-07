@@ -30,6 +30,7 @@ var app = angular.module('dodatado', [
   'do.automate',
   'toggle-switch',
   'angular-tour',
+  'flash',
 ])
 
 .directive('fallbackSrc', function () {
@@ -183,9 +184,9 @@ var app = angular.module('dodatado', [
     delete $httpProvider.defaults.headers.common['X-Requested-With'];
 
     $httpProvider.interceptors.push(['$rootScope', '$location', '$q',
-      '$timeout',
+      '$timeout', 'flash',
       function ($rootScope, $location, $q,
-        $timeout) {
+        $timeout, flash) {
         $rootScope.error = false;
         $rootScope.success = false;
         $rootScope.errMsgRootScope = '';
