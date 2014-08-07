@@ -7682,15 +7682,15 @@ pre code {
 }
 
 .avg-health {
-  border-right: 8px solid #5bc0de;
+  border-right: 6px solid #f39c12;
 }
 
 .good-health {
-  border-right: 8px solid #13987e; 
+  border-right: 6px solid #2ecc71;
 }
 
 .bad-health {
-  border-right: 8px solid #d9534f; 
+  border-right: 6px solid #e74c3c;
 }
 
 
