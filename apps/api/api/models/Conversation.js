@@ -270,55 +270,13 @@ ConversationSchema.statics.reopened = function (coId, cb) {
 };
 
 
-// /**
-//  * Creates reply to a conversation
-//  *
-//  * @param {string} aid app-id
-//  * @param {string} coId conversation-id
-//  * @param {object} reply  reply-message-object
-//  * @param {function} cb callback
-//  */
-
-// ConversationSchema.statics.reply = function (aid, coId, reply, cb) {
-
-//   if (!reply.body) {
-//     return cb(new Error('Provide message body'));
-//   }
-
-
-//   if (!_.contains(['user', 'account'], reply.from)) {
-//     return cb(new Error('Provide valid from type, either user/account'));
-//   }
-
-
-//   if (!_.contains(['email', 'notification'], reply.type)) {
-//     return cb(new Error('Provide message type'));
-//   }
-
-
-//   var conditions = {
-//     _id: coId,
-//     aid: aid
-//   };
-
-//   var update = {
-//     $push: {
-//       messages: reply
-//     }
-//   };
-
-//   Conversation.findOneAndUpdate(conditions, update, function (err, con) {
-
-//     if (err) return cb(err);
-//     if (!con) return cb(new Error('Conversation not found'));
-
-//     cb(null, con);
-//   });
-// };
-
-
 /**
  * Adds a reply from user to a conversation by its emailId (Mailgun)
+ *
+ * Updates 'isTicket' status to true
+ * When an automessage conversation is created, the isTicket status is false,
+ * however when a user replies to an automessage, the isTicket status should
+ * become true
  *
  * @param {string} replyToEmailId unique-email-message-id
  * @param {object} reply  reply-message-object
@@ -354,6 +312,7 @@ ConversationSchema.statics.replyByEmailId = function (replyToEmailId, reply,
   };
 
   var update = {
+    isTicket: true,
     $push: {
       messages: reply
     }
@@ -371,6 +330,11 @@ ConversationSchema.statics.replyByEmailId = function (replyToEmailId, reply,
 
 /**
  * Adds a reply to a conversation by the conversation-id (UserJoy Dashboard)
+ *
+ * Updates 'isTicket' status to true
+ * When an automessage conversation is created, the isTicket status is false,
+ * however when a user replies to an automessage, the isTicket status should
+ * become true
  *
  * @param {string} aid unique-email-message-id
  * @param {string} coId conversation-id
@@ -403,6 +367,7 @@ ConversationSchema.statics.replyByConversationId = function (aid, coId,
   };
 
   var update = {
+    isTicket: true,
     $push: {
       messages: reply
     }
