@@ -133,7 +133,7 @@ describe('Worker automessageConsumer', function () {
 
     });
 
-
+    // TODO: write to test case that isTicket is set to false for new automessage conversation
 
   });
 
@@ -288,6 +288,11 @@ describe('Worker automessageConsumer', function () {
               .to.have.property('sub')
               .that.is.a('string')
               .and.is.not.empty;
+
+            expect(cons[0])
+              .to.have.property('isTicket')
+              .that.is.a('boolean')
+              .and.is.false;
 
             expect(cons[0])
               .to.have.property('messages')

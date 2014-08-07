@@ -83,6 +83,11 @@ module.exports = function createAndSendAutoMessage(app, amsg, sender, user, cb) 
           amId: amsg._id,
 
           assignee: sender._id,
+
+          // automessage conversations are not tickets
+          // they become tickets when users reply to them
+          isTicket: false,
+
           messages: [],
           sub: sub,
           uid: user._id
@@ -115,7 +120,7 @@ module.exports = function createAndSendAutoMessage(app, amsg, sender, user, cb) 
 
 
         // send email only if type email
-        if (amsg.type !== 'email') return cb();
+        if (amsg.type !== 'email') return cb(null, con);
 
 
         var fromName = sender.name;
@@ -151,7 +156,7 @@ module.exports = function createAndSendAutoMessage(app, amsg, sender, user, cb) 
 
           // update emailId to allow threading
           Conversation.updateEmailId(msgId, emailId, function (err) {
-            cb(err);
+            cb(err, con);
           });
         });
 
@@ -160,7 +165,7 @@ module.exports = function createAndSendAutoMessage(app, amsg, sender, user, cb) 
 
 
       // track automessage events here
-      function trackAutomessageEvent(cb) {
+      function trackAutomessageEvent(con, cb) {
 
         var ids = {
           aid: amsg.aid,
@@ -174,14 +179,17 @@ module.exports = function createAndSendAutoMessage(app, amsg, sender, user, cb) 
 
         var title = amsg.title;
 
-
-        createEventAndIncrementCount(ids, state, title, cb);
+        createEventAndIncrementCount(ids, state, title, function (err) {
+          cb(err, con)
+        });
 
       }
 
 
     ],
 
-    cb);
+    function finalCallback(err, con) {
+      cb(err, con)
+    });
 
 };

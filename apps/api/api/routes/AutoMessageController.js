@@ -37,7 +37,7 @@ var logger = require('../../helpers/logger');
  * Services
  */
 
-var automessage = require('../services/automessage');
+var sendAutoMessage = require('../services/automessage');
 
 
 /**
@@ -253,12 +253,14 @@ router
 
 
         function createConversationAndSend(amsg, user, cb) {
-          automessage(req.app, amsg, amsg.sender, user, cb);
+          sendAutoMessage(req.app, amsg, amsg.sender, user, function (err, con) {
+            cb(err, con)
+          });
         }
       ],
 
 
-      function callback(err) {
+      function callback(err, con) {
 
         if (err) {
 
@@ -272,7 +274,8 @@ router
         res
           .status(200)
           .json({
-            message: 'Message is queued'
+            message: 'Message is queued',
+            conversation: con
           });
 
 

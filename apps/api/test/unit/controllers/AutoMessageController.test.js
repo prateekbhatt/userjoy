@@ -273,7 +273,8 @@ describe('Resource /apps/:aid/automessages', function () {
             expect(res.body)
               .to.have.property("userAttributes")
               .that.is.an('array')
-              .that.eqls(['user.name', 'user.first_name', 'user.last_name',
+              .that.eqls(['user.name', 'user.first_name',
+                'user.last_name',
                 'user.email', 'user.plan'
               ]);
 
@@ -427,8 +428,19 @@ describe('Resource /apps/:aid/automessages', function () {
         .put(testUrl)
         .set('cookie', loginCookie)
         .expect('Content-Type', /json/)
-        .expect({
-          message: 'Message is queued'
+        .expect(function (res) {
+
+          var message = res.body.message;
+          var conversation = res.body.conversation;
+
+          expect(message)
+            .to.eql('Message is queued');
+
+          expect(conversation)
+            .to.be.an('object')
+            .and.to.have.property('isTicket')
+            .that.is.false;
+
         })
         .expect(200)
         .end(done);
