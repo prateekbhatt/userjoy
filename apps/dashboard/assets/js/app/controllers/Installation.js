@@ -411,7 +411,7 @@ angular.module('do.install', [])
             return;
           }
 
-          if ($scope.email.match(/^[a-zA-Z0-9_]*$/g)) {
+          if ($scope.email.match(/^[a-zA-Z0-9]*$/g)) {
             var data = {
               name: $scope.name,
               subdomain: $scope.email
