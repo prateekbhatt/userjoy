@@ -17,16 +17,19 @@ case 'www.do.localhost':
   signupApiUrl = 'http://api.do.localhost/account';
   loginApiUrl = 'http://api.do.localhost/auth/login';
   cookieDomain = '.do.localhost';
+  loginUrl = 'http://app.do.localhost';
   break;
 case 'do.localhost':
   signupApiUrl = 'http://api.do.localhost/account';
   loginApiUrl = 'http://api.do.localhost/auth/login';
   cookieDomain = '.do.localhost';
+  loginUrl = 'http://app.do.localhost';
   break;
 default:
   signupApiUrl = 'https://api.userjoy.co/account';
   loginApiUrl = 'https://api.userjoy.co/auth/login';
   cookieDomain = '.userjoy.co';
+  loginUrl = 'https://app.userjoy.co';
 }
 
 $('#signup_form_submit')
@@ -78,7 +81,7 @@ $('#signup_form_submit')
 
 
         // set
-        window.location.href = "http://app.do.localhost/apps/" + data.app._id +
+        window.location.href = loginUrl + "/apps/" + data.app._id +
           "/addcode";
 
       },
