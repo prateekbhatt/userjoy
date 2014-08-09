@@ -65677,7 +65677,8 @@ angular.module('do.install', [])
         $scope.placeHolderEmail = 'app';
         $scope.$watch('name', function () {
           if ($scope.name) {
-            $scope.email = $scope.name.split(' ')
+            $scope.email = $scope.name.replace(/\W/g, '')
+              .split(' ')
               .join('')
               .toLowerCase();
           }
@@ -65967,7 +65968,8 @@ angular.module('do.install', [])
         $scope.placeHolderEmail = 'app';
         $scope.$watch('name', function () {
           if ($scope.name) {
-            $scope.email = $scope.name.split(' ')
+             $scope.email = $scope.name.replace(/\W/g, '')
+              .split(' ')
               .join('')
               .toLowerCase();
           }
@@ -66143,12 +66145,13 @@ angular.module('do.login', [])
 
 .controller('LoginCtrl', ['$scope', 'LoginService', 'AuthService', '$state',
   '$log', 'ErrMsgService', 'login', '$location', '$rootScope', 'AppService',
-  'CurrentAppService', '$timeout', 'AccountModel',
+  'CurrentAppService', '$timeout', 'AccountModel', 'AppModel',
   function ($scope, LoginService, AuthService, $state, $log,
     ErrMsgService, login, $location, $rootScope, AppService,
-    CurrentAppService, $timeout, AccountModel) {
+    CurrentAppService, $timeout, AccountModel, AppModel) {
 
     console.log('LoginProvider:', login.getLoggedIn());
+    console.log("reached /login");
     $scope.errMsg = '';
     $scope.showError = false;
     $scope.enableLogin = true;
@@ -66177,14 +66180,75 @@ angular.module('do.login', [])
       ._id == null) {
       CurrentAppService.getCurrentApp()
         .then(function (currentApp) {
-          if (currentApp[0].isActive) {
-            $location.path('/apps/' + currentApp[0]._id + '/users/list');
-          }
+          // if (currentApp[0].isActive) {
+          //   $location.path('/apps/' + currentApp[0]._id + '/users/list');
+          // }
 
-          if (!currentApp[0].isActive) {
-            $location.path('/apps/' + currentApp[0]._id + '/addcode');
-          }
+          // if (!currentApp[0].isActive) {
+          //   $location.path('/apps/' + currentApp[0]._id + '/addcode');
+          // }
+          AccountModel.get(function (err, acc) {
+            if (err) {
+              console.log("error");
+              return;
+            }
+            console.log("account ===================: ", acc);
+            if (acc.defaultApp) {
+              var callback = function (err) {
+                if (err) {
+                  console.log("error");
+                  return;
+                }
+
+                if (AppService.getCurrentApp()
+                  .isActive) {
+                  $location.path('/apps/' + AppService.getCurrentApp()
+                    ._id + '/users/list');
+                } else {
+                  $location.path('/apps/' + AppService.getCurrentApp()
+                    ._id + '/addcode');
+                }
+              }
+              AppModel.getSingleApp(acc.defaultApp, callback);
+
+            } else {
+
+              console.log("AppService data Auth.js", currentApp);
+
+              var data = {
+                defaultApp: currentApp[0]._id
+              }
+              AccountModel.updateDefaultApp(data, function (err,
+                updatedApp) {
+
+                if (err) {
+                  console.log("error");
+                  return;
+                }
+
+                console.log("updated app: ", updatedApp);
+                if (AppService.getLoggedInApps()[0].isActive) {
+                  $location.path('/apps/' + AppService.getLoggedInApps()[
+                    0]._id + '/users/list');
+                } else {
+                  console.log(
+                    "Auth.js redirecting to addcode url");
+                  $location.path('/apps/' + AppService.getLoggedInApps()[
+                    0]._id + '/addcode');
+                }
+                AppService.setCurrentApp(AppService.getLoggedInApps()[
+                  0]);
+                AppService.setAppName(AppService.getLoggedInApps()[
+                  0].name);
+
+              });
+
+
+            }
+
+          })
         })
+
     }
 
     $scope.hideErrorAlert = function () {
@@ -66302,6 +66366,7 @@ angular.module('do.login', [])
     }
   }
 ]);
+
 angular.module('do.message', [])
 
 .config(['$stateProvider',
@@ -72828,9 +72893,11 @@ angular.module('do.home', [])
 
 .controller('HomeCtrl', ['$scope', '$state',
   function HomeController($scope, $state) {
+    console.log("reached /");
     $state.go('login');
   }
 ]);
+
 angular.module('do.register', [])
 
 .config(['$stateProvider',
@@ -73203,6 +73270,7 @@ angular.module('models.auth', ['services'])
                     console.log("error");
                     return;
                   }
+                  console.log("account ===================: ", acc);
                   if (acc.defaultApp) {
                     var callback = function (err) {
                       if (err) {
