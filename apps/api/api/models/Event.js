@@ -60,10 +60,6 @@ var EventSchema = new Schema({
   },
 
 
-  // name of the module
-  module: String,
-
-
   // name of the event
   // NOTE: in case of pageview type, this stores the path
   name: {
@@ -108,20 +104,18 @@ EventSchema.index({
  * @param {string} type form/link/track
  * @param {object} ids (should contain aid, uid, cid)
  * @param {string} action
- * @param {string} module
  * @param {function} cb callback
  */
 
-EventSchema.statics.track = function (type, ids, name, module, cb) {
+EventSchema.statics.track = function (type, ids, name, cb) {
 
-  if (arguments.length !== 5) {
-    throw new Error('Event.track: Expected five arguments');
+  if (arguments.length !== 4) {
+    throw new Error('Event.track: Expected four arguments');
   }
 
   var newEvent = {
     aid: ids.aid,
     cid: ids.cid,
-    module: module,
     name: name,
     type: type,
     uid: ids.uid

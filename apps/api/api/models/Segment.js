@@ -75,11 +75,6 @@ var SegmentFilterSchema = new Schema({
     },
 
 
-    module: {
-      type: String
-    },
-
-
     op: {
       type: String
     },
