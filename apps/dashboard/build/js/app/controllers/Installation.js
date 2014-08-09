@@ -92,7 +92,8 @@ angular.module('do.install', [])
         $scope.placeHolderEmail = 'app';
         $scope.$watch('name', function () {
           if ($scope.name) {
-            $scope.email = $scope.name.split(' ')
+            $scope.email = $scope.name.replace(/\W/g, '')
+              .split(' ')
               .join('')
               .toLowerCase();
           }
@@ -382,7 +383,8 @@ angular.module('do.install', [])
         $scope.placeHolderEmail = 'app';
         $scope.$watch('name', function () {
           if ($scope.name) {
-            $scope.email = $scope.name.split(' ')
+             $scope.email = $scope.name.replace(/\W/g, '')
+              .split(' ')
               .join('')
               .toLowerCase();
           }
