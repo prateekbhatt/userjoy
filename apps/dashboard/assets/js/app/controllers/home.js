@@ -19,6 +19,7 @@ angular.module('do.home', [])
 
 .controller('HomeCtrl', ['$scope', '$state',
   function HomeController($scope, $state) {
+    console.log("reached /");
     $state.go('login');
   }
 ]);

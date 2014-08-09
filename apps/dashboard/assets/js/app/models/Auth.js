@@ -46,6 +46,7 @@ angular.module('models.auth', ['services'])
                     console.log("error");
                     return;
                   }
+                  console.log("account ===================: ", acc);
                   if (acc.defaultApp) {
                     var callback = function (err) {
                       if (err) {
