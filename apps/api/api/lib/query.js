@@ -137,8 +137,7 @@ function dateFromDaysAgo(days) {
  *       {
  *         method: 'hasnotdone',
  *         type: 'track',
- *         name: 'new chat',
- *         module: 'group'
+ *         name: 'new chat'
  *       },
  *
  *       {
@@ -768,11 +767,6 @@ Query.prototype.getCountFilterCond = function (filter) {
     });
   }
 
-  if (filter.module) {
-    cond['$and'].push({
-      $eq: ['$module', filter.module]
-    });
-  }
 
   // if fromAgo and/or toAgo are present, add created time condions
 

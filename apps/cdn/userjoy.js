@@ -7772,23 +7772,19 @@ UserJoy.prototype.company = function (traits, fn) {
 
 
 /**
- * Track an `event` that a user has triggered with optional `module`.
+ * Track an `event` that a user has triggered with an optional callback
  *
  * @param {String} event
- * @param {String} module (optional)
  * @param {Function} fn (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.track = function (name, module, fn) {
+UserJoy.prototype.track = function (name, fn) {
 
 
-  this.debug('track', name, module);
+  this.debug('track', name);
 
-  if (is.fn(module)) fn = module, module = null;
-
-
-  this._sendEvent('track', name, module);
+  this._sendEvent('track', name);
 
   this._callback(fn);
   return this;
@@ -7801,11 +7797,10 @@ UserJoy.prototype.track = function (name, module, fn) {
  *
  * @param {Element or Array} links
  * @param {String or Function} name
- * @param {String or Function} module (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.track_link = function (links, name, module) {
+UserJoy.prototype.track_link = function (links, name) {
   if (!links) return this;
   if (is.string(links)) links = [links]; // always arrays, handles jquery
 
@@ -7820,7 +7815,6 @@ UserJoy.prototype.track_link = function (links, name, module) {
 
       // TODO: test the next lines
       var ev = is.fn(name) ? name(el) : name;
-      var module = is.fn(module) ? module(el) : module;
 
 
       // self.track(ev);
@@ -7845,11 +7839,10 @@ UserJoy.prototype.track_link = function (links, name, module) {
  *
  * @param {Element or Array} forms
  * @param {String or Function} name
- * @param {String or Object or Function} module
  * @return {UserJoy}
  */
 
-UserJoy.prototype.track_form = function (forms, name, module) {
+UserJoy.prototype.track_form = function (forms, name) {
 
 
   if (!forms) return this;
@@ -7866,10 +7859,9 @@ UserJoy.prototype.track_form = function (forms, name, module) {
 
       // TODO: check the next lines
       var ev = is.fn(name) ? name(el) : name;
-      var module = is.fn(module) ? module(el) : module;
 
       // self.track(ev);
-      self._sendEvent('form', ev, module);
+      self._sendEvent('form', ev);
 
       self._callback(function () {
         el.submit();
@@ -7893,20 +7885,16 @@ UserJoy.prototype.track_form = function (forms, name, module) {
 
 
 /**
- * Trigger a pageview, labeling the current page with an optional `module`,
- * and `name`.
+ * Trigger a pageview, labeling the current page with an optional `name`.
  *
  * @param {String} name (optional)
- * @param {String} module (optional)
  * @param {Function} fn (optional)
  * @return {UserJoy}
  */
 
-UserJoy.prototype.page = function (name, module, fn) {
+UserJoy.prototype.page = function (name, fn) {
 
   name = name || canonicalPath();
-
-  if (is.fn(module)) fn = module, module = null;
 
   // var defs = {
   //   path: canonicalPath(),
@@ -7921,7 +7909,7 @@ UserJoy.prototype.page = function (name, module, fn) {
   // if (category) defs.category = category;
 
 
-  this._sendEvent('page', name, module);
+  this._sendEvent('page', name);
 
   this._callback(fn);
   return this;
@@ -7959,12 +7947,11 @@ UserJoy.prototype._callback = function (fn) {
  *
  * @param {String} type of event (link/form/track)
  * @param {String} name of event
- * @param {String} name of module
  * @return {UserJoy}
  * @api private
  */
 
-UserJoy.prototype._sendEvent = function (type, name, module) {
+UserJoy.prototype._sendEvent = function (type, name) {
 
   var self = this;
 
@@ -7995,8 +7982,6 @@ UserJoy.prototype._sendEvent = function (type, name, module) {
   };
 
   if (cid) data.c = cid;
-
-  if (module) data.e.module = module;
 
   self.debug('Sending new event: %o', data);
 

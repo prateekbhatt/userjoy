@@ -1,4 +1,4 @@
-describe('Lib query', function () {
+describe.only('Lib query', function () {
 
   /**
    * npm dependencies
@@ -197,7 +197,6 @@ describe('Lib query', function () {
         filters = [{
           method: 'count',
           name: 'Create new chat',
-          module: 'Group',
           op: 'gt',
           val: 15
         }];
@@ -213,7 +212,6 @@ describe('Lib query', function () {
       filters = [{
         method: 'count',
         name: 'Add member',
-        module: 'Group',
         op: 'gt',
         val: 15
       }, {
@@ -238,7 +236,6 @@ describe('Lib query', function () {
         filters = [{
           method: 'count',
           name: 'Create new chat',
-          module: 'Group',
           op: 'gt',
           val: 15
         }];
@@ -255,7 +252,6 @@ describe('Lib query', function () {
         filters = [{
           method: 'count',
           name: 'Add member',
-          module: 'Group',
           op: 'gt',
           val: 15
         }, {
@@ -919,33 +915,11 @@ describe('Lib query', function () {
 
       });
 
-    it('should add events.module condition if module attr present',
-      function () {
-
-        var filter = {
-          method: 'count',
-          type: 'track',
-          module: 'Authentication',
-          name: 'Clicked login btn',
-          op: 'gt',
-          val: 10
-        };
-
-        var cond = Query.prototype.getCountFilterCond(filter);
-
-        expect(cond.$and[2])
-          .to.eql({
-            '$eq': ['$module', 'Authentication']
-          });
-
-      });
-
     it('should add gt/lt timestamps for fromAgo, toAgo', function () {
 
       var filter = {
         method: 'count',
         type: 'track',
-        module: 'Authentication',
         name: 'Clicked login btn',
         op: 'gt',
         val: 10
@@ -969,10 +943,6 @@ describe('Lib query', function () {
       //     },
 
       //     {
-      //       "$eq": ["$module", "Authentication"]
-      //     },
-
-      //     {
       //       "$gt": ["$ct", "2014-06-14T18:57:41.091Z"]
       //     },
 
@@ -990,19 +960,19 @@ describe('Lib query', function () {
           .unix();
       }
 
-      expect(moment(cond.$and[3].$gt[1])
+      expect(moment(cond.$and[2].$gt[1])
         .utc()
         .startOf('day')
         .unix())
         .to.eql(getDateUnix(new Date(), Query.prototype.fromAgo));
 
-      expect(cond.$and[3].$gt[1])
+      expect(cond.$and[2].$gt[1])
         .to.be.a('date');
 
-      expect(cond.$and[4].$lt[1])
+      expect(cond.$and[3].$lt[1])
         .to.be.a('date');
 
-      expect(moment(cond.$and[4].$lt[1])
+      expect(moment(cond.$and[3].$lt[1])
         .utc()
         .startOf('day')
         .unix())

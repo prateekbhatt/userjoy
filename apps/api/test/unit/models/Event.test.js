@@ -127,7 +127,7 @@ describe('Model Event', function () {
 
         expect(Event.track)
           .to.
-        throw ('Event.track: Expected five arguments');
+        throw ('Event.track: Expected four arguments');
 
       });
 
@@ -140,11 +140,10 @@ describe('Model Event', function () {
       };
 
       var name = 'Open chat';
-      var module = 'Group';
 
       var type = 'randomEventTypeThatIsNotValid';
 
-      Event.track(type, ids, name, module, function (err, evn) {
+      Event.track(type, ids, name, function (err, evn) {
 
         expect(err)
           .to.exist
@@ -168,11 +167,10 @@ describe('Model Event', function () {
       };
 
       var name = 'Open chat';
-      var module = 'Group';
 
       var type = 'track';
 
-      Event.track(type, ids, name, module, function (err, evn) {
+      Event.track(type, ids, name, function (err, evn) {
 
         expect(err)
           .to.not.exist;
@@ -184,9 +182,6 @@ describe('Model Event', function () {
 
         expect(evn)
           .to.have.property("name", "Open chat");
-
-        expect(evn)
-          .to.have.property("module", "Group");
 
         done();
       });

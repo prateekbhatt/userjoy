@@ -36,7 +36,7 @@ This app contains an expressjs api which exposes a rest interface for the db.
 
 ###### Definitions
 
-Show the list of defined modules, actions and sent events for an app
+Show the list of defined actions and sent events for an app
 
 ###### Query engine
 
@@ -329,7 +329,6 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 > - method
 > - type
 > - name
-> - module
 > - op
 > - val (Schema.Types.Mixed - to allow integer/string etc types)
 
@@ -343,7 +342,6 @@ Data is preallocated on first creation (from du_1 ... du_31, ds_1 ... ds_31). Us
 - amState (clicked,sent,seen,replied)
 - cid
 - ct
-- module
 - name (required)
 - type (required)
 - uid (required)

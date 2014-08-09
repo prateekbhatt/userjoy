@@ -199,18 +199,15 @@ router
 
     if (event.type === 'page') {
 
-      // FIXME : pageview events must accept module name
-
       var name = event.name;
       return Event.page(ids, name, callback);
 
     } else if (_.contains(['form', 'link', 'track'], event.type)) {
 
       var name = event.name;
-      var module = event.module;
       var type = event.type;
 
-      return Event.track(type, ids, name, module, callback);
+      return Event.track(type, ids, name, callback);
 
     } else {
 
