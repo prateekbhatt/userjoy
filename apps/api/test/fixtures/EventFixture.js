@@ -59,7 +59,6 @@ var pageviewEventNames = [
 
 var domainNames = ['dodatado.com', 'userjoy.co'];
 var pathNames = ['/messages', '/users', '/install'];
-var moduleNames = ['Users', 'Messages', 'Onboarding'];
 
 
 /**
@@ -91,7 +90,6 @@ function createEvent(aid, uid, cb) {
 
   if (fakeEvent.type === 'track') {
     fakeEvent.name = randomFromArray(trackEventNames);
-    fakeEvent.module = randomFromArray(moduleNames);
   } else {
     fakeEvent.name = randomFromArray(pageviewEventNames);
   }
