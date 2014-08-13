@@ -21,6 +21,7 @@ var cssFilesToInject = [
 
   // NOTE: put required bower dependencies here
   // e.g. 'bower_components/bootstrap/dist/css/bootstrap.css',
+  'bower_components/font-awesome/css/font-awesome.min.css',
 
   // all other styles go below
   'styles/**/*.css'
