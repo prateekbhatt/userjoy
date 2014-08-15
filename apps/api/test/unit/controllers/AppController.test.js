@@ -367,6 +367,62 @@ describe('Resource /apps', function () {
     // being updated and no subdomain is provided (it should throw a bad request
     // error))
 
+    it('should return error if duplicate subdomain',
+
+      function (done) {
+
+        var newName = 'New App Name';
+        var aid = saved.apps.first._id;
+        var newSubdomain = saved.apps.second.subdomain;
+
+
+        async.series([
+
+          function checkSubdomain(done) {
+
+            App
+              .find({
+                subdomain: newSubdomain
+              })
+              .exec(function (err, apps) {
+                expect(err)
+                  .to.not.exist;
+
+                expect(apps)
+                  .to.be.an("array")
+                  .that.has.length(1);
+
+                done();
+              });
+
+          },
+
+
+          function makeRequest(done) {
+
+            request
+              .put('/apps/' + aid)
+              .send({
+                name: newName,
+                subdomain: newSubdomain
+              })
+              .set('cookie', loginCookie)
+              .expect('Content-Type', /json/)
+              .expect(400)
+              .expect({
+                "error": "Please choose a different email subdomain",
+                "status": 400
+              })
+              .end(done);
+
+          }
+
+        ], done);
+
+
+      });
+
+
     it('updates app name and subdomain',
 
       function (done) {
@@ -762,7 +818,7 @@ describe('Resource /apps', function () {
 
                 // expecting three health filters
                 expect(preSegs.length)
-                  .to.eql(3);
+                  .to.eql(5);
 
                 cb();
               })
@@ -810,7 +866,7 @@ describe('Resource /apps', function () {
 
                 // expecting three health filters
                 expect(preSegs.length)
-                  .to.eql(3);
+                  .to.eql(5);
 
                 cb();
               });
@@ -863,7 +919,7 @@ describe('Resource /apps', function () {
 
                 // expecting three health filters
                 expect(preSegs.length)
-                  .to.eql(3);
+                  .to.eql(5);
 
                 cb();
               });
