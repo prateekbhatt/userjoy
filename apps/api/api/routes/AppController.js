@@ -184,6 +184,8 @@ router
     req.app.name = req.body.name;
     req.app.subdomain = req.body.subdomain || req.app.subdomain;
 
+
+
     if (!req.app.subdomain) {
       return res.badRequest('App subdomain is required');
     }
@@ -191,6 +193,17 @@ router
     req.app.save(function (err, app) {
 
       if (err) {
+
+        if (err.name == 'MongoError' && (err.code == 11000 || err.code ==
+          11001)) {
+
+          if (_.contains(err.message, '$subdomain')) {
+            return res.badRequest(
+              'Please choose a different email subdomain');
+          }
+        }
+
+
         return next(err);
       }
 
