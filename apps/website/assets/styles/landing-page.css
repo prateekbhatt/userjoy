@@ -21,7 +21,7 @@ body, h1, h2, h3, h4, h5, h6 {
   /*padding-bottom: 50px;*/
   background-color: #29333a;
   color: #fff;
-  background: url(/images/landing_page_img/userjoy_homepage_img.png) no-repeat center 60px;
+  background: url(/images/landing_page_img/userjoy_homepage_img.png) no-repeat center 0px;
   background-size: cover;
   text-align: center;
 }
@@ -165,4 +165,9 @@ footer {
 
 p.copyright {
   margin: 15px 0 0;
+}
+
+
+.navbar {
+  margin-bottom: 0px;
 }
