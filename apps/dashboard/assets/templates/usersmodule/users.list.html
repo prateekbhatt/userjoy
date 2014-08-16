@@ -348,7 +348,7 @@
                                                             </th>
                                                         </tr>
                                                     </thead>
-                                                    <tr ng-repeat="user in $data" ng-class="{'good-health': user.health == 'good', 'bad-health': user.health == 'poor', 'avg-health': user.health == 'average'}">
+                                                    <tr ng-repeat="user in $data" >
                                                         <td width="30" style="text-align: left">
                                                             <input type="checkbox" ng-model="checkboxes.items[user.id]" />
                                                         </td>
@@ -362,7 +362,7 @@
                                                             <span>{{user.datejoined}}</span>
                                                         </td>
                                                         <td data-title="'Health'" class="text-center" sortable="health" ng-show="columns[4].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
-                                                            <span>{{user.health}}</span>
+                                                            <span ng-class="{'label label-success': user.health == 'good', 'label label-danger': user.health == 'poor', 'label label-warning': user.health == 'average'}">{{user.health}}</span>
                                                         </td>
                                                         <td data-title="'Last Session'" class="text-center" sortable="lastsession" ng-show="columns[5].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
                                                             <span>{{user.lastsession}}</span>
