@@ -41,6 +41,38 @@ module.exports.routes = {
     }
   },
 
+  '/convert': {
+    view: 'customers_acquire',
+    locals: {
+      title: 'Increase SaaS freemium and trial conversions',
+      meta_desc: 'Create an UserJoy account and increase freemium / trial conversions and customer engagement'
+    }
+  },
+
+  '/retain': {
+    view: 'customers_retain',
+    locals: {
+      title: 'Improve SaaS engagement and retentions',
+      meta_desc: 'Create an UserJoy account and increase freemium / trial conversions and customer engagement'
+    }
+  },
+
+  '/monetize': {
+    view: 'customers_monetize',
+    locals: {
+      title: 'Increase renewals, upsells and referrals',
+      meta_desc: 'Create an UserJoy account and increase freemium / trial conversions and customer engagement'
+    }
+  },
+
+  '/product': {
+    view: 'product',
+    locals: {
+      title: 'Easy Customer Success Management for SaaS teams',
+      meta_desc: 'Create an UserJoy account and increase freemium / trial conversions and customer engagement'
+    }
+  },
+
   '/legal/terms': {
     view: 'termsofservice',
     locals: {
