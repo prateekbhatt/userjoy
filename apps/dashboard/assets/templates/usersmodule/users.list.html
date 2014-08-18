@@ -7,6 +7,9 @@
         <div class="caption-full">
             <form name="usersListForm" novalidate id="filterUsersAndRunQuery">
                 <div class="col-md-8" style="margin-left: 10px;">
+                    <div class="row" style="padding-left: 40px;" ng-show="segmentClicked">
+                        <h4 class="well" ng-bind="segmentNameClicked"></h4>
+                    </div>
                     <div class="row" style="padding-left: 40px;">
                         <div class="col-md-12">
                             <label class="col-md-1 control-label" style="font-size: 20px; padding-left: 13px">List: </label>
@@ -348,7 +351,7 @@
                                                             </th>
                                                         </tr>
                                                     </thead>
-                                                    <tr ng-repeat="user in $data" ng-class="{'good-health': user.health == 'good', 'bad-health': user.health == 'poor', 'avg-health': user.health == 'average'}">
+                                                    <tr ng-repeat="user in $data" >
                                                         <td width="30" style="text-align: left">
                                                             <input type="checkbox" ng-model="checkboxes.items[user.id]" />
                                                         </td>
@@ -362,7 +365,7 @@
                                                             <span>{{user.datejoined}}</span>
                                                         </td>
                                                         <td data-title="'Health'" class="text-center" sortable="health" ng-show="columns[4].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
-                                                            <span>{{user.health}}</span>
+                                                            <span ng-class="{'label label-success': user.health == 'good', 'label label-danger': user.health == 'poor', 'label label-warning': user.health == 'average'}">{{user.health}}</span>
                                                         </td>
                                                         <td data-title="'Last Session'" class="text-center" sortable="lastsession" ng-show="columns[5].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
                                                             <span>{{user.lastsession}}</span>
@@ -380,9 +383,7 @@
                                                             <span>{{user.userkarma}}</span>
                                                         </td>
 
-                                                        <!-- <td data-title="'Unsubscribed'" class="text-center" sortable="status" ng-show="columns[4].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
-                                                                                                                    <span>{{user.unsubscribed}}</span>
-                                                        </td> -->
+                                                        <!-- <td data-title="'Unsubscribed'" class="text-center" sortable="status" ng-show="columns[4].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)"></td> -->
                                                     </tr>
                                                 </table>
                                             </div>
@@ -405,12 +406,13 @@
                         <ul class="list-group" ng-show="segmentsCreated">
                             <li style="padding-bottom: 2px;" class="list-group-item-segment"  ng-class="{'active': $index === selectedIndex}"  ng-repeat="segname in segmentsCreatedName" ng-mouseenter="showAutoMsgButton()" ng-mouseleave="hideAutoMsgButton()">
                                 <strong>
-                                <a style="padding: 10px 15px; display: inline-block; cursor: pointer; width: 150px; text-decoration: none; color: #333; word-wrap: break-word;" ng-click="showQuery(segname.id, $index, segname)" ng-if="!segname.predefined">{{segname.name}}</a>
+                                <a style="padding: 10px 15px; display: inline-block; cursor: pointer; width: 180px; text-decoration: none; color: #333; word-wrap: break-word;" ng-click="showQuery(segname.id, $index, segname)" ng-if="!segname.health">{{segname.name}}</a>
                                 </strong>
-                                <a style="padding: 10px 15px; display: inline-block; cursor: pointer; text-decoration: none; color: inherit;" ng-click="showQuery(segname.id, $index, segname)" ng-if="segname.predefined" >
+                                <a style="padding: 10px 15px; display: inline-block; cursor: pointer; text-decoration: none; color: inherit;" ng-click="showQuery(segname.id, $index, segname)" ng-if="segname.health" >
                                 <span style="font-size: 14px;" class="fa fa-smile-o" ng-if="segname.name == 'Good Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
                                 <span style="font-size: 14px;" class="fa fa-meh-o" ng-if="segname.name == 'Average Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
                                 <span style="font-size: 14px;" class="fa fa-frown-o" ng-if="segname.name == 'Poor Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
+                                <!-- <span ng-if="segname.name == 'Hot Trials' || segname.name == 'Risk Users' || segname.name == 'Signed up 1 day ago' || segname.name == 'Signed up 3 days ago' || segname.name == 'Signed up 7 days ago'"><strong>{{segname.name}}</strong></span> -->
                                 </a>
                                 <!-- <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 140px; background-color: #5cb85c; border-radius: 4px;" ng-if="segname.name == 'Good Health'">
                                                                         <span class="progress-type"><strong>{{segname.name}}</strong></span>

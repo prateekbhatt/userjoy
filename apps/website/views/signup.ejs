@@ -1,73 +1,100 @@
 <%include nav_distraction_free.ejs %>
 <div class="container">
     <div class="row">
-        <div id="signupbox" class="col-md-8 col-md-offset-2 col-sm-12">
+        <div id="signupbox">
             <div>
-                <div class="text-center">
+
+
+
+
+
+                <div class="col-md-6 col-sm-12">
                     <h3 style="color: #3498db;">Sign up for a Free Trial</h3>
-                    <h5>Completely free. No credit card required.</h5>
+                    <h5>No credit card required</h5>
                     <br>
-                </div>
-                <div class="panel-body">
-                    <form id="signup_form" class="form-horizontal" role="form">
-                        <!-- <div id="signupsuccess" class="alert alert-success" style="display: none;">
-                            <button type="button" class="close" aria-hidden="true" onclick="closeSuccessMsg()">&times;</button>
-                            <span id="successtext"></span>
-                        </div> -->
-                        <div id="signupalert" class="alert alert-danger col-md-offset-3" style="display: none;">
+
+
+                    <form id="signup_form" role="form">
+                        <div id="signupalert" class="alert alert-danger" style="display: none;">
                             <button type="button" class="close" aria-hidden="true" onclick="closeErrMsg()">&times;</button>
                             <p><strong>Error</strong>:
                             <span id="errortext"></span>
                             </p>
                         </div>
                         <div class="form-group">
-                            <label for="name" class="col-md-3 control-label">Name *</label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" name="name" id="name" placeholder="John Appleseed" required autofocus>
-                            </div>
+                            <label for="name" class="control-label">Name *</label>
+                            <input type="text" class="form-control" name="name" id="name" placeholder="John Appleseed" required autofocus>
                         </div>
                         <div class="form-group">
-                            <label for="email" class="col-md-3 control-label">Email *</label>
-                            <div class="col-md-9">
-                                <input type="email" class="form-control" name="email" id="email" placeholder="john.appleseed@apple.com" required>
-                            </div>
+                            <label for="email" class="control-label">Email *</label>
+                            <input type="email" class="form-control" name="email" id="email" placeholder="john.appleseed@apple.com" required>
                         </div>
                         <div class="form-group">
-                            <label for="password" class="col-md-3 control-label">Password *</label>
-                            <div class="col-md-9">
-                                <input type="password" class="form-control" name="password" id="password" placeholder="*************" required>
-                            </div>
+                            <label for="password" class="control-label">Password *</label>
+                            <input type="password" class="form-control" name="password" id="password" placeholder="*************" required>
                         </div>
+
                         <div class="form-group">
                             <!-- Button -->
-                            <div class="col-md-offset-3 col-md-9">
-                                <button id="signup_form_submit" class="btn btn-lg btn-success col-md-6" type="submit">
+                            <div>
+                                <button id="signup_form_submit" class="btn btn-lg btn-success btn3d" type="submit">
                                 <strong>Create Account</strong>
                                 </button>
                                 <br>
                                 <p class="col-md-1 col-md-offset-1" id="spin" style="margin-top: 10px;">
                                 </p>
                                 <br>
-                                <br>
-                                <br>
                                 <small>By signing up, you agree to our
                                 <a href="/legal/terms" target="_blank">terms</a> and
                                 <a href="/legal/privacy" target="_blank">privacy policy</a>.</small>
                             </div>
-<!--
-                            <div class="text-center">
-                                <small>Already have an account?<a id="signinlink" href="javascript:redirectToLogin()">Sign In</a></small>
-                            </div> -->
                         </div>
                     </form>
-                    <!--  <h4 class="col-md-offset-3 col-md-9">
-                                        <a id="signinlink" href="javascript:redirectToLogin()">Have an account? Sign In</a>
-                    </h4> -->
+
+
                 </div>
+
+
+                <div class="col-md-6">
+
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+
+                    <div class="panel panel-default" style="background-color: #ecf0f1;">
+                        <div class="panel-body col-md-offset-1">
+
+                            <h4>What's Included</h4>
+                            <div style="font-size: 1.1em;">
+                                <ul class="list-unstyled">
+                                    <li>- Up to 250 users tracked</li>
+                                    <li>- Send unlimited messages</li>
+                                    <li>- All features in standard plans</li>
+                                    <li>- Unlimited email support</li>
+                                </ul>
+                            </div>
+
+
+                            <br>
+
+                            <p style="font-size: 0.9em;">It took us less than 10 minutes to integrate UserJoy on our web app. They had excellent support for any queries that we had.</p>
+                            <div class="col-sm-2 text-center">
+                                <img class="img-circle img-responsive" src="images/landing_page_img/anupama_testimonial.jpg" style="max-height: 50px;">
+                            </div>
+                            <div class="col-sm-10">
+                                <small style="color: #7f8c8d; font-size: 12px;">Anupama Panchal, Co-Founder, <a id="gridle-testimonial-link" href="http://gridle.io" target="_blank">Gridle.io</a></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
             </div>
         </div>
     </div>
 </div>
+<br>
 <br>
 <br>
 <br>

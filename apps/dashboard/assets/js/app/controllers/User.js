@@ -83,6 +83,7 @@ angular.module('do.users', [])
         $scope.showUpdateButton = false;
         $scope.segmentClicked = false;
         $scope.segmentsCreatedName = [];
+        $scope.segmentsCreatedName1 = [];
         $scope.showUpdatePopover = false;
         $scope.showSpinner = false;
         $scope.showAutoMsgBtn = false;
@@ -101,24 +102,34 @@ angular.module('do.users', [])
                 segmentService.getSegments()[i].name == 'Average Health' ||
                 segmentService.getSegments()[i].name == 'Poor Health') {
                 $scope.segmentsCreatedName.push({
-                  predefined: true,
-                  id: segmentService.getSegments()[i]
-                    ._id,
-                  name: segmentService.getSegments()[
-                    i].name
-                })
-              } else {
-                $scope.segmentsCreatedName.push({
-                  predefined: false,
+                  health: true,
                   id: segmentService.getSegments()[i]
                     ._id,
                   name: segmentService.getSegments()[
                     i].name
                 })
               }
+            }
+            for (var i = 0; i < segmentService.getSegments()
+              .length; i++) {
+              if (segmentService.getSegments()[
+                  i].name != 'Good Health' &&
+                segmentService.getSegments()[i].name != 'Average Health' &&
+                segmentService.getSegments()[i].name != 'Poor Health') {
+                $scope.segmentsCreatedName.push({
+                  // predefined: true,
+                  health: false,
+                  id: segmentService.getSegments()[i]
+                    ._id,
+                  name: segmentService.getSegments()[
+                    i].name
+                })
+              }
+
+
             };
             $scope.segmentsCreated = true;
-            console.log("$scope.segmentName: ", $scope.segmentsCreatedName);
+            console.log("$scope.segmentName: ", $scope.segmentsCreatedName, $scope.segmentsCreatedName1);
           } else {
             $scope.segmentsCreated = false;
           }
@@ -660,6 +671,7 @@ angular.module('do.users', [])
               index].key;
             $scope.filters[parentindex].valuetext = $scope.healthStatusValuesname[
               index].name;
+            $scope.filters[parentindex].op = 'eq';
           }
 
           $scope.chngPayingStatus = function (parentindex, index) {
@@ -667,6 +679,8 @@ angular.module('do.users', [])
               index].key;
             $scope.filters[parentindex].valuetext = $scope.payingStatusValues[
               index].name;
+            $scope.filters[parentindex].op = 'eq';
+
           }
 
           $scope.chngquery = function (parentindex, index) {
@@ -1431,6 +1445,8 @@ angular.module('do.users', [])
             console.log("segname: ", segname);
             $scope.currentSegment.id = segname.id;
             $scope.currentSegment.name = segname.name;
+            $scope.segmentNameClicked = segname.name;
+            console.log("segment name: ", $scope.segmentNameClicked);
             segmentService.setSingleSegment($scope.currentSegment);
             console.log("segmentId: ", segmentService.getSegmentId(),
               segmentService.getSingleSegment());
@@ -2212,7 +2228,8 @@ angular.module('do.users', [])
             }
 
             $scope.graphDataValues = value;
-            console.log("$scope.graphDataValues: ", $scope.graphDataValues, $scope.graphDataValues.length);
+            console.log("$scope.graphDataValues: ", $scope.graphDataValues,
+              $scope.graphDataValues.length);
             $scope.graphData = [{
               "key": "Series 1",
               "values": value
