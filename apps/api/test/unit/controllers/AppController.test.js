@@ -863,7 +863,7 @@ describe('Resource /apps', function () {
 
                 // expecting three health filters
                 expect(preSegs.length)
-                  .to.eql(5);
+                  .to.eql(8);
 
                 cb();
               })
@@ -911,7 +911,7 @@ describe('Resource /apps', function () {
 
                 // expecting three health filters
                 expect(preSegs.length)
-                  .to.eql(5);
+                  .to.eql(8);
 
                 cb();
               });
@@ -964,7 +964,7 @@ describe('Resource /apps', function () {
 
                 // expecting three health filters
                 expect(preSegs.length)
-                  .to.eql(5);
+                  .to.eql(8);
 
                 cb();
               });

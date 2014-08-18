@@ -205,6 +205,20 @@ AutoMessageSchema.statics.incrementCount = function (amId, type, cb) {
 };
 
 
+AutoMessageSchema.statics.createPreDefinedAutoMsg = function () {
+  var predefinedAutoMsgs = [{
+    body: '',
+    sid: {
+
+    },
+    sub: '',
+    title: '',
+    type: ''
+  }, {
+
+  }]
+}
+
 
 var AutoMessage = mongoose.model('AutoMessage', AutoMessageSchema);
 

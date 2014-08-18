@@ -340,6 +340,51 @@ SegmentSchema.statics.createPredefined = function (aid, adminUid, cb) {
         }
 
       ]
+    },
+
+    {
+      name: 'Signed up 1 day ago',
+      // health: 'poor',
+      filters: [
+
+        {
+          method: 'attr',
+          name: 'joined',
+          op: 'lt',
+          val: '1'
+        }
+
+      ]
+    },
+
+    {
+      name: 'Signed up 3 days ago',
+      // health: 'poor',
+      filters: [
+
+        {
+          method: 'attr',
+          name: 'joined',
+          op: 'lt',
+          val: '3'
+        }
+
+      ]
+    },
+
+    {
+      name: 'Signed up 7 days ago',
+      // health: 'poor',
+      filters: [
+
+        {
+          method: 'attr',
+          name: 'joined',
+          op: 'lt',
+          val: '7'
+        }
+
+      ]
     }
 
   ];

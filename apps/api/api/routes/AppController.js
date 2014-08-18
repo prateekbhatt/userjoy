@@ -34,6 +34,13 @@ var logger = require('../../helpers/logger');
 
 
 /**
+ * Lib
+ */
+
+var createPreDefinedAutoMsg = require('../lib/create-predefined-automessages');
+
+
+/**
  * Services
  */
 
@@ -383,6 +390,7 @@ router
   .put(function (req, res, next) {
 
     var aid = req.app._id;
+    var amsgCreatorId = req.user._id;
 
 
     async.waterfall(
@@ -431,6 +439,18 @@ router
             .accid;
 
           Segment.createPredefined(aid, adminUid, function (err) {
+            cb(err, isActive);
+          });
+        },
+
+
+        function predefinedAutoMessages(isActive, cb) {
+
+          // if not active, move on
+          if (!isActive) return cb(null, isActive);
+
+
+          createPreDefinedAutoMsg(aid, amsgCreatorId, function (err) {
             cb(err, isActive);
           });
         }

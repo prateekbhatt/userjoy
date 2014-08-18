@@ -161,6 +161,7 @@ describe('Model AutoMessage', function () {
   });
 
 
+
   describe('#updateLastQueued', function () {
 
     it('should should update lastQueued to current time', function (done) {

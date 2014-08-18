@@ -7,6 +7,10 @@
         <div class="caption-full">
             <form name="usersListForm" novalidate id="filterUsersAndRunQuery">
                 <div class="col-md-8" style="margin-left: 10px;">
+                    <div class="row" style="padding-left: 40px;" ng-show="segmentClicked">
+                        <h4 class="well" ng-bind="segmentNameClicked"></h4>
+                    </div>
+                    <br>
                     <div class="row" style="padding-left: 40px;">
                         <div class="col-md-12">
                             <label class="col-md-1 control-label" style="font-size: 20px; padding-left: 13px">List: </label>
@@ -380,9 +384,7 @@
                                                             <span>{{user.userkarma}}</span>
                                                         </td>
 
-                                                        <!-- <td data-title="'Unsubscribed'" class="text-center" sortable="status" ng-show="columns[4].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
-                                                                                                                    <span>{{user.unsubscribed}}</span>
-                                                        </td> -->
+                                                        <!-- <td data-title="'Unsubscribed'" class="text-center" sortable="status" ng-show="columns[4].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)"></td> -->
                                                     </tr>
                                                 </table>
                                             </div>
@@ -405,7 +407,7 @@
                         <ul class="list-group" ng-show="segmentsCreated">
                             <li style="padding-bottom: 2px;" class="list-group-item-segment"  ng-class="{'active': $index === selectedIndex}"  ng-repeat="segname in segmentsCreatedName" ng-mouseenter="showAutoMsgButton()" ng-mouseleave="hideAutoMsgButton()">
                                 <strong>
-                                <a style="padding: 10px 15px; display: inline-block; cursor: pointer; width: 150px; text-decoration: none; color: #333; word-wrap: break-word;" ng-click="showQuery(segname.id, $index, segname)" ng-if="!segname.predefined">{{segname.name}}</a>
+                                <a style="padding: 10px 15px; display: inline-block; cursor: pointer; width: 180px; text-decoration: none; color: #333; word-wrap: break-word;" ng-click="showQuery(segname.id, $index, segname)" ng-if="!segname.predefined">{{segname.name}}</a>
                                 </strong>
                                 <a style="padding: 10px 15px; display: inline-block; cursor: pointer; text-decoration: none; color: inherit;" ng-click="showQuery(segname.id, $index, segname)" ng-if="segname.predefined" >
                                 <span style="font-size: 14px;" class="fa fa-smile-o" ng-if="segname.name == 'Good Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
