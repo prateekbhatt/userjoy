@@ -329,4 +329,11 @@ For more info and more free Bootstrap 3 HTML themes, visit http://startbootstrap
   background: url(/images/landing_page_img/userjoy_homepage_img.png) no-repeat center 0px;
   background-size: cover;
   text-align: center;
+  margin-bottom: 0;
+}
+
+
+.img-feature {
+  border: 1px solid #bdc3c7;
+  border-radius: 10px;
 }
