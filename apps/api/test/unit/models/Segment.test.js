@@ -628,7 +628,7 @@ describe('Model Segment', function () {
     it('should create predefined segments', function (done) {
 
       Segment.createPredefined(aid, adminUid,
-        function (err, good, average, poor, hotTrials, riskUsers) {
+        function (err, good, average, poor, hotTrials, riskUsers, signedUp1DayAgo, signedUp3DaysAgo, signedUp7DaysAgo) {
 
           expect(err)
             .to.not.exist;
@@ -638,6 +638,9 @@ describe('Model Segment', function () {
           poor = poor.toJSON();
           hotTrials = hotTrials.toJSON();
           riskUsers = riskUsers.toJSON();
+          signedUp1DayAgo = signedUp1DayAgo.toJSON();
+          signedUp3DaysAgo = signedUp3DaysAgo.toJSON();
+          signedUp7DaysAgo = signedUp7DaysAgo.toJSON();
 
           expect(good)
             .to.have.property('filters')
@@ -713,13 +716,49 @@ describe('Model Segment', function () {
               }
             ]);
 
+          expect(signedUp1DayAgo)
+            .to.have.property('filters')
+            .that.is.an('array')
+            .and.deep.equals([{
+                method: 'attr',
+                name: 'joined',
+                op: 'lt',
+                val: '1'
+              }
+            ]);
+
+          expect(signedUp3DaysAgo)
+            .to.have.property('filters')
+            .that.is.an('array')
+            .and.deep.equals([{
+                method: 'attr',
+                name: 'joined',
+                op: 'lt',
+                val: '3'
+              }
+            ]);
+
+          expect(signedUp7DaysAgo)
+            .to.have.property('filters')
+            .that.is.an('array')
+            .and.deep.equals([{
+                method: 'attr',
+                name: 'joined',
+                op: 'lt',
+                val: '7'
+              }
+            ]);
+
 
           var hmap = {
             'good': good,
             'average': average,
             'poor': poor,
             'hotTrials': hotTrials,
-            'riskUsers': riskUsers
+            'riskUsers': riskUsers,
+            'signedUp1DayAgo': signedUp1DayAgo,
+            'signedUp3DaysAgo': signedUp3DaysAgo,
+            'signedUp7DaysAgo': signedUp7DaysAgo
           };
 
 
@@ -729,7 +768,7 @@ describe('Model Segment', function () {
           }
 
 
-          _.each(['good', 'average', 'poor', 'hotTrials', 'riskUsers'],
+          _.each(['good', 'average', 'poor', 'hotTrials', 'riskUsers', 'signedUp1DayAgo', 'signedUp3DaysAgo', 'signedUp7DaysAgo'],
             function (h) {
 
               var type = hmap[h];
