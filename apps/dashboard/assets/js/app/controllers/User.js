@@ -1431,6 +1431,8 @@ angular.module('do.users', [])
             console.log("segname: ", segname);
             $scope.currentSegment.id = segname.id;
             $scope.currentSegment.name = segname.name;
+            $scope.segmentNameClicked = segname.name;
+            console.log("segment name: ", $scope.segmentNameClicked);
             segmentService.setSingleSegment($scope.currentSegment);
             console.log("segmentId: ", segmentService.getSegmentId(),
               segmentService.getSingleSegment());
