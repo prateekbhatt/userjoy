@@ -671,6 +671,7 @@ angular.module('do.users', [])
               index].key;
             $scope.filters[parentindex].valuetext = $scope.healthStatusValuesname[
               index].name;
+            $scope.filters[parentindex].op = 'eq';
           }
 
           $scope.chngPayingStatus = function (parentindex, index) {
@@ -678,6 +679,8 @@ angular.module('do.users', [])
               index].key;
             $scope.filters[parentindex].valuetext = $scope.payingStatusValues[
               index].name;
+            $scope.filters[parentindex].op = 'eq';
+
           }
 
           $scope.chngquery = function (parentindex, index) {
