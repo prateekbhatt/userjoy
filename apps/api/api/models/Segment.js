@@ -296,6 +296,95 @@ SegmentSchema.statics.createPredefined = function (aid, adminUid, cb) {
         }
 
       ]
+    },
+
+    {
+      name: 'Hot Trials',
+      health: 'good',
+      filters: [
+
+        {
+          method: 'attr',
+          name: 'health',
+          op: 'eq',
+          val: 'good'
+        },
+
+        {
+          method: 'attr',
+          name: 'status',
+          op: 'eq',
+          val: 'trial'
+        }
+
+      ]
+    },
+
+    {
+      name: 'Risk Users',
+      health: 'poor',
+      filters: [
+
+        {
+          method: 'attr',
+          name: 'health',
+          op: 'eq',
+          val: 'poor'
+        },
+
+        {
+          method: 'attr',
+          name: 'status',
+          op: 'eq',
+          val: 'paying'
+        }
+
+      ]
+    },
+
+    {
+      name: 'Signed up 1 day ago',
+      // health: 'poor',
+      filters: [
+
+        {
+          method: 'attr',
+          name: 'joined',
+          op: 'lt',
+          val: '1'
+        }
+
+      ]
+    },
+
+    {
+      name: 'Signed up 3 days ago',
+      // health: 'poor',
+      filters: [
+
+        {
+          method: 'attr',
+          name: 'joined',
+          op: 'lt',
+          val: '3'
+        }
+
+      ]
+    },
+
+    {
+      name: 'Signed up 7 days ago',
+      // health: 'poor',
+      filters: [
+
+        {
+          method: 'attr',
+          name: 'joined',
+          op: 'lt',
+          val: '7'
+        }
+
+      ]
     }
 
   ];

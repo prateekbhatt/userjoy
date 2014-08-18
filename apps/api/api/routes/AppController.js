@@ -34,6 +34,13 @@ var logger = require('../../helpers/logger');
 
 
 /**
+ * Lib
+ */
+
+var createPreDefinedAutoMsg = require('../lib/create-predefined-automessages');
+
+
+/**
  * Services
  */
 
@@ -190,6 +197,8 @@ router
     req.app.name = req.body.name;
     req.app.subdomain = req.body.subdomain || req.app.subdomain;
 
+
+
     if (!req.app.subdomain) {
       return res.badRequest('App subdomain is required');
     }
@@ -201,6 +210,15 @@ router
         // subdomain must be a single alphanumeric word
         if (err.name === 'ValidationError' && err.errors.subdomain) {
           return res.badRequest(err.errors.subdomain.message);
+        }
+
+        if (err.name == 'MongoError' && (err.code == 11000 || err.code ==
+          11001)) {
+
+          if (_.contains(err.message, '$subdomain')) {
+            return res.badRequest(
+              'Please choose a different email subdomain');
+          }
         }
 
         return next(err);
@@ -372,6 +390,7 @@ router
   .put(function (req, res, next) {
 
     var aid = req.app._id;
+    var amsgCreatorId = req.user._id;
 
 
     async.waterfall(
@@ -420,6 +439,18 @@ router
             .accid;
 
           Segment.createPredefined(aid, adminUid, function (err) {
+            cb(err, isActive);
+          });
+        },
+
+
+        function predefinedAutoMessages(isActive, cb) {
+
+          // if not active, move on
+          if (!isActive) return cb(null, isActive);
+
+
+          createPreDefinedAutoMsg(aid, amsgCreatorId, function (err) {
             cb(err, isActive);
           });
         }
