@@ -99,7 +99,13 @@ angular.module('do.users', [])
               .length; i++) {
               if (segmentService.getSegments()[i].name == 'Good Health' ||
                 segmentService.getSegments()[i].name == 'Average Health' ||
-                segmentService.getSegments()[i].name == 'Poor Health') {
+                segmentService.getSegments()[i].name == 'Poor Health' ||
+                segmentService.getSegments()[i].name == 'Hot Trials' ||
+                segmentService.getSegments()[i].name == 'Risk Users' ||
+                segmentService.getSegments()[i].name ==
+                'Signed up 1 day ago' || segmentService.getSegments()[i].name ==
+                'Signed up 3 days ago' || segmentService.getSegments()[i].name ==
+                'Signed Up 7 days ago') {
                 $scope.segmentsCreatedName.push({
                   predefined: true,
                   id: segmentService.getSegments()[i]
@@ -2214,7 +2220,8 @@ angular.module('do.users', [])
             }
 
             $scope.graphDataValues = value;
-            console.log("$scope.graphDataValues: ", $scope.graphDataValues, $scope.graphDataValues.length);
+            console.log("$scope.graphDataValues: ", $scope.graphDataValues,
+              $scope.graphDataValues.length);
             $scope.graphData = [{
               "key": "Series 1",
               "values": value
