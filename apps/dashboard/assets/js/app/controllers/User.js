@@ -83,6 +83,7 @@ angular.module('do.users', [])
         $scope.showUpdateButton = false;
         $scope.segmentClicked = false;
         $scope.segmentsCreatedName = [];
+        $scope.segmentsCreatedName1 = [];
         $scope.showUpdatePopover = false;
         $scope.showSpinner = false;
         $scope.showAutoMsgBtn = false;
@@ -99,32 +100,36 @@ angular.module('do.users', [])
               .length; i++) {
               if (segmentService.getSegments()[i].name == 'Good Health' ||
                 segmentService.getSegments()[i].name == 'Average Health' ||
-                segmentService.getSegments()[i].name == 'Poor Health' ||
-                segmentService.getSegments()[i].name == 'Hot Trials' ||
-                segmentService.getSegments()[i].name == 'Risk Users' ||
-                segmentService.getSegments()[i].name ==
-                'Signed up 1 day ago' || segmentService.getSegments()[i].name ==
-                'Signed up 3 days ago' || segmentService.getSegments()[i].name ==
-                'Signed Up 7 days ago') {
+                segmentService.getSegments()[i].name == 'Poor Health') {
                 $scope.segmentsCreatedName.push({
-                  predefined: true,
-                  id: segmentService.getSegments()[i]
-                    ._id,
-                  name: segmentService.getSegments()[
-                    i].name
-                })
-              } else {
-                $scope.segmentsCreatedName.push({
-                  predefined: false,
+                  health: true,
                   id: segmentService.getSegments()[i]
                     ._id,
                   name: segmentService.getSegments()[
                     i].name
                 })
               }
+            }
+            for (var i = 0; i < segmentService.getSegments()
+              .length; i++) {
+              if (segmentService.getSegments()[
+                  i].name != 'Good Health' &&
+                segmentService.getSegments()[i].name != 'Average Health' &&
+                segmentService.getSegments()[i].name != 'Poor Health') {
+                $scope.segmentsCreatedName.push({
+                  // predefined: true,
+                  health: false,
+                  id: segmentService.getSegments()[i]
+                    ._id,
+                  name: segmentService.getSegments()[
+                    i].name
+                })
+              }
+
+
             };
             $scope.segmentsCreated = true;
-            console.log("$scope.segmentName: ", $scope.segmentsCreatedName);
+            console.log("$scope.segmentName: ", $scope.segmentsCreatedName, $scope.segmentsCreatedName1);
           } else {
             $scope.segmentsCreated = false;
           }
