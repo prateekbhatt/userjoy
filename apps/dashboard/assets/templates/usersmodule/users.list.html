@@ -10,7 +10,6 @@
                     <div class="row" style="padding-left: 40px;" ng-show="segmentClicked">
                         <h4 class="well" ng-bind="segmentNameClicked"></h4>
                     </div>
-                    <br>
                     <div class="row" style="padding-left: 40px;">
                         <div class="col-md-12">
                             <label class="col-md-1 control-label" style="font-size: 20px; padding-left: 13px">List: </label>
@@ -413,6 +412,7 @@
                                 <span style="font-size: 14px;" class="fa fa-smile-o" ng-if="segname.name == 'Good Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
                                 <span style="font-size: 14px;" class="fa fa-meh-o" ng-if="segname.name == 'Average Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
                                 <span style="font-size: 14px;" class="fa fa-frown-o" ng-if="segname.name == 'Poor Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
+                                <span ng-if="segname.name == 'Hot Trials' || segname.name == 'Risk Users' || segname.name == 'Signed up 1 day ago' || segname.name == 'Signed up 3 days ago' || segname.name == 'Signed up 7 days ago'"><strong>{{segname.name}}</strong></span>
                                 </a>
                                 <!-- <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 140px; background-color: #5cb85c; border-radius: 4px;" ng-if="segname.name == 'Good Health'">
                                                                         <span class="progress-type"><strong>{{segname.name}}</strong></span>
