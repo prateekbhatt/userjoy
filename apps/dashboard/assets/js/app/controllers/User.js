@@ -822,6 +822,7 @@ angular.module('do.users', [])
             $scope.segmentClicked = false;
             $scope.showUpdatePopover = false;
             $scope.selectedIndex = '';
+            $scope.selectedIndex1 = '';
             $scope.segmentName = '';
             $scope.showPopover = false;
             $scope.showSpinner = true;
@@ -1441,18 +1442,17 @@ angular.module('do.users', [])
             $scope.showUpdateButton = true;
             $scope.showSpinner = true;
             if (segname.name == 'Good Health' || segname.name ==
-              'Average Health' || segname.name == 'Poor Health' || segname
-              .name == 'Risk Users' || segname.name == 'Hot Trials' ||
-              segname.name == 'Signed up 1 day ago' || segname.name ==
-              'Signed up 3 days ago' || segname.name ==
-              'Signed up 7 days ago') {
+              'Average Health' || segname.name == 'Poor Health') {
               // $scope.showUpdateButton = false;
+              $scope.selectedIndex = index;
+              $scope.selectedIndex1 = '';
               $scope.isHealth = true;
             } else {
               $scope.isHealth = false;
+              $scope.selectedIndex1 = index;
+              $scope.selectedIndex = '';
             }
             this.showAutoMsgBtn = true;
-            $scope.selectedIndex = index;
             $scope.showSaveButton = false;
             $scope.updatedSegmentName = segname.name;
             segmentService.setSegmentId(segId);
