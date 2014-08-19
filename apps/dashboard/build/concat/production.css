@@ -7636,6 +7636,14 @@ li.list-group-item-segment.active, li.list-group-item-segment.active:hover, li.l
     background-color: #ddd;
     border-color: #ddd;
 }
+
+li.list-group-item-segment.active-health, li.list-group-item-segment.active-health:hover, li.list-group-item-segment.active-health:focus {
+    z-index: 2;
+    color: #222;
+    background-color: #ddd;
+    border-color: #ddd;
+}
+
 .nav.navbar-nav > li >  a.active {
     color: #555;
     background-color: #e7e7e7;
