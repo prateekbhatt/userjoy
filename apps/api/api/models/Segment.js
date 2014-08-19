@@ -385,6 +385,57 @@ SegmentSchema.statics.createPredefined = function (aid, adminUid, cb) {
         }
 
       ]
+    },
+
+    {
+      name: 'Evangelists',
+      // health: 'poor',
+      filters: [
+
+        {
+          method: 'attr',
+          name: 'status',
+          op: 'eq',
+          val: 'paying'
+        },
+
+        {
+          method: 'attr',
+          name: 'health',
+          op: 'eq',
+          val: 'good'
+        },
+
+        {
+          method: 'attr',
+          name: 'joined',
+          op: 'gt',
+          val: '180'
+        }
+
+      ]
+    },
+
+    {
+      name: 'Upsell Opportunities',
+      // health: 'poor',
+      filters: [
+
+        {
+          method: 'attr',
+          name: 'status',
+          op: 'eq',
+          val: 'paying'
+        },
+
+        {
+          method: 'attr',
+          name: 'health',
+          op: 'eq',
+          val: 'good'
+        }
+
+      ]
     }
 
   ];
