@@ -1,4 +1,4 @@
-describe.only('Lib create-predefined-automessage', function () {
+describe('Lib create-predefined-automessage', function () {
 
   /**
    * Models
