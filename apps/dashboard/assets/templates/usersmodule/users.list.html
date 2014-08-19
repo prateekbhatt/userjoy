@@ -1,6 +1,6 @@
 <div ng-include src="'/templates/navbar/navbar.html'"></div>
 <div style="margin-top: 5px;">
-<!-- <flash:messages></flash:messages> -->
+    <!-- <flash:messages></flash:messages> -->
 </div>
 <div class="panel">
     <div class="panel-body">
@@ -86,13 +86,13 @@
                                                     </ul>
                                                 </div>
                                                 <!-- <div ng-if="!filter.checkMethod" style="float:left; padding-left: 24px;">
-                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.name}}</span>&nbsp;<span class="caret"></span></button>
-                                                    <ul class="dropdown-menu" style="left: auto; max-height: 356px; overflow-y: scroll;">
-                                                        <li ng-repeat="hasDoneItem in hasDoneItems">
-                                                            <a style="cursor: default" ng-click="changeFilterHasNotDone($parent.$index, $index, $event)">{{hasDoneItem.query}}
-                                                            </a>
-                                                        </li>
-                                                    </ul>
+                                                                                                        <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.name}}</span>&nbsp;<span class="caret"></span></button>
+                                                                                                        <ul class="dropdown-menu" style="left: auto; max-height: 356px; overflow-y: scroll;">
+                                                                                                                <li ng-repeat="hasDoneItem in hasDoneItems">
+                                                                                                                        <a style="cursor: default" ng-click="changeFilterHasNotDone($parent.$index, $index, $event)">{{hasDoneItem.query}}
+                                                                                                                        </a>
+                                                                                                                </li>
+                                                                                                        </ul>
                                                 </div> -->
                                                 <div ng-if="filter.checkMethod && filter.showDatePicker" style="float:left; padding-left: 24px;">
                                                     <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
@@ -250,8 +250,8 @@
                                 </div>
                                 <div class="col-md-6">
                                     <!-- <div class="btn-group col-md-5">
-                                        <button class="fa fa-tag btn btn-info">
-                                        <span>Tag</span></button>
+                                                                                <button class="fa fa-tag btn btn-info">
+                                                                                <span>Tag</span></button>
                                     </div> -->
                                     <div class="col-md-5 col-md-push-10">
                                         <button type="button" class="btn btn-default btn-block dropdown-toggle"> Select Data
@@ -340,7 +340,6 @@
                                                                 ng-click="tableParams.sorting('operatingsystem', tableParams.isSortBy('operatingsystem', 'asc') ? 'desc' : 'asc')">
                                                                 <div>OS</div>
                                                             </th>
-
                                                             <th class="text-center" ng-show="columns[9].visible" ng-class="{
                                                                 'sort-asc': tableParams.isSortBy('userkarma', 'asc'),
                                                                 'sort-desc': tableParams.isSortBy('userkarma', 'desc'),
@@ -382,7 +381,6 @@
                                                         <td data-title="'User Karma'" class="text-center" sortable="userkarma" ng-show="columns[9].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)">
                                                             <span>{{user.userkarma}}</span>
                                                         </td>
-
                                                         <!-- <td data-title="'Unsubscribed'" class="text-center" sortable="status" ng-show="columns[4].visible" style="cursor: pointer;" ng-click="showUserProfile(user.id)"></td> -->
                                                     </tr>
                                                 </table>
@@ -395,7 +393,26 @@
                     </div>
                 </div>
                 <div class="col-md-3" style="margin-left: 60px;">
-                    <div class="panel panel-default" style="min-height: 825px; width: 300px; overflow: auto; border-color: #bdc3c7;" id="segment">
+                    <div class="panel panel-default" style="height: 174px; width: 300px; overflow: auto; border-color: #bdc3c7;" id="segment">
+                        <div class="panel-heading" style="color: #7b8a8b; background-color: #bdc3c7; border-color: #bdc3c7;">
+                            <h3 class="panel-title" style="color: #fff;">
+                            Health Segments</h3>
+                        </div>
+                        <!-- <div ng-show="!segmentsCreated">
+                            <p class="text-center" style="padding-top: 60px;">No Segments Created.</p>
+                        </div> -->
+                        <ul class="list-group">
+                            <li style="padding-bottom: 2px;" class="list-group-item-segment"  ng-class="{'active-health': $index === selectedIndex}"  ng-repeat="segname in segmentsCreatedHealth" ng-mouseenter="showAutoMsgButton()" ng-mouseleave="hideAutoMsgButton()" >
+                                <a style="padding: 10px 30px; display: inline-block; cursor: pointer; text-decoration: none; color: inherit;" ng-click="showQuery(segname.id, $index, segname)" ng-if="segname.health" >
+                                <span style="font-size: 14px;" class="fa fa-smile-o" ng-if="segname.name == 'Good Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
+                                <span style="font-size: 14px;" class="fa fa-meh-o" ng-if="segname.name == 'Average Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
+                                <span style="font-size: 14px;" class="fa fa-frown-o" ng-if="segname.name == 'Poor Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
+                                </a>
+                                <a class="btn btn-sm btn-default pull-right" href="/apps/{{currApp}}/automessage/segments/{{segname.id}}/write" style="margin-top: 5px;" ng-show="showAutoMsgBtn">AutoMessage</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default" style="min-height: 650px; width: 300px; overflow: auto; border-color: #bdc3c7;" id="segment">
                         <div class="panel-heading" style="color: #7b8a8b; background-color: #bdc3c7; border-color: #bdc3c7;">
                             <h3 class="panel-title" style="color: #fff;">
                             Segments</h3>
@@ -404,10 +421,10 @@
                             <p class="text-center" style="padding-top: 60px;">No Segments Created.</p>
                         </div>
                         <ul class="list-group" ng-show="segmentsCreated">
-                            <li style="padding-bottom: 2px;" class="list-group-item-segment">
-                              <span style="padding: 10px 15px; display: inline-block; font-size: 16px;" class="fa fa-user-md"><em><strong>&nbsp;Health Segments</strong></em></span>
-                            </li>
-                            <li style="padding-bottom: 2px;" class="list-group-item-segment"  ng-class="{'active-health': $index === selectedIndex}"  ng-repeat="segname in segmentsCreatedHealth" ng-mouseenter="showAutoMsgButton()" ng-mouseleave="hideAutoMsgButton()" >
+                            <!-- <li style="padding-bottom: 2px;" class="list-group-item-segment">
+                                <span style="padding: 10px 15px; display: inline-block; font-size: 16px;" class="fa fa-user-md"><em><strong>&nbsp;Health Segments</strong></em></span>
+                            </li> -->
+                            <!-- <li style="padding-bottom: 2px;" class="list-group-item-segment"  ng-class="{'active-health': $index === selectedIndex}"  ng-repeat="segname in segmentsCreatedHealth" ng-mouseenter="showAutoMsgButton()" ng-mouseleave="hideAutoMsgButton()" >
                                 <strong>
                                 <a style="padding: 10px 15px; display: inline-block; cursor: pointer; width: 180px; text-decoration: none; color: #333; word-wrap: break-word;" ng-click="showQuery(segname.id, $index, segname)" ng-if="!segname.health">{{segname.name}}</a>
                                 </strong>
@@ -417,11 +434,11 @@
                                 <span style="font-size: 13px;" class="fa fa-frown-o" ng-if="segname.name == 'Poor Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
                                 </a>
                                 <a class="btn btn-sm btn-default pull-right" href="/apps/{{currApp}}/automessage/segments/{{segname.id}}/write" style="margin-top: 5px;" ng-show="showAutoMsgBtn">AutoMessage</a>
-                            </li>
+                            </li> -->
                             <li style="padding-bottom: 2px;" class="list-group-item-segment"  ng-class="{'active': $index === selectedIndex1}"  ng-repeat="segname in segmentsCreatedName" ng-mouseenter="showAutoMsgButton()" ng-mouseleave="hideAutoMsgButton()" ng-style="darkerBorder($first)">
-                             <strong>
+                                <strong>
                                 <a style="padding: 10px 15px; display: inline-block; cursor: pointer; width: 180px; text-decoration: none; color: #333; word-wrap: break-word;" ng-click="showQuery(segname.id, $index, segname)" ng-if="!segname.health">{{segname.name}}</a>
-                              </strong>
+                                </strong>
                                 <a class="btn btn-sm btn-default pull-right" href="/apps/{{currApp}}/automessage/segments/{{segname.id}}/write" style="margin-top: 5px;" ng-show="showAutoMsgBtn">AutoMessage</a>
                             </li>
                         </ul>
