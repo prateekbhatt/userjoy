@@ -83,7 +83,7 @@ angular.module('do.users', [])
         $scope.showUpdateButton = false;
         $scope.segmentClicked = false;
         $scope.segmentsCreatedName = [];
-        $scope.segmentsCreatedName1 = [];
+        $scope.segmentsCreatedHealth = [];
         $scope.showUpdatePopover = false;
         $scope.showSpinner = false;
         $scope.showAutoMsgBtn = false;
@@ -101,7 +101,7 @@ angular.module('do.users', [])
               if (segmentService.getSegments()[i].name == 'Good Health' ||
                 segmentService.getSegments()[i].name == 'Average Health' ||
                 segmentService.getSegments()[i].name == 'Poor Health') {
-                $scope.segmentsCreatedName.push({
+                $scope.segmentsCreatedHealth.push({
                   health: true,
                   id: segmentService.getSegments()[i]
                     ._id,
@@ -129,10 +129,21 @@ angular.module('do.users', [])
 
             };
             $scope.segmentsCreated = true;
-            console.log("$scope.segmentName: ", $scope.segmentsCreatedName, $scope.segmentsCreatedName1);
+            console.log("$scope.segmentName: ", $scope.segmentsCreatedName,
+              $scope.segmentsCreatedName1);
           } else {
             $scope.segmentsCreated = false;
           }
+        }
+
+        $scope.darkerBorder = function ($first) {
+          console.log("$first: ", $first);
+          var mystyle = '';
+          if($first) {
+            mystyle = "{'border-top': '1px solid #7f8c8d;'}";
+          }
+          console.log("mystyle: ", mystyle);
+          return mystyle;
         }
 
         modelsSegment.getAllSegments(currentAppId,
@@ -1430,7 +1441,11 @@ angular.module('do.users', [])
             $scope.showUpdateButton = true;
             $scope.showSpinner = true;
             if (segname.name == 'Good Health' || segname.name ==
-              'Average Health' || segname.name == 'Poor Health') {
+              'Average Health' || segname.name == 'Poor Health' || segname
+              .name == 'Risk Users' || segname.name == 'Hot Trials' ||
+              segname.name == 'Signed up 1 day ago' || segname.name ==
+              'Signed up 3 days ago' || segname.name ==
+              'Signed up 7 days ago') {
               // $scope.showUpdateButton = false;
               $scope.isHealth = true;
             } else {

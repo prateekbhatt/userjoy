@@ -628,7 +628,9 @@ describe('Model Segment', function () {
     it('should create predefined segments', function (done) {
 
       Segment.createPredefined(aid, adminUid,
-        function (err, good, average, poor, hotTrials, riskUsers, signedUp1DayAgo, signedUp3DaysAgo, signedUp7DaysAgo) {
+        function (err, good, average, poor, hotTrials, riskUsers,
+          signedUp1DayAgo, signedUp3DaysAgo, signedUp7DaysAgo,
+          evangelists, upsellOpportunities) {
 
           expect(err)
             .to.not.exist;
@@ -641,6 +643,8 @@ describe('Model Segment', function () {
           signedUp1DayAgo = signedUp1DayAgo.toJSON();
           signedUp3DaysAgo = signedUp3DaysAgo.toJSON();
           signedUp7DaysAgo = signedUp7DaysAgo.toJSON();
+          evangelists = evangelists.toJSON();
+          upsellOpportunities = upsellOpportunities.toJSON();
 
           expect(good)
             .to.have.property('filters')
@@ -720,32 +724,72 @@ describe('Model Segment', function () {
             .to.have.property('filters')
             .that.is.an('array')
             .and.deep.equals([{
-                method: 'attr',
-                name: 'joined',
-                op: 'lt',
-                val: '1'
-              }
-            ]);
+              method: 'attr',
+              name: 'joined',
+              op: 'lt',
+              val: '1'
+            }]);
 
           expect(signedUp3DaysAgo)
             .to.have.property('filters')
             .that.is.an('array')
             .and.deep.equals([{
-                method: 'attr',
-                name: 'joined',
-                op: 'lt',
-                val: '3'
-              }
-            ]);
+              method: 'attr',
+              name: 'joined',
+              op: 'lt',
+              val: '3'
+            }]);
 
           expect(signedUp7DaysAgo)
             .to.have.property('filters')
             .that.is.an('array')
             .and.deep.equals([{
+              method: 'attr',
+              name: 'joined',
+              op: 'lt',
+              val: '7'
+            }]);
+
+          expect(evangelists)
+            .to.have.property('filters')
+            .that.is.an('array')
+            .and.deep.equals([{
+                method: 'attr',
+                name: 'status',
+                op: 'eq',
+                val: 'paying'
+              },
+
+              {
+                method: 'attr',
+                name: 'health',
+                op: 'eq',
+                val: 'good'
+              },
+
+              {
                 method: 'attr',
                 name: 'joined',
-                op: 'lt',
-                val: '7'
+                op: 'gt',
+                val: '180'
+              }
+            ]);
+
+          expect(upsellOpportunities)
+            .to.have.property('filters')
+            .that.is.an('array')
+            .and.deep.equals([{
+                method: 'attr',
+                name: 'status',
+                op: 'eq',
+                val: 'paying'
+              },
+
+              {
+                method: 'attr',
+                name: 'health',
+                op: 'eq',
+                val: 'good'
               }
             ]);
 
@@ -758,7 +802,9 @@ describe('Model Segment', function () {
             'riskUsers': riskUsers,
             'signedUp1DayAgo': signedUp1DayAgo,
             'signedUp3DaysAgo': signedUp3DaysAgo,
-            'signedUp7DaysAgo': signedUp7DaysAgo
+            'signedUp7DaysAgo': signedUp7DaysAgo,
+            'evangelists': evangelists,
+            'upsellOpportunities': upsellOpportunities
           };
 
 
@@ -768,7 +814,9 @@ describe('Model Segment', function () {
           }
 
 
-          _.each(['good', 'average', 'poor', 'hotTrials', 'riskUsers', 'signedUp1DayAgo', 'signedUp3DaysAgo', 'signedUp7DaysAgo'],
+          _.each(['good', 'average', 'poor', 'hotTrials', 'riskUsers',
+              'signedUp1DayAgo', 'signedUp3DaysAgo', 'signedUp7DaysAgo',
+              'evangelists', 'upsellOpportunities'],
             function (h) {
 
               var type = hmap[h];
