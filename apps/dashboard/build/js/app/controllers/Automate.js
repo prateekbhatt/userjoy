@@ -700,7 +700,12 @@ angular.module('do.automate', [])
                   .replace(/&#160/g, ' '));
               }
               saveMsgService.setTitle($scope.title);
-              saveMsgService.setSub('');
+              if ($scope.subjectNotification != null) {
+                saveMsgService.setSub($scope.subjectNotification.replace(
+                    /<(?:.|\n)*?>/gm, '')
+                  .replace(/&#34;/g, '"')
+                  .replace(/&#160;/g, ' '));
+              }
             }
 
             if ($scope.showEmail) {
@@ -1066,6 +1071,8 @@ angular.module('do.automate', [])
           };
           $scope.notificationBody = AutoMsgService.getSingleAutoMsg()
             .body;
+          $scope.subjectNotification = AutoMsgService.getSingleAutoMsg()
+            .sub;
           var notificationTextLength = $scope.notificationBody.replace(
             /<(?:.|\n)*?>/gm, '')
             .replace(/&#34;/g, '"')
@@ -1141,7 +1148,12 @@ angular.module('do.automate', [])
               .replace(/&#34;/g, '"')
               .replace(/&#160;/g, ' '));
             saveMsgService.setTitle($scope.title);
-            saveMsgService.setSub('');
+            if ($scope.subjectNotification != null) {
+              saveMsgService.setSub($scope.subjectNotification.replace(
+                  /<(?:.|\n)*?>/gm, '')
+                .replace(/&#34;/g, '"')
+                .replace(/&#160;/g, ' '));
+            }
           }
 
           if ($scope.showEmail) {
