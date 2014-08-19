@@ -267,7 +267,7 @@ angular.module('do.install', [])
   }
 ])
 
-.controller('installInviteTeamAppCtrl', ['$scope', '$stateParams', 'AppModel',
+.controller('installInviteTeamNewAppCtrl', ['$scope', '$stateParams', 'AppModel',
   '$rootScope', '$timeout', '$location',
   function ($scope, $stateParams, AppModel, $rootScope, $timeout, $location) {
 

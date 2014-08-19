@@ -99,6 +99,8 @@
                 </span>
 
                 <text-angular-toolbar name="toolbar" ta-toolbar="[['h1','h2','h3','p', 'pre'], ['bold','italics','ul', 'ol'],['html', 'insertImage', 'insertLink', 'dropdown']]"></text-angular-toolbar>
+                <text-angular name="subject" ng-model="subjectNotification" ta-target-toolbars='toolbar' class="subject"></text-angular>
+                <br>
                 <text-angular name="notificationBody" ng-model="notificationBody" ta-target-toolbars='toolbar' ng-change="showText(notificationBody)"></text-angular>
             </div>
             <div ng-show="showEmail">

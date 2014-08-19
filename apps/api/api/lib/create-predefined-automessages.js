@@ -82,7 +82,7 @@ function createPreDefinedAutoMsg(aid, creatorAccId, cb) {
       amsg: {
         body: '<p>Hi {{=user.name || "there"}},</p><p></p><p>Thank you for signing up for our free trial. We hope you managed to use our product for a while now. Just wanted to find out if you have questions for us.&#160;</p><p></p><p>Feel free to reply to this email if you have any questions about the product. We love hearing from our customers</p>  ',
         sub: 'How is your trial going?',
-        title: 'Message sent after 3 days'
+        title: 'New user follow-up 3 days'
       }
     },
 
@@ -91,7 +91,7 @@ function createPreDefinedAutoMsg(aid, creatorAccId, cb) {
       amsg: {
         body: ' <p>Hi {{=user.name || "there"}},</p><p>Just touching base to find out how has been your trial so far. If you are facing any problems, feel free to let us know. We will be glad to help you out.</p>  ',
         sub: 'Facing Problems?',
-        title: 'Message sent after 7 days'
+        title: 'New User follow-up 7 days'
       }
     }
 
