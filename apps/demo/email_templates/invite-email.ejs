@@ -1,0 +1,31 @@
+{{ include header }}
+<p>Hi,</p>
+<br>
+<p>{{= fromName }} has invited you to join <b>{{= appName }}</b> on UserJoy. Please click on the link below to accept the invitation.</p>
+
+</td>
+<td class="expander"></td>
+</tr>
+</table>
+<table class="row">
+<tr>
+<td class="wrapper offset-by-three">
+<table class="six columns">
+  <tr>
+    <td class="center">
+      <table class="button">
+        <tr>
+          <td>
+            <a href="{{= inviteUrl }}">Accept Invitation</a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</td>
+</tr>
+</table>
+<br>
+<br>
+{{ include footer }}
