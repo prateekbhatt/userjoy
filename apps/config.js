@@ -5,25 +5,30 @@
 var path = require('path');
 var _ = require('lodash');
 
-var ENVIRONMENTS = ['development', 'production', 'test'];
+var ENVIRONMENTS = ['development', 'production', 'test', 'demo'];
 
 var BASE_URLS = {
   development: 'do.localhost',
   production: 'userjoy.co',
-  test: 'do.localhost'
+  test: 'do.localhost',
+
+  // demo base url is always the main server url
+  demo: 'userjoy.co'
 };
 
 var PORTS = {
   website: 8000,
   dashboard: 8001,
   api: 8002,
-  workers: 8003
+  workers: 8003,
+  demo: 8004
 };
 
 var DATABASES = {
   development: "mongodb://localhost/userjoy-api-dev",
   production: "mongodb://54.225.236.74/userjoy-api-prod",
-  test: "mongodb://localhost/userjoy-api-test"
+  test: "mongodb://localhost/userjoy-api-test",
+  demo: "mongodb://localhost/userjoy-api-demo"
 };
 
 var API_CORS_WHITELIST = {
@@ -40,13 +45,20 @@ var API_CORS_WHITELIST = {
   test: [
     'http://app.do.localhost',
     'http://do.localhost'
+  ],
+  demo: [
+    'https://demo.userjoy.co',
+    'https://userjoy.co',
+    'https://www.demo.userjoy.co',
+    'https://www.userjoy.co'
   ]
 };
 
 var REDIS_HOST = {
   development: 'localhost',
   production: 'uj-session.pb8czn.0001.use1.cache.amazonaws.com',
-  test: 'localhost'
+  test: 'localhost',
+  demo: 'localhost'
 };
 
 var IRON_IO_TOKEN = {
@@ -93,7 +105,8 @@ function getHosts(env, url) {
     website: protocol + url,
     dashboard: protocol + 'app.' + url,
     api: protocol + 'api.' + url,
-    cdn: protocol + 'cdn.' + url
+    cdn: protocol + 'cdn.' + url,
+    demo: protocol + 'demo.' + url
   };
   return hosts;
 }
