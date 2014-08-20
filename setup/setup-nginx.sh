@@ -32,7 +32,7 @@ fi
 # Create nginx config files in nginx/sites-available
 if [[ $1 == 'dev' ]]; then
 
-  declare -a DO_APPS=( "website" "dashboard" "api" "cdn")
+  declare -a DO_APPS=( "website" "dashboard" "api" "cdn" "demo")
 
   echo 'Creating nginx development files in sites-available and'
   echo 'creating symlinks for nginx config files from sites-available in sites-enabled'
@@ -58,6 +58,11 @@ if [[ $1 == 'dev' ]]; then
       PORT=8002
       SERVER_NAME='api.do.localhost'
 
+    elif [[ $app == 'demo' ]]; then
+
+      PORT=8004
+      SERVER_NAME='demo.do.localhost'
+
     elif [[ $app == 'cdn' ]]; then
 
       PORT=''
@@ -66,7 +71,7 @@ if [[ $1 == 'dev' ]]; then
     fi
 
 
-    if [[ $app == 'website' ]] || [[ $app == 'dashboard' ]] || [[ $app == 'api' ]]; then
+    if [[ $app == 'website' ]] || [[ $app == 'dashboard' ]] || [[ $app == 'api' ]] || [[ $app == 'demo' ]]; then
 
       # create nginx config files
       cat > /etc/nginx/sites-available/app-$app << EOF
@@ -154,7 +159,7 @@ elif [[ $1 == 'prod' ]]; then
   then
     # do dangerous stuff
 
-    declare -a DO_APPS=( "website" "dashboard" "api" )
+    declare -a DO_APPS=( "website" "dashboard" "api" "demo" )
 
     echo 'Creating nginx production files in sites-available and'
     echo 'creating symlinks for nginx config files from sites-available in sites-enabled'
@@ -177,6 +182,11 @@ elif [[ $1 == 'prod' ]]; then
 
         PORT=8002
         SERVER_NAME='api.userjoy.co'
+
+      elif [[ $app == 'demo' ]]; then
+
+        PORT=8002
+        SERVER_NAME='demo.userjoy.co'
 
       fi
 
