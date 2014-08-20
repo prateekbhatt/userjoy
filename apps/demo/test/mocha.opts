@@ -1,0 +1,8 @@
+--ui bdd
+--recursive
+--reporter spec
+--growl
+--slow 30
+--check-leaks
+--timeout 60000
+--globals CookieAccessInfo,Cookie,CookieJar,request,_,async,loginUser,logoutUser,saved,setupTestDb,expect,sinon,loginCookie

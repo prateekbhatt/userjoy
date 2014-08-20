@@ -1,0 +1,32 @@
+{{ include header }}
+<p>Hi {{= name || 'there' }},</p>
+<br>
+<p style="font-size: 15px; margin-top: 10px;"><b>{{= sentBy }} sent you a message: <b></p>
+<br>
+<p>{{- message }}</p>
+</td>
+<td class="expander"></td>
+</tr>
+</table>
+<table class="row">
+<tr>
+<td class="wrapper offset-by-three">
+<table class="six columns">
+  <tr>
+    <td class="center">
+      <table class="button">
+        <tr>
+          <td>
+            <a href="{{= conversationUrl }}">View Conversation</a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</td>
+</tr>
+</table>
+<br>
+<br>
+{{ include footer }}
