@@ -6826,12 +6826,12 @@ body {
 }
 /*Placeholder Font Color*/
 
-.form-control: -moz-placeholder {
+/*.form-control: -moz-placeholder {
     color: #000000;
 }
 .form-control: : -moz-placeholder {
     color: #000000;
-}
+}*/
 : : -webkit-input-placeholder {
     /* WebKit browsers */
 

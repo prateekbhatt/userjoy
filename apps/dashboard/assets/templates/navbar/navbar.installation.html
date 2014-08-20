@@ -16,14 +16,14 @@
                 <a style="font-size:19px; cursor: pointer" class="navbar-brand" ng-click="redirectToApp()">UserJoy
                 </a>
             </div>
-            <div class="col-md-6 col-md-push-2" style="margin-top: 15px;" ng-show="info">
-                <div class="alert alert-danger text-center" style="padding: 3px; border-color: #c0392b; margin-bottom: 0px; position: absolute;" >{{infoMsgRootScope}}</div>
+            <div class="col-md-6 col-md-push-2" ng-show="info">
+                <div class="alert alert-danger text-center" style="padding: 3px; border-color: #c0392b; margin-bottom: 0px; position: absolute; margin-top: 15px;" >{{infoMsgRootScope}}</div>
             </div>
             <div class="col-md-4 col-md-push-3" style="margin-top: 15px;"  ng-show="error">
-                <div class="alert alert-danger text-center" style="padding: 3px; border-color: #c0392b; margin-bottom: 0px; position: absolute; width: 400px;">{{errMsgRootScope}}</div>
+                <div class="alert alert-danger text-center" style="padding: 3px; border-color: #c0392b; margin-bottom: 0px; position: absolute; width: 400px; margin-top: 15px;">{{errMsgRootScope}}</div>
             </div>
             <div class="col-md-4 col-md-push-3" style="margin-top: 15px;"  ng-show="showSuccess">
-                <div class="alert alert-success text-center" style="padding: 3px; border-color: #30b661; margin-bottom: 0px; position: absolute; width: 400px;">{{showSuccessMsgRootScope}}</div>
+                <div class="alert alert-success text-center" style="padding: 3px; border-color: #30b661; margin-bottom: 0px; position: absolute; width: 400px; margin-top: 15px;">{{showSuccessMsgRootScope}}</div>
             </div>
         </div>
         <!-- <div class="col-md-4 col-md-push-3">

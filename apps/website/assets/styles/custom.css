@@ -7,23 +7,23 @@ body {
 
 
 /*Placeholder Font Color*/
-.form-control:-moz-placeholder {
+/*.form-control:-moz-placeholder {
     color: #000000;
 }
 .form-control::-moz-placeholder {
     color: #000000;
-}
+}*/
 
-::-webkit-input-placeholder { /* WebKit browsers */
+::-webkit-input-placeholder {
     color: #000000;
 }
-:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+:-moz-placeholder {
     color: #000000;
 }
-::-moz-placeholder { /* Mozilla Firefox 19+ */
+::-moz-placeholder {
     color: #000000;
 }
-:-ms-input-placeholder { /* Internet Explorer 10+ */
+:-ms-input-placeholder {
     color: #000000;
 }
 /*Placeholder Font Color*/
