@@ -1,9 +1,11 @@
 <% include nav.ejs %>
 <div class="jumbotron jumbotron-page-header">
     <div class="container text-center">
-        <h3>
-            <strong>Monetize existing customers by increasing renewals, upsells and referrals</strong>
-        </h3>
+        <br>
+        <h2>
+            <strong>Increasing renewals, upsells and referrals</strong>
+        </h2>
+        <br>
     </div>
 </div>
 
@@ -73,39 +75,27 @@
         <!-- /.container -->
     </div>
 
-    <div class="row text-center">
-        <a href="/product" class="btn btn-success btn-lg btn3d">
-            Take a Tour
-        </a>
+
+    <div class="banner-guide-user">
+        <div class="container">
+
+            <div class="row text-center">
+
+                <a href="/retain" class="btn btn-info pull-left">
+                    &larr; Retain Customers
+                </a>
+
+
+                <a href="/product" class="btn btn-info pull-right">
+                    Take a Tour &rarr;
+                </a>
+
+            </div>
+        </div>
     </div>
 
 </div>
-<div class="banner">
-    <div class="container text-center">
-        <div class="row">
-            <h3>Getting started takes less than 10 minutes</h3>
 
-            <br>
 
-            <p style="color: #bdc3c7">
-
-            Our simple JavaScript snippet is <strong>less than 15 lines of code</strong>.
-
-            <br>
-
-            Even if you get stuck, our smart and fast support team can help at no extra cost.
-
-            </p>
-        </div>
-
-        <div class="row">
-
-            <a href="/signup" class="btn btn-primary btn-lg btn3d">
-                Start Free Trial
-            </a>
-
-        </div>
-    </div>
-    <!-- /.container -->
-</div>
+<% include _get_started.ejs %>
 <% include footer.ejs %>
