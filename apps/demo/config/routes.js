@@ -112,7 +112,7 @@ module.exports.error = function loadErrorRoutes(app) {
 
     // DISABLE EMAILS IN DEMO
     if (err.message === 'DEMO_MESSAGE_NOT_ALLOWED') {
-      return res.forbidden('Sending messages is disabled in Demo');
+      return res.badRequest('Sending messages is disabled in Demo');
     }
 
 
