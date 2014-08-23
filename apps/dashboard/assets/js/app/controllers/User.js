@@ -137,12 +137,12 @@ angular.module('do.users', [])
         }
 
         $scope.darkerBorder = function ($first) {
-          console.log("$first: ", $first);
+          // console.log("$first: ", $first);
           var mystyle = '';
           if($first) {
             mystyle = "{'border-top': '1px solid #7f8c8d;'}";
           }
-          console.log("mystyle: ", mystyle);
+          // console.log("mystyle: ", mystyle);
           return mystyle;
         }
 
