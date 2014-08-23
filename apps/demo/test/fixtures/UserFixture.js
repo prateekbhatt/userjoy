@@ -26,10 +26,11 @@ var randomId = mongoose.Types.ObjectId;
  */
 
 var billingStatuses = ['trial', 'free', 'paying', 'cancelled'];
+
 var browsers = ['Firefox 25', 'Firefox 26', 'Firefox 27', 'Chrome 25',
   'Internet Explorer 9'
 ];
-var healthStatuses = ['good', 'average', 'poor'];
+
 var osVals = ["Linux x86_64", 'Windows 8', 'Windows 7', 'Windows XP', 'Unix',
   'Mac OSX'
 ];
@@ -38,7 +39,7 @@ var osVals = ["Linux x86_64", 'Windows 8', 'Windows 7', 'Windows XP', 'Unix',
  * possible plans
  */
 
-var plans = ['basic', 'pro', 'propro', 'premium', 'enterprise'];
+var plans = ['basic', 'pro', 'premium', 'enterprise'];
 
 
 /**
@@ -48,7 +49,7 @@ var plans = ['basic', 'pro', 'propro', 'premium', 'enterprise'];
  */
 
 function randomFromArray(arr) {
-  return arr[Math.round(Math.random() * arr.length)];
+  return arr[Math.floor(Math.random() * arr.length)];
 }
 
 
@@ -65,11 +66,45 @@ function genFakeCompany() {
 }
 
 
+function getHealthFromScore(score) {
+
+  var h;
+
+  if (score <= 33) {
+    h = 'poor';
+  } else if (score > 33 && score <= 67) {
+    h = 'average';
+  } else {
+    h = 'good';
+  }
+
+  return h;
+
+}
+
+
+function getTimeDaysAgo(daysAgo) {
+  var date = new Date();
+  var t = date.getTime();
+  t -= daysAgo * 24 * 60 * 60 * 1000; // some time from now to N days ago, in milliseconds
+  return new Date(t);
+}
+
+
 /**
  * a fake user
  */
 
 function genFakeUser(aid) {
+
+  var score = faker.Helpers.randomNumber(100);
+
+  var joinedStart = getTimeDaysAgo(100);
+  var joinedEnd = getTimeDaysAgo(1);
+  var joined = faker.Date.between(joinedStart, joinedEnd);
+
+  var lastSession = faker.Date.between(getTimeDaysAgo(10), getTimeDaysAgo(0));
+
 
   var aFakeUser = {
 
@@ -79,17 +114,19 @@ function genFakeUser(aid) {
 
     email: faker.Internet.email(),
 
-    ct: faker.Date.recent(10000),
+    ct: joined,
 
-    lastSession: faker.Date.recent(10),
+    joined: joined,
 
-    score: faker.Helpers.randomNumber(100),
+    lastSession: lastSession,
+
+    score: score,
 
     // billing status
     status: randomFromArray(billingStatuses),
 
     // health status
-    health: randomFromArray(healthStatuses),
+    health: getHealthFromScore(score),
 
     os: randomFromArray(osVals),
 
