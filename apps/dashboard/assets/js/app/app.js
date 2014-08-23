@@ -31,6 +31,7 @@ var app = angular.module('dodatado', [
   'toggle-switch',
   'angular-tour',
   'flash',
+  'do.demo',
 ])
 
 .directive('fallbackSrc', function () {
@@ -282,7 +283,7 @@ var app = angular.module('dodatado', [
             if (rejection.status === 401 && checkUrl !=
               'login' && checkUrl != 'forgot-password' && checkUrl !=
               'signup' && inviteUrl != 'invite' && inviteUrl !=
-              'verify-email') {
+              'verify-email' && checkUrl != 'demo') {
               console.log("401 status logout");
               loginProvider.setLoggedIn = false;
               $rootScope.loggedIn = false;
@@ -334,7 +335,7 @@ var app = angular.module('dodatado', [
             //   })
             // };
             // options.push({
-            //   name: 
+            //   name:
             // })
           })
           .error(function () {

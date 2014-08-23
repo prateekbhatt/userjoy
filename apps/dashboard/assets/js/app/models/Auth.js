@@ -42,13 +42,14 @@ angular.module('models.auth', ['services'])
 
 
                 AccountModel.get(function (err, acc) {
+                  console.log("acc: ", acc);
                   if (err) {
                     console.log("error");
                     return;
                   }
                   console.log("account ===================: ", acc);
                   if (acc.defaultApp) {
-                    var callback = function (err) {
+                    var callbackSingleApp = function (err) {
                       if (err) {
                         console.log("error");
                         return;
@@ -63,7 +64,7 @@ angular.module('models.auth', ['services'])
                           ._id + '/addcode');
                       }
                     }
-                    AppModel.getSingleApp(acc.defaultApp, callback);
+                    AppModel.getSingleApp(acc.defaultApp, callbackSingleApp);
 
                   } else {
 
