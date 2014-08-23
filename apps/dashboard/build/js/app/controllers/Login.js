@@ -96,7 +96,8 @@ angular.module('do.login', [])
               console.log("error");
               return;
             }
-            console.log("account ===================: ", acc);
+            console.log("account ===================: ", acc, AppService
+              .getCurrentApp());
             if (acc.defaultApp) {
               var callback = function (err) {
                 if (err) {

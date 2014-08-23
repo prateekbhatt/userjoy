@@ -18,7 +18,7 @@ angular
       this.getSingleApp = function (appId, cb) {
         console.log("is the error here????", appId);
 
-        var callbackGetSingleApp = function () {
+        var callbackGetSingleApp = function (appId) {
           $http.get(config.apiUrl + '/apps/' + appId)
           .success(function (data) {
             console.log("current App: --> from App Model: ", data);
@@ -37,10 +37,11 @@ angular
               return;
             }
             appId = acc.defaultApp;
-            callbackGetSingleApp();
+            callbackGetSingleApp(appId);
           })
         } else {
-          callbackGetSingleApp();
+          console.log("appId is not null: ", appId);
+          callbackGetSingleApp(appId);
         }
 
       }
