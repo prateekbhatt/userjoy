@@ -177,7 +177,8 @@ BaseMailer.prototype.send = function (cb) {
 
 
   // DISABLE SENDING EMAILS FOR DEMO APP
-  return cb(null, 'Sending emails is disabled in Demo');
+  // return cb();
+  return cb(new Error('DEMO_MESSAGE_NOT_ALLOWED'));
 
 
 

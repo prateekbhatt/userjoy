@@ -10,7 +10,7 @@ function bootstrapDevDB(cb) {
    */
 
   var async = require('async');
-  var curl = require('curlrequest');
+  var request = require('request');
 
 
   /**
@@ -48,7 +48,10 @@ function bootstrapDevDB(cb) {
   var savedApp = {};
   var userIds = [];
   var aid;
+  var loginCookie;
 
+
+  var appLocalUrl = 'http://localhost:8004';
 
   async.series({
 
@@ -66,23 +69,22 @@ function bootstrapDevDB(cb) {
           password: 'demodemo'
         };
 
-        curl.request(
+        request.post(
 
           {
-            url: config.appUrl + '/account',
+            // url: config.appUrl + '/account',
+            url: appLocalUrl + '/account',
             method: 'POST',
-            data: demoAccount
+            json: demoAccount
           },
 
-          function (err, res) {
+          function (err, res, body) {
 
             if (err) return cb(err);
+            console.log('\n\n this is working', err, body, '\n\n')
 
-            // parse response to JSON
-            res = JSON.parse(res);
-
-            savedAccount = res['account'];
-            savedApp = res['app'];
+            savedAccount = body['account'];
+            savedApp = body['app'];
             aid = savedApp['_id'];
 
             cb();
@@ -94,9 +96,9 @@ function bootstrapDevDB(cb) {
 
       createUsers: function (cb) {
 
-        console.log('loading user fixtures ...');
+        console.log('loading user fixtures ...', aid);
 
-        createUsers(aid, 1000, function (err, uids) {
+        createUsers(aid, 100, function (err, uids) {
           if (err) return cb(err);
           userIds = uids;
           cb();
@@ -106,32 +108,69 @@ function bootstrapDevDB(cb) {
 
       createEvents: function (cb) {
 
-        console.log('loading event fixtures ...');
+        console.log('loading event fixtures ...', aid, userIds);
 
-        createEvents(aid, userIds, 100000, cb);
+        createEvents(aid, userIds, 10000, cb);
       },
 
 
       createReports: function (cb) {
-
         console.log('loading daily report fixtures ...');
 
         createDailyReports(aid, userIds, cb);
       },
 
 
-      // to create the predefined segments and automessages, we need to activate
-      // the app
-      activateApp: function (cb) {
+      login: function (cb) {
 
-        curl.request(
+        request.post(
 
           {
-            url: config.appUrl + '/apps/' + aid + '/activate',
-            method: 'PUT'
+
+            url: appLocalUrl + '/auth/login',
+            json: {
+              email: 'demo@userjoy.co',
+              password: 'demodemo'
+            }
+
           },
 
-          cb
+          function (err, res, body) {
+
+            loginCookie = res['headers']['set-cookie'];
+            console.log('\n\n auth', err, loginCookie);
+
+            cb(err);
+          }
+
+        )
+
+      },
+
+
+      // to create the predefined segments and automessages, we need to $
+      // the app
+      activateApp: function (cb) {
+        console.log('\n\n userjoy activating \n', aid, '\n\n');
+
+
+        request.put(
+
+          {
+            url: appLocalUrl + '/apps/' + aid + '/activate',
+            method: 'PUT',
+            headers: {
+              cookie: loginCookie
+            }
+          },
+
+
+          function (err, res, body) {
+
+            console.log('\n\n\n activated', err, '\n\n body::', body,
+              '\n\n');
+            cb(err);
+          }
 
         );
       }

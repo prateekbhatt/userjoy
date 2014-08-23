@@ -480,6 +480,9 @@ Query.prototype.runAttrQuery = function (cb) {
 
   User
     .find(self.genAttrMatchCond())
+    .sort({
+      lastSession: -1
+    })
     .lean()
     .exec(function (err, users) {
       cb(err, users);
