@@ -59,15 +59,15 @@ angular.module('do.users', [])
   'userAttributes', 'lodash', '$modal',
   'UidService', '$moment', 'UserList', '$timeout', 'modelsSegment',
   'segmentService', 'CurrentAppService', 'UserModel', '$log',
-  'MsgService', '$stateParams', '$rootScope', 'flash',
+  'MsgService', '$stateParams', '$rootScope', 'flash', 'config',
   function ($scope, $location, segment, queryMatching, $filter,
     countOfActions, hasNotDone, hasDoneActions,
     ngTableParams, login, modelsQuery, AppService, segment,
     queryMatching, eventNames, userAttributes, lodash, $modal,
     UidService, $moment, UserList, $timeout, modelsSegment,
     segmentService, CurrentAppService, UserModel, $log, MsgService,
-    $stateParams, $rootScope, flash) {
-
+    $stateParams, $rootScope, flash, config) {
+console.log("config.apiUrl: ", config.apiUrl);
     CurrentAppService.getCurrentApp()
       .then(function (currentApp) {
         // flash('Saved!');

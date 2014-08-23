@@ -3,10 +3,10 @@ angular.module('models.auth', ['services'])
 .service('AuthService', ['$http', 'utils', 'ipCookie', 'LoginService',
   '$log', 'config', '$state', '$location', 'AppService',
   'ErrMsgService', 'authService', 'login', '$rootScope', 'AccountModel',
-  'AppModel',
+  'AppModel', 'AccountService',
   function ($http, utils, ipCookie, LoginService, $log, config, $state,
     $location, AppService, ErrMsgService, authService, login,
-    $rootScope, AccountModel, AppModel) {
+    $rootScope, AccountModel, AppModel, AccountService) {
 
     this.attemptLogin = function (email, password, callback) {
 
@@ -48,6 +48,7 @@ angular.module('models.auth', ['services'])
                     return;
                   }
                   console.log("account ===================: ", acc);
+                  AccountService.set(acc);
                   if (acc.defaultApp) {
                     var callbackSingleApp = function (err) {
                       if (err) {
