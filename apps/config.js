@@ -50,7 +50,16 @@ var API_CORS_WHITELIST = {
     'https://demo.userjoy.co',
     'https://userjoy.co',
     'https://www.demo.userjoy.co',
-    'https://www.userjoy.co'
+    'https://www.userjoy.co',
+    'http://do.localhost',
+    'http://www.do.localhost',
+    'http://demo.do.localhost',
+    'http://www.demo.do.localhost',
+    'http://app.do.localhost',
+    'http://www.app.do.localhost',
+    'https://app.userjoy.co',
+    'https://www.app.userjoy.co'
+
   ]
 };
 

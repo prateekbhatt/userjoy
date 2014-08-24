@@ -618,7 +618,7 @@ angular.module('do.automate', [])
             value: "Email",
             label: 'fa fa-envelope'
           }];
-
+console.log("AccountService: ", AccountService.get());
           $scope.sender = AccountService.get()
             .name;
           $scope.senderEmail = AccountService.get()

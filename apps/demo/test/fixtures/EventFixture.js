@@ -26,7 +26,7 @@ var randomId = mongoose.Types.ObjectId;
  * allowed event types
  */
 
-var eventTypes = ['auto', 'form', 'link', 'page', 'track'];
+var eventTypes = ['form', 'link', 'page', 'track'];
 
 
 /**
@@ -57,8 +57,19 @@ var pageviewEventNames = [
 ];
 
 
-var domainNames = ['dodatado.com', 'userjoy.co'];
-var pathNames = ['/messages', '/users', '/install'];
+var formEvents = [
+  'navbar-login',
+  'sign-up',
+  'add-credit-card',
+  'invite-team-member'
+];
+
+
+var linkEvents = [
+  'navbar-logout',
+  'navbar-logo',
+  'benefits-convert'
+];
 
 
 /**
@@ -90,8 +101,12 @@ function createEvent(aid, uid, cb) {
 
   if (fakeEvent.type === 'track') {
     fakeEvent.name = randomFromArray(trackEventNames);
-  } else {
+  } else if (fakeEvent.type === 'page') {
     fakeEvent.name = randomFromArray(pageviewEventNames);
+  } else if (fakeEvent.type === 'link') {
+    fakeEvent.name = randomFromArray(linkEvents);
+  } else if (fakeEvent.type === 'form') {
+    fakeEvent.name = randomFromArray(formEvents);
   }
 
   Event.create(fakeEvent, cb);

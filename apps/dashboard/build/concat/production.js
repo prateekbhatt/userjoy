@@ -63193,6 +63193,7 @@ var app = angular.module('dodatado', [
   'toggle-switch',
   'angular-tour',
   'flash',
+  'do.demo',
 ])
 
 .directive('fallbackSrc', function () {
@@ -63444,7 +63445,7 @@ var app = angular.module('dodatado', [
             if (rejection.status === 401 && checkUrl !=
               'login' && checkUrl != 'forgot-password' && checkUrl !=
               'signup' && inviteUrl != 'invite' && inviteUrl !=
-              'verify-email') {
+              'verify-email' && checkUrl != 'demo') {
               console.log("401 status logout");
               loginProvider.setLoggedIn = false;
               $rootScope.loggedIn = false;
@@ -63496,7 +63497,7 @@ var app = angular.module('dodatado', [
             //   })
             // };
             // options.push({
-            //   name: 
+            //   name:
             // })
           })
           .error(function () {
@@ -63578,25 +63579,6 @@ var app = angular.module('dodatado', [
   }
 ])
 
-// .run(['AppService', 'AppModel', '$log', 'appIdProvider', '$rootScope',
-//     function (AppService, AppModel, $log, appIdProvider, $rootScope) {
-//         if ($rootScope.loggedIn) {
-//             AppModel.get(function (err, apps) {
-//                 console.log("Run App", err, apps);
-//                 if (err) {
-//                     return;
-//                 }
-//                 AppService.setLoggedInApps(apps);
-//                 // console.log("apps[0]: ", apps[0]);
-//                 AppService.setCurrentApp(apps[0]);
-//                 appIdProvider.setAppId(apps[0]._id);
-//                 // console.log("AppIdProvider: ", appIdProvider.getAppId());
-//                 // console.log("default app:", AppService.getCurrentApp());
-
-//             });
-//         }
-//     }
-// ])
 .run(['$state', 'LoginService', '$rootScope',
   function ($state, LoginService, $rootScope) {
 
@@ -63612,12 +63594,6 @@ var app = angular.module('dodatado', [
     });
   }
 ])
-
-/*.run(['ThreadService', 'MsgService',
-    function (ThreadService, MsgService) {
-        window.location.pathname
-    }
-])*/
 
 .run(['segment', 'queryMatching', 'countOfActions', 'hasNotDone',
   'hasDoneActions', 'modelsQuery', 'AppService',
@@ -63749,6 +63725,7 @@ angular.element(document)
   .ready(function () {
     angular.bootstrap(document, ['dodatado']);
   });
+
 angular.module('do.automate', [])
 
 .config(['$stateProvider',
@@ -64369,7 +64346,7 @@ angular.module('do.automate', [])
             value: "Email",
             label: 'fa fa-envelope'
           }];
-
+console.log("AccountService: ", AccountService.get());
           $scope.sender = AccountService.get()
             .name;
           $scope.senderEmail = AccountService.get()
@@ -65573,6 +65550,45 @@ angular.module('do.automate', [])
   }
 ])
 
+angular.module('do.demo', [])
+
+.config(['$stateProvider',
+  function ($stateProvider) {
+    $stateProvider
+      .state('demo', {
+        url: '/demo',
+        views: {
+          "main": {
+            templateUrl: '/templates/demo/demo.html',
+            controller: 'DemoCtrl',
+            authenticate: false
+          }
+        }
+      })
+
+  }
+])
+
+.controller('DemoCtrl', ['$scope', '$location', 'AuthService', '$rootScope',
+  'config',
+  function ($scope, $location, AuthService, $rootScope, config) {
+    $rootScope.demo = true;
+
+    config.siteName = 'DoDataDo';
+    config.siteUrl = '/';
+    config.apiUrl = 'https://demo.userjoy.co';
+    config.cookieDomain = '.userjoy.co';
+    config.currentUser = false;
+
+    AuthService.attemptLogin('demo@userjoy.co', 'demodemo', function (err) {
+      if (err) {
+        console.log("error");
+        return;
+      }
+    })
+  }
+])
+
 angular.module('do.feed', [])
 
 .config(['$stateProvider',
@@ -66205,7 +66221,8 @@ angular.module('do.login', [])
               console.log("error");
               return;
             }
-            console.log("account ===================: ", acc);
+            console.log("account ===================: ", acc, AppService
+              .getCurrentApp());
             if (acc.defaultApp) {
               var callback = function (err) {
                 if (err) {
@@ -69022,7 +69039,13 @@ angular.module('do.navbar', [])
         $scope.appId = $location.path()
           .split("/")[2];
 
-        var callback = function () {
+        var callback = function (err) {
+
+          if(err) {
+            console.log("here is the error");
+            return;
+          }
+
           var appsconnected;
           $scope.apps = [];
 
@@ -69188,7 +69211,6 @@ angular.module('do.navbar', [])
 
         }
 
-
         AppModel.getSingleApp($scope.appId, callback);
         // if ($location.path()
         //   .split("/")[2] != 'settings') {
@@ -69260,7 +69282,12 @@ angular.module('do.navbar', [])
 
 
 
-        var callback = function () {
+        var callback = function (err) {
+
+          if(err) {
+            console.log("error");
+            return;
+          }
 
           $scope.displayApp = AppService.getAppName();
 
@@ -70368,15 +70395,15 @@ angular.module('do.users', [])
   'userAttributes', 'lodash', '$modal',
   'UidService', '$moment', 'UserList', '$timeout', 'modelsSegment',
   'segmentService', 'CurrentAppService', 'UserModel', '$log',
-  'MsgService', '$stateParams', '$rootScope', 'flash',
+  'MsgService', '$stateParams', '$rootScope', 'flash', 'config',
   function ($scope, $location, segment, queryMatching, $filter,
     countOfActions, hasNotDone, hasDoneActions,
     ngTableParams, login, modelsQuery, AppService, segment,
     queryMatching, eventNames, userAttributes, lodash, $modal,
     UidService, $moment, UserList, $timeout, modelsSegment,
     segmentService, CurrentAppService, UserModel, $log, MsgService,
-    $stateParams, $rootScope, flash) {
-
+    $stateParams, $rootScope, flash, config) {
+console.log("config.apiUrl: ", config.apiUrl);
     CurrentAppService.getCurrentApp()
       .then(function (currentApp) {
         // flash('Saved!');
@@ -70446,12 +70473,12 @@ angular.module('do.users', [])
         }
 
         $scope.darkerBorder = function ($first) {
-          console.log("$first: ", $first);
+          // console.log("$first: ", $first);
           var mystyle = '';
           if($first) {
             mystyle = "{'border-top': '1px solid #7f8c8d;'}";
           }
-          console.log("mystyle: ", mystyle);
+          // console.log("mystyle: ", mystyle);
           return mystyle;
         }
 
@@ -73093,8 +73120,8 @@ angular
 angular
   .module('models.apps', ['services'])
   .service('AppModel', ['$http', 'config', '$state', 'AppService',
-    '$location',
-    function ($http, config, $state, AppService, $location) {
+    '$location', 'AccountModel',
+    function ($http, config, $state, AppService, $location, AccountModel) {
 
       this.get = function (cb) {
 
@@ -73108,14 +73135,34 @@ angular
       };
 
       this.getSingleApp = function (appId, cb) {
-        $http.get(config.apiUrl + '/apps/' + appId)
+        console.log("is the error here????", appId);
+
+        var callbackGetSingleApp = function (appId) {
+          $http.get(config.apiUrl + '/apps/' + appId)
           .success(function (data) {
             console.log("current App: --> from App Model: ", data);
             AppService.setCurrentApp(data);
             AppService.setAppName(data.name);
-            cb();
+            cb(null);
           })
           .error(cb);
+        }
+
+        if(appId == null) {
+          console.log("appId is null");
+          AccountModel.get(function (err, acc) {
+            if(err) {
+              console.log("error");
+              return;
+            }
+            appId = acc.defaultApp;
+            callbackGetSingleApp(appId);
+          })
+        } else {
+          console.log("appId is not null: ", appId);
+          callbackGetSingleApp(appId);
+        }
+
       }
 
 
@@ -73272,10 +73319,10 @@ angular.module('models.auth', ['services'])
 .service('AuthService', ['$http', 'utils', 'ipCookie', 'LoginService',
   '$log', 'config', '$state', '$location', 'AppService',
   'ErrMsgService', 'authService', 'login', '$rootScope', 'AccountModel',
-  'AppModel',
+  'AppModel', 'AccountService',
   function ($http, utils, ipCookie, LoginService, $log, config, $state,
     $location, AppService, ErrMsgService, authService, login,
-    $rootScope, AccountModel, AppModel) {
+    $rootScope, AccountModel, AppModel, AccountService) {
 
     this.attemptLogin = function (email, password, callback) {
 
@@ -73311,13 +73358,15 @@ angular.module('models.auth', ['services'])
 
 
                 AccountModel.get(function (err, acc) {
+                  console.log("acc: ", acc);
                   if (err) {
                     console.log("error");
                     return;
                   }
                   console.log("account ===================: ", acc);
+                  AccountService.set(acc);
                   if (acc.defaultApp) {
-                    var callback = function (err) {
+                    var callbackSingleApp = function (err) {
                       if (err) {
                         console.log("error");
                         return;
@@ -73332,7 +73381,7 @@ angular.module('models.auth', ['services'])
                           ._id + '/addcode');
                       }
                     }
-                    AppModel.getSingleApp(acc.defaultApp, callback);
+                    AppModel.getSingleApp(acc.defaultApp, callbackSingleApp);
 
                   } else {
 
@@ -74090,6 +74139,7 @@ angular.module('services.CurrentAppService', [])
     return {
       getCurrentApp: function () {
         var defer = $q.defer();
+        console.log("getting apps");
         $http.get(config.apiUrl + '/apps')
           .success(function (data) {
             defer.resolve(data);
@@ -74101,6 +74151,7 @@ angular.module('services.CurrentAppService', [])
 
   }
 ])
+
 angular.module('services.ErrMsgService', [])
 
 .service('ErrMsgService', ['$log',

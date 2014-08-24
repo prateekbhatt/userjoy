@@ -7,6 +7,7 @@ angular.module('services.CurrentAppService', [])
     return {
       getCurrentApp: function () {
         var defer = $q.defer();
+        console.log("getting apps");
         $http.get(config.apiUrl + '/apps')
           .success(function (data) {
             defer.resolve(data);
