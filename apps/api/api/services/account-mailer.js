@@ -191,6 +191,13 @@ exports.sendTeamReplyConversation = function (options, cb) {
   mailer.send(cb);
 }
 
+exports.sendContactUserJoy = function (options, cb) {
+  var mailer = new Mailer(options);
+  mailer.subject = 'New Contact Us Message';
+  mailer.template = 'email-contact-us.ejs';
+  mailer.send(cb);
+}
+
 /**
  * FOR TESTING PURPOSE
  *

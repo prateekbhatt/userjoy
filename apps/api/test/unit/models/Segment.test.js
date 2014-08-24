@@ -726,7 +726,7 @@ describe('Model Segment', function () {
             .and.deep.equals([{
               method: 'attr',
               name: 'joined',
-              op: 'lt',
+              op: 'eq',
               val: '1'
             }]);
 
@@ -736,7 +736,7 @@ describe('Model Segment', function () {
             .and.deep.equals([{
               method: 'attr',
               name: 'joined',
-              op: 'lt',
+              op: 'eq',
               val: '3'
             }]);
 
@@ -746,7 +746,7 @@ describe('Model Segment', function () {
             .and.deep.equals([{
               method: 'attr',
               name: 'joined',
-              op: 'lt',
+              op: 'eq',
               val: '7'
             }]);
 
