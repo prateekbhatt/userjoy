@@ -350,7 +350,7 @@ SegmentSchema.statics.createPredefined = function (aid, adminUid, cb) {
         {
           method: 'attr',
           name: 'joined',
-          op: 'lt',
+          op: 'eq',
           val: '1'
         }
 
@@ -365,7 +365,7 @@ SegmentSchema.statics.createPredefined = function (aid, adminUid, cb) {
         {
           method: 'attr',
           name: 'joined',
-          op: 'lt',
+          op: 'eq',
           val: '3'
         }
 
@@ -380,7 +380,7 @@ SegmentSchema.statics.createPredefined = function (aid, adminUid, cb) {
         {
           method: 'attr',
           name: 'joined',
-          op: 'lt',
+          op: 'eq',
           val: '7'
         }
 
