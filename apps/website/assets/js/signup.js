@@ -59,10 +59,7 @@ $('#signup_form_submit')
       dataType: 'json',
       success: function (data) {
         spinner.stop();
-        $("#spin")
-          .css({
-            display: "none"
-          })
+
         console.log('signup success', arguments, data);
         $('#signup_form_submit')
           .attr("disabled", false);
