@@ -59,10 +59,7 @@ $('#signup_form_submit')
       dataType: 'json',
       success: function (data) {
         spinner.stop();
-        $("#spin")
-          .css({
-            display: "none"
-          })
+
         console.log('signup success', arguments, data);
         $('#signup_form_submit')
           .attr("disabled", false);
@@ -104,48 +101,56 @@ $('#signup_form_submit')
 
   });
 
-/**
- * Add jquery validation to valdiate form elements: TODO
- */
-// $('#signup_form').validate({
-
-// })
-
 $(function () {
+
+
+  // USE bootstrap-validator
   $("#signup_form")
-    .validate({
-      rules: {
+    .bootstrapValidator({
+      message: 'This value is not valid',
+      feedbackIcons: {
+        valid: 'glyphicon glyphicon-ok',
+        invalid: 'glyphicon glyphicon-remove',
+        validating: 'glyphicon glyphicon-refresh'
+      },
+      fields: {
         name: {
-          required: true,
-          minlength: 2
+          message: 'Name is not valid',
+          validators: {
+            notEmpty: {
+              message: 'Name is required and cannot be empty'
+            },
+            stringLength: {
+              min: 2,
+              max: 30,
+              message: 'Name must be more than 2 and less than 30 characters long'
+            }
+          }
         },
         email: {
-          required: true,
-          email: true
+          validators: {
+            notEmpty: {
+              message: 'The email is required and cannot be empty'
+            },
+            emailAddress: {
+              message: 'The input is not a valid email address'
+            }
+          }
         },
         password: {
-          required: true,
-          minlength: 8
+          message: 'Password is not valid',
+          validators: {
+            notEmpty: {
+              message: 'Password is required and cannot be empty'
+            },
+            stringLength: {
+              min: 8,
+              max: 30,
+              message: 'Password must be more than 8 and less than 30 characters long'
+            }
+          }
         }
       },
-
-      messages: {
-        name: {
-          required: "Please provide your name",
-          minlength: "Your name must be atleast 2 characters long"
-        },
-        email: {
-          required: "Please enter your email"
-        },
-        password: {
-          required: "Please provide a password",
-          minlength: "Your password must be atleast 8 characters long"
-        }
-      },
-
-      submitHandler: function (form) {
-        form.submit();
-      }
     });
 });
 
