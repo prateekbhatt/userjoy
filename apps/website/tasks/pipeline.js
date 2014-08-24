@@ -22,6 +22,7 @@ var cssFilesToInject = [
   // NOTE: put required bower dependencies here
   // e.g. 'bower_components/bootstrap/dist/css/bootstrap.css',
   'bower_components/font-awesome/css/font-awesome.min.css',
+  'bower_components/bootstrapValidator/dist/css/bootstrapValidator.min.css',
 
   // all other styles go below
   'styles/**/*.css'
@@ -51,6 +52,7 @@ var jsFilesToInject = [
   'bower_components/jquery/dist/jquery.js',
   'bower_components/bootstrap/dist/js/bootstrap.js',
   'bower_components/jquery-cookie/jquery.cookie.js',
+  'bower_components/bootstrapValidator/dist/js/bootstrapValidator.min.js',
 
   // All of the rest of your app scripts
   'js/**/*.js'
