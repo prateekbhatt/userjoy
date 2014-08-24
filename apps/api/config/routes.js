@@ -46,6 +46,8 @@ module.exports.dashboard = function loadDashboardRoutes(app) {
   /////////////////////////////////////////////////////////
 
   app.use('/account', routes.AccountController);
+  app.use('/contact', routes.ContactController);
+
 
   // "/apps/:aid/invites/"
   //
