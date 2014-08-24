@@ -22,11 +22,11 @@ angular.module('do.demo', [])
   function ($scope, $location, AuthService, $rootScope, config) {
     $rootScope.demo = true;
 
-    config.siteName = 'DoDataDo';
-    config.siteUrl = '/';
-    config.apiUrl = 'https://demo.userjoy.co';
-    config.cookieDomain = '.userjoy.co';
-    config.currentUser = false;
+    // config.siteName = 'DoDataDo';
+    // config.siteUrl = '/';
+    // config.apiUrl = 'https://demo.userjoy.co';
+    // config.cookieDomain = '.userjoy.co';
+    // config.currentUser = false;
 
     AuthService.attemptLogin('demo@userjoy.co', 'demodemo', function (err) {
       if (err) {
