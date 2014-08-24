@@ -7,23 +7,23 @@ body {
 
 
 /*Placeholder Font Color*/
-.form-control:-moz-placeholder {
+/*.form-control:-moz-placeholder {
     color: #000000;
 }
 .form-control::-moz-placeholder {
     color: #000000;
-}
+}*/
 
-::-webkit-input-placeholder { /* WebKit browsers */
+::-webkit-input-placeholder {
     color: #000000;
 }
-:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+:-moz-placeholder {
     color: #000000;
 }
-::-moz-placeholder { /* Mozilla Firefox 19+ */
+::-moz-placeholder {
     color: #000000;
 }
-:-ms-input-placeholder { /* Internet Explorer 10+ */
+:-ms-input-placeholder {
     color: #000000;
 }
 /*Placeholder Font Color*/
@@ -32,32 +32,6 @@ body {
 .form-control:focus {
   box-shadow: none;
   border-width: 1px;
-}
-
-/* Wrapper for page content to push down footer */
-#sticky-footer-wrap {
-  min-height: 100%;
-  height: auto !important;
-  height: 100%;
-  /* Negative indent footer by its height */
-  margin: 0 auto -60px;
-  /* Pad bottom by footer height */
-  padding: 0 0 60px;
-}
-
-/* Set the fixed height of the footer here */
-#sticky-footer {
-  height: 60px;
-}
-
-/* Lastly, apply responsive CSS fixes as necessary */
-@media (max-width: 767px) {
-  #sticky-footer {
-    margin-left: -20px;
-    margin-right: -20px;
-    padding-left: 20px;
-    padding-right: 20px;
-  }
 }
 
 /*code for sticky footer ends*/
@@ -97,231 +71,6 @@ body {
 }
 
 
-/*.horiz-bar {
-  background-color: #ffffff;
-  content: "";
-  display: inline-block;
-  height: 1px;
-  position: relative;
-  vertical-align: middle;
-  width: 50%;
-}
-/*
-.hidden-sm {
-  .hidden-sm {
-  display: inherit !important;
-}
-}*/
-
-/*
-Author: Start Bootstrap - http://startbootstrap.com
-'SB Admin' HTML Template by Start Bootstrap
-
-All Start Bootstrap themes are licensed under Apache 2.0.
-For more info and more free Bootstrap 3 HTML themes, visit http://startbootstrap.com!
-*/
-
-/* ATTN: This is mobile first CSS - to update 786px and up screen width use the media query near the bottom of the document! */
-
-/* Global Styles */
-
-#navbar-sidenav-wrapper {
-  padding-left: 0;
-}
-
-#navbar-sidenav-page-wrapper {
-  width: 100%;
-  padding: 5px 15px;
-}
-
-/*hide navbar brand on sidenav for smaller screens*/
-#navbar-brand-sidenav {
-  display: none;
-}
-
-/* Edit Below to Customize Widths > 768px */
-@media (min-width:768px) {
-
-  /* Wrappers */
-  #navbar-brand-sidenav {
-    display: block;
-  }
-
-  #navbar-sidenav-wrapper {
-    padding-left: 180px;
-  }
-
-  #navbar-sidenav-page-wrapper {
-    padding: 15px 25px;
-  }
-
-  /* Side Nav */
-
-  .navbar-sidenav {
-    margin-left: -180px;
-    left: 180px;
-    width: 180px;
-    position: fixed;
-    color: #2c3e50;
-    /*padding-top: 61px;*/
-    height: 100%;
-    border-radius: 0;
-    border: none;
-    background-color: #ecf0f1;
-    overflow-y: auto;
-  }
-
-  .navbar-default .navbar-sidenav>.active>a, .navbar-default .navbar-nav>.active>a:hover, .navbar-default .navbar-nav>.active>a:focus {
-    color: #fff;
-    background-color: #7f8c8d;
-  }
-
-  /* Bootstrap Default Overrides - Customized Dropdowns for the Side Nav */
-
-  .navbar-sidenav>li.dropdown>ul.dropdown-menu {
-  position: relative;
-  min-width: 180px;
-  margin: 0;
-  padding: 0;
-  border: none;
-  border-radius: 0;
-  background-color: transparent;
-  box-shadow: none;
-  -webkit-box-shadow: none;
-  }
-
-  .navbar-sidenav>li.dropdown>ul.dropdown-menu>li>a {
-  color: #999999;
-  padding: 15px 15px 15px 25px;
-  }
-
-  .navbar-sidenav>li.dropdown>ul.dropdown-menu>li>a:hover,
-  .navbar-sidenav>li.dropdown>ul.dropdown-menu>li>a.active,
-  .navbar-sidenav>li.dropdown>ul.dropdown-menu>li>a:focus {
-  color: #fff;
-  background-color: #080808;
-  }
-
-  .navbar-sidenav>li>a {
-  width: 180px;
-  }
-
-  .navbar-inverse .navbar-nav>li>a:hover,
-  .navbar-inverse .navbar-nav>li>a:focus {
-  background-color: #080808;
-  }
-
-  a {
-    color: #428bca;
-    text-decoration: none;
-  }
-
-  a:hover, a:focus {
-    color: #2a6496;
-    text-decoration: underline;
-  }
-
-  .form-control: -moz-placeholder {
-    color: #000000;
-  }
-  .form-control: : -moz-placeholder {
-    color: #000000;
-  }
-
-  .form-control {
-    border: 1px solid #ccc;
-  }
-
-  .form-control:focus {
-    border-color: #66afe9;
-    outline: 0;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
-  }
-
-  .btn-info {
-    color: #ffffff;
-    background-color: #5bc0de;
-    border-color: #46b8da;
-  }
-
-  .btn-info:hover, .btn-info:focus, .btn-info:active, .btn-info.active, .open .dropdown-toggle.btn-info {
-    color: #ffffff;
-    background-color: #39b3d7;
-    border-color: #3498db;
-  }
-
-  .alert-danger {
-    background-color: #f2dede;
-    border-color: #ebccd1;
-    color: #a94442;
-  }
-
-  .error {
-    color: #a94442;
-  }
-
-  .form-control.error {
-    border-color: #A94442;
-  }
-
-  .form-control:focus.error {
-    border-color: #843534;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 6px #CE8483;
-  }
-
-  .alert-success {
-    background-color: #dff0d8;
-    border-color: #d6e9c6;
-    color: #3c763d;
-  }
-
-  .lead {
-    font-size: 33px;margin-bottom:0px;
-  }
-
-  .panel-info {
-    border-color: #bce8f1;
-  }
-  .panel-info > .panel-heading {
-    color: #31708f;
-    background-color: #d9edf7;
-    border-color: #bce8f1;
-  }
-
-  .panel-primary {
-    border-color: #428bca;
-  }
-
-  .panel-primary>.panel-heading {
-    color: #fff;
-    background-color: #428bca;
-    border-color: #428bca;
-  }
-
-  .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open .dropdown-toggle.btn-primary {
-    color: #fff;
-    background-color: #3276b1;
-    border-color: #285e8e;
-  }
-
-  .btn-primary {
-    color: #fff;
-    background-color: #428bca;
-    border-color: #357ebd;
-  }
-
-  .hide {
-    position: absolute !important;
-    top: -9999px !important;
-    left: -9999px !important;
-  }
-
-}
-
-
-
-
 /* jumbotron with background image used on header of benefits and features pages */
 .jumbotron-page-header {
   background-color: #29333a;
@@ -336,4 +85,19 @@ For more info and more free Bootstrap 3 HTML themes, visit http://startbootstrap
 .img-feature {
   border: 1px solid #bdc3c7;
   border-radius: 10px;
+}
+
+.banner-get-started {
+  padding: 50px 0;
+  color: #f8f8f8;
+  background-color: #34495E;
+  background-size: cover;
+}
+
+
+.banner-guide-user {
+  padding: 20px 0;
+  color: #f8f8f8;
+  background-color: #C5EFF7;
+  background-size: cover;
 }

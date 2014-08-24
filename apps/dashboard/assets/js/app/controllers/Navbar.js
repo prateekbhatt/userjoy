@@ -56,7 +56,13 @@ angular.module('do.navbar', [])
         $scope.appId = $location.path()
           .split("/")[2];
 
-        var callback = function () {
+        var callback = function (err) {
+
+          if(err) {
+            console.log("here is the error");
+            return;
+          }
+
           var appsconnected;
           $scope.apps = [];
 
@@ -222,7 +228,6 @@ angular.module('do.navbar', [])
 
         }
 
-
         AppModel.getSingleApp($scope.appId, callback);
         // if ($location.path()
         //   .split("/")[2] != 'settings') {
@@ -294,7 +299,12 @@ angular.module('do.navbar', [])
 
 
 
-        var callback = function () {
+        var callback = function (err) {
+
+          if(err) {
+            console.log("error");
+            return;
+          }
 
           $scope.displayApp = AppService.getAppName();
 

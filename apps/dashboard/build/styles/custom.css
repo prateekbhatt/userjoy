@@ -9,12 +9,12 @@ body {
 }
 /*Placeholder Font Color*/
 
-.form-control: -moz-placeholder {
+/*.form-control: -moz-placeholder {
     color: #000000;
 }
 .form-control: : -moz-placeholder {
     color: #000000;
-}
+}*/
 : : -webkit-input-placeholder {
     /* WebKit browsers */
 
@@ -884,6 +884,14 @@ pre code {
   border-left: 6px solid #e74c3c;
 }
 
+.progress-bar-striped {
+  background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
+  background-size: 40px 40px;
+}
+
+.progress-bar.active {
+  -webkit-animation: progress-bar-stripes 2s linear infinite;
+}
 
 /*.active-smart-filters {
     background-color: #e0e0e0;

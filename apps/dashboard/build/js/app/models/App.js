@@ -1,8 +1,8 @@
 angular
   .module('models.apps', ['services'])
   .service('AppModel', ['$http', 'config', '$state', 'AppService',
-    '$location',
-    function ($http, config, $state, AppService, $location) {
+    '$location', 'AccountModel',
+    function ($http, config, $state, AppService, $location, AccountModel) {
 
       this.get = function (cb) {
 
@@ -16,14 +16,34 @@ angular
       };
 
       this.getSingleApp = function (appId, cb) {
-        $http.get(config.apiUrl + '/apps/' + appId)
+        console.log("is the error here????", appId);
+
+        var callbackGetSingleApp = function (appId) {
+          $http.get(config.apiUrl + '/apps/' + appId)
           .success(function (data) {
             console.log("current App: --> from App Model: ", data);
             AppService.setCurrentApp(data);
             AppService.setAppName(data.name);
-            cb();
+            cb(null);
           })
           .error(cb);
+        }
+
+        if(appId == null) {
+          console.log("appId is null");
+          AccountModel.get(function (err, acc) {
+            if(err) {
+              console.log("error");
+              return;
+            }
+            appId = acc.defaultApp;
+            callbackGetSingleApp(appId);
+          })
+        } else {
+          console.log("appId is not null: ", appId);
+          callbackGetSingleApp(appId);
+        }
+
       }
 
 

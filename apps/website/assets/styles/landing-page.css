@@ -157,8 +157,9 @@ body, h1, h2, h3, h4, h5, h6 {
 }
 
 footer {
-  background-color: #f8f8f8;
-  padding: 20px 0;
+  background-color: #E4F1FE;
+  padding: 50px 0 20px 0;
+  font-size: 90%;
 }
 
 p.copyright {
