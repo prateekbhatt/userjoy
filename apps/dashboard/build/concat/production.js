@@ -65574,11 +65574,11 @@ angular.module('do.demo', [])
   function ($scope, $location, AuthService, $rootScope, config) {
     $rootScope.demo = true;
 
-    config.siteName = 'DoDataDo';
-    config.siteUrl = '/';
-    config.apiUrl = 'https://demo.userjoy.co';
-    config.cookieDomain = '.userjoy.co';
-    config.currentUser = false;
+    // config.siteName = 'DoDataDo';
+    // config.siteUrl = '/';
+    // config.apiUrl = 'https://demo.userjoy.co';
+    // config.cookieDomain = '.userjoy.co';
+    // config.currentUser = false;
 
     AuthService.attemptLogin('demo@userjoy.co', 'demodemo', function (err) {
       if (err) {
@@ -74553,6 +74553,17 @@ angular.module('services.config', [])
 .service('config', function () {
 
   // private vars here if needed
+  //
+  if(window.location.pathname == '/demo') {
+    return {
+      siteName: 'DoDataDo',
+      // no trailing slash!
+      siteUrl: '/',
+      apiUrl: 'https://demo.userjoy.co',
+      cookieDomain: '.userjoy.co',
+      currentUser: false
+    };
+  }
   if (window.location.href.split("/")[2] == 'app.do.localhost') {
     return {
       siteName: 'DoDataDo',
@@ -74576,6 +74587,7 @@ angular.module('services.config', [])
   }
 
 });
+
 angular.module('services', [
   'services.config',
   'services.utils',
