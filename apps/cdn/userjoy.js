@@ -921,8 +921,13 @@ function isEmpty (val) {
 });
 require.register("ianstormtaylor-is/index.js", function(exports, require, module){
 
-var isEmpty = require('is-empty')
-  , typeOf = require('type');
+var isEmpty = require('is-empty');
+
+try {
+  var typeOf = require('type');
+} catch (e) {
+  var typeOf = require('component-type');
+}
 
 
 /**
@@ -4420,6 +4425,7 @@ exports.select = function(fn){
  */
 
 exports.reject = function(fn){
+  var dom = this.dom;
   var out = [];
   var len = this.length;
   var val, i;
@@ -6917,17 +6923,18 @@ var MSG_SENT_TEMPLATE_ID = 'uj_message_sent';
 var MSG_ERROR_ID = 'uj_message_error';
 var MSG_SEND_FEEDBACK_ID = 'uj_message_send_button';
 var MSG_DISPLAY_QMARK = 'uj_message_display_qmark';
+var MSG_OUTER_DIV = 'uj_message_outer_div';
 
 
 /**
  * Initialize a new `Message` instance.
  */
 
-  function Message() {
+function Message() {
 
-    this.debug = debug;
+  this.debug = debug;
 
-  }
+}
 
 
 Message.prototype.load = function () {
@@ -6944,6 +6951,7 @@ Message.prototype.load = function () {
     MSG_ERROR_ID: MSG_ERROR_ID,
     MSG_SEND_FEEDBACK_ID: MSG_SEND_FEEDBACK_ID,
     MSG_DISPLAY_QMARK: MSG_DISPLAY_QMARK,
+    MSG_OUTER_DIV: MSG_OUTER_DIV,
     color: appTraits.color,
     isDisplayed: appTraits.showMessageBox ? 'block' : 'none'
   };
@@ -6985,6 +6993,25 @@ Message.prototype.show = function () {
     .style.display = 'none';
   document.getElementById(MSG_BODY_TEMPLATE_ID)
     .focus();
+
+  document.getElementById(MSG_OUTER_DIV)
+    .style.background = (document.getElementById(MSG_TEMPLATE_ID)
+      .style.display === 'block') ? 'rgba(0, 0, 0, 0.4)': '';
+  document.getElementById(MSG_OUTER_DIV)
+    .style.height = (document.getElementById(MSG_TEMPLATE_ID)
+      .style.display === 'block') ? '100%' : '';
+  document.getElementById(MSG_OUTER_DIV)
+    .style.width = (document.getElementById(MSG_TEMPLATE_ID)
+      .style.display === 'block') ? '100%' : '';
+  document.getElementById(MSG_OUTER_DIV)
+    .style.position = (document.getElementById(MSG_TEMPLATE_ID)
+      .style.display === 'block') ? 'fixed' : '';
+  document.getElementById(MSG_OUTER_DIV)
+    .style.left = (document.getElementById(MSG_TEMPLATE_ID)
+      .style.display === 'block') ? '0' : '';
+  document.getElementById(MSG_OUTER_DIV)
+    .style.top = (document.getElementById(MSG_TEMPLATE_ID)
+      .style.display === 'block') ? '0' : '';
 
 };
 
@@ -7053,7 +7080,7 @@ Message.prototype.send = function () {
 
       document.getElementById(MSG_SENT_TEMPLATE_ID)
         .style.display = 'block';
-        
+
       document.getElementById(MSG_ERROR_ID)
         .style.display = 'none';
 
@@ -7087,6 +7114,7 @@ Message.prototype.send = function () {
  */
 
 module.exports = bind.all(new Message());
+
 });
 require.register("userjoy/lib/message-template.js", function(exports, require, module){
 module.exports = function anonymous(obj) {
@@ -7107,7 +7135,7 @@ module.exports = function anonymous(obj) {
     return '';
   };
 
-  return "<div>\n    <a style=\"cursor: pointer; display: " + escape(obj.isDisplayed) + ";\" onclick=\"userjoy.showMessageBox()\" id=\"" + escape(obj.MSG_DISPLAY_QMARK) + "\">\n        <div style=\"position: fixed; bottom:30px; right:20px; z-index: 99999999;\">\n            <span style=\"display: inline-block;\n            min-width: 20px;\n            padding: 10px 14px;\n            font-size: 24px;\n            font-weight: 700;\n            color: #fff;\n            line-height: 1;\n            vertical-align: baseline;\n            white-space: nowrap;\n            text-align: center;\n            background-color: " + escape(obj.color) + ";\n            border-radius: 10px;\">&#63;\n            </span>\n        </div>\n    </a>\n    <div style=\"display: none\" id=\"" + escape(obj.MSG_TEMPLATE_ID) + "\">\n        <div style=\"position: fixed; right: 9px; z-index: 99999999; top: 50%; left: 50%; margin-left: -225px; height: 1000px; margin-top: -150px;\" class=\"uj-col-md-4\">\n            <div class=\"uj-panel uj-panel-default\" style=\"border-color: #ddd;\">\n                <div class=\"uj-panel-heading\">\n                    <h3 class=\"uj-panel-title\" style=\"text-align: center;\">How may we help you?</h3>\n                    <button type=\"button\" class=\"uj-close\" aria-hidden=\"true\" onclick=\"userjoy.hideMessageBox()\" id=\"close-userjoy-message-box\" style=\"margin-top: -25px;\">&times;</button>\n                </div>\n                <div class=\"uj-panel-body\">\n                    <form role=\"form\">\n                        <textarea id=\"" + escape(obj.MSG_BODY_TEMPLATE_ID) + "\" class=\"uj-form-control\" style=\"padding: 4px; height: 200px; border-color: " + escape(obj.color) + "; box-shadow: none;\"></textarea>\n                        <span style=\"display: none; margin-top: 10px;\" id=\"" + escape(obj.MSG_SENT_TEMPLATE_ID) + "\">\n                        Message sent. Have a wonderful day!</span>\n                        <span id=\"" + escape(obj.MSG_ERROR_ID) + "\" style=\" display:none; color: #a94442; margin-top: 10px;\">\n                        Your message cannot be blank\n                        </span>\n                        <button type=\"button\" class=\"uj-btn uj-btn-sm uj-btn-block\" onclick=\"userjoy.sendConversation()\" style=\"float: right; margin-top: 10px; color: #fff; background-color: " + escape(obj.color) + "; border-color: " + escape(obj.color) + "\" id=\"" + escape(obj.MSG_SEND_FEEDBACK_ID) + "\">Send Message</button>\n                        <div style=\"text-align: center;\">\n                        <small style=\"color: #95a5a6;\">Powered by <a style=\"text-decoration:none; color: " + escape(obj.color) + "\" href=\"https://userjoy.co\", target=\"_blank\">UserJoy</a></small>\n                        </div>\n                    </form>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n"
+  return "<div id=\"" + escape(obj.MSG_OUTER_DIV) + "\">\n    <a style=\"cursor: pointer; display: " + escape(obj.isDisplayed) + ";\" onclick=\"userjoy.showMessageBox()\" id=\"" + escape(obj.MSG_DISPLAY_QMARK) + "\">\n        <div style=\"position: fixed; bottom:30px; right:20px; z-index: 99999999;\">\n            <span style=\"display: inline-block;\n            min-width: 20px;\n            padding: 10px 14px;\n            font-size: 24px;\n            font-weight: 700;\n            color: #fff;\n            line-height: 1;\n            vertical-align: baseline;\n            white-space: nowrap;\n            text-align: center;\n            background-color: " + escape(obj.color) + ";\n            border-radius: 10px;\">&#63;\n            </span>\n        </div>\n    </a>\n    <div style=\"display: none; background: rgba(0, 0, 0, 0.4);\" id=\"" + escape(obj.MSG_TEMPLATE_ID) + "\">\n        <div style=\"position: fixed; right: 9px; z-index: 99999999; top: 50%; left: 50%; margin-left: -225px; height: 1000px; margin-top: -150px;\" class=\"uj-col-md-4\">\n            <div class=\"uj-panel uj-panel-default\" style=\"border-color: #ddd;\">\n                <div class=\"uj-panel-heading\">\n                    <h3 class=\"uj-panel-title\" style=\"text-align: center;\">How may we help you?</h3>\n                    <button type=\"button\" class=\"uj-close\" aria-hidden=\"true\" onclick=\"userjoy.hideMessageBox()\" id=\"close-userjoy-message-box\" style=\"margin-top: -25px;\">&times;</button>\n                </div>\n                <div class=\"uj-panel-body\">\n                    <form role=\"form\">\n                        <textarea id=\"" + escape(obj.MSG_BODY_TEMPLATE_ID) + "\" class=\"uj-form-control\" style=\"padding: 4px; height: 200px; border-color: " + escape(obj.color) + "; box-shadow: none;\"></textarea>\n                        <span style=\"display: none; margin-top: 10px;\" id=\"" + escape(obj.MSG_SENT_TEMPLATE_ID) + "\">\n                        Message sent. Have a wonderful day!</span>\n                        <span id=\"" + escape(obj.MSG_ERROR_ID) + "\" style=\" display:none; color: #a94442; margin-top: 10px;\">\n                        Your message cannot be blank\n                        </span>\n                        <button type=\"button\" class=\"uj-btn uj-btn-sm uj-btn-block\" onclick=\"userjoy.sendConversation()\" style=\"float: right; margin-top: 10px; color: #fff; background-color: " + escape(obj.color) + "; border-color: " + escape(obj.color) + "\" id=\"" + escape(obj.MSG_SEND_FEEDBACK_ID) + "\">Send Message</button>\n                        <div style=\"text-align: center;\">\n                        <small style=\"color: #95a5a6;\">Powered by <a style=\"text-decoration:none; color: " + escape(obj.color) + "\" href=\"https://userjoy.co\", target=\"_blank\">UserJoy</a></small>\n                        </div>\n                    </form>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n"
 }
 });
 require.register("userjoy/lib/notification.js", function(exports, require, module){
