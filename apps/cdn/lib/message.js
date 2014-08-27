@@ -17,17 +17,18 @@ var MSG_SENT_TEMPLATE_ID = 'uj_message_sent';
 var MSG_ERROR_ID = 'uj_message_error';
 var MSG_SEND_FEEDBACK_ID = 'uj_message_send_button';
 var MSG_DISPLAY_QMARK = 'uj_message_display_qmark';
+var MSG_OUTER_DIV = 'uj_message_outer_div';
 
 
 /**
  * Initialize a new `Message` instance.
  */
 
-  function Message() {
+function Message() {
 
-    this.debug = debug;
+  this.debug = debug;
 
-  }
+}
 
 
 Message.prototype.load = function () {
@@ -44,6 +45,7 @@ Message.prototype.load = function () {
     MSG_ERROR_ID: MSG_ERROR_ID,
     MSG_SEND_FEEDBACK_ID: MSG_SEND_FEEDBACK_ID,
     MSG_DISPLAY_QMARK: MSG_DISPLAY_QMARK,
+    MSG_OUTER_DIV: MSG_OUTER_DIV,
     color: appTraits.color,
     isDisplayed: appTraits.showMessageBox ? 'block' : 'none'
   };
@@ -85,6 +87,25 @@ Message.prototype.show = function () {
     .style.display = 'none';
   document.getElementById(MSG_BODY_TEMPLATE_ID)
     .focus();
+
+  document.getElementById(MSG_OUTER_DIV)
+    .style.background = (document.getElementById(MSG_TEMPLATE_ID)
+      .style.display === 'block') ? 'rgba(0, 0, 0, 0.4)': '';
+  document.getElementById(MSG_OUTER_DIV)
+    .style.height = (document.getElementById(MSG_TEMPLATE_ID)
+      .style.display === 'block') ? '100%' : '';
+  document.getElementById(MSG_OUTER_DIV)
+    .style.width = (document.getElementById(MSG_TEMPLATE_ID)
+      .style.display === 'block') ? '100%' : '';
+  document.getElementById(MSG_OUTER_DIV)
+    .style.position = (document.getElementById(MSG_TEMPLATE_ID)
+      .style.display === 'block') ? 'fixed' : '';
+  document.getElementById(MSG_OUTER_DIV)
+    .style.left = (document.getElementById(MSG_TEMPLATE_ID)
+      .style.display === 'block') ? '0' : '';
+  document.getElementById(MSG_OUTER_DIV)
+    .style.top = (document.getElementById(MSG_TEMPLATE_ID)
+      .style.display === 'block') ? '0' : '';
 
 };
 
@@ -153,7 +174,7 @@ Message.prototype.send = function () {
 
       document.getElementById(MSG_SENT_TEMPLATE_ID)
         .style.display = 'block';
-        
+
       document.getElementById(MSG_ERROR_ID)
         .style.display = 'none';
 
