@@ -103,6 +103,7 @@ cases:
 name          | embedded documents      | description
 -----         | ----------------------  | -----------
 Account       |                         | accounts on Userjoy
+Alert         |                         | alerts to be sent to team members
 App           | team                    | apps belonging to an account
 AutoMessage   |                         | automated messages
 Company       |                         | companies of a specific account
@@ -140,6 +141,23 @@ UserNote      |                         | notes created by team members about a 
 ##### Notes:
 
 - No need to store the reporting hour
+
+
+### Alert
+
+##### Columns:
+
+- active (boolean)
+- aid (required)
+- ct
+- lastQueued (timestamp)
+- sid (required)
+- ut
+
+##### Indexes:
+
+- aid
+
 
 ### App
 
