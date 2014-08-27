@@ -24,19 +24,19 @@ describe('Model Alert', function () {
   describe('#create', function () {
 
     it(
-      'should return error if aid/sid is not provided',
+      'should return error if aid/sid/title/when is not provided',
       function (done) {
 
-        var newAutoMsg = {};
+        var newAlert = {};
 
-        Alert.create(newAutoMsg, function (err, amsg) {
+        Alert.create(newAlert, function (err, alert) {
 
           expect(err)
             .to.exist;
 
           expect(Object.keys(err.errors)
             .length)
-            .to.eql(3);
+            .to.eql(4);
 
           expect(err.errors.aid.message)
             .to.eql('Invalid aid');
@@ -44,10 +44,13 @@ describe('Model Alert', function () {
           expect(err.errors.sid.message)
             .to.eql('Invalid segment id');
 
-          expect(err.errors.when.message)
-            .to.eql("Provide entry / exit status");
+          expect(err.errors.title.message)
+            .to.eql("Provide alert title");
 
-          expect(amsg)
+          expect(err.errors.when.message)
+            .to.eql("Provide enters / leaves status");
+
+          expect(alert)
             .to.not.exist;
 
           done();
@@ -61,24 +64,32 @@ describe('Model Alert', function () {
       var newAlert = {
         aid: randomId,
         sid: randomId,
-        when: 'entry'
+        title: 'New User',
+        team: [randomId],
+        when: 'enters'
       };
 
-      Alert.create(newAlert, function (err, msg) {
+      Alert
+        .create(newAlert, function (err, alert) {
 
-        expect(err)
-          .to.not.exist;
+          expect(err)
+            .to.not.exist;
 
-        expect(msg)
-          .to.be.an('object');
+          expect(alert)
+            .to.be.an('object');
 
-        savedAlert = msg;
+          savedAlert = alert;
 
-        expect(msg.aid.toString())
-          .to.eql(newAlert.aid);
+          expect(alert.aid.toString())
+            .to.eql(newAlert.aid);
 
-        done();
-      });
+          expect(alert)
+            .to.have.property('team')
+            .that.is.an('array')
+            .and.to.contain(randomId);
+
+          done();
+        });
 
     });
 
@@ -118,18 +129,18 @@ describe('Model Alert', function () {
         .to.not.have.property('lastQueued');
 
       Alert.updateLastQueued(savedAlert._id,
-        function (err, msg) {
+        function (err, alert) {
 
           expect(err)
             .to.not.exist;
 
-          expect(msg)
+          expect(alert)
             .to.be.an('object');
 
-          expect(msg)
+          expect(alert)
             .to.have.property("lastQueued");
 
-          expect(msg.lastQueued)
+          expect(alert.lastQueued)
             .to.be.a("date");
 
           done();

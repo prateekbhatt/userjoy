@@ -64,6 +64,9 @@ module.exports.dashboard = function loadDashboardRoutes(app) {
   // "/apps/:aid/automessages/"
   app.use('/apps', routes.AutoMessageController);
 
+  // "/apps/:aid/alerts/"
+  app.use('/apps', routes.AlertController);
+
   // "/apps/:aid/query/"
   app.use('/apps', routes.QueryController);
 

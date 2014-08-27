@@ -221,13 +221,17 @@ var alerts = {
   first: {
     aid: null,
     sid: null,
-    when: 'entry'
+    title: 'New User',
+    team: [],
+    when: 'enters'
   },
 
   second: {
     aid: null,
     sid: null,
-    when: 'exit'
+    title: 'Risk Users',
+    team: [],
+    when: 'leaves'
   }
 };
 
@@ -303,10 +307,11 @@ function createAutoMessage(accid, aid, sender, sid, automessage, fn) {
 
 
 
-function createAlert(aid, sid, alert, fn) {
+function createAlert(aid, sid, toId, alert, fn) {
 
   alert.aid = aid;
   alert.sid = sid;
+  alert.team.push(toId);
 
   Alert.create(alert, fn);
 }
@@ -477,11 +482,12 @@ module.exports = function loadFixtures(callback) {
 
     createFirstAlert: function (cb) {
 
+      var accid = accounts.first._id;
       var aid = apps.first._id;
       var sid = segments.first._id;
       var alert = alerts.first;
 
-      createAlert(aid, sid, alert, function (err, alert) {
+      createAlert(aid, sid, accid, alert, function (err, alert) {
         if (err) return cb(err);
         alerts.first = alert;
         cb();
@@ -492,11 +498,12 @@ module.exports = function loadFixtures(callback) {
 
     createSecondAlert: function (cb) {
 
+      var accid = accounts.first._id;
       var aid = apps.second._id;
       var sid = segments.first._id;
       var alert = alerts.second;
 
-      createAlert(aid, sid, alert, function (err, alert) {
+      createAlert(aid, sid, accid, alert, function (err, alert) {
         if (err) return cb(err);
         alerts.second = alert;
         cb();
