@@ -220,12 +220,14 @@ var alerts = {
 
   first: {
     aid: null,
-    sid: null
+    sid: null,
+    when: 'entry'
   },
 
   second: {
     aid: null,
     sid: null,
+    when: 'exit'
   }
 };
 

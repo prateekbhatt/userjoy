@@ -74,10 +74,7 @@ var AlertSchema = new Schema({
   when: {
     type: String,
     enum: ['entry', 'exit'],
-    required: true,
-
-    // for backwards compatibility
-    default: 'entry'
+    required: [true, 'Provide entry / exit status']
   },
 
 });

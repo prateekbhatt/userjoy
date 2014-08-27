@@ -36,13 +36,16 @@ describe('Model Alert', function () {
 
           expect(Object.keys(err.errors)
             .length)
-            .to.eql(2);
+            .to.eql(3);
 
           expect(err.errors.aid.message)
             .to.eql('Invalid aid');
 
           expect(err.errors.sid.message)
             .to.eql('Invalid segment id');
+
+          expect(err.errors.when.message)
+            .to.eql("Provide entry / exit status");
 
           expect(amsg)
             .to.not.exist;
@@ -57,13 +60,8 @@ describe('Model Alert', function () {
 
       var newAlert = {
         aid: randomId,
-        body: 'Hey, Welkom to CabanaLand!',
-        creator: randomId,
-        sender: randomId,
         sid: randomId,
-        sub: 'Welkom!',
-        title: 'Welcome Message',
-        type: 'email'
+        when: 'entry'
       };
 
       Alert.create(newAlert, function (err, msg) {
