@@ -64,17 +64,32 @@ var AlertSchema = new Schema({
   },
 
 
+  // alerts should be sent to the following team members
+  team: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Account',
+    required: true
+  }],
+
+
+  // title of the alert
+  title: {
+    type: String,
+    required: [true, 'Provide alert title']
+  },
+
+
   // updated at timestamp
   ut: {
     type: Date
   },
 
 
-  // trigger alert on entry / exit into a segment
+  // trigger alert on entering / leaving a segment
   when: {
     type: String,
-    enum: ['entry', 'exit'],
-    required: [true, 'Provide entry / exit status']
+    enum: ['enters', 'leaves'],
+    required: [true, 'Provide enters / leaves status']
   },
 
 });

@@ -152,7 +152,9 @@ UserNote      |                         | notes created by team members about a 
 - ct
 - lastQueued (timestamp)
 - sid (required)
+- title (required)
 - ut
+- when (enters/leaves)
 
 ##### Indexes:
 
