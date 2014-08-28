@@ -188,12 +188,6 @@ router
     // if sender account id is not provided, add logged in account as sender
     newAutoMessage.sender = sender || accid;
 
-    // if type notification, make title as subject
-    // TODO: test this case
-    if (newAutoMessage.type === 'notification') {
-      newAutoMessage.sub = newAutoMessage.title;
-    }
-
     AutoMessage
       .create(newAutoMessage, function (err, savedAutoMsg) {
         if (err) return next(err);
