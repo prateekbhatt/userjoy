@@ -107,6 +107,10 @@ Message.prototype.show = function () {
     .style.top = (document.getElementById(MSG_TEMPLATE_ID)
       .style.display === 'block') ? '0' : '';
 
+  document.getElementById(MSG_OUTER_DIV)
+    .style.zIndex = (document.getElementById(MSG_TEMPLATE_ID)
+      .style.display === 'block') ? '999999' : '';
+
 };
 
 
