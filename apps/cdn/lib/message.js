@@ -122,6 +122,21 @@ Message.prototype.hide = function () {
 
   document.getElementById(id)
     .style.display = 'none';
+  document.getElementById(MSG_OUTER_DIV)
+    .style.background = '';
+  document.getElementById(MSG_OUTER_DIV)
+    .style.height = '';
+  document.getElementById(MSG_OUTER_DIV)
+    .style.width = '';
+  document.getElementById(MSG_OUTER_DIV)
+    .style.position = '';
+  document.getElementById(MSG_OUTER_DIV)
+    .style.left = '';
+  document.getElementById(MSG_OUTER_DIV)
+    .style.top = '';
+
+  document.getElementById(MSG_OUTER_DIV)
+    .style.zIndex = '';
 
 };
 
