@@ -18,6 +18,7 @@ var ObjectId = require('mongoose')
  */
 
 var Account = require('../../api/models/Account');
+var Alert = require('../../api/models/Alert');
 var App = require('../../api/models/App');
 var AutoMessage = require('../../api/models/AutoMessage');
 var Company = require('../../api/models/Company');
@@ -215,6 +216,25 @@ var automessages = {
 };
 
 
+var alerts = {
+
+  first: {
+    aid: null,
+    sid: null,
+    title: 'New User',
+    team: [],
+    when: 'enters'
+  },
+
+  second: {
+    aid: null,
+    sid: null,
+    title: 'Risk Users',
+    team: [],
+    when: 'leaves'
+  }
+};
+
 var companies = {
 
   first: {
@@ -283,6 +303,17 @@ function createAutoMessage(accid, aid, sender, sid, automessage, fn) {
   automessage.sid = sid;
 
   AutoMessage.create(automessage, fn);
+}
+
+
+
+function createAlert(aid, sid, toId, alert, fn) {
+
+  alert.aid = aid;
+  alert.sid = sid;
+  alert.team.push(toId);
+
+  Alert.create(alert, fn);
 }
 
 
@@ -449,6 +480,37 @@ module.exports = function loadFixtures(callback) {
     },
 
 
+    createFirstAlert: function (cb) {
+
+      var accid = accounts.first._id;
+      var aid = apps.first._id;
+      var sid = segments.first._id;
+      var alert = alerts.first;
+
+      createAlert(aid, sid, accid, alert, function (err, alert) {
+        if (err) return cb(err);
+        alerts.first = alert;
+        cb();
+      });
+
+    },
+
+
+    createSecondAlert: function (cb) {
+
+      var accid = accounts.first._id;
+      var aid = apps.second._id;
+      var sid = segments.first._id;
+      var alert = alerts.second;
+
+      createAlert(aid, sid, accid, alert, function (err, alert) {
+        if (err) return cb(err);
+        alerts.second = alert;
+        cb();
+      });
+
+    },
+
     createFirstConversation: function (cb) {
       var accid = accounts.first._id;
       var aid = apps.first._id;
@@ -539,6 +601,7 @@ module.exports = function loadFixtures(callback) {
 
     var savedObj = {
       accounts: accounts,
+      alerts: alerts,
       apps: apps,
       automessages: automessages,
       companies: companies,
