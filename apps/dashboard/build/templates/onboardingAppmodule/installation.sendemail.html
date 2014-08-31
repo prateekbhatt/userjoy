@@ -9,7 +9,7 @@
         <input class="form-control" ng-model="toEmail" placeholder="email address" style="width: 300px;" type="email">
     </div>
     <div class="col-md-2">
-    <button class="btn btn-info fa fa-mail-forward" ng-click="sendEmail()" ng-disabled="!(toEmail.length && enableSendEmail)" id="sendToDeveloper">Send to Developer</button>
+    <a class="btn btn-info fa fa-mail-forward" ng-click="sendEmail()" ng-disabled="!(toEmail.length && enableSendEmail)" id="sendToDeveloper">Send to Developer</a>
     </div>
 </div>
 <br>
