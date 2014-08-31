@@ -7802,9 +7802,9 @@ pre code {
     background-color: #D9534F;
     color: #FFF
 }
-body {
+/*body {
     margin: 10px;
-}
+}*/
 .stepwizard-step p {
     margin-top: 10px;
 }
@@ -7844,6 +7844,7 @@ body {
     line-height: 1.428571429;
     border-radius: 15px;
 }
+
 /* Global Styles */
 
 /* ------------------------------- */
