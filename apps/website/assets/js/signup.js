@@ -79,7 +79,7 @@ $('#signup_form_submit')
 
         // set
         window.location.href = loginUrl + "/apps/" + data.app._id +
-          "/addcode";
+          "/gettingstarted";
 
       },
       error: function (error) {
