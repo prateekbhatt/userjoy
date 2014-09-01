@@ -1,0 +1,35 @@
+<div ng-include src="'/templates/navbar/navbar.installation.html'"></div>
+<div class="container">
+    <h1 class="text-center">Getting Started with UserJoy</h1>
+    <br>
+    <br>
+    <div class="row col-md-offset-2">
+        <h4>Choose how to install the UserJoy code</h4>
+        <hr class="pull-left col-md-9" style="margin-top: 0px; margin-bottom: 0px;">
+        <br>
+    </div>
+    <div class="row col-md-offset-2">
+        <p>UserJoy helps you convert more trial users, increase engagement and reduce churn</p>
+    </div>
+    <br>
+    <br>
+    <div class="row">
+        <div class="col-md-3 col-md-offset-2 well" style="height: 200px;">
+            <h4 class="text-center">I can install the code myself</h4>
+            <br>
+            <div class="text-center">
+                <a class="btn btn-success fa fa-code" id="startInstall" ng-click="goToAddcode()">&nbsp;Start Installation</a>
+            </div>
+        </div>
+        <div class="col-md-2 text-center" style="margin-top: 80px;">
+        <span style="font-size: 25px;">Or</span>
+        </div>
+        <div class="col-md-3 well" style="height: 200px;">
+            <h4 class="text-center">I will need a colleague's help to install the code</h4>
+            <br>
+            <div class="text-center">
+                <a class="btn btn-success fa fa-mail-forward" id="goToSendEmail" ng-click="goToSendEmail()">&nbsp;Send Email</a>
+            </div>
+        </div>
+    </div>
+</div>
