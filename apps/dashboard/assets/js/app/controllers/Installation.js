@@ -73,15 +73,27 @@ angular.module('do.install', [])
         },
         authenticate: true
       })
+      .state('gettingstarted', {
+        url: '/apps/:id/gettingstarted',
+        views: {
+          "main": {
+            templateUrl: '/templates/onboardingAppmodule/installation.addcodeOrsendemail.html',
+            controller: 'installGettingStartedAppCtrl'
+          }
+        },
+        authenticate: true
+      })
 
   }
 ])
 
 .controller('installOnboardingAppCtrl', ['$scope', '$http', 'config', '$state',
   'AppService', '$log', 'AppModel', 'AccountService',
-  'CurrentAccountService', '$stateParams', '$location',
+  'CurrentAccountService', '$stateParams', '$location', '$rootScope',
+  '$timeout',
   function ($scope, $http, config, $state, AppService, $log, AppModel,
-    AccountService, CurrentAccountService, $stateParams, $location) {
+    AccountService, CurrentAccountService, $stateParams, $location,
+    $rootScope, $timeout) {
 
     CurrentAccountService.getCurrentAccount()
       .then(function (currentAccount) {
@@ -267,7 +279,8 @@ angular.module('do.install', [])
   }
 ])
 
-.controller('installInviteTeamNewAppCtrl', ['$scope', '$stateParams', 'AppModel',
+.controller('installInviteTeamNewAppCtrl', ['$scope', '$stateParams',
+  'AppModel',
   '$rootScope', '$timeout', '$location',
   function ($scope, $stateParams, AppModel, $rootScope, $timeout, $location) {
 
@@ -383,7 +396,7 @@ angular.module('do.install', [])
         $scope.placeHolderEmail = 'app';
         $scope.$watch('name', function () {
           if ($scope.name) {
-             $scope.email = $scope.name.replace(/\W/g, '')
+            $scope.email = $scope.name.replace(/\W/g, '')
               .split(' ')
               .join('')
               .toLowerCase();
@@ -506,5 +519,17 @@ angular.module('do.install', [])
         }
 
       })
+  }
+])
+
+.controller('installGettingStartedAppCtrl', ['$scope', '$stateParams', '$location',
+  function ($scope, $stateParams, $location) {
+    $scope.goToAddcode = function () {
+      $location.path('/apps/' + $stateParams.id + '/addcode');
+    }
+
+    $scope.goToSendEmail = function () {
+      $location.path('/apps/' + $stateParams.id + '/sendemail');
+    }
   }
 ])
