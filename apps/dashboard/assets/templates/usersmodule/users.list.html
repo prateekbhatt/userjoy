@@ -243,17 +243,17 @@
                                 <h4 class="well text-center">There are no users to be displayed. Run a query!!</h4>
                             </div> -->
                             <div class="row"  ng-show="showUsers">
-                                <div class="col-md-4" style="margin-top: 10px; margin-left: 20px;">
+                                <div class="col-md-5" style="margin-top: 10px; margin-left: 20px;">
                                     <span class="fa fa-user">&nbsp;&nbsp;{{countUsers}} <b>users</b></span> &nbsp;&nbsp;
                                     <button type="button" class="fa fa-envelope-o btn btn-info" ng-click="openModal()">
                                     <span>Message</span></button>
                                 </div>
                                 <div class="col-md-6">
                                     <!-- <div class="btn-group col-md-5">
-                                                                                <button class="fa fa-tag btn btn-info">
-                                                                                <span>Tag</span></button>
+                                      <button class="fa fa-tag btn btn-info">
+                                      <span>Tag</span></button>
                                     </div> -->
-                                    <div class="col-md-5 col-md-push-10">
+                                    <div class="col-md-5 col-md-push-8">
                                         <button type="button" class="btn btn-default btn-block dropdown-toggle"> Select Data
                                         <span class="caret" style="border-top-color: #333;"></span>
                                         </button>
@@ -404,9 +404,9 @@
                         <ul class="list-group">
                             <li style="padding-bottom: 2px;" class="list-group-item-segment"  ng-class="{'active-health': $index === selectedIndex}"  ng-repeat="segname in segmentsCreatedHealth" ng-mouseenter="showAutoMsgButton()" ng-mouseleave="hideAutoMsgButton()" >
                                 <a style="padding: 10px 30px; display: inline-block; cursor: pointer; text-decoration: none; color: inherit;" ng-click="showQuery(segname.id, $index, segname)" ng-if="segname.health" >
-                                <span style="font-size: 14px;" class="fa fa-smile-o" ng-if="segname.name == 'Good Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
-                                <span style="font-size: 14px;" class="fa fa-meh-o" ng-if="segname.name == 'Average Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
-                                <span style="font-size: 14px;" class="fa fa-frown-o" ng-if="segname.name == 'Poor Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
+                                <span style="font-size: 13px;" class="fa fa-smile-o" ng-if="segname.name == 'Good Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
+                                <span style="font-size: 13px;" class="fa fa-meh-o" ng-if="segname.name == 'Average Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
+                                <span style="font-size: 13px;" class="fa fa-frown-o" ng-if="segname.name == 'Poor Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
                                 </a>
                                 <a class="btn btn-sm btn-default pull-right" href="/apps/{{currApp}}/automessage/segments/{{segname.id}}/write" style="margin-top: 5px;" ng-show="showAutoMsgBtn">AutoMessage</a>
                             </li>
@@ -421,20 +421,6 @@
                             <p class="text-center" style="padding-top: 60px;">No Segments Created.</p>
                         </div>
                         <ul class="list-group" ng-show="segmentsCreated">
-                            <!-- <li style="padding-bottom: 2px;" class="list-group-item-segment">
-                                <span style="padding: 10px 15px; display: inline-block; font-size: 16px;" class="fa fa-user-md"><em><strong>&nbsp;Health Segments</strong></em></span>
-                            </li> -->
-                            <!-- <li style="padding-bottom: 2px;" class="list-group-item-segment"  ng-class="{'active-health': $index === selectedIndex}"  ng-repeat="segname in segmentsCreatedHealth" ng-mouseenter="showAutoMsgButton()" ng-mouseleave="hideAutoMsgButton()" >
-                                <strong>
-                                <a style="padding: 10px 15px; display: inline-block; cursor: pointer; width: 180px; text-decoration: none; color: #333; word-wrap: break-word;" ng-click="showQuery(segname.id, $index, segname)" ng-if="!segname.health">{{segname.name}}</a>
-                                </strong>
-                                <a style="padding: 10px 30px; display: inline-block; cursor: pointer; text-decoration: none; color: inherit;" ng-click="showQuery(segname.id, $index, segname)" ng-if="segname.health" >
-                                <span style="font-size: 13px;" class="fa fa-smile-o" ng-if="segname.name == 'Good Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
-                                <span style="font-size: 13px;" class="fa fa-meh-o" ng-if="segname.name == 'Average Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
-                                <span style="font-size: 13px;" class="fa fa-frown-o" ng-if="segname.name == 'Poor Health'"><strong>&nbsp;&nbsp;{{segname.name}}</strong></span>
-                                </a>
-                                <a class="btn btn-sm btn-default pull-right" href="/apps/{{currApp}}/automessage/segments/{{segname.id}}/write" style="margin-top: 5px;" ng-show="showAutoMsgBtn">AutoMessage</a>
-                            </li> -->
                             <li style="padding-bottom: 2px;" class="list-group-item-segment"  ng-class="{'active': $index === selectedIndex1}"  ng-repeat="segname in segmentsCreatedName" ng-mouseenter="showAutoMsgButton()" ng-mouseleave="hideAutoMsgButton()" ng-style="darkerBorder($first)">
                                 <strong>
                                 <a style="padding: 10px 15px; display: inline-block; cursor: pointer; width: 180px; text-decoration: none; color: #333; word-wrap: break-word;" ng-click="showQuery(segname.id, $index, segname)" ng-if="!segname.health">{{segname.name}}</a>
