@@ -1,0 +1,52 @@
+<div ng-controller="alertCtrl">
+    <div class="modal-header">
+        <h3 class="modal-title">Update Alert</h3>
+    </div>
+    <form name="sendMsgForm" class="form-horizontal" role="form" ng-submit="createNewAlert()" novalidate id="updateAlert">
+        <div class="modal-body">
+            <p ng-bind="content"></p>
+            <div style="margin-bottom: 25px;">
+                <input id="title" type="text" class="form-control" name="title" placeholder="Title" ng-model="selectedSegmentUpdate.name" required autofocus>
+            </div>
+            When a user
+            <span>
+            <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="statusUpdate" ng-bind="statusUpdate"></span>&nbsp;<span class="caret"></span></button>
+            <ul class="select dropdown-menu" role="select" style="left: 108px; top: 66%;">
+                <li ng-repeat="userstatus in userStatus">
+                    <a style="cursor: default" ng-click="changeBtnTextUpdate($index)">{{userstatus.value}}
+                    </a>
+                </li>
+            </ul>
+            </span>
+            the segment
+            <span style="display: none;" id="segmentId">{{selectedSegmentUpdate.id}}</span>
+            <span>
+            <button type="button" class="btn btn-default dropdown-toggle form-control selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="segmentValue">&nbsp;{{selectedSegmentUpdate.name}}</span>&nbsp;<span class="caret"></span></button>
+            <ul class="select dropdown-menu" role="select" style="left: 290px; top:66%;">
+                <li ng-repeat="segment in segments">
+                    <a style="cursor: default" ng-click="changeSelectedSegmentUpdate($index)">{{segment.name}}
+                    </a>
+                </li>
+            </ul>
+            </span>,
+            send an alert to
+            <span>
+            <button class="dropdown-toggle btn btn-default" data-toggle="dropdown">
+            Select team
+            <b class="caret"></b>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li ng-repeat="team in teammembers">
+                    <a href="#">
+                    <input type="checkbox" ng-click="$event.stopPropagation();" ng-model="team.checked" id="{{team.id}}">
+                    {{team.name}}
+                    </a>
+                </li>
+            </ul>
+            </span>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-info" id="createAlert">Save</button>
+        </div>
+    </form>
+</div>

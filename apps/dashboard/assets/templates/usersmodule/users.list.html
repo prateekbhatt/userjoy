@@ -1,8 +1,6 @@
 <div ng-include src="'/templates/navbar/navbar.html'"></div>
-<div style="margin-top: 5px;">
-    <!-- <flash:messages></flash:messages> -->
-</div>
-<div class="panel">
+<div ng-include src="'/templates/navbar/side-navbar.html'"></div>
+<div class="panel" id="page-wrapper">
     <div class="panel-body">
         <div class="caption-full">
             <form name="usersListForm" novalidate id="filterUsersAndRunQuery">
@@ -12,9 +10,9 @@
                     </div>
                     <div class="row" style="padding-left: 40px;">
                         <div class="col-md-12">
-                            <label class="col-md-1 control-label" style="font-size: 20px; padding-left: 13px">List: </label>
+                            <label class="col-md-1 control-label" style="font-size: 17px; padding-left: 13px">List: </label>
                             <div class="col-md-8">
-                                <button type="button" class="btn btn-sm btn-default" ng-model="selectedIcon" data-html="1" ng-options="segmenticon.value as segmenticon.label for segmenticon in segmenticons" bs-select style=".dropdown-menu > li > a:hover,.dropdown-menu > li > a:focus { background-color: #7b8a8b}">
+                                <button type="button" class="btn btn-sm btn-default" ng-model="selectedIcon" data-html="1" ng-options="segmenticon.value as segmenticon.label for segmenticon in segmenticons" bs-select style=".dropdown-menu > li > a:hover,.dropdown-menu > li > a:focus { background-color: #7b8a8b}; padding-top: 3px; padding-bottom: 3px;">
                                 All Users
                                 </button>
                             </div>
@@ -25,14 +23,14 @@
                         <div ng-repeat="filter in filters" ng-init="ind = $index">
                             <div class="row" style="padding-left: 40px;">
                                 <br>
-                                <label class="col-md-1 control-label" style="font-size:20px" ng-show="$first">Filter: </label>
+                                <label class="col-md-1 control-label" style="font-size:17px" ng-show="$first">Filter: </label>
                                 <a style="font-size:17px; cursor:pointer; cursor:hand" ng-show="!$first" ng-click="switchAndOr()" class="col-md-1">{{text}}</a>
                                 <div>
                                     <div class="col-md-11">
                                         <div class="row">
                                             <div>
                                                 <div style="padding-left: 24px; float: left;">
-                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.btntext}}</span>&nbsp;<span class="caret"></span></button>
+                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown" style="padding-top: 3px; padding-bottom: 3px;"> <span data-bind="label" id="Users">{{filter.btntext}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto;">
                                                         <li class="dropdown dropdown-submenu">
                                                             <a style="cursor: default" id="hasdoneQueries">Has done</a>
@@ -59,7 +57,7 @@
                                                 </div>
                                                 <div ng-if="filter.checkMethod && !filter.showDatePicker && !filter.showOtherAttributesQuery &&
                                                     !filter.showScore && !filter.showHealthStatus && !filter.showPayingStatus && !filter.isEvent" style="float: left; padding-left: 24px;">
-                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
+                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown" style="padding-top: 3px; padding-bottom: 3px;"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto">
                                                         <li ng-repeat="query in selectedqueries">
                                                             <a style="cursor: default;" ng-click="chngquery($parent.$index, $index)">{{query.value}}
@@ -68,7 +66,7 @@
                                                     </ul>
                                                 </div>
                                                 <div ng-if="filter.checkMethod && filter.showOtherAttributesQuery" style="float: left; padding-left: 24px;">
-                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
+                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown" style="padding-top: 3px; padding-bottom: 3px;"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto">
                                                         <li ng-repeat="query in otherAttributesQuery">
                                                             <a style="cursor: default;" ng-click="changeOtherAttributesQuery($parent.$index, $index)">{{query.name}}
@@ -77,7 +75,7 @@
                                                     </ul>
                                                 </div>
                                                 <div ng-if="!filter.checkMethod" style="float:left; padding-left: 24px;">
-                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.query}}</span>&nbsp;<span class="caret"></span></button>
+                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown" style="padding-top: 3px; padding-bottom: 3px;"> <span data-bind="label" id="Users">{{filter.query}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="dropdown-menu" style="left: auto; max-height: 356px; overflow-y: scroll;">
                                                         <li ng-repeat="hasDoneItem in hasDoneItems">
                                                             <a style="cursor: default" ng-click="changeEventFilter($parent.$index, $index, $event)">{{hasDoneItem.query}}
@@ -85,17 +83,8 @@
                                                         </li>
                                                     </ul>
                                                 </div>
-                                                <!-- <div ng-if="!filter.checkMethod" style="float:left; padding-left: 24px;">
-                                                                                                        <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.name}}</span>&nbsp;<span class="caret"></span></button>
-                                                                                                        <ul class="dropdown-menu" style="left: auto; max-height: 356px; overflow-y: scroll;">
-                                                                                                                <li ng-repeat="hasDoneItem in hasDoneItems">
-                                                                                                                        <a style="cursor: default" ng-click="changeFilterHasNotDone($parent.$index, $index, $event)">{{hasDoneItem.query}}
-                                                                                                                        </a>
-                                                                                                                </li>
-                                                                                                        </ul>
-                                                </div> -->
                                                 <div ng-if="filter.checkMethod && filter.showDatePicker" style="float:left; padding-left: 24px;">
-                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
+                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown" style="padding-top: 3px; padding-bottom: 3px;"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto;">
                                                         <li ng-repeat="query in datePickerQueries">
                                                             <a style="cursor: default;" ng-click="chngDatePickerQuery($parent.$index, $index)">{{query.name}}
@@ -104,10 +93,10 @@
                                                     </ul>
                                                 </div>
                                                 <div ng-if="filter.checkMethod && (filter.showHealthStatus || filter.showPayingStatus)" style="float:left; padding-left: 24px;">
-                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span></button>
+                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown" style="padding-top: 3px; padding-bottom: 3px;"> <span data-bind="label" id="Users">{{filter.optext}}</span></button>
                                                 </div>
                                                 <div ng-if="filter.checkMethod && filter.isEvent" style="float:left; padding-left: 24px;">
-                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
+                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown" style="padding-top: 3px; padding-bottom: 3px;"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto;">
                                                         <li ng-repeat="query in scoreQueries">
                                                             <a style="cursor: default;" ng-click="chngScoreQuery($parent.$index, $index)">{{query.name}}
@@ -116,7 +105,7 @@
                                                     </ul>
                                                 </div>
                                                 <div ng-if="filter.checkMethod && filter.showScore" style="float:left; padding-left: 24px;">
-                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
+                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown" style="padding-top: 3px; padding-bottom: 3px;"> <span data-bind="label" id="Users">{{filter.optext}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto;">
                                                         <li ng-repeat="query in scoreQueries">
                                                             <a style="cursor: default;" ng-click="chngScoreQuery($parent.$index, $index)">{{query.name}}
@@ -125,23 +114,21 @@
                                                     </ul>
                                                 </div>
                                                 <div ng-if="filter.checkMethod && filter.isEvent" style="float: left; padding-left: 24px;">
-                                                    <input type="text" placeholder="Value" ng-model="filter.val" class="form-control input-sm" style="width: 70px;">
+                                                    <input type="text" placeholder="Value" ng-model="filter.val" class="form-control input-sm" style="width: 70px; height: 27px;">
                                                 </div>
                                                 <div ng-if="filter.checkMethod && !filter.isEvent && !filter.showDatePicker && !filter.showHealthStatus && !filter.showPayingStatus" style="float: left; padding-left: 24px;">
-                                                    <input type="text" placeholder="Value" ng-model="filter.val" class="form-control input-sm">
+                                                    <input type="text" placeholder="Value" ng-model="filter.val" class="form-control input-sm" style="height: 27px;">
                                                 </div>
                                                 <div ng-if="filter.checkMethod && !filter.isEvent && filter.showDatePicker" style="float: left; padding-left: 24px;">
-                                                    <!-- <p class="input-group" style="width: 200px;"> -->
-                                                    <!-- <input type="text" class="form-control input-sm" datepicker-popup="{{format}}" ng-model="filter.val" is-open="$parent.dateOpened" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" show-weeks="false" max="maxDate" show-button-bar="false"/> -->
                                                     <span class="input-group">
                                                     <input type="text" class="form-control input-sm"  ng-model="filter.val" style="width: 70px; border-top-left-radius: 3px;
                                                     border-bottom-left-radius: 3px;
                                                     border-bottom-right-radius: 3px;
-                                                    border-top-right-radius: 3px;" /> &nbsp;
+                                                    border-top-right-radius: 3px; height: 27px;" /> &nbsp;
                                                     days ago</span>
                                                 </div>
                                                 <div ng-if="filter.checkMethod && !filter.isEvent && filter.showHealthStatus" style="float: left; padding-left: 24px;">
-                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.valuetext}}</span>&nbsp;<span class="caret"></span></button>
+                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown" style="padding-top: 3px; padding-bottom: 3px;"> <span data-bind="label" id="Users">{{filter.valuetext}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto">
                                                         <li ng-repeat="healthStatus in healthStatusValuesname">
                                                             <a style="cursor: default;" ng-click="chngHealthStatus($parent.$index, $index)">{{healthStatus.name}}
@@ -150,7 +137,7 @@
                                                     </ul>
                                                 </div>
                                                 <div ng-if="filter.checkMethod && !filter.isEvent && filter.showPayingStatus" style="float: left; padding-left: 24px;">
-                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="Users">{{filter.valuetext}}</span>&nbsp;<span class="caret"></span></button>
+                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown" style="padding-top: 3px; padding-bottom: 3px;"> <span data-bind="label" id="Users">{{filter.valuetext}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto">
                                                         <li ng-repeat="payingStatus in payingStatusValues">
                                                             <a style="cursor: default;" ng-click="chngPayingStatus($parent.$index, $index)">{{payingStatus.name}}
@@ -159,7 +146,7 @@
                                                     </ul>
                                                 </div>
                                                 <div ng-if="filter.isEvent" style="float: left; padding-left: 24px;">
-                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown"> <span data-bind="label" id="timeRangeValues">{{otherTimeRange}}</span>&nbsp;<span class="caret"></span></button>
+                                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle selectwidthauto" data-toggle="dropdown" style="padding-top: 3px; padding-bottom: 3px;"> <span data-bind="label" id="timeRangeValues">{{otherTimeRange}}</span>&nbsp;<span class="caret"></span></button>
                                                     <ul class="select dropdown-menu" role="select" style="left: auto">
                                                         <li ng-repeat="range in timeSpan">
                                                             <a style="cursor: default;" ng-click="chngrange($parent.$index, $index)">{{range.name}}
@@ -168,7 +155,7 @@
                                                     </ul>
                                                 </div>
                                                 <div style="float: left; padding-left: 24px;">
-                                                    <a class="btn btn-sm btn-default fa fa-times" ng-click="removeFilter(filter)" ng-hide="segmentClicked && $first"></a>
+                                                    <a class="btn btn-sm btn-default fa fa-times" ng-click="removeFilter(filter)" ng-hide="segmentClicked && $first" style="padding-top: 5px; padding-bottom: 5px;"></a>
                                                 </div>
                                             </div>
                                         </div>
@@ -179,7 +166,7 @@
                         <br>
                         <div class="row">
                             <div class="col-md-4" style="margin-left: 20px">
-                                <button type="button" class="btn btn-default btn-sm" ng-click="addAnotherFilter()" ng-show="true">
+                                <button type="button" class="btn btn-default btn-sm" ng-click="addAnotherFilter()" ng-show="true" style="padding-top: 3px; padding-bottom: 3px;">
                                 <i class="fa fa-plus-square"></i>
                                 Filter
                                 </button>
@@ -188,13 +175,13 @@
                         <br>
                         <div class="row">
                             <div class="col-md-12" style="margin-left: 20px">
-                                <button type="button" class="btn btn-info btn-sm fa fa-toggle-right" ng-click="runQuery()">
-                                Run
+                                <button type="button" class="btn btn-success btn-sm fa fa-toggle-right" ng-click="runQuery()">
+                                Compute
                                 </button>
                                 <button type="button" class="btn btn-default btn-sm fa fa-save" ng-click="saveQuery()" ng-show="showSaveButton">
                                 Save
                                 </button>
-                                <div class="popover right" tabindex="-1" style="display: block; position: absolute; top: -73px; left: 145px;" ng-show="showPopover">
+                                <div class="popover right" tabindex="-1" style="display: block; position: absolute; top: -73px; left: 190px;" ng-show="showPopover">
                                     <div class="arrow"></div>
                                     <h3 class="popover-title"> Save segment
                                     </h3>
@@ -213,7 +200,7 @@
                                 Update
                                 </button>
                                 <img src="/images/spiffygif_30x30.gif" ng-show="showSpinner">
-                                <div class="popover right" tabindex="-1" style="display: block; position: absolute; top: -73px; left: 160px;" ng-show="showUpdatePopover">
+                                <div class="popover right" tabindex="-1" style="display: block; position: absolute; top: -73px; left: 204px;" ng-show="showUpdatePopover">
                                     <div class="arrow"></div>
                                     <h3 class="popover-title"> Update segment
                                     </h3>
@@ -228,7 +215,7 @@
                                         </form>
                                     </div>
                                 </div>
-                                <button  type="button" class="btn btn-default btn-sm pull-right" ng-click="clearAllFilters()" ng-show="showUpdateButton || showSaveButton">Clear
+                                <button  type="button" class="btn btn-default btn-sm pull-right fa fa-times" ng-click="clearAllFilters()" ng-show="showUpdateButton || showSaveButton">&nbsp;Clear All Filters
                                 </button>
                                 <!-- <span us-spinner></span> -->
                             </div>
@@ -245,7 +232,7 @@
                             <div class="row"  ng-show="showUsers">
                                 <div class="col-md-5" style="margin-top: 10px; margin-left: 20px;">
                                     <span class="fa fa-user">&nbsp;&nbsp;{{countUsers}} <b>users</b></span> &nbsp;&nbsp;
-                                    <button type="button" class="fa fa-envelope-o btn btn-info" ng-click="openModal()">
+                                    <button type="button" class="fa fa-envelope-o btn btn-success" ng-click="openModal()">
                                     <span>Message</span></button>
                                 </div>
                                 <div class="col-md-6">

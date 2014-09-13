@@ -6,7 +6,7 @@
                 <div id="wrapper-settings">
                     <!-- Sidebar -->
                     <div id="sidebar-wrapper-settings">
-                        <ul class="sidebar-nav">
+                         <ul class="sidebar-nav">
                             <li>
                                 <a ng-click="goToOpenMsg()" style="cursor: pointer;"><i class="fa fa-inbox"></i> Open Messages</a>
                             </li>
@@ -16,71 +16,21 @@
                             <li>
                                 <a ng-click="goToClosedMsg()" style="cursor: pointer;"><i class="fa fa-check"></i>&nbsp; Closed Messages</a>
                             </li>
-                            <!-- <li>
-                                <a href="/apps/{{currApp}}/messages/automate"><i class="fa fa-edit"></i> Automate Messages </a>
-                            </li> -->
-                           <!--  <li>
-                                <a ui-sref="message.template"><span class="glyphicon glyphicon-list-alt"></span> Choose Templates</a>
-                            </li> -->
                             <li>
-                            <span style="cursor: default; color: #333;"><i class="fa fa-paperclip"></i> Smart Filters
-                                <ul style="list-style: none;">
-                                    <li>
-                                        <div class="progress" style="margin-left: 10px;">
-                                            <a style="cursor: pointer" ng-click="goToGoodHealth()">
-                                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #5cb85c;">
-                                                <span class="progress-type pull-left"><strong>Good Health</strong></span>
-                                            </div>
-                                            </a>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="progress" style="margin-left: 10px;">
-                                            <a style="cursor: pointer" ng-click="goToAvgHealth()">
-                                            <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #428bca;">
-                                                <span class="progress-type pull-left"><strong>Average Health</strong></span>
-                                            </div>
-                                            </a>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="progress" style="margin-left: 10px;">
-                                            <a style="cursor: pointer" ng-click="goToPoorHealth()">
-                                            <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #d9534f;">
-                                                <span class="progress-type pull-left"><strong>Poor Health</strong></span>
-                                            </div>
-                                            </a>
-                                        </div>
-                                    </li>
-                                    <!-- <li>
-                                        <div class="progress" style="margin-left: 30px;">
-                                            <a ui-sref="#goodhealth" style="cursor: pointer">
-                                            <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #f0ad4e;">
-                                                <span class="progress-type pull-left"><strong>Open Conversations</strong></span>
-                                            </div>
-                                            </a>
-                                        </div>
-                                    </li> -->
-                                    <!-- <li>
-                                        <div class="progress" style="margin-left: 30px;">
-                                            <a href="/apps/{{currApp}}/messages/closed" style="cursor: pointer">
-                                            <div class="progress-bar progress-bar-default" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #999;">
-                                                <span class="progress-type pull-left"><strong>Closed Conversations</strong></span>
-                                            </div>
-                                            </a>
-                                        </div>
-                                    </li> -->
-                                    <!-- <li>
-                                        <div class="progress" style="margin-left: 30px;">
-                                            <a ui-sref="#goodhealth" style="cursor: pointer">
-                                            <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%; background-color: #5bc0de;">
-                                                <span class="progress-type pull-left"><strong>Paying Customers</strong></span>
-                                            </div>
-                                            </a>
-                                        </div>
-                                    </li> -->
-                                </ul>
+                                <span style="cursor: default; color: #333;"> SMART FILTERS
                                 </span>
+                            </li>
+                            <li class="active">
+                                <a style="cursor: pointer;" ng-click="goToGoodHealth()"><i class="fa fa-smile-o"></i>&nbsp;Good Health
+                                </a>
+                            </li>
+                            <li>
+                                <a style="cursor: pointer;" ng-click="goToAvgHealth()"><i class="fa fa-meh-o"></i>&nbsp;Average Health
+                                </a>
+                            </li>
+                            <li>
+                                <a style="cursor: pointer;" ng-click="goToPoorHealth()"><i class="fa fa-frown-o"></i>&nbsp;Poor Health
+                                </a>
                             </li>
                         </ul>
                         <!-- /#side-menu -->
@@ -100,7 +50,10 @@
                                 <!-- /.panel-heading -->
                                 <div>
                                     <div class="row">
-                                        <div ng-show="!showGoodHealthConversations" class="text-center"><br><span> There are no Messages for this filter</span><br><br></div>
+                                        <div class="col-md-offset-4">
+                                            <br>
+                                            <div ng-show="!showGoodHealthConversations" class="text-center well" style="width: 250px;"><br><span> This folder doesn't have any messages</span><br><br></div>
+                                        </div>
                                         <div class="col-lg-12" ng-show="showGoodHealthConversations">
                                             <div class="table-responsive">
                                                 <table ng-table="tableParamsClosed" show-filter="true" class="table table-bordered table-hover table-striped">

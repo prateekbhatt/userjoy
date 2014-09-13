@@ -12,10 +12,10 @@ angular.module('do.users', [])
         },
         authenticate: true
       })
-      .state('users.segment', {
-        url: '/segment',
+      .state('segment', {
+        url: '/apps/:id/users/segment',
         views: {
-          "panel": {
+          "main": {
             templateUrl: '/templates/usersmodule/users.segment.html',
             controller: 'UserSegmentCtrl'
           }
@@ -67,7 +67,7 @@ angular.module('do.users', [])
     UidService, $moment, UserList, $timeout, modelsSegment,
     segmentService, CurrentAppService, UserModel, $log, MsgService,
     $stateParams, $rootScope, flash, config) {
-console.log("config.apiUrl: ", config.apiUrl);
+    console.log("config.apiUrl: ", config.apiUrl);
     CurrentAppService.getCurrentApp()
       .then(function (currentApp) {
         // flash('Saved!');
@@ -139,7 +139,7 @@ console.log("config.apiUrl: ", config.apiUrl);
         $scope.darkerBorder = function ($first) {
           // console.log("$first: ", $first);
           var mystyle = '';
-          if($first) {
+          if ($first) {
             mystyle = "{'border-top': '1px solid #7f8c8d;'}";
           }
           // console.log("mystyle: ", mystyle);
@@ -1702,6 +1702,1602 @@ console.log("config.apiUrl: ", config.apiUrl);
 ])
 
 
+
+.controller('UserSegmentCtrl', ['$scope', '$location', 'segment',
+  'queryMatching', '$filter', 'countOfActions', 'hasNotDone',
+  'hasDoneActions', 'ngTableParams', 'login', 'modelsQuery',
+  'AppService', 'segment', 'queryMatching', 'eventNames',
+  'userAttributes', 'lodash', '$modal',
+  'UidService', '$moment', 'UserList', '$timeout', 'modelsSegment',
+  'segmentService', 'CurrentAppService', 'UserModel', '$log',
+  'MsgService', '$stateParams', '$rootScope', 'flash', 'config',
+  function ($scope, $location, segment, queryMatching, $filter,
+    countOfActions, hasNotDone, hasDoneActions,
+    ngTableParams, login, modelsQuery, AppService, segment,
+    queryMatching, eventNames, userAttributes, lodash, $modal,
+    UidService, $moment, UserList, $timeout, modelsSegment,
+    segmentService, CurrentAppService, UserModel, $log, MsgService,
+    $stateParams, $rootScope, flash, config) {
+    CurrentAppService.getCurrentApp()
+      .then(function (currentApp) {
+        // flash('Saved!');
+        console.log("Promise Resolved: ", currentApp);
+        console.log("current App from service -->: ",
+          AppService.getCurrentApp());
+        var currentAppId = $stateParams.id;
+        console.log("currentAppId--> ", currentAppId);
+        if (currentAppId == null) {
+          currentAppId = currentApp[0]._id;
+        }
+        $scope.showSaveButton = false;
+        $scope.showUpdateButton = false;
+        $scope.segmentClicked = false;
+        $scope.segmentsCreatedName = [];
+        $scope.segmentsCreatedHealth = [];
+        $scope.showUpdatePopover = false;
+        $scope.showSpinner = false;
+        $scope.showAutoMsgBtn = false;
+        $scope.firstFilterShowQuery = false;
+        $scope.currApp = $stateParams.id;
+        var checkSegments = function (err) {
+          if (err) {
+            return err;
+          }
+          console.log("segment: ", segmentService.getSegments());
+          if (segmentService.getSegments()
+            .length > 0) {
+            for (var i = 0; i < segmentService.getSegments()
+              .length; i++) {
+              if (segmentService.getSegments()[i].name == 'Good Health' ||
+                segmentService.getSegments()[i].name == 'Average Health' ||
+                segmentService.getSegments()[i].name == 'Poor Health') {
+                $scope.segmentsCreatedHealth.push({
+                  health: true,
+                  id: segmentService.getSegments()[i]
+                    ._id,
+                  name: segmentService.getSegments()[
+                    i].name
+                })
+              }
+            }
+            for (var i = 0; i < segmentService.getSegments()
+              .length; i++) {
+              if (segmentService.getSegments()[
+                  i].name != 'Good Health' &&
+                segmentService.getSegments()[i].name != 'Average Health' &&
+                segmentService.getSegments()[i].name != 'Poor Health') {
+                $scope.segmentsCreatedName.push({
+                  // predefined: true,
+                  health: false,
+                  id: segmentService.getSegments()[i]
+                    ._id,
+                  name: segmentService.getSegments()[
+                    i].name
+                })
+              }
+
+
+            };
+            $scope.segmentsCreated = true;
+            console.log("$scope.segmentName: ", $scope.segmentsCreatedName,
+              $scope.segmentsCreatedName1);
+          } else {
+            $scope.segmentsCreated = false;
+          }
+        }
+
+        $scope.darkerBorder = function ($first) {
+          // console.log("$first: ", $first);
+          var mystyle = '';
+          if ($first) {
+            mystyle = "{'border-top': '1px solid #7f8c8d;'}";
+          }
+          // console.log("mystyle: ", mystyle);
+          return mystyle;
+        }
+
+        modelsSegment.getAllSegments(currentAppId,
+          checkSegments);
+
+
+
+
+        var _ = lodash;
+
+        var stringify = function (obj, prefix) {
+          if (_.isArray(obj)) {
+            return stringifyArray(obj, prefix);
+          } else if ('[object Object]' == Object.prototype.toString
+            .call(
+              obj)) {
+            return stringifyObject(obj, prefix);
+          } else if ('string' == typeof obj) {
+            return stringifyString(obj, prefix);
+          } else {
+            return prefix + '=' + encodeURIComponent(
+              String(obj));
+          }
+        };
+
+        /**
+         * Stringify the given `str`.
+         *
+         * @param {String} str
+         * @param {String} prefix
+         * @return {String}
+         * @api private
+         */
+
+        function stringifyString(str, prefix) {
+          if (!prefix) throw new TypeError(
+            'stringify expects an object');
+          return prefix + '=' + encodeURIComponent(str);
+        }
+
+        /**
+         * Stringify the given `arr`.
+         *
+         * @param {Array} arr
+         * @param {String} prefix
+         * @return {String}
+         * @api private
+         */
+
+        function stringifyArray(arr, prefix) {
+          var ret = [];
+          if (!prefix) throw new TypeError(
+            'stringify expects an object');
+          for (var i = 0; i < arr.length; i++) {
+            ret.push(stringify(arr[i], prefix + '[' + i +
+              ']'));
+          }
+          return ret.join('&');
+        }
+
+        /**
+         * Stringify the given `obj`.
+         *
+         * @param {Object} obj
+         * @param {String} prefix
+         * @return {String}
+         * @api private
+         */
+
+        function stringifyObject(obj, prefix) {
+          var ret = [],
+            keys = _.keys(obj),
+            key;
+
+          for (var i = 0, len = keys.length; i < len; ++i) {
+            key = keys[i];
+            if ('' == key) continue;
+            if (null == obj[key]) {
+              ret.push(encodeURIComponent(key) + '=');
+            } else {
+              ret.push(stringify(obj[key], prefix ?
+                prefix + '[' +
+                encodeURIComponent(
+                  key) + ']' :
+                encodeURIComponent(key)));
+            }
+          }
+
+          return ret.join('&');
+        }
+
+        var allActions = [];
+
+        var attributes = [];
+
+        var fillData = function (err) {
+
+          if (err) {
+            return;
+          }
+          for (var i = 0; i < eventNames.getEvents()
+            .length; i++) {
+            eObj = {};
+
+            if (eventNames.getEvents()[i].type == 'link') {
+              eObj.query = 'Clicked on ' + eventNames.getEvents()[i].name;
+              eObj.name = eventNames.getEvents()[i].name;
+              eObj.type = eventNames.getEvents()[i].type;
+            }
+
+            if (eventNames.getEvents()[i].type == 'form') {
+              eObj.query = 'Submitted form ' + eventNames.getEvents()[i].name;
+              eObj.name = eventNames.getEvents()[i].name;
+              eObj.type = eventNames.getEvents()[i].type;
+            }
+
+            if (eventNames.getEvents()[i].type == 'page') {
+              eObj.query = 'Viewed ' + eventNames.getEvents()[i].name;
+              eObj.name = eventNames.getEvents()[i].name;
+              eObj.type = eventNames.getEvents()[i].type;
+            }
+
+            if (eventNames.getEvents()[i].type == 'auto') {
+              eObj.query = eventNames.getEvents()[i].name;
+              eObj.name = eventNames.getEvents()[i].name;
+              eObj.type = eventNames.getEvents()[i].type;
+            }
+
+            if (eventNames.getEvents()[i].type == 'track') {
+              eObj.query = eventNames.getEvents()[i].name;
+              eObj.name = eventNames.getEvents()[i].name;
+              eObj.type = eventNames.getEvents()[i].type;
+            }
+
+            allActions.push(eObj);
+
+            // allActions.push({
+            //   name: eventNames.getEvents()[i].name,
+            //   type: eventNames.getEvents()[i].type
+            // })
+          };
+
+          for (var i = 0; i < userAttributes.getUserAttributes()
+            .length; i++) {
+            attributes.push({
+              name: userAttributes.getUserAttributes()[
+                i]
+            })
+          };
+
+
+
+          console.log("allActions: ", allActions)
+
+
+          console.log("inside UserListCtrl loginProvider: ",
+            login.getLoggedIn());
+          $scope.state = 'form-control';
+          $scope.isErr = '';
+          $scope.method = 'count';
+          $scope.checkMethod = true;
+          $scope.rootOperator = 'and';
+
+
+          $scope.selectFilter = 'Users';
+          $scope.hasNotDoneItems = [];
+          $scope.hasNotDoneItems = allActions;
+          $scope.hasDoneItems = [];
+          $scope.hasDoneItems = allActions;
+          $scope.countOfItems = [];
+          $scope.countOfItems = allActions;
+          $scope.hasDoneOrHasNotDoneClicked = false;
+          $scope.hasCountOfClicked = true;
+
+          $scope.attributes = [];
+          $scope.attributes = attributes;
+
+          $scope.timeSpan = [{
+            name: 'at any time',
+            value: ''
+          }, {
+            name: 'within a day',
+            value: 1
+          }, {
+            name: 'within 3 days',
+            value: 3
+          }, {
+            name: 'within a week',
+            value: 7
+          }, {
+            name: 'within a month',
+            value: 30
+          }]
+
+          $scope.otherTimeRange = 'at any time';
+
+          $scope.scoreQueries = [{
+            name: 'equals',
+            key: 'eq'
+          }, {
+            name: 'more than',
+            key: 'gt'
+          }, {
+            name: 'less than',
+            key: 'lt'
+          }];
+
+          $scope.healthStatusValuesname = [{
+            name: 'Good',
+            key: 'good'
+          }, {
+            name: 'Average',
+            key: 'average'
+          }, {
+            name: 'Poor',
+            key: 'poor'
+          }];
+
+          $scope.payingStatusValues = [{
+            name: 'Free',
+            key: 'free'
+          }, {
+            name: 'Trial',
+            key: 'trial'
+          }, {
+            name: 'Paying',
+            key: 'paying'
+          }, {
+            name: 'Cancelled',
+            key: 'cancelled'
+          }];
+
+          $scope.changeEventFilter = function (parentindex, index,
+            evt) {
+            $scope.filters[parentindex].name = $scope.hasDoneItems[
+              index].name;
+            $scope.filters[parentindex].query = $scope.hasDoneItems[index]
+              .query;
+          }
+
+          $scope.changeFilterAttribute = function (
+            parentindex, index,
+            evt) {
+
+            if ($scope.attributes[index].name == 'joined' || $scope.attributes[
+              index].name == 'lastSession') {
+              $scope.filters[parentindex].showPayingStatus = false;
+              $scope.filters[parentindex].showHealthStatus = false;
+              $scope.filters[parentindex].showDatePicker = true;
+              $scope.filters[parentindex].showScore = false;
+              $scope.filters[parentindex].showOtherAttributesQuery = false;
+              console.log("inside joined attribute: ", $scope.showDatePicker);
+
+              $scope.filters[parentindex].checkMethod = true;
+              $scope.filters[parentindex].isEvent = false;
+              $scope.filters[parentindex].btntext = $scope.attributes[
+                index].name;
+              $scope.filters[parentindex].method = 'attr';
+              $scope.filters[parentindex].name = $scope.attributes[
+                index].name;
+              $scope.filters[parentindex].query = '';
+              $scope.filters[parentindex].type = '';
+              $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
+              // $scope.filters[parentindex].timeRange = '';
+              // $scope.otherTimeRange = 'at any time';
+              $scope.filters[parentindex].optext = 'more than';
+              $scope.filters[parentindex].val = '';
+              $scope.filters[parentindex].op = 'gt';
+              console.log("$scope.filters error attributes: ", $scope.filters);
+            } else if ($scope.attributes[index].name == 'score') {
+              $scope.filters[parentindex].showHealthStatus = false;
+              $scope.filters[parentindex].showPayingStatus = false;
+              $scope.filters[parentindex].showScore = true;
+              $scope.filters[parentindex].showDatePicker = false;
+              $scope.filters[parentindex].showOtherAttributesQuery = false;
+              $scope.filters[parentindex].checkMethod = true;
+              $scope.filters[parentindex].isEvent = false;
+              $scope.filters[parentindex].btntext = $scope.attributes[
+                index].name;
+              $scope.filters[parentindex].method = 'attr';
+              $scope.filters[parentindex].name = $scope.attributes[
+                index].name;
+              $scope.filters[parentindex].query = '';
+              $scope.filters[parentindex].type = '';
+              $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
+              // $scope.filters[parentindex].timeRange = '';
+              // $scope.otherTimeRange = 'at any time';
+              $scope.filters[parentindex].optext = 'equals';
+              $scope.filters[parentindex].val = '';
+            } else if ($scope.attributes[index].name == 'status') {
+              $scope.filters[parentindex].showHealthStatus = false;
+              $scope.filters[parentindex].showPayingStatus = true;
+              $scope.filters[parentindex].showScore = false;
+              $scope.filters[parentindex].showDatePicker = false;
+              $scope.filters[parentindex].showOtherAttributesQuery = false;
+              $scope.filters[parentindex].checkMethod = true;
+              $scope.filters[parentindex].isEvent = false;
+              $scope.filters[parentindex].btntext = $scope.attributes[
+                index].name;
+              $scope.filters[parentindex].method = 'attr';
+              $scope.filters[parentindex].name = $scope.attributes[
+                index].name;
+              $scope.filters[parentindex].query = '';
+              $scope.filters[parentindex].type = '';
+              $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
+              // $scope.filters[parentindex].timeRange = '';
+              // $scope.otherTimeRange = 'at any time';
+              $scope.filters[parentindex].optext = 'equals';
+              $scope.filters[parentindex].val = 'free';
+              $scope.filters[parentindex].valuetext = 'Free';
+
+            } else if ($scope.attributes[index].name == 'health') {
+              $scope.filters[parentindex].showHealthStatus = true;
+              $scope.filters[parentindex].showPayingStatus = false;
+              $scope.filters[parentindex].showScore = false;
+              $scope.filters[parentindex].showDatePicker = false;
+              $scope.filters[parentindex].showOtherAttributesQuery = false;
+              $scope.filters[parentindex].checkMethod = true;
+              $scope.filters[parentindex].isEvent = false;
+              $scope.filters[parentindex].btntext = $scope.attributes[
+                index].name;
+              $scope.filters[parentindex].method = 'attr';
+              $scope.filters[parentindex].name = $scope.attributes[
+                index].name;
+              $scope.filters[parentindex].query = '';
+              $scope.filters[parentindex].type = '';
+              $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
+              // $scope.filters[parentindex].timeRange = '';
+              // $scope.otherTimeRange = 'at any time';
+              $scope.filters[parentindex].optext = 'equals';
+              $scope.filters[parentindex].val = 'poor';
+              $scope.filters[parentindex].valuetext = 'Poor';
+            } else {
+              $scope.filters[parentindex].showOtherAttributesQuery = true;
+              $scope.filters[parentindex].showPayingStatus = false;
+              $scope.filters[parentindex].showDatePicker = false;
+              $scope.filters[parentindex].showHealthStatus = false;
+              $scope.filters[parentindex].showScore = false;
+              $scope.filters[parentindex].checkMethod = true;
+              $scope.filters[parentindex].isEvent = false;
+              $scope.filters[parentindex].btntext = $scope.attributes[
+                index].name;
+              $scope.filters[parentindex].query = '';
+              $scope.filters[parentindex].method = 'attr';
+              $scope.filters[parentindex].name = $scope.attributes[
+                index].name;
+              $scope.filters[parentindex].type = '';
+              $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
+              // $scope.filters[parentindex].timeRange = '';
+              // $scope.otherTimeRange = 'at any time';
+              $scope.filters[parentindex].optext = 'contains';
+              $scope.filters[parentindex].op = 'contains';
+              $scope.filters[parentindex].val = '';
+            }
+          }
+
+          $scope.changeFilterHasDone = function (parentindex,
+            index, evt) {
+            $scope.filters[parentindex].showHealthStatus = false;
+            $scope.filters[parentindex].showPayingStatus = false;
+            $scope.filters[parentindex].showScore = false;
+            $scope.filters[parentindex].showDatePicker = false;
+            $scope.filters[parentindex].showOtherAttributesQuery = false
+            $scope.method = 'hasdone';
+            $scope.filters[parentindex].checkMethod =
+              false;
+            $scope.filters[parentindex].isEvent = true;
+            console.log("has done: ", parentindex);
+            $scope.filters[parentindex].btntext =
+              'Has Done';
+            $scope.filters[parentindex].method = 'hasdone';
+            $scope.filters[parentindex].name = $scope.hasDoneItems[
+              index].name;
+            $scope.filters[parentindex].query = $scope.hasDoneItems[
+              index].query;
+            $scope.filters[parentindex].op = '';
+            $scope.filters[parentindex].optext = '';
+            $scope.filters[parentindex].val = '';
+            $scope.filters[parentindex].type = $scope.hasDoneItems[
+              index].type;
+            // $scope.otherTimeRange = 'at any time';
+            $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
+            $scope.filters[parentindex].val = '';
+          }
+
+          $scope.changeFilterHasNotDone = function (
+            parentindex, index,
+            evt) {
+            $scope.filters[parentindex].showHealthStatus = false;
+            $scope.filters[parentindex].showPayingStatus = false;
+            $scope.filters[parentindex].showScore = false;
+            $scope.filters[parentindex].showDatePicker = false;
+            $scope.filters[parentindex].showOtherAttributesQuery = false
+            $scope.method = 'hasnotdone';
+            $scope.filters[parentindex].checkMethod =
+              false;
+            $scope.filters[parentindex].isEvent = true;
+            console.log("has not done: ", parentindex);
+            $scope.filters[parentindex].method =
+              'hasnotdone';
+            $scope.filters[parentindex].btntext =
+              'Has Not Done ';
+            $scope.filters[parentindex].name = $scope.hasNotDoneItems[
+              index].name;
+            $scope.filters[parentindex].query = $scope.hasNotDoneItems[
+              index].query;
+            $scope.filters[parentindex].op = '';
+            $scope.filters[parentindex].optext = '';
+            $scope.filters[parentindex].val = '';
+            $scope.filters[parentindex].type = $scope.hasNotDoneItems[
+              index].type;
+            // $scope.otherTimeRange = 'at any time';
+            $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
+            $scope.filters[parentindex].val = '';
+            console.log($scope.filters);
+          }
+
+
+
+          $scope.changeFilterCountOf = function (parentindex,
+            index, evt) {
+            $scope.filters[parentindex].showHealthStatus = false;
+            $scope.filters[parentindex].showPayingStatus = false;
+            $scope.filters[parentindex].showScore = false;
+            $scope.filters[parentindex].showDatePicker = false;
+            $scope.filters[parentindex].showOtherAttributesQuery = false
+            $scope.method = 'count';
+            $scope.filters[parentindex].checkMethod = true;
+            $scope.filters[parentindex].isEvent = true;
+            console.log("count: ", parentindex);
+            $scope.filters[parentindex].method = 'count';
+            $scope.filters[parentindex].btntext =
+              'Count Of ' + $scope
+              .countOfItems[
+                index].query;
+            $scope.filters[parentindex].name = $scope
+              .countOfItems[
+                index].name;
+            $scope.filters[parentindex].query = $scope.countOfItems[
+              index].query;
+            $scope.filters[parentindex].type = $scope.countOfItems[
+              index].type;
+            // $scope.otherTimeRange = 'at any time';
+            $scope.filters[parentindex].timeRange = $scope.otherTimeRange;
+            $scope.filters[parentindex].optext = 'more than';
+            $scope.filters[parentindex].op = 'gt';
+            $scope.filters[parentindex].val = '';
+          }
+
+          var segments = segment.get.all();
+          $scope.dropdown = [];
+          for (var i = segments.length - 1; i >= 0; i--) {
+            $scope.dropdown.push({
+              text: segments[i].name
+            });
+          };
+
+
+          $scope.segments = segment.get.all();
+          $scope.segmenticons = [];
+          $scope.selectedIcon = $scope.segments[0].name;
+
+          for (var i = $scope.segments.length - 1; i >= 0; i--) {
+            $scope.segmenticons.push({
+              value: $scope.segments[i].name,
+              label: $scope.segments[i].name
+            })
+          };
+
+          // $scope.opened = false;
+          // $scope.dt = new Date();
+
+          $scope.$watch('isOpen', function () {
+            console.log("inside datepicker watch");
+          })
+
+          $scope.openDatePicker = function (event) {
+            console.log("opening datepicker: ", $scope.dateOpened);
+            event.preventDefault();
+            event.stopPropagation();
+
+            $scope.dateOpened = true;
+            // $timeout(function () {
+            //   $scope.dateOpened = true;
+            // });
+            console.log("is datepicker opened: ", $scope.dateOpened);
+          };
+
+          $scope.dateOptions = {
+            formatYear: 'yy',
+            startingDay: 1
+          };
+
+          $scope.maxDate = new Date();
+
+          // $scope.initDate = new Date('2016-15-20');
+          $scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy',
+            'shortDate'
+          ];
+          $scope.format = $scope.formats[0];
+
+
+          $scope.queries = queryMatching.get.all();
+          $scope.query = [];
+          $scope.queryDisplayed = $scope.queries[0].name;
+          $scope.selectedQuery = queryMatching.get.selected();
+          $scope.selectedqueries = [];
+          for (var i = 0; i <= $scope.queries.length - 1; i++) {
+            $scope.selectedqueries.push({
+              value: $scope.queries[i].name,
+              label: $scope.queries[i].name
+            })
+          };
+
+          $scope.datePickerQueries = [{
+            name: 'exactly',
+            key: 'eq'
+          }, {
+            name: 'less than',
+            key: 'lt'
+          }, {
+            name: 'more than',
+            key: 'gt'
+          }]
+
+          $scope.otherAttributesQuery = [{
+            name: 'contains',
+            key: 'contains'
+          }, {
+            name: 'equals',
+            key: 'eq'
+          }]
+
+          $scope.chngHealthStatus = function (parentindex, index) {
+            $scope.filters[parentindex].val = $scope.healthStatusValuesname[
+              index].key;
+            $scope.filters[parentindex].valuetext = $scope.healthStatusValuesname[
+              index].name;
+            $scope.filters[parentindex].op = 'eq';
+          }
+
+          $scope.chngPayingStatus = function (parentindex, index) {
+            $scope.filters[parentindex].val = $scope.payingStatusValues[
+              index].key;
+            $scope.filters[parentindex].valuetext = $scope.payingStatusValues[
+              index].name;
+            $scope.filters[parentindex].op = 'eq';
+
+          }
+
+          $scope.chngquery = function (parentindex, index) {
+            console.log("parentindex: ", parentindex);
+            $scope.filters[parentindex].optext = $scope.queries[
+              index]
+              .name;
+            $scope.filters[parentindex].op = $scope.queries[
+              index].key;
+            console.log($scope.filters[parentindex].op);
+            console.log($scope.filters);
+          }
+
+          $scope.chngScoreQuery = function (parentindex, index) {
+            $scope.filters[parentindex].optext = $scope.scoreQueries[
+              index]
+              .name;
+            $scope.filters[parentindex].op = $scope.scoreQueries[
+              index].key;
+          }
+
+          $scope.changeOtherAttributesQuery = function (parentindex, index) {
+            $scope.filters[parentindex].optext = $scope.otherAttributesQuery[
+              index]
+              .name;
+            $scope.filters[parentindex].op = $scope.otherAttributesQuery[
+              index].key;
+          }
+
+          $scope.chngDatePickerQuery = function (parentindex, index) {
+            $scope.filters[parentindex].optext = $scope.datePickerQueries[
+              index]
+              .name;
+            $scope.filters[parentindex].op = $scope.datePickerQueries[
+              index].key;
+            console.log("DatePickerQuery: ", $scope.filters);
+          }
+
+          $scope.chngrange = function (parentindex, index) {
+            $scope.filters[0].timeRange = $scope.timeSpan[index]
+              .name;
+            $scope.otherTimeRange = $scope.filters[0].timeRange;
+            $scope.filters[0].timeRangeValue = $scope.timeSpan[index].value;
+          }
+
+
+          console.log("queryDisplayed: ", $scope.queryDisplayed);
+
+          $scope.text = 'AND';
+          $scope.segmentFilterCtrl = segment.get.selected();
+          $scope.queryFilterCtrl = queryMatching.get.selected();
+          $scope.filters = [];
+
+          $scope.addAnotherFilter = function addAnotherFilter() {
+            $scope.checkMethod = true;
+            $scope.filters.push({
+              method: '',
+              btntext: 'Choose',
+              checkMethod: true,
+              isEvent: false,
+              days: '',
+              name: '',
+              query: '',
+              op: 'eq',
+              optext: 'equals',
+              val: '',
+              type: '',
+              showHealthStatus: false,
+              showPayingStatus: false,
+              showScore: false,
+              showDatePicker: false,
+              showOtherAttributesQuery: false
+            });
+            console.log("$scope.filters[0]: ", $scope.filters[0]);
+            if ($scope.filters.length > 0) {
+              console.log("getting inside filters length > 0");
+              for (var i = 1; i < $scope.filters.length; i++) {
+                $scope.filters[i].timeRange = $scope.filters[0].timeRange;
+                $scope.filters[i].timeRangeValue = $scope.filters[0].timeRangeValue;
+              };
+              console.log("$scope.filters[i]: ", $scope.filters);
+            } else {
+              $scope.filters[0].timeRange = 'at any time';
+              $scope.filters[0].timeRangeValue = '';
+            }
+            if ($scope.filters.length > 0 && $scope.segmentClicked ==
+              false) {
+              $scope.showSaveButton = true;
+              $scope.showUpdateButton = false;
+            }
+
+            if ($scope.segmentClicked == true) {
+              $scope.showSaveButton = false;
+              $scope.showUpdateButton = true;
+            }
+
+            // if($scope.segmentClicked == true && $scope.isHealth == true) {
+            //   $scope.showSaveButton = false;
+            //   $scope.showUpdateButton = false;
+            // }
+            console.log("$scope.filters: ", $scope.filters);
+          }
+
+          $scope.removeFilter = function removeFilter(
+            filterToRemove) {
+            var index = $scope.filters.indexOf(
+              filterToRemove);
+            $scope.filters.splice(index, 1);
+            // if ($scope.filters.length < $scope.segmentLength &&
+            //     $scope.segmentClicked == true) {
+            //     $scope.showUpdateButton = true;
+            // }
+
+            if ($scope.filters.length == 0) {
+              $scope.showSaveButton = false;
+              $scope.showUpdateButton = false;
+              $scope.segmentClicked = false;
+              $scope.showUpdatePopover = false;
+              $scope.showPopover = false;
+              // $scope.showUsers = false;
+            }
+          }
+
+          $scope.clearAllFilters = function () {
+            $scope.filters = [];
+            $scope.showSaveButton = false;
+            $scope.showUpdateButton = false;
+            $scope.segmentClicked = false;
+            $scope.showUpdatePopover = false;
+            $scope.selectedIndex = '';
+            $scope.selectedIndex1 = '';
+            $scope.segmentName = '';
+            $scope.showPopover = false;
+            $scope.showSpinner = true;
+            $scope.showErrorOnInput = true;
+            $scope.filtersBackend = [];
+            $scope.fromTime = '';
+            $scope.queryObj.list = $scope.selectedIcon.toLowerCase();
+            $scope.queryObj.op = $scope.text.toLowerCase();
+            $scope.queryObj.filters = $scope.filtersBackend;
+            $scope.queryObj.fromAgo = $scope.fromTime;
+
+            var stringifiedQuery = stringify($scope.queryObj);
+            console.log('queryObj', $scope.queryObj);
+            console.log('stringifiedQuery',
+              stringifiedQuery);
+
+
+            modelsQuery.runQueryAndGetUsers(currentAppId,
+              stringifiedQuery, populateTable);
+            // populateFilterAndRunQuery();
+            // $scope.showUsers = false;
+          }
+
+          $scope.switchAndOr = function switchAndOr() {
+            if ($scope.text === 'AND') {
+              $scope.text = 'OR'
+            } else {
+              $scope.text = 'AND'
+            }
+          }
+
+          var populateTable = function () {
+            $scope.showSpinner = false;
+
+            if (err) {
+              return err;
+            }
+            $scope.countUsers = UserList.getUsers()
+              .length;
+            $scope.users = [];
+            if (UserList.getUsers()
+              .length > 0) {
+              $scope.showUsers = true;
+            }
+            for (var i = 0; i < UserList.getUsers()
+              .length; i++) {
+              $scope.users.push({
+                id: UserList.getUsers()[i]._id,
+                email: UserList.getUsers()[i].email,
+                userkarma: UserList.getUsers()[i].score,
+                datejoined: moment(UserList.getUsers()[
+                  i].joined)
+                  .format("MMMM Do YYYY"),
+                health: UserList.getUsers()[i].health,
+                lastsession: moment(UserList.getUsers()[i].lastSession)
+                  .format("MMMM Do YYYY"),
+                unsubscribed: UserList.getUsers()[
+                  i].unsubscribed,
+                browser: UserList.getUsers()[i].browser,
+                country: UserList.getUsers()[i].country,
+                os: UserList.getUsers()[i].os,
+                status: UserList.getUsers()[i].status
+              })
+            };
+
+            $scope.columns = [{
+              title: '',
+              field: 'checkbox',
+              visible: true
+            }, {
+              title: 'Email',
+              field: 'email',
+              visible: true
+            }, {
+              title: 'Status',
+              field: 'status',
+              visible: true
+            }, {
+              title: 'Date Joined',
+              field: 'datejoined',
+              visible: true
+            }, {
+              title: 'Health',
+              field: 'health',
+              visible: true
+            }, {
+              title: 'Last Session',
+              field: 'lastsession',
+              visible: true
+            }, {
+              title: 'Browser',
+              field: 'browser',
+              visible: false
+            }, {
+              title: 'Country',
+              field: 'country',
+              visible: false
+            }, {
+              title: 'Operating System',
+              field: 'operatingsystem',
+              visible: false
+            }, {
+              title: 'Engagement Score',
+              field: 'userkarma',
+              visible: false
+            }];
+
+            /**
+             * Reference: http://plnkr.co/edit/dtlKAHwy99jdnWVU0pc8?p=preview
+             *
+             */
+
+            $scope.refreshTable = function () {
+              $scope['tableParams'] = {
+                reload: function () {},
+                settings: function () {
+                  return {}
+                }
+              };
+              $timeout(setTable, 100)
+            };
+            $scope.refreshTable();
+
+            function setTable(arguments) {
+
+              $scope.tableParams = new ngTableParams({
+                page: 1, // show first page
+                count: 10, // count per page
+                filter: {
+                  name: '' // initial filter
+                },
+                sorting: {
+                  name: 'asc'
+                }
+              }, {
+                filterSwitch: true,
+                total: $scope.users.length, // length of data
+                getData: function ($defer, params) {
+                  var orderedData = params.sorting() ?
+                    $filter('orderBy')($scope.users,
+                      params.orderBy()) :
+                    $scope.users;
+                  params.total(orderedData.length);
+                  $defer.resolve(orderedData.slice(
+                    (params.page() -
+                      1) * params.count(),
+                    params.page() *
+                    params.count()));
+                }
+              });
+            }
+          }
+
+
+          $scope.queryObj = {};
+
+          $scope.showErrorOnInput = true;
+          // $scope.runQuery = function () {
+          //   $scope.showSpinner = true;
+          //   $scope.showErrorOnInput = true;
+          //   for (var i = 0; i < $scope.filters.length; i++) {
+          //     console.log("val: ", $scope.filters[i].val);
+          //     if ($scope.filters[i].val == '' && ($scope
+          //       .filters[i].method ==
+          //       'count' || $scope.filters[i].method ==
+          //       'attr' || $scope.filters[i].method == '')) {
+          //       console.log("val: ", $scope.filters[i]
+          //         .val);
+          //       $scope.showErrorOnInput = true;
+          //       $rootScope.error = true;
+          //       $rootScope.errMsgRootScope =
+          //         'Provide a value in segment filter';
+          //       $scope.showErr = true;
+          //       $scope.showSpinner = false;
+          //       $timeout(function () {
+          //         $rootScope.error = false;
+          //       }, 5000);
+          //       return;
+          //       // $scope.isErr = 'error';
+          //       // console.log("error class", $scope.isErr);
+          //     } else if ($scope.filters[i].method == '') {
+          //       $rootScope.error = true;
+          //       $rootScope.errMsgRootScope =
+          //         'Provide a value in segment filter';
+          //       $scope.showSpinner = false;
+          //       $timeout(function () {
+          //         $rootScope.error = false;
+          //       }, 5000);
+          //       return;
+          //     } else {
+          //       $scope.showErr = false;
+          //       // $scope.isErr = '';
+          //     }
+          //   };
+          //   if ($scope.filters.length > 0) {
+          //     $scope.fromTime = $scope.filters[0].timeRangeValue;
+          //   } else {
+          //     $scope.fromTime = '';
+          //   }
+          //   $scope.filtersBackend = [];
+          //   console.log("run Query: ", $scope.filters);
+          //   for (var i = 0; i < $scope.filters.length; i++) {
+          //     $scope.filtersBackend.push({
+          //       method: $scope.filters[i].method,
+          //       type: $scope.filters[i].type,
+          //       name: $scope.filters[i].name,
+          //       op: $scope.filters[i].op,
+          //       val: $scope.filters[i].val,
+          //       type: $scope.filters[i].type,
+          //     })
+          //   };
+
+          //   $scope.queryObj.list = $scope.selectedIcon.toLowerCase();
+          //   $scope.queryObj.op = $scope.text.toLowerCase();
+          //   $scope.queryObj.filters = $scope.filtersBackend;
+          //   $scope.queryObj.fromAgo = $scope.fromTime;
+
+          //   var stringifiedQuery = stringify($scope.queryObj);
+          //   console.log('queryObj', $scope.queryObj);
+          //   console.log('stringifiedQuery',
+          //     stringifiedQuery);
+
+
+          //   modelsQuery.runQueryAndGetUsers(currentAppId,
+          //     stringifiedQuery, populateTable);
+
+          // }
+
+          $scope.saveQuery = function () {
+            for (var i = 0; i < $scope.filters.length; i++) {
+              console.log("val: ", $scope.filters[i].val);
+              if ($scope.filters[i].val == '' && ($scope
+                .filters[i].method ==
+                'count' || $scope.filters[i].method ==
+                'attr')) {
+                console.log("val: ", $scope.filters[i]
+                  .val);
+                $rootScope.error = true;
+                $rootScope.errMsgRootScope =
+                  'Provide a value in segment filter';
+                $scope.showErr = true;
+                $timeout(function () {
+                  $rootScope.error = false;
+                }, 5000);
+                return;
+                // $scope.isErr = 'error';
+                // console.log("error class", $scope.isErr);
+              } else {
+                $scope.showErr = false;
+                // $scope.isErr = '';
+              }
+            };
+            $scope.showPopover = !$scope.showPopover;
+          }
+
+          $scope.closePopover = function (event) {
+            event.preventDefault();
+            $scope.showPopover = false;
+          }
+
+          $scope.closeUpdatePopover = function (event) {
+            event.preventDefault();
+            $scope.showUpdatePopover = false;
+          }
+
+          $scope.updateQuery = function () {
+            $scope.showUpdatePopover = !$scope.showUpdatePopover;
+          }
+
+
+          $scope.showSpinner = true;
+          $scope.showErrorOnInput = true;
+          $scope.filtersBackend = [];
+          $scope.fromTime = '';
+          $scope.queryObj.list = $scope.selectedIcon.toLowerCase();
+          $scope.queryObj.op = $scope.text.toLowerCase();
+          $scope.queryObj.filters = $scope.filtersBackend;
+          $scope.queryObj.fromAgo = $scope.fromTime;
+
+          var stringifiedQuery = stringify($scope.queryObj);
+          console.log('queryObj', $scope.queryObj);
+          console.log('stringifiedQuery',
+            stringifiedQuery);
+
+
+          modelsQuery.runQueryAndGetUsers(currentAppId,
+            stringifiedQuery, populateTable);
+
+          var populateUpdatedSegment = function (err, data) {
+            if (err) {
+              console.log(
+                "error in updating segment name");
+              return err;
+            }
+            console.log("updated segment: ", data);
+            $scope.segmentsCreatedName[$scope.selectedIndex]
+              .id = data._id;
+            $scope.segmentsCreatedName[$scope.selectedIndex]
+              .name = data.name;
+
+          }
+
+          $scope.updateSegment = function () {
+            $scope.updateSegmentObj = {};
+            $scope.filtersBackend = [];
+            console.log("update segment: ", $scope.filters);
+            for (var i = 0; i < $scope.filters.length; i++) {
+              $scope.filtersBackend.push({
+                method: $scope.filters[i].method,
+                type: $scope.filters[i].type,
+                name: $scope.filters[i].name,
+                op: $scope.filters[i].op,
+                val: $scope.filters[i].val
+
+              })
+            };
+            $scope.updateSegmentObj.list = $scope.selectedIcon
+              .toLowerCase();
+            $scope.updateSegmentObj.name = $scope.updatedSegmentName;
+            $scope.updateSegmentObj.op = $scope.text.toLowerCase();
+            $scope.updateSegmentObj.filters = $scope.filtersBackend;
+            $scope.updateSegmentObj.fromAgo = $scope.filters[0].timeRangeValue;
+            console.log("updateSegmentObj: ", $scope.updateSegmentObj);
+
+            modelsSegment.updateSegmentModels(currentAppId,
+              segmentService.getSegmentId(), $scope.updateSegmentObj,
+              populateUpdatedSegment);
+            $scope.showUpdatePopover = false;
+          }
+
+          var populateNewSegment = function (err, data) {
+            if (err) {
+              return err;
+            }
+            $scope.showPopover = false;
+            $scope.segmentsCreatedName.push({
+              id: data._id,
+              name: data.name
+            })
+          }
+
+          $scope.createSegmentObj = {};
+          $scope.createSegment = function () {
+            $scope.filtersBackend = [];
+            console.log("create segment: ", $scope.filters);
+            for (var i = 0; i < $scope.filters.length; i++) {
+              $scope.filtersBackend.push({
+                method: $scope.filters[i].method,
+                type: $scope.filters[i].type,
+                name: $scope.filters[i].name,
+                op: $scope.filters[i].op,
+                val: $scope.filters[i].val
+
+              })
+            };
+            $scope.createSegmentObj.list = $scope.selectedIcon
+              .toLowerCase();
+            $scope.createSegmentObj.name = $scope.segmentName;
+            $scope.createSegmentObj.op = $scope.text.toLowerCase();
+            $scope.createSegmentObj.filters = $scope.filtersBackend;
+            $scope.createSegmentObj.fromAgo = $scope.filters[0].timeRangeValue;
+            console.log("createSegmentObj: ", $scope.createSegmentObj);
+
+            modelsSegment.createSegment(currentAppId,
+              $scope.createSegmentObj,
+              populateNewSegment);
+
+
+          }
+
+
+
+          var populateFilterAndRunQuery = function () {
+            $scope.segmentLength = '';
+            $scope.queryObject = {};
+            $scope.filtersFrontEnd = [];
+            $scope.fromTimeBackend = ''
+            var getFilters = [];
+            $scope.filters = [];
+            console.log("$scope.queries: ", $scope.queries);
+            console.log("segment: ", segmentService.getSingleSegment());
+            if (segmentService.getSingleSegment()
+              .fromAgo) {
+              $scope.fromTimeBackend = segmentService.getSingleSegment()
+                .fromAgo;
+            } else {
+              $scope.fromTimeBackend = '';
+            }
+            console.log("$scope.fromTimeBackend: ", $scope.fromTimeBackend,
+              $scope.timeSpan.length);
+            for (var i = 0; i < $scope.timeSpan.length; i++) {
+              console.log("$scope.timeSpan[i]: $scope.fromTimeBackend: ",
+                $scope.timeSpan[i].value);
+              if ($scope.fromTimeBackend === $scope.timeSpan[i].value) {
+                console.log("$scope.fromTimeBackend: ", $scope.timeSpan[i]
+                  .value);
+                $scope.fromTimeFrontEnd = $scope.timeSpan[i].name;
+                $scope.fromTimeFrontEndValue = $scope.timeSpan[i].value;
+                $scope.otherTimeRange = $scope.fromTimeFrontEnd;
+                console.log("otherTimeRange: ", $scope.otherTimeRange);
+                break;
+              }
+            };
+
+
+            console.log("$scope.fromTimeFrontEnd: ", $scope.fromTimeFrontEnd);
+            // if($scope.fromTimeBackend === 1) {
+            //   $scope.fromTimeFrontEnd = 'within a day';
+            // }
+
+            getFilters = segmentService.getSingleSegment()
+              .filters;
+            $scope.segmentLength = getFilters.length;
+            console.log("getFilters: ", getFilters);
+            for (var i = 0; i < getFilters.length; i++) {
+              $scope.filterValueText = '';
+              var filterValueText = '';
+              for (var j = 0; j < $scope.healthStatusValuesname.length; j++) {
+                console.log("get filters val healthStatusValuesname key: ",
+                  getFilters[i].val, $scope.healthStatusValuesname[i].key,
+                  i);
+                if (getFilters[i].val == $scope.healthStatusValuesname[j]
+                  .key) {
+                  filterValueText = $scope.healthStatusValuesname[j]
+                    .name;
+                  console.log("inside for loop filterValueText: ",
+                    filterValueText)
+                }
+                // break;
+              };
+
+              for (var k = 0; k < $scope.payingStatusValues.length; k++) {
+                console.log("getFilters ??? null: ", getFilters[i], i);
+                if (getFilters[i].val == $scope.payingStatusValues[k].key) {
+                  filterStatusValueText = $scope.payingStatusValues[k].name;
+                }
+              };
+
+              console.log("filterValueText: ", filterValueText);
+              var buttonText = '';
+              var btnName = '';
+              var btnQuery = '';
+              var chkMethod = false;
+              var operationText = '';
+              console.log("op text: ", getFilters[i].op);
+              if (getFilters[i].op != '') {
+                for (var j = 0; j < $scope.queries.length; j++) {
+                  console.log("$scope.queries[j]: ",
+                    $scope.queries[
+                      j]);
+                  if ($scope.queries[j].key ==
+                    getFilters[i].op) {
+                    operationText = $scope.queries[
+                      j].name;
+                  }
+                };
+              }
+              if (getFilters[i].method == 'hasdone' || getFilters[i].method ==
+                'hasnotdone' || getFilters[i].method == 'count') {
+                if (getFilters[i].type == 'link') {
+                  btnQuery = 'Clicked on ' + getFilters[i].name;
+                }
+
+                if (getFilters[i].type == 'form') {
+                  btnQuery = 'Submitted form ' + getFilters[i].name;
+                }
+
+                if (getFilters[i].type == 'page') {
+                  btnQuery = 'Viewed ' + getFilters[i].name;
+                }
+
+                if (getFilters[i].type == 'auto') {
+                  btnQuery = getFilters[i].name;
+                }
+
+                if (getFilters[i].type == 'track') {
+                  btnQuery = getFilters[i].name;
+                }
+
+              }
+              if (getFilters[i].method == 'hasdone') {
+                showHealthStatus = false;
+                showPayingStatus = false;
+                showScore = false;
+                showDatePicker = false;
+                showOtherAttributesQuery = false;
+                buttonText = "Has Done";
+                btnName = getFilters[i].name;
+                chkMethod = false;
+                isEvent = true;
+                timeRange = $scope.fromTimeFrontEnd;
+                timeRangeValue = $scope.fromTimeFrontEndValue;
+              }
+              if (getFilters[i].method == 'hasnotdone') {
+                showHealthStatus = false;
+                showPayingStatus = false;
+                showScore = false;
+                showDatePicker = false;
+                showOtherAttributesQuery = false;
+                buttonText = "Has not Done";
+                btnName = getFilters[i].name;
+                chkMethod = false;
+                isEvent = true;
+                timeRange = $scope.fromTimeFrontEnd;
+                timeRangeValue = $scope.fromTimeFrontEndValue;
+              }
+              if (getFilters[i].method == 'count') {
+                showHealthStatus = false;
+                showPayingStatus = false;
+                showScore = false;
+                showDatePicker = false;
+                showOtherAttributesQuery = false;
+                buttonText = "Count of " + btnQuery;
+                btnName = getFilters[i].name;
+                chkMethod = true;
+                isEvent = true;
+                timeRange = $scope.fromTimeFrontEnd;
+                timeRangeValue = $scope.fromTimeFrontEndValue;
+              }
+              if (getFilters[i].method == 'attr') {
+                if (getFilters[i].name == 'score') {
+                  showHealthStatus = false;
+                  showPayingStatus = false;
+                  showScore = true;
+                  showDatePicker = false;
+                  showOtherAttributesQuery = false;
+                } else if (getFilters[i].name == 'health') {
+                  showHealthStatus = true;
+                  showPayingStatus = false;
+                  showScore = false;
+                  showDatePicker = false;
+                  showOtherAttributesQuery = false;
+                  filterValueText = filterValueText;
+                } else if (getFilters[i].name == 'status') {
+                  showHealthStatus = false;
+                  showPayingStatus = true;
+                  showScore = false;
+                  showDatePicker = false;
+                  showOtherAttributesQuery = false;
+                  filterValueText = filterStatusValueText;
+                } else if (getFilters[i].name == 'joined' || getFilters[i]
+                  .name == 'lastSession') {
+                  showHealthStatus = false;
+                  showPayingStatus = false;
+                  showScore = false;
+                  showDatePicker = true;
+                  showOtherAttributesQuery = false;
+                } else {
+                  showHealthStatus = false;
+                  showPayingStatus = false;
+                  showScore = false;
+                  showDatePicker = false;
+                  showOtherAttributesQuery = true;
+                }
+                buttonText = getFilters[i].name;
+                btnName = getFilters[i].name;
+                chkMethod = true;
+                isEvent = false;
+                timeRange = $scope.fromTimeFrontEnd;
+                timeRangeValue = $scope.fromTimeFrontEndValue;
+              }
+              console.log("operation text: ", operationText);
+              $scope.filters.push({
+                method: getFilters[i].method,
+                btntext: buttonText,
+                checkMethod: chkMethod,
+                name: btnName,
+                query: btnQuery,
+                op: getFilters[i].op,
+                optext: operationText,
+                val: getFilters[i].val,
+                type: getFilters[i].type,
+                timeRange: timeRange,
+                isEvent: isEvent,
+                timeRangeValue: timeRangeValue,
+                valuetext: filterValueText,
+                showHealthStatus: showHealthStatus,
+                showPayingStatus: showPayingStatus,
+                showScore: showScore,
+                showDatePicker: showDatePicker,
+                showOtherAttributesQuery: showOtherAttributesQuery,
+                otherTimeRange: $scope.otherTimeRange
+              })
+              // if($scope.segmentClicked && i == 0) {
+              //     console.log("$scope.filters: ", $scope.filters);
+              //     $scope.firstFilterShowQuery = true;
+              // }
+
+            };
+
+            console.log("$scope.otherTimeRange: ", $scope.otherTimeRange);
+            console.log("$scope.filters: ", $scope.filters);
+            $scope.otherTimeRange = $scope.filters[0].timeRange;
+            $scope.queryObject.list = segmentService.getSingleSegment()
+              .list;
+            $scope.queryObject.op = segmentService.getSingleSegment()
+              .op;
+            $scope.text = $scope.queryObject.op.toUpperCase();
+            $scope.queryObject.filters = getFilters;
+            console.log("queryobject: ", $scope.queryObject);
+
+            var stringifiedQueryObject = stringify($scope.queryObject);
+            console.log('queryObj', $scope.queryObject);
+            console.log('stringifiedQuery',
+              stringifiedQueryObject);
+
+            modelsQuery.runQueryAndGetUsers(currentAppId,
+              stringifiedQueryObject,
+              populateTable);
+
+
+          }
+
+          $scope.currentSegment = [];
+          $scope.showQuery = function (segId, index, segname) {
+            $scope.segmentClicked = true;
+            $scope.showUpdateButton = true;
+            $scope.showSpinner = true;
+            if (segname.name == 'Good Health' || segname.name ==
+              'Average Health' || segname.name == 'Poor Health') {
+              // $scope.showUpdateButton = false;
+              $scope.selectedIndex = index;
+              $scope.selectedIndex1 = '';
+              $scope.isHealth = true;
+            } else {
+              $scope.isHealth = false;
+              $scope.selectedIndex1 = index;
+              $scope.selectedIndex = '';
+            }
+            this.showAutoMsgBtn = true;
+            $scope.showSaveButton = false;
+            $scope.updatedSegmentName = segname.name;
+            segmentService.setSegmentId(segId);
+            $scope.sid = segId;
+            console.log("segname: ", segname);
+            $scope.currentSegment.id = segname.id;
+            $scope.currentSegment.name = segname.name;
+            $scope.segmentNameClicked = segname.name;
+            console.log("segment name: ", $scope.segmentNameClicked);
+            segmentService.setSingleSegment($scope.currentSegment);
+            console.log("segmentId: ", segmentService.getSegmentId(),
+              segmentService.getSingleSegment());
+            modelsSegment.getSegment(currentAppId, segId,
+              populateFilterAndRunQuery);
+          }
+
+          $scope.showAutoMsgButton = function () {
+            this.showAutoMsgBtn = true;
+          }
+
+          $scope.hideAutoMsgButton = function () {
+            this.showAutoMsgBtn = false;
+          }
+
+          $scope.isErr = 'error';
+
+          $scope.popoverForm = function () {
+            console.log($scope.filters);
+            for (var i = 0; i < $scope.filters.length; i++) {
+              console.log("val: ", $scope.filters[i].val);
+              if ($scope.filters[i].val == '' && $scope.filters[
+                  i].method ==
+                'count') {
+                console.log("val: ", $scope.filters[i]
+                  .val);
+                $scope.showErr = true;
+              } else {
+                $scope.showErr = false;
+              }
+            };
+          }
+
+        }
+
+        var showProfile = function (err, data, uid) {
+          $location.path('/apps/' + currentAppId +
+            '/users/profile/' + uid);
+        }
+
+        $scope.showUserProfile = function (id) {
+          UserModel.getUserProfile(id, currentAppId,
+            showProfile);
+        }
+
+        console.log("App Id: ", currentAppId);
+
+
+        modelsQuery.getQueries(currentAppId, fillData);
+
+
+
+
+        $scope.showErr = false;
+
+        $scope.hideMaxMsgErrorAlert = function () {
+          $scope.showMaxMsgErr = false;
+        }
+
+        var data = [];
+        $scope.users = [];
+
+        $scope.checkboxes = {
+          'checked': false,
+          items: {}
+        };
+
+        console.log("checkboxes: ", $scope.checkboxes);
+
+        $scope.$watch('checkboxes.all', function (value) {
+          angular.forEach($scope.users, function (item) {
+            if (angular.isDefined(item.id)) {
+              $scope.checkboxes.items[item.id] =
+                value;
+            }
+          });
+        });
+
+        $scope.$watch('checkboxes.items', function (value) {
+          // if($scope.checkboxes.items.length > 0) {
+          //   $scope.mailLength = false;
+          // }
+          console.log("$watch checkboxes: ", $scope.checkboxes
+            .items);
+        })
+
+
+        $scope.openModal = function () {
+          $scope.mail = [];
+          console.log("items ticked: ", _.keys(
+              $scope.checkboxes
+              .items)
+            .length);
+          if (_.keys($scope.checkboxes.items)
+            .length == 0) {
+            $rootScope.error = true;
+            $rootScope.errMsgRootScope = 'Please select at least one user';
+            $timeout(function () {
+              $rootScope.errMsgRootScope = '';
+              $rootScope.error = false;
+            }, 5000);
+            return;
+          }
+          console.log("checkboxes items: ",
+            $scope.checkboxes
+            .items);
+
+          console.log("email objects: ", $scope.mail);
+          var prop, value;
+          var keys = _.keys($scope.checkboxes
+            .items);
+          for (var i = 0; i < _.keys($scope
+              .checkboxes
+              .items)
+            .length; i++) {
+            prop = keys[i];
+            console.log("id: ", prop);
+            value = $scope.checkboxes.items[
+              prop];
+            console.log("value: ", value);
+            if (value == true) {
+              $scope.mail.push(prop);
+            }
+          };
+
+          if ($scope.mail.length == 0) {
+            $rootScope.error = true;
+            $rootScope.errMsgRootScope =
+              'Please select at least one user';
+            $timeout(function () {
+              $rootScope.errMsgRootScope = '';
+              $rootScope.error = false;
+            }, 5000);
+            return;
+          }
+          UidService.set($scope.mail);
+
+
+          if ($scope.mail.length > 50) {
+            $rootScope.error = true;
+            $rootScope.errMsgRootScope =
+              'Maximum Messages that can be sent at once is 50';
+            $timeout(function () {
+              $rootScope.error = false;
+            }, 5000);
+          } else {
+
+            var modalInstance = $modal.open({
+              templateUrl: '/templates/usersmodule/message.modal.html',
+              controller: 'sendMessageCtrl',
+              size: 'lg'
+            });
+
+            modalInstance.opened.then(function () {
+              // $log.info(
+              //   'message modal template downloaded'
+              // );
+            })
+
+            var populateMsgOnCreation = function (err,
+              lastNote) {
+              if (err) {
+                return;
+              }
+            }
+            modalInstance.result.then(function (mail) {
+              var sanitizedMsg = mail.msgtext.replace(/\n/g, '<br/>');
+
+              console.log("subject : ", mail.sub);
+              console.log("msgtext: ", mail.msgtext);
+              console.log("sanitizedMsg: ", sanitizedMsg);
+              console.log("uid : ", UidService.get());
+              MsgService.sendManualMessage(mail.sub,
+                sanitizedMsg, UidService.get(), currentAppId,
+                populateMsgOnCreation);
+            }, function () {
+              // $log.info('Modal dismissed at: ' + new Date());
+            });
+          }
+
+        };
+
+      })
+
+  }
+])
 
 .controller('sendMessageCtrl', ['$scope', 'MsgService', '$modal', 'UidService',
   '$modalInstance',

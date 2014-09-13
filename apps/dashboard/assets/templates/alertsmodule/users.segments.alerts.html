@@ -1,0 +1,46 @@
+<div ng-include src="'/templates/navbar/navbar.html'"></div>
+<div class="panel">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <i class="fa fa-warning"></i> Alerts
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="row">
+            <div class="text-center" ng-show="false"><br><span>There are no Alerts!! Create one</span><br><br></div>
+            <div class="col-lg-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <th class="text-center">Segment</th>
+                            <th class="text-center">Title</th>
+                            <th class="text-center">When</th>
+                            <th class="text-center">Team Member</th>
+                            <th></th>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="alert in allAlerts" ng-click="editAlert(alert._id)" style="cursor: pointer;">
+                              <td class="text-center">{{alert.segment.name}}</td>
+                              <td class="text-center">{{alert.title}}</td>
+                              <td class="text-center">{{alert.when}}</td>
+                              <td class="text-center">{{alert.team}}</td>
+                            </tr>
+
+
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.table-responsive -->
+            </div>
+            <div class="text-center" style="padding-top: 20px;">
+                <div class="col-md-push-4 col-md-4">
+                    <a class="btn btn-info btn-block" ng-click="openNewAlertModal('lg')">Create a New Alert</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

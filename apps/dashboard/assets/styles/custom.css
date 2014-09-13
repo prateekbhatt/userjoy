@@ -5,7 +5,7 @@ html, body {
 }
 
 body {
-    padding: 72px 0 0 0;
+    padding: 60px 0 0 0;
 }
 /*Placeholder Font Color*/
 
@@ -225,7 +225,7 @@ height: 100%;
     color: #777;
 }
 .navbar-inverse .navbar-nav > li > a {
-    color: #999;
+    color: #777;
 }
 .navbar-inverse .navbar-nav > li > a:hover, .navbar-inverse .navbar-nav > li > a:focus {
     color: #333;
@@ -891,6 +891,12 @@ pre code {
 
 .progress-bar.active {
   -webkit-animation: progress-bar-stripes 2s linear infinite;
+}
+
+ul.dropdown-menu-form {
+  padding: 5px 10px 0;
+  max-height: 300px;
+  overflow-y: scroll;
 }
 
 /*.active-smart-filters {

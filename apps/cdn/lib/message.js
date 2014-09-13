@@ -90,7 +90,7 @@ Message.prototype.show = function () {
 
   document.getElementById(MSG_OUTER_DIV)
     .style.background = (document.getElementById(MSG_TEMPLATE_ID)
-      .style.display === 'block') ? 'rgba(0, 0, 0, 0.4)': '';
+      .style.display === 'block') ? 'rgba(0, 0, 0, 0.4)' : '';
   document.getElementById(MSG_OUTER_DIV)
     .style.height = (document.getElementById(MSG_TEMPLATE_ID)
       .style.display === 'block') ? '100%' : '';
@@ -206,9 +206,26 @@ Message.prototype.send = function () {
       document.getElementById(MSG_SEND_FEEDBACK_ID)
         .disabled = false;
 
+
+
       setTimeout(function () {
         document.getElementById(MSG_TEMPLATE_ID)
           .style.display = 'none';
+        document.getElementById(MSG_OUTER_DIV)
+          .style.background = '';
+        document.getElementById(MSG_OUTER_DIV)
+          .style.height = '';
+        document.getElementById(MSG_OUTER_DIV)
+          .style.width = '';
+        document.getElementById(MSG_OUTER_DIV)
+          .style.position = '';
+        document.getElementById(MSG_OUTER_DIV)
+          .style.left = '';
+        document.getElementById(MSG_OUTER_DIV)
+          .style.top = '';
+
+        document.getElementById(MSG_OUTER_DIV)
+          .style.zIndex = '';
       }, 2000);
     },
 

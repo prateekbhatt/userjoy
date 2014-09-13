@@ -17,4 +17,5 @@ angular.module('services', [
   'services.InviteIdService',
   'services.NotesService',
   'services.CurrentAccountService',
+  'services.AlertService',
 ]);

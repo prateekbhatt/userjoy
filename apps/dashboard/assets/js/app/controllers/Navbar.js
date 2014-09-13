@@ -58,7 +58,7 @@ angular.module('do.navbar', [])
 
         var callback = function (err) {
 
-          if(err) {
+          if (err) {
             console.log("here is the error");
             return;
           }
@@ -244,6 +244,52 @@ angular.module('do.navbar', [])
   }
 ])
 
+.controller('sideNavbarCtrl', ['$scope', '$cookieStore',
+  function ($scope, $cookieStore) {
+    console.log("inside sideNavbarCtrl");
+    var mobileView = 992;
+
+    $scope.getWidth = function() { return window.innerWidth; };
+
+    $scope.$watch($scope.getWidth, function(newValue, oldValue)
+    {
+        if(newValue >= mobileView)
+        {
+            if(angular.isDefined($cookieStore.get('toggle')))
+            {
+                if($cookieStore.get('toggle') == false)
+                {
+                    $scope.toggle = false;
+                }
+                else
+                {
+                    $scope.toggle = true;
+                }
+            }
+            else
+            {
+                $scope.toggle = true;
+            }
+        }
+        else
+        {
+            $scope.toggle = false;
+        }
+
+    });
+
+    $scope.toggleSidebar = function()
+    {
+        console.log("inside toggleSidebar");
+        $scope.toggle = ! $scope.toggle;
+
+        $cookieStore.put('toggle', $scope.toggle);
+    };
+
+    window.onresize = function() { $scope.$apply(); };
+  }
+])
+
 .controller('navbarInstallationCtrl', ['$scope', 'AuthService', '$location',
   'LoginService', 'AppService', '$log', 'CurrentAppService', 'AppModel',
   'AccountModel',
@@ -301,7 +347,7 @@ angular.module('do.navbar', [])
 
         var callback = function (err) {
 
-          if(err) {
+          if (err) {
             console.log("error");
             return;
           }
@@ -377,17 +423,19 @@ angular.module('do.navbar', [])
           }
 
           $scope.goToAccountSettings = function () {
-            if($scope.appId != 'onboarding') {
+            if ($scope.appId != 'onboarding') {
               $location.path('/apps/' + $scope.appId + '/account/settings');
             } else {
-              AccountModel.get(function(err, acc) {
+              AccountModel.get(function (err, acc) {
                 console.log("default app : ", acc);
-                if(err) {
+                if (err) {
                   console.log("error");
-                  $location.path('/apps/' + AppService.getLoggedInApps()[0]._id + '/account/settings');
+                  $location.path('/apps/' + AppService.getLoggedInApps()[
+                    0]._id + '/account/settings');
                   return;
                 }
-                $location.path('/apps/' + acc.defaultApp + '/account/settings');
+                $location.path('/apps/' + acc.defaultApp +
+                  '/account/settings');
 
               })
             }

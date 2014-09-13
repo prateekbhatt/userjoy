@@ -13,4 +13,5 @@ angular.module('models', [
   'models.Segment',
   'models.automate',
   'models.Invite',
+  'models.alerts',
 ]);

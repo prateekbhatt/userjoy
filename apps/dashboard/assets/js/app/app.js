@@ -32,6 +32,8 @@ var app = angular.module('dodatado', [
   'angular-tour',
   'flash',
   'do.demo',
+  'do.alerts',
+  'ngCookies',
 ])
 
 .directive('fallbackSrc', function () {
