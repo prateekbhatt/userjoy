@@ -955,7 +955,7 @@ console.log("config.apiUrl: ", config.apiUrl);
                   name: '' // initial filter
                 },
                 sorting: {
-                  name: 'asc'
+                  date: 'desc'
                 }
               }, {
                 filterSwitch: true,
