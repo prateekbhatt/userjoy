@@ -6,6 +6,9 @@ echo 'Adding do, app.do, api.do, cdn.do, demo.do to /etc/hosts'
 
 ETCHOSTFILE=/etc/hosts
 ETCHOSTURL=127.0.0.1
+
+# CHECK: REPLACE THE FOLLOWING WITH YOUR CONFIG BEFORE RUNNING
+
 declare -a DOHOSTS=( "do.localhost" "app.do.localhost" "api.do.localhost" "cdn.do.localhost" "demo.do.localhost" "www.do.localhost" "www.app.do.localhost" "www.api.do.localhost" "www.cdn.do.localhost" "www.demo.do.localhost" )
 
 for host in "${DOHOSTS[@]}"

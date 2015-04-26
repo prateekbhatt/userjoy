@@ -37,6 +37,7 @@ if [[ $1 == 'dev' ]]; then
   echo 'Creating nginx development files in sites-available and'
   echo 'creating symlinks for nginx config files from sites-available in sites-enabled'
 
+  # CHECK: REPLACE THE FOLLOWING WITH YOUR CONFIG BEFORE RUNNING
 
   for app in "${DO_APPS[@]}"; do
 
