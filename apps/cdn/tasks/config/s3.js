@@ -11,13 +11,15 @@
  */
 module.exports = function (grunt) {
 
+  var config = require('../../../config')('api');
+
   grunt.config.set('s3', {
 
     // TODO: aws keys should be defined in the config file
     options: {
-      key: 'YOUR_AWS_KEY',
-      secret: 'YOUR_AWS_SECRET',
-      bucket: 'cdn.userjoy.co',
+      key: config.awsKey,
+      secret: config.awsSecret,
+      bucket: config.awsS3CDNBucket,
       access: 'public-read',
       gzip: true
     },

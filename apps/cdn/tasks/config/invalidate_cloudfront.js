@@ -11,13 +11,15 @@
  */
 module.exports = function (grunt) {
 
+  var config = require('../../../config')('api');
+
   grunt.config.set('invalidate_cloudfront', {
 
     // TODO: aws keys should be defined in the config file
     options: {
-      key: 'YOUR_AWS_KEY',
-      secret: 'YOUR_AWS_SECRET',
-      distribution: 'YOUR_AWS_CLOUDFRONT_DISTRIBUTION_ID'
+      key: config.awsKey,
+      secret: config.awsSecret,
+      distribution: config.awsCloudfrontDistributionId
     },
     dist: {
       files: [{

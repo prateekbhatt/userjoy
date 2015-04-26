@@ -62,6 +62,7 @@ module.exports.session = function loadSessionMiddleware(app) {
   var cookieDomain = config.cookieDomain;
   var redisHost = config.redisHost;
   var sessionSecret = config.sessionSecret;
+  var sessionKey = config.sessionKey;
 
 
   /**
@@ -78,8 +79,8 @@ module.exports.session = function loadSessionMiddleware(app) {
   // Express Session middleware
   // TODO : ADD SESSION CONFIG TO A DIFFERENT FILE
   app.use(session({
-    secret: 'YOUR_SESSION_SECRET',
-    key: 'userjoy.sid',
+    secret: sessionSecret,
+    key: sessionKey,
     cookie: {
       domain: cookieDomain,
       maxAge: 864000000
