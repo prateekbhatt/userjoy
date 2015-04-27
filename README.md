@@ -1,7 +1,12 @@
 ![UserJoy.co](/apps/website/assets/images/userjoy_logo.png)
 ==========
 
-Analytics and CRM for SaaS (Subscription as a Service) applications
+UserJoy is an analytics and CRM tool for SaaS (Subscription as a Service) applications. It helps you convert free accounts, increase user engagement, and reduce churn.
+
+You can learn more about the features and benefits on the project [website](https://userjoy.co), or by directly visiting the following links :
+* [Convert more free / trial accounts to paid accounts](https://userjoy.co/convert)
+* [Improve customer engagement and retention](https://userjoy.co/retain)
+* [Increasing renewals, upsells and referrals](https://userjoy.co/monetize)
 
 ## Demo
 A demo is running at https://app.userjoy.co/demo . Select 'Demo App' in the second-right dropdown (besides the 'Account' dropdown).
@@ -34,3 +39,7 @@ Before installing, you need to search (grep) for "CHECK: REPLACE THE FOLLOWING W
 Run `./install.sh` from the root directory
 
 Then run `userjoy` in the command line to get a list of commands to start / stop / diagnose the application
+
+## License
+
+Released under the [MIT License](/LICENSE.txt)
