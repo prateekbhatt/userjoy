@@ -3,22 +3,22 @@
 
 UserJoy is an analytics and CRM tool for SaaS (Subscription as a Service) applications. It helps you convert free accounts, increase user engagement, and reduce churn.
 
-You can learn more about the features and benefits on the project [website](https://userjoy.co), or by directly visiting the following links :
-* [Convert more free / trial accounts to paid accounts](https://userjoy.co/convert)
-* [Improve customer engagement and retention](https://userjoy.co/retain)
-* [Increasing renewals, upsells and referrals](https://userjoy.co/monetize)
+You can learn more about the features and benefits on the project [website](http://userjoy.co), or by directly visiting the following links :
+* [Convert more free / trial accounts to paid accounts](http://userjoy.co/convert)
+* [Improve customer engagement and retention](http://userjoy.co/retain)
+* [Increasing renewals, upsells and referrals](http://userjoy.co/monetize)
 
 ## Demo
-A demo is running at https://app.userjoy.co/demo . Select 'Demo App' in the second-right dropdown (besides the 'Account' dropdown).
+A demo is running at http://app.userjoy.co/demo . Select 'Demo App' in the second-right dropdown (besides the 'Account' dropdown).
 
 ## Structure
 
 The UserJoy application itself consists of multiple Node.js / JS applications:. These are present in the `apps/` directory.
 * **api**: The backend API. Built using Express.js and MongoDB and runs at `api.userjoy.co`
 * **cdn**: It consists of the source code to generate the `userjoy.js` script which tracks and sends the event data from client applications to the `track` api
-* **dashboard**: The dashboard. Running at `https://app.userjoy.co`
-* **demo**: A demo app with static data. Running at `https://app.userjoy.co`
-* **website**: The main website at https://userjoy.co
+* **dashboard**: The dashboard. Running at `http://app.userjoy.co`
+* **demo**: A demo app with static data. Running at `http://app.userjoy.co`
+* **website**: The main website at http://userjoy.co
 * **workers**: A Node.js app which runs the background workers to run the periodic analysis, and send the behavioral emails.
 
 
